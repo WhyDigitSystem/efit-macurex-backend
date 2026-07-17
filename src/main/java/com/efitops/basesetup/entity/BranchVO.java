@@ -33,6 +33,8 @@ public class BranchVO {
 	private String branch;
 	@Column(name = "branchcode")
 	private String branchCode;
+	
+	
 	@Column(name = "orgid")
 	private Long orgId;
 	@Column(name = "addressline1")

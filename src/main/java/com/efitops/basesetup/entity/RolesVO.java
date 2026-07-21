@@ -1,5 +1,6 @@
 package com.efitops.basesetup.entity;
 
+
 import java.util.List;
 
 import javax.persistence.CascadeType;

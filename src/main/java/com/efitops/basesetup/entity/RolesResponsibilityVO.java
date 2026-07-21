@@ -1,5 +1,6 @@
 package com.efitops.basesetup.entity;
 
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

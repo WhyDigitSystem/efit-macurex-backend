@@ -45,19 +45,19 @@ import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.StateVO;
 import com.efitops.basesetup.entity.UserVO;
 import com.efitops.basesetup.exception.ApplicationException;
-import com.efitops.basesetup.repo.CityRepo;
-import com.efitops.basesetup.repo.CompanyRepo;
-import com.efitops.basesetup.repo.CountryRepo;
-import com.efitops.basesetup.repo.CurrencyRepo;
-import com.efitops.basesetup.repo.EmployeeRepo;
-import com.efitops.basesetup.repo.FinScreenRepo;
-import com.efitops.basesetup.repo.FinancialYearRepo;
-import com.efitops.basesetup.repo.RegionRepo;
-import com.efitops.basesetup.repo.ResponsibilitiesRepo;
-import com.efitops.basesetup.repo.RoleRepo;
-import com.efitops.basesetup.repo.ScreenNamesRepo;
-import com.efitops.basesetup.repo.StateRepo;
-import com.efitops.basesetup.repo.UserRepo;
+import com.efitops.basesetup.repository.BankDetailsRepo;
+import com.efitops.basesetup.repository.CityRepo;
+import com.efitops.basesetup.repository.CompanyRepo;
+import com.efitops.basesetup.repository.CountryRepo;
+import com.efitops.basesetup.repository.CurrencyRepo;
+import com.efitops.basesetup.repository.EmployeeRepo;
+import com.efitops.basesetup.repository.FinScreenRepo;
+import com.efitops.basesetup.repository.FinancialYearRepo;
+import com.efitops.basesetup.repository.RegionRepo;
+import com.efitops.basesetup.repository.ResponsibilitiesRepo;
+import com.efitops.basesetup.repository.ScreenNamesRepo;
+import com.efitops.basesetup.repository.StateRepo;
+import com.efitops.basesetup.repository.UserRepo;
 import com.efitops.basesetup.util.CryptoUtils;
 
 @Service
@@ -87,17 +87,12 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	@Autowired
 	CompanyRepo companyRepo;
 
-	@Autowired
-	EmployeeRepo employeeRepo;
 
 	@Autowired
 	UserRepo userRepo;
 
 	@Autowired
 	FinancialYearRepo financialYearRepo;
-
-	@Autowired
-	RoleRepo roleRepo;
 
 	@Autowired
 	ResponsibilitiesRepo responsibilitiesRepo;
@@ -111,11 +106,13 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	@Autowired
 	BankDetailsRepo bankDetailsRepo;
 	
+	@Autowired
+	EmployeeRepo employeeRepo;
+	
 	@PersistenceContext
 	private EntityManager entityManager;
 	
-	@Autowired
-	CommonNotificationService commonNotificationService;
+
 
 	// Company
 
@@ -894,7 +891,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		getCurrencyVOFromCurrencyDTO(currencyVO, currencyDTO);
 
 		currencyRepo.save(currencyVO);
-		commonNotificationService.generateNotification(currencyVO.getScreenCode(), currencyVO.getId(), oldCurrency, currencyVO);
+//		commonNotificationService.generateNotification(currencyVO.getScreenCode(), currencyVO.getId(), oldCurrency, currencyVO);
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", message);

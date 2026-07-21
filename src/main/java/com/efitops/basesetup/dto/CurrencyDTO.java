@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,3 +21,5 @@ public class CurrencyDTO {
 	private boolean active;
 	private String createdBy;
 }
+
+

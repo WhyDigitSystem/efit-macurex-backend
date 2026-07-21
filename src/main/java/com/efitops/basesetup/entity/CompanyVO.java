@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
+import com.efitops.basesetup.entity.BankDetailsVO;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 

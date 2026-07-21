@@ -1,14 +1,4 @@
-/*
- * ========================================================================
- * This file is the intellectual property of GSM Outdoors.it
- * may not be copied in whole or in part without the express written
- * permission of GSM Outdoors.
- * ========================================================================
- * Copyrights(c) 2023 GSM Outdoors. All rights reserved.
- * ========================================================================
- */
 package com.efitops.basesetup.dto;
-
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;

@@ -19,3 +19,4 @@ public class EmployeeFinanceInformationDTO {
 	private String payBill;
 	private LocalDate date;
 }
+ 

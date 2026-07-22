@@ -9,13 +9,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
+import com.efitops.basesetup.entity.BankDetailsVO;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -40,8 +43,11 @@ public class CompanyVO {
 	private String companyCode;
 	@Column(name = "companyname")
 	private String companyName;
-	@Column(name = "country")
-	private String country;
+	
+	@ManyToOne
+	@JoinColumn(name = "countryid")
+	private CountryVO country;
+	
 	@Column(name = "currency")
 	private String currency;
 	@Column(name = "maincurrency")
@@ -50,10 +56,17 @@ public class CompanyVO {
 	private String address;
 	@Column(name = "zipcode")
 	private String zip;
-	@Column(name = "city")
-	private String city;
-	@Column(name = "state")
-	private String state;
+	
+	
+	@ManyToOne
+	@JoinColumn(name = "cityid")
+	private CityVO city;
+	
+	
+	@ManyToOne
+	@JoinColumn(name = "stateid")
+	private StateVO state;
+	
 	@Column(name = "phone")
 	private String phone;
 	@Column(name = "email")

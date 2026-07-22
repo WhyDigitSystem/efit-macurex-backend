@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,3 +20,5 @@ public class DesignationDTO {
     private String finYear;
     private boolean active;
 }
+
+

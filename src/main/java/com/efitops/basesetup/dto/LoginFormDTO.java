@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -19,3 +20,4 @@ public class LoginFormDTO {
 	@Size(min = 6, max = 100, message = "Password is required")
 	private String password;
 }
+

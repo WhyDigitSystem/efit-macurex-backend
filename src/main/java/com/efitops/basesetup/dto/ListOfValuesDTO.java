@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -20,3 +21,4 @@ public class ListOfValuesDTO {
 	private List<ListOfValues1DTO> ListOfValues1DTO;
 
 }
+

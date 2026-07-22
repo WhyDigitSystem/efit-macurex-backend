@@ -15,13 +15,13 @@ public class CompanyDTO {
 	private Long id;
 	private String companyCode;
 	private String companyName;
-	private String country;
+	private Long countryId;
 	private String currency;
 	private String mainCurrency;
 	private String address;
 	private String zip;
-	private String city;
-	private String state;
+	private Long cityId;
+	private Long stateId;
 	private String phone;
 	private String email;
 	private String webSite;

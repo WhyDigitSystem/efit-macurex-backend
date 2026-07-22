@@ -19,9 +19,9 @@ import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.entity.UserActionVO;
 import com.efitops.basesetup.entity.UserVO;
-import com.efitops.basesetup.repo.TokenRepo;
-import com.efitops.basesetup.repo.UserActionRepo;
-import com.efitops.basesetup.repo.UserRepo;
+import com.efitops.basesetup.repository.TokenRepo;
+import com.efitops.basesetup.repository.UserActionRepo;
+import com.efitops.basesetup.repository.UserRepo;
 import com.efitops.basesetup.security.TokenProvider;
 
 @Service

@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+
 import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
@@ -22,3 +23,4 @@ public class ResetPasswordFormDTO {
 //	@Size(min = 6, max = 100, message = "New Password is required")
 	private String newPassword;
 }
+

@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -27,8 +29,12 @@ public class CurrencyVO {
 	@SequenceGenerator(name = "currencygen", sequenceName = "currencyseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "currencyid")
 	private Long id;
-	@Column(name = "country")
-	private String country;
+	
+	
+	@ManyToOne
+	@JoinColumn(name = "countryid")
+	private CountryVO country;
+	
 	@Column(name = "currency")
 	private String currency;
 	@Column(name = "subcurrency")

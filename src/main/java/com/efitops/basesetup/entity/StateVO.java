@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -33,8 +35,11 @@ public class StateVO {
 	private String stateCode;
 	@Column(name="state")
 	private String stateName;
-	@Column(name="country")
-    private String country;
+     
+	@ManyToOne
+	@JoinColumn(name = "countryid")
+	private CountryVO country;
+	
 	@Column(name="region")
     private String region;
 	@Column(name="statenumber")

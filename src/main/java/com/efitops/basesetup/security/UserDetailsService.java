@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.efitops.basesetup.entity.UserVO;
-import com.efitops.basesetup.repo.UserRepo;
+import com.efitops.basesetup.repository.UserRepo;
 
 
 @Service

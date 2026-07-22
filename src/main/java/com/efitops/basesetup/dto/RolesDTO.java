@@ -16,6 +16,10 @@ public class RolesDTO {
 	private String createdBy;
 	private Long orgId;
 	private boolean active;
+	private String updatedBy;
 	private List<RolesResponsibilityDTO> rolesResponsibilityDTO;
+	
+	
 
 }
+

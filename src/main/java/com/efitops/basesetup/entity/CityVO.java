@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -30,12 +32,20 @@ public class CityVO {
 
 	@Column(name = "citycode")
 	private String cityCode;
-	@Column(name = "country")
-	private String country;
+	
+	
+	@ManyToOne
+	@JoinColumn(name = "countryid")
+	private CountryVO country;
+	
 	@Column(name = "city")
 	private String cityName;
-	@Column(name = "state")
-	private String state;
+	
+	
+	@ManyToOne
+	@JoinColumn(name = "stateid")
+	private StateVO state;
+	
 	@Column(name = "active")
 	private boolean active;
 	@Column(name = "createdby")

@@ -1,4 +1,3 @@
-
 package com.efitops.basesetup.entity;
 
 import java.time.LocalDateTime;

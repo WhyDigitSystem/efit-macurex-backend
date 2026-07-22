@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,3 +15,4 @@ public class ListOfValues1DTO {
 	private String valueDescription;
 	private boolean active;
 }
+

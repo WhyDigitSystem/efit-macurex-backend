@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,3 +22,6 @@ public class CountryDTO {
 //	private String updatedBy;
 	private boolean cancel;
 }
+
+
+

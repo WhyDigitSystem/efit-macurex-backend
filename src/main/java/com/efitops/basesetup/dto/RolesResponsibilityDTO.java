@@ -13,3 +13,4 @@ public class RolesResponsibilityDTO {
 	private Long responsibilityId;
 
 }
+

@@ -14,7 +14,7 @@ private Long id;
 	
 	private String stateCode;
 	private String stateName;
-    private String country;
+    private Long countryId;
     private String region;
     private String stateNumber;
     private boolean active;

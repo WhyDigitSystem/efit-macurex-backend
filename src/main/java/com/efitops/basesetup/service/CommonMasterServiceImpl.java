@@ -211,16 +211,31 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return companyVO;
 	}
 
-	private void getCompanyVOFromCompanyDTO(CompanyVO companyVO, CompanyDTO companyDTO) {
+	private void getCompanyVOFromCompanyDTO(CompanyVO companyVO, CompanyDTO companyDTO) throws ApplicationException {
 		companyVO.setCompanyCode(companyDTO.getCompanyCode());
 		companyVO.setCompanyName(companyDTO.getCompanyName());
-		companyVO.setCountry(companyDTO.getCountry());
+		
 		companyVO.setCurrency(companyDTO.getCurrency());
 		companyVO.setMainCurrency(companyDTO.getMainCurrency());
 		companyVO.setAddress(companyDTO.getAddress());
 		companyVO.setZip(companyDTO.getZip());
-		companyVO.setCity(companyDTO.getCity());
-		companyVO.setState(companyDTO.getState());
+		
+		CountryVO country = countryRepo.findById(companyDTO.getCountryId())
+		        .orElseThrow(() -> new ApplicationException("Country not found"));
+
+		StateVO state = stateRepo.findById(companyDTO.getStateId())
+		        .orElseThrow(() -> new ApplicationException("State not found"));
+
+		CityVO city = cityRepo.findById(companyDTO.getCityId())
+		        .orElseThrow(() -> new ApplicationException("City not found"));
+
+		companyVO.setCountry(country);
+		companyVO.setState(state);
+		companyVO.setCity(city);
+
+		companyVO.setCurrency(companyDTO.getCurrency().toUpperCase());
+		companyVO.setMainCurrency(companyDTO.getMainCurrency().toUpperCase());
+		
 		companyVO.setPhone(companyDTO.getPhone());
 		companyVO.setEmail(companyDTO.getEmail());
 		companyVO.setWebSite(companyDTO.getWebSite());
@@ -259,16 +274,31 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return companyRepo.save(companyVO);
 	}
 
-	private void mapCompanyDTOToCompanyVO(CompanyVO companyVO, CompanyDTO companyDTO) {
+	private void mapCompanyDTOToCompanyVO(CompanyVO companyVO, CompanyDTO companyDTO) throws ApplicationException {
 		companyVO.setCompanyCode(companyDTO.getCompanyCode());
 		companyVO.setCompanyName(companyDTO.getCompanyName());
-		companyVO.setCountry(companyDTO.getCountry());
 		companyVO.setCurrency(companyDTO.getCurrency());
 		companyVO.setMainCurrency(companyDTO.getMainCurrency());
+		
 		companyVO.setAddress(companyDTO.getAddress());
 		companyVO.setZip(companyDTO.getZip());
-		companyVO.setCity(companyDTO.getCity());
-		companyVO.setState(companyDTO.getState());
+
+		CountryVO country = countryRepo.findById(companyDTO.getCountryId())
+		        .orElseThrow(() -> new ApplicationException("Country not found"));
+
+		StateVO state = stateRepo.findById(companyDTO.getStateId())
+		        .orElseThrow(() -> new ApplicationException("State not found"));
+
+		CityVO city = cityRepo.findById(companyDTO.getCityId())
+		        .orElseThrow(() -> new ApplicationException("City not found"));
+
+		companyVO.setCountry(country);
+		companyVO.setState(state);
+		companyVO.setCity(city);
+
+		companyVO.setCurrency(companyDTO.getCurrency().toUpperCase());
+		companyVO.setMainCurrency(companyDTO.getMainCurrency().toUpperCase());
+		
 		companyVO.setPhone(companyDTO.getPhone());
 		companyVO.setEmail(companyDTO.getEmail());
 		companyVO.setWebSite(companyDTO.getWebSite());
@@ -596,15 +626,20 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", message);
 		response.put("stateVO", stateVO);
-
 		return response;
 	}
 
-	private void getStateVOFromStateDTO(StateVO stateVO, StateDTO stateDTO) {
+	private void getStateVOFromStateDTO(StateVO stateVO, StateDTO stateDTO) throws ApplicationException {
 		stateVO.setStateCode(stateDTO.getStateCode().toUpperCase());
 		stateVO.setStateName(stateDTO.getStateName().toUpperCase());
 		stateVO.setStateNumber(stateDTO.getStateNumber().toUpperCase());
-		stateVO.setCountry(stateDTO.getCountry().toUpperCase());
+
+		CountryVO countryVO = countryRepo.findById(stateDTO.getCountryId())
+	            .orElseThrow(() ->
+	                    new ApplicationException("Country not found with id : " + stateDTO.getCountryId()));
+		
+	    stateVO.setCountry(countryVO);
+
 		stateVO.setRegion(stateDTO.getRegion().toUpperCase());
 		stateVO.setActive(stateDTO.isActive());
 		stateVO.setCancel(stateDTO.isCancel());
@@ -693,11 +728,19 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return response;
 	}
 
-	private void getCityVOFromCityDTO(CityVO cityVO, CityDTO cityDTO) {
+	private void getCityVOFromCityDTO(CityVO cityVO, CityDTO cityDTO) throws ApplicationException {
 		cityVO.setCityCode(cityDTO.getCityCode().toUpperCase());
 		cityVO.setCityName(cityDTO.getCityName().toUpperCase());
-		cityVO.setCountry(cityDTO.getCountry().toUpperCase());
-		cityVO.setState(cityDTO.getState().toUpperCase());
+		CountryVO countryVO = countryRepo.findById(cityDTO.getCountryId())
+		        .orElseThrow(() ->
+		                new ApplicationException("Country not found with id : " + cityDTO.getCountryId()));
+
+		StateVO stateVO = stateRepo.findById(cityDTO.getStateId())
+		        .orElseThrow(() ->
+		                new ApplicationException("State not found with id : " + cityDTO.getStateId()));
+
+		cityVO.setCountry(countryVO);
+		cityVO.setState(stateVO);
 		cityVO.setActive(cityDTO.isActive());
 		cityVO.setOrgId(cityDTO.getOrgId());
 		cityVO.setCancel(cityDTO.isCancel());
@@ -816,21 +859,26 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		CurrencyVO currencyVO;
 		String message = null;
          CurrencyVO oldCurrency = null;
+         CountryVO countryVO = countryRepo.findById(currencyDTO.getCountryId())
+ 		        .orElseThrow(() ->
+ 		                new ApplicationException("Country not found with id : "
+ 		                        + currencyDTO.getCountryId()));
 		if (ObjectUtils.isEmpty(currencyDTO.getId())) {
+			
 			if (currencyRepo.existsByOrgIdAndCountryAndCurrencyIgnoreCase(currencyDTO.getOrgId(),
-					currencyDTO.getCountry(), currencyDTO.getCurrency())) {
+					countryVO, currencyDTO.getCurrency())) {
 				String errorMessage = String.format("This Currency:%s Already Exists in This Organization.",
 						currencyDTO.getCurrency());
 				throw new ApplicationException(errorMessage);
 			}
 			if (currencyRepo.existsByOrgIdAndCountryAndCurrencyDescriptionIgnoreCase(currencyDTO.getOrgId(),
-					currencyDTO.getCountry(), currencyDTO.getCurrencyDescription())) {
+					 countryVO, currencyDTO.getCurrencyDescription())) {
 				String errorMessage = String.format("This CurrencyDescription:%s Already Exists in This Organization.",
 						currencyDTO.getCurrencyDescription());
 				throw new ApplicationException(errorMessage);
 			}
 			if (currencyRepo.existsByOrgIdAndCountryAndSubCurrencyIgnoreCase(currencyDTO.getOrgId(),
-					currencyDTO.getCountry(), currencyDTO.getSubCurrency())) {
+					countryVO, currencyDTO.getSubCurrency())) {
 				String errorMessage = String.format("This SubCurrency:%s Already Exists in This Organization.",
 						currencyDTO.getSubCurrency());
 				throw new ApplicationException(errorMessage);
@@ -855,7 +903,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 			if (!currencyVO.getCurrency().equalsIgnoreCase(currencyDTO.getCurrency())) {
 				if (currencyRepo.existsByOrgIdAndCountryAndCurrencyIgnoreCase(currencyDTO.getOrgId(),
-						currencyDTO.getCountry(), currencyDTO.getCurrency())) {
+						countryVO, currencyDTO.getCurrency())) {
 					String errorMessage = String.format("This Currency:%s Already Exists in This Organization.",
 							currencyDTO.getCurrency());
 					throw new ApplicationException(errorMessage);
@@ -864,7 +912,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			}
 			if (!currencyVO.getSubCurrency().equalsIgnoreCase(currencyDTO.getSubCurrency())) {
 				if (currencyRepo.existsByOrgIdAndCountryAndSubCurrencyIgnoreCase(currencyDTO.getOrgId(),
-						currencyDTO.getCountry(), currencyDTO.getSubCurrency())) {
+						countryVO, currencyDTO.getSubCurrency())) {
 					String errorMessage = String.format("This SubCurrency:%s Already Exists in This Organization.",
 							currencyDTO.getSubCurrency());
 					throw new ApplicationException(errorMessage);
@@ -875,7 +923,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			}
 			if (!currencyVO.getCurrencyDescription().equalsIgnoreCase(currencyDTO.getCurrencyDescription())) {
 				if (currencyRepo.existsByOrgIdAndCountryAndCurrencyDescriptionIgnoreCase(currencyDTO.getOrgId(),
-						currencyDTO.getCountry(), currencyDTO.getCurrencyDescription())) {
+						countryVO, currencyDTO.getCurrencyDescription())) {
 					String errorMessage = String.format(
 							"This CurrencyDescription:%s Already Exists in This Organization.",
 							currencyDTO.getCurrencyDescription());
@@ -899,7 +947,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return response;
 	}
 
-	private void getCurrencyVOFromCurrencyDTO(CurrencyVO currencyVO, CurrencyDTO currencyDTO) {
+	private void getCurrencyVOFromCurrencyDTO(CurrencyVO currencyVO, CurrencyDTO currencyDTO) throws ApplicationException {
 		currencyVO.setCurrency(currencyDTO.getCurrency().toUpperCase());
 		if (currencyDTO.getSubCurrency() != null) {
 			currencyVO.setSubCurrency(currencyDTO.getSubCurrency().toUpperCase());
@@ -908,7 +956,14 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			currencyVO.setCurrencyDescription(currencyDTO.getCurrencyDescription().toUpperCase());
 		}
 		currencyVO.setActive(currencyDTO.isActive());
-		currencyVO.setCountry(currencyDTO.getCountry().toUpperCase());
+		
+		
+		CountryVO countryVO = countryRepo.findById(currencyDTO.getCountryId())
+		        .orElseThrow(() ->
+		                new ApplicationException("Country not found with id : "
+		                        + currencyDTO.getCountryId()));
+
+		currencyVO.setCountry(countryVO);
 		currencyVO.setOrgId(currencyDTO.getOrgId());
 	}
 

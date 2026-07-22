@@ -11,9 +11,9 @@ public class CityDTO {
 	private Long id;
 
 	private String cityCode;
-	private String country;
+	private Long countryId;
 	private String cityName;
-	private String state;
+	private Long stateId;
 	private boolean active;
 	private String createdBy;
 	private Long orgId;

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class CurrencyDTO {
 
 	private Long id;
-	private String country;
+	private Long countryId;
 	private String currency;
 	private String subCurrency;
 	private String currencyDescription;

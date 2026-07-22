@@ -9,11 +9,11 @@
 		<version>2.7.16</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.ops</groupId>
-	<artifactId>efit-ops</artifactId>
+	<groupId>com.macurex</groupId>
+	<artifactId>efit-macurex</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>efit ops</name>
-	<description>efit ops Project project for Spring Boot</description>
+	<name>efit macurex</name>
+	<description>efit macurex Project project for Spring Boot</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>

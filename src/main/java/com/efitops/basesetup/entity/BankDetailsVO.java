@@ -47,8 +47,8 @@ public class BankDetailsVO {
 	@Column(name = "primaryaccount")
 	private boolean primaryAccount;
 
-	@ManyToOne
-	@JsonBackReference
-	@JoinColumn(name = "companyid")
-	CompanyVO companyVO;
+//	@ManyToOne
+//	@JsonBackReference
+//	@JoinColumn(name = "companyid")
+//	CompanyVO companyVO;
 }

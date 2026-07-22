@@ -965,6 +965,16 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		currencyVO.setCountry(countryVO);
 		currencyVO.setOrgId(currencyDTO.getOrgId());
+		
+		    currencyVO.setMainCurrency(currencyDTO.getMainCurrency().toUpperCase());
+		    currencyVO.setMainCurrencySymbol(currencyDTO.getMainCurrencySymbol());
+		    currencyVO.setSubSymbol(currencyDTO.getSubSymbol());
+		    currencyVO.setCurrencyRepresentation(currencyDTO.getCurrencyRepresentation());
+		    currencyVO.setCurrencyInteger(currencyDTO.getCurrencyInteger());
+		    currencyVO.setCurrencyDecimal(currencyDTO.getCurrencyDecimal());
+		    currencyVO.setCancelRemarks(currencyDTO.getCancelRemarks());
+
+		
 	}
 
 	@Override

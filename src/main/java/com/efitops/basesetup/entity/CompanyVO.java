@@ -115,12 +115,13 @@ public class CompanyVO {
 	private String termsAndConditions;
 	@Column(name = "active")
 	private boolean active;
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
 
+    @Column(name = "screen_code", length = 5)
+    private String screenCode = "COM";
 
-    @Column(name = "screencode", length = 5)
-    private String screenCode = "CMP";
-
-    @Column(name = "screenname", length = 25)
+    @Column(name = "screen_name", length = 25)
     private String screenName = "COMPANY";
     
 //	@OneToMany(mappedBy = "companyVO", cascade = CascadeType.ALL)

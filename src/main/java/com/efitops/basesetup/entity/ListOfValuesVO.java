@@ -29,19 +29,21 @@ public class ListOfValuesVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "listofvaluesgen")
 	@SequenceGenerator(name = "listofvaluesgen", sequenceName = "listofvaluesseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "listofvaluesid")
+	@Column(name = "listofvalues_id")
 	private Long id;
-	@Column(name = "listcode")
+	@Column(name = "list_code")
 	private String listCode;
-	@Column(name = "listdescription")
+	@Column(name = "list_description")
 	private String listDescription;
 	@Column(name = "cancel")
 	private boolean cancel;
-	@Column(name = "createdby")
+	
+	@Column(name = "created_by")
 	private String createdBy;
-	@Column(name = "modifiedby")
+	
+	@Column(name = "modified_by")
 	private String  updatedBy;
-	@Column(name = "cancelremarks")
+	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 	
 	@Column(name="orgid")
@@ -51,7 +53,7 @@ public class ListOfValuesVO {
 	
 	@OneToMany(mappedBy = "listOfValuesVO",cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<ListOfValues1VO> listOfValues1VO;
+	private List<ListOfValuesDetailsVO> listOfValuesDetailsVO;
 	
 	
 	@Embedded

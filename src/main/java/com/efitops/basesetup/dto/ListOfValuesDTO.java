@@ -18,7 +18,7 @@ public class ListOfValuesDTO {
 	private String createdBy;
 	private boolean active;
 		
-	private List<ListOfValues1DTO> ListOfValues1DTO;
+	private List<ListOfValuesDetailsDTO> details;
 
 }
 

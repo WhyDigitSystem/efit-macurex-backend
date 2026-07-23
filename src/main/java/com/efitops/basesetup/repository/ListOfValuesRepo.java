@@ -29,6 +29,8 @@ public interface ListOfValuesRepo extends JpaRepository<ListOfValuesVO, Long> {
 			+ " group by l1.valuedescription order by l1.valuedescription asc")
 	Set<Object[]> getAllListValues(Long orgId,String listDescription);
 
+	List<ListOfValuesVO> findByOrgId(Long orgId);
+
 
         
 }

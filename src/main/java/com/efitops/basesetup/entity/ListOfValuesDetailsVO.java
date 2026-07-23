@@ -20,22 +20,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "listofvalues1")
+@Table(name = "listofvaluesDetails")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ListOfValues1VO {
+public class ListOfValuesDetailsVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "listofvalues1gen")
-	@SequenceGenerator(name = "listofvalues1gen", sequenceName = "listofvalues1seq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "listofvalues1id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "listofvaluesDetailsgen")
+	@SequenceGenerator(name = "listofvaluesDetailsgen", sequenceName = "listofvaluesDetailsseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "listofvaluesDetails_id")
 	private Long id;
-	@Column(name = "sno")
+	@Column(name = "s_no")
 	private Long sNo;
-	@Column(name = "valuecode")
+	@Column(name = "value_code")
 	private String valueCode;
-	@Column(name = "valuedescription")
+	@Column(name = "value_description")
 	private String valueDescription;
 	@Column(name = "active")
 	private boolean active;

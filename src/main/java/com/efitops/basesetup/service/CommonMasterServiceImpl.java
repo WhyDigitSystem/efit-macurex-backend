@@ -384,7 +384,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		companyVO.setAdminEmail(dto.getAdminEmail());
 		companyVO.setAdminMobileNo(dto.getAdminMobileNo());
 
-		companyVO.setUpdatedBy(dto.getUpdatedBy());
+		companyVO.setUpdatedBy(dto.getCreatedBy());
 
 		companyVO.setActive(dto.isActive());
 

@@ -48,8 +48,6 @@ import com.efitops.basesetup.entity.MaterialTypeDetailsVO;
 import com.efitops.basesetup.entity.MaterialTypeVO;
 import com.efitops.basesetup.entity.UomVO;
 import com.efitops.basesetup.exception.ApplicationException;
-import com.efitops.basesetup.repo.MaterialTypeDetailRepo;
-import com.efitops.basesetup.repo.MaterialTypeRepo;
 import com.efitops.basesetup.repository.BomDetailsRepo;
 import com.efitops.basesetup.repository.BomRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
@@ -61,6 +59,8 @@ import com.efitops.basesetup.repository.EmployeeFinanceInformationRepo;
 import com.efitops.basesetup.repository.EmployeeLoanDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.EmployeePersonalDetailsRepo;
+import com.efitops.basesetup.repository.MaterialTypeDetailRepo;
+import com.efitops.basesetup.repository.MaterialTypeRepo;
 import com.efitops.basesetup.repository.UomRepo;
 import com.efitops.basesetup.repository.UserRepo;
 

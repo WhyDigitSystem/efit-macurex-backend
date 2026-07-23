@@ -17,7 +17,8 @@ public class CityDTO {
 	private boolean active;
 	private String createdBy;
 	private Long orgId;
-	private boolean cancel;
+	private String cancelRemarks;
+
 }
 
 

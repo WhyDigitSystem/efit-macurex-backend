@@ -1,4 +1,4 @@
-package com.efitops.basesetup.repo;
+package com.efitops.basesetup.repository;
 
 import java.util.List;
 

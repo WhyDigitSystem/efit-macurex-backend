@@ -37,6 +37,7 @@ import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.StateDTO;
+import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CompanyVO;
@@ -46,6 +47,7 @@ import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.StateVO;
+import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.service.CommonMasterService;
 
 @CrossOrigin
@@ -1019,5 +1021,90 @@ public class CommonMasterController extends BaseController {
 			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 			return ResponseEntity.ok().body(responseDTO);
 		}
+	 
+	 //transport
+	 
+	 @PutMapping("/updateCreateTransportMaster")
+		public ResponseEntity<ResponseDTO> updateCreateTransportMaster(@RequestBody TransportMasterDTO transportMasterDTO) {
+			String methodName = "updateCreateTransportMaster()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+			String errorMsg = null;
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			ResponseDTO responseDTO = null;
+			try {
+				Map<String, Object> transportMasterVO = commonMasterService.updateCreateTransportMaster(transportMasterDTO);
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, transportMasterVO.get("message"));
+				responseObjectsMap.put("transportMasterVO", transportMasterVO.get("transportMasterVO"));
+				responseDTO = createServiceResponse(responseObjectsMap);
+			} catch (Exception e) {
+				errorMsg = e.getMessage();
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+			}
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		
+	 @GetMapping("/getTransportById")
+	 public ResponseEntity<ResponseDTO> getTransportById(@RequestParam Long id) {
+
+	     String methodName = "getTransportById()";
+	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     String errorMsg = null;
+	     ResponseDTO responseDTO = null;
+
+	     try {
+
+	         TransportMasterVO transportVO = commonMasterService.getTransportNameById(id);
+
+	         responseObjectsMap.put("transportVO", transportVO);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         errorMsg = e.getMessage();
+	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	     }
+
+	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	     return ResponseEntity.ok().body(responseDTO);
+	 }
+	 
+	 @GetMapping("/getTransportByOrgId")
+	 public ResponseEntity<ResponseDTO> getTransportByOrgId(@RequestParam Long orgId,@RequestParam String branchCode) {
+
+	     String methodName = "getTransportByOrgId()";
+	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     String errorMsg = null;
+	     ResponseDTO responseDTO = null;
+
+	     try {
+
+	         List<TransportMasterVO> transportList = commonMasterService.getTransportNameByOrgId(orgId,branchCode);
+
+	         responseObjectsMap.put("transportList", transportList);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         errorMsg = e.getMessage();
+	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	     }
+
+	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	     return ResponseEntity.ok().body(responseDTO);
+	 }
 	
 }

@@ -35,6 +35,7 @@ import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.Role;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.StateDTO;
+import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.entity.BankDetailsVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
@@ -46,6 +47,7 @@ import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.StateVO;
+import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UserVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BankDetailsRepo;
@@ -61,6 +63,7 @@ import com.efitops.basesetup.repository.RegionRepo;
 import com.efitops.basesetup.repository.ResponsibilitiesRepo;
 import com.efitops.basesetup.repository.ScreenNamesRepo;
 import com.efitops.basesetup.repository.StateRepo;
+import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.repository.UserRepo;
 import com.efitops.basesetup.util.CryptoUtils;
 
@@ -117,7 +120,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	@PersistenceContext
 	private EntityManager entityManager;
 	
-	
+	@Autowired
+	TransportRepo transportRepo;
 
 	// Company
 
@@ -1428,4 +1432,104 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return branchVO;
 	}
 
+	
+	  @Autowired
+		TransportRepo transportMasterrepo;
+		
+	  @Override
+	  @Transactional
+	  public Map<String, Object> updateCreateTransportMaster(@Valid TransportMasterDTO transportMasterDTO)
+	          throws ApplicationException {
+
+	      TransportMasterVO transportMasterVO = new TransportMasterVO();
+	      String message;
+
+	      if (ObjectUtils.isNotEmpty(transportMasterDTO.getId())) {
+
+	          transportMasterVO = transportMasterrepo.findById(transportMasterDTO.getId())
+	                  .orElseThrow(() -> new ApplicationException("Invalid Transport Details"));
+
+	          if (!transportMasterVO.getTransportName()
+	                  .equalsIgnoreCase(transportMasterDTO.getTransportName())) {
+
+	              if (transportMasterrepo.existsByTransportNameAndOrgId(
+	                      transportMasterDTO.getTransportName(),
+	                      transportMasterDTO.getOrgId())) {
+
+	                  throw new ApplicationException(
+	                          "The Transport : " + transportMasterDTO.getTransportName()
+	                                  + " already exists in this Organization.");
+	              }
+	          }
+
+	          createUpdateTransportMasterVOByTransportMasterDTO(transportMasterDTO, transportMasterVO);
+
+	          transportMasterVO.setUpdated_By(transportMasterDTO.getCreatedBy());
+
+	          message = "Transport Updated Successfully";
+
+	      } else {
+
+	          if (transportMasterrepo.existsByTransportNameAndOrgId(
+	                  transportMasterDTO.getTransportName(),
+	                  transportMasterDTO.getOrgId())) {
+
+	              throw new ApplicationException(
+	                      "The Transport : " + transportMasterDTO.getTransportName()
+	                              + " already exists in this Organization.");
+	          }
+
+	          createUpdateTransportMasterVOByTransportMasterDTO(transportMasterDTO, transportMasterVO);
+
+	          transportMasterVO.setCreatedBy(transportMasterDTO.getCreatedBy());
+	          transportMasterVO.setUpdated_By(transportMasterDTO.getCreatedBy());
+
+	          message = "Transport Created Successfully";
+	      }
+
+	      transportMasterrepo.save(transportMasterVO);
+
+	      Map<String, Object> response = new HashMap<>();
+	      response.put("transportMasterVO", transportMasterVO);
+	      response.put("message", message);
+
+	      return response;
+	  }
+	  
+	  private void createUpdateTransportMasterVOByTransportMasterDTO(
+		        TransportMasterDTO transportMasterDTO,
+		        TransportMasterVO transportMasterVO) {
+
+		    transportMasterVO.setTransportName(transportMasterDTO.getTransportName().toUpperCase());
+		    transportMasterVO.setAddress(transportMasterDTO.getAddress());
+		    transportMasterVO.setOrgId(transportMasterDTO.getOrgId());
+		    transportMasterVO.setBranchCode(transportMasterDTO.getBranchCode());
+		    transportMasterVO.setActive(transportMasterDTO.getActive());
+		    transportMasterVO.setCancelRemarks(transportMasterDTO.getCancelRemarks());
+		    transportMasterVO.setBranch(transportMasterDTO.getBranch());
+
+		}
+
+
+		@Override
+		public TransportMasterVO getTransportNameById(Long id) throws ApplicationException {
+
+		    return transportRepo.findById(id)
+		            .orElseThrow(() -> new ApplicationException("Invalid Transport Details"));
+		}
+
+		@Override
+		public List<TransportMasterVO> getTransportNameByOrgId(Long orgId,String branchCode) throws ApplicationException {
+
+		    List<TransportMasterVO> transportList =
+		            transportRepo.findByOrgIdAndBranch(orgId,branchCode);
+
+		    if (transportList.isEmpty()) {
+		        throw new ApplicationException("No Transport Details Found");
+		    }
+
+		    return transportList;
+		}
+
+		
 }

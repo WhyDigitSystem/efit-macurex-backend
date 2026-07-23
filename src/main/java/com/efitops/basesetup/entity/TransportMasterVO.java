@@ -46,7 +46,7 @@ public class TransportMasterVO {
 	@Column(name = "modified_by")
 	private String updated_By;
 	@Column(name = "cancel")
-	private boolean cancel;
+	private boolean cancel=false;
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 	

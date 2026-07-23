@@ -8,11 +8,7 @@ import com.efitops.basesetup.exception.ApplicationException;
 
 public interface TransportMasterService {
 
-	Map<String, Object> updateCreateTransportMaster(TransportMasterDTO transportMasterDTO) throws ApplicationException;
 
-	Object getTransportNameById(Long id);
-
-	Object getTransportNameByOrgId(Long orgId);
 
 //	Map<String, Object> updateCreateListOfValues(ListOfValuesDTO listOfValuesDTO) throws ApplicationException;
 //

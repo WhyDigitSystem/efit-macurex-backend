@@ -1022,6 +1022,36 @@ public class CommonMasterController extends BaseController {
 			return ResponseEntity.ok().body(responseDTO);
 		}
 	 
+	 @GetMapping("/getBranchByOrgId")
+	 public ResponseEntity<ResponseDTO> getBranchByOrgId(@RequestParam Long orgId) {
+	     String methodName = "getBranchByOrgId()";
+	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	     String errorMsg = null;
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     ResponseDTO responseDTO = null;
+	     List<BranchVO> branchList = new ArrayList<>();
+
+	     try {
+	         branchList = commonMasterService.getBranchByOrgId(orgId);
+	     } catch (Exception e) {
+	         errorMsg = e.getMessage();
+	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+	     }
+
+	     if (StringUtils.isBlank(errorMsg)) {
+	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Branch information retrieved successfully");
+	         responseObjectsMap.put("branchList", branchList);
+	         responseDTO = createServiceResponse(responseObjectsMap);
+	     } else {
+	         responseDTO = createServiceResponseError(responseObjectsMap,
+	                 "Branch information retrieval failed", errorMsg);
+	     }
+
+	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+	     return ResponseEntity.ok().body(responseDTO);
+	 }
+	 
 	 //transport
 	 
 	 @PutMapping("/updateCreateTransportMaster")

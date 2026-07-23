@@ -1432,9 +1432,18 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return branchVO;
 	}
 
-	
-	  @Autowired
-		TransportRepo transportMasterrepo;
+	@Override
+	public List<BranchVO> getBranchByOrgId(Long orgId) throws ApplicationException {
+
+	    List<BranchVO> branchList =
+	            branchRepo.getBranchByOrgId(orgId);
+
+	    if (branchList.isEmpty()) {
+	        throw new ApplicationException("No branch Details Found");
+	    }
+
+	    return branchList;
+	}
 		
 	  @Override
 	  @Transactional
@@ -1446,13 +1455,13 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	      if (ObjectUtils.isNotEmpty(transportMasterDTO.getId())) {
 
-	          transportMasterVO = transportMasterrepo.findById(transportMasterDTO.getId())
+	          transportMasterVO = transportRepo.findById(transportMasterDTO.getId())
 	                  .orElseThrow(() -> new ApplicationException("Invalid Transport Details"));
 
 	          if (!transportMasterVO.getTransportName()
 	                  .equalsIgnoreCase(transportMasterDTO.getTransportName())) {
 
-	              if (transportMasterrepo.existsByTransportNameAndOrgId(
+	              if (transportRepo.existsByTransportNameAndOrgId(
 	                      transportMasterDTO.getTransportName(),
 	                      transportMasterDTO.getOrgId())) {
 
@@ -1470,7 +1479,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	      } else {
 
-	          if (transportMasterrepo.existsByTransportNameAndOrgId(
+	          if (transportRepo.existsByTransportNameAndOrgId(
 	                  transportMasterDTO.getTransportName(),
 	                  transportMasterDTO.getOrgId())) {
 
@@ -1487,7 +1496,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	          message = "Transport Created Successfully";
 	      }
 
-	      transportMasterrepo.save(transportMasterVO);
+	      transportRepo.save(transportMasterVO);
 
 	      Map<String, Object> response = new HashMap<>();
 	      response.put("transportMasterVO", transportMasterVO);

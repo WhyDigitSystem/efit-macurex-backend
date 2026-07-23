@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListOfValues1DTO {
+public class ListOfValuesDetailsDTO {
 	private Long id;
 	private Long sNo;
 	private String valueCode;

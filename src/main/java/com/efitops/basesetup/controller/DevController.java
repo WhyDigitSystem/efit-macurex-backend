@@ -34,42 +34,7 @@ public class DevController extends BaseController{
 	@Autowired
 	TransportMasterService transportMasterService;
 	
-	@PutMapping("/updateCreateTransportMaster")
-	public ResponseEntity<ResponseDTO> updateCreateTransportMaster(@RequestBody TransportMasterDTO transportMasterDTO) {
-		String methodName = "updateCreateTransportMaster()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-		String errorMsg = null;
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO = null;
-		try {
-			Map<String, Object> transportMasterVO = transportMasterService.updateCreateTransportMaster(transportMasterDTO);
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, transportMasterVO.get("message"));
-			responseObjectsMap.put("transportMasterVO", transportMasterVO.get("transportMasterVO"));
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} catch (Exception e) {
-			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		}
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-		return ResponseEntity.ok().body(responseDTO);
-	}
 	
-    @GetMapping("/getById/{id}")
-    public ResponseEntity<?> getTransportById(@PathVariable Long id)
-            throws ApplicationException {
-
-        return ResponseEntity.ok(
-                transportMasterService.getTransportNameById(id));
-    }
-
-    @GetMapping("/getByOrgId/{orgId}")
-    public ResponseEntity<?> getTransportByOrgId(@PathVariable Long orgId)
-            throws ApplicationException {
-
-        return ResponseEntity.ok(
-                transportMasterService.getTransportNameByOrgId(orgId));
-    }
 // ------------ListOfValues----------------------
     
 //    @PutMapping("/updateCreateListOfValues")

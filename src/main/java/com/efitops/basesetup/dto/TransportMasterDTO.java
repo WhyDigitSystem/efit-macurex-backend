@@ -15,9 +15,9 @@ public class TransportMasterDTO {
 	private String transportName;
 	private String address;
 	private Boolean active;
+	private String branch;
 	private String branchCode;
 	private String createdBy;
-	private boolean cancel;
 	private String cancelRemarks;
 
 }

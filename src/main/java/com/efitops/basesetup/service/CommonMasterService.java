@@ -21,6 +21,7 @@ import com.efitops.basesetup.dto.FinancialYearDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.StateDTO;
+import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CompanyVO;
@@ -30,6 +31,7 @@ import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.StateVO;
+import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -138,5 +140,16 @@ public interface CommonMasterService {
 	Map<String, Object> createUpdateBranch(BranchDTO branchDTO) throws ApplicationException;
 
 	BranchVO getBranchById(Long id) throws ApplicationException;
+	
+	//transport
+	
+	Map<String, Object> updateCreateTransportMaster(TransportMasterDTO transportMasterDTO) throws ApplicationException;
+
+	TransportMasterVO getTransportNameById(Long id) throws ApplicationException;
+
+
+	List<TransportMasterVO> getTransportNameByOrgId(Long orgId, String branchCode) throws ApplicationException;
+	
+	
 
 }

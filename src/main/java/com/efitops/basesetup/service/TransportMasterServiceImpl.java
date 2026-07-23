@@ -32,110 +32,15 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
     private final ListOfValuesRepo listOfValuesRepo;
 	
-	@Autowired
-	TransportRepo transportMasterrepo;
+	
 
 
     TransportMasterServiceImpl(ListOfValuesRepo listOfValuesRepo, ListOfValuesDetailsRepo listOfValuesDetailsRepo) {
         this.listOfValuesRepo = listOfValuesRepo;
         this.listOfValuesDetailsRepo = listOfValuesDetailsRepo;
     }
-	
-	
-	@Override
-	@Transactional
-	public Map<String, Object> updateCreateTransportMaster(@Valid TransportMasterDTO transportMasterDTO)
-	        throws ApplicationException {
-
-	    String screenCode = "TM";
-	    TransportMasterVO transportMasterVO = new TransportMasterVO();
-	    String message;
-
-	    if (ObjectUtils.isNotEmpty(transportMasterDTO.getId())) {
-
-	        transportMasterVO = transportMasterrepo.findById(transportMasterDTO.getId())
-	                .orElseThrow(() -> new ApplicationException("Transport not found"));
-
-	        if (!transportMasterVO.getTransportName()
-	                .equalsIgnoreCase(transportMasterDTO.getTransportName())) {
-
-	            if (transportMasterrepo.existsByTransportNameAndOrgId(
-	                    transportMasterDTO.getTransportName(),
-	                    transportMasterDTO.getOrgId())) {
-
-	                throw new ApplicationException(
-	                        "The Transport : " + transportMasterDTO.getTransportName()
-	                                + " already exists in this Organization.");
-	            }
-	        }
-
-	        createUpdateTransportMasterVOByTransportMasterDTO(
-	                transportMasterDTO, transportMasterVO);
-
-	        transportMasterVO.setCreatedBy(transportMasterDTO.getCreatedBy());
-
-	        message = "Transport Updated Successfully";
-
-	    } else {
-
-	        if (transportMasterrepo.existsByTransportNameAndOrgId(
-	                transportMasterDTO.getTransportName(),
-	                transportMasterDTO.getOrgId())) {
-
-	            throw new ApplicationException(
-	                    "The Transport : " + transportMasterDTO.getTransportName()
-	                            + " already exists in this Organization.");
-	        }
-
-	        createUpdateTransportMasterVOByTransportMasterDTO(
-	                transportMasterDTO, transportMasterVO);
-
-	       
-
-	       
-	        transportMasterVO.setTransportName(transportMasterDTO.getTransportName());
-	        transportMasterVO.setAddress(transportMasterDTO.getAddress());
-	        transportMasterVO.setCreatedBy(transportMasterDTO.getCreatedBy());
-	        transportMasterVO.setUpdated_By(transportMasterDTO.getCreatedBy());
-	        transportMasterVO.setActive(transportMasterDTO.getActive());
-	        transportMasterVO.setOrgId(transportMasterDTO.getOrgId());
-	        transportMasterVO.setBranchCode(transportMasterDTO.getBranchCode());
-	        transportMasterVO.setCancel(transportMasterDTO.isCancel());
-	        transportMasterVO.setCancelRemarks(transportMasterDTO.getCancelRemarks());
-	        
-
-	        message = "Transport Created Successfully";
-	    }
-
-	    transportMasterrepo.save(transportMasterVO);
-
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("transportMasterVO", transportMasterVO);
-	    response.put("message", message);
-
-	    return response;
-	}
-
-
-	private void createUpdateTransportMasterVOByTransportMasterDTO(@Valid TransportMasterDTO transportMasterDTO,
-			TransportMasterVO transportMasterVO) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public Object getTransportNameById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public Object getTransportNameByOrgId(Long orgId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    
+  
 //           --------------ListOfVlaues----------------	
 //	public Map<String, Object> updateCreateListOfValues(@Valid ListOfValuesDTO listOfValuesDTO)
 //	        throws ApplicationException {

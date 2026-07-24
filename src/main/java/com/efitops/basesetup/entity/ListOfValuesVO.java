@@ -1,5 +1,6 @@
 package com.efitops.basesetup.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -9,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -36,7 +39,11 @@ public class ListOfValuesVO {
 	@Column(name = "list_description")
 	private String listDescription;
 	@Column(name = "cancel")
-	private boolean cancel;
+	private boolean cancel=false;
+	
+	@ManyToOne
+	@JoinColumn(name = "branch_id")
+	private BranchVO branch;
 	
 	@Column(name = "created_by")
 	private String createdBy;
@@ -46,12 +53,18 @@ public class ListOfValuesVO {
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 	
-	@Column(name="orgid")
+	@Column(name="org_id")
 	private Long orgId;
 	@Column(name="active")
     private boolean active;
 	
-	@OneToMany(mappedBy = "listOfValuesVO",cascade = CascadeType.ALL)
+	@Column(name = "screen_name")
+	private String screenName="LISTOFVALUES";
+	
+	@Column(name = "screen_Code")
+	private String screenCode="LIS";
+	
+	@OneToMany(mappedBy = "listOfValuesVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<ListOfValuesDetailsVO> listOfValuesDetailsVO;
 	

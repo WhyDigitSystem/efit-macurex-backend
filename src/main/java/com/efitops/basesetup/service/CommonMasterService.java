@@ -18,8 +18,11 @@ import com.efitops.basesetup.dto.CountryDTO;
 import com.efitops.basesetup.dto.CurrencyDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
+import com.efitops.basesetup.dto.GSTRateMasterDTO;
+import com.efitops.basesetup.dto.ListOfValuesDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
+import com.efitops.basesetup.dto.ServiceAccMasterDTO;
 import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.entity.BranchVO;
@@ -28,8 +31,11 @@ import com.efitops.basesetup.entity.CompanyVO;
 import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
+import com.efitops.basesetup.entity.GSTRateMasterVO;
+import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
+import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.entity.StateVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -154,7 +160,33 @@ public interface CommonMasterService {
 
 	List<TransportMasterVO> getTransportNameByOrgId(Long orgId, String branchCode) throws ApplicationException;
 
+	//listofvalues
+
+	Map<String, Object> updateCreateListOfValues(@Valid ListOfValuesDTO dto) throws ApplicationException;
 	
+	ListOfValuesVO getListOfValuesById(Long id);
+
+	List<ListOfValuesVO> getListOfValuesByOrgId(Long orgId, Long branchCode);
+
+	//gstratemaster
+	
+	Map<String, Object> updateCreateGSTRateMaster(@Valid GSTRateMasterDTO gSTRateMasterDTO) throws ApplicationException;
+
+	GSTRateMasterVO getGSTRateMasterById(Long id) throws ApplicationException;
+
+	List<GSTRateMasterVO> getGSTRateByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+	//serviceacc
+	
+	Map<String, Object> updateCreateServiceAccMaster(@Valid ServiceAccMasterDTO serviceAccMasterDTO)
+			throws ApplicationException;
+
+	ServiceAccMasterVO getServiceNameById(Long id) throws ApplicationException;
+
+	List<ServiceAccMasterVO> getServiceNameByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+
+
 	
 
 }

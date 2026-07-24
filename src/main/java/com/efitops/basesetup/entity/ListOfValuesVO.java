@@ -1,5 +1,6 @@
 package com.efitops.basesetup.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -9,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -29,29 +32,41 @@ public class ListOfValuesVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "listofvaluesgen")
 	@SequenceGenerator(name = "listofvaluesgen", sequenceName = "listofvaluesseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "listofvaluesid")
+	@Column(name = "listofvalues_id")
 	private Long id;
-	@Column(name = "listcode")
+	@Column(name = "list_code")
 	private String listCode;
-	@Column(name = "listdescription")
+	@Column(name = "list_description")
 	private String listDescription;
 	@Column(name = "cancel")
-	private boolean cancel;
-	@Column(name = "createdby")
+	private boolean cancel=false;
+	
+	@ManyToOne
+	@JoinColumn(name = "branch_id")
+	private BranchVO branch;
+	
+	@Column(name = "created_by")
 	private String createdBy;
-	@Column(name = "modifiedby")
+	
+	@Column(name = "modified_by")
 	private String  updatedBy;
-	@Column(name = "cancelremarks")
+	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 	
-	@Column(name="orgid")
+	@Column(name="org_id")
 	private Long orgId;
 	@Column(name="active")
     private boolean active;
 	
-	@OneToMany(mappedBy = "listOfValuesVO",cascade = CascadeType.ALL)
+	@Column(name = "screen_name")
+	private String screenName="LISTOFVALUES";
+	
+	@Column(name = "screen_Code")
+	private String screenCode="LIS";
+	
+	@OneToMany(mappedBy = "listOfValuesVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<ListOfValues1VO> listOfValues1VO;
+	private List<ListOfValuesDetailsVO> listOfValuesDetailsVO;
 	
 	
 	@Embedded

@@ -17,8 +17,11 @@ public class ListOfValuesDTO {
 	private Long orgId;
 	private String createdBy;
 	private boolean active;
+	private String cancelRemarks;
+
+	private Long branchId;
 		
-	private List<ListOfValues1DTO> ListOfValues1DTO;
+	private List<ListOfValuesDetailsDTO> details;
 
 }
 

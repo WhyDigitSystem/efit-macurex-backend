@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListOfValues1DTO {
-	private Long id;
-	private Long sNo;
+public class ListOfValuesDetailsDTO {
 	private String valueCode;
 	private String valueDescription;
 	private boolean active;

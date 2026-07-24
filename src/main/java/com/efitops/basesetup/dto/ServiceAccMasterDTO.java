@@ -7,19 +7,18 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CityDTO {
-	private Long id;
 
-	private String cityCode;
-	private Long countryId;
-	private String cityName;
-	private Long stateId;
-	private boolean active;
-	private String createdBy;
+public class ServiceAccMasterDTO {
+	private Long id;
+	private String serviceName;
+	private String serviceDescription;
+	private String hsncode;
 	private Long orgId;
+	private boolean active;
+	private String createdBy;;
+	private Long branchId;
 	private String cancelRemarks;
+	
+
 
 }
-
-
-

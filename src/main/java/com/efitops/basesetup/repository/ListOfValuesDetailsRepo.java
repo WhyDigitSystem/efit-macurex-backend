@@ -14,5 +14,7 @@ public interface ListOfValuesDetailsRepo extends JpaRepository<ListOfValuesDetai
 	List<ListOfValuesDetailsVO> findBylistOfValuesVO(ListOfValuesVO listOfValuesVO);
 
 	void deleteByListOfValuesVO_Id(Long id);
+
+	List<ListOfValuesDetailsVO> findByListOfValuesVO(ListOfValuesVO listOfValuesVO);
 }
 

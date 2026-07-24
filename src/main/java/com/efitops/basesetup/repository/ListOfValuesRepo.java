@@ -11,11 +11,7 @@ import com.efitops.basesetup.entity.ListOfValuesVO;
 @Repository
 public interface ListOfValuesRepo extends JpaRepository<ListOfValuesVO, Long> {
 
-	@Query(nativeQuery = true, value = "select * from listofvalues where listofvaluesid=?1")
-	List<ListOfValuesVO> getListOfValuesById(Long id);
-	
-	@Query(nativeQuery = true, value = "select * from listofvalues where orgid=?1")
-	List<ListOfValuesVO> getListOfValuesByOrgId(Long orgid);
+
 
 	boolean existsByListCodeAndOrgId(String listCode, Long orgId);
 
@@ -29,7 +25,12 @@ public interface ListOfValuesRepo extends JpaRepository<ListOfValuesVO, Long> {
 			+ " group by l1.valuedescription order by l1.valuedescription asc")
 	Set<Object[]> getAllListValues(Long orgId,String listDescription);
 
-	List<ListOfValuesVO> findByOrgId(Long orgId);
+	@Query(nativeQuery = true, value = "select * from listofvalues where org_id=?1 and branch_id=?2 and active=1 and cancel=0")
+	List<ListOfValuesVO> getListOfValuesByOrgId(Long orgId,Long branchId );
+	
+	@Query(nativeQuery = true, value = "select * from listofvalues where listofvalues_id=?1")
+	ListOfValuesVO getListOfValuesById(Long id);
+
 
 
         

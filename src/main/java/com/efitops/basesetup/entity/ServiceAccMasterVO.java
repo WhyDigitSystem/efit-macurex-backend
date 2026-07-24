@@ -1,0 +1,76 @@
+package com.efitops.basesetup.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "serviceaccmaster")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+
+public class ServiceAccMasterVO {
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "serviceaccmastergen")
+	@SequenceGenerator(name = "serviceaccmastergen", sequenceName = "serviceaccmasterseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "serviceaccmaster_id", columnDefinition = "BIGINT DEFAULT 0")
+	private Long id;
+
+	@Column(name = "service_name")
+	private String serviceName;
+	
+	@Column(name = "service_description")
+	private String serviceDescription;
+	
+	@Column(name = "hsn_code")
+	private String hsncode;
+		
+	@Column(name = "org_id")
+	private Long orgId;
+	@Column(name = "created_by", length = 25)
+	private String createdBy;
+	@Column(name = "modify_by", length = 25)
+	private String updatedBy;
+	@Column(name = "cancel_remarks", length = 150)
+	private String cancelRemarks;
+	@Column(name = "active")
+	private boolean active;
+	@Column(name = "cancel")
+	private boolean cancel=false;
+
+	@ManyToOne
+	@JoinColumn(name = "branch_id")
+	private BranchVO branch;
+	
+    @Column(name = "finyear", length = 5)
+    private String finYear;
+	@Column(name = "screen_code", length = 30)
+	private String screenCode = "SAM";
+	@Column(name = "screen_name", length = 30)
+	private String screenName = "serviceAccount";
+
+	@JsonGetter("active")
+	public String getActive() {
+		return active ? "Active" : "In-Active";
+	}
+
+	@JsonGetter("cancel")
+	public String getCancel() {
+		return cancel ? "T" : "F";
+	}
+
+
+}

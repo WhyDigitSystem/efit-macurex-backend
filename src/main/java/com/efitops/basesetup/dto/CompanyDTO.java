@@ -1,8 +1,6 @@
 
 package com.efitops.basesetup.dto;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,38 +9,52 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompanyDTO {
-	
+
 	private Long id;
+
 	private String companyCode;
 	private String companyName;
-	private String country;
-	private String currency;
-	private String mainCurrency;
-	private String address;
-	private String zip;
-	private String city;
-	private String state;
-	private String phone;
 	private String email;
-	private String webSite;
-	private String note;
-	private String cin;
-	//private String userId;
-	private String employeeName;
-	private String employeeCode;
-	private String password;
-	private String createdBy;
-	private String updatedBy;
-	private boolean cancel;
-	private boolean active;
-	private String ceo;
-	private String gst;
-	private int role;
-	private String termsAndConditions;
+	private String phoneNo;
 	private String panNo;
-	
+	private String gst;
+	private String cin;
+	private String officialWebsite;
+	private String industryType;
+	private String companySize;
+
+	private Long countryId;
+
+	private Long stateId;
+
+	private Long cityId;
+
+	private String pincode;
+
+	private String ceo;
+	private String registeredAddress;
+
+	private String selectPlan;
+	private int trialPeriod;
+	private String maxUsers;
+	private String storageLimit;
+
+	private String adminName;
+	private String adminEmail;
+	private String adminMobileNo;
+
+	private String password;
+	private String conformPassword;
+
 //	private byte[] companyLogo;
-	
-	List<BankDetailsDTO>bankDetailsDTO;
+
+	private String createdBy;
+
+	private boolean active;
+	private String cancelRemarks;
+
+	private String termsAndConditions;
+
+//	List<BankDetailsDTO>bankDetailsDTO;
 
 }

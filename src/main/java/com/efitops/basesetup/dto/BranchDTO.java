@@ -1,5 +1,7 @@
 package com.efitops.basesetup.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,47 +10,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BranchDTO {
-
-	private Long id;
-	private String branch;
-	
-	private String branchCode;
-	
-	private Long orgId;
-	
-	private String addressLine1;
-	
-	private String addressLine2;
-
-	private String pan;
-
-	private String gstIn;
-
-	private String phone;
-	
-	private String state;
-
-	private String city;
-
-	private String pinCode;
-	
-	private String country;
-
-	private String stateNo;
-
-	private String stateCode;
-
-	private String region;
-
-	private String lccurrency;
-
-	private boolean cancel;
-	
-	private String cancelRemarks;
-
-	private String createdBy;
-
-	private boolean active;
-	
-	private String userid;
+    private Long id;
+    private String branchCode;
+    private String branchName;
+    private String branchIncharge;
+    private String phoneNo;
+    private String email;
+    private String address;
+    private String eccNo;
+    private String division;
+    private Long cityId;
+    private String pincode;
+    private Long stateId;
+    private String gstinNo;
+    private String panNo;
+    private String cinNo;
+    private String dunsNo;
+    private Long orgId;
+    private String createdBy;
+    private boolean active;
+    private String cancelRemarks;
+    
+    private List<BankDetailsDTO> bankDetails;
 }

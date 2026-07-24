@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -25,32 +27,46 @@ public class CityVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "citygen")
 	@SequenceGenerator(name = "citygen", sequenceName = "cityseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "cityid")
+	@Column(name = "city_id")
 	private Long id;
 
-	@Column(name = "citycode")
+	@Column(name = "code")
 	private String cityCode;
-	@Column(name = "country")
-	private String country;
+	
+	
+	@ManyToOne
+	@JoinColumn(name = "country_id")
+	private CountryVO country;
+	
 	@Column(name = "city")
 	private String cityName;
-	@Column(name = "state")
-	private String state;
+	
+	
+	@ManyToOne
+	@JoinColumn(name = "state_id")
+	private StateVO state;
+	
 	@Column(name = "active")
 	private boolean active;
-	@Column(name = "createdby")
+	@Column(name = "created_by")
 	private String createdBy;
-	@Column(name = "modifiedby")
+	@Column(name = "modified_by")
 	private String updatedBy;
-	@Column(name = "orgid")
+	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "cancel")
-	private boolean cancel;
-
+	private boolean cancel=false;
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
 	@JsonGetter("active")
 	public String getActive() {
 		return active ? "Active" : "In-Active";
 	}
+    @Column(name = "screen_code", length = 5)
+    private String screenCode = "CT";
+
+    @Column(name = "screen_name", length = 25)
+    private String screenName = "CITY";
 
 	// Optionally, if you want to control serialization for 'cancel' field similarly
 	@JsonGetter("cancel")

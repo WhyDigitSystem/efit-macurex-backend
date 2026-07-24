@@ -1,3 +1,5 @@
+package com.efitops.basesetup.dto;
+
 /*
  * ========================================================================
  * This file is the intellectual property of GSM Outdoors.it
@@ -7,9 +9,10 @@
  * Copyrights(c) 2023 GSM Outdoors. All rights reserved.
  * ========================================================================
  */
-package com.efitops.basesetup.dto;
 
 import java.util.List;
+
+import javax.persistence.Column;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,8 +35,13 @@ public class SignUpFormDTO {
 	private String userType;
 	private boolean isActive;
 	private boolean allIndiaAcces;
+	private String branch;
+	private String branchcode;
+	private String department;
+	private String designation;
+	private String companyName;
+
 	private List<UserLoginRoleAccessDTO> roleAccessDTO;
-//	private List<UserLoginClientAccessDTO> clientAccessDTOList;
 	private List<UserLoginBranchAccessDTO> branchAccessDTOList;
 
 }

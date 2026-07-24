@@ -9,13 +9,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
+import com.efitops.basesetup.entity.BankDetailsVO;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -33,71 +36,97 @@ public class CompanyVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "companygen")
 	@SequenceGenerator(name = "companygen", sequenceName = "companyseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "companyid")
+	@Column(name = "company_id")
 	private Long id;
 
-	@Column(name = "companycode")
+	@Column(name = "company_code")
 	private String companyCode;
-	@Column(name = "companyname")
+	@Column(name = "company_name")
 	private String companyName;
-	@Column(name = "country")
-	private String country;
-	@Column(name = "currency")
-	private String currency;
-	@Column(name = "maincurrency")
-	private String mainCurrency;
-	@Column(name = "address")
-	private String address;
-	@Column(name = "zipcode")
-	private String zip;
-	@Column(name = "city")
-	private String city;
-	@Column(name = "state")
-	private String state;
-	@Column(name = "phone")
-	private String phone;
 	@Column(name = "email")
 	private String email;
-	@Column(name = "website")
-	private String webSite;
-	@Column(name = "notes")
-	private String note;
-//	@Column(name = "userd")
-//	private String userId;
-	@Column(name = "active")
-	private boolean active;
-//	@Column(unique = true)
-//	private String dupchk;
-	@Column(name = "employeename")
-	private String employeeName;
-	@Column(name = "employeecode")
-	private String employeeCode;
+	@Column(name = "phone_no")
+	private String phoneNo;
+	@Column(name = "pan_no", length = 10)
+	@Size(min = 10, max = 10, message = "PanNo must be exactly 10 characters.")
+	private String panNo;
+	@Column(name = "gst")
+	private String gst;
+	@Column(name = "cin")
+	private String cin;
+	@Column(name = "official_website")
+	private String officialWebsite;
+	@Column(name = "industry_type")
+	private String industryType;
+	@Column(name = "company_size")
+	private String companySize;
+	@ManyToOne
+	@JoinColumn(name = "country_id")
+	private CountryVO country;
+	@ManyToOne
+	@JoinColumn(name = "city_id")
+	private CityVO city;
+	@ManyToOne
+	@JoinColumn(name = "state_id")
+	private StateVO state;
+	@Column(name = "pincode")
+	private String pincode;
+	
+	@Column(name = "ceo")
+	private String ceo;
+	@Column(name = "registered_address")
+	private String RegisteredAddress;
+
+	@Column(name = "select_plan")
+	private String selectPlan;
+
+	@Column(name = "trial_period")
+	private int trialPeriod;
+	
+	@Column(name = "max_users")
+	private String maxUsers;
+	
+	@Column(name = "storage_limit")
+	private String storageLimit;
+	
+	@Column(name = "admin_name")
+	private String adminName;
+	@Column(name = "admin_email")
+	private String adminEmail;
+	@Column(name = "admin_mobileno")
+	private String adminMobileNo;
+
 	@Column(name = "password")
 	private String password;
-	@Column(name = "createdby")
+	@Column(name = "conform_password")
+	private String conformPassword;
+	
+	@Lob
+	@Column(name = "company_logo", columnDefinition = "LONGBLOB") // Ensure the column is LONGBLOB
+	private byte[] companyLogo;
+
+	@Column(name = "created_by")
 	private String createdBy;
-	@Column(name = "modifiedby")
+	@Column(name = "modified_by")
 	private String updatedBy;
 	@Column(name = "cancel")
 	private boolean cancel;
-	private int role;
-	private String ceo;
-	private String gst;
-	@Column(name = "termsandconditions", length = 10000)
+	@Column(name = "terms_conditions", length = 10000)
 	private String termsAndConditions;
-	@Column(name = "cin")
-	private String cin;
-	@Column(name = "panno", length = 10)
-	@Size(min = 10, max = 10, message = "PanNo must be exactly 10 characters.")
-	private String panNo;
+	@Column(name = "active")
+	private boolean active;
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
 
-	@Lob
-	@Column(name = "companylogo", columnDefinition = "LONGBLOB") // Ensure the column is LONGBLOB
-	private byte[] companyLogo;
+    @Column(name = "screen_code", length = 5)
+    private String screenCode = "COM";
 
-	@OneToMany(mappedBy = "companyVO", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	List<BankDetailsVO> bankDetailsVO;
+    @Column(name = "screen_name", length = 25)
+    private String screenName = "COMPANY";
+    
+//	@OneToMany(mappedBy = "companyVO", cascade = CascadeType.ALL)
+//	@JsonManagedReference
+//	List<BankDetailsVO> bankDetailsVO;
 
 	@JsonGetter("active")
 	public String getActive() {

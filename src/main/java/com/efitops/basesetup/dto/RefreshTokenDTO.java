@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,3 +15,4 @@ public class RefreshTokenDTO {
 	private String tokenId;
 	private String token;
 }
+

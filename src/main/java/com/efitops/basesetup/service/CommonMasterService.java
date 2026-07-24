@@ -10,6 +10,8 @@ import javax.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.CompanyResponseDTO;
+import com.efitops.basesetup.dto.BranchDTO;
 import com.efitops.basesetup.dto.CityDTO;
 import com.efitops.basesetup.dto.CompanyDTO;
 import com.efitops.basesetup.dto.CountryDTO;
@@ -19,6 +21,8 @@ import com.efitops.basesetup.dto.FinancialYearDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.StateDTO;
+import com.efitops.basesetup.dto.TransportMasterDTO;
+import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CompanyVO;
 import com.efitops.basesetup.entity.CountryVO;
@@ -27,6 +31,7 @@ import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.StateVO;
+import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -95,13 +100,13 @@ public interface CommonMasterService {
 
 	List<CompanyVO> getCompanyById(Long companyid);
 
-	CompanyVO createCompany(CompanyDTO companyDTO) throws Exception;
+	CompanyResponseDTO createCompany(CompanyDTO companyDTO) throws Exception;
 
-	CompanyVO updateCompany(CompanyDTO companyDTO) throws ApplicationException;
+	CompanyResponseDTO updateCompany(CompanyDTO companyDTO) throws ApplicationException, Exception;
 
 	void deleteCompany(Long companyid);
 
-	List<Map<String, Object>> getCompanyByOrgId(Long orgId);
+//	List<Map<String, Object>> getCompanyByOrgId(Long orgId);
 
 
 	// FINANCIAL YEAR
@@ -131,5 +136,25 @@ public interface CommonMasterService {
 	List<Map<String, Object>> getAllCurrencyForExRate(Long orgId);
 
 	CompanyVO uploadCompanyLogoInBloob(MultipartFile file, Long id) throws IOException  ;
+
+	//branch
+	
+	Map<String, Object> createUpdateBranch(BranchDTO branchDTO) throws ApplicationException;
+
+	BranchVO getBranchById(Long id) throws ApplicationException;
+	
+	List<BranchVO> getBranchByOrgId(Long orgId) throws ApplicationException;
+
+	//transport
+	
+	Map<String, Object> updateCreateTransportMaster(TransportMasterDTO transportMasterDTO) throws ApplicationException;
+
+	TransportMasterVO getTransportNameById(Long id) throws ApplicationException;
+
+
+	List<TransportMasterVO> getTransportNameByOrgId(Long orgId, String branchCode) throws ApplicationException;
+
+	
+	
 
 }

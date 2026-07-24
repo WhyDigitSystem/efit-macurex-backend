@@ -1,4 +1,5 @@
 package com.efitops.basesetup.dto;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,12 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BankDetailsDTO {
+	private Long id;
 	private String bankName;
-	private String accountCode;
-	private String beneficiaryName;
-	private String branch;
-	private String ifsc;
+	private String ifscCode;
 	private Long accountNo;
-	private String accountType;
-	private boolean primaryAccount;
+	private String bankBranch;
 }

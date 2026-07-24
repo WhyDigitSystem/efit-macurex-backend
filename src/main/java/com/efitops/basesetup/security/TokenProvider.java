@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.efitops.basesetup.entity.TokenVO;
 import com.efitops.basesetup.entity.UserVO;
-import com.efitops.basesetup.repo.TokenRepo;
+import com.efitops.basesetup.repository.TokenRepo;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

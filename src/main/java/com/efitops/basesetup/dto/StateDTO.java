@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,12 +14,15 @@ private Long id;
 	
 	private String stateCode;
 	private String stateName;
-    private String country;
+    private Long countryId;
     private String region;
     private String stateNumber;
     private boolean active;
     private String createdBy;
 	private Long orgId;
-	private boolean cancel;
+	private String cancelRemarks;
 
 }
+
+
+

@@ -22,7 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.CompanyResponseDTO;
 import com.efitops.basesetup.dto.BankDetailsDTO;
+import com.efitops.basesetup.dto.BranchDTO;
 import com.efitops.basesetup.dto.CityDTO;
 import com.efitops.basesetup.dto.CompanyDTO;
 import com.efitops.basesetup.dto.CountryDTO;
@@ -33,7 +35,9 @@ import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.Role;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.StateDTO;
+import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.entity.BankDetailsVO;
+import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CompanyVO;
 import com.efitops.basesetup.entity.CountryVO;
@@ -43,21 +47,24 @@ import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.StateVO;
+import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UserVO;
 import com.efitops.basesetup.exception.ApplicationException;
-import com.efitops.basesetup.repo.CityRepo;
-import com.efitops.basesetup.repo.CompanyRepo;
-import com.efitops.basesetup.repo.CountryRepo;
-import com.efitops.basesetup.repo.CurrencyRepo;
-import com.efitops.basesetup.repo.EmployeeRepo;
-import com.efitops.basesetup.repo.FinScreenRepo;
-import com.efitops.basesetup.repo.FinancialYearRepo;
-import com.efitops.basesetup.repo.RegionRepo;
-import com.efitops.basesetup.repo.ResponsibilitiesRepo;
-import com.efitops.basesetup.repo.RoleRepo;
-import com.efitops.basesetup.repo.ScreenNamesRepo;
-import com.efitops.basesetup.repo.StateRepo;
-import com.efitops.basesetup.repo.UserRepo;
+import com.efitops.basesetup.repository.BankDetailsRepo;
+import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.CityRepo;
+import com.efitops.basesetup.repository.CompanyRepo;
+import com.efitops.basesetup.repository.CountryRepo;
+import com.efitops.basesetup.repository.CurrencyRepo;
+import com.efitops.basesetup.repository.EmployeeRepo;
+import com.efitops.basesetup.repository.FinScreenRepo;
+import com.efitops.basesetup.repository.FinancialYearRepo;
+import com.efitops.basesetup.repository.RegionRepo;
+import com.efitops.basesetup.repository.ResponsibilitiesRepo;
+import com.efitops.basesetup.repository.ScreenNamesRepo;
+import com.efitops.basesetup.repository.StateRepo;
+import com.efitops.basesetup.repository.TransportRepo;
+import com.efitops.basesetup.repository.UserRepo;
 import com.efitops.basesetup.util.CryptoUtils;
 
 @Service
@@ -67,7 +74,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	@Autowired
 	CountryRepo countryRepo;
-	
 
 	@Autowired
 	CurrencyRepo currencyRepo;
@@ -88,16 +94,10 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	CompanyRepo companyRepo;
 
 	@Autowired
-	EmployeeRepo employeeRepo;
-
-	@Autowired
 	UserRepo userRepo;
 
 	@Autowired
 	FinancialYearRepo financialYearRepo;
-
-	@Autowired
-	RoleRepo roleRepo;
 
 	@Autowired
 	ResponsibilitiesRepo responsibilitiesRepo;
@@ -110,12 +110,18 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	@Autowired
 	BankDetailsRepo bankDetailsRepo;
+
+	@Autowired
+	EmployeeRepo employeeRepo;
 	
+	@Autowired
+	BranchRepo branchRepo;
+
 	@PersistenceContext
 	private EntityManager entityManager;
 	
 	@Autowired
-	CommonNotificationService commonNotificationService;
+	TransportRepo transportRepo;
 
 	// Company
 
@@ -131,70 +137,29 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	@Override
 	@Transactional
-	public CompanyVO createCompany(CompanyDTO companyDTO) throws Exception {
+	public CompanyResponseDTO  createCompany(CompanyDTO companyDTO) throws Exception {
 
-		if (companyRepo.existsByCompanyCodeAndCompanyNameAndEmployeeCodeAndEmailAndPhoneAndId(
-				companyDTO.getCompanyCode(), companyDTO.getCompanyName(), companyDTO.getEmployeeCode(),
-				companyDTO.getEmail(), companyDTO.getPhone(), companyDTO.getId())) {
-
-			String errorMessage = String.format(
-					"The CompanyCode : %s And CompanyName : %s And EmployeeCode : %s And Email : %s And PhoneNumber : %s Already Exists"
-							+ "This Organization",
-					companyDTO.getCompanyCode(), companyDTO.getCompanyName(), companyDTO.getEmployeeCode(),
-					companyDTO.getEmail(), companyDTO.getPhone());
-			throw new ApplicationException(errorMessage);
-		}
-
-		if (companyRepo.existsByCompanyCodeAndId(companyDTO.getCompanyCode(), companyDTO.getId())) {
-
-			String errorMessage = String.format("The CompanyCode : %s Already Exists This Organization",
-					companyDTO.getCompanyCode());
-			throw new ApplicationException(errorMessage);
-		}
-
-		if (companyRepo.existsByCompanyNameAndId(companyDTO.getCompanyName(), companyDTO.getId())) {
-			String errorMessage = String.format("The CompanyName : %s Already Exists This Organization",
-					companyDTO.getCompanyName());
-			throw new ApplicationException(errorMessage);
-		}
-
-		if (companyRepo.existsByEmployeeCodeAndId(companyDTO.getEmployeeCode(), companyDTO.getId())) {
-			String errorMessage = String.format("The EmployeeCode : %s Already Exists This Organization",
-					companyDTO.getEmployeeCode());
-			throw new ApplicationException(errorMessage);
-		}
-
-		if (companyRepo.existsByEmailAndId(companyDTO.getEmail(), companyDTO.getId())) {
-			String errorMessage = String.format("The Email : %s Already Exists This Organization",
-					companyDTO.getEmail());
-			throw new ApplicationException(errorMessage);
-		}
-
-		if (companyRepo.existsByPhoneAndId(companyDTO.getPhone(), companyDTO.getId())) {
-			String errorMessage = String.format("The PhoneNumber : %s Already Exists This Organization",
-					companyDTO.getPhone());
-			throw new ApplicationException(errorMessage);
-		}
+		validateCreateCompany(companyDTO);
 
 		CompanyVO companyVO = new CompanyVO();
-		getCompanyVOFromCompanyDTO(companyVO, companyDTO);
+		mapCreateCompanyDTOToVO(companyVO, companyDTO);
 		companyRepo.save(companyVO);
 
 		EmployeeVO employeeVO = new EmployeeVO();
-		employeeVO.setEmployeeName(companyVO.getEmployeeName());
-		employeeVO.setEmployeeCode(companyVO.getEmployeeCode());
+		employeeVO.setEmployeeName(companyVO.getAdminName());
+//		employeeVO.setEmployeeCode(companyVO.getCompanyCode());
 		employeeVO.setActive(true);
 		employeeVO.setOrgId(companyVO.getId());
 		employeeRepo.save(employeeVO);
 
 		UserVO userVO = new UserVO();
-		userVO.setUserName(companyVO.getEmployeeCode());
-		userVO.setEmployeeName(companyVO.getEmployeeName());
-		userVO.setEmployeeCode(companyVO.getEmployeeCode());
-		userVO.setEmail(companyVO.getEmail());
-		userVO.setMobileNo(companyVO.getPhone());
+		userVO.setUserName(companyVO.getAdminName());
+		userVO.setEmployeeName(companyVO.getAdminName());
+//		userVO.setEmployeeCode(companyVO.getCompanyCode());
+		userVO.setEmail(companyVO.getAdminEmail());
+		userVO.setMobileNo(companyVO.getAdminMobileNo());
 		userVO.setRole(Role.ROLE_USER);
-		userVO.setUserType("admin");
+		userVO.setUserType("ADMIN");
 		userVO.setOrgId(companyVO.getId());
 		userVO.setCreatedby(companyVO.getCreatedBy());
 		userVO.setUpdatedby(companyVO.getCreatedBy());
@@ -203,117 +168,254 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		userVO.setCompanyVO(companyVO);
 
 		try {
-			userVO.setPassword(encoder.encode(CryptoUtils.getDecrypt(companyDTO.getPassword())));
+		    userVO.setPassword(
+		        encoder.encode(
+		            CryptoUtils.getDecrypt(companyDTO.getPassword())
+		        )
+		    );
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-			throw new ApplicationContextException("Unable To Encode Password");
+		    throw new ApplicationContextException("Unable To Encode Password");
 		}
 
 		userRepo.save(userVO);
 
-		return companyVO;
+		return mapCompanyVOToResponseDTO(companyVO);
 	}
 
-	private void getCompanyVOFromCompanyDTO(CompanyVO companyVO, CompanyDTO companyDTO) {
-		companyVO.setCompanyCode(companyDTO.getCompanyCode());
-		companyVO.setCompanyName(companyDTO.getCompanyName());
-		companyVO.setCountry(companyDTO.getCountry());
-		companyVO.setCurrency(companyDTO.getCurrency());
-		companyVO.setMainCurrency(companyDTO.getMainCurrency());
-		companyVO.setAddress(companyDTO.getAddress());
-		companyVO.setZip(companyDTO.getZip());
-		companyVO.setCity(companyDTO.getCity());
-		companyVO.setState(companyDTO.getState());
-		companyVO.setPhone(companyDTO.getPhone());
-		companyVO.setEmail(companyDTO.getEmail());
-		companyVO.setWebSite(companyDTO.getWebSite());
-		companyVO.setNote(companyDTO.getNote());
-		companyVO.setEmployeeCode(companyDTO.getEmployeeCode());
-		companyVO.setEmployeeName(companyDTO.getEmployeeName());
-		companyVO.setCreatedBy(companyDTO.getCreatedBy());
-		companyVO.setUpdatedBy(companyDTO.getCreatedBy());
-		companyVO.setActive(companyDTO.isActive());
-		companyVO.setCancel(companyDTO.isCancel());
-		companyVO.setGst(companyDTO.getGst());
-		companyVO.setCeo(companyDTO.getCeo());
-		companyVO.setTermsAndConditions(companyDTO.getTermsAndConditions());
-		companyVO.setPanNo(companyDTO.getPanNo());
-		companyVO.setCin(companyDTO.getCin());
+	private void validateCreateCompany(CompanyDTO dto) throws ApplicationException {
+
+		if (companyRepo.existsByCompanyCode(dto.getCompanyCode())) {
+			throw new ApplicationException("Company Code : " + dto.getCompanyCode() + " already exists.");
+		}
+
+		if (companyRepo.existsByCompanyName(dto.getCompanyName())) {
+			throw new ApplicationException("Company Name : " + dto.getCompanyName() + " already exists.");
+		}
+
+		if (companyRepo.existsByEmail(dto.getAdminEmail())) {
+			throw new ApplicationException("Email : " + dto.getAdminEmail() + " already exists.");
+		}
+
+		if (companyRepo.existsByPhoneNo(dto.getAdminMobileNo())) {
+			throw new ApplicationException("Phone Number : " + dto.getAdminMobileNo() + " already exists.");
+		}
+	}
+
+	private void mapCreateCompanyDTOToVO(CompanyVO companyVO, CompanyDTO dto) throws ApplicationException {
+
+		companyVO.setCompanyCode(dto.getCompanyCode());
+		companyVO.setCompanyName(dto.getCompanyName());
+		companyVO.setEmail(dto.getEmail());
+		companyVO.setPhoneNo(dto.getPhoneNo());
+		companyVO.setPanNo(dto.getPanNo());
+		companyVO.setGst(dto.getGst());
+		companyVO.setCin(dto.getCin());
+		companyVO.setOfficialWebsite(dto.getOfficialWebsite());
+		companyVO.setIndustryType(dto.getIndustryType());
+		companyVO.setCompanySize(dto.getCompanySize());
+
+		companyVO.setPincode(dto.getPincode());
+		companyVO.setCeo(dto.getCeo());
+		companyVO.setRegisteredAddress(dto.getRegisteredAddress());
+
+		companyVO.setSelectPlan(dto.getSelectPlan());
+		companyVO.setTrialPeriod(dto.getTrialPeriod());
+		companyVO.setMaxUsers(dto.getMaxUsers());
+		companyVO.setStorageLimit(dto.getStorageLimit());
+
+		companyVO.setAdminName(dto.getAdminName());
+		companyVO.setAdminEmail(dto.getAdminEmail());
+		companyVO.setAdminMobileNo(dto.getAdminMobileNo());
+
+		companyVO.setCreatedBy(dto.getCreatedBy());
+		companyVO.setUpdatedBy(dto.getCreatedBy());
+
+		companyVO.setActive(dto.isActive());
+
+		companyVO.setTermsAndConditions(dto.getTermsAndConditions());
+
+		if (dto.getCountryId() != null && dto.getCountryId() != 0) {
+		    CountryVO country = countryRepo.findById(dto.getCountryId())
+		            .orElseThrow(() -> new ApplicationException("Country Not Found"));
+		    companyVO.setCountry(country);
+		}
+
+		if (dto.getStateId() != null && dto.getStateId() != 0) {
+		    StateVO state = stateRepo.findById(dto.getStateId())
+		            .orElseThrow(() -> new ApplicationException("State Not Found"));
+		    companyVO.setState(state);
+		}
+
+		if (dto.getCityId() != null && dto.getCityId() != 0) {
+		    CityVO city = cityRepo.findById(dto.getCityId())
+		            .orElseThrow(() -> new ApplicationException("City Not Found"));
+		    companyVO.setCity(city);
+		}
 
 		try {
-			companyVO.setPassword(encoder.encode(CryptoUtils.getDecrypt(companyDTO.getPassword())));
+			companyVO.setPassword(encoder.encode(CryptoUtils.getDecrypt(dto.getPassword())));
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-			throw new ApplicationContextException("Unable To Encode Password");
+			throw new ApplicationException("Unable To Encode Password");
 		}
 	}
+	private CompanyResponseDTO mapCompanyVOToResponseDTO(CompanyVO companyVO) {
 
-	public CompanyVO updateCompany(CompanyDTO companyDTO) throws ApplicationException {
+	    CompanyResponseDTO dto = new CompanyResponseDTO();
 
-		if (ObjectUtils.isEmpty(companyDTO.getId())) {
-			throw new ApplicationException("Invalid Company Id");
-		}
+	    dto.setId(companyVO.getId());
+	    dto.setCompanyCode(companyVO.getCompanyCode());
+	    dto.setCompanyName(companyVO.getCompanyName());
+	    dto.setEmail(companyVO.getEmail());
+	    dto.setPhoneNo(companyVO.getPhoneNo());
+	    dto.setPanNo(companyVO.getPanNo());
+	    dto.setGst(companyVO.getGst());
+	    dto.setCin(companyVO.getCin());
+	    dto.setOfficialWebsite(companyVO.getOfficialWebsite());
+	    dto.setIndustryType(companyVO.getIndustryType());
+	    dto.setCompanySize(companyVO.getCompanySize());
+
+	    if (companyVO.getCountry() != null) {
+	        dto.setCountryId(companyVO.getCountry().getId());
+	        dto.setCountryName(companyVO.getCountry().getCountryName());
+	    }
+
+	    if (companyVO.getState() != null) {
+	        dto.setStateId(companyVO.getState().getId());
+	        dto.setStateName(companyVO.getState().getStateName());
+	    }
+
+	    if (companyVO.getCity() != null) {
+	        dto.setCityId(companyVO.getCity().getId());
+	        dto.setCityName(companyVO.getCity().getCityName());
+	    }
+
+	    dto.setPincode(companyVO.getPincode());
+	    dto.setCeo(companyVO.getCeo());
+	    dto.setRegisteredAddress(companyVO.getRegisteredAddress());
+
+	    dto.setSelectPlan(companyVO.getSelectPlan());
+	    dto.setTrialPeriod(companyVO.getTrialPeriod());
+	    dto.setMaxUsers(companyVO.getMaxUsers());
+	    dto.setStorageLimit(companyVO.getStorageLimit());
+
+	    dto.setAdminName(companyVO.getAdminName());
+	    dto.setAdminEmail(companyVO.getAdminEmail());
+	    dto.setAdminMobileNo(companyVO.getAdminMobileNo());
+
+	    dto.setCompanyLogo(companyVO.getCompanyLogo());
+
+	    dto.setCreatedBy(companyVO.getCreatedBy());
+	    dto.setUpdatedBy(companyVO.getUpdatedBy());
+
+	    dto.setTermsAndConditions(companyVO.getTermsAndConditions());
+	    dto.setCancelRemarks(companyVO.getCancelRemarks());
+
+	    dto.setScreenCode(companyVO.getScreenCode());
+	    dto.setScreenName(companyVO.getScreenName());
+
+	    dto.setActive(companyVO.getActive());
+	    dto.setCancel(companyVO.getCancel());
+
+	    dto.setCommonDate(companyVO.getCommonDate());
+
+	    return dto;
+	}
+
+	@Override
+	@Transactional
+	public CompanyResponseDTO  updateCompany(CompanyDTO companyDTO) throws Exception {
 
 		CompanyVO companyVO = companyRepo.findById(companyDTO.getId())
-				.orElseThrow(() -> new ApplicationException("Company not found for Id: " + companyDTO.getId()));
+				.orElseThrow(() -> new ApplicationException("Company Not Found"));
 
-		mapCompanyDTOToCompanyVO(companyVO, companyDTO);
+		validateUpdateCompany(companyDTO);
 
-		return companyRepo.save(companyVO);
+		mapUpdateCompanyDTOToVO(companyVO, companyDTO);
+
+		CompanyVO updatedCompany = companyRepo.save(companyVO);
+		return mapCompanyVOToResponseDTO(updatedCompany);
 	}
 
-	private void mapCompanyDTOToCompanyVO(CompanyVO companyVO, CompanyDTO companyDTO) {
-		companyVO.setCompanyCode(companyDTO.getCompanyCode());
-		companyVO.setCompanyName(companyDTO.getCompanyName());
-		companyVO.setCountry(companyDTO.getCountry());
-		companyVO.setCurrency(companyDTO.getCurrency());
-		companyVO.setMainCurrency(companyDTO.getMainCurrency());
-		companyVO.setAddress(companyDTO.getAddress());
-		companyVO.setZip(companyDTO.getZip());
-		companyVO.setCity(companyDTO.getCity());
-		companyVO.setState(companyDTO.getState());
-		companyVO.setPhone(companyDTO.getPhone());
-		companyVO.setEmail(companyDTO.getEmail());
-		companyVO.setWebSite(companyDTO.getWebSite());
-		companyVO.setNote(companyDTO.getNote());
-//			companyVO.setEmployeeCode(companyDTO.getEmployeeCode());
-//			companyVO.setEmployeeName(companyDTO.getEmployeeName());
-		companyVO.setCreatedBy(companyDTO.getCreatedBy());
-		companyVO.setUpdatedBy(companyDTO.getUpdatedBy());
-		companyVO.setActive(companyDTO.isActive());
-		companyVO.setCancel(companyDTO.isCancel());
-		companyVO.setRole(companyDTO.getRole());
-		companyVO.setGst(companyDTO.getGst());
-		companyVO.setCeo(companyDTO.getCeo());
-		companyVO.setTermsAndConditions(companyDTO.getTermsAndConditions());
-		companyVO.setPanNo(companyDTO.getPanNo());
-		companyVO.setCin(companyDTO.getCin());
+	private void validateUpdateCompany(CompanyDTO dto) throws ApplicationException {
 
-		if (ObjectUtils.isNotEmpty(companyDTO.getId())) {
-			List<BankDetailsVO> bankDetailsVO1 = bankDetailsRepo.findByCompanyVO(companyVO);
-			bankDetailsRepo.deleteAll(bankDetailsVO1);
+		if (companyRepo.existsByCompanyCodeAndIdNot(dto.getCompanyCode(), dto.getId())) {
+			throw new ApplicationException("Company Code : " + dto.getCompanyCode() + " already exists.");
 		}
 
-		List<BankDetailsVO> bankDetailsVOs = new ArrayList<>();
-		for (BankDetailsDTO bankDetailsDTO : companyDTO.getBankDetailsDTO()) {
-			BankDetailsVO bankDetailsVO = new BankDetailsVO();
-
-			bankDetailsVO.setBankName(bankDetailsDTO.getBankName());
-			bankDetailsVO.setAccountCode(bankDetailsDTO.getAccountCode());
-			bankDetailsVO.setBeneficiaryName(bankDetailsDTO.getBeneficiaryName());
-			bankDetailsVO.setBranch(bankDetailsDTO.getBranch());
-
-			bankDetailsVO.setIfsc(bankDetailsDTO.getIfsc());
-			bankDetailsVO.setAccountNo(bankDetailsDTO.getAccountNo());
-			bankDetailsVO.setAccountType(bankDetailsDTO.getAccountType());
-			bankDetailsVO.setPrimaryAccount(bankDetailsDTO.isPrimaryAccount());
-
-			bankDetailsVO.setCompanyVO(companyVO);
-			bankDetailsVOs.add(bankDetailsVO);
-
+		if (companyRepo.existsByCompanyNameAndIdNot(dto.getCompanyName(), dto.getId())) {
+			throw new ApplicationException("Company Name : " + dto.getCompanyName() + " already exists.");
 		}
-		companyVO.setBankDetailsVO(bankDetailsVOs);
 
+		if (companyRepo.existsByAdminEmailAndIdNot(dto.getAdminEmail(), dto.getId())) {
+			throw new ApplicationException("Email : " + dto.getAdminEmail() + " already exists.");
+		}
+
+		if (companyRepo.existsByAdminMobileNoAndIdNot(dto.getAdminMobileNo(), dto.getId())) {
+			throw new ApplicationException("Phone Number : " + dto.getAdminMobileNo() + " already exists.");
+		}
+	}
+
+	private void mapUpdateCompanyDTOToVO(CompanyVO companyVO, CompanyDTO dto) throws ApplicationException {
+
+		companyVO.setCompanyCode(dto.getCompanyCode());
+		companyVO.setCompanyName(dto.getCompanyName());
+
+		companyVO.setEmail(dto.getEmail());
+		companyVO.setPhoneNo(dto.getPhoneNo());
+
+		companyVO.setPanNo(dto.getPanNo());
+		companyVO.setGst(dto.getGst());
+		companyVO.setCin(dto.getCin());
+
+		companyVO.setOfficialWebsite(dto.getOfficialWebsite());
+		companyVO.setIndustryType(dto.getIndustryType());
+		companyVO.setCompanySize(dto.getCompanySize());
+
+		companyVO.setPincode(dto.getPincode());
+		companyVO.setCeo(dto.getCeo());
+		companyVO.setRegisteredAddress(dto.getRegisteredAddress());
+
+		companyVO.setSelectPlan(dto.getSelectPlan());
+		companyVO.setTrialPeriod(dto.getTrialPeriod());
+		companyVO.setMaxUsers(dto.getMaxUsers());
+		companyVO.setStorageLimit(dto.getStorageLimit());
+
+		companyVO.setAdminName(dto.getAdminName());
+		companyVO.setAdminEmail(dto.getAdminEmail());
+		companyVO.setAdminMobileNo(dto.getAdminMobileNo());
+
+		companyVO.setUpdatedBy(dto.getCreatedBy());
+
+		companyVO.setActive(dto.isActive());
+
+		companyVO.setTermsAndConditions(dto.getTermsAndConditions());
+
+		if (dto.getCountryId() != null && dto.getCountryId() != 0) {
+		    CountryVO country = countryRepo.findById(dto.getCountryId())
+		            .orElseThrow(() -> new ApplicationException("Country Not Found"));
+		    companyVO.setCountry(country);
+		}
+
+		if (dto.getStateId() != null && dto.getStateId() != 0) {
+		    StateVO state = stateRepo.findById(dto.getStateId())
+		            .orElseThrow(() -> new ApplicationException("State Not Found"));
+		    companyVO.setState(state);
+		}
+
+		if (dto.getCityId() != null && dto.getCityId() != 0) {
+		    CityVO city = cityRepo.findById(dto.getCityId())
+		            .orElseThrow(() -> new ApplicationException("City Not Found"));
+		    companyVO.setCity(city);
+		}
+
+
+		if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+			try {
+				companyVO.setPassword(encoder.encode(CryptoUtils.getDecrypt(dto.getPassword())));
+			} catch (Exception e) {
+				throw new ApplicationException("Unable To Encode Password");
+			}
+		}
 	}
 
 	@Override
@@ -599,18 +701,22 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", message);
 		response.put("stateVO", stateVO);
-
 		return response;
 	}
 
-	private void getStateVOFromStateDTO(StateVO stateVO, StateDTO stateDTO) {
+	private void getStateVOFromStateDTO(StateVO stateVO, StateDTO stateDTO) throws ApplicationException {
 		stateVO.setStateCode(stateDTO.getStateCode().toUpperCase());
 		stateVO.setStateName(stateDTO.getStateName().toUpperCase());
 		stateVO.setStateNumber(stateDTO.getStateNumber().toUpperCase());
-		stateVO.setCountry(stateDTO.getCountry().toUpperCase());
+
+		CountryVO countryVO = countryRepo.findById(stateDTO.getCountryId())
+				.orElseThrow(() -> new ApplicationException("Country not found with id : " + stateDTO.getCountryId()));
+
+		stateVO.setCountry(countryVO);
+
 		stateVO.setRegion(stateDTO.getRegion().toUpperCase());
 		stateVO.setActive(stateDTO.isActive());
-		stateVO.setCancel(stateDTO.isCancel());
+		stateVO.setCancelRemarks(stateDTO.getCancelRemarks());
 		stateVO.setOrgId(stateDTO.getOrgId());
 		// stateVO.setDupchk(stateDTO.getOrgId() + stateDTO.getStateCode() +
 		// stateDTO.getStateName());
@@ -696,14 +802,21 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return response;
 	}
 
-	private void getCityVOFromCityDTO(CityVO cityVO, CityDTO cityDTO) {
+	private void getCityVOFromCityDTO(CityVO cityVO, CityDTO cityDTO) throws ApplicationException {
 		cityVO.setCityCode(cityDTO.getCityCode().toUpperCase());
 		cityVO.setCityName(cityDTO.getCityName().toUpperCase());
-		cityVO.setCountry(cityDTO.getCountry().toUpperCase());
-		cityVO.setState(cityDTO.getState().toUpperCase());
+		CountryVO countryVO = countryRepo.findById(cityDTO.getCountryId())
+				.orElseThrow(() -> new ApplicationException("Country not found with id : " + cityDTO.getCountryId()));
+
+		StateVO stateVO = stateRepo.findById(cityDTO.getStateId())
+				.orElseThrow(() -> new ApplicationException("State not found with id : " + cityDTO.getStateId()));
+
+		cityVO.setCountry(countryVO);
+		cityVO.setState(stateVO);
 		cityVO.setActive(cityDTO.isActive());
 		cityVO.setOrgId(cityDTO.getOrgId());
-		cityVO.setCancel(cityDTO.isCancel());
+		cityVO.setCancelRemarks(cityDTO.getCancelRemarks());
+
 	}
 
 	@Override
@@ -818,22 +931,25 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		CurrencyVO currencyVO;
 		String message = null;
-         CurrencyVO oldCurrency = null;
+		CurrencyVO oldCurrency = null;
+		CountryVO countryVO = countryRepo.findById(currencyDTO.getCountryId()).orElseThrow(
+				() -> new ApplicationException("Country not found with id : " + currencyDTO.getCountryId()));
 		if (ObjectUtils.isEmpty(currencyDTO.getId())) {
-			if (currencyRepo.existsByOrgIdAndCountryAndCurrencyIgnoreCase(currencyDTO.getOrgId(),
-					currencyDTO.getCountry(), currencyDTO.getCurrency())) {
+
+			if (currencyRepo.existsByOrgIdAndCountryAndCurrencyIgnoreCase(currencyDTO.getOrgId(), countryVO,
+					currencyDTO.getCurrency())) {
 				String errorMessage = String.format("This Currency:%s Already Exists in This Organization.",
 						currencyDTO.getCurrency());
 				throw new ApplicationException(errorMessage);
 			}
-			if (currencyRepo.existsByOrgIdAndCountryAndCurrencyDescriptionIgnoreCase(currencyDTO.getOrgId(),
-					currencyDTO.getCountry(), currencyDTO.getCurrencyDescription())) {
+			if (currencyRepo.existsByOrgIdAndCountryAndCurrencyDescriptionIgnoreCase(currencyDTO.getOrgId(), countryVO,
+					currencyDTO.getCurrencyDescription())) {
 				String errorMessage = String.format("This CurrencyDescription:%s Already Exists in This Organization.",
 						currencyDTO.getCurrencyDescription());
 				throw new ApplicationException(errorMessage);
 			}
-			if (currencyRepo.existsByOrgIdAndCountryAndSubCurrencyIgnoreCase(currencyDTO.getOrgId(),
-					currencyDTO.getCountry(), currencyDTO.getSubCurrency())) {
+			if (currencyRepo.existsByOrgIdAndCountryAndSubCurrencyIgnoreCase(currencyDTO.getOrgId(), countryVO,
+					currencyDTO.getSubCurrency())) {
 				String errorMessage = String.format("This SubCurrency:%s Already Exists in This Organization.",
 						currencyDTO.getSubCurrency());
 				throw new ApplicationException(errorMessage);
@@ -846,19 +962,19 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			message = "Currency Created Successfully";
 		} else {
 			// Update existing currency
-			
-			oldCurrency = currencyRepo.findById(currencyDTO.getId())
-		            .orElseThrow(() -> new ApplicationException("Currency master not found"));
 
-		    entityManager.detach(oldCurrency); // detach snapshot
-		    
+			oldCurrency = currencyRepo.findById(currencyDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Currency master not found"));
+
+			entityManager.detach(oldCurrency); // detach snapshot
+
 			currencyVO = currencyRepo.findById(currencyDTO.getId()).orElseThrow(
 					() -> new ApplicationException("This Id Is Not Found Any Information: " + currencyDTO.getId()));
 			currencyVO.setUpdatedBy(currencyDTO.getCreatedBy());
 
 			if (!currencyVO.getCurrency().equalsIgnoreCase(currencyDTO.getCurrency())) {
-				if (currencyRepo.existsByOrgIdAndCountryAndCurrencyIgnoreCase(currencyDTO.getOrgId(),
-						currencyDTO.getCountry(), currencyDTO.getCurrency())) {
+				if (currencyRepo.existsByOrgIdAndCountryAndCurrencyIgnoreCase(currencyDTO.getOrgId(), countryVO,
+						currencyDTO.getCurrency())) {
 					String errorMessage = String.format("This Currency:%s Already Exists in This Organization.",
 							currencyDTO.getCurrency());
 					throw new ApplicationException(errorMessage);
@@ -866,8 +982,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				currencyVO.setCurrency(currencyDTO.getCurrency().toUpperCase());
 			}
 			if (!currencyVO.getSubCurrency().equalsIgnoreCase(currencyDTO.getSubCurrency())) {
-				if (currencyRepo.existsByOrgIdAndCountryAndSubCurrencyIgnoreCase(currencyDTO.getOrgId(),
-						currencyDTO.getCountry(), currencyDTO.getSubCurrency())) {
+				if (currencyRepo.existsByOrgIdAndCountryAndSubCurrencyIgnoreCase(currencyDTO.getOrgId(), countryVO,
+						currencyDTO.getSubCurrency())) {
 					String errorMessage = String.format("This SubCurrency:%s Already Exists in This Organization.",
 							currencyDTO.getSubCurrency());
 					throw new ApplicationException(errorMessage);
@@ -878,7 +994,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			}
 			if (!currencyVO.getCurrencyDescription().equalsIgnoreCase(currencyDTO.getCurrencyDescription())) {
 				if (currencyRepo.existsByOrgIdAndCountryAndCurrencyDescriptionIgnoreCase(currencyDTO.getOrgId(),
-						currencyDTO.getCountry(), currencyDTO.getCurrencyDescription())) {
+						countryVO, currencyDTO.getCurrencyDescription())) {
 					String errorMessage = String.format(
 							"This CurrencyDescription:%s Already Exists in This Organization.",
 							currencyDTO.getCurrencyDescription());
@@ -894,7 +1010,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		getCurrencyVOFromCurrencyDTO(currencyVO, currencyDTO);
 
 		currencyRepo.save(currencyVO);
-		commonNotificationService.generateNotification(currencyVO.getScreenCode(), currencyVO.getId(), oldCurrency, currencyVO);
+//		commonNotificationService.generateNotification(currencyVO.getScreenCode(), currencyVO.getId(), oldCurrency, currencyVO);
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", message);
@@ -902,7 +1018,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return response;
 	}
 
-	private void getCurrencyVOFromCurrencyDTO(CurrencyVO currencyVO, CurrencyDTO currencyDTO) {
+	private void getCurrencyVOFromCurrencyDTO(CurrencyVO currencyVO, CurrencyDTO currencyDTO)
+			throws ApplicationException {
 		currencyVO.setCurrency(currencyDTO.getCurrency().toUpperCase());
 		if (currencyDTO.getSubCurrency() != null) {
 			currencyVO.setSubCurrency(currencyDTO.getSubCurrency().toUpperCase());
@@ -911,8 +1028,21 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			currencyVO.setCurrencyDescription(currencyDTO.getCurrencyDescription().toUpperCase());
 		}
 		currencyVO.setActive(currencyDTO.isActive());
-		currencyVO.setCountry(currencyDTO.getCountry().toUpperCase());
+
+		CountryVO countryVO = countryRepo.findById(currencyDTO.getCountryId()).orElseThrow(
+				() -> new ApplicationException("Country not found with id : " + currencyDTO.getCountryId()));
+
+		currencyVO.setCountry(countryVO);
 		currencyVO.setOrgId(currencyDTO.getOrgId());
+
+		currencyVO.setMainCurrency(currencyDTO.getMainCurrency().toUpperCase());
+		currencyVO.setMainCurrencySymbol(currencyDTO.getMainCurrencySymbol());
+		currencyVO.setSubSymbol(currencyDTO.getSubSymbol());
+		currencyVO.setCurrencyRepresentation(currencyDTO.getCurrencyRepresentation());
+		currencyVO.setCurrencyInteger(currencyDTO.getCurrencyInteger());
+		currencyVO.setCurrencyDecimal(currencyDTO.getCurrencyDecimal());
+		currencyVO.setCancelRemarks(currencyDTO.getCancelRemarks());
+
 	}
 
 	@Override
@@ -1124,35 +1254,291 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return currencyList;
 	}
 
-	@Override
-	public List<Map<String, Object>> getCompanyByOrgId(Long orgId) {
-
-		Set<Object[]> getCompanyBankDetails = companyRepo.findCompanyBankDetails(orgId);
-		return getBank(getCompanyBankDetails); // Returning a list of Map<String, Object>
-	}
-
-	private List<Map<String, Object>> getBank(Set<Object[]> getCompanyBankDetails) {
-		List<Map<String, Object>> bankDetailsList = new ArrayList<>(); // Correct variable name
-
-		for (Object[] bank : getCompanyBankDetails) { // Iterating over getFullGridCurrency
-			Map<String, Object> bankMap = new HashMap<>();
-			bankMap.put("bankName", bank[0] != null ? bank[0].toString() : "");
-			bankMap.put("accountCode", bank[1] != null ? bank[1].toString() : "");
-			bankMap.put("accountNo", bank[2] != null ? bank[2].toString() : "");
-			bankMap.put("ifsc", bank[3] != null ? bank[3].toString() : "");
-			bankMap.put("accountType", bank[4] != null ? bank[4].toString() : "");
-			bankMap.put("beneficiaryName", bank[5] != null ? bank[5].toString() : "");
-			bankMap.put("branch", bank[6] != null ? bank[6].toString() : "");
-
-			bankDetailsList.add(bankMap); // Add the Map to the list
-		}
-		return bankDetailsList;
-	}
+//	@Override
+//	public List<Map<String, Object>> getCompanyByOrgId(Long orgId) {
+//
+//		Set<Object[]> getCompanyBankDetails = companyRepo.findCompanyBankDetails(orgId);
+//		return getBank(getCompanyBankDetails); // Returning a list of Map<String, Object>
+//	}
+//
+//	private List<Map<String, Object>> getBank(Set<Object[]> getCompanyBankDetails) {
+//		List<Map<String, Object>> bankDetailsList = new ArrayList<>(); // Correct variable name
+//
+//		for (Object[] bank : getCompanyBankDetails) { // Iterating over getFullGridCurrency
+//			Map<String, Object> bankMap = new HashMap<>();
+//			bankMap.put("bankName", bank[0] != null ? bank[0].toString() : "");
+//			bankMap.put("accountCode", bank[1] != null ? bank[1].toString() : "");
+//			bankMap.put("accountNo", bank[2] != null ? bank[2].toString() : "");
+//			bankMap.put("ifsc", bank[3] != null ? bank[3].toString() : "");
+//			bankMap.put("accountType", bank[4] != null ? bank[4].toString() : "");
+//			bankMap.put("beneficiaryName", bank[5] != null ? bank[5].toString() : "");
+//			bankMap.put("branch", bank[6] != null ? bank[6].toString() : "");
+//
+//			bankDetailsList.add(bankMap); // Add the Map to the list
+//		}
+//		return bankDetailsList;
+//	}
 
 	public CompanyVO uploadCompanyLogoInBloob(MultipartFile file, Long id) throws IOException {
 		CompanyVO companyVO = companyRepo.findById(id).orElseThrow(() -> new RuntimeException("Company not found"));
 		companyVO.setCompanyLogo(file.getBytes()); // Store image as byte array
 		return companyRepo.save(companyVO);
 	}
+	
+	
+	
+	//branch
+	
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateBranch(BranchDTO branchDTO) throws ApplicationException {
 
+	    BranchVO branchVO = new BranchVO();
+	    String message;
+
+	    if (branchDTO.getId() != null) {
+
+	        branchVO = branchRepo.findById(branchDTO.getId())
+	                .orElseThrow(() -> new ApplicationException("Invalid Branch Details"));
+
+	        branchVO.setUpdatedBy(branchDTO.getCreatedBy());
+
+	        if (!branchVO.getBranchName().equalsIgnoreCase(branchDTO.getBranchName())) {
+
+	            if (branchRepo.existsByBranchNameAndOrgId(branchDTO.getBranchName(), branchDTO.getOrgId())) {
+	                throw new ApplicationException(
+	                        "Branch Name : " + branchDTO.getBranchName() + " already exists.");
+	            }
+	        }
+
+	        if (!branchVO.getBranchCode().equalsIgnoreCase(branchDTO.getBranchCode())) {
+
+	            if (branchRepo.existsByBranchCodeAndOrgId(branchDTO.getBranchCode(), branchDTO.getOrgId())) {
+	                throw new ApplicationException(
+	                        "Branch Code : " + branchDTO.getBranchCode() + " already exists.");
+	            }
+	        }
+
+
+		    branchVO.setCreatedBy(branchDTO.getCreatedBy());
+	        message = "Branch Updated Successfully";
+
+	    } else {
+
+	        if (branchRepo.existsByBranchNameAndOrgId(branchDTO.getBranchName(), branchDTO.getOrgId())) {
+	            throw new ApplicationException(
+	                    "Branch Name : " + branchDTO.getBranchName() + " already exists.");
+	        }
+
+	        if (branchRepo.existsByBranchCodeAndOrgId(branchDTO.getBranchCode(), branchDTO.getOrgId())) {
+	            throw new ApplicationException(
+	                    "Branch Code : " + branchDTO.getBranchCode() + " already exists.");
+	        }
+
+	        branchVO.setCreatedBy(branchDTO.getCreatedBy());
+	        branchVO.setUpdatedBy(branchDTO.getCreatedBy());
+
+	        message = "Branch Created Successfully";
+	    }
+
+	    createUpdateBranchVO(branchDTO, branchVO);
+
+	    branchRepo.save(branchVO);
+
+	    // Delete old Bank Details while updating
+	    if (branchDTO.getId() != null) {
+
+	        List<BankDetailsVO> bankList = bankDetailsRepo.findByBranchVO(branchVO);
+
+	        bankDetailsRepo.deleteAll(bankList);
+	    }
+
+	    // Save Bank Details
+	    if (branchDTO.getBankDetails() != null && !branchDTO.getBankDetails().isEmpty()) {
+
+	        for (BankDetailsDTO bankDTO : branchDTO.getBankDetails()) {
+
+	            BankDetailsVO bankVO = new BankDetailsVO();
+
+	            bankVO.setBankName(bankDTO.getBankName());
+	            bankVO.setIfscCode(bankDTO.getIfscCode());
+	            bankVO.setAccountNo(bankDTO.getAccountNo());
+	            bankVO.setBankBranch(bankDTO.getBankBranch());
+
+	            bankVO.setBranchVO(branchVO);
+
+	            bankDetailsRepo.save(bankVO);
+	        }
+	    }
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("branchVO", branchVO);
+	    response.put("message", message);
+
+	    return response;
+	}
+	
+	private void createUpdateBranchVO(BranchDTO dto, BranchVO branchVO)
+	        throws ApplicationException {
+
+	    branchVO.setBranchCode(dto.getBranchCode().toUpperCase());
+	    branchVO.setBranchName(dto.getBranchName().toUpperCase());
+	    branchVO.setBranchIncharge(dto.getBranchIncharge());
+	    branchVO.setPhoneNo(dto.getPhoneNo());
+	    branchVO.setEmail(dto.getEmail());
+	    branchVO.setAddress(dto.getAddress());
+	    branchVO.setEccNo(dto.getEccNo());
+	    branchVO.setDivision(dto.getDivision());
+	    branchVO.setPincode(dto.getPincode());
+
+	    branchVO.setGstinNo(dto.getGstinNo());
+	    branchVO.setPanNo(dto.getPanNo());
+	    branchVO.setCinNo(dto.getCinNo());
+	    branchVO.setDunsNo(dto.getDunsNo());
+
+	    branchVO.setOrgId(dto.getOrgId());
+
+
+	    branchVO.setActive(dto.isActive());
+	    branchVO.setCancelRemarks(dto.getCancelRemarks());
+
+	    if (dto.getStateId() != null && dto.getStateId() != 0) {
+
+	        StateVO state = stateRepo.findById(dto.getStateId())
+	                .orElseThrow(() -> new ApplicationException("State Not Found"));
+
+	        branchVO.setState(state);
+	    }
+
+	    if (dto.getCityId() != null && dto.getCityId() != 0) {
+
+	        CityVO city = cityRepo.findById(dto.getCityId())
+	                .orElseThrow(() -> new ApplicationException("City Not Found"));
+
+	        branchVO.setCity(city);
+	    }
+	}
+	
+	@Override
+	public BranchVO getBranchById(Long id) throws ApplicationException {
+
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ApplicationException("Invalid Id");
+		}
+
+		BranchVO branchVO = branchRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Branch not found for Id: " + id));
+
+		return branchVO;
+	}
+
+	@Override
+	public List<BranchVO> getBranchByOrgId(Long orgId) throws ApplicationException {
+
+	    List<BranchVO> branchList =
+	            branchRepo.getBranchByOrgId(orgId);
+
+	    if (branchList.isEmpty()) {
+	        throw new ApplicationException("No branch Details Found");
+	    }
+
+	    return branchList;
+	}
+		
+	  @Override
+	  @Transactional
+	  public Map<String, Object> updateCreateTransportMaster(@Valid TransportMasterDTO transportMasterDTO)
+	          throws ApplicationException {
+
+	      TransportMasterVO transportMasterVO = new TransportMasterVO();
+	      String message;
+
+	      if (ObjectUtils.isNotEmpty(transportMasterDTO.getId())) {
+
+	          transportMasterVO = transportRepo.findById(transportMasterDTO.getId())
+	                  .orElseThrow(() -> new ApplicationException("Invalid Transport Details"));
+
+	          if (!transportMasterVO.getTransportName()
+	                  .equalsIgnoreCase(transportMasterDTO.getTransportName())) {
+
+	              if (transportRepo.existsByTransportNameAndOrgId(
+	                      transportMasterDTO.getTransportName(),
+	                      transportMasterDTO.getOrgId())) {
+
+	                  throw new ApplicationException(
+	                          "The Transport : " + transportMasterDTO.getTransportName()
+	                                  + " already exists in this Organization.");
+	              }
+	          }
+
+	          createUpdateTransportMasterVOByTransportMasterDTO(transportMasterDTO, transportMasterVO);
+
+	          transportMasterVO.setUpdated_By(transportMasterDTO.getCreatedBy());
+
+	          message = "Transport Updated Successfully";
+
+	      } else {
+
+	          if (transportRepo.existsByTransportNameAndOrgId(
+	                  transportMasterDTO.getTransportName(),
+	                  transportMasterDTO.getOrgId())) {
+
+	              throw new ApplicationException(
+	                      "The Transport : " + transportMasterDTO.getTransportName()
+	                              + " already exists in this Organization.");
+	          }
+
+	          createUpdateTransportMasterVOByTransportMasterDTO(transportMasterDTO, transportMasterVO);
+
+	          transportMasterVO.setCreatedBy(transportMasterDTO.getCreatedBy());
+	          transportMasterVO.setUpdated_By(transportMasterDTO.getCreatedBy());
+
+	          message = "Transport Created Successfully";
+	      }
+
+	      transportRepo.save(transportMasterVO);
+
+	      Map<String, Object> response = new HashMap<>();
+	      response.put("transportMasterVO", transportMasterVO);
+	      response.put("message", message);
+
+	      return response;
+	  }
+	  
+	  private void createUpdateTransportMasterVOByTransportMasterDTO(
+		        TransportMasterDTO transportMasterDTO,
+		        TransportMasterVO transportMasterVO) {
+
+		    transportMasterVO.setTransportName(transportMasterDTO.getTransportName().toUpperCase());
+		    transportMasterVO.setAddress(transportMasterDTO.getAddress());
+		    transportMasterVO.setOrgId(transportMasterDTO.getOrgId());
+		    transportMasterVO.setBranchCode(transportMasterDTO.getBranchCode());
+		    transportMasterVO.setActive(transportMasterDTO.getActive());
+		    transportMasterVO.setCancelRemarks(transportMasterDTO.getCancelRemarks());
+		    transportMasterVO.setBranch(transportMasterDTO.getBranch());
+
+		}
+
+
+		@Override
+		public TransportMasterVO getTransportNameById(Long id) throws ApplicationException {
+
+		    return transportRepo.findById(id)
+		            .orElseThrow(() -> new ApplicationException("Invalid Transport Details"));
+		}
+
+		@Override
+		public List<TransportMasterVO> getTransportNameByOrgId(Long orgId,String branchCode) throws ApplicationException {
+
+		    List<TransportMasterVO> transportList =
+		            transportRepo.findByOrgIdAndBranch(orgId,branchCode);
+
+		    if (transportList.isEmpty()) {
+		        throw new ApplicationException("No Transport Details Found");
+		    }
+
+		    return transportList;
+		}
+
+		
 }

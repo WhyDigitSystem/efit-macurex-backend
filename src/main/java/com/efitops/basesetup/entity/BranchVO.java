@@ -36,10 +36,10 @@ public class BranchVO {
 	@Column(name = "branch_id")
     private Long id;
 
-    @Column(name = "branch_code", length = 20)
+    @Column(name = "code", length = 20)
     private String branchCode;
 
-    @Column(name = "branch_name")
+    @Column(name = "branch")
     private String branchName;
 
     @Column(name = "branch_incharge")

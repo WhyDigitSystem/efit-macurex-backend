@@ -137,10 +137,14 @@ public interface CommonMasterService {
 
 	CompanyVO uploadCompanyLogoInBloob(MultipartFile file, Long id) throws IOException  ;
 
+	//branch
+	
 	Map<String, Object> createUpdateBranch(BranchDTO branchDTO) throws ApplicationException;
 
 	BranchVO getBranchById(Long id) throws ApplicationException;
 	
+	List<BranchVO> getBranchByOrgId(Long orgId) throws ApplicationException;
+
 	//transport
 	
 	Map<String, Object> updateCreateTransportMaster(TransportMasterDTO transportMasterDTO) throws ApplicationException;
@@ -149,6 +153,7 @@ public interface CommonMasterService {
 
 
 	List<TransportMasterVO> getTransportNameByOrgId(Long orgId, String branchCode) throws ApplicationException;
+
 	
 	
 

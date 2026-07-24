@@ -49,7 +49,6 @@ public class CompanyDTO {
 //	private byte[] companyLogo;
 
 	private String createdBy;
-	private String updatedBy;
 
 	private boolean active;
 	private String cancelRemarks;

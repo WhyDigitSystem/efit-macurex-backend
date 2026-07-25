@@ -60,7 +60,7 @@ public interface CommonMasterService {
 
 	Optional<StateVO> getStateById(Long stateid);
 
-	List<StateVO> getStatesByCountry(Long orgid, String country);
+	List<StateVO> getStatesByCountry(Long orgid, Long country);
 
 	Map<String, Object> createUpdateState(StateDTO stateDTO) throws ApplicationException;
 
@@ -70,7 +70,7 @@ public interface CommonMasterService {
 
 	List<CityVO> getAllgetAllCities(Long orgid);
 
-	List<CityVO> getAllCitiesByState(Long orgid, String state);
+	List<CityVO> getAllCitiesByState(Long orgid, Long state);
 
 	Optional<CityVO> getCityById(Long cityid);
 
@@ -117,7 +117,7 @@ public interface CommonMasterService {
 
 	// FINANCIAL YEAR
 
-	Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
+//	Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
 
 	List<FinancialYearVO> getAllActiveFInYear(Long orgId);
 
@@ -184,6 +184,8 @@ public interface CommonMasterService {
 	ServiceAccMasterVO getServiceNameById(Long id) throws ApplicationException;
 
 	List<ServiceAccMasterVO> getServiceNameByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+
 
 
 

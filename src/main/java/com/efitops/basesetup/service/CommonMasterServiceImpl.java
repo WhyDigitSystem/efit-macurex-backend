@@ -644,7 +644,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	}
 
 	@Override
-	public List<StateVO> getStatesByCountry(Long orgid, String country) {
+	public List<StateVO> getStatesByCountry(Long orgid, Long country) {
 
 		return stateRepo.findByCountry(orgid, country);
 	}
@@ -733,11 +733,14 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		stateVO.setStateName(stateDTO.getStateName().toUpperCase());
 		stateVO.setStateNumber(stateDTO.getStateNumber().toUpperCase());
 
-		CountryVO countryVO = countryRepo.findById(stateDTO.getCountryId())
-				.orElseThrow(() -> new ApplicationException("Country not found with id : " + stateDTO.getCountryId()));
+		if (stateDTO.getCountry() != null && stateDTO.getCountry() != 0) {
 
-		stateVO.setCountry(countryVO);
+		    CountryVO countryVO = countryRepo.findById(stateDTO.getCountry())
+		            .orElseThrow(() -> new ApplicationException(
+		                    "Country not found with id : " + stateDTO.getCountry()));
 
+		    stateVO.setCountry(countryVO);
+		}
 		stateVO.setRegion(stateDTO.getRegion().toUpperCase());
 		stateVO.setActive(stateDTO.isActive());
 		stateVO.setCancelRemarks(stateDTO.getCancelRemarks());
@@ -759,9 +762,9 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	}
 
 	@Override
-	public List<CityVO> getAllCitiesByState(Long orgid, String state) {
+	public List<CityVO> getAllCitiesByState(Long orgid, Long state) {
 
-		return cityRepo.findAll(orgid, state);
+		return cityRepo.getAllCitiesByState(orgid, state);
 	}
 
 	@Override
@@ -829,14 +832,25 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	private void getCityVOFromCityDTO(CityVO cityVO, CityDTO cityDTO) throws ApplicationException {
 		cityVO.setCityCode(cityDTO.getCityCode().toUpperCase());
 		cityVO.setCityName(cityDTO.getCityName().toUpperCase());
-		CountryVO countryVO = countryRepo.findById(cityDTO.getCountryId())
-				.orElseThrow(() -> new ApplicationException("Country not found with id : " + cityDTO.getCountryId()));
+		if (cityDTO.getCountry() != null && cityDTO.getCountry() != 0) {
 
-		StateVO stateVO = stateRepo.findById(cityDTO.getStateId())
-				.orElseThrow(() -> new ApplicationException("State not found with id : " + cityDTO.getStateId()));
+		    CountryVO countryVO = countryRepo.findById(cityDTO.getCountry())
+		            .orElseThrow(() -> new ApplicationException(
+		                    "Country not found with id : " + cityDTO.getCountry()));
 
-		cityVO.setCountry(countryVO);
-		cityVO.setState(stateVO);
+		    cityVO.setCountry(countryVO);
+		}
+
+		if (cityDTO.getState() != null && cityDTO.getState() != 0) {
+
+		    StateVO stateVO = stateRepo.findById(cityDTO.getState())
+		            .orElseThrow(() -> new ApplicationException(
+		                    "State not found with id : " + cityDTO.getState()));
+
+		    cityVO.setState(stateVO);
+		}
+
+
 		cityVO.setActive(cityDTO.isActive());
 		cityVO.setOrgId(cityDTO.getOrgId());
 		cityVO.setCancelRemarks(cityDTO.getCancelRemarks());
@@ -1902,12 +1916,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 					    return serviceAccMasterVO;
 					}
 
-					@Override
-					public Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO)
-							throws ApplicationException {
-						// TODO Auto-generated method stub
-						return null;
-					}
+					
 
 						
 				

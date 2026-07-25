@@ -47,7 +47,6 @@ public class EfitMasterController extends BaseController {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(EfitMasterController.class);
 
-	@Autowired
 	EfitMasterService efitMasterService;
 
 

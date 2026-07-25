@@ -10,7 +10,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
 
 import lombok.AllArgsConstructor;
@@ -18,61 +17,57 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "city")
+@Table(name = "hsn")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CityVO {
-
+public class HsnVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "citygen")
-	@SequenceGenerator(name = "citygen", sequenceName = "cityseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "city_id")
-	private Long id;
-
-	@Column(name = "code")
-	private String cityCode;
-	
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hsngen")
+	@SequenceGenerator(name = "hsngen", sequenceName = "hsnseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "hsn_id")
+    private Long id;
 	
 	@ManyToOne
-	@JoinColumn(name = "country")
-	private CountryVO country;
+	@JoinColumn(name = "listofvalues_id")
+	private ListOfValuesVO listofvalues;
 	
-	@Column(name = "city")
-	private String cityName;
+	@Column(name = "hsn")
+	private String hsn;
+	@Column(name = "description")
+	private String description;
 	
-	
-	@ManyToOne
-	@JoinColumn(name = "state")
-	private StateVO state;
-	
+	@Column(name = "org_id")
+	private Long orgId;
 	@Column(name = "active")
 	private boolean active;
 	@Column(name = "created_by")
 	private String createdBy;
 	@Column(name = "modified_by")
 	private String updatedBy;
-	@Column(name = "org_id")
-	private Long orgId;
 	@Column(name = "cancel")
 	private boolean cancel=false;
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
+	@Column(name = "branch")
+	private String branch;
+	@Column(name = "branch_code")
+	private String branchCode;
+	@Column(name = "screen_name")
+	private String screenName="CURRENCY";
+	@Column(name = "screen_code")
+	private String screenCode="HSN";
+	
 	@JsonGetter("active")
 	public String getActive() {
 		return active ? "Active" : "In-Active";
 	}
-    @Column(name = "screen_code", length = 5)
-    private String screenCode = "CT";
-
-    @Column(name = "screen_name", length = 25)
-    private String screenName = "CITY";
 
 	// Optionally, if you want to control serialization for 'cancel' field similarly
 	@JsonGetter("cancel")
 	public String getCancel() {
 		return cancel ? "T" : "F";
 	}
+	
 
-	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 }

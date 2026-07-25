@@ -19,7 +19,7 @@ public class ListOfValuesDTO {
 	private boolean active;
 	private String cancelRemarks;
 
-	private Long branchId;
+	private Long branch;
 		
 	private List<ListOfValuesDetailsDTO> details;
 

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BankDetailsDTO {
-	private Long id;
 	private String bankName;
 	private String ifscCode;
 	private Long accountNo;

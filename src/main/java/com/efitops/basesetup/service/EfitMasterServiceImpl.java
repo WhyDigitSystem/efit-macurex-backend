@@ -35,6 +35,7 @@ import com.efitops.basesetup.dto.MaterialTypeDetailsDTO;
 import com.efitops.basesetup.dto.UomDTO;
 import com.efitops.basesetup.entity.BomDetailsVO;
 import com.efitops.basesetup.entity.BomVO;
+import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DesignationVO;
 import com.efitops.basesetup.entity.EmployeeCommunicationDetailsVO;
@@ -50,6 +51,7 @@ import com.efitops.basesetup.entity.UomVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BomDetailsRepo;
 import com.efitops.basesetup.repository.BomRepo;
+import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DesignationRepo;
 import com.efitops.basesetup.repository.EmployeeCommunicationDetailsRepo;
@@ -118,6 +120,9 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 	
 	@Autowired
 	UserRepo userRepo;
+	
+	@Autowired
+	BranchRepo branchRepo;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -168,7 +173,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 				throw new ApplicationException(errorMessage);
 			}
 			String docId = departmentRepo.getDepartmentDocId(departmentDTO.getOrgId(), departmentDTO.getFinYear(),
-					departmentDTO.getBranchCode(), screenCode);
+					departmentDTO.getBranch(), screenCode);
 			departmentVO.setDocId(docId);
 
 //			// GETDOCID LASTNO +1
@@ -191,31 +196,39 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		return response;
 	}
 
-	private void createUpdateDepartmentVOByDepartmentDTO(DepartmentDTO departmentDTO, DepartmentVO departmentVO) {
+	private void createUpdateDepartmentVOByDepartmentDTO(DepartmentDTO departmentDTO, DepartmentVO departmentVO) throws ApplicationException {
 		departmentVO.setDepartmentName(departmentDTO.getDepartmentName().toUpperCase());
 		departmentVO.setDepartmentCode(departmentDTO.getDepartmentCode().toUpperCase());
 		departmentVO.setOrgId(departmentDTO.getOrgId());
 		departmentVO.setFinYear(departmentDTO.getFinYear());
-		departmentVO.setBranch(departmentDTO.getBranch());
-		departmentVO.setBranchCode(departmentDTO.getBranchCode());
 		departmentVO.setCreatedBy(departmentDTO.getCreatedBy());
 		departmentVO.setActive(departmentDTO.isActive());
+		departmentVO.setCancelRemarks(departmentDTO.getCancelRemarks());	
+		
+		if (departmentDTO.getBranch() != null && departmentDTO.getBranch() != 0) {
+
+            BranchVO branch = branchRepo.findById(departmentDTO.getBranch())
+                    .orElseThrow(() ->
+                            new ApplicationException("branch Not Found"));
+
+            departmentVO.setBranch(branch);
+        }
 
 	}
 
 	@Override
-	public String getDepartmentDocId(Long orgId, String finyear, String branchCode) {
+	public String getDepartmentDocId(Long orgId, String finyear, Long branch) {
 		String screenCode = "DEPT";
-		String result = departmentRepo.getDepartmentDocId(orgId, finyear, branchCode, screenCode);
+		String result = departmentRepo.getDepartmentDocId(orgId, finyear, branch, screenCode);
 		return result;
 	}
 
 	@Override
-	public List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, String branchCode) {
+	public List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, Long branch) {
 		List<DepartmentVO> departmentVO = new ArrayList<>();
 		if (ObjectUtils.isNotEmpty(orgId)) {
 			LOGGER.info("Successfully Received  Department BY OrgId : {}", orgId);
-			departmentVO = departmentRepo.getAllDepartmentByOrgId(orgId, branchCode);
+			departmentVO = departmentRepo.getAllDepartmentByOrgId(orgId, branch);
 		}
 		return departmentVO;
 	}
@@ -351,11 +364,11 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 	}
 
 	@Override
-	public List<DesignationVO> getDesignationByOrgId(Long orgId, String branchCode) {
+	public List<DesignationVO> getDesignationByOrgId(Long orgId, Long branch) {
 		List<DesignationVO> designationVO = new ArrayList<>();
 		if (ObjectUtils.isNotEmpty(orgId)) {
 			LOGGER.info("Successfully Received ArapAdjustments BY OrgId : {}", orgId);
-			designationVO = designationrepo.getDesignationByOrgId(orgId, branchCode);
+			designationVO = designationrepo.getDesignationByOrgId(orgId, branch);
 		}
 		return designationVO;
 	}
@@ -404,7 +417,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		} else {
 			createUpdateDesignationVOByDesignationDTO(designationDTO, designationVO);
 			String docId = designationrepo.getDesignationDocId(designationDTO.getOrgId(), designationDTO.getFinYear(),
-					designationDTO.getBranchCode(), screenCode);
+					designationDTO.getBranch(), screenCode);
 			designationVO.setDocId(docId);
 
 //			// GETDOCID LASTNO +1
@@ -454,16 +467,24 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		designationVO.setDesignationCode(designationDTO.getDesignationCode().toUpperCase());
 		designationVO.setOrgId(designationDTO.getOrgId());
 		designationVO.setFinYear(designationDTO.getFinYear());
-		designationVO.setBranch(designationDTO.getBranch());
-		designationVO.setBranchCode(designationDTO.getBranchCode());
 		designationVO.setActive(designationDTO.isActive());
+		designationVO.setCancelRemarks(designationDTO.getCancelRemarks());
+		if (designationDTO.getBranch() != null && designationDTO.getBranch() != 0) {
+
+            BranchVO branch = branchRepo.findById(designationDTO.getBranch())
+                    .orElseThrow(() ->
+                            new ApplicationException("branch Not Found"));
+
+            designationVO.setBranch(branch);
+        }
+		
 
 	}
 
 	@Override
-	public String getDesignationDocId(Long orgId, String finYear, String branchCode) {
+	public String getDesignationDocId(Long orgId, String finYear, Long branch) {
 		String screenCode = "DSG";
-		String result = designationrepo.getDesignationDocId(orgId, finYear, branchCode, screenCode);
+		String result = designationrepo.getDesignationDocId(orgId, finYear, branch, screenCode);
 		return result;
 	}
 

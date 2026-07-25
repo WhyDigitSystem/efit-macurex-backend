@@ -1,7 +1,6 @@
 package com.efitops.basesetup.entity;
 
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,47 +18,52 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "gstratemaster")
+@Table(name = "location")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 
-public class GSTRateMasterVO {
+public class LocationVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gstratemastergen")
-	@SequenceGenerator(name = "gstratemastergen", sequenceName = "gstratemasterseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "gstratemaster_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "locationgen")
+	@SequenceGenerator(name = "locationgen", sequenceName = "locationseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "id")
 	private Long id;
-
-	@Column(name = "category")
-	private String category;
-	@Column(name = "hsn_code")
-	private String hsncode;
-	@Column(name = "description")
-	private String description;
 	
-	@Column(name = "wef")
-	private String wef;
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
 	
-	@Column(name = "igst_rate")
-	private Double igstRate;
+	@ManyToOne
+	@JoinColumn(name = "location_type")
+	private ListOfValuesVO locationType;
 	
-	@Column(name = "sgst_rate")
-	private Double sgstRate;
-	
-	@Column(name = "cgst_rate")
-	private Double cgstRate;
-	
-	@Column(name = "rate")
-	private Double rate;
-	
-	@Column(name = "taxable")
-	private String taxable;
+	@ManyToOne
+	@JoinColumn(name = "belongs_to")
+	private ListOfValuesVO belongsTo;
 	
 	
-
+	@Column(name = "location_id")
+	private String locationId;
 	
+	@ManyToOne
+	@JoinColumn(name = "listofvalues_id")
+	private ListOfValuesVO listOfValues;
 	
+	@Column(name = "address")
+	private String address;
+	
+	@Column(name = "phone_no")
+	private Long phoneNo;
+	
+	@Column(name = "fax_no")
+	private Long faxNo;
+	
+	@Column(name = "email")
+	private String email;
+	
+	@Column(name = "consider_mrp")
+	private String considerMrp;
 	
 	@Column(name = "org_id")
 	private Long orgId;
@@ -74,16 +78,12 @@ public class GSTRateMasterVO {
 	@Column(name = "cancel")
 	private boolean cancel=false;
 	
-	@ManyToOne
-	@JoinColumn(name = "branch")
-	private BranchVO branch;
-	
     @Column(name = "finyear", length = 5)
     private String finYear;
-	@Column(name = "screencode", length = 30)
-	private String screenCode = "GSTRM";
-	@Column(name = "screenname", length = 30)
-	private String screenName = "GSTRateMaster";
+	@Column(name = "screen_code", length = 30)
+	private String screenCode = "LM";
+	@Column(name = "screen_name", length = 30)
+	private String screenName = "locationMaster";
 
 	@JsonGetter("active")
 	public String getActive() {
@@ -94,10 +94,10 @@ public class GSTRateMasterVO {
 	public String getCancel() {
 		return cancel ? "T" : "F";
 	}
-	@Embedded
-	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
+
 	
+	
+	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
+
+
 }
-
-
-

@@ -117,7 +117,7 @@ public interface CommonMasterService {
 
 	// FINANCIAL YEAR
 
-	Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
+//	Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
 
 	List<FinancialYearVO> getAllActiveFInYear(Long orgId);
 

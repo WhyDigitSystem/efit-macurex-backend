@@ -6,12 +6,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.Valid;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.efitops.basesetup.dto.TransportMasterDTO;
+import com.fasterxml.jackson.annotation.JsonGetter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,6 +40,10 @@ public class TransportMasterVO {
 	@Column(name = "address")
 	private String address;
 	
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
+	
 	@Column(name = "active")
 	private boolean active;
 	@Column(name = "org_id")
@@ -50,19 +57,29 @@ public class TransportMasterVO {
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 	
-	@Column(name = "branch", length = 25)
-	private String branch;
-	@Column(name = "branch_code", length = 20)
-	private String branchCode;
+	
+	
+	
    
 	@Column(name = "screen_code",length = 10)
 	private String screenCode ="TM";
 	@Column(name = "screen_name",length = 30)
 	private String screenName="Transport Master";
 	
+	@JsonGetter("active")
+	public String getActive() {
+		return active ? "Active" : "In-Active";
+	}
 
+	@JsonGetter("cancel")
+	public String getCancel() {
+		return cancel ? "T" : "F";
+	}
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
+	
+
+	
 	
 	
 	

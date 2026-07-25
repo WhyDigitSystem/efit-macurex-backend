@@ -652,26 +652,26 @@ public class CommonMasterController extends BaseController {
 
 	// FINANCIAL YEAR
 
-	@PutMapping("/createUpdateFinYear")
-	public ResponseEntity<ResponseDTO> createUpdateFinYear(@RequestBody FinancialYearDTO financialYearDTO) {
-		String methodName = "createUpdateFinYear()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-		String errorMsg = null;
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO = null;
-		try {
-			Map<String, Object> finYearVO = commonMasterService.createUpdateFinYear(financialYearDTO);
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, finYearVO.get("messages"));
-			responseObjectsMap.put("finYearVO", finYearVO.get("financialYearVO"));
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} catch (Exception e) {
-			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		}
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-		return ResponseEntity.ok().body(responseDTO);
-	}
+//	@PutMapping("/createUpdateFinYear")
+//	public ResponseEntity<ResponseDTO> createUpdateFinYear(@RequestBody FinancialYearDTO financialYearDTO) {
+//		String methodName = "createUpdateFinYear()";
+//		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//		String errorMsg = null;
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//		ResponseDTO responseDTO = null;
+//		try {
+//			Map<String, Object> finYearVO = commonMasterService.createUpdateFinYear(financialYearDTO);
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, finYearVO.get("messages"));
+//			responseObjectsMap.put("finYearVO", finYearVO.get("financialYearVO"));
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//		} catch (Exception e) {
+//			errorMsg = e.getMessage();
+//			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+//			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+//		}
+//		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//		return ResponseEntity.ok().body(responseDTO);
+//	}
 
 	@GetMapping("/getAllAciveFInYear")
 	public ResponseEntity<ResponseDTO> getAllFInYear(@RequestParam Long orgId) {

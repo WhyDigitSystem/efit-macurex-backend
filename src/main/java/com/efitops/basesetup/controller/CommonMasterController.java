@@ -196,7 +196,7 @@ public class CommonMasterController extends BaseController {
 	}
 
 	@GetMapping("/state/country")
-	public ResponseEntity<ResponseDTO> getStateByCountry(@RequestParam Long orgid, @RequestParam String country) {
+	public ResponseEntity<ResponseDTO> getStateByCountry(@RequestParam Long orgid, @RequestParam Long country) {
 		String methodName = "getStateByCountry()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -271,7 +271,7 @@ public class CommonMasterController extends BaseController {
 	}
 
 	@GetMapping("/city/state")
-	public ResponseEntity<ResponseDTO> getAllCitiesByState(@RequestParam Long orgid, @RequestParam String state) {
+	public ResponseEntity<ResponseDTO> getAllCitiesByState(@RequestParam Long orgid, @RequestParam Long state) {
 		String methodName = "getAllCitiesByState()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;

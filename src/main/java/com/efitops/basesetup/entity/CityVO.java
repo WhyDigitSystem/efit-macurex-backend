@@ -35,7 +35,7 @@ public class CityVO {
 	
 	
 	@ManyToOne
-	@JoinColumn(name = "country_id")
+	@JoinColumn(name = "country")
 	private CountryVO country;
 	
 	@Column(name = "city")
@@ -43,7 +43,7 @@ public class CityVO {
 	
 	
 	@ManyToOne
-	@JoinColumn(name = "state_id")
+	@JoinColumn(name = "state")
 	private StateVO state;
 	
 	@Column(name = "active")

@@ -1,13 +1,10 @@
 package com.efitops.basesetup.entity;
 
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -19,27 +16,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "serviceaccmaster")
+@Table(name = "dailyexrate")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class ServiceAccMasterVO {
+public class DailyExchangeRateVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "serviceaccmastergen")
-	@SequenceGenerator(name = "serviceaccmastergen", sequenceName = "serviceaccmasterseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "serviceaccmaster_id", columnDefinition = "BIGINT DEFAULT 0")
-	private Long id;
-
-	@Column(name = "service_name")
-	private String serviceName;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dailyexrategen")
+	@SequenceGenerator(name = "dailyexrategen", sequenceName = "dailyexrateseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "dailyexrate_id")
+	private Long dailyExRateId;
 	
-	@Column(name = "service_description")
-	private String serviceDescription;
+	@Column(name = "date")
+	private String date;
 	
-	@Column(name = "hsn_code")
-	private String hsncode;
-		
+	@Column(name = "month")
+	private String month;
+	
 	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "created_by", length = 25)
@@ -52,17 +45,13 @@ public class ServiceAccMasterVO {
 	private boolean active;
 	@Column(name = "cancel")
 	private boolean cancel=false;
-
-	@ManyToOne
-	@JoinColumn(name = "branch")
-	private BranchVO branch;
 	
-    @Column(name = "finyear", length = 5)
+    @Column(name = "financial_year", length = 5)
     private String finYear;
 	@Column(name = "screen_code", length = 30)
-	private String screenCode = "SAM";
+	private String screenCode = "DER";
 	@Column(name = "screen_name", length = 30)
-	private String screenName = "serviceAccount";
+	private String screenName = "dailyExchangeRate";
 
 	@JsonGetter("active")
 	public String getActive() {
@@ -73,9 +62,11 @@ public class ServiceAccMasterVO {
 	public String getCancel() {
 		return cancel ? "T" : "F";
 	}
-	@Embedded
-	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
+	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 
+
+	
+	
 
 }

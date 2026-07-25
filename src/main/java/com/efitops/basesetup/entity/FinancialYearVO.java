@@ -28,19 +28,15 @@ public class FinancialYearVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "financialyearegen")
 	@SequenceGenerator(name = "financialyearegen", sequenceName = "financialyearseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "finyearid")
+	@Column(name = "finyear_id")
 	private Long id;
-	@Column(name = "financialyearid")
-	private Long finYearId;
-	@Column(name = "finyear")
+	@Column(name = "fin_year")
 	private int finYear;
-	@Column(name = "finyearidentifier")
-	private String finYearIdentifier;
-	@Column(name = "startdate")
+	@Column(name = "start_date")
 	private LocalDate startDate;
-	@Column(name = "enddate")
+	@Column(name = "end_date")
 	private LocalDate endDate;
-	@Column(name = "currentfinyear")
+	@Column(name = "current_finyear")
 	private boolean currentFinYear;
 	@Column(name = "closed")
 	private boolean closed;
@@ -51,6 +47,9 @@ public class FinancialYearVO {
 	@Column(name = "modifiedby")
 	private String updatedBy;
 	private boolean active;
+	
+	@Column(name = "cancel_Remarks")
+	private String cancelRemarks;
 
 	@JsonGetter("active")
     public String getActive() {

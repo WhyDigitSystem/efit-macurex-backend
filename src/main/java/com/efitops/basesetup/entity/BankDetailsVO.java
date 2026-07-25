@@ -27,7 +27,7 @@ public class BankDetailsVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bankdetailsgen")
 	@SequenceGenerator(name = "bankdetailsgen", sequenceName = "bankdetailsseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "bankdetailsid")
+	@Column(name = "bankdetails_id")
 	private Long id;
 	@Column(name = "bank_name")
 	private String bankName;

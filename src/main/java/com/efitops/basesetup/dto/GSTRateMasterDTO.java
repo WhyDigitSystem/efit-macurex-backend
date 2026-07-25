@@ -22,7 +22,7 @@ public class GSTRateMasterDTO {
 	private String createdBy;;
 	private String cancelRemarks;;
     private String finYear;
-	private Long branchId;
+	private Long branch;
     private boolean active;
 
 }

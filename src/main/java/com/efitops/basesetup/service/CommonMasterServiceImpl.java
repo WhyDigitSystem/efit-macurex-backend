@@ -1150,95 +1150,95 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	}
 
 	// Financila Year
-	@Override
-	public Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO) throws ApplicationException {
-		FinancialYearVO financialYearVO = null;
-		String message;
-
-		if (ObjectUtils.isEmpty(financialYearDTO.getId())) {
-			if (financialYearRepo.existsByFinYearAndOrgId(financialYearDTO.getFinYear(), financialYearDTO.getOrgId())) {
-				String errorMessage = String.format("ThiS finyear:%s Already Exists This Organization .",
-						financialYearDTO.getFinYear());
-				throw new ApplicationException(errorMessage);
-			}
-
-			if (financialYearRepo.existsByFinYearIdentifierAndOrgId(financialYearDTO.getFinYearIdentifier(),
-					financialYearDTO.getOrgId())) {
-				String errorMessage = String.format("ThiS finyearidentifier:%s Already Exists This Organization .",
-						financialYearDTO.getFinYearIdentifier());
-				throw new ApplicationException(errorMessage);
-			}
-
-			if (financialYearRepo.existsByFinYearIdAndOrgId(financialYearDTO.getFinYearId(),
-					financialYearDTO.getOrgId())) {
-				String errorMessage = String.format("ThiS finyearid:%s Already Exists This Organization .",
-						financialYearDTO.getFinYearId());
-				throw new ApplicationException(errorMessage);
-			}
-
-			financialYearVO = new FinancialYearVO();
-			financialYearVO.setCreatedBy(financialYearDTO.getCreatedBy());
-			financialYearVO.setUpdatedBy(financialYearDTO.getCreatedBy());
-			message = "Financial Year Creation Successfully";
-
-		} else {
-			financialYearVO = financialYearRepo.findById(financialYearDTO.getId())
-					.orElseThrow(() -> new ApplicationException(String
-							.format("This Id Is Not Found Any Information, Invalid Id: %s", financialYearDTO.getId())));
-
-			if (financialYearVO.getFinYear() != financialYearDTO.getFinYear()) {
-				if (financialYearRepo.existsByFinYearAndOrgId(financialYearDTO.getFinYear(),
-						financialYearDTO.getOrgId())) {
-					String errorMessage = String.format("This finyear: %s already exists for this organization.",
-							financialYearDTO.getFinYear());
-					throw new ApplicationException(errorMessage);
-				}
-				financialYearVO.setFinYear(financialYearDTO.getFinYear());
-			}
-
-			if (!financialYearVO.getFinYearIdentifier().equals(financialYearDTO.getFinYearIdentifier())) {
-				if (financialYearRepo.existsByFinYearIdentifierAndOrgId(financialYearDTO.getFinYearIdentifier(),
-						financialYearDTO.getOrgId())) {
-					String errorMessage = String.format(
-							"This finyearIdentifier: %s already exists for this organization.",
-							financialYearDTO.getFinYearIdentifier());
-					throw new ApplicationException(errorMessage);
-				}
-				financialYearVO.setFinYearIdentifier(financialYearDTO.getFinYearIdentifier());
-			}
-
-			if (financialYearVO.getFinYearId() != financialYearDTO.getFinYearId()) {
-				if (financialYearRepo.existsByFinYearIdAndOrgId(financialYearDTO.getFinYearId(),
-						financialYearDTO.getOrgId())) {
-					String errorMessage = String.format("This finyearId: %s already exists for this organization.",
-							financialYearDTO.getFinYearId());
-					throw new ApplicationException(errorMessage);
-				}
-				financialYearVO.setFinYearId(financialYearDTO.getFinYearId());
-			}
-
-			financialYearVO.setUpdatedBy(financialYearDTO.getCreatedBy());
-			message = "Financial Year Updation Successfully";
-
-		}
-		getFinancialYearVOFromFinancialYearDTO(financialYearVO, financialYearDTO);
-		financialYearRepo.save(financialYearVO);
-		Map<String, Object> response = new HashMap<String, Object>();
-		response.put("financialYearVO", financialYearVO);
-		response.put("message", response);
-		return response;
-
-	}
+//	@Override
+//	public Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO) throws ApplicationException {
+//		FinancialYearVO financialYearVO = null;
+//		String message;
+//
+//		if (ObjectUtils.isEmpty(financialYearDTO.getId())) {
+//			if (financialYearRepo.existsByFinYearAndOrgId(financialYearDTO.getFinYear(), financialYearDTO.getOrgId())) {
+//				String errorMessage = String.format("ThiS finyear:%s Already Exists This Organization .",
+//						financialYearDTO.getFinYear());
+//				throw new ApplicationException(errorMessage);
+//			}
+//
+//			if (financialYearRepo.existsByFinYearIdentifierAndOrgId(financialYearDTO.getFinYearIdentifier(),
+//					financialYearDTO.getOrgId())) {
+//				String errorMessage = String.format("ThiS finyearidentifier:%s Already Exists This Organization .",
+//						financialYearDTO.getFinYearIdentifier());
+//				throw new ApplicationException(errorMessage);
+//			}
+//
+//			if (financialYearRepo.existsByFinYearAndOrgId(financialYearDTO.getFinYearId(),
+//					financialYearDTO.getOrgId())) {
+//				String errorMessage = String.format("ThiS finyearid:%s Already Exists This Organization .",
+//						financialYearDTO.getFinYearId());
+//				throw new ApplicationException(errorMessage);
+//			}
+//
+//			financialYearVO = new FinancialYearVO();
+//			financialYearVO.setCreatedBy(financialYearDTO.getCreatedBy());
+//			financialYearVO.setUpdatedBy(financialYearDTO.getCreatedBy());
+//			message = "Financial Year Creation Successfully";
+//
+//		} else {
+//			financialYearVO = financialYearRepo.findById(financialYearDTO.getId())
+//					.orElseThrow(() -> new ApplicationException(String
+//							.format("This Id Is Not Found Any Information, Invalid Id: %s", financialYearDTO.getId())));
+//
+//			if (financialYearVO.getFinYear() != financialYearDTO.getFinYear()) {
+//				if (financialYearRepo.existsByFinYearAndOrgId(financialYearDTO.getFinYear(),
+//						financialYearDTO.getOrgId())) {
+//					String errorMessage = String.format("This finyear: %s already exists for this organization.",
+//							financialYearDTO.getFinYear());
+//					throw new ApplicationException(errorMessage);
+//				}
+//				financialYearVO.setFinYear(financialYearDTO.getFinYear());
+//			}
+//
+//			if (!financialYearVO.getFinYearIdentifier().equals(financialYearDTO.getFinYearIdentifier())) {
+//				if (financialYearRepo.existsByFinYearIdentifierAndOrgId(financialYearDTO.getFinYearIdentifier(),
+//						financialYearDTO.getOrgId())) {
+//					String errorMessage = String.format(
+//							"This finyearIdentifier: %s already exists for this organization.",
+//							financialYearDTO.getFinYearIdentifier());
+//					throw new ApplicationException(errorMessage);
+//				}
+//				financialYearVO.setFinYearIdentifier(financialYearDTO.getFinYearIdentifier());
+//			}
+//
+//			if (financialYearVO.getFinYearId() != financialYearDTO.getFinYearId()) {
+//				if (financialYearRepo.existsByFinYearAndOrgId(financialYearDTO.getFinYearId(),
+//						financialYearDTO.getOrgId())) {
+//					String errorMessage = String.format("This finyearId: %s already exists for this organization.",
+//							financialYearDTO.getFinYearId());
+//					throw new ApplicationException(errorMessage);
+//				}
+//				financialYearVO.setFinYearId(financialYearDTO.getFinYearId());
+//			}
+//
+//			financialYearVO.setUpdatedBy(financialYearDTO.getCreatedBy());
+//			message = "Financial Year Updation Successfully";
+//
+//		}
+//		getFinancialYearVOFromFinancialYearDTO(financialYearVO, financialYearDTO);
+//		financialYearRepo.save(financialYearVO);
+//		Map<String, Object> response = new HashMap<String, Object>();
+//		response.put("financialYearVO", financialYearVO);
+//		response.put("message", response);
+//		return response;
+//
+//	}
 
 	private void getFinancialYearVOFromFinancialYearDTO(FinancialYearVO financialYearVO,
 			FinancialYearDTO financialYearDTO) {
 		financialYearVO.setFinYear(financialYearDTO.getFinYear());
-		financialYearVO.setFinYearId(financialYearDTO.getFinYearId());
-		financialYearVO.setFinYearIdentifier(financialYearDTO.getFinYearIdentifier());
+//		financialYearVO.setFinYearId(financialYearDTO.getFinYearId());
+//		financialYearVO.setFinYearIdentifier(financialYearDTO.getFinYearIdentifier());
 		financialYearVO.setStartDate(financialYearDTO.getStartDate());
 		financialYearVO.setEndDate(financialYearDTO.getEndDate());
-		financialYearVO.setCurrentFinYear(financialYearDTO.isCurrentFinYear());
-		financialYearVO.setClosed(financialYearDTO.isClosed());
+//		financialYearVO.setCurrentFinYear(financialYearDTO.isCurrentFinYear());
+//		financialYearVO.setClosed(financialYearDTO.isClosed());
 		financialYearVO.setOrgId(financialYearDTO.getOrgId());
 		financialYearVO.setActive(financialYearDTO.isActive());
 	}
@@ -1344,7 +1344,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	        }
 
 
-		    branchVO.setCreatedBy(branchDTO.getCreatedBy());
 	        message = "Branch Updated Successfully";
 
 	    } else {
@@ -1368,33 +1367,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	    createUpdateBranchVO(branchDTO, branchVO);
 
 	    branchRepo.save(branchVO);
-
-	    // Delete old Bank Details while updating
-	    if (branchDTO.getId() != null) {
-
-	        List<BankDetailsVO> bankList = bankDetailsRepo.findByBranchVO(branchVO);
-
-	        bankDetailsRepo.deleteAll(bankList);
-	    }
-
-	    // Save Bank Details
-	    if (branchDTO.getBankDetails() != null && !branchDTO.getBankDetails().isEmpty()) {
-
-	        for (BankDetailsDTO bankDTO : branchDTO.getBankDetails()) {
-
-	            BankDetailsVO bankVO = new BankDetailsVO();
-
-	            bankVO.setBankName(bankDTO.getBankName());
-	            bankVO.setIfscCode(bankDTO.getIfscCode());
-	            bankVO.setAccountNo(bankDTO.getAccountNo());
-	            bankVO.setBankBranch(bankDTO.getBankBranch());
-
-	            bankVO.setBranchVO(branchVO);
-
-	            bankDetailsRepo.save(bankVO);
-	        }
-	    }
-
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("branchVO", branchVO);
 	    response.put("message", message);
@@ -1441,6 +1413,38 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	        branchVO.setCity(city);
 	    }
+	    
+	 // Delete old Bank Details while updating
+	    if (dto.getId() != null) {
+
+	        List<BankDetailsVO> bankList = bankDetailsRepo.findByBranchVO(branchVO);
+
+	        bankDetailsRepo.deleteAll(bankList);
+	    }
+
+	    List<BankDetailsVO> bankList = new ArrayList<>();
+
+	    if (dto.getBankDetails() != null && !dto.getBankDetails().isEmpty()) {
+
+	        for (BankDetailsDTO bankDTO : dto.getBankDetails()) {
+
+	            BankDetailsVO bankVO = new BankDetailsVO();
+
+	            bankVO.setBankName(bankDTO.getBankName());
+	            bankVO.setIfscCode(bankDTO.getIfscCode());
+	            bankVO.setAccountNo(bankDTO.getAccountNo());
+	            bankVO.setBankBranch(bankDTO.getBankBranch());
+
+	            // Parent Mapping
+	            bankVO.setBranchVO(branchVO);
+
+	            // ⭐ Add to list
+	            bankList.add(bankVO);
+	        }
+
+	        // Set child list to parent
+	        branchVO.setBankDetailsVO(bankList);
+	    }
 	}
 	
 	@Override
@@ -1468,6 +1472,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	    return branchList;
 	}
+	
+	//Transport Master
 		
 	  @Override
 	  @Transactional
@@ -1531,16 +1537,21 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	  
 	  private void createUpdateTransportMasterVOByTransportMasterDTO(
 		        TransportMasterDTO transportMasterDTO,
-		        TransportMasterVO transportMasterVO) {
+		        TransportMasterVO transportMasterVO) throws ApplicationException {
 
 		    transportMasterVO.setTransportName(transportMasterDTO.getTransportName().toUpperCase());
 		    transportMasterVO.setAddress(transportMasterDTO.getAddress());
 		    transportMasterVO.setOrgId(transportMasterDTO.getOrgId());
-		    transportMasterVO.setBranchCode(transportMasterDTO.getBranchCode());
 		    transportMasterVO.setActive(transportMasterDTO.getActive());
 		    transportMasterVO.setCancelRemarks(transportMasterDTO.getCancelRemarks());
-		    transportMasterVO.setBranch(transportMasterDTO.getBranch());
+		    if (transportMasterDTO.getBranch() != null && transportMasterDTO.getBranch() != 0) {
 
+	            BranchVO branch = branchRepo.findById(transportMasterDTO.getBranch())
+	                    .orElseThrow(() ->
+	                            new ApplicationException("branch Not Found"));
+
+	            transportMasterVO.setBranch(branch);
+	        }
 		}
 
 
@@ -1631,9 +1642,9 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		        listVO.setActive(dto.isActive());
 		        listVO.setCancelRemarks(dto.getCancelRemarks());
 
-		        if (dto.getBranchId() != null && dto.getBranchId() != 0) {
+		        if (dto.getBranch() != null && dto.getBranch() != 0) {
 
-		            BranchVO branch = branchRepo.findById(dto.getBranchId())
+		            BranchVO branch = branchRepo.findById(dto.getBranch())
 		                    .orElseThrow(() ->
 		                            new ApplicationException("Branch Not Found"));
 
@@ -1760,9 +1771,9 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				  gSTRateMasterVO.setFinYear(gSTRateMasterDTO.getFinYear());
 				  gSTRateMasterVO.setActive(gSTRateMasterDTO.isActive());
 
-				  if (gSTRateMasterDTO.getBranchId() != null && gSTRateMasterDTO.getBranchId() != 0) {
+				  if (gSTRateMasterDTO.getBranch() != null && gSTRateMasterDTO.getBranch() != 0) {
 
-			            BranchVO branch = branchRepo.findById(gSTRateMasterDTO.getBranchId())
+			            BranchVO branch = branchRepo.findById(gSTRateMasterDTO.getBranch())
 			                    .orElseThrow(() ->
 			                            new ApplicationException("branch Not Found"));
 
@@ -1889,6 +1900,13 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 					    }
 
 					    return serviceAccMasterVO;
+					}
+
+					@Override
+					public Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO)
+							throws ApplicationException {
+						// TODO Auto-generated method stub
+						return null;
 					}
 
 						

@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemUnitsDTO {
+	
+	private Long id;
 
 	private BigDecimal purchaseUnit;
 

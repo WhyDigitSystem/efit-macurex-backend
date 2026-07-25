@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ItemSalesDTO {
 
+	private Long id;
+
 	private String itemBlocked;
 
 	private BigDecimal minimumSellingPrice;

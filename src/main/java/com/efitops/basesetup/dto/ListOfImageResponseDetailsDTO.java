@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemDrawingDTO {
-
-	private Long id;
-	private String name;
+public class ListOfImageResponseDetailsDTO {
+	private String valueCode;
+	private String valueDescription;
 
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemOthersDTO {
+	private Long id;
 	private String technicalSpecification;
 
 	private String supplierPartNo;

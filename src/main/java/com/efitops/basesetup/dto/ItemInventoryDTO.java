@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ItemInventoryDTO {
 
+	private Long id;
 	private String manufacured;
 
 	private String defaultLocation;

@@ -5,11 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class ItemDrawingDTO {
-
+@NoArgsConstructor
+public class BranchResponseDTO {
 	private Long id;
-	private String name;
+	private String branchCode;
+	private String branchName;
 
 }

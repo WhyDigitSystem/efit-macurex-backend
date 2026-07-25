@@ -3,14 +3,10 @@ package com.efitops.basesetup.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ItemMasterDTO {
+public class ItemMasterResponseDTO {
 	private Long id;
 
 	private Long listOfValuesId;
@@ -39,6 +35,8 @@ public class ItemMasterDTO {
 	private BigDecimal lenth;
 
 	private String psw;
+
+	private ListOfImageResponseDTO listOfValues;
 
 	private BigDecimal weight;
 
@@ -87,5 +85,4 @@ public class ItemMasterDTO {
 	private List<ItemOthersDTO> itemOthersDTO;
 
 	private List<ItemDrawingDTO> itemDrawingDTO;
-
 }

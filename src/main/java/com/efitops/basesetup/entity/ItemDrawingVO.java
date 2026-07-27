@@ -57,7 +57,7 @@ public class ItemDrawingVO {
 
 	@ManyToOne
 	@JsonBackReference
-	@JoinColumn(name = "itemmaster_id")
+	@JoinColumn(name = "item_id")
 	ItemMasterVO itemMasterVO;
 
 }

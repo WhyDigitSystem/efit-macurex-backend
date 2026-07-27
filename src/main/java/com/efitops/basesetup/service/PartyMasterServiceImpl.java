@@ -1,30 +1,8 @@
 package com.efitops.basesetup.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.transaction.Transactional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.efitops.basesetup.ResponseDTO.BranchResponseDTO;
-import com.efitops.basesetup.ResponseDTO.LogisticsResponseDTO;
-import com.efitops.basesetup.ResponseDTO.PartyCategoryResponseDTO;
-import com.efitops.basesetup.ResponseDTO.PartyMasterResponseDTO;
-import com.efitops.basesetup.ResponseDTO.SupplierCategoryResponseDTO;
-import com.efitops.basesetup.dto.PartyMasterDTO;
-import com.efitops.basesetup.entity.BranchVO;
-import com.efitops.basesetup.entity.ListOfValuesVO;
-import com.efitops.basesetup.entity.PartyMasterVO;
-import com.efitops.basesetup.entity.TransportMasterVO;
-import com.efitops.basesetup.exception.ApplicationException;
-import com.efitops.basesetup.repository.BranchRepo;
-import com.efitops.basesetup.repository.ListOfValuesRepo;
-import com.efitops.basesetup.repository.PartyMasterRepo;
-import com.efitops.basesetup.repository.TransportRepo;
 
 @Service
 public class PartyMasterServiceImpl implements PartyMasterService {

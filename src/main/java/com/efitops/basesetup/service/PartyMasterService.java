@@ -1,13 +1,5 @@
 package com.efitops.basesetup.service;
 
-import java.util.Map;
-
-import javax.validation.Valid;
-
-import com.efitops.basesetup.dto.PartyMasterDTO;
-import com.efitops.basesetup.entity.PartyMasterVO;
-import com.efitops.basesetup.exception.ApplicationException;
-
 public interface PartyMasterService {
 
 

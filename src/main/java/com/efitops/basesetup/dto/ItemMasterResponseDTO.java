@@ -37,6 +37,8 @@ public class ItemMasterResponseDTO {
 	private String psw;
 
 	private ListOfImageResponseDTO listOfValues;
+	
+	private PrimaryUnitImageDTO primaryUnits;
 
 	private BigDecimal weight;
 

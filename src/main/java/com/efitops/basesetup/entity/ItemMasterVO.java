@@ -37,7 +37,6 @@ public class ItemMasterVO {
 	@Column(name = "itemmaster_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
-	
 	@ManyToOne
 	@JoinColumn(name = "listofvalues_id")
 	private ListOfValuesVO itemGroup;
@@ -47,6 +46,10 @@ public class ItemMasterVO {
 
 	@Column(name = "item_type")
 	private String itemType;
+
+	@ManyToOne
+	@JoinColumn(name = "unitmaster_id")
+	private UnitMasterVO primaryUnit;
 
 //	@Column(name = "item_group")
 //	private String itemGroup;
@@ -87,8 +90,8 @@ public class ItemMasterVO {
 	@Column(name = "need_qc_approval")
 	private String needQcApproval;
 
-	@Column(name = "primary_unit")
-	private String primaryUnit;
+//	@Column(name = "primary_unit")
+//	private String primaryUnit;
 
 	@Column(name = "inspection")
 	private String inspection;
@@ -130,7 +133,7 @@ public class ItemMasterVO {
 	@Column(name = "modified_by")
 	private String updatedBy;
 	@Column(name = "active")
-	private boolean active=true;
+	private boolean active = true;
 	@Column(name = "cancel")
 	private boolean cancel = false;
 	@Column(name = "cancel_remarks", length = 150)

@@ -55,7 +55,7 @@ public class ItemInventoryVO {
 	@Column(name = "position")
 	private String position;
 
-	@Column(name = "minimum_order_qty", precision = 10, scale = 2)
+	@Column(name = "minimum_order_qty", precision = 10, scale = 2)	
 	private BigDecimal minimumOrderQty;
 
 	@Column(name = "maximum_order_qty", precision = 10, scale = 2)
@@ -66,7 +66,7 @@ public class ItemInventoryVO {
 
 	@Column(name = "bin_qty", precision = 10, scale = 2)
 	private BigDecimal binQty;
-
+	
 	@ManyToOne
 	@JsonBackReference
 	@JoinColumn(name = "itemmaster_id")

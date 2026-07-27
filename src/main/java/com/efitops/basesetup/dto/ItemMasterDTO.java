@@ -14,6 +14,8 @@ public class ItemMasterDTO {
 	private Long id;
 
 	private Long listOfValuesId;
+	
+	private Long primaryUnitId;
 
 	private String capital;
 

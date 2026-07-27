@@ -1,6 +1,7 @@
 package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -14,14 +15,16 @@ public class ItemMasterDTO {
 	private Long id;
 
 	private Long listOfValuesId;
-	
-	private Long primaryUnitId;
 
-	private String capital;
+	private Long primaryUnitId;
+	
+	private Long branchId;
+
+	private String capitalOrInput;
 
 	private String itemType;
 
-	private String group;
+	private String itemGroupType;
 
 	private String grade;
 
@@ -30,15 +33,16 @@ public class ItemMasterDTO {
 	private String exciseTariffNo;
 
 	private String itemDescription;
+
 	private BigDecimal thickness;
 
-	private String stock;
+	private String isStock;
 
 	private BigDecimal width;
 
-	private String protoType;
+	private String prototype;
 
-	private BigDecimal lenth;
+	private BigDecimal length;
 
 	private String psw;
 
@@ -46,48 +50,199 @@ public class ItemMasterDTO {
 
 	private String needQcApproval;
 
-	private String primaryUnit;
-
 	private String inspection;
 
 	private String abcGrade;
 
 	private String drawingNo;
 
-	private String excisbleItem;
+	private String isExciseItem;
 
 	private BigDecimal lotSize;
 
-	private String shelfLifePart;
+	private String isShelfLifePart;
 
-	private String importLocal;
+	private String importOrLocal;
 
-	private String safetyStock;
+	private String saftyStockMsl;
 
-	private String grnRequired;
+	private String isGrnRequired;
 
-	private String rowmaterials;
+	private String rawMaterialsMake;
 
-	private String hsnSacCode;
+	private boolean active;
+
+	private String hsnCode;
+
+	// Purchase Item
+
+	private BigDecimal purchaseUnit;
+
+	private BigDecimal sellingUnit;
+
+	private BigDecimal pricingUnit;
+
+	private BigDecimal secondaryUnit;
+
+	private BigDecimal secondaryPurchaseUnit;
+
+	// Inventory
+
+	private String manufacturedOrBoughtout;
+
+	private String defaultLocation;
+
+	private String alternativeLocation;
+
+	private BigDecimal leadTime;
+
+	private String reorderLevel;
+
+	private String rackNo;
+
+	private String rowNo;
+
+	private String position;
+
+	private String minOrderQty;
+
+	private String maxOrderQty;
+
+	private BigDecimal binSize;
+
+	private BigDecimal binQty;
+
+	private BigDecimal minimumOrderQty;
+
+	private BigDecimal maximumOrderQty;
+
+	// Purchase
+
+	private String defaultSupplier;
+
+	private String alternativeSupplier;
+
+	private String pruchaseTalerance;
+
+	private BigDecimal rate;
+
+	private LocalDate date;
+
+	private String landedCostRate;
+
+	private String toolOwner;
+
+	private String toolNo;
+
+	// Sales
+
+	private BigDecimal costRate;
+
+	private String isItemBlockedForInvoicing;
+
+	private BigDecimal minSellPrice;
+
+	private BigDecimal saleAmt;
+
+	private String leadTimeToDispatch;
+
+	private String customerPartNo;
+
+	private String supplierPartNo;
+
+	private String techSpec;
+
+	private BigDecimal salesAccount;
+
+	// Common
 
 	private String createdBy;
 
-	private Long orgId;
-
 	private String updatedBy;
+
+	private boolean cancel;
 
 	private String cancelRemarks;
 
-	private List<ItemUnitsDTO> itemUnitsDTO;
+	private String screenName;
 
-	private List<ItemInventoryDTO> itemInventoryDTO;
+	private String screenCode;
 
-	private List<ItemPurchaseDTO> itemPurchaseDTO;
+	private Long org;
 
-	private List<ItemSalesDTO> itemSalesDTO;
+	private String financialYear;
 
-	private List<ItemOthersDTO> itemOthersDTO;
-
+//	private String capital;
+//
+//	private String itemType;
+//
+//	private String group;
+//
+//	private String grade;
+//
+//	private String itemCode;
+//
+//	private String exciseTariffNo;
+//
+//	private String itemDescription;
+//	private BigDecimal thickness;
+//
+//	private String stock;
+//
+//	private BigDecimal width;
+//
+//	private String protoType;
+//
+//	private BigDecimal lenth;
+//
+//	private String psw;
+//
+//	private BigDecimal weight;
+//
+//	private String needQcApproval;
+//
+//	private String primaryUnit;
+//
+//	private String inspection;
+//
+//	private String abcGrade;
+//
+//	private String drawingNo;
+//
+//	private String excisbleItem;
+//
+//	private BigDecimal lotSize;
+//
+//	private String shelfLifePart;
+//
+//	private String importLocal;
+//
+//	private String safetyStock;
+//
+//	private String grnRequired;
+//
+//	private String rowmaterials;
+//
+//	private String hsnSacCode;
+//
+//	private String createdBy;
+//
+//	private Long orgId;
+//
+//	private String updatedBy;
+//
+//	private String cancelRemarks;
+//
+//	private List<ItemUnitsDTO> itemUnitsDTO;
+//
+//	private List<ItemInventoryDTO> itemInventoryDTO;
+//
+//	private List<ItemPurchaseDTO> itemPurchaseDTO;
+//
+//	private List<ItemSalesDTO> itemSalesDTO;
+//
+//	private List<ItemOthersDTO> itemOthersDTO;
+	
 	private List<ItemDrawingDTO> itemDrawingDTO;
 
 }

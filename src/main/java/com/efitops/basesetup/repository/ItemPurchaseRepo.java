@@ -11,6 +11,6 @@ import com.efitops.basesetup.entity.ItemPurchaseVO;
 @Repository
 public interface ItemPurchaseRepo extends JpaRepository<ItemPurchaseVO, Long> {
 
-	List<ItemPurchaseVO> findByItemMasterVO(ItemMasterVO itemMasterVO);
+//	List<ItemPurchaseVO> findByItemMasterVO(ItemMasterVO itemMasterVO);
 
 }

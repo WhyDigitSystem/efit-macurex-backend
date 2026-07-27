@@ -32,24 +32,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.ItemDrawingDTO;
-import com.efitops.basesetup.dto.ItemInventoryDTO;
 import com.efitops.basesetup.dto.ItemMasterDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDTO;
-import com.efitops.basesetup.dto.ItemOthersDTO;
-import com.efitops.basesetup.dto.ItemPurchaseDTO;
-import com.efitops.basesetup.dto.ItemSalesDTO;
-import com.efitops.basesetup.dto.ItemUnitsDTO;
 import com.efitops.basesetup.dto.ListOfImageResponseDTO;
 import com.efitops.basesetup.dto.ListOfImageResponseDetailsDTO;
 import com.efitops.basesetup.dto.PrimaryUnitImageDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.ItemDrawingVO;
-import com.efitops.basesetup.entity.ItemInventoryVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
-import com.efitops.basesetup.entity.ItemOthersVO;
-import com.efitops.basesetup.entity.ItemPurchaseVO;
-import com.efitops.basesetup.entity.ItemSalesVO;
-import com.efitops.basesetup.entity.ItemUnitsVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
@@ -120,7 +110,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 					.orElseThrow(() -> new ApplicationException("Item not found"));
 
 			if (!itemMasterVO.getItemCode().equals(itemMasterDTO.getItemCode())) {
-				if (itemMasterRepo.existsByItemCodeAndOrgId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId())) {
+				if (itemMasterRepo.existsByItemCodeAndOrg(itemMasterDTO.getItemCode(), itemMasterDTO.getOrg())) {
 
 					String errorMessage = String.format("This ItemCode: %s already exists for this organization.",
 							itemMasterDTO.getItemCode());
@@ -134,7 +124,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			message = "Item Updated Successfully";
 		} else {
 
-			if (itemMasterRepo.existsByItemCodeAndOrgId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId())) {
+			if (itemMasterRepo.existsByItemCodeAndOrg(itemMasterDTO.getItemCode(), itemMasterDTO.getOrg())) {
 
 				String errorMessage = String.format("This ItemCode: %s already exists for this organization.",
 						itemMasterDTO.getItemCode());
@@ -160,7 +150,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		ItemMasterResponseDTO responseDTO = new ItemMasterResponseDTO();
 
 		responseDTO.setId(itemMasterVO.getId());
-		responseDTO.setCapital(itemMasterVO.getCapital());
+		responseDTO.setCapitalOrInput(itemMasterVO.getCapitalOrInput());
 		responseDTO.setItemType(itemMasterVO.getItemType());
 		responseDTO.setGrade(itemMasterVO.getGrade());
 
@@ -189,10 +179,10 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		responseDTO.setExciseTariffNo(itemMasterVO.getExciseTariffNo());
 		responseDTO.setItemDescription(itemMasterVO.getItemDescription());
 		responseDTO.setThickness(itemMasterVO.getThickness());
-		responseDTO.setStock(itemMasterVO.getStock());
+		responseDTO.setIsStock(itemMasterVO.getIsStock());
 		responseDTO.setWidth(itemMasterVO.getWidth());
-		responseDTO.setProtoType(itemMasterVO.getProtoType());
-		responseDTO.setLenth(itemMasterVO.getLenth());
+		responseDTO.setPrototype(itemMasterVO.getPrototype());
+		responseDTO.setLength(itemMasterVO.getLength());
 		responseDTO.setPsw(itemMasterVO.getPsw());
 		responseDTO.setWeight(itemMasterVO.getWeight());
 		responseDTO.setNeedQcApproval(itemMasterVO.getNeedQcApproval());
@@ -207,111 +197,159 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		responseDTO.setInspection(itemMasterVO.getInspection());
 		responseDTO.setAbcGrade(itemMasterVO.getAbcGrade());
 		responseDTO.setDrawingNo(itemMasterVO.getDrawingNo());
-		responseDTO.setExcisbleItem(itemMasterVO.getExcisbleItem());
+		responseDTO.setExciseTariffNo(itemMasterVO.getExciseTariffNo());
 		responseDTO.setLotSize(itemMasterVO.getLotSize());
-		responseDTO.setShelfLifePart(itemMasterVO.getShelfLifePart());
-		responseDTO.setImportLocal(itemMasterVO.getImportLocal());
-		responseDTO.setSafetyStock(itemMasterVO.getSafetyStock());
-		responseDTO.setGrnRequired(itemMasterVO.getGrnRequired());
-		responseDTO.setRowmaterials(itemMasterVO.getRowmaterials());
-		responseDTO.setHsnSacCode(itemMasterVO.getHsnSacCode());
+//		responseDTO.setSaftyStockMsl(itemMasterVO.getSaftyStockMsl());
+		responseDTO.setImportOrLocal(itemMasterVO.getImportOrLocal());
+		responseDTO.setSaftyStockMsl(itemMasterVO.getSaftyStockMsl());
+		responseDTO.setIsGrnRequired(itemMasterVO.getIsGrnRequired());
+		responseDTO.setRawMaterialsMake(itemMasterVO.getRawMaterialsMake());
+		responseDTO.setHsnCode(itemMasterVO.getHsnCode());
 		responseDTO.setCreatedBy(itemMasterVO.getCreatedBy());
-		responseDTO.setOrgId(itemMasterVO.getOrgId());
+		responseDTO.setOrg(itemMasterVO.getOrg());
 		responseDTO.setUpdatedBy(itemMasterVO.getUpdatedBy());
 		responseDTO.setCancelRemarks(itemMasterVO.getCancelRemarks());
 
-		List<ItemUnitsDTO> unitsResponseList = new ArrayList<>();
-		if (itemMasterVO.getItemUnitsVO() != null) {
-			for (ItemUnitsVO unitsVO : itemMasterVO.getItemUnitsVO()) {
-				ItemUnitsDTO unitsDTO = new ItemUnitsDTO();
-				unitsDTO.setId(unitsVO.getId());
-				unitsDTO.setPurchaseUnit(unitsVO.getPurchaseUnit());
-				unitsDTO.setSellingUnit(unitsVO.getSellingUnit());
-				unitsDTO.setPricingUnit(unitsVO.getPricingUnit());
-				unitsDTO.setSecondaryUnit(unitsVO.getSecondaryUnit());
-				unitsResponseList.add(unitsDTO);
-			}
+		responseDTO.setPurchaseUnit(itemMasterVO.getPurchaseUnit());
+		responseDTO.setSellingUnit(itemMasterVO.getSellingUnit());
+		responseDTO.setPricingUnit(itemMasterVO.getPricingUnit());
+		responseDTO.setSecondaryUnit(itemMasterVO.getSecondaryUnit());
+
+		responseDTO.setManufacturedOrBoughtout(itemMasterVO.getManufacturedOrBoughtout());
+		responseDTO.setDefaultLocation(itemMasterVO.getDefaultLocation());
+		responseDTO.setAlternativeLocation(itemMasterVO.getAlternativeLocation());
+		responseDTO.setLeadTime(itemMasterVO.getLeadTime());
+		responseDTO.setReorderLevel(itemMasterVO.getReorderLevel());
+		responseDTO.setRackNo(itemMasterVO.getRackNo());
+		responseDTO.setRowNo(itemMasterVO.getRowNo());
+		responseDTO.setPosition(itemMasterVO.getPosition());
+		responseDTO.setMinimumOrderQty(itemMasterVO.getMinimumOrderQty());
+		responseDTO.setMaximumOrderQty(itemMasterVO.getMaximumOrderQty());
+		responseDTO.setBinSize(itemMasterVO.getBinSize());
+		responseDTO.setBinQty(itemMasterVO.getBinQty());
+
+		responseDTO.setDefaultSupplier(itemMasterVO.getDefaultSupplier());
+		responseDTO.setAlternativeSupplier(itemMasterVO.getAlternativeSupplier());
+		responseDTO.setLeadTime(itemMasterVO.getLeadTime());
+		responseDTO.setPruchaseTalerance(itemMasterVO.getPruchaseTalerance());
+		responseDTO.setRate(itemMasterVO.getRate());
+		responseDTO.setDate(itemMasterVO.getDate());
+		responseDTO.setLandedCostRate(itemMasterVO.getLandedCostRate());
+		responseDTO.setToolOwner(itemMasterVO.getToolOwner());
+		responseDTO.setToolNo(itemMasterVO.getToolNo());
+
+		if (itemMasterVO.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(itemMasterVO.getBranch().getId());
+			branchDTO.setBranchCode(itemMasterVO.getBranch().getBranchCode());
+			branchDTO.setBranchName(itemMasterVO.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+
+			responseDTO.setBranchId(itemMasterVO.getBranch().getId());
 		}
-		responseDTO.setItemUnitsDTO(unitsResponseList);
 
-		List<ItemInventoryDTO> inventoryResponseList = new ArrayList<>();
-		if (itemMasterVO.getItemInventoryVO() != null) {
-			for (ItemInventoryVO inventoryVO : itemMasterVO.getItemInventoryVO()) {
-				ItemInventoryDTO inventoryDTO = new ItemInventoryDTO();
-				inventoryDTO.setId(inventoryVO.getId());
-				inventoryDTO.setManufacured(inventoryVO.getManufacured());
-				inventoryDTO.setDefaultLocation(inventoryVO.getDefaultLocation());
-				inventoryDTO.setAlternateLocation(inventoryVO.getAlternateLocation());
-				inventoryDTO.setLeadTime(inventoryVO.getLeadTime());
-				inventoryDTO.setReorderLevel(inventoryVO.getReorderLevel());
-				inventoryDTO.setRackNo(inventoryVO.getRackNo());
-				inventoryDTO.setRowNo(inventoryVO.getRowNo());
-				inventoryDTO.setPosition(inventoryVO.getPosition());
-				inventoryDTO.setMinimumOrderQty(inventoryVO.getMinimumOrderQty());
-				inventoryDTO.setMaximumOrderQty(inventoryVO.getMaximumOrderQty());
-				inventoryDTO.setBinSize(inventoryVO.getBinSize());
-				inventoryDTO.setBinQty(inventoryVO.getBinQty());
-				inventoryResponseList.add(inventoryDTO);
-			}
-		}
-		responseDTO.setItemInventoryDTO(inventoryResponseList);
+		responseDTO.setIsItemBlockedForInvoicing(itemMasterVO.getIsItemBlockedForInvoicing());
+		responseDTO.setMinSellPrice(itemMasterVO.getMinSellPrice());
+		responseDTO.setSalesAccount(itemMasterVO.getSalesAccount());
+		responseDTO.setLeadTimeToDispatch(itemMasterVO.getLeadTimeToDispatch());
+		responseDTO.setCustomerPartNo(itemMasterVO.getCustomerPartNo());
 
-		List<ItemPurchaseDTO> purchaseResponseList = new ArrayList<>();
-		if (itemMasterVO.getItemPurchaseVO() != null) {
-			for (ItemPurchaseVO purchaseVO : itemMasterVO.getItemPurchaseVO()) {
-				ItemPurchaseDTO purchaseDTO = new ItemPurchaseDTO();
-				purchaseDTO.setId(purchaseVO.getId());
-				purchaseDTO.setDefaultSupplier(purchaseVO.getDefaultSupplier());
-				purchaseDTO.setAlternateSupplier(purchaseVO.getAlternateSupplier());
-				purchaseDTO.setLeadTime(purchaseVO.getLeadTime());
-				purchaseDTO.setPurchaseTolerance(purchaseVO.getPurchaseTolerance());
-				purchaseDTO.setRate(purchaseVO.getRate());
-				purchaseDTO.setDate(purchaseVO.getDate());
-				purchaseDTO.setLandedCostRate(purchaseVO.getLandedCostRate());
-				purchaseDTO.setToolOwner(purchaseVO.getToolOwner());
-				purchaseDTO.setToolNo(purchaseVO.getToolNo());
+		responseDTO.setTechSpec(itemMasterVO.getTechSpec());
+		responseDTO.setSupplierPartNo(itemMasterVO.getSupplierPartNo());
 
-				if (purchaseVO.getBranch() != null) {
-					BranchResponseDTO branchDTO = new BranchResponseDTO();
-					branchDTO.setId(purchaseVO.getBranch().getId());
-					branchDTO.setBranchCode(purchaseVO.getBranch().getBranchCode());
-					branchDTO.setBranchName(purchaseVO.getBranch().getBranchName());
-					purchaseDTO.setBranch(branchDTO);
-
-					purchaseDTO.setBranchId(purchaseVO.getBranch().getId());
-				}
-
-				purchaseResponseList.add(purchaseDTO);
-			}
-		}
-		responseDTO.setItemPurchaseDTO(purchaseResponseList);
-
-		List<ItemSalesDTO> salesResponseList = new ArrayList<>();
-		if (itemMasterVO.getItemSalesVO() != null) {
-			for (ItemSalesVO salesVO : itemMasterVO.getItemSalesVO()) {
-				ItemSalesDTO salesDTO = new ItemSalesDTO();
-				salesDTO.setId(salesVO.getId());
-				salesDTO.setItemBlocked(salesVO.getItemBlocked());
-				salesDTO.setMinimumSellingPrice(salesVO.getMinimumSellingPrice());
-				salesDTO.setSalesAccount(salesVO.getSalesAccount());
-				salesDTO.setLeadTimeToDespatch(salesVO.getLeadTimeToDespatch());
-				salesDTO.setCustomerPartNo(salesVO.getCustomerPartNo());
-				salesResponseList.add(salesDTO);
-			}
-		}
-		responseDTO.setItemSalesDTO(salesResponseList);
-
-		List<ItemOthersDTO> othersResponseList = new ArrayList<>();
-		if (itemMasterVO.getItemOthersVO() != null) {
-			for (ItemOthersVO othersVO : itemMasterVO.getItemOthersVO()) {
-				ItemOthersDTO othersDTO = new ItemOthersDTO();
-				othersDTO.setId(othersVO.getId());
-				othersDTO.setTechnicalSpecification(othersVO.getTechnicalSpecification());
-				othersDTO.setSupplierPartNo(othersVO.getSupplierPartNo());
-				othersResponseList.add(othersDTO);
-			}
-		}
-		responseDTO.setItemOthersDTO(othersResponseList);
+//
+//		List<ItemUnitsDTO> unitsResponseList = new ArrayList<>();
+//		if (itemMasterVO.getItemUnitsVO() != null) {
+//			for (ItemUnitsVO unitsVO : itemMasterVO.getItemUnitsVO()) {
+//				ItemUnitsDTO unitsDTO = new ItemUnitsDTO();
+//				unitsDTO.setId(unitsVO.getId());
+//				unitsDTO.setPurchaseUnit(unitsVO.getPurchaseUnit());
+//				unitsDTO.setSellingUnit(unitsVO.getSellingUnit());
+//				unitsDTO.setPricingUnit(unitsVO.getPricingUnit());
+//				unitsDTO.setSecondaryUnit(unitsVO.getSecondaryUnit());
+//				unitsResponseList.add(unitsDTO);
+//			}
+//		}
+//		responseDTO.setItemUnitsDTO(unitsResponseList);
+//
+//		List<ItemInventoryDTO> inventoryResponseList = new ArrayList<>();
+//		if (itemMasterVO.getItemInventoryVO() != null) {
+//			for (ItemInventoryVO inventoryVO : itemMasterVO.getItemInventoryVO()) {
+//				ItemInventoryDTO inventoryDTO = new ItemInventoryDTO();
+//				inventoryDTO.setId(inventoryVO.getId());
+//				inventoryDTO.setManufacured(inventoryVO.getManufacured());
+//				inventoryDTO.setDefaultLocation(inventoryVO.getDefaultLocation());
+//				inventoryDTO.setAlternateLocation(inventoryVO.getAlternateLocation());
+//				inventoryDTO.setLeadTime(inventoryVO.getLeadTime());
+//				inventoryDTO.setReorderLevel(inventoryVO.getReorderLevel());
+//				inventoryDTO.setRackNo(inventoryVO.getRackNo());
+//				inventoryDTO.setRowNo(inventoryVO.getRowNo());
+//				inventoryDTO.setPosition(inventoryVO.getPosition());
+//				inventoryDTO.setMinimumOrderQty(inventoryVO.getMinimumOrderQty());
+//				inventoryDTO.setMaximumOrderQty(inventoryVO.getMaximumOrderQty());
+//				inventoryDTO.setBinSize(inventoryVO.getBinSize());
+//				inventoryDTO.setBinQty(inventoryVO.getBinQty());
+//				inventoryResponseList.add(inventoryDTO);
+//			}
+//		}
+//		responseDTO.setItemInventoryDTO(inventoryResponseList);
+//
+//		List<ItemPurchaseDTO> purchaseResponseList = new ArrayList<>();
+//		if (itemMasterVO.getItemPurchaseVO() != null) {
+//			for (ItemPurchaseVO purchaseVO : itemMasterVO.getItemPurchaseVO()) {
+//				ItemPurchaseDTO purchaseDTO = new ItemPurchaseDTO();
+//				purchaseDTO.setId(purchaseVO.getId());
+//				purchaseDTO.setDefaultSupplier(purchaseVO.getDefaultSupplier());
+//				purchaseDTO.setAlternateSupplier(purchaseVO.getAlternateSupplier());
+//				purchaseDTO.setLeadTime(purchaseVO.getLeadTime());
+//				purchaseDTO.setPurchaseTolerance(purchaseVO.getPurchaseTolerance());
+//				purchaseDTO.setRate(purchaseVO.getRate());
+//				purchaseDTO.setDate(purchaseVO.getDate());
+//				purchaseDTO.setLandedCostRate(purchaseVO.getLandedCostRate());
+//				purchaseDTO.setToolOwner(purchaseVO.getToolOwner());
+//				purchaseDTO.setToolNo(purchaseVO.getToolNo());
+//
+//				if (purchaseVO.getBranch() != null) {
+//					BranchResponseDTO branchDTO = new BranchResponseDTO();
+//					branchDTO.setId(purchaseVO.getBranch().getId());
+//					branchDTO.setBranchCode(purchaseVO.getBranch().getBranchCode());
+//					branchDTO.setBranchName(purchaseVO.getBranch().getBranchName());
+//					purchaseDTO.setBranch(branchDTO);
+//
+//					purchaseDTO.setBranchId(purchaseVO.getBranch().getId());
+//				}
+//
+//				purchaseResponseList.add(purchaseDTO);
+//			}
+//		}
+//		responseDTO.setItemPurchaseDTO(purchaseResponseList);
+//
+//		List<ItemSalesDTO> salesResponseList = new ArrayList<>();
+//		if (itemMasterVO.getItemSalesVO() != null) {
+//			for (ItemSalesVO salesVO : itemMasterVO.getItemSalesVO()) {
+//				ItemSalesDTO salesDTO = new ItemSalesDTO();
+//				salesDTO.setId(salesVO.getId());
+//				salesDTO.setItemBlocked(salesVO.getItemBlocked());
+//				salesDTO.setMinimumSellingPrice(salesVO.getMinimumSellingPrice());
+//				salesDTO.setSalesAccount(salesVO.getSalesAccount());
+//				salesDTO.setLeadTimeToDespatch(salesVO.getLeadTimeToDespatch());
+//				salesDTO.setCustomerPartNo(salesVO.getCustomerPartNo());
+//				salesResponseList.add(salesDTO);
+//			}
+//		}
+//		responseDTO.setItemSalesDTO(salesResponseList);
+//
+//		List<ItemOthersDTO> othersResponseList = new ArrayList<>();
+//		if (itemMasterVO.getItemOthersVO() != null) {
+//			for (ItemOthersVO othersVO : itemMasterVO.getItemOthersVO()) {
+//				ItemOthersDTO othersDTO = new ItemOthersDTO();
+//				othersDTO.setId(othersVO.getId());
+//				othersDTO.setTechnicalSpecification(othersVO.getTechnicalSpecification());
+//				othersDTO.setSupplierPartNo(othersVO.getSupplierPartNo());
+//				othersResponseList.add(othersDTO);
+//			}
+//		}
+//		responseDTO.setItemOthersDTO(othersResponseList);
 
 		List<ItemDrawingDTO> drawingResponseList = new ArrayList<>();
 		if (itemMasterVO.getItemDrawingVO() != null) {
@@ -330,7 +368,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 	private void createUpdateItemMasterVOByItemMasterDTO(ItemMasterDTO itemMasterDTO, ItemMasterVO itemMasterVO)
 			throws ApplicationException {
 
-		itemMasterVO.setOrgId(itemMasterDTO.getOrgId());
+		itemMasterVO.setOrg(itemMasterDTO.getOrg());
 		itemMasterVO.setCreatedBy(itemMasterDTO.getCreatedBy());
 
 		if (itemMasterDTO.getListOfValuesId() != null && itemMasterDTO.getListOfValuesId() != 0) {
@@ -341,7 +379,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			itemMasterVO.setItemGroup(listofvalues);
 
 		}
-		itemMasterVO.setCapital(itemMasterDTO.getCapital());
+		itemMasterVO.setCapitalOrInput(itemMasterDTO.getCapitalOrInput());
 		itemMasterVO.setItemType(itemMasterDTO.getItemType());
 		itemMasterVO.setGrade(itemMasterDTO.getGrade());
 		itemMasterVO.setItemCode(itemMasterDTO.getItemCode());
@@ -349,10 +387,10 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		itemMasterVO.setItemDescription(itemMasterDTO.getItemDescription());
 
 		itemMasterVO.setThickness(itemMasterDTO.getThickness());
-		itemMasterVO.setStock(itemMasterDTO.getStock());
+		itemMasterVO.setSaftyStockMsl(itemMasterDTO.getSaftyStockMsl());
 		itemMasterVO.setWidth(itemMasterDTO.getWidth());
-		itemMasterVO.setProtoType(itemMasterDTO.getProtoType());
-		itemMasterVO.setLenth(itemMasterDTO.getLenth());
+		itemMasterVO.setPrototype(itemMasterDTO.getPrototype());
+		itemMasterVO.setLength(itemMasterDTO.getLength());
 		itemMasterVO.setPsw(itemMasterDTO.getPsw());
 		itemMasterVO.setWeight(itemMasterDTO.getWeight());
 		itemMasterVO.setNeedQcApproval(itemMasterDTO.getNeedQcApproval());
@@ -367,155 +405,199 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		itemMasterVO.setInspection(itemMasterDTO.getInspection());
 		itemMasterVO.setAbcGrade(itemMasterDTO.getAbcGrade());
 		itemMasterVO.setDrawingNo(itemMasterDTO.getDrawingNo());
-		itemMasterVO.setExcisbleItem(itemMasterDTO.getExcisbleItem());
+		itemMasterVO.setExciseTariffNo(itemMasterDTO.getExciseTariffNo());
 		itemMasterVO.setLotSize(itemMasterDTO.getLotSize());
-		itemMasterVO.setShelfLifePart(itemMasterDTO.getShelfLifePart());
-		itemMasterVO.setImportLocal(itemMasterDTO.getImportLocal());
-		itemMasterVO.setSafetyStock(itemMasterDTO.getSafetyStock());
-		itemMasterVO.setGrnRequired(itemMasterDTO.getGrnRequired());
-		itemMasterVO.setRowmaterials(itemMasterDTO.getRowmaterials());
-		itemMasterVO.setHsnSacCode(itemMasterDTO.getHsnSacCode());
+//		itemMasterVO.setShelfLifePart(itemMasterDTO.getShelfLifePart());
+		itemMasterVO.setImportOrLocal(itemMasterDTO.getImportOrLocal());
+		itemMasterVO.setSaftyStockMsl(itemMasterDTO.getSaftyStockMsl());
+		itemMasterVO.setIsGrnRequired(itemMasterDTO.getIsGrnRequired());
+		itemMasterVO.setRawMaterialsMake(itemMasterDTO.getRawMaterialsMake());
+		itemMasterVO.setHsnCode(itemMasterDTO.getHsnCode());
 
 		itemMasterVO.setCreatedBy(itemMasterDTO.getCreatedBy());
-		itemMasterVO.setOrgId(itemMasterDTO.getOrgId());
 		itemMasterVO.setUpdatedBy(itemMasterDTO.getUpdatedBy());
 		itemMasterVO.setCancelRemarks(itemMasterDTO.getCancelRemarks());
 
-		// Delete existing child records if updating
-		if (ObjectUtils.isNotEmpty(itemMasterVO.getId())) {
+		itemMasterVO.setPurchaseUnit(itemMasterDTO.getPurchaseUnit());
+		itemMasterVO.setSellingUnit(itemMasterDTO.getSellingUnit());
+		itemMasterVO.setPricingUnit(itemMasterDTO.getPricingUnit());
+		itemMasterVO.setSecondaryUnit(itemMasterDTO.getSecondaryUnit());
 
-			List<ItemUnitsVO> itemUnits = itemUnitsRepo.findByItemMasterVO(itemMasterVO);
-			itemUnitsRepo.deleteAll(itemUnits);
+		itemMasterVO.setManufacturedOrBoughtout(itemMasterDTO.getManufacturedOrBoughtout());
+		itemMasterVO.setDefaultLocation(itemMasterDTO.getDefaultLocation());
+		itemMasterVO.setAlternativeLocation(itemMasterDTO.getAlternativeLocation());
+		itemMasterVO.setLeadTime(itemMasterDTO.getLeadTime());
+		itemMasterVO.setReorderLevel(itemMasterDTO.getReorderLevel());
+		itemMasterVO.setRackNo(itemMasterDTO.getRackNo());
+		itemMasterVO.setRowNo(itemMasterDTO.getRowNo());
+		itemMasterVO.setPosition(itemMasterDTO.getPosition());
+		itemMasterVO.setMinimumOrderQty(itemMasterDTO.getMinimumOrderQty());
+		itemMasterVO.setMaximumOrderQty(itemMasterDTO.getMaximumOrderQty());
+		itemMasterVO.setBinSize(itemMasterDTO.getBinSize());
+		itemMasterVO.setBinQty(itemMasterDTO.getBinQty());
 
-			List<ItemInventoryVO> itemInventory = itemInventoryRepo.findByItemMasterVO(itemMasterVO);
-			itemInventoryRepo.deleteAll(itemInventory);
+		itemMasterVO.setDefaultSupplier(itemMasterDTO.getDefaultSupplier());
+		itemMasterVO.setAlternativeSupplier(itemMasterDTO.getAlternativeSupplier());
+		itemMasterVO.setLeadTime(itemMasterDTO.getLeadTime());
+		itemMasterVO.setPruchaseTalerance(itemMasterDTO.getPruchaseTalerance());
+		itemMasterVO.setRate(itemMasterDTO.getRate());
+		itemMasterVO.setDate(itemMasterDTO.getDate());
+		itemMasterVO.setLandedCostRate(itemMasterDTO.getLandedCostRate());
+		itemMasterVO.setToolOwner(itemMasterDTO.getToolOwner());
+		itemMasterVO.setToolNo(itemMasterDTO.getToolNo());
 
-			List<ItemPurchaseVO> itemPurchase = itemPurchaseRepo.findByItemMasterVO(itemMasterVO);
-			itemPurchaseRepo.deleteAll(itemPurchase);
+		itemMasterVO.setIsItemBlockedForInvoicing(itemMasterDTO.getIsItemBlockedForInvoicing());
+		itemMasterVO.setMinSellPrice(itemMasterDTO.getMinSellPrice());
+		itemMasterVO.setSalesAccount(itemMasterDTO.getSalesAccount());
+		itemMasterVO.setLeadTimeToDispatch(itemMasterDTO.getLeadTimeToDispatch());
+		itemMasterVO.setCustomerPartNo(itemMasterDTO.getCustomerPartNo());
 
-			List<ItemSalesVO> itemSales = itemSalesRepo.findByItemMasterVO(itemMasterVO);
-			itemSalesRepo.deleteAll(itemSales);
+		itemMasterVO.setTechSpec(itemMasterDTO.getTechSpec());
+		itemMasterVO.setSupplierPartNo(itemMasterDTO.getSupplierPartNo());
 
-			List<ItemOthersVO> itemOthers = itemOthersRepo.findByItemMasterVO(itemMasterVO);
-			itemOthersRepo.deleteAll(itemOthers);
+		if (itemMasterDTO.getBranchId() != null && itemMasterDTO.getBranchId() != 0) {
 
-			List<ItemDrawingVO> itemDrawing = itemDrawingRepo.findByItemMasterVO(itemMasterVO);
-			itemDrawingRepo.deleteAll(itemDrawing);
+			BranchVO branch = branchRepo.findById(itemMasterDTO.getBranchId())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			itemMasterVO.setBranch(branch);
 		}
 
-		List<ItemUnitsVO> itemUnitsVOs = new ArrayList<>();
-		if (itemMasterDTO.getItemUnitsDTO() != null) {
-			for (ItemUnitsDTO dto : itemMasterDTO.getItemUnitsDTO()) {
-
-				ItemUnitsVO vo = new ItemUnitsVO();
-
-				vo.setPurchaseUnit(dto.getPurchaseUnit());
-				vo.setSellingUnit(dto.getSellingUnit());
-				vo.setPricingUnit(dto.getPricingUnit());
-				vo.setSecondaryUnit(dto.getSecondaryUnit());
-
-				vo.setItemMasterVO(itemMasterVO);
-
-				itemUnitsVOs.add(vo);
-			}
-		}
-		itemMasterVO.setItemUnitsVO(itemUnitsVOs);
-
-		// Set ItemInventory
-		List<ItemInventoryVO> itemInventoryVOs = new ArrayList<>();
-		if (itemMasterDTO.getItemInventoryDTO() != null) {
-			for (ItemInventoryDTO dto : itemMasterDTO.getItemInventoryDTO()) {
-
-				ItemInventoryVO vo = new ItemInventoryVO();
-
-				vo.setManufacured(dto.getManufacured());
-				vo.setDefaultLocation(dto.getDefaultLocation());
-				vo.setAlternateLocation(dto.getAlternateLocation());
-				vo.setLeadTime(dto.getLeadTime());
-				vo.setReorderLevel(dto.getReorderLevel());
-				vo.setRackNo(dto.getRackNo());
-				vo.setRowNo(dto.getRowNo());
-				vo.setPosition(dto.getPosition());
-				vo.setMinimumOrderQty(dto.getMinimumOrderQty());
-				vo.setMaximumOrderQty(dto.getMaximumOrderQty());
-				vo.setBinSize(dto.getBinSize());
-				vo.setBinQty(dto.getBinQty());
-
-				vo.setItemMasterVO(itemMasterVO);
-
-				itemInventoryVOs.add(vo);
-			}
-		}
-		itemMasterVO.setItemInventoryVO(itemInventoryVOs);
-
-		// Set ItemPurchase - Store branch reference
-		List<ItemPurchaseVO> itemPurchaseVOs = new ArrayList<>();
-		if (itemMasterDTO.getItemPurchaseDTO() != null) {
-			for (ItemPurchaseDTO dto : itemMasterDTO.getItemPurchaseDTO()) {
-
-				ItemPurchaseVO vo = new ItemPurchaseVO();
-
-				vo.setDefaultSupplier(dto.getDefaultSupplier());
-				vo.setAlternateSupplier(dto.getAlternateSupplier());
-				vo.setLeadTime(dto.getLeadTime());
-				vo.setPurchaseTolerance(dto.getPurchaseTolerance());
-				vo.setRate(dto.getRate());
-				vo.setDate(dto.getDate());
-				vo.setLandedCostRate(dto.getLandedCostRate());
-				vo.setToolOwner(dto.getToolOwner());
-				vo.setToolNo(dto.getToolNo());
-
-				if (dto.getBranchId() != null && dto.getBranchId() != 0) {
-
-					BranchVO branch = branchRepo.findById(dto.getBranchId())
-							.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-					vo.setBranch(branch);
-				}
-
-				vo.setItemMasterVO(itemMasterVO);
-
-				itemPurchaseVOs.add(vo);
-			}
-		}
-		itemMasterVO.setItemPurchaseVO(itemPurchaseVOs);
-
-		// Set ItemSales
-		List<ItemSalesVO> itemSalesVOs = new ArrayList<>();
-		if (itemMasterDTO.getItemSalesDTO() != null) {
-			for (ItemSalesDTO dto : itemMasterDTO.getItemSalesDTO()) {
-
-				ItemSalesVO vo = new ItemSalesVO();
-
-				vo.setItemBlocked(dto.getItemBlocked());
-				vo.setMinimumSellingPrice(dto.getMinimumSellingPrice());
-				vo.setSalesAccount(dto.getSalesAccount());
-				vo.setLeadTimeToDespatch(dto.getLeadTimeToDespatch());
-				vo.setCustomerPartNo(dto.getCustomerPartNo());
-
-				vo.setItemMasterVO(itemMasterVO);
-
-				itemSalesVOs.add(vo);
-			}
-		}
-		itemMasterVO.setItemSalesVO(itemSalesVOs);
-
-		// Set ItemOthers
-		List<ItemOthersVO> itemOthersVOs = new ArrayList<>();
-		if (itemMasterDTO.getItemOthersDTO() != null) {
-			for (ItemOthersDTO dto : itemMasterDTO.getItemOthersDTO()) {
-
-				ItemOthersVO vo = new ItemOthersVO();
-
-				vo.setTechnicalSpecification(dto.getTechnicalSpecification());
-				vo.setSupplierPartNo(dto.getSupplierPartNo());
-
-				vo.setItemMasterVO(itemMasterVO);
-
-				itemOthersVOs.add(vo);
-			}
-		}
-		itemMasterVO.setItemOthersVO(itemOthersVOs);
+//		// Delete existing child records if updating
+//		if (ObjectUtils.isNotEmpty(itemMasterVO.getId())) {
+//
+//			List<ItemUnitsVO> itemUnits = itemUnitsRepo.findByItemMasterVO(itemMasterVO);
+//			itemUnitsRepo.deleteAll(itemUnits);
+//
+//			List<ItemInventoryVO> itemInventory = itemInventoryRepo.findByItemMasterVO(itemMasterVO);
+//			itemInventoryRepo.deleteAll(itemInventory);
+//
+//			List<ItemPurchaseVO> itemPurchase = itemPurchaseRepo.findByItemMasterVO(itemMasterVO);
+//			itemPurchaseRepo.deleteAll(itemPurchase);
+//
+//			List<ItemSalesVO> itemSales = itemSalesRepo.findByItemMasterVO(itemMasterVO);
+//			itemSalesRepo.deleteAll(itemSales);
+//
+//			List<ItemOthersVO> itemOthers = itemOthersRepo.findByItemMasterVO(itemMasterVO);
+//			itemOthersRepo.deleteAll(itemOthers);
+//
+//			List<ItemDrawingVO> itemDrawing = itemDrawingRepo.findByItemMasterVO(itemMasterVO);
+//			itemDrawingRepo.deleteAll(itemDrawing);
+//		}
+//
+//		List<ItemUnitsVO> itemUnitsVOs = new ArrayList<>();
+//		if (itemMasterDTO.getItemUnitsDTO() != null) {
+//			for (ItemUnitsDTO dto : itemMasterDTO.getItemUnitsDTO()) {
+//
+//				ItemUnitsVO vo = new ItemUnitsVO();
+//
+//				vo.setPurchaseUnit(dto.getPurchaseUnit());
+//				vo.setSellingUnit(dto.getSellingUnit());
+//				vo.setPricingUnit(dto.getPricingUnit());
+//				vo.setSecondaryUnit(dto.getSecondaryUnit());
+//
+//				vo.setItemMasterVO(itemMasterVO);
+//
+//				itemUnitsVOs.add(vo);
+//			}
+//		}
+//		itemMasterVO.setItemUnitsVO(itemUnitsVOs);
+//
+//		// Set ItemInventory
+//		List<ItemInventoryVO> itemInventoryVOs = new ArrayList<>();
+//		if (itemMasterDTO.getItemInventoryDTO() != null) {
+//			for (ItemInventoryDTO dto : itemMasterDTO.getItemInventoryDTO()) {
+//
+//				ItemInventoryVO vo = new ItemInventoryVO();
+//
+//				vo.setManufacured(dto.getManufacured());
+//				vo.setDefaultLocation(dto.getDefaultLocation());
+//				vo.setAlternateLocation(dto.getAlternateLocation());
+//				vo.setLeadTime(dto.getLeadTime());
+//				vo.setReorderLevel(dto.getReorderLevel());
+//				vo.setRackNo(dto.getRackNo());
+//				vo.setRowNo(dto.getRowNo());
+//				vo.setPosition(dto.getPosition());
+//				vo.setMinimumOrderQty(dto.getMinimumOrderQty());
+//				vo.setMaximumOrderQty(dto.getMaximumOrderQty());
+//				vo.setBinSize(dto.getBinSize());
+//				vo.setBinQty(dto.getBinQty());
+//
+//				vo.setItemMasterVO(itemMasterVO);
+//
+//				itemInventoryVOs.add(vo);
+//			}
+//		}
+//		itemMasterVO.setItemInventoryVO(itemInventoryVOs);
+//
+//		// Set ItemPurchase - Store branch reference
+//		List<ItemPurchaseVO> itemPurchaseVOs = new ArrayList<>();
+//		if (itemMasterDTO.getItemPurchaseDTO() != null) {
+//			for (ItemPurchaseDTO dto : itemMasterDTO.getItemPurchaseDTO()) {
+//
+//				ItemPurchaseVO vo = new ItemPurchaseVO();
+//
+//				vo.setDefaultSupplier(dto.getDefaultSupplier());
+//				vo.setAlternateSupplier(dto.getAlternateSupplier());
+//				vo.setLeadTime(dto.getLeadTime());
+//				vo.setPurchaseTolerance(dto.getPurchaseTolerance());
+//				vo.setRate(dto.getRate());
+//				vo.setDate(dto.getDate());
+//				vo.setLandedCostRate(dto.getLandedCostRate());
+//				vo.setToolOwner(dto.getToolOwner());
+//				vo.setToolNo(dto.getToolNo());
+//
+//				if (dto.getBranchId() != null && dto.getBranchId() != 0) {
+//
+//					BranchVO branch = branchRepo.findById(dto.getBranchId())
+//							.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+//
+//					vo.setBranch(branch);
+//				}
+//
+//				vo.setItemMasterVO(itemMasterVO);
+//
+//				itemPurchaseVOs.add(vo);
+//			}
+//		}
+//		itemMasterVO.setItemPurchaseVO(itemPurchaseVOs);
+//
+//		// Set ItemSales
+//		List<ItemSalesVO> itemSalesVOs = new ArrayList<>();
+//		if (itemMasterDTO.getItemSalesDTO() != null) {
+//			for (ItemSalesDTO dto : itemMasterDTO.getItemSalesDTO()) {
+//
+//				ItemSalesVO vo = new ItemSalesVO();
+//
+//				vo.setItemBlocked(dto.getItemBlocked());
+//				vo.setMinimumSellingPrice(dto.getMinimumSellingPrice());
+//				vo.setSalesAccount(dto.getSalesAccount());
+//				vo.setLeadTimeToDespatch(dto.getLeadTimeToDespatch());
+//				vo.setCustomerPartNo(dto.getCustomerPartNo());
+//
+//				vo.setItemMasterVO(itemMasterVO);
+//
+//				itemSalesVOs.add(vo);
+//			}
+//		}
+//		itemMasterVO.setItemSalesVO(itemSalesVOs);
+//
+//		// Set ItemOthers
+//		List<ItemOthersVO> itemOthersVOs = new ArrayList<>();
+//		if (itemMasterDTO.getItemOthersDTO() != null) {
+//			for (ItemOthersDTO dto : itemMasterDTO.getItemOthersDTO()) {
+//
+//				ItemOthersVO vo = new ItemOthersVO();
+//
+//				vo.setTechnicalSpecification(dto.getTechnicalSpecification());
+//				vo.setSupplierPartNo(dto.getSupplierPartNo());
+//
+//				vo.setItemMasterVO(itemMasterVO);
+//
+//				itemOthersVOs.add(vo);
+//			}
+//		}
+//		itemMasterVO.setItemOthersVO(itemOthersVOs);
 
 		// Set ItemDrawing
 		List<ItemDrawingVO> itemDrawingVOs = new ArrayList<>();

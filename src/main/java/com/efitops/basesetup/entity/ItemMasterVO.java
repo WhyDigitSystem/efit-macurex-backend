@@ -1,6 +1,7 @@
 package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -25,34 +26,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "itemmaster")
+@Table(name = "item")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemMasterVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemmastergen")
-	@SequenceGenerator(name = "itemmastergen", sequenceName = "itemmasterseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "itemmaster_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "itemgen")
+	@SequenceGenerator(name = "itemgen", sequenceName = "itemseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "item_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "listofvalues_id")
-	private ListOfValuesVO itemGroup;
-
-	@Column(name = "capital")
-	private String capital;
+	@Column(name = "capital_or_input")
+	private String capitalOrInput;
 
 	@Column(name = "item_type")
 	private String itemType;
 
-	@ManyToOne
-	@JoinColumn(name = "unitmaster_id")
-	private UnitMasterVO primaryUnit;
-
-//	@Column(name = "item_group")
-//	private String itemGroup;
+	@Column(name = "item_group_type")
+	private String itemGroupType;
 
 	@Column(name = "grade")
 	private String grade;
@@ -69,17 +62,17 @@ public class ItemMasterVO {
 	@Column(name = "thickness", precision = 10, scale = 2)
 	private BigDecimal thickness;
 
-	@Column(name = "stock")
-	private String stock;
+	@Column(name = "is_stock")
+	private String isStock;
 
 	@Column(name = "width", precision = 10, scale = 2)
 	private BigDecimal width;
 
-	@Column(name = "proto_type")
-	private String protoType;
+	@Column(name = "prototype")
+	private String prototype;
 
-	@Column(name = "lenth", precision = 10, scale = 2)
-	private BigDecimal lenth;
+	@Column(name = "length", precision = 10, scale = 2)
+	private BigDecimal length;
 
 	@Column(name = "psw")
 	private String psw;
@@ -90,9 +83,6 @@ public class ItemMasterVO {
 	@Column(name = "need_qc_approval")
 	private String needQcApproval;
 
-//	@Column(name = "primary_unit")
-//	private String primaryUnit;
-
 	@Column(name = "inspection")
 	private String inspection;
 
@@ -102,68 +92,300 @@ public class ItemMasterVO {
 	@Column(name = "drawing_no")
 	private String drawingNo;
 
-	@Column(name = "excisble_item")
-	private String excisbleItem;
+	@Column(name = "is_excise_item")
+	private String isExciseItem;
 
 	@Column(name = "lot_size", precision = 10, scale = 2)
 	private BigDecimal lotSize;
 
-	@Column(name = "shelf_life_part")
-	private String shelfLifePart;
+	@Column(name = "is_shelf_life_part")
+	private String isShelfLifePart;
 
-	@Column(name = "import_local")
-	private String importLocal;
+	@Column(name = "import_or_local")
+	private String importOrLocal;
 
-	@Column(name = "safety_stock")
-	private String safetyStock;
+	@Column(name = "safty_stock_msl")
+	private String saftyStockMsl;
 
-	@Column(name = "grn_required")
-	private String grnRequired;
+	@Column(name = "is_grn_required")
+	private String isGrnRequired;
 
-	@Column(name = "row_materials")
-	private String rowmaterials;
+	@Column(name = "raw_materials_make")
+	private String rawMaterialsMake;
 
-	@Column(name = "hsn_sac_code")
-	private String hsnSacCode;
+	@Column(name = "active")
+	private boolean active;
+
+	@Column(name = "hsn_code")
+	private String hsnCode;
+
+	// Purchase Item
+
+	@Column(name = "purchase_unit", precision = 10, scale = 2)
+	private BigDecimal purchaseUnit;
+
+	@Column(name = "selling_unit", precision = 10, scale = 2)
+	private BigDecimal sellingUnit;
+
+	@Column(name = "pricing_unit", precision = 10, scale = 2)
+	private BigDecimal pricingUnit;
+
+	@Column(name = "secondary_unit", precision = 10, scale = 2)
+	private BigDecimal secondaryUnit;
+
+	@Column(name = "secondary_purchase_unit", precision = 10, scale = 2)
+	private BigDecimal secondaryPurchaseUnit;
+
+	// inventory
+
+	@Column(name = "manufactured_or_boughtout")
+	private String manufacturedOrBoughtout;
+
+	@Column(name = "default_location")
+	private String defaultLocation;
+
+	@Column(name = "alternative_location")
+	private String alternativeLocation;
+
+	@Column(name = "lead_time", precision = 10, scale = 2)
+	private BigDecimal leadTime;
+
+	@Column(name = "reorder_level")
+	private String reorderLevel;
+
+	@Column(name = "rack_no")
+	private String rackNo;
+
+	@Column(name = "row_no")
+	private String rowNo;
+
+	@Column(name = "position")
+	private String position;
+
+	@Column(name = "min_order_qty")
+	private String minOrderQty;
+
+	@Column(name = "max_order_qty")
+	private String maxOrderQty;
+
+	@Column(name = "bin_size", precision = 10, scale = 2)
+	private BigDecimal binSize;
+
+	@Column(name = "bin_qty", precision = 10, scale = 2)
+	private BigDecimal binQty;
+
+	@Column(name = "minimum_order_qty", precision = 10, scale = 2)
+	private BigDecimal minimumOrderQty;
+
+	@Column(name = "maximum_order_qty", precision = 10, scale = 2)
+	private BigDecimal maximumOrderQty;
+
+	// purchae
+
+	@Column(name = "default_supplier")
+	private String defaultSupplier;
+
+	@Column(name = "alternative_supplier")
+	private String alternativeSupplier;
+
+	@Column(name = "pruchase_talerance")
+	private String pruchaseTalerance;
+
+	@Column(name = "rate", precision = 10, scale = 2)
+	private BigDecimal rate;
+
+	@Column(name = "date")
+	private LocalDate date;
+
+	@Column(name = "landed_cost_rate")
+	private String landedCostRate;
+
+	@Column(name = "tool_owner")
+	private String toolOwner;
+
+	@Column(name = "tool_no")
+	private String toolNo;
+
+	// Sales
+
+	@Column(name = "cost_rate", precision = 10, scale = 2)
+	private BigDecimal costRate;
+
+	@Column(name = "is_item_blocked_for_invoicing")
+	private String isItemBlockedForInvoicing;
+
+	@Column(name = "min_sell_price", precision = 10, scale = 2)
+	private BigDecimal minSellPrice;
+
+	@Column(name = "sale_amt", precision = 10, scale = 2)
+	private BigDecimal saleAmt;
+
+	@Column(name = "lead_time_to_dispatch")
+	private String leadTimeToDispatch;
+
+	@Column(name = "customer_part_no")
+	private String customerPartNo;
+
+	@Column(name = "supplier_part_no")
+	private String supplierPartNo;
+
+	@Column(name = "tech_spec")
+	private String techSpec;
+
+	@Column(name = "sales_account")
+	private BigDecimal salesAccount;
+
+	//
 
 	@Column(name = "created_by")
 	private String createdBy;
-	@Column(name = "org_id")
-	private Long orgId;
-	@Column(name = "modified_by")
+
+	@Column(name = "updated_by")
 	private String updatedBy;
-	@Column(name = "active")
-	private boolean active = true;
+
 	@Column(name = "cancel")
-	private boolean cancel = false;
-	@Column(name = "cancel_remarks", length = 150)
+	private boolean cancel;
+
+	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 
-	@Column(name = "screen_code", length = 5)
-	private String screenCode = "ITM";
-	@Column(name = "screen_name", length = 30)
-	private String screenName = " ITEM MASTER";
+	@Column(name = "screen_name")
+	private String screenName;
 
-	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	private List<ItemUnitsVO> itemUnitsVO;
+	@Column(name = "screen_code")
+	private String screenCode;
 
-	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	private List<ItemInventoryVO> itemInventoryVO;
+	@Column(name = "org")
+	private Long org;
 
-	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	private List<ItemPurchaseVO> itemPurchaseVO;
+	@Column(name = "financial_year")
+	private String financialYear;
 
-	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	private List<ItemSalesVO> itemSalesVO;
+	@ManyToOne
+	@JoinColumn(name = "listofvalues_id")
+	private ListOfValuesVO itemGroup;
 
-	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	private List<ItemOthersVO> itemOthersVO;
+	@ManyToOne
+	@JoinColumn(name = "unitmaster_id")
+	private UnitMasterVO primaryUnit;
 
+	@ManyToOne
+	@JoinColumn(name = "branch_id")
+	private BranchVO branch;
+
+////	@Column(name = "item_group")
+////	private String itemGroup;
+//
+//	@Column(name = "grade")
+//	private String grade;
+//
+//	@Column(name = "item_code")
+//	private String itemCode;
+//
+//	@Column(name = "excise_tariff_no")
+//	private String exciseTariffNo;
+//
+//	@Column(name = "item_description")
+//	private String itemDescription;
+//
+//	@Column(name = "thickness", precision = 10, scale = 2)
+//	private BigDecimal thickness;
+//
+//	@Column(name = "stock")
+//	private String stock;
+//
+//	@Column(name = "width", precision = 10, scale = 2)
+//	private BigDecimal width;
+//
+//	@Column(name = "proto_type")
+//	private String protoType;
+//
+//	@Column(name = "lenth", precision = 10, scale = 2)
+//	private BigDecimal lenth;
+//
+//	@Column(name = "psw")
+//	private String psw;
+//
+//	@Column(name = "weight", precision = 10, scale = 2)
+//	private BigDecimal weight;
+//
+//	@Column(name = "need_qc_approval")
+//	private String needQcApproval;
+//
+////	@Column(name = "primary_unit")
+////	private String primaryUnit;
+//
+//	@Column(name = "inspection")
+//	private String inspection;
+//
+//	@Column(name = "abc_grade")
+//	private String abcGrade;
+//
+//	@Column(name = "drawing_no")
+//	private String drawingNo;
+//
+//	@Column(name = "excisble_item")
+//	private String excisbleItem;
+//
+//	@Column(name = "lot_size", precision = 10, scale = 2)
+//	private BigDecimal lotSize;
+//
+//	@Column(name = "shelf_life_part")
+//	private String shelfLifePart;
+//
+//	@Column(name = "import_local")
+//	private String importLocal;
+//
+//	@Column(name = "safety_stock")
+//	private String safetyStock;
+//
+//	@Column(name = "grn_required")
+//	private String grnRequired;
+//
+//	@Column(name = "row_materials")
+//	private String rowmaterials;
+//
+//	@Column(name = "hsn_sac_code")
+//	private String hsnSacCode;
+//
+//	@Column(name = "created_by")
+//	private String createdBy;
+//	@Column(name = "org_id")
+//	private Long orgId;
+//	@Column(name = "modified_by")
+//	private String updatedBy;
+//	@Column(name = "active")
+//	private boolean active = true;
+//	@Column(name = "cancel")
+//	private boolean cancel = false;
+//	@Column(name = "cancel_remarks", length = 150)
+//	private String cancelRemarks;
+//
+//	@Column(name = "screen_code", length = 5)
+//	private String screenCode = "ITM";
+//	@Column(name = "screen_name", length = 30)
+//	private String screenName = " ITEM MASTER";
+//
+//	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
+//	@JsonManagedReference
+//	private List<ItemUnitsVO> itemUnitsVO;
+//
+//	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
+//	@JsonManagedReference
+//	private List<ItemInventoryVO> itemInventoryVO;
+//
+//	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
+//	@JsonManagedReference
+//	private List<ItemPurchaseVO> itemPurchaseVO;
+//
+//	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
+//	@JsonManagedReference
+//	private List<ItemSalesVO> itemSalesVO;
+//
+//	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
+//	@JsonManagedReference
+//	private List<ItemOthersVO> itemOthersVO;
+//
 	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<ItemDrawingVO> itemDrawingVO;

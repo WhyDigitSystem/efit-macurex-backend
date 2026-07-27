@@ -63,9 +63,9 @@ public class ItemPurchaseVO {
 	@Column(name = "tool_no")
 	private String toolNo;
 
-	@ManyToOne
-	@JsonBackReference
-	@JoinColumn(name = "itemmaster_id")
-	ItemMasterVO itemMasterVO;
+//	@ManyToOne
+//	@JsonBackReference
+//	@JoinColumn(name = "itemmaster_id")
+//	ItemMasterVO itemMasterVO;
 
 }

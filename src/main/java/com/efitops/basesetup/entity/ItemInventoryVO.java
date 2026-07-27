@@ -67,8 +67,8 @@ public class ItemInventoryVO {
 	@Column(name = "bin_qty", precision = 10, scale = 2)
 	private BigDecimal binQty;
 	
-	@ManyToOne
-	@JsonBackReference
-	@JoinColumn(name = "itemmaster_id")
-	ItemMasterVO itemMasterVO;
+//	@ManyToOne
+//	@JsonBackReference
+//	@JoinColumn(name = "itemmaster_id")
+//	ItemMasterVO itemMasterVO;
 }

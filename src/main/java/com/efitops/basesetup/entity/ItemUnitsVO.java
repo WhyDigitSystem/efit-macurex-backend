@@ -43,8 +43,8 @@ public class ItemUnitsVO {
 	@Column(name = "secondary_unit", precision = 10, scale = 2)
 	private BigDecimal secondaryUnit;
 
-	@ManyToOne
-	@JsonBackReference
-	@JoinColumn(name = "itemmaster_id")
-	ItemMasterVO itemMasterVO;
+//	@ManyToOne
+//	@JsonBackReference
+//	@JoinColumn(name = "itemmaster_id")
+//	ItemMasterVO itemMasterVO;
 }

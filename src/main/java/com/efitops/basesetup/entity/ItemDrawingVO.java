@@ -52,8 +52,8 @@ public class ItemDrawingVO {
 	private String name;
 
 	@Lob
-	@Column(name = "upload_file", columnDefinition = "LONGBLOB")
-	private byte[] uploadFile;
+	@Column(name = "item_attachment_url", columnDefinition = "LONGBLOB")
+	private byte[] itemAttachmentUrl;
 
 	@ManyToOne
 	@JsonBackReference

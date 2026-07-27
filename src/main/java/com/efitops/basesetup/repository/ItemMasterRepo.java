@@ -12,6 +12,6 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
 	@Query(nativeQuery = true, value = "select * from itemmaster where itemmaster_id=?1 and active=1 and cancel=0")
 	ItemMasterVO getItemMasterById(Long id);
 
-	boolean existsByItemCodeAndOrgId(String itemCode, Long orgId);
+	boolean existsByItemCodeAndOrg(String itemCode, Long org);
 
 }

@@ -47,9 +47,9 @@ public class ItemSalesVO {
 	@Column(name = "customer_part_no")
 	private String customerPartNo;
 
-	@ManyToOne
-	@JsonBackReference
-	@JoinColumn(name = "itemmaster_id")
-	ItemMasterVO itemMasterVO;
+//	@ManyToOne
+//	@JsonBackReference
+//	@JoinColumn(name = "itemmaster_id")
+//	ItemMasterVO itemMasterVO;
 
 }

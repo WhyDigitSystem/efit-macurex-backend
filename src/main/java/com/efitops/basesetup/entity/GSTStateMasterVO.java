@@ -19,20 +19,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "unitmaster")
+@Table(name = "gststatemaster")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UnitMasterVO {
+
+public class GSTStateMasterVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "unitmastergen")
-	@SequenceGenerator(name = "unitmastergen", sequenceName = "unitmasterseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "unitmaster_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gststatemastergen")
+	@SequenceGenerator(name = "gststatemastergen", sequenceName = "gststatemasterrseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "gststatemaster_id")
     private Long id;
 	
-    @Column(name = "unit_id")
-    private String unitId;
-	@Column(name = "org_id")
+	@Column(name = "state_code")
+    private String stateCode;
+    @Column(name = "state_name")
+    private String stateName;
+    @Column(name = "gst_state_id")
+    private String gstStateId;
+    @Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "active")
 	private boolean active;
@@ -65,7 +70,5 @@ public class UnitMasterVO {
 	
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-	
-
-
+    
 }

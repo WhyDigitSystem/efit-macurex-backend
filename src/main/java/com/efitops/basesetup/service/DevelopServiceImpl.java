@@ -851,7 +851,6 @@ private void getDocumentTypeMasterVOFromDTO(
             masterVO = new DocumentTypeMappingVO();
 
             masterVO.setCreatedBy(documnentTypeMappingDTO.getCreatedBy());
-            masterVO.getCommonDate().setCreatedDate(LocalDateTime.now());
 
             message = "Document Type Mapping Created Successfully";
 
@@ -861,7 +860,6 @@ private void getDocumentTypeMasterVOFromDTO(
                     .orElseThrow(() -> new ApplicationException("Document Type Mapping not found"));
 
             masterVO.setUpdatedBy(documnentTypeMappingDTO.getCreatedBy());
-            masterVO.getCommonDate().setUpdatedDate(LocalDateTime.now());
 
             message = "Document Type Mapping Updated Successfully";
         }

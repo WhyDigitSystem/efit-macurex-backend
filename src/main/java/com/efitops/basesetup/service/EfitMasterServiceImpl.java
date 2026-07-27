@@ -172,9 +172,9 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 						departmentDTO.getDepartmentCode());
 				throw new ApplicationException(errorMessage);
 			}
-			String docId = departmentRepo.getDepartmentDocId(departmentDTO.getOrgId(), departmentDTO.getFinYear(),
-					departmentDTO.getBranch(), screenCode);
-			departmentVO.setDocId(docId);
+//			String docId = departmentRepo.getDepartmentDocId(departmentDTO.getOrgId(), departmentDTO.getFinYear(),
+//					departmentDTO.getBranch(), screenCode);
+//			departmentVO.setDocId(docId);
 
 //			// GETDOCID LASTNO +1
 //			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
@@ -416,9 +416,9 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			message = "Designation  Updated Successfully";
 		} else {
 			createUpdateDesignationVOByDesignationDTO(designationDTO, designationVO);
-			String docId = designationrepo.getDesignationDocId(designationDTO.getOrgId(), designationDTO.getFinYear(),
-					designationDTO.getBranch(), screenCode);
-			designationVO.setDocId(docId);
+//			String docId = designationrepo.getDesignationDocId(designationDTO.getOrgId(), designationDTO.getFinYear(),
+//					designationDTO.getBranch(), screenCode);
+//			designationVO.setDocId(docId);
 
 //			// GETDOCID LASTNO +1
 //			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo

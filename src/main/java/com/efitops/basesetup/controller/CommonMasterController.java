@@ -1131,7 +1131,7 @@ public class CommonMasterController extends BaseController {
 	 }
 	 
 	 @GetMapping("/getTransportByOrgId")
-	 public ResponseEntity<ResponseDTO> getTransportByOrgId(@RequestParam Long orgId,@RequestParam String branchCode) {
+	 public ResponseEntity<ResponseDTO> getTransportByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
 
 	     String methodName = "getTransportByOrgId()";
 	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -1142,7 +1142,7 @@ public class CommonMasterController extends BaseController {
 
 	     try {
 
-	         List<TransportMasterVO> transportList = commonMasterService.getTransportNameByOrgId(orgId,branchCode);
+	         List<TransportMasterVO> transportList = commonMasterService.getTransportNameByOrgId(orgId,branch);
 
 	         responseObjectsMap.put("transportList", transportList);
 

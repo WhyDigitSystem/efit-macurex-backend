@@ -1,8 +1,11 @@
 package com.efitops.basesetup.entity;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,33 +34,37 @@ public class GSTRateMasterVO {
 	@Column(name = "gstratemaster_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
-	@Column(name = "category")
-	private String category;
-	@Column(name = "hsn_code")
-	private String hsncode;
-	@Column(name = "description")
-	private String description;
-	
-	@Column(name = "wef")
-	private String wef;
-	
-	@Column(name = "igst_rate")
-	private Double igstRate;
-	
-	@Column(name = "sgst_rate")
-	private Double sgstRate;
-	
-	@Column(name = "cgst_rate")
-	private Double cgstRate;
-	
-	@Column(name = "rate")
-	private Double rate;
-	
-	@Column(name = "taxable")
-	private String taxable;
-	
-	
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category")
+    private ListOfValuesVO category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hsn_sac_code")
+    private HsnVO hsnSacCode;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "wef", precision = 10, scale = 2)
+    private BigDecimal wef;
+
+    @Column(name = "taxable")
+    private boolean taxable;
+
+    @Column(name = "rate", precision = 10, scale = 2)
+    private BigDecimal rate;
+
+    @Column(name = "igst", precision = 10, scale = 2)
+    private BigDecimal igst;
+
+    @Column(name = "sgst", precision = 10, scale = 2)
+    private BigDecimal sgst;
+
+    @Column(name = "cgst", precision = 10, scale = 2)
+    private BigDecimal cgst;
+
+    @Column(name = "duplicate_check")
+    private boolean duplicateCheck;
 	
 	
 	
@@ -78,8 +85,8 @@ public class GSTRateMasterVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 	
-    @Column(name = "finyear", length = 5)
-    private String finYear;
+    @Column(name = "financial_year", length = 5)
+    private String financialYear;
 	@Column(name = "screencode", length = 30)
 	private String screenCode = "GSTRM";
 	@Column(name = "screenname", length = 30)

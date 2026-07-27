@@ -29,11 +29,11 @@ public interface EfitMasterService {
 
 	Map<String, Object> createUpdateDepartment(DepartmentDTO departmentDTO) throws ApplicationException;
 
-	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, String branchCode);
+	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, Long branch);
 
 	List<DepartmentVO> getDepartmentById(Long id);
 
-	String getDepartmentDocId(Long orgId, String finYear, String branchCode);
+	String getDepartmentDocId(Long orgId, String finYear, Long branch);
 
 	
 	// Material Type
@@ -46,12 +46,12 @@ public interface EfitMasterService {
 
 	// Designation
 
-	List<DesignationVO> getDesignationByOrgId(Long orgId, String branchCode);
+	List<DesignationVO> getDesignationByOrgId(Long orgId, Long branch);
 	List<DesignationVO> getDesignationById(Long id);
 
 	Map<String, Object> updateCreateDesignation(DesignationDTO designationdto) throws ApplicationException;
 
-	String getDesignationDocId(Long orgId, String finYear, String branchCode);
+	String getDesignationDocId(Long orgId, String finYear, Long branch);
 
 	// UOM
 
@@ -83,5 +83,7 @@ public interface EfitMasterService {
 
 	Map<String, Object> updateCreateEmployeeMaster(@Valid EmployeeMasterDTO employeeMasterDTO) throws Exception;
 
+	
 
+	
 }

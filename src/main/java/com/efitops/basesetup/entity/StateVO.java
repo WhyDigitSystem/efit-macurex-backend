@@ -37,7 +37,7 @@ public class StateVO {
 	private String stateName;
      
 	@ManyToOne
-	@JoinColumn(name = "country_id")
+	@JoinColumn(name = "country")
 	private CountryVO country;
 	
 	@Column(name="region")
@@ -52,11 +52,11 @@ public class StateVO {
     private String createdBy;
     @Column(name="modified_by")
 	private String updatedBy;
-    @Column(name="orgid")
+    @Column(name="org_id")
 	private Long orgId;
     @Column(name="cancel")
 	private boolean cancel;
-    @Column(name="cancelRemarks")
+    @Column(name="cancel_Remarks")
 	private String cancelRemarks;
     
     @Column(name = "screen_code", length = 5)

@@ -19,7 +19,9 @@ import com.efitops.basesetup.dto.CurrencyDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
 import com.efitops.basesetup.dto.GSTRateMasterDTO;
+import com.efitops.basesetup.dto.LMEDTO;
 import com.efitops.basesetup.dto.ListOfValuesDTO;
+import com.efitops.basesetup.dto.LocationDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
@@ -32,7 +34,9 @@ import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
+import com.efitops.basesetup.entity.LMEVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
+import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
@@ -60,7 +64,7 @@ public interface CommonMasterService {
 
 	Optional<StateVO> getStateById(Long stateid);
 
-	List<StateVO> getStatesByCountry(Long orgid, String country);
+	List<StateVO> getStatesByCountry(Long orgid, Long country);
 
 	Map<String, Object> createUpdateState(StateDTO stateDTO) throws ApplicationException;
 
@@ -70,7 +74,7 @@ public interface CommonMasterService {
 
 	List<CityVO> getAllgetAllCities(Long orgid);
 
-	List<CityVO> getAllCitiesByState(Long orgid, String state);
+	List<CityVO> getAllCitiesByState(Long orgid, Long state);
 
 	Optional<CityVO> getCityById(Long cityid);
 
@@ -117,7 +121,7 @@ public interface CommonMasterService {
 
 	// FINANCIAL YEAR
 
-	Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
+//	Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
 
 	List<FinancialYearVO> getAllActiveFInYear(Long orgId);
 
@@ -184,6 +188,33 @@ public interface CommonMasterService {
 	ServiceAccMasterVO getServiceNameById(Long id) throws ApplicationException;
 
 	List<ServiceAccMasterVO> getServiceNameByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+	//locationmaster
+
+	Map<String, Object> updateCreateLocationMaster(LocationDTO locationDTO) throws ApplicationException;
+
+	LocationVO getLocationById(Long id) throws ApplicationException;
+
+	
+
+	List<LocationVO> getLocationByOrgId(Long orgId, Long branch) throws ApplicationException;
+	
+	//LME
+
+	Map<String, Object> updateCreateLMEMaster(LMEDTO lMEDTO) throws ApplicationException;
+
+	LMEVO getLMEById(Long id) throws ApplicationException;
+
+	List<LMEVO> getLMEByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	//FIN YEAR
+	Map<String, Object> createUpdateFinancialYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
+
+
+	List<FinancialYearVO> getFinancialYearByOrgId(Long orgId) throws ApplicationException;
+
+	FinancialYearVO getFinancialYearById(Long id) throws ApplicationException;
+
 
 
 

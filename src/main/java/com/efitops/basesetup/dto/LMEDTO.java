@@ -7,19 +7,19 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CityDTO {
+public class LMEDTO {
+	
 	private Long id;
+	private Long branch;
 
-	private String cityCode;
-	private Long country;
-	private String cityName;
-	private Long state;
-	private boolean active;
-	private String createdBy;
+	private Long currencyName;
+	private Double lmeRate;
+	private String lmeDateFrom;
+	private String elmeDateTo;
 	private Long orgId;
+	private String finyear;
+	private Boolean active;
 	private String cancelRemarks;
+	private String createdBy;
 
 }
-
-
-

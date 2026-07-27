@@ -1,5 +1,7 @@
 package com.efitops.basesetup.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,27 +11,45 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import com.efitops.basesetup.dto.DocumentTypeMappingDetailsDTO;
+import com.efitops.basesetup.dto.DocumentTypeMasterDTO;
+import com.efitops.basesetup.dto.DocumnentTypeMappingDTO;
+import com.efitops.basesetup.dto.GSTStateMasterDTO;
 import com.efitops.basesetup.dto.GradeMasterDTO;
 import com.efitops.basesetup.dto.HsnDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
 import com.efitops.basesetup.dto.UomConversionDTO;
+import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingVO;
+import com.efitops.basesetup.entity.DocumentTypeMasterVO;
+import com.efitops.basesetup.entity.FinancialYearVO;
+import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.GradeMasterVO;
 import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.entity.UomConversionVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
+import com.efitops.basesetup.repository.DocumentTypeMasterRepo;
+import com.efitops.basesetup.repository.DocumnentTypeMappingRepo;
+import com.efitops.basesetup.repository.FinancialYearRepo;
+import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.GradeMasterRepo;
 import com.efitops.basesetup.repository.HsnRepo;
 import com.efitops.basesetup.repository.ListOfValuesRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 import com.efitops.basesetup.repository.UomConversionRepo;
+
 
 @Service
 public class DevelopServiceImpl implements DevelopService {
@@ -51,13 +71,35 @@ private UomConversionRepo uomConversionRepo;
 @Autowired
 private GradeMasterRepo gradeMasterRepo;
 
+@Autowired
+private BranchRepo branchRepo;
+
+@Autowired
+private GSTStateMasterRepo gstStateMasterRepo;
+
+@Autowired
+private DocumnentTypeMappingRepo documnentTypeMappingRepo;
+
+@Autowired
+private DocumentTypeMasterRepo documentTypeMasterRepo;
+
+@Autowired
+private DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
+
+@Autowired
+private FinancialYearRepo financialYearRepo;
+
+
+
 @PersistenceContext
 private EntityManager entityManager;
 
+//HSN
+
 
 @Override
-public List<HsnVO> getAllHSN(Long orgId) {
-    return hsnRepo.findByOrgId(orgId);
+public List<HsnVO> getHsnByOrgId(Long orgId,Long branch) {
+    return hsnRepo.findByOrgId(orgId,branch);
 }
 
 @Override
@@ -67,26 +109,28 @@ public Optional<HsnVO> getHSNById(Long hsnId) {
 
 @Override
 @Transactional
-public Map<String, Object> createUpdateHSN(HsnDTO hsnDTO) throws ApplicationException {
+public Map<String, Object> createUpdateHSN(HsnDTO hsnDTO)
+        throws ApplicationException {
 
     HsnVO hsnVO;
-    String message = null;
+    String message;
     HsnVO oldHSN = null;
 
-    ListOfValuesVO listOfValuesVO = listOfValuesRepo.findById(hsnDTO.getListofvalues())
-            .orElseThrow(() -> new ApplicationException(
-                    "Category not found with id : " + hsnDTO.getListofvalues()));
+    ListOfValuesVO category = listOfValuesRepo.findById(hsnDTO.getCategory())
+            .orElseThrow(() ->
+                    new ApplicationException(
+                            "Category not found with id : " + hsnDTO.getCategory()));
 
     if (ObjectUtils.isEmpty(hsnDTO.getId())) {
 
-        if (hsnRepo.existsByOrgIdAndListofvaluesAndHsnIgnoreCase(
-                hsnDTO.getOrgId(), listOfValuesVO, hsnDTO.getHsn())) {
+        if (hsnRepo.existsByOrgIdAndCategoryAndHsnIgnoreCase(
+                hsnDTO.getOrgId(),
+                category,
+                hsnDTO.getHsn())) {
 
-            String errorMessage = String.format(
-                    "This HSN : %s Already Exists in This Organization.",
-                    hsnDTO.getHsn());
-
-            throw new ApplicationException(errorMessage);
+            throw new ApplicationException(
+                    "This HSN : " + hsnDTO.getHsn()
+                            + " Already Exists in This Organization.");
         }
 
         hsnVO = new HsnVO();
@@ -98,40 +142,46 @@ public Map<String, Object> createUpdateHSN(HsnDTO hsnDTO) throws ApplicationExce
     } else {
 
         oldHSN = hsnRepo.findById(hsnDTO.getId())
-                .orElseThrow(() -> new ApplicationException("HSN Master not found"));
+                .orElseThrow(() ->
+                        new ApplicationException("HSN Master not found"));
 
         entityManager.detach(oldHSN);
 
         hsnVO = hsnRepo.findById(hsnDTO.getId())
-                .orElseThrow(() -> new ApplicationException(
-                        "This Id Is Not Found : " + hsnDTO.getId()));
+                .orElseThrow(() ->
+                        new ApplicationException(
+                                "This Id Is Not Found : " + hsnDTO.getId()));
 
         hsnVO.setUpdatedBy(hsnDTO.getCreatedBy());
 
         if (!hsnVO.getHsn().equalsIgnoreCase(hsnDTO.getHsn())) {
 
-            if (hsnRepo.existsByOrgIdAndListofvaluesAndHsnIgnoreCase(
-                    hsnDTO.getOrgId(), listOfValuesVO, hsnDTO.getHsn())) {
+            if (hsnRepo.existsByOrgIdAndCategoryAndHsnIgnoreCase(
+                    hsnDTO.getOrgId(),
+                    category,
+                    hsnDTO.getHsn())) {
 
-            	 
-                String errorMessage = String.format(
-                        "This HSN : %s Already Exists in This Organization.",
-                        hsnDTO.getHsn());
-
-                throw new ApplicationException(errorMessage);
+                throw new ApplicationException(
+                        "This HSN : " + hsnDTO.getHsn()
+                                + " Already Exists in This Organization.");
             }
 
             hsnVO.setHsn(hsnDTO.getHsn().toUpperCase());
         }
 
-        if (!hsnVO.getDescription().equalsIgnoreCase(hsnDTO.getDescription())) {
-            hsnVO.setDescription(hsnDTO.getDescription().toUpperCase());
+        if (hsnDTO.getDescription() != null) {
+
+            if (hsnVO.getDescription() == null
+                    || !hsnVO.getDescription().equalsIgnoreCase(hsnDTO.getDescription())) {
+
+                hsnVO.setDescription(hsnDTO.getDescription().toUpperCase());
+            }
         }
 
         message = "HSN Updated Successfully";
     }
 
-    getHSNVOFromHSNDTO(hsnVO, hsnDTO);
+    getHSNVOFromDTO(hsnVO, hsnDTO);
 
     hsnRepo.save(hsnVO);
 
@@ -142,7 +192,8 @@ public Map<String, Object> createUpdateHSN(HsnDTO hsnDTO) throws ApplicationExce
     return response;
 }
 
-private void getHSNVOFromHSNDTO(HsnVO hsnVO, HsnDTO hsnDTO)
+private void getHSNVOFromDTO(HsnVO hsnVO,
+                             HsnDTO hsnDTO)
         throws ApplicationException {
 
     hsnVO.setHsn(hsnDTO.getHsn().toUpperCase());
@@ -152,118 +203,134 @@ private void getHSNVOFromHSNDTO(HsnVO hsnVO, HsnDTO hsnDTO)
     }
 
     hsnVO.setActive(hsnDTO.isActive());
-
-    ListOfValuesVO listOfValuesVO = listOfValuesRepo.findById(hsnDTO.getListofvalues())
-            .orElseThrow(() -> new ApplicationException(
-                    "Category not found with id : " + hsnDTO.getListofvalues()));
-
-    hsnVO.setListofvalues(listOfValuesVO);
     hsnVO.setOrgId(hsnDTO.getOrgId());
     hsnVO.setCancelRemarks(hsnDTO.getCancelRemarks());
+
+    if (hsnDTO.getCategory() != null && hsnDTO.getCategory() != 0) {
+
+    ListOfValuesVO category = listOfValuesRepo.findById(hsnDTO.getCategory())
+            .orElseThrow(() ->
+                    new ApplicationException(
+                            "Category not found with id : " + hsnDTO.getCategory()));
+
+    hsnVO.setCategory(category);
+    }
+    if (hsnDTO.getBranch() != null && hsnDTO.getBranch() != 0) {
+
+        BranchVO branch = branchRepo.findById(hsnDTO.getBranch())
+                .orElseThrow(() ->
+                        new ApplicationException("Branch Not Found"));
+
+        hsnVO.setBranch(branch);
+    }
 }
 
 //Unit Master
 
 @Override
-public List<UnitMasterVO> getAllUnitMaster(Long orgId) {
-	return unitMasterRepo.findByOrgId(orgId);
+public List<UnitMasterVO> getUnitMasterByOrgId(Long orgId,Long branch) {
+    return unitMasterRepo.findByOrgIdAndBranch(orgId,branch);
 }
 
 @Override
 public Optional<UnitMasterVO> getUnitMasterById(Long id) {
-	return unitMasterRepo.findById(id);
+    return unitMasterRepo.findById(id);
 }
 
 @Override
 @Transactional
 public Map<String, Object> createUpdateUnitMaster(UnitMasterDTO unitMasterDTO)
-		throws ApplicationException {
+        throws ApplicationException {
 
-	UnitMasterVO unitMasterVO;
-	String message = null;
-	UnitMasterVO oldUnitMaster = null;
+    UnitMasterVO unitMasterVO;
+    String message;
+    UnitMasterVO oldUnitMaster = null;
 
-	if (ObjectUtils.isEmpty(unitMasterDTO.getId())) {
+    if (ObjectUtils.isEmpty(unitMasterDTO.getId())) {
 
-		if (unitMasterRepo.existsByOrgIdAndUnitIdIgnoreCase(
-				unitMasterDTO.getOrgId(),
-				unitMasterDTO.getUnitId())) {
+        if (unitMasterRepo.existsByOrgIdAndUnitIdIgnoreCase(
+                unitMasterDTO.getOrgId(),
+                unitMasterDTO.getUnitId())) {
 
-			String errorMessage = String.format(
-					"This Unit Id : %s Already Exists in This Organization.",
-					unitMasterDTO.getUnitId());
+            throw new ApplicationException(
+                    "This Unit Id : " + unitMasterDTO.getUnitId()
+                            + " Already Exists in This Organization.");
+        }
 
-			throw new ApplicationException(errorMessage);
-		}
+        unitMasterVO = new UnitMasterVO();
+        unitMasterVO.setCreatedBy(unitMasterDTO.getCreatedBy());
+        unitMasterVO.setUpdatedBy(unitMasterDTO.getCreatedBy());
 
-		unitMasterVO = new UnitMasterVO();
-		unitMasterVO.setCreatedBy(unitMasterDTO.getCreatedBy());
-		unitMasterVO.setUpdatedBy(unitMasterDTO.getCreatedBy());
+        message = "Unit Master Created Successfully";
 
-		message = "Unit Master Created Successfully";
+    } else {
 
-	} else {
+        oldUnitMaster = unitMasterRepo.findById(unitMasterDTO.getId())
+                .orElseThrow(() ->
+                        new ApplicationException("Unit Master not found"));
 
-		oldUnitMaster = unitMasterRepo.findById(unitMasterDTO.getId())
-				.orElseThrow(() ->
-						new ApplicationException("Unit Master not found"));
+        entityManager.detach(oldUnitMaster);
 
-		entityManager.detach(oldUnitMaster);
+        unitMasterVO = unitMasterRepo.findById(unitMasterDTO.getId())
+                .orElseThrow(() ->
+                        new ApplicationException(
+                                "This Id Is Not Found : " + unitMasterDTO.getId()));
 
-		unitMasterVO = unitMasterRepo.findById(unitMasterDTO.getId())
-				.orElseThrow(() ->
-						new ApplicationException(
-								"This Id Is Not Found : " + unitMasterDTO.getId()));
+        unitMasterVO.setUpdatedBy(unitMasterDTO.getCreatedBy());
 
-		unitMasterVO.setUpdatedBy(unitMasterDTO.getCreatedBy());
+        if (!unitMasterVO.getUnitId()
+                .equalsIgnoreCase(unitMasterDTO.getUnitId())) {
 
-		if (!unitMasterVO.getUnitId().equalsIgnoreCase(unitMasterDTO.getUnitId())) {
+            if (unitMasterRepo.existsByOrgIdAndUnitIdIgnoreCase(
+                    unitMasterDTO.getOrgId(),
+                    unitMasterDTO.getUnitId())) {
 
-			if (unitMasterRepo.existsByOrgIdAndUnitIdIgnoreCase(
-					unitMasterDTO.getOrgId(),
-					unitMasterDTO.getUnitId())) {
+                throw new ApplicationException(
+                        "This Unit Id : " + unitMasterDTO.getUnitId()
+                                + " Already Exists in This Organization.");
+            }
 
-				String errorMessage = String.format(
-						"This Unit Id : %s Already Exists in This Organization.",
-						unitMasterDTO.getUnitId());
+            unitMasterVO.setUnitId(unitMasterDTO.getUnitId().toUpperCase());
+        }
 
-				throw new ApplicationException(errorMessage);
-			}
+        message = "Unit Master Updated Successfully";
+    }
 
-			unitMasterVO.setUnitId(unitMasterDTO.getUnitId().toUpperCase());
-		}
+    getUnitMasterVOFromDTO(unitMasterVO, unitMasterDTO);
 
-		message = "Unit Master Updated Successfully";
-	}
+    unitMasterRepo.save(unitMasterVO);
 
-	getUnitMasterVOFromDTO(unitMasterVO, unitMasterDTO);
+    Map<String, Object> response = new HashMap<>();
+    response.put("message", message);
+    response.put("unitMasterVO", unitMasterVO);
 
-	unitMasterRepo.save(unitMasterVO);
-
-	Map<String, Object> response = new HashMap<>();
-	response.put("message", message);
-	response.put("unitMasterVO", unitMasterVO);
-
-	return response;
+    return response;
 }
 
-private void getUnitMasterVOFromDTO(UnitMasterVO unitMasterVO,
-		UnitMasterDTO unitMasterDTO) {
+private void getUnitMasterVOFromDTO(
+        UnitMasterVO unitMasterVO,
+        UnitMasterDTO unitMasterDTO) throws ApplicationException {
 
-	unitMasterVO.setUnitId(unitMasterDTO.getUnitId().toUpperCase());
-	unitMasterVO.setActive(unitMasterDTO.isActive());
-	unitMasterVO.setOrgId(unitMasterDTO.getOrgId());
-	unitMasterVO.setCancelRemarks(unitMasterDTO.getCancelRemarks());
-	unitMasterVO.setBranch(unitMasterDTO.getBranch());
-	unitMasterVO.setBranchCode(unitMasterDTO.getBranchCode());
+    unitMasterVO.setUnitId(unitMasterDTO.getUnitId().toUpperCase());
+    unitMasterVO.setOrgId(unitMasterDTO.getOrgId());
+    unitMasterVO.setActive(unitMasterDTO.isActive());
+    unitMasterVO.setCancelRemarks(unitMasterDTO.getCancelRemarks());
+
+    if (unitMasterDTO.getBranch() != null
+            && unitMasterDTO.getBranch() != 0) {
+
+        BranchVO branch = branchRepo.findById(unitMasterDTO.getBranch())
+                .orElseThrow(() ->
+                        new ApplicationException("Branch Not Found"));
+
+        unitMasterVO.setBranch(branch);
+    }
 }
-
-
 //Uom Conversion
 
 @Override
-public List<UomConversionVO> getAllUomConversion(Long orgId) {
-	return uomConversionRepo.findByOrgId(orgId);
+public List<UomConversionVO> getUomConversionByOrgId(Long orgId, Long branch) {
+	return uomConversionRepo.findByOrgIdAndBranch(orgId,branch);
 }
 
 @Override
@@ -346,8 +413,8 @@ public Map<String, Object> createUpdateUomConversion(UomConversionDTO uomConvers
 }
 
 private void getUomConversionVOFromDTO(
-		UomConversionVO uomConversionVO,
-		UomConversionDTO uomConversionDTO) {
+        UomConversionVO uomConversionVO,
+        UomConversionDTO uomConversionDTO) throws ApplicationException {
 
 	uomConversionVO.setFromUnit(uomConversionDTO.getFromUnit());
 	uomConversionVO.setToUnit(uomConversionDTO.getToUnit());
@@ -358,6 +425,15 @@ private void getUomConversionVOFromDTO(
 	uomConversionVO.setActive(uomConversionDTO.isActive());
 	uomConversionVO.setCancelRemarks(uomConversionDTO.getCancelRemarks());
 	
+	if (uomConversionDTO.getBranch() != null && uomConversionDTO.getBranch() != 0) {
+
+	    BranchVO branch = branchRepo.findById(uomConversionDTO.getBranch())
+	            .orElseThrow(() ->
+	                    new ApplicationException("Branch Not Found"));
+
+	    uomConversionVO.setBranch(branch);
+	}
+	
 }
 
 
@@ -365,8 +441,8 @@ private void getUomConversionVOFromDTO(
 
 
 @Override
-public List<GradeMasterVO> getAllGradeMaster(Long orgId) {
- return gradeMasterRepo.findByOrgId(orgId);
+public List<GradeMasterVO> getGradeMasterByOrgId(Long orgId,Long branch) {
+ return gradeMasterRepo.findByOrgIdAndBranch(orgId,branch);
 }
 
 @Override
@@ -458,7 +534,7 @@ public Map<String, Object> createUpdateGradeMaster(GradeMasterDTO gradeMasterDTO
 }
 
 private void getGradeMasterVOFromDTO(GradeMasterVO gradeMasterVO,
-     GradeMasterDTO gradeMasterDTO) {
+     GradeMasterDTO gradeMasterDTO) throws ApplicationException {
 
  gradeMasterVO.setGradeCode(gradeMasterDTO.getGradeCode().toUpperCase());
  gradeMasterVO.setGradeDescription(
@@ -472,8 +548,382 @@ private void getGradeMasterVOFromDTO(GradeMasterVO gradeMasterVO,
  gradeMasterVO.setActive(gradeMasterDTO.isActive());
  gradeMasterVO.setOrgId(gradeMasterDTO.getOrgId());
  gradeMasterVO.setCancelRemarks(gradeMasterDTO.getCancelRemarks());
- gradeMasterVO.setBranch(gradeMasterDTO.getBranch());
- gradeMasterVO.setBranchCode(gradeMasterDTO.getBranchCode());
+ 
+ if (gradeMasterDTO.getBranch() != null && gradeMasterDTO.getBranch() != 0) {
+
+	    BranchVO branch = branchRepo.findById(gradeMasterDTO.getBranch())
+	            .orElseThrow(() ->
+	                    new ApplicationException("Branch Not Found"));
+
+	    gradeMasterVO.setBranch(branch);
+   }
 }
 
+//GSTStateMaster
+
+@Override
+public List<GSTStateMasterVO> getGSTStateMasterByOrgId(Long orgId,Long branch) {
+    return gstStateMasterRepo.findByGSTStateMasterByOrgId(orgId,branch);
 }
+
+@Override
+public Optional<GSTStateMasterVO> getGSTStateMasterById(Long id) {
+    return gstStateMasterRepo.findById(id);
+}
+
+@Override
+@Transactional
+public Map<String, Object> createUpdateGSTStateMaster(GSTStateMasterDTO gstStateMasterDTO)
+        throws ApplicationException {
+
+    GSTStateMasterVO gstStateMasterVO;
+    String message;
+    GSTStateMasterVO oldGSTStateMaster = null;
+
+    if (ObjectUtils.isEmpty(gstStateMasterDTO.getId())) {
+
+        if (gstStateMasterRepo.existsByOrgIdAndStateCodeIgnoreCase(
+                gstStateMasterDTO.getOrgId(),
+                gstStateMasterDTO.getStateCode())) {
+
+            String errorMessage = String.format(
+                    "This State Code : %s Already Exists in This Organization.",
+                    gstStateMasterDTO.getStateCode());
+
+            throw new ApplicationException(errorMessage);
+        }
+
+        gstStateMasterVO = new GSTStateMasterVO();
+        gstStateMasterVO.setCreatedBy(gstStateMasterDTO.getCreatedBy());
+        gstStateMasterVO.setUpdatedBy(gstStateMasterDTO.getCreatedBy());
+
+        message = "GST State Master Created Successfully";
+
+    } else {
+
+        oldGSTStateMaster = gstStateMasterRepo.findById(gstStateMasterDTO.getId())
+                .orElseThrow(() ->
+                        new ApplicationException("GST State Master not found"));
+
+        entityManager.detach(oldGSTStateMaster);
+
+        gstStateMasterVO = gstStateMasterRepo.findById(gstStateMasterDTO.getId())
+                .orElseThrow(() ->
+                        new ApplicationException(
+                                "This Id Is Not Found : " + gstStateMasterDTO.getId()));
+
+        gstStateMasterVO.setUpdatedBy(gstStateMasterDTO.getCreatedBy());
+
+        if (!gstStateMasterVO.getStateCode()
+                .equalsIgnoreCase(gstStateMasterDTO.getStateCode())) {
+
+            if (gstStateMasterRepo.existsByOrgIdAndStateCodeIgnoreCase(
+                    gstStateMasterDTO.getOrgId(),
+                    gstStateMasterDTO.getStateCode())) {
+
+                String errorMessage = String.format(
+                        "This State Code : %s Already Exists in This Organization.",
+                        gstStateMasterDTO.getStateCode());
+
+                throw new ApplicationException(errorMessage);
+            }
+
+            gstStateMasterVO.setStateCode(
+                    gstStateMasterDTO.getStateCode().toUpperCase());
+        }
+
+        if (!gstStateMasterVO.getStateName()
+                .equalsIgnoreCase(gstStateMasterDTO.getStateName())) {
+
+            gstStateMasterVO.setStateName(
+                    gstStateMasterDTO.getStateName().toUpperCase());
+        }
+
+        if (!gstStateMasterVO.getGstStateId()
+                .equalsIgnoreCase(gstStateMasterDTO.getGstStateId())) {
+
+            gstStateMasterVO.setGstStateId(
+                    gstStateMasterDTO.getGstStateId().toUpperCase());
+        }
+
+        message = "GST State Master Updated Successfully";
+    }
+
+    getGSTStateMasterVOFromDTO(gstStateMasterVO, gstStateMasterDTO);
+
+    gstStateMasterRepo.save(gstStateMasterVO);
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("message", message);
+    response.put("gstStateMasterVO", gstStateMasterVO);
+
+    return response;
+}
+
+private void getGSTStateMasterVOFromDTO(
+        GSTStateMasterVO gstStateMasterVO,
+        GSTStateMasterDTO gstStateMasterDTO)
+        throws ApplicationException {
+
+    gstStateMasterVO.setStateCode(
+            gstStateMasterDTO.getStateCode().toUpperCase());
+
+    gstStateMasterVO.setStateName(
+            gstStateMasterDTO.getStateName().toUpperCase());
+
+    gstStateMasterVO.setGstStateId(
+            gstStateMasterDTO.getGstStateId().toUpperCase());
+
+    gstStateMasterVO.setOrgId(gstStateMasterDTO.getOrgId());
+    gstStateMasterVO.setActive(gstStateMasterDTO.isActive());
+    gstStateMasterVO.setCancelRemarks(
+            gstStateMasterDTO.getCancelRemarks());
+
+    if (gstStateMasterDTO.getBranch() != null
+            && gstStateMasterDTO.getBranch() != 0) {
+
+        BranchVO branch = branchRepo.findById(gstStateMasterDTO.getBranch())
+                .orElseThrow(() ->
+                        new ApplicationException("Branch Not Found"));
+
+        gstStateMasterVO.setBranch(branch);
+    }
+}
+
+
+//DocumentTypeMaster
+
+@Override
+public List<DocumentTypeMasterVO> getDocumentTypeMasterByOrgId(Long orgId,Long branch) {
+    return documentTypeMasterRepo.findByOrgIdAndBranch(orgId,branch);
+}
+
+@Override
+public Optional<DocumentTypeMasterVO> getDocumentTypeMasterById(Long id) {
+    return documentTypeMasterRepo.findById(id);
+}
+
+@Override
+@Transactional
+public Map<String, Object> createUpdateDocumentTypeMaster(
+        DocumentTypeMasterDTO documentTypeMasterDTO)
+        throws ApplicationException {
+  
+    DocumentTypeMasterVO documentTypeMasterVO;
+    String message;
+    DocumentTypeMasterVO oldDocumentTypeMaster = null;
+
+    if (ObjectUtils.isEmpty(documentTypeMasterDTO.getId())) {
+
+        if (documentTypeMasterRepo.existsByOrgIdAndCodeIgnoreCase(
+                documentTypeMasterDTO.getOrgId(),
+                documentTypeMasterDTO.getCode())) {
+
+            throw new ApplicationException(
+                    "Document Type Code : " + documentTypeMasterDTO.getCode()
+                            + " Already Exists in This Organization.");
+        }
+
+        documentTypeMasterVO = new DocumentTypeMasterVO();
+        documentTypeMasterVO.setCreatedBy(documentTypeMasterDTO.getCreatedBy());
+        documentTypeMasterVO.setUpdatedBy(documentTypeMasterDTO.getCreatedBy());
+
+        message = "Document Type Master Created Successfully";
+
+    } else {
+
+        oldDocumentTypeMaster = documentTypeMasterRepo.findById(documentTypeMasterDTO.getId())
+                .orElseThrow(() ->
+                        new ApplicationException("Document Type Master Not Found"));
+
+        entityManager.detach(oldDocumentTypeMaster);
+
+        documentTypeMasterVO = documentTypeMasterRepo.findById(documentTypeMasterDTO.getId())
+                .orElseThrow(() ->
+                        new ApplicationException(
+                                "This Id Is Not Found : " + documentTypeMasterDTO.getId()));
+
+        documentTypeMasterVO.setUpdatedBy(documentTypeMasterDTO.getCreatedBy());
+
+        if (!documentTypeMasterVO.getCode()
+                .equalsIgnoreCase(documentTypeMasterDTO.getCode())) {
+
+            if (documentTypeMasterRepo.existsByOrgIdAndCodeIgnoreCase(
+                    documentTypeMasterDTO.getOrgId(),
+                    documentTypeMasterDTO.getCode())) {
+
+                throw new ApplicationException(
+                        "Document Type Code : " + documentTypeMasterDTO.getCode()
+                                + " Already Exists in This Organization.");
+            }
+
+            documentTypeMasterVO.setCode(
+                    documentTypeMasterDTO.getCode().toUpperCase());
+        }
+
+        message = "Document Type Master Updated Successfully";
+    }
+
+    getDocumentTypeMasterVOFromDTO(
+            documentTypeMasterVO,
+            documentTypeMasterDTO);
+
+    documentTypeMasterRepo.save(documentTypeMasterVO);
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("message", message);
+    response.put("documentTypeMasterVO", documentTypeMasterVO);
+
+    return response;
+}
+
+private void getDocumentTypeMasterVOFromDTO(
+        DocumentTypeMasterVO documentTypeMasterVO,
+        DocumentTypeMasterDTO documentTypeMasterDTO)
+        throws ApplicationException {
+
+    documentTypeMasterVO.setCode(
+            documentTypeMasterDTO.getCode().toUpperCase());
+
+    if (documentTypeMasterDTO.getName() != null) {
+        documentTypeMasterVO.setName(
+                documentTypeMasterDTO.getName().toUpperCase());
+    }
+
+    if (documentTypeMasterDTO.getDes() != null) {
+        documentTypeMasterVO.setDescription(
+                documentTypeMasterDTO.getDescription().toUpperCase());
+    }
+
+    if (documentTypeMasterDTO.getDocCode() != null) {
+        documentTypeMasterVO.setDocCode(
+                documentTypeMasterDTO.getDocCode().toUpperCase());
+    }
+
+    documentTypeMasterVO.setOrgId(documentTypeMasterDTO.getOrgId());
+    documentTypeMasterVO.setActive(documentTypeMasterDTO.isActive());
+    documentTypeMasterVO.setCancelRemarks(documentTypeMasterDTO.getCancelRemarks());
+
+    if (documentTypeMasterDTO.getBranch() != null
+            && documentTypeMasterDTO.getBranch() != 0) {
+
+        BranchVO branch = branchRepo.findById(documentTypeMasterDTO.getBranch())
+                .orElseThrow(() ->
+                        new ApplicationException("Branch Not Found"));
+
+        documentTypeMasterVO.setBranch(branch);
+    }
+}
+    
+    
+    //documenttypemapping
+    
+    
+    @Override
+    @Transactional
+    public Map<String, Object> updateCreateDocumnentTypeMapping(
+    		DocumnentTypeMappingDTO documnentTypeMappingDTO)
+            throws ApplicationException {
+
+        Map<String, Object> response = new HashMap<>();
+        String message = "";
+
+        DocumentTypeMappingVO masterVO;
+
+        BranchVO branchVO = branchRepo.findById(documnentTypeMappingDTO.getBranch())
+                .orElseThrow(() -> new ApplicationException(
+                        "Branch not found with id : " + documnentTypeMappingDTO.getBranch()));
+
+        FinancialYearVO financialYearVO = financialYearRepo.findById(documnentTypeMappingDTO.getFinancialYear())
+                .orElseThrow(() -> new ApplicationException(
+                        "Financial Year not found with id : " + documnentTypeMappingDTO.getFinancialYear()));
+
+        if (ObjectUtils.isEmpty(documnentTypeMappingDTO.getId())) {
+
+        	if (documnentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(
+        	        documnentTypeMappingDTO.getBranch(),
+        	        documnentTypeMappingDTO.getFinancialYear(),
+        	        documnentTypeMappingDTO.getOrgId())) {
+
+                throw new ApplicationException("Document Type Mapping already exists.");
+            }
+
+            masterVO = new DocumentTypeMappingVO();
+
+            masterVO.setCreatedBy(documnentTypeMappingDTO.getCreatedBy());
+            masterVO.getCommonDate().setCreatedDate(LocalDateTime.now());
+
+            message = "Document Type Mapping Created Successfully";
+
+        } else {
+
+            masterVO = documnentTypeMappingRepo.findById(documnentTypeMappingDTO.getId())
+                    .orElseThrow(() -> new ApplicationException("Document Type Mapping not found"));
+
+            masterVO.setUpdatedBy(documnentTypeMappingDTO.getCreatedBy());
+            masterVO.getCommonDate().setUpdatedDate(LocalDateTime.now());
+
+            message = "Document Type Mapping Updated Successfully";
+        }
+
+        masterVO.setBranch(branchVO);
+        masterVO.setFinancialYear(financialYearVO);
+        masterVO.setOrgId(documnentTypeMappingDTO.getOrgId());
+        masterVO.setActive(documnentTypeMappingDTO.isActive());
+        masterVO.setCancelRemarks(documnentTypeMappingDTO.getCancelRemarks());
+
+        List<DocumentTypeMappingDetailsVO> details = new ArrayList<>();
+
+        if (CollectionUtils.isNotEmpty(documnentTypeMappingDTO.getDetails())) {
+
+            for (DocumentTypeMappingDetailsDTO dto : documnentTypeMappingDTO.getDetails()) {
+
+                DocumentTypeMappingDetailsVO detailVO;
+
+                if (ObjectUtils.isEmpty(dto.getId())) {
+
+                    detailVO = documentTypeMappingDetailsRepo.findById(dto.getId())
+                            .orElse(new DocumentTypeMappingDetailsVO());
+
+                } else {
+
+                    detailVO = new DocumentTypeMappingDetailsVO();
+                }
+
+                detailVO.setScreenName(dto.getScreenName());
+                detailVO.setScreenCode(dto.getScreenCode());
+                detailVO.setDocCode(dto.getDocCode());
+                detailVO.setPrefix(dto.getPrefix());
+                detailVO.setActive(dto.isActive());
+
+                detailVO.setDocumentTypeMappingMasterVO(masterVO);
+                details.add(detailVO);
+            }
+        }
+
+        masterVO.setDetails(details);
+
+        documnentTypeMappingRepo.save(masterVO);
+
+        response.put("message", message);
+        response.put("documentTypeMappingMasterVO", masterVO);
+
+        return response;
+    }
+
+	@Override
+	public DocumentTypeMappingVO getDocumnentTypeMappingById(Long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
+
+
+
+

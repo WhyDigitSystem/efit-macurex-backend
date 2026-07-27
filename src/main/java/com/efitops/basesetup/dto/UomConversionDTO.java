@@ -1,5 +1,7 @@
 package com.efitops.basesetup.dto;
 
+import com.efitops.basesetup.entity.BranchVO;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +24,7 @@ public class UomConversionDTO {
 	  private String description;
 	  private boolean active;
 	  private Long branch;
+		
 		
 
 }

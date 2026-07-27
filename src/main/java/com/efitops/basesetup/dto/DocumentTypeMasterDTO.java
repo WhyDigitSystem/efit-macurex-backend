@@ -1,7 +1,5 @@
 package com.efitops.basesetup.dto;
 
-import javax.persistence.Column;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,19 +8,23 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder 
+@Builder
 
-public class HsnDTO {
-	
+public class DocumentTypeMasterDTO {
+
 	 private Long id;
+	 private String code;
+	 private String name;
+	 private String des;
+	 private String docCode;
 	 private Long orgId;
+	 private String financialYear;
 	 private String createdBy;
 	 private String cancelRemarks;
-	 private Long category;
-	 private String hsn;
 	 private String description;
 	 private boolean active;
-	 private Long branch;
-		
+ 	 private Long branch;
+ 	 
+ 	 
 
 }

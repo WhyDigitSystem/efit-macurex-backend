@@ -13,31 +13,7 @@ import com.efitops.basesetup.exception.ApplicationException;
 
 public interface TransportMasterService {
 
-	Map<String, Object> updateCreateLocationMaster(LocationDTO locationDTO) throws ApplicationException;
-
-	LocationVO getLocationById(Long id) throws ApplicationException;
-
 	
-
-	List<LocationVO> getLocationByOrgId(Long orgId, Long branch) throws ApplicationException;
-	
-	//LME
-
-	Map<String, Object> updateCreateLMEMaster(LMEDTO lMEDTO) throws ApplicationException;
-
-	LMEVO getLMEById(Long id) throws ApplicationException;
-
-	List<LMEVO> getLMEByOrgId(Long orgId, Long branch) throws ApplicationException;
-
-	//FIN YEAR
-	Map<String, Object> createUpdateFinancialYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
-
-
-	List<FinancialYearVO> getFinancialYearByOrgId(Long orgId) throws ApplicationException;
-
-	FinancialYearVO getFinancialYearById(Long id) throws ApplicationException;
-
-
 	
 
 	

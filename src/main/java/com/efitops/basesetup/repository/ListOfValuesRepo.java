@@ -17,11 +17,11 @@ public interface ListOfValuesRepo extends JpaRepository<ListOfValuesVO, Long> {
 
 	boolean existsByListDescriptionAndOrgId(String listDescription, Long orgId);
 
-	@Query(nativeQuery = true,value = "select b.valuedescription from listofvalues a, listofvalues1 b where a.orgid=?1 and a.active=1  group by b.valuedescription")
+	@Query(nativeQuery = true,value = "select b.value_description from listofvalues a, listofvaluesdetails b where a.org_id=?1 and a.active=1  group by b.valuedescription")
 	Set<Object[]> getChargeType(Long orgId);
 	
-	@Query(nativeQuery = true,value = "select l1.valuedescription from listofvalues l join listofvalues1 l1 on l.listofvaluesid=l1.listofvaluesid where \r\n"
-			+ "l.orgid=?1 and l.listdescription=?2 \r\n"
+	@Query(nativeQuery = true,value = "select l1.value_description from listofvalues l join listofvaluesdetails l1 on l.listofvaluesid=l1.listofvaluesid where \r\n"
+			+ "l.org_id=?1 and l.listdescription=?2 \r\n"
 			+ " group by l1.valuedescription order by l1.valuedescription asc")
 	Set<Object[]> getAllListValues(Long orgId,String listDescription);
 

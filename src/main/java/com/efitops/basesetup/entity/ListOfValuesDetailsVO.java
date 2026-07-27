@@ -47,7 +47,7 @@ public class ListOfValuesDetailsVO {
 	private String screenCode="LISD";
 	
 	@ManyToOne
-	@JoinColumn(name = "listofvaluesid")
+	@JoinColumn(name = "listofvalues_id")
 	@JsonBackReference
 	private ListOfValuesVO listOfValuesVO;
 	

@@ -19,24 +19,30 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "grademaster")
+@Table(name = "documenttypemaster")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class GradeMasterVO {
+public class DocumentTypeMasterVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "grademastergen")
-	@SequenceGenerator(name = "grademastergen", sequenceName = "grademasterseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "grademaster_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "documenttypemastergen")
+	@SequenceGenerator(name = "documenttypemastergen", sequenceName = "documenttypemasterseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "documenttypemaster_id")
     private Long id;
 	
-	 @Column(name = "grade_code")
-	 private String gradeCode;
-     @Column(name = "grade_description")
-	 private String gradeDescription;
-     @Column(name = "remarks")
-     private String remarks;
+	 @Column(name = "code")
+	 private String code;
+     @Column(name = "name")
+	 private String name;
+     @Column(name = "description")
+	 private String description;
+     @Column(name = "doc_code")
+	 private String docCode;
+     @Column(name = "financial_year")
+	 private String financialYear;
+     
+     
      
      @Column(name = "org_id")
  	private Long orgId;
@@ -51,12 +57,12 @@ public class GradeMasterVO {
  	@Column(name = "cancel_remarks")
  	private String cancelRemarks;
  	@ManyToOne
-	@JoinColumn(name = "branch")
-	private BranchVO branch;
+ 	@JoinColumn(name = "branch")
+ 	private BranchVO branch;
  	@Column(name = "screen_name")
- 	private String screenName="UNITMASTER";
+ 	private String screenName="documenttypemaster";
  	@Column(name = "screen_code")
- 	private String screenCode="UM";
+ 	private String screenCode="DTM";
  	
  	@JsonGetter("active")
  	public String getActive() {
@@ -70,8 +76,10 @@ public class GradeMasterVO {
  	}
  	
  	@Embedded
-	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-	
-  }
+ 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
+     
+ }
+
+     
 
 

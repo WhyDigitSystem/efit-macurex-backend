@@ -1,17 +1,9 @@
 package com.efitops.basesetup.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonGetter;
 
 import lombok.AllArgsConstructor;
@@ -19,20 +11,34 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "unitmaster")
+@Table(name = "documenttypemappingdetails")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UnitMasterVO {
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "unitmastergen")
-	@SequenceGenerator(name = "unitmastergen", sequenceName = "unitmasterseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "unitmaster_id")
+public class DocumentTypeMappingDetailsVO {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "documenttypemappingdetailsgen")
+    @SequenceGenerator(name = "documenttypemappingdetailsgen",
+            sequenceName = "documenttypemappingdetailsseq",
+            initialValue = 1000000001,
+            allocationSize = 1)
+    @Column(name = "documenttypemappingdetails_id")
     private Long id;
-	
-    @Column(name = "unit_id")
-    private String unitId;
-	@Column(name = "org_id")
+
+    @Column(name = "screen_name")
+    private String screenName;
+
+    @Column(name = "screen_code")
+    private String screenCode;
+
+    @Column(name = "doc_code")
+    private String docCode;
+
+    @Column(name = "prefix")
+    private String prefix;
+
+    @Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "active")
 	private boolean active;
@@ -44,13 +50,7 @@ public class UnitMasterVO {
 	private boolean cancel=false;
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
-	@ManyToOne
-	@JoinColumn(name = "branch")
-	private BranchVO branch;
-	@Column(name = "screen_name")
-	private String screenName="UNITMASTER";
-	@Column(name = "screen_code")
-	private String screenCode="UM";
+	
 	
 	@JsonGetter("active")
 	public String getActive() {
@@ -63,9 +63,13 @@ public class UnitMasterVO {
 		return cancel ? "T" : "F";
 	}
 	
+
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
 
-
+	@ManyToOne
+	@JoinColumn(name = "documenttypemappingmaster_id")
+	@JsonBackReference
+	private DocumentTypeMappingVO documentTypeMappingMasterVO;
 }

@@ -17,12 +17,11 @@ public class GradeMasterDTO {
 	 private String gradeDescription;
 	 private String remarks;
 	 private Long orgId;
-	  private String createdBy;
-	  private String cancelRemarks;
-	  private String description;
-	  private boolean active;
-	  private String branch;
-	  private String branchCode;
+	 private String createdBy;
+	 private String cancelRemarks;
+	 private String description;
+	 private boolean active;
+	 private Long branch;
 
 
 }

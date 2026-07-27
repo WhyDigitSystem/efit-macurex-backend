@@ -51,9 +51,9 @@ public class UomConversionVO {
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 	
-//	@ManyToOne
-//	@JoinColumn(name = "branch_id")
-//	private BranchVO branch;
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
 	
 	@Column(name = "screen_name")
 	private String screenName="UNITMASTER";

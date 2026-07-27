@@ -145,18 +145,24 @@ private EntityManager entityManager;
         return response;
     }
 
-	@Override
-	public DocumentTypeMappingVO getDocumnentTypeMappingById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+    @Override
+    public DocumentTypeMappingVO getDocumnentTypeMappingById(Long id)
+            throws ApplicationException {
+
+        return documnentTypeMappingRepo.findById(id)
+                .orElseThrow(() ->
+                        new ApplicationException("Document Type Mapping not found with id : " + id));
+    }
+	
+
+    @Override
+    public List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch)
+            throws ApplicationException {
+
+        return documnentTypeMappingRepo.findByOrgIdAndBranch(orgId, branch);
+    }
 	}
 
-	@Override
-	public List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-}
 
 
 

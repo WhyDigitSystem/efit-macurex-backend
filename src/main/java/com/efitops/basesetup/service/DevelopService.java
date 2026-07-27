@@ -27,14 +27,15 @@ public interface DevelopService {
 
 	//documenttypemapping
 
-		Map<String, Object> updateCreateDocumnentTypeMapping(DocumnentTypeMappingDTO documnentTypeMappingDTO)
-				throws ApplicationException;
+	Map<String, Object> updateCreateDocumnentTypeMapping(
+	        DocumnentTypeMappingDTO documnentTypeMappingDTO)
+	        throws ApplicationException;
 
-		DocumentTypeMappingVO getDocumnentTypeMappingById(Long id);
+	DocumentTypeMappingVO getDocumnentTypeMappingById(Long id)
+	        throws ApplicationException;
 
-		List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch);
-
-		
+	List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch)
+	        throws ApplicationException;
 		
 	
 	

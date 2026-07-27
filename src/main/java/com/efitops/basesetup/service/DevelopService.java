@@ -25,78 +25,17 @@ import com.efitops.basesetup.exception.ApplicationException;
 @Service
 public interface DevelopService {
 
-	List<HsnVO> getHsnByOrgId(Long orgId, Long branch);
-
-	Optional<HsnVO> getHSNById(Long hsnId);
-
-	Map<String, Object> createUpdateHSN(HsnDTO hsnDTO) throws ApplicationException;
-	
-	// Unit Master
-	
-	List<UnitMasterVO> getUnitMasterByOrgId(Long orgId, Long branch);
-
-	Optional<UnitMasterVO> getUnitMasterById(Long id);
-
-	Map<String, Object> createUpdateUnitMaster(UnitMasterDTO unitMasterDTO)
-	        throws ApplicationException;
-
-	//uom
-	
-	Map<String, Object> createUpdateUomConversion(UomConversionDTO uomConversionDTO)
-	       throws ApplicationException;
-
-
-	List<UomConversionVO> getUomConversionByOrgId(Long orgId, Long branch);
-
-	Optional<UomConversionVO> getUomConversionById(Long id);
-	
-	//grademaster
-
-	Map<String, Object> createUpdateGradeMaster(GradeMasterDTO gradeMasterDTO)
-			throws ApplicationException;
-
-
-
-	List<GradeMasterVO> getGradeMasterByOrgId(Long orgId,Long branch);
-
-	Optional<GradeMasterVO> getGradeMasterById(Long id);
-	
-	//GSTStateMaster
-	
-	List<GSTStateMasterVO> getGSTStateMasterByOrgId(Long orgId, Long branch);
-
-	Optional<GSTStateMasterVO> getGSTStateMasterById(Long id);
-
-	Map<String, Object> createUpdateGSTStateMaster(
-	        GSTStateMasterDTO gstStateMasterDTO)
-	        throws ApplicationException;
-	
-	
-	//DocumentTypeMaster
-	
-	
-	List<DocumentTypeMasterVO> getDocumentTypeMasterByOrgId(Long orgId, Long branch);
-
-	Optional<DocumentTypeMasterVO> getDocumentTypeMasterById(Long id);
-
-	Map<String, Object> createUpdateDocumentTypeMaster(
-	        DocumentTypeMasterDTO documentTypeMasterDTO)
-	        throws ApplicationException;
-	
-
 	//documenttypemapping
 
-	Map<String, Object> updateCreateDocumnentTypeMapping(DocumnentTypeMappingDTO documnentTypeMappingDTO)
-			throws ApplicationException;
+		Map<String, Object> updateCreateDocumnentTypeMapping(DocumnentTypeMappingDTO documnentTypeMappingDTO)
+				throws ApplicationException;
 
-	DocumentTypeMappingVO getDocumnentTypeMappingById(Long id);
+		DocumentTypeMappingVO getDocumnentTypeMappingById(Long id);
 
-	List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch);
+		List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch);
 
-	
-	
-	
-	
+		
+		
 	
 	
 	

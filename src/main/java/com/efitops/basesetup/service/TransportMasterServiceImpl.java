@@ -31,15 +31,5 @@ import com.efitops.basesetup.repository.LocationRepo;
 @Service
 public class TransportMasterServiceImpl implements TransportMasterService {
 
-    private final FinancialYearRepo financialYearRepo;
-
-
-
-
-    TransportMasterServiceImpl(FinancialYearRepo financialYearRepo) {
-        this.financialYearRepo = financialYearRepo;
-    }
-
-	
 
 }

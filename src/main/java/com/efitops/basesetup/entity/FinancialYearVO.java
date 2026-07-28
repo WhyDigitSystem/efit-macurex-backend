@@ -28,15 +28,15 @@ public class FinancialYearVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "financialyearegen")
 	@SequenceGenerator(name = "financialyearegen", sequenceName = "financialyearseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "finyear_id")
+	@Column(name = "financialyear_id")
 	private Long id;
-	@Column(name = "fin_year")
+	@Column(name = "financial_year")
 	private int finYear;
 	@Column(name = "start_date")
 	private LocalDate startDate;
 	@Column(name = "end_date")
 	private LocalDate endDate;
-	@Column(name = "current_finyear")
+	@Column(name = "current_financialyear")
 	private boolean currentFinYear;
 	@Column(name = "closed")
 	private boolean closed;

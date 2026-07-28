@@ -2059,7 +2059,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 						  locationVO.setConsiderMrp(locationDTO.getConsiderMrp());
 						  locationVO.setAddress(locationDTO.getAddress());
 						  locationVO.setPhoneNo(locationDTO.getPhoneNo());
-						  
+						  locationVO.setLocationName(locationDTO.getLocationName());
+
 
 						  locationVO.setCancelRemarks(locationDTO.getCancelRemarks());
 						    if (locationDTO.getBranch() != null && locationDTO.getBranch() != 0) {

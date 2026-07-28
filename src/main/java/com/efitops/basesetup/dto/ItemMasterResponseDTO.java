@@ -23,12 +23,16 @@ public class ItemMasterResponseDTO {
 	private BranchResponseDTO branch;
 
 	private PrimaryUnitImageDTO primaryUnits;
-	
-	private LocationImageDTO locationImageReponse;
+
+	private LocationImageDTO locationDefalutReponse;
+
+	private LocationImageDTO locationAlterReponse;
 
 	private HsnResponseImageDTO itemHsn;
-	
-	private PartyResponseDTO partyResponse;
+
+	private PartyResponseDTO alterPartyResponse;
+
+	private PartyResponseDTO defaultPartyResponse;
 
 	private String itemGroupType;
 
@@ -78,7 +82,7 @@ public class ItemMasterResponseDTO {
 
 	private boolean active;
 
-	private String hsnCode;
+//	private String hsnCode;
 
 	// Purchase Item
 
@@ -95,10 +99,6 @@ public class ItemMasterResponseDTO {
 	// Inventory
 
 	private String manufacturedOrBoughtout;
-
-	private String defaultLocation;
-
-	private String alternativeLocation;
 
 	private BigDecimal leadTime;
 
@@ -179,16 +179,10 @@ public class ItemMasterResponseDTO {
 	private String financialYear;
 
 	private ListOfImageResponseDTO listOfValues;
-
-//	private List<ItemUnitsDTO> itemUnitsDTO;
-//
-//	private List<ItemInventoryDTO> itemInventoryDTO;
-//
-//	private List<ItemPurchaseDTO> itemPurchaseDTO;
-//
-//	private List<ItemSalesDTO> itemSalesDTO;
-//
-//	private List<ItemOthersDTO> itemOthersDTO;
+	
+	private ListOfImageResponseDTO listOfGrade;
+	
+	private ListOfImageResponseDTO listOfGroupDetails;
 
 	private List<ItemDrawingDTO> itemDrawingDTO;
 }

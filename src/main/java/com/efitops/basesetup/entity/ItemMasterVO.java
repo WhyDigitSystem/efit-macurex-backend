@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -293,7 +294,7 @@ public class ItemMasterVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "hsn_Code")
 	private HsnVO hsnCode;
 
@@ -301,7 +302,7 @@ public class ItemMasterVO {
 	@JoinColumn(name = "itemType")
 	private ListOfValuesVO itemType;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "grade")
 	private ListOfValuesVO grade;
 

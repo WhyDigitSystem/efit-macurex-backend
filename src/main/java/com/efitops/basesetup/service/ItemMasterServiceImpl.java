@@ -212,7 +212,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			}
 			listOfValuesDTO.setListOfImageResponseDetailsDTO(detailsList);
 
-			responseDTO.setListOfValues(listOfValuesDTO);
+			responseDTO.setListOfGrade(listOfValuesDTO);
 			responseDTO.setListOfValuesId(itemMasterVO.getGrade().getId());
 		}
 
@@ -233,7 +233,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			}
 			listOfValuesDTO.setListOfImageResponseDetailsDTO(detailsList);
 
-			responseDTO.setListOfValues(listOfValuesDTO);
+			responseDTO.setListOfGroupDetails(listOfValuesDTO);
 			responseDTO.setListOfValuesId(itemMasterVO.getItemGroup().getId());
 		}
 
@@ -338,14 +338,14 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			LocationImageDTO primaryUnitDTO = new LocationImageDTO();
 			primaryUnitDTO.setId(itemMasterVO.getDefaultLocation().getId());
 			primaryUnitDTO.setLocationName(itemMasterVO.getDefaultLocation().getLocationName());
-			responseDTO.setLocationImageReponse(primaryUnitDTO);
+			responseDTO.setLocationDefalutReponse(primaryUnitDTO);
 		}
 
 		if (itemMasterVO.getAlternativeLocation() != null) {
 			LocationImageDTO primaryUnitDTO = new LocationImageDTO();
 			primaryUnitDTO.setId(itemMasterVO.getAlternativeLocation().getId());
 			primaryUnitDTO.setLocationName(itemMasterVO.getAlternativeLocation().getLocationName());
-			responseDTO.setLocationImageReponse(primaryUnitDTO);
+			responseDTO.setLocationAlterReponse(primaryUnitDTO);
 		}
 
 		responseDTO.setLeadTime(itemMasterVO.getLeadTime());
@@ -365,14 +365,14 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			PartyResponseDTO primaryUnitDTO = new PartyResponseDTO();
 			primaryUnitDTO.setId(itemMasterVO.getDefaultSupplier().getId());
 			primaryUnitDTO.setPartyName(itemMasterVO.getDefaultSupplier().getCustomerName());
-			responseDTO.setPartyResponse(primaryUnitDTO);
+			responseDTO.setDefaultPartyResponse(primaryUnitDTO);
 		}
 
 		if (itemMasterVO.getAlternativeSupplier() == null || itemMasterVO.getAlternativeSupplier() != null) {
 			PartyResponseDTO primaryUnitDTO = new PartyResponseDTO();
 			primaryUnitDTO.setId(itemMasterVO.getAlternativeSupplier().getId());
 			primaryUnitDTO.setPartyName(itemMasterVO.getAlternativeSupplier().getCustomerName());
-			responseDTO.setPartyResponse(primaryUnitDTO);
+			responseDTO.setAlterPartyResponse(primaryUnitDTO);
 		}
 
 		responseDTO.setLeadTime(itemMasterVO.getLeadTime());
@@ -491,7 +491,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		if (itemMasterDTO.getHsnId() != null && itemMasterDTO.getHsnId() != 0) {
 
 			HsnVO hsn = hsnRepo.findById(itemMasterDTO.getHsnId())
-					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("HsnCode Not Found"));
 
 			itemMasterVO.setHsnCode(hsn);
 		}
@@ -503,7 +503,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		if (itemMasterDTO.getPurchaseUnitId() != null && itemMasterDTO.getPurchaseUnitId() != 0) {
 
 			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getPurchaseUnitId())
-					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("PurchaseUnit Not Found"));
 
 			itemMasterVO.setPurchaseUnit(branch);
 		}
@@ -511,7 +511,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		if (itemMasterDTO.getSellingUnitId() != null && itemMasterDTO.getSellingUnitId() != 0) {
 
 			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getSellingUnitId())
-					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("SellingUnit Not Found"));
 
 			itemMasterVO.setSellingUnit(branch);
 		}
@@ -519,7 +519,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		if (itemMasterDTO.getPricingUnitId() != null && itemMasterDTO.getPricingUnitId() != 0) {
 
 			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getPricingUnitId())
-					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("PricingUnit Not Found"));
 
 			itemMasterVO.setPricingUnit(branch);
 		}
@@ -527,7 +527,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		if (itemMasterDTO.getSecondaryUnitId() != null && itemMasterDTO.getSecondaryUnitId() != 0) {
 
 			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getSecondaryUnitId())
-					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("SecondaryUnit Not Found"));
 
 			itemMasterVO.setSecondaryUnit(branch);
 		}
@@ -537,7 +537,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		if (itemMasterDTO.getDefaultLocationId() != null && itemMasterDTO.getDefaultLocationId() != 0) {
 
 			LocationVO location = locationRepo.findById(itemMasterDTO.getDefaultLocationId())
-					.orElseThrow(() -> new ApplicationException("LocationMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("DefaultLocation Not Found"));
 
 			itemMasterVO.setDefaultLocation(location);
 		}
@@ -545,7 +545,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		if (itemMasterDTO.getAlternativeLocationId() != null && itemMasterDTO.getAlternativeLocationId() != 0) {
 
 			LocationVO location = locationRepo.findById(itemMasterDTO.getAlternativeLocationId())
-					.orElseThrow(() -> new ApplicationException("LocationMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("tAlternativeLocation Not Found"));
 
 			itemMasterVO.setAlternativeLocation(location);
 		}
@@ -571,7 +571,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		if (itemMasterDTO.getAlternativeSupplierId() == null || itemMasterDTO.getAlternativeSupplierId() != null) {
 
 			CustomerVO party = customerRepo.findById(itemMasterDTO.getAlternativeSupplierId())
-					.orElseThrow(() -> new ApplicationException("PartyMster Not Found"));
+					.orElseThrow(() -> new ApplicationException("AlternativeSupplier Not Found"));
 
 			itemMasterVO.setAlternativeSupplier(party);
 		}
@@ -579,7 +579,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		if (itemMasterDTO.getDefaultSupplierId() == null || itemMasterDTO.getDefaultSupplierId() != null) {
 
 			CustomerVO party = customerRepo.findById(itemMasterDTO.getDefaultSupplierId())
-					.orElseThrow(() -> new ApplicationException("PartyMster Not Found"));
+					.orElseThrow(() -> new ApplicationException("DefaultSupplier Not Found"));
 
 			itemMasterVO.setDefaultSupplier(party);
 		}

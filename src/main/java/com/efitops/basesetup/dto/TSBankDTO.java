@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TSBankDTO {
+	private Long id;
 	private String beneficiary;
 	private String bank;
 	private String acno;

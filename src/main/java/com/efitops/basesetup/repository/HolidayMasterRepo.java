@@ -6,22 +6,23 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.efitops.basesetup.entity.TSBankVO;
+import com.efitops.basesetup.entity.HolidayMasterVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 
-public interface TSBankRepo extends JpaRepository<TSBankVO, Long>{
+public interface HolidayMasterRepo extends JpaRepository<HolidayMasterVO, Long> {
 
-	boolean existsByBankAndOrgId(String bank, Long orgId);
-
-	List<TSBankVO> getBankMasterByOrgId(Long orgId);
 	@Query(value = """
 	        SELECT *
-	        FROM bankdetails
+	        FROM holiday
 	        WHERE org_id = :orgId
+	          AND branch = :branch
 	          AND cancel = false and active = 1
-	        ORDER BY beneficiary_name
+	        ORDER BY holiday_id
 	        """, nativeQuery = true)
-	List<TSBankVO> getBankMasterByOrgId1(@Param("orgId") Long orgId
-	                                             );
+	List<HolidayMasterVO> getHolidayMasterByOrgId(@Param("orgId") Long orgId,
+	                                             @Param("branch") Long branch);
 
+	HolidayMasterVO getHolidayMasterById(Long id);
+
+	
 }

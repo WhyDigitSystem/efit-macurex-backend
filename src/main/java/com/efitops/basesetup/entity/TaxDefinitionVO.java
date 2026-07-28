@@ -1,5 +1,9 @@
 package com.efitops.basesetup.entity;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -8,42 +12,57 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tsbank")
+@Table(name = "taxbasic")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TSBankVO {
+public class TaxDefinitionVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tsbankgen")
-	@SequenceGenerator(name = "tsbankgen", sequenceName = "tsbankseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "tsbank_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "taxbasicgen")
+	@SequenceGenerator(name = "taxbasicgen", sequenceName = "taxbasicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "taxbasic_id")
 	private Long id;
 	
-	@Column(name = "beneficiary_name")
-	private String beneficiary;
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
 	
-	@Column(name = "bank_name")
-	private String bank;
+	@ManyToOne
+	@JoinColumn(name = "module")
+	private ListOfValuesVO module;
 	
-	@Column(name = "ac_no")
-	private String acno;
+	@Column(name = "tax_no")
+	private Long taxNo;
 	
-	@Column(name = "branch")
-	private String branch;
+	@Column(name = "tax_description")
+	private String taxDescription;
 	
-	@Column(name = "ifsc_code")
-	private String ifscCode;
+	@Column(name = "doc_date")
+	private LocalDate docDate;
+	
+	@Column(name = "effective_date")
+	private LocalDate effectiveDate;
+	
+	@Column(name = "fill_copy_of")
+	private String fillCopyOF;
+	
+	@Column(name = "print_name")
+	private String PrintName;
+	
+	
 	
 	@Column(name = "org_id")
 	private Long orgId;
@@ -63,9 +82,9 @@ public class TSBankVO {
     @Column(name = "finyear", length = 5)
     private String finYear;
 	@Column(name = "screencode", length = 30)
-	private String screenCode = "BM";
+	private String screenCode = "TD";
 	@Column(name = "screenname", length = 30)
-	private String screenName = "Bank Master";
+	private String screenName = "Tax Definition Master";
 
 	@JsonGetter("active")
 	public String getActive() {
@@ -78,8 +97,10 @@ public class TSBankVO {
 	}
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-
 	
+	@OneToMany(mappedBy = "taxDefinitionVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<TaxDefinitionDetailsVO> taxDefinitionDetailsVO;
 
 
 }

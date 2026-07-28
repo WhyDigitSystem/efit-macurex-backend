@@ -112,11 +112,11 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 	@Autowired
 	CustomerRepo customerRepo;
 
-	@Override
-	public ItemMasterVO getItemMasterById(Long id) {
-
-		return itemMasterRepo.getItemMasterById(id);
-	}
+//		@Override
+//		public ItemMasterVO getItemMasterById(Long id) {
+//	
+//			return itemMasterRepo.getItemMasterById(id);
+//		}
 
 	@Override
 	public Map<String, Object> updateCreateItemMaster(ItemMasterDTO itemMasterDTO) throws ApplicationException {
@@ -813,5 +813,29 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
 				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+
+	@Override
+	public ItemMasterResponseDTO getItemMasterById(Long id) throws ApplicationException {
+		
+		ItemMasterVO itemMasterVO = itemMasterRepo.getItemMasterById(id);
+
+		if (itemMasterVO == null) {
+			throw new ApplicationException("Item Master Not Found");
+		}
+
+		return buildItemMasterResponse(itemMasterVO);
+	}
+
+	@Override
+	public ItemMasterResponseDTO getItemMasterByOrgId(Long orgId, Long branchId) throws ApplicationException {
+
+		ItemMasterVO itemMasterVO = itemMasterRepo.getItemMasterByOrgId(orgId,branchId);
+
+		if (itemMasterVO == null) {
+			throw new ApplicationException("Item Master Not Found");
+		}
+
+		return buildItemMasterResponse(itemMasterVO);
 	}
 }

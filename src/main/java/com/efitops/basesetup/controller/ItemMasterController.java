@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.ItemMasterDTO;
+import com.efitops.basesetup.dto.ItemMasterResponseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.service.ItemMasterService;
@@ -39,30 +40,98 @@ public class ItemMasterController extends BaseController {
 
 	// TaxInvoice
 
+//	@GetMapping("/getItemMasterById")
+//	public ResponseEntity<ResponseDTO> getItemMasterById(@RequestParam Long id) {
+//		String methodName = "getItemMasterById()";
+//		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//		String errorMsg = null;
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//		ResponseDTO responseDTO = null;
+//		ItemMasterVO itemMasterVO = new ItemMasterVO();
+//		try {
+//			itemMasterVO = itemMasterService.getItemMasterById(id);
+//		} catch (Exception e) {
+//			errorMsg = e.getMessage();
+//			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+//		}
+//		if (StringUtils.isBlank(errorMsg)) {
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "ItemMaster information get successfully By id");
+//			responseObjectsMap.put("itemMasterVO", itemMasterVO);
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//		} else {
+//			responseDTO = createServiceResponseError(responseObjectsMap, "ItemMaster information receive failedByOrgId",
+//					errorMsg);
+//		}
+//		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//		return ResponseEntity.ok().body(responseDTO);
+//	}
+
 	@GetMapping("/getItemMasterById")
 	public ResponseEntity<ResponseDTO> getItemMasterById(@RequestParam Long id) {
+
 		String methodName = "getItemMasterById()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO = null;
-		ItemMasterVO itemMasterVO = new ItemMasterVO();
+
 		try {
-			itemMasterVO = itemMasterService.getItemMasterById(id);
+
+			ItemMasterResponseDTO itemMasterResponseDTO = itemMasterService.getItemMasterById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "ItemMaster information retrieved successfully");
+
+			responseObjectsMap.put("itemMasterVO", itemMasterResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
 		} catch (Exception e) {
+
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-		}
-		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "ItemMaster information get successfully By id");
-			responseObjectsMap.put("itemMasterVO", itemMasterVO);
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "ItemMaster information receive failedByOrgId",
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "ItemMaster information retrieval failed",
 					errorMsg);
 		}
+
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-		return ResponseEntity.ok().body(responseDTO);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getItemMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getItemMasterByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
+
+		String methodName = "getItemMasterByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ItemMasterResponseDTO itemMasterResponseDTO = itemMasterService.getItemMasterByOrgId(orgId, branchId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "ItemMaster information retrieved successfully");
+
+			responseObjectsMap.put("itemMasterVO", itemMasterResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "ItemMaster information retrieval failed",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
 	}
 
 	@PutMapping("/updateCreateItemMaster")

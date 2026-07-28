@@ -115,7 +115,7 @@ public class ItemMasterVO {
 	private String rawMaterialsMake;
 
 	@Column(name = "active")
-	private boolean active;
+	private boolean active=true;
 
 //	@Column(name = "hsn_code")
 //	private String hsnCode;
@@ -265,7 +265,7 @@ public class ItemMasterVO {
 	private String updatedBy;
 
 	@Column(name = "cancel")
-	private boolean cancel;
+	private boolean cancel=false;
 
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;

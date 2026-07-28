@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+ @Data
 @AllArgsConstructor
 @NoArgsConstructor
 
@@ -15,8 +15,7 @@ public class TransportMasterDTO {
 	private String transportName;
 	private String address;
 	private Boolean active;
-	private String branch;
-	private String branchCode;
+	private Long branch;
 	private String createdBy;
 	private String cancelRemarks;
 

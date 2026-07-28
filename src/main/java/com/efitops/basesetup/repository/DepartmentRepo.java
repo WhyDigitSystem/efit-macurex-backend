@@ -11,8 +11,8 @@ import com.efitops.basesetup.entity.DepartmentVO;
 @Repository
 public interface DepartmentRepo extends JpaRepository<DepartmentVO, Long> {
 
-	@Query(nativeQuery = true, value = "select * from department  where orgid=?1 and branchCode=?2")
-	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, String branchCode);
+	@Query(nativeQuery = true, value = "select * from department  where org_id=?1 and branch=?2 and active=1 and cancel=0")
+	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, Long branch);
 
 	@Query(nativeQuery = true, value = "select * from department where departmentid=?1")
 	List<DepartmentVO> getDepartmentById(Long id);
@@ -21,8 +21,8 @@ public interface DepartmentRepo extends JpaRepository<DepartmentVO, Long> {
 
 	boolean existsByDepartmentCodeAndOrgId(String departmentCode, Long orgId);
 
-	@Query(nativeQuery = true, value = "select concat(prefixfield,lpad(lastno,5,0)) AS docid from documenttypemappingdetails where orgid=?1 and finyear=?2 and branchcode=?3 and screencode=?4")
-	String getDepartmentDocId(Long orgId,String finYear,String branchCode, String screenCode);
+	@Query(nativeQuery = true, value = "select concat(prefixfield,lpad(lastno,5,0)) AS docid from documenttypemappingdetails where orgid=?1 and finyear=?2 and branch=?3 and screencode=?4")
+	String getDepartmentDocId(Long orgId,String finYear,Long long1, String screenCode);
 
 }
 

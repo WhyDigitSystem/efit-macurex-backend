@@ -1,13 +1,17 @@
 package com.efitops.basesetup.entity;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
 
 import lombok.AllArgsConstructor;
@@ -40,10 +44,9 @@ public class UnitMasterVO {
 	private boolean cancel=false;
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
-	@Column(name = "branch")
-	private String branch;
-	@Column(name = "branch_code")
-	private String branchCode;
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
 	@Column(name = "screen_name")
 	private String screenName="UNITMASTER";
 	@Column(name = "screen_code")
@@ -59,6 +62,9 @@ public class UnitMasterVO {
 	public String getCancel() {
 		return cancel ? "T" : "F";
 	}
+	
+	@Embedded
+	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
 
 

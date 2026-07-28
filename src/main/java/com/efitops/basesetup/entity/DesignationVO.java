@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -27,37 +29,42 @@ public class DesignationVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "designationgen")
 	@SequenceGenerator(name = "designationgen", sequenceName = "designationseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "designationid")
+	@Column(name = "designation_id")
 	private Long id;
 	
-	@Column(name = "docid")
+	@Column(name = "doc_id")
 	private String docId;
 	
     @Column(name = "designation", length = 30)
     private String designation;
     
-    @Column(name = "designationcode")
+    @Column(name = "designation_code")
     private String designationCode;
 
-    @Column(name = "orgid")
+    @Column(name = "org_id")
 	private Long orgId;
-	@Column(name = "createdby")
+	@Column(name = "created_by")
 	private String createdBy;
-	@Column(name = "modifiedby")
+	@Column(name = "modified_by")
 	private String updatedBy;
 	@Column(name = "cancel")
-	private boolean cancel;
+	private String cancel;
+	
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
+	
 	@Column(name = "active")
 	private boolean active;
-	@Column(name = "branch", length = 25)
-	private String branch;
-	@Column(name = "branchcode", length = 20)
-	private String branchCode;
-    @Column(name = "finyear", length = 5)
+	
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
+	
+    @Column(name = "financial_year", length = 5)
     private String finYear;
-	@Column(name = "screencode",length = 10)
+	@Column(name = "screen_code",length = 10)
 	private String screenCode ="DSG";
-	@Column(name = "screenname",length = 30)
+	@Column(name = "screen_name",length = 30)
 	private String screenName="DESIGNATION";
 	
 

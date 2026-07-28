@@ -35,6 +35,7 @@ import com.efitops.basesetup.entity.DesignationVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.MaterialTypeVO;
 import com.efitops.basesetup.entity.UomVO;
+import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.service.EfitMasterService;
 
 @CrossOrigin
@@ -42,41 +43,52 @@ import com.efitops.basesetup.service.EfitMasterService;
 @RequestMapping("/api/efitmaster")
 public class EfitMasterController extends BaseController {
 
+    private final BranchRepo branchRepo;
+
 	public static final Logger LOGGER = LoggerFactory.getLogger(EfitMasterController.class);
 
 	@Autowired
-	EfitMasterService efitMasterService;
+	private EfitMasterService efitMasterService;
+
+    EfitMasterController(BranchRepo branchRepo) {
+        this.branchRepo = branchRepo;
+    }
 
 	
 	
 	// Department
 
-	@GetMapping("/getAllDepartmentByOrgId")
-	public ResponseEntity<ResponseDTO> getAllDepartmentByOrgId(@RequestParam Long orgId,@RequestParam String branchCode) {
-		String methodName = "getAllDepartmentByOrgId()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-		String errorMsg = null;
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO = null;
-		List<DepartmentVO> departmentVO = new ArrayList<>();
-		try {
-			departmentVO = efitMasterService.getAllDepartmentByOrgId(orgId,branchCode);
-		} catch (Exception e) {
-			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-		}
-		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Department information get successfully ByOrgId");
-			responseObjectsMap.put("departmentVO", departmentVO);
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap,
-					"Department information receive failed By OrgId", errorMsg);
-		}
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-		return ResponseEntity.ok().body(responseDTO);
+    @GetMapping("/getAllDepartmentByOrgId")
+    public ResponseEntity<ResponseDTO> getAllDepartmentByOrgId(
+            @RequestParam Long orgId,
+            @RequestParam Long branch) {
 
-	}
+        String methodName = "getAllDepartmentByOrgId()";
+        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+        try {
+            List<DepartmentVO> departmentVO = efitMasterService.getAllDepartmentByOrgId(orgId, branch);
+
+            Map<String, Object> responseObjectsMap = new HashMap<>();
+            responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+                    "Department information retrieved successfully.");
+            responseObjectsMap.put("departmentVO", departmentVO);
+
+            LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+            return ResponseEntity.ok(createServiceResponse(responseObjectsMap));
+
+        } catch (Exception e) {
+
+            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+
+            Map<String, Object> responseObjectsMap = new HashMap<>();
+
+            return ResponseEntity.ok(createServiceResponseError(
+                    responseObjectsMap,
+                    "Department information retrieval failed.",
+                    e.getMessage()));
+        }
+    }
 
 	@GetMapping("/getDepartmentById")
 	public ResponseEntity<ResponseDTO> getDepartmentById(@RequestParam Long id) {
@@ -127,7 +139,7 @@ public class EfitMasterController extends BaseController {
 	}
 
 	@GetMapping("/getDepartmentDocId")
-	public ResponseEntity<ResponseDTO> getDepartmentDocId(@RequestParam Long orgId,@RequestParam String finYear,@RequestParam String branchCode) {
+	public ResponseEntity<ResponseDTO> getDepartmentDocId(@RequestParam Long orgId,@RequestParam String finYear,@RequestParam Long branch) {
 
 		String methodName = "getDepartmentDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -137,7 +149,7 @@ public class EfitMasterController extends BaseController {
 		String mapp = "";
 
 		try {
-			mapp = efitMasterService.getDepartmentDocId(orgId,finYear,branchCode);
+			mapp = efitMasterService.getDepartmentDocId(orgId,finYear,branch);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -238,7 +250,7 @@ public class EfitMasterController extends BaseController {
 	// designation master
 
 	@GetMapping("/getDesignationByOrgId")
-	public ResponseEntity<ResponseDTO> getDesignationByOrgId(@RequestParam Long orgId, @RequestParam String branchCode) {
+	public ResponseEntity<ResponseDTO> getDesignationByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
 		String methodName = "getDesignationByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -246,7 +258,7 @@ public class EfitMasterController extends BaseController {
 		ResponseDTO responseDTO = null;
 		List<DesignationVO> designationVO = new ArrayList<>();
 		try {
-			designationVO = efitMasterService.getDesignationByOrgId(orgId,branchCode);
+			designationVO = efitMasterService.getDesignationByOrgId(orgId,branch);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -313,7 +325,7 @@ public class EfitMasterController extends BaseController {
 	}
 
 	@GetMapping("/getDesignationDocId")
-	public ResponseEntity<ResponseDTO> getDesignationDocId(@RequestParam Long orgId,@RequestParam String finYear,@RequestParam String branchCode ) {
+	public ResponseEntity<ResponseDTO> getDesignationDocId(@RequestParam Long orgId,@RequestParam String finYear,@RequestParam Long branch ) {
 		String methodName = "getDesignationDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -322,7 +334,7 @@ public class EfitMasterController extends BaseController {
 		String mapp = "";
 
 		try {
-			mapp = efitMasterService.getDesignationDocId(orgId,finYear,branchCode);
+			mapp = efitMasterService.getDesignationDocId(orgId,finYear,branch);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);

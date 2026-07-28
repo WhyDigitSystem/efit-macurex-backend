@@ -17,6 +17,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
@@ -42,7 +43,7 @@ public class ListOfValuesVO {
 	private boolean cancel=false;
 	
 	@ManyToOne
-	@JoinColumn(name = "branch_id")
+	@JoinColumn(name = "branch")
 	private BranchVO branch;
 	
 	@Column(name = "created_by")
@@ -69,11 +70,18 @@ public class ListOfValuesVO {
 	private List<ListOfValuesDetailsVO> listOfValuesDetailsVO;
 	
 	
+	@JsonGetter("active")
+	public String getActive() {
+		return active ? "Active" : "In-Active";
+	}
+
+	@JsonGetter("cancel")
+	public String getCancel() {
+		return cancel ? "T" : "F";
+	}
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
-//	@JsonGetter("active")
-//	public String getActive() {
-//		return active ? "Active" : "In-Active";
-//	}
+	
+	
 }

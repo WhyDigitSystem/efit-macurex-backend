@@ -19,7 +19,6 @@ public class UnitMasterDTO {
 	private String cancelRemarks;
     private String description;
 	private boolean active;
-	private String branch;
-	private String branchCode;
+	private Long branch;
 
 }

@@ -35,6 +35,7 @@ import com.efitops.basesetup.dto.RolesDTO;
 import com.efitops.basesetup.dto.RolesResponsibilityDTO;
 import com.efitops.basesetup.dto.ScreensDTO;
 import com.efitops.basesetup.dto.SignUpFormDTO;
+import com.efitops.basesetup.dto.UserBranchResponseDTO;
 import com.efitops.basesetup.dto.UserLoginBranchAccessDTO;
 import com.efitops.basesetup.dto.UserLoginRoleAccessDTO;
 import com.efitops.basesetup.dto.UserResponseDTO;
@@ -245,6 +246,22 @@ public class AuthServiceImpl implements AuthService {
 					UserConstants.ERRROR_MSG_USER_INFORMATION_NOT_FOUND_AND_ASKING_SIGNUP);
 		}
 		UserResponseDTO userResponseDTO = mapUserVOToDTO(userVO);
+		
+		List<UserBranchResponseDTO> branchList = new ArrayList<>();
+
+		if (userVO.getBranchAccessibleVO() != null) {
+		    for (UserLoginBranchAccessibleVO branchVO : userVO.getBranchAccessibleVO()) {
+
+		        UserBranchResponseDTO dto = new UserBranchResponseDTO();
+		        dto.setId(branchVO.getId());
+		        dto.setBranch(branchVO.getBranch());
+		        dto.setBranchCode(branchVO.getBranchcode());
+
+		        branchList.add(dto);
+		    }
+		}
+
+		userResponseDTO.setBranches(branchList);
 
 		List<Map<String, Object>> roleVOList = new ArrayList<>();
 

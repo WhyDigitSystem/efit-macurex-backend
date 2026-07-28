@@ -33,6 +33,7 @@ public class UserResponseDTO {
 	private List<Map<String, Object>> roleVO;
 //	private List<Map<String, Object>> responsibilityVO;
 //	private List<Map<String, Object>> screensVO;
+	private List<UserBranchResponseDTO> branches;
 	
     @Embedded
     private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();

@@ -1,6 +1,7 @@
 package com.efitops.basesetup.entity;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,6 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
 
 import lombok.AllArgsConstructor;
@@ -52,7 +54,7 @@ public class ServiceAccMasterVO {
 	private boolean cancel=false;
 
 	@ManyToOne
-	@JoinColumn(name = "branch_id")
+	@JoinColumn(name = "branch")
 	private BranchVO branch;
 	
     @Column(name = "finyear", length = 5)
@@ -71,6 +73,9 @@ public class ServiceAccMasterVO {
 	public String getCancel() {
 		return cancel ? "T" : "F";
 	}
+	@Embedded
+	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
+	
 
 
 }

@@ -14,10 +14,10 @@ public class DepartmentDTO {
 	private String departmentCode;
 	private boolean active;
 	private Long orgId;
-	private String branch;
-	private String branchCode;
+	private Long branch;
     private String finYear;
 	private String createdBy;
+	private String cancelRemarks;
 }
 
 

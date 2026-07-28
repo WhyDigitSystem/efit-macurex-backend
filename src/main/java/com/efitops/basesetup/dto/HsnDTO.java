@@ -18,12 +18,11 @@ public class HsnDTO {
 	 private Long orgId;
 	 private String createdBy;
 	 private String cancelRemarks;
-	 private Long listofvalues;
+	 private Long category;
 	 private String hsn;
 	 private String description;
 	 private boolean active;
-	 private String branch;
-	private String branchCode;
+	 private Long branch;
 		
 
 }

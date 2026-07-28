@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.HsnResponseImageDTO;
 import com.efitops.basesetup.dto.ItemDrawingDTO;
 import com.efitops.basesetup.dto.ItemMasterDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDTO;
@@ -38,6 +39,7 @@ import com.efitops.basesetup.dto.ListOfImageResponseDTO;
 import com.efitops.basesetup.dto.ListOfImageResponseDetailsDTO;
 import com.efitops.basesetup.dto.PrimaryUnitImageDTO;
 import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.ItemDrawingVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
@@ -45,6 +47,7 @@ import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.HsnRepo;
 import com.efitops.basesetup.repository.ItemDrawingRepo;
 import com.efitops.basesetup.repository.ItemInventoryRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
@@ -92,6 +95,9 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 	@Autowired
 	UnitMasterRepo unitMasterRepo;
+
+	@Autowired
+	HsnRepo hsnRepo;
 
 	@Override
 	public ItemMasterVO getItemMasterById(Long id) {
@@ -151,8 +157,51 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 		responseDTO.setId(itemMasterVO.getId());
 		responseDTO.setCapitalOrInput(itemMasterVO.getCapitalOrInput());
-		responseDTO.setItemType(itemMasterVO.getItemType());
-		responseDTO.setGrade(itemMasterVO.getGrade());
+//		responseDTO.setItemType(itemMasterVO.getItemType());
+
+		if (itemMasterVO.getItemType() != null) {
+			ListOfImageResponseDTO listOfValuesDTO = new ListOfImageResponseDTO();
+			listOfValuesDTO.setId(itemMasterVO.getItemType().getId());
+			listOfValuesDTO.setListCode(itemMasterVO.getItemType().getListCode());
+			listOfValuesDTO.setListDescription(itemMasterVO.getItemType().getListDescription());
+
+			List<ListOfImageResponseDetailsDTO> detailsList = new ArrayList<>();
+			if (itemMasterVO.getItemType().getListOfValuesDetailsVO() != null) {
+				for (ListOfValuesDetailsVO detailVO : itemMasterVO.getItemType().getListOfValuesDetailsVO()) {
+					ListOfImageResponseDetailsDTO detailDTO = new ListOfImageResponseDetailsDTO();
+					detailDTO.setValueCode(detailVO.getValueCode());
+					detailDTO.setValueDescription(detailVO.getValueDescription());
+					detailsList.add(detailDTO);
+				}
+			}
+			listOfValuesDTO.setListOfImageResponseDetailsDTO(detailsList);
+
+			responseDTO.setListOfValues(listOfValuesDTO);
+			responseDTO.setListOfValuesId(itemMasterVO.getItemType().getId());
+		}
+
+//		responseDTO.setGrade(itemMasterVO.getGrade());
+
+		if (itemMasterVO.getGrade() != null) {
+			ListOfImageResponseDTO listOfValuesDTO = new ListOfImageResponseDTO();
+			listOfValuesDTO.setId(itemMasterVO.getGrade().getId());
+			listOfValuesDTO.setListCode(itemMasterVO.getGrade().getListCode());
+			listOfValuesDTO.setListDescription(itemMasterVO.getGrade().getListDescription());
+
+			List<ListOfImageResponseDetailsDTO> detailsList = new ArrayList<>();
+			if (itemMasterVO.getGrade().getListOfValuesDetailsVO() != null) {
+				for (ListOfValuesDetailsVO detailVO : itemMasterVO.getGrade().getListOfValuesDetailsVO()) {
+					ListOfImageResponseDetailsDTO detailDTO = new ListOfImageResponseDetailsDTO();
+					detailDTO.setValueCode(detailVO.getValueCode());
+					detailDTO.setValueDescription(detailVO.getValueDescription());
+					detailsList.add(detailDTO);
+				}
+			}
+			listOfValuesDTO.setListOfImageResponseDetailsDTO(detailsList);
+
+			responseDTO.setListOfValues(listOfValuesDTO);
+			responseDTO.setListOfValuesId(itemMasterVO.getGrade().getId());
+		}
 
 		if (itemMasterVO.getItemGroup() != null) {
 			ListOfImageResponseDTO listOfValuesDTO = new ListOfImageResponseDTO();
@@ -176,7 +225,29 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		}
 
 		responseDTO.setItemCode(itemMasterVO.getItemCode());
-		responseDTO.setExciseTariffNo(itemMasterVO.getExciseTariffNo());
+//		responseDTO.setExciseTariffNo(itemMasterVO.getExciseTariffNo());
+		
+		if (itemMasterVO.getExciseTariffNo() != null) {
+			ListOfImageResponseDTO listOfValuesDTO = new ListOfImageResponseDTO();
+			listOfValuesDTO.setId(itemMasterVO.getExciseTariffNo().getId());
+			listOfValuesDTO.setListCode(itemMasterVO.getExciseTariffNo().getListCode());
+			listOfValuesDTO.setListDescription(itemMasterVO.getExciseTariffNo().getListDescription());
+
+			List<ListOfImageResponseDetailsDTO> detailsList = new ArrayList<>();
+			if (itemMasterVO.getExciseTariffNo().getListOfValuesDetailsVO() != null) {
+				for (ListOfValuesDetailsVO detailVO : itemMasterVO.getExciseTariffNo().getListOfValuesDetailsVO()) {
+					ListOfImageResponseDetailsDTO detailDTO = new ListOfImageResponseDetailsDTO();
+					detailDTO.setValueCode(detailVO.getValueCode());
+					detailDTO.setValueDescription(detailVO.getValueDescription());
+					detailsList.add(detailDTO);
+				}
+			}
+			listOfValuesDTO.setListOfImageResponseDetailsDTO(detailsList);
+
+			responseDTO.setListOfValues(listOfValuesDTO);
+			responseDTO.setListOfValuesId(itemMasterVO.getExciseTariffNo().getId());
+		}
+		
 		responseDTO.setItemDescription(itemMasterVO.getItemDescription());
 		responseDTO.setThickness(itemMasterVO.getThickness());
 		responseDTO.setIsStock(itemMasterVO.getIsStock());
@@ -197,20 +268,28 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		responseDTO.setInspection(itemMasterVO.getInspection());
 		responseDTO.setAbcGrade(itemMasterVO.getAbcGrade());
 		responseDTO.setDrawingNo(itemMasterVO.getDrawingNo());
-		responseDTO.setExciseTariffNo(itemMasterVO.getExciseTariffNo());
 		responseDTO.setLotSize(itemMasterVO.getLotSize());
-//		responseDTO.setSaftyStockMsl(itemMasterVO.getSaftyStockMsl());
 		responseDTO.setImportOrLocal(itemMasterVO.getImportOrLocal());
 		responseDTO.setSaftyStockMsl(itemMasterVO.getSaftyStockMsl());
 		responseDTO.setIsGrnRequired(itemMasterVO.getIsGrnRequired());
 		responseDTO.setRawMaterialsMake(itemMasterVO.getRawMaterialsMake());
-		responseDTO.setHsnCode(itemMasterVO.getHsnCode());
+
+//		responseDTO.setHsnCode(itemMasterVO.getHsnCode());
+
+		if (itemMasterVO.getPrimaryUnit() != null) {
+			HsnResponseImageDTO hsnResponseImageDTO = new HsnResponseImageDTO();
+			hsnResponseImageDTO.setId(itemMasterVO.getHsnCode().getId());
+			hsnResponseImageDTO.setHsnCode(itemMasterVO.getHsnCode().getHsn());
+			responseDTO.setItemHsn(hsnResponseImageDTO);
+		}
+
 		responseDTO.setCreatedBy(itemMasterVO.getCreatedBy());
 		responseDTO.setOrg(itemMasterVO.getOrg());
 		responseDTO.setUpdatedBy(itemMasterVO.getUpdatedBy());
 		responseDTO.setCancelRemarks(itemMasterVO.getCancelRemarks());
 
 		responseDTO.setPurchaseUnit(itemMasterVO.getPurchaseUnit());
+
 		responseDTO.setSellingUnit(itemMasterVO.getSellingUnit());
 		responseDTO.setPricingUnit(itemMasterVO.getPricingUnit());
 		responseDTO.setSecondaryUnit(itemMasterVO.getSecondaryUnit());
@@ -286,10 +365,37 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 		}
 		itemMasterVO.setCapitalOrInput(itemMasterDTO.getCapitalOrInput());
-		itemMasterVO.setItemType(itemMasterDTO.getItemType());
-		itemMasterVO.setGrade(itemMasterDTO.getGrade());
+
+		if (itemMasterDTO.getListOfValuesId() != null && itemMasterDTO.getListOfValuesId() != 0) {
+
+			ListOfValuesVO listofvalues = listOfValuesRepo.findById(itemMasterDTO.getListOfValuesId())
+					.orElseThrow(() -> new ApplicationException("ListOfValues Is Not Found"));
+
+			itemMasterVO.setItemType(listofvalues);
+
+		}
+
+//		itemMasterVO.setGrade(itemMasterDTO.getGrade());
+
+		if (itemMasterDTO.getGradeId() != null && itemMasterDTO.getGradeId() != 0) {
+
+			ListOfValuesVO listofvalues = listOfValuesRepo.findById(itemMasterDTO.getGradeId())
+					.orElseThrow(() -> new ApplicationException("ListOfValues Is Not Found"));
+
+			itemMasterVO.setGrade(listofvalues);
+
+		}
 		itemMasterVO.setItemCode(itemMasterDTO.getItemCode());
-		itemMasterVO.setExciseTariffNo(itemMasterDTO.getExciseTariffNo());
+		
+		if (itemMasterDTO.getExciseTariffNoId() != null && itemMasterDTO.getExciseTariffNoId() != 0) {
+
+			ListOfValuesVO listofvalues = listOfValuesRepo.findById(itemMasterDTO.getExciseTariffNoId())
+					.orElseThrow(() -> new ApplicationException("ListOfValues Is Not Found"));
+
+			itemMasterVO.setExciseTariffNo(listofvalues);
+
+		}
+//		itemMasterVO.setExciseTariffNo(itemMasterDTO.getExciseTariffNo());
 		itemMasterVO.setItemDescription(itemMasterDTO.getItemDescription());
 
 		itemMasterVO.setThickness(itemMasterDTO.getThickness());
@@ -311,23 +417,64 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		itemMasterVO.setInspection(itemMasterDTO.getInspection());
 		itemMasterVO.setAbcGrade(itemMasterDTO.getAbcGrade());
 		itemMasterVO.setDrawingNo(itemMasterDTO.getDrawingNo());
-		itemMasterVO.setExciseTariffNo(itemMasterDTO.getExciseTariffNo());
 		itemMasterVO.setLotSize(itemMasterDTO.getLotSize());
 //		itemMasterVO.setShelfLifePart(itemMasterDTO.getShelfLifePart());
 		itemMasterVO.setImportOrLocal(itemMasterDTO.getImportOrLocal());
 		itemMasterVO.setSaftyStockMsl(itemMasterDTO.getSaftyStockMsl());
 		itemMasterVO.setIsGrnRequired(itemMasterDTO.getIsGrnRequired());
 		itemMasterVO.setRawMaterialsMake(itemMasterDTO.getRawMaterialsMake());
-		itemMasterVO.setHsnCode(itemMasterDTO.getHsnCode());
+
+		if (itemMasterDTO.getHsnId() != null && itemMasterDTO.getHsnId() != 0) {
+
+			HsnVO hsn = hsnRepo.findById(itemMasterDTO.getHsnId())
+					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+
+			itemMasterVO.setHsnCode(hsn);
+		}
 
 		itemMasterVO.setCreatedBy(itemMasterDTO.getCreatedBy());
 		itemMasterVO.setUpdatedBy(itemMasterDTO.getUpdatedBy());
 		itemMasterVO.setCancelRemarks(itemMasterDTO.getCancelRemarks());
+		
+		
+//
+//		itemMasterVO.setPurchaseUnit(itemMasterDTO.getPurchaseUnit());
+//		itemMasterVO.setSellingUnit(itemMasterDTO.getSellingUnit());
+//		itemMasterVO.setPricingUnit(itemMasterDTO.getPricingUnit());
+//		itemMasterVO.setSecondaryUnit(itemMasterDTO.getSecondaryUnit());
+		
+		if (itemMasterDTO.getPurchaseUnitId() != null && itemMasterDTO.getPurchaseUnitId() != 0) {
 
-		itemMasterVO.setPurchaseUnit(itemMasterDTO.getPurchaseUnit());
-		itemMasterVO.setSellingUnit(itemMasterDTO.getSellingUnit());
-		itemMasterVO.setPricingUnit(itemMasterDTO.getPricingUnit());
-		itemMasterVO.setSecondaryUnit(itemMasterDTO.getSecondaryUnit());
+			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getPurchaseUnitId())
+					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+
+			itemMasterVO.setPurchaseUnit(branch);
+		}
+		
+		if (itemMasterDTO.getSellingUnitId() != null && itemMasterDTO.getSellingUnitId() != 0) {
+
+			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getSellingUnitId())
+					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+
+			itemMasterVO.setSellingUnit(branch);
+		}
+		
+		if (itemMasterDTO.getPricingUnitId() != null && itemMasterDTO.getPricingUnitId() != 0) {
+
+			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getPricingUnitId())
+					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+
+			itemMasterVO.setPricingUnit(branch);
+		}
+		
+		if (itemMasterDTO.getSecondaryUnitId() != null && itemMasterDTO.getSecondaryUnitId() != 0) {
+
+			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getSecondaryUnitId())
+					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+
+			itemMasterVO.setSecondaryUnit(branch);
+		}
+		
 
 		itemMasterVO.setManufacturedOrBoughtout(itemMasterDTO.getManufacturedOrBoughtout());
 		itemMasterVO.setDefaultLocation(itemMasterDTO.getDefaultLocation());

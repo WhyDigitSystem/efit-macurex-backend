@@ -41,20 +41,20 @@ public class ItemMasterVO {
 	@Column(name = "capital_or_input")
 	private String capitalOrInput;
 
-	@Column(name = "item_type")
-	private String itemType;
+//	@Column(name = "item_type")
+//	private String itemType;
 
 	@Column(name = "item_group_type")
 	private String itemGroupType;
 
-	@Column(name = "grade")
-	private String grade;
+//	@Column(name = "grade")
+//	private String grade;
 
 	@Column(name = "item_code")
 	private String itemCode;
 
-	@Column(name = "excise_tariff_no")
-	private String exciseTariffNo;
+//	@Column(name = "excise_tariff_no")
+//	private String exciseTariffNo;
 
 	@Column(name = "item_description")
 	private String itemDescription;
@@ -116,22 +116,26 @@ public class ItemMasterVO {
 	@Column(name = "active")
 	private boolean active;
 
-	@Column(name = "hsn_code")
-	private String hsnCode;
+//	@Column(name = "hsn_code")
+//	private String hsnCode;
 
 	// Purchase Item
 
-	@Column(name = "purchase_unit", precision = 10, scale = 2)
-	private BigDecimal purchaseUnit;
+	@ManyToOne
+	@JoinColumn(name = "purchase_unit")
+	private UnitMasterVO purchaseUnit;
 
-	@Column(name = "selling_unit", precision = 10, scale = 2)
-	private BigDecimal sellingUnit;
+	@ManyToOne
+	@JoinColumn(name = "selling_unit")
+	private UnitMasterVO sellingUnit;
 
-	@Column(name = "pricing_unit", precision = 10, scale = 2)
-	private BigDecimal pricingUnit;
+	@ManyToOne
+	@JoinColumn(name = "pricing_unit")
+	private UnitMasterVO pricingUnit;
 
-	@Column(name = "secondary_unit", precision = 10, scale = 2)
-	private BigDecimal secondaryUnit;
+	@ManyToOne
+	@JoinColumn(name = "secondary_unit")
+	private UnitMasterVO secondaryUnit;
 
 	@Column(name = "secondary_purchase_unit", precision = 10, scale = 2)
 	private BigDecimal secondaryPurchaseUnit;
@@ -262,16 +266,32 @@ public class ItemMasterVO {
 	private String financialYear;
 
 	@ManyToOne
-	@JoinColumn(name = "listofvalues_id")
+	@JoinColumn(name = "item_group")
 	private ListOfValuesVO itemGroup;
 
 	@ManyToOne
-	@JoinColumn(name = "unitmaster_id")
+	@JoinColumn(name = "primary_Unit")
 	private UnitMasterVO primaryUnit;
 
 	@ManyToOne
-	@JoinColumn(name = "branch_id")
+	@JoinColumn(name = "branch")
 	private BranchVO branch;
+
+	@ManyToOne
+	@JoinColumn(name = "hsn_Code")
+	private HsnVO hsnCode;
+
+	@ManyToOne
+	@JoinColumn(name = "itemType")
+	private ListOfValuesVO itemType;
+
+	@ManyToOne
+	@JoinColumn(name = "grade")
+	private ListOfValuesVO grade;
+
+	@ManyToOne
+	@JoinColumn(name = "excise_tariff_no")
+	private ListOfValuesVO exciseTariffNo;
 
 	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
 	@JsonManagedReference

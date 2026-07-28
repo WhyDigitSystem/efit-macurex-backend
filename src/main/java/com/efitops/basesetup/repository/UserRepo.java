@@ -29,16 +29,18 @@ public interface UserRepo extends JpaRepository<UserVO, Long> {
 
 	boolean existsByUserNameOrEmailOrMobileNo(String userName, String email, String email2);
 
-	  @Query("SELECT u.id FROM UserVO u WHERE u.employeeCode IN :empCodes")
-	    List<Long> findUserIdsByEmployeeCodes(@Param("empCodes") List<String> empCodes);
+	@Query("SELECT u.id FROM UserVO u WHERE u.employee.employeeCode IN :empCodes")
+	List<Long> findUserIdsByEmployeeCodes(@Param("empCodes") List<String> empCodes);
 
-	  UserVO findByUserNameOrEmailOrMobileNoOrEmployeeName(String userName, String userName2, String userName3,
-			String userName4);
+	UserVO findByUserNameOrEmailOrMobileNoOrEmployee_EmployeeName(
+	        String userName,
+	        String email,
+	        String mobileNo,
+	        String employeeName);
 
 	  Optional<UserVO> findByEmail(String email);
 
-	  UserVO findByEmployeeName(String userName);
-
+	  UserVO findByEmployee_EmployeeName(String employeeName);
 //	UserVO findByUserNameAndUsersId(String userName, Long usersId);
 
 

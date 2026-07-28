@@ -236,8 +236,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		UserVO userVO = new UserVO();
 		userVO.setUserName(companyVO.getAdminName());
-		userVO.setEmployeeName(companyVO.getAdminName());
-//		userVO.setEmployeeCode(companyVO.getCompanyCode());
+		userVO.setEmployee(employeeVO);
+		//		userVO.setEmployeeCode(companyVO.getCompanyCode());
 		userVO.setEmail(companyVO.getAdminEmail());
 		userVO.setMobileNo(companyVO.getAdminMobileNo());
 		userVO.setRole(Role.ROLE_USER);
@@ -1635,7 +1635,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		}
 
 		@Override
-		public List<TransportMasterVO> getTransportNameByOrgId(Long orgId,String branchCode) throws ApplicationException {
+		public List<TransportMasterVO> getTransportNameByOrgId(Long orgId,Long branchCode) throws ApplicationException {
 
 		    List<TransportMasterVO> transportList =
 		            transportRepo.findByOrgIdAndBranch(orgId,branchCode);
@@ -1766,93 +1766,104 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			
 			//GST Rate Master
 			
-			  @Override
-			  @Transactional
-			  public Map<String, Object> updateCreateGSTRateMaster(@Valid GSTRateMasterDTO gSTRateMasterDTO)
-			          throws ApplicationException {
+			@Override
+			@Transactional
+			public Map<String, Object> updateCreateGSTRateMaster(@Valid GSTRateMasterDTO dto)
+			        throws ApplicationException {
 
-			      GSTRateMasterVO gSTRateMasterVO = new GSTRateMasterVO();
-			      String message;
+			    GSTRateMasterVO vo = new GSTRateMasterVO();
+			    String message;
 
-			      if (ObjectUtils.isNotEmpty(gSTRateMasterDTO.getId())) {
+			    if (ObjectUtils.isNotEmpty(dto.getId())) {
 
-			    	  gSTRateMasterVO = gstRateMasterRepo.findById(gSTRateMasterDTO.getId())
-			                  .orElseThrow(() -> new ApplicationException("Invalid GST Rate Master Details"));
+			        vo = gstRateMasterRepo.findById(dto.getId())
+			                .orElseThrow(() -> new ApplicationException("Invalid GST Rate Master"));
 
-			          if (!gSTRateMasterVO.getCategory()
-			                  .equalsIgnoreCase(gSTRateMasterDTO.getCategory())) {
+			        // Duplicate Check
+			        if (!vo.getCategory().getId().equals(dto.getCategory())) {
 
-			              if (gstRateMasterRepo.existsByCategoryAndOrgId(
-			            		  gSTRateMasterDTO.getCategory(),
-			            		  gSTRateMasterDTO.getOrgId())) {
+			            if (gstRateMasterRepo.existsByCategoryIdAndOrgId(dto.getCategory(), dto.getOrgId())) {
 
-			                  throw new ApplicationException(
-			                          "The GST Rate Master : " + gSTRateMasterDTO.getCategory()
-			                                  + " already exists in this Organization.");
-			              }
-			          }
-
-			          createUpdateGSTRateMasterVOByGSTRateMasterDTO(gSTRateMasterDTO, gSTRateMasterVO);
-
-			          gSTRateMasterVO.setUpdatedBy(gSTRateMasterDTO.getCreatedBy());
-
-			          message = "Transport Updated Successfully";
-
-			      } else {
-
-			          if (gstRateMasterRepo.existsByCategoryAndOrgId(
-			        		  gSTRateMasterDTO.getCategory(),
-			        		  gSTRateMasterDTO.getOrgId())) {
-
-			              throw new ApplicationException(
-			                      "The GST Rate Master : " + gSTRateMasterDTO.getCategory()
-			                              + " already exists in this Organization.");
-			          }
-
-			          createUpdateGSTRateMasterVOByGSTRateMasterDTO(gSTRateMasterDTO, gSTRateMasterVO);
-
-			          gSTRateMasterVO.setCreatedBy(gSTRateMasterDTO.getCreatedBy());
-			          gSTRateMasterVO.setUpdatedBy(gSTRateMasterDTO.getCreatedBy());
-
-			          message = "GST Rate Master Created Successfully";
-			      }
-
-			      gstRateMasterRepo.save(gSTRateMasterVO);
-
-			      Map<String, Object> response = new HashMap<>();
-			      response.put("gSTRateMasterVO", gSTRateMasterVO);
-			      response.put("message", message);
-
-			      return response;
-			  }
-			  
-			  private void createUpdateGSTRateMasterVOByGSTRateMasterDTO(@Valid GSTRateMasterDTO gSTRateMasterDTO,
-					GSTRateMasterVO gSTRateMasterVO) throws ApplicationException {
-				
-				  gSTRateMasterVO.setCategory(gSTRateMasterDTO.getCategory().toUpperCase());
-				  gSTRateMasterVO.setHsncode(gSTRateMasterDTO.getHsncode());
-				  gSTRateMasterVO.setOrgId(gSTRateMasterDTO.getOrgId());
-				  gSTRateMasterVO.setDescription (gSTRateMasterDTO.getDescription());
-				  gSTRateMasterVO.setWef(gSTRateMasterDTO.getWef());
-				  gSTRateMasterVO.setIgstRate(gSTRateMasterDTO.getIgstRate());
-				  gSTRateMasterVO.setCgstRate(gSTRateMasterDTO.getCgstRate());
-				  gSTRateMasterVO.setSgstRate(gSTRateMasterDTO.getSgstRate());
-				  gSTRateMasterVO.setRate(gSTRateMasterDTO.getRate());
-				  gSTRateMasterVO.setTaxable(gSTRateMasterDTO.getTaxable());
-				  gSTRateMasterVO.setCancelRemarks(gSTRateMasterDTO.getCancelRemarks());
-				  gSTRateMasterVO.setFinYear(gSTRateMasterDTO.getFinYear());
-				  gSTRateMasterVO.setActive(gSTRateMasterDTO.isActive());
-
-				  if (gSTRateMasterDTO.getBranch() != null && gSTRateMasterDTO.getBranch() != 0) {
-
-			            BranchVO branch = branchRepo.findById(gSTRateMasterDTO.getBranch())
-			                    .orElseThrow(() ->
-			                            new ApplicationException("branch Not Found"));
-
-			            gSTRateMasterVO.setBranch(branch);
+			                throw new ApplicationException("GST Rate Master already exists.");
+			            }
 			        }
 
-				}
+			        createUpdateGSTRateMasterVOByDTO(dto, vo);
+
+			        vo.setUpdatedBy(dto.getCreatedBy());
+
+			        message = "GST Rate Master Updated Successfully";
+
+			    } else {
+
+			        // Duplicate Check
+			        if (gstRateMasterRepo.existsByCategoryIdAndOrgId(dto.getCategory(), dto.getOrgId())) {
+
+			            throw new ApplicationException("GST Rate Master already exists.");
+			        }
+
+			        createUpdateGSTRateMasterVOByDTO(dto, vo);
+
+			        vo.setCreatedBy(dto.getCreatedBy());
+			        vo.setUpdatedBy(dto.getCreatedBy());
+
+			        message = "GST Rate Master Created Successfully";
+			    }
+
+			    gstRateMasterRepo.save(vo);
+
+			    Map<String, Object> map = new HashMap<>();
+			    map.put("gSTRateMasterVO", vo);
+			    map.put("message", message);
+
+			    return map;
+			}
+
+			private void createUpdateGSTRateMasterVOByDTO(GSTRateMasterDTO dto,
+			        GSTRateMasterVO vo) throws ApplicationException {
+
+			    // Category
+			    if (dto.getCategory() != null) {
+
+			        ListOfValuesVO category = listOfValuesRepo.findById(dto.getCategory())
+			                .orElseThrow(() -> new ApplicationException("Category Not Found"));
+
+			        vo.setCategory(category);
+			    }
+
+			    // HSN SAC Code
+			    if (dto.getHsnSacCode() != null) {
+
+			        HsnVO hsn = hsnRepo.findById(dto.getHsnSacCode())
+			                .orElseThrow(() -> new ApplicationException("HSN/SAC Code Not Found"));
+
+			        vo.setHsnSacCode(hsn);
+			    }
+
+			    // Branch
+			    if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+			        BranchVO branch = branchRepo.findById(dto.getBranch())
+			                .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			        vo.setBranch(branch);
+			    }
+
+			    vo.setDescription(dto.getDescription());
+			    vo.setWef(dto.getWef());
+			    vo.setTaxable(dto.isTaxable());
+			    vo.setRate(dto.getRate());
+			    vo.setIgst(dto.getIgst());
+			    vo.setSgst(dto.getSgst());
+			    vo.setCgst(dto.getCgst());
+			    vo.setDuplicateCheck(dto.isDuplicateCheck());
+			    vo.setOrgId(dto.getOrgId());
+			    vo.setFinancialYear(dto.getFinancialYear());
+			    vo.setCancelRemarks(dto.getCancelRemarks());
+			    vo.setActive(dto.isActive());
+			}
+			
+			
 				@Override
 				public GSTRateMasterVO getGSTRateMasterById(Long id) throws ApplicationException {
 

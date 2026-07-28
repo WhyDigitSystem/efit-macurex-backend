@@ -176,7 +176,7 @@ public interface CommonMasterService {
 	TransportMasterVO getTransportNameById(Long id) throws ApplicationException;
 
 
-	List<TransportMasterVO> getTransportNameByOrgId(Long orgId, String branchCode) throws ApplicationException;
+	List<TransportMasterVO> getTransportNameByOrgId(Long orgId, Long branchCode) throws ApplicationException;
 
 	//listofvalues
 

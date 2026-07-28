@@ -1,5 +1,7 @@
 package com.efitops.basesetup.entity;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,22 +18,32 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "dailyexrate")
+@Table(name = "dailyexchangerate")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class DailyExchangeRateVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dailyexrategen")
-	@SequenceGenerator(name = "dailyexrategen", sequenceName = "dailyexrateseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "dailyexrate_id")
-	private Long dailyExRateId;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dailyexchangerategen")
+	@SequenceGenerator(name = "dailyexchangerategen", sequenceName = "dailyexchangerateseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "dailyexchangerate_id")
+	private Long dailyExchangeRateId;
 	
-	@Column(name = "date")
-	private String date;
-	
-	@Column(name = "month")
-	private String month;
+	@Column(name = "currency_symbol", length = 10)
+    private String currencySymbol;
+
+    @Column(name = "currency_name", length = 100)
+    private String currencyName;
+
+    @Column(name = "exchange_rate", precision = 18, scale = 4)
+    private BigDecimal exchangeRate;
+
+    @Column(name = "exchange_from_date")
+    private String exchangeFromDate;
+
+    @Column(name = "exchange_to_date")
+    private String exchangeToDate;
+    
 	
 	@Column(name = "org_id")
 	private Long orgId;
@@ -47,7 +59,7 @@ public class DailyExchangeRateVO {
 	private boolean cancel=false;
 	
     @Column(name = "financial_year", length = 5)
-    private String finYear;
+    private String financialYear;
 	@Column(name = "screen_code", length = 30)
 	private String screenCode = "DER";
 	@Column(name = "screen_name", length = 30)

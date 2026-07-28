@@ -11,7 +11,7 @@ import com.efitops.basesetup.entity.CurrencyVO;
 
 public interface CurrencyRepo extends JpaRepository<CurrencyVO, Long> {
 
-	@Query(value = "select * FROM currency where orgid=?1", nativeQuery = true)
+	@Query(value = "select * FROM currency where org_id=?1 and active=1 and cancel=0", nativeQuery = true)
 	List<CurrencyVO> findAll(Long orgid);
 
 	@Query(value = "SELECT \r\n" + "    ROW_NUMBER() OVER () AS id,\r\n" + "    currency,\r\n" + "    currencydesc \r\n"
@@ -26,7 +26,7 @@ public interface CurrencyRepo extends JpaRepository<CurrencyVO, Long> {
 
 	boolean existsByOrgIdAndCountryAndSubCurrencyIgnoreCase(Long orgId, CountryVO country, String subCurrency);
 
-	@Query(value = "select currency,country FROM currency where orgid=?1 and country=?2", nativeQuery = true)
+	@Query(value = "select currency,country FROM currency where org_id=?1 and country=?2", nativeQuery = true)
 	Set<Object[]> getCurrencyForPartyMaster(Long orgId, String country);
 
 }

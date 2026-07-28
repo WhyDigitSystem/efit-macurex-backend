@@ -2,6 +2,7 @@ package com.efitops.basesetup.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,14 +29,18 @@ public class UserLoginBranchAccessibleVO {
 	@Column(name="userloginbranchaccessibleid")
 	private long id;
 	
-	@Column(name="branch")
-	private String branch;
-	@Column(name="branchcode")
-	private String branchcode;
+//	@Column(name="branch")
+//	private String branch;
+//	@Column(name="branchcode")
+//	private String branchcode;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
 	
 	@JsonBackReference
 	@ManyToOne
-    @JoinColumn(name = "usersid")
+    @JoinColumn(name = "user_id")
     private UserVO userVO;
 	
 //	@Embedded

@@ -23,7 +23,7 @@ import com.efitops.basesetup.exception.ApplicationException;
 @Service
 public interface AuthService {
 
-	public void signup(SignUpFormDTO signUpRequest);
+	public void signup(SignUpFormDTO signUpRequest) throws ApplicationException;
 
 	public UserResponseDTO login(LoginFormDTO loginRequest, HttpServletRequest request) throws ApplicationException;
 

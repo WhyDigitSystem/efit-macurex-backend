@@ -236,8 +236,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		UserVO userVO = new UserVO();
 		userVO.setUserName(companyVO.getAdminName());
-		userVO.setEmployeeName(companyVO.getAdminName());
-//		userVO.setEmployeeCode(companyVO.getCompanyCode());
+		userVO.setEmployee(employeeVO);
+		//		userVO.setEmployeeCode(companyVO.getCompanyCode());
 		userVO.setEmail(companyVO.getAdminEmail());
 		userVO.setMobileNo(companyVO.getAdminMobileNo());
 		userVO.setRole(Role.ROLE_USER);

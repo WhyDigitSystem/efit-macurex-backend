@@ -17,13 +17,13 @@ public class ItemMasterResponseDTO {
 	private String capitalOrInput;
 
 	private String itemType;
-	
+
 	private Long branchId;
-	
+
 	private BranchResponseDTO branch;
 
 	private PrimaryUnitImageDTO primaryUnits;
-	
+
 	private HsnResponseImageDTO itemHsn;
 
 	private String itemGroupType;
@@ -78,13 +78,13 @@ public class ItemMasterResponseDTO {
 
 	// Purchase Item
 
-	private BigDecimal purchaseUnit;
+	private PrimaryUnitImageDTO purchaseUnit;
 
-	private BigDecimal sellingUnit;
+	private PrimaryUnitImageDTO sellingUnit;
 
-	private BigDecimal pricingUnit;
+	private PrimaryUnitImageDTO pricingUnit;
 
-	private BigDecimal secondaryUnit;
+	private PrimaryUnitImageDTO secondaryUnit;
 
 	private BigDecimal secondaryPurchaseUnit;
 

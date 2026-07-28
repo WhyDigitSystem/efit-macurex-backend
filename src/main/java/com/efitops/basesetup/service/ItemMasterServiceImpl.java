@@ -276,7 +276,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 //		responseDTO.setHsnCode(itemMasterVO.getHsnCode());
 
-		if (itemMasterVO.getPrimaryUnit() != null) {
+		if (itemMasterVO.getHsnCode() != null) {
 			HsnResponseImageDTO hsnResponseImageDTO = new HsnResponseImageDTO();
 			hsnResponseImageDTO.setId(itemMasterVO.getHsnCode().getId());
 			hsnResponseImageDTO.setHsnCode(itemMasterVO.getHsnCode().getHsn());
@@ -288,11 +288,37 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		responseDTO.setUpdatedBy(itemMasterVO.getUpdatedBy());
 		responseDTO.setCancelRemarks(itemMasterVO.getCancelRemarks());
 
-		responseDTO.setPurchaseUnit(itemMasterVO.getPurchaseUnit());
-
-		responseDTO.setSellingUnit(itemMasterVO.getSellingUnit());
-		responseDTO.setPricingUnit(itemMasterVO.getPricingUnit());
-		responseDTO.setSecondaryUnit(itemMasterVO.getSecondaryUnit());
+//		responseDTO.setPurchaseUnit(itemMasterVO.getPurchaseUnit());
+//
+//		responseDTO.setSellingUnit(itemMasterVO.getSellingUnit());
+//		responseDTO.setPricingUnit(itemMasterVO.getPricingUnit());
+//		responseDTO.setSecondaryUnit(itemMasterVO.getSecondaryUnit());
+		
+		if (itemMasterVO.getPurchaseUnit() != null) {
+			PrimaryUnitImageDTO primaryUnitDTO = new PrimaryUnitImageDTO();
+			primaryUnitDTO.setId(itemMasterVO.getPurchaseUnit().getId());
+			primaryUnitDTO.setPrimaryUnit(itemMasterVO.getPurchaseUnit().getUnitId());
+			responseDTO.setPurchaseUnit(primaryUnitDTO);
+		}
+		if (itemMasterVO.getSellingUnit() != null) {
+			PrimaryUnitImageDTO primaryUnitDTO = new PrimaryUnitImageDTO();
+			primaryUnitDTO.setId(itemMasterVO.getSellingUnit().getId());
+			primaryUnitDTO.setPrimaryUnit(itemMasterVO.getSellingUnit().getUnitId());
+			responseDTO.setSellingUnit(primaryUnitDTO);
+		}
+		if (itemMasterVO.getPricingUnit() != null) {
+			PrimaryUnitImageDTO primaryUnitDTO = new PrimaryUnitImageDTO();
+			primaryUnitDTO.setId(itemMasterVO.getPricingUnit().getId());
+			primaryUnitDTO.setPrimaryUnit(itemMasterVO.getPricingUnit().getUnitId());
+			responseDTO.setPricingUnit(primaryUnitDTO);
+		}
+		if (itemMasterVO.getSecondaryUnit() != null) {
+			PrimaryUnitImageDTO primaryUnitDTO = new PrimaryUnitImageDTO();
+			primaryUnitDTO.setId(itemMasterVO.getSecondaryUnit().getId());
+			primaryUnitDTO.setPrimaryUnit(itemMasterVO.getSecondaryUnit().getUnitId());
+			responseDTO.setSecondaryUnit(primaryUnitDTO);
+		}
+		
 
 		responseDTO.setManufacturedOrBoughtout(itemMasterVO.getManufacturedOrBoughtout());
 		responseDTO.setDefaultLocation(itemMasterVO.getDefaultLocation());

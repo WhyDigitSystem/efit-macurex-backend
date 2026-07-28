@@ -174,7 +174,7 @@ public class ItemMasterResponseDTO {
 
 	private String screenCode;
 
-	private Long org;
+	private Long orgId;
 
 	private String financialYear;
 

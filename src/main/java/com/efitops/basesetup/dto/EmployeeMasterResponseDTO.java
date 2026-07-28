@@ -2,28 +2,24 @@ package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import com.efitops.basesetup.ResponseDTO.CityResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeMasterDTO {
+@NoArgsConstructor
+public class EmployeeMasterResponseDTO {
 
 	private Long id;
 
-	@NotBlank(message = "Surname is required")
-	@Pattern(regexp = "^[A-Za-z ]+$", message = "Invalid surname")
+	private String employeeId;
+
 	private String surName;
 
 	private String middleName;
@@ -40,12 +36,8 @@ public class EmployeeMasterDTO {
 
 	private Long telephone;
 
-	@NotNull(message = "Mobile number is required")
-	@Digits(integer = 10, fraction = 0, message = "Mobile number must be 10 digits")
 	private Long mobile;
 
-	@NotBlank(message = "Email is required")
-	@Email(message = "Invalid email address")
 	private String email;
 
 	private String qualification;
@@ -66,9 +58,9 @@ public class EmployeeMasterDTO {
 
 	private String tempCity;
 
-	private Long tempStateId;
+	private StateResponseDTO tempState;
 
-	private Long tempCountryId;
+	private CountryResponseDTO tempCountry;
 
 	private Long tempPincode;
 
@@ -78,9 +70,9 @@ public class EmployeeMasterDTO {
 
 	private String permanentCity;
 
-	private Long permanentStateId;
+	private StateResponseDTO permanentState;
 
-	private Long permanentCountryId;
+	private CountryResponseDTO permanentCountry;
 
 	private Long permanentPincode;
 
@@ -92,11 +84,11 @@ public class EmployeeMasterDTO {
 
 	private LocalDate dateOfJoining;
 
-	private Long plantId;
+	private BranchResponseDTO plant;
 
-	private Long departmentId;
+	private DepartmentResponseDTO department;
 
-	private Long designationId;
+	private DesignationResponseDTO designation;
 
 	private String natureOfEmployment;
 
@@ -104,7 +96,7 @@ public class EmployeeMasterDTO {
 
 	private String referenceBy;
 
-	private Long okdById;
+	private EmployeeResponseDTO okdBy;
 
 	private String modeOfPayment;
 
@@ -122,7 +114,7 @@ public class EmployeeMasterDTO {
 
 	private LocalDate dateOfConfirmation;
 
-	private String information_active;
+	private String informationActive;
 
 	private LocalDate trainingStartDate;
 
@@ -134,11 +126,15 @@ public class EmployeeMasterDTO {
 
 	private LocalDate currentSalaryPeriodEnd;
 
-	// Common Fields
+	// Common
 
 	private String createdBy;
 
 	private String updatedBy;
+
+	private boolean active;
+
+	private boolean cancel;
 
 	private String cancelRemarks;
 
@@ -150,5 +146,5 @@ public class EmployeeMasterDTO {
 
 	private String financialYear;
 
-	private Long branchId;
+	private BranchResponseDTO branch;
 }

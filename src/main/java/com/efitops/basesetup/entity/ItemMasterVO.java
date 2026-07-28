@@ -276,8 +276,8 @@ public class ItemMasterVO {
 	@Column(name = "screen_code")
 	private String screenCode;
 
-	@Column(name = "org")
-	private Long org;
+	@Column(name = "orgid")
+	private Long orgId;
 
 	@Column(name = "financial_year")
 	private String financialYear;

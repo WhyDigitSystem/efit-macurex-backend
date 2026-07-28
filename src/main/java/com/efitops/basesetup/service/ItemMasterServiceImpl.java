@@ -112,12 +112,6 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 	@Autowired
 	CustomerRepo customerRepo;
 
-//		@Override
-//		public ItemMasterVO getItemMasterById(Long id) {
-//	
-//			return itemMasterRepo.getItemMasterById(id);
-//		}
-
 	@Override
 	public Map<String, Object> updateCreateItemMaster(ItemMasterDTO itemMasterDTO) throws ApplicationException {
 
@@ -129,7 +123,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 					.orElseThrow(() -> new ApplicationException("Item not found"));
 
 			if (!itemMasterVO.getItemCode().equals(itemMasterDTO.getItemCode())) {
-				if (itemMasterRepo.existsByItemCodeAndOrg(itemMasterDTO.getItemCode(), itemMasterDTO.getOrg())) {
+				if (itemMasterRepo.existsByItemCodeAndOrgId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId())) {
 
 					String errorMessage = String.format("This ItemCode: %s already exists for this organization.",
 							itemMasterDTO.getItemCode());
@@ -143,7 +137,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			message = "Item Updated Successfully";
 		} else {
 
-			if (itemMasterRepo.existsByItemCodeAndOrg(itemMasterDTO.getItemCode(), itemMasterDTO.getOrg())) {
+			if (itemMasterRepo.existsByItemCodeAndOrgId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId())) {
 
 				String errorMessage = String.format("This ItemCode: %s already exists for this organization.",
 						itemMasterDTO.getItemCode());
@@ -297,7 +291,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		}
 
 		responseDTO.setCreatedBy(itemMasterVO.getCreatedBy());
-		responseDTO.setOrg(itemMasterVO.getOrg());
+		responseDTO.setOrgId(itemMasterVO.getOrgId());
 		responseDTO.setUpdatedBy(itemMasterVO.getUpdatedBy());
 		responseDTO.setCancelRemarks(itemMasterVO.getCancelRemarks());
 
@@ -419,7 +413,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 	private void createUpdateItemMasterVOByItemMasterDTO(ItemMasterDTO itemMasterDTO, ItemMasterVO itemMasterVO)
 			throws ApplicationException {
 
-		itemMasterVO.setOrg(itemMasterDTO.getOrg());
+		itemMasterVO.setOrgId(itemMasterDTO.getOrgId());
 		itemMasterVO.setCreatedBy(itemMasterDTO.getCreatedBy());
 
 		if (itemMasterDTO.getListOfValuesId() != null && itemMasterDTO.getListOfValuesId() != 0) {
@@ -817,7 +811,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 	@Override
 	public ItemMasterResponseDTO getItemMasterById(Long id) throws ApplicationException {
-		
+
 		ItemMasterVO itemMasterVO = itemMasterRepo.getItemMasterById(id);
 
 		if (itemMasterVO == null) {
@@ -830,7 +824,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 	@Override
 	public ItemMasterResponseDTO getItemMasterByOrgId(Long orgId, Long branchId) throws ApplicationException {
 
-		ItemMasterVO itemMasterVO = itemMasterRepo.getItemMasterByOrgId(orgId,branchId);
+		ItemMasterVO itemMasterVO = itemMasterRepo.getItemMasterByOrgId(orgId, branchId);
 
 		if (itemMasterVO == null) {
 			throw new ApplicationException("Item Master Not Found");

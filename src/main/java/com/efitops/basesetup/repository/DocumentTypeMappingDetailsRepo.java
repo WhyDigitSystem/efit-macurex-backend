@@ -3,14 +3,17 @@ package com.efitops.basesetup.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 
 @Repository
-public interface DocumentTypeMappingDetailsRepo
-extends JpaRepository<DocumentTypeMappingDetailsVO, Long> {
+public interface DocumentTypeMappingDetailsRepo extends JpaRepository<DocumentTypeMappingDetailsVO, Long> {
 
-List<DocumentTypeMappingDetailsVO> findByDocumentTypeMappingMasterVOId(Long id);
+	List<DocumentTypeMappingDetailsVO> findByDocumentTypeMappingMasterVOId(Long id);
+
+	@Query(nativeQuery = true, value = "select * from documenttypemappingdetails where orgid=?1 and screencode=?2")
+	DocumentTypeMappingDetailsVO findByOrgIdScreenCode(Long orgId, String screenCode);
 
 }

@@ -145,11 +145,19 @@ public class ItemMasterVO {
 	@Column(name = "manufactured_or_boughtout")
 	private String manufacturedOrBoughtout;
 
-	@Column(name = "default_location")
-	private String defaultLocation;
+//	@Column(name = "default_location")
+//	private String defaultLocation;
+//
+//	@Column(name = "alternative_location")
+//	private String alternativeLocation;
 
-	@Column(name = "alternative_location")
-	private String alternativeLocation;
+	@ManyToOne
+	@JoinColumn(name = "default_location")
+	private LocationVO defaultLocation;
+
+	@ManyToOne
+	@JoinColumn(name = "alternative_location")
+	private LocationVO alternativeLocation;
 
 	@Column(name = "lead_time", precision = 10, scale = 2)
 	private BigDecimal leadTime;
@@ -186,11 +194,19 @@ public class ItemMasterVO {
 
 	// purchae
 
-	@Column(name = "default_supplier")
-	private String defaultSupplier;
+//	@Column(name = "default_supplier")
+//	private String defaultSupplier;
+//
+//	@Column(name = "alternative_supplier")
+//	private String alternativeSupplier;
+	
+	@ManyToOne
+	@JoinColumn(name = "default_supplier")
+	private CustomerVO defaultSupplier;
 
-	@Column(name = "alternative_supplier")
-	private String alternativeSupplier;
+	@ManyToOne
+	@JoinColumn(name = "alternative_supplier")
+	private CustomerVO alternativeSupplier;
 
 	@Column(name = "pruchase_talerance")
 	private String pruchaseTalerance;

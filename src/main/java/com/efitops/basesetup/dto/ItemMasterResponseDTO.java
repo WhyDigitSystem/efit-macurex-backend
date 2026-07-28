@@ -23,8 +23,12 @@ public class ItemMasterResponseDTO {
 	private BranchResponseDTO branch;
 
 	private PrimaryUnitImageDTO primaryUnits;
+	
+	private LocationImageDTO locationImageReponse;
 
 	private HsnResponseImageDTO itemHsn;
+	
+	private PartyResponseDTO partyResponse;
 
 	private String itemGroupType;
 

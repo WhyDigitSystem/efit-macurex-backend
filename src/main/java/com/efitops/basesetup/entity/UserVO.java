@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -44,10 +45,15 @@ public class UserVO {
 	private String userName;
 	@Column(name = "password")
 	private String password;
-	@Column(name = "employeecode")
-	private String employeeCode;
-	@Column(name = "employeename")
-	private String employeeName;
+//	@Column(name = "employeecode")
+//	private String employeeCode;
+//	@Column(name = "employeename")
+//	private String employeeName;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "employee")
+	private EmployeeVO employee;
+	
 	@Column(name = "nickname")
 	private String nickName;
 	@Column(name = "email")

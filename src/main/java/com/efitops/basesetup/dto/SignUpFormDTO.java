@@ -26,8 +26,7 @@ public class SignUpFormDTO {
 	private Long id;
 	private String userName;
 	private String password;
-	private String employeeCode;
-	private String employeeName;
+	private Long employee; 
 	private String nickName;
 	private String email;
 	private Long orgId;
@@ -40,6 +39,7 @@ public class SignUpFormDTO {
 	private String department;
 	private String designation;
 	private String companyName;
+	private String createdBy;
 
 	private List<UserLoginRoleAccessDTO> roleAccessDTO;
 	private List<UserLoginBranchAccessDTO> branchAccessDTOList;

@@ -16,6 +16,8 @@ import com.efitops.basesetup.dto.CityDTO;
 import com.efitops.basesetup.dto.CompanyDTO;
 import com.efitops.basesetup.dto.CountryDTO;
 import com.efitops.basesetup.dto.CurrencyDTO;
+import com.efitops.basesetup.dto.DailyExchangeRateDTO;
+import com.efitops.basesetup.dto.DocumentTypeMappingDTO;
 import com.efitops.basesetup.dto.DocumentTypeMasterDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
@@ -29,6 +31,7 @@ import com.efitops.basesetup.dto.ListOfValuesDTO;
 import com.efitops.basesetup.dto.LocationDTO;
 import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.RegionDTO;
+import com.efitops.basesetup.dto.SalesZoneMasterDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
@@ -43,6 +46,8 @@ import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CompanyVO;
 import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
+import com.efitops.basesetup.entity.DailyExchangeRateVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingVO;
 import com.efitops.basesetup.entity.DocumentTypeMasterVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
@@ -55,6 +60,7 @@ import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.MappingOfPartyToAccVO;
 import com.efitops.basesetup.entity.RegionVO;
+import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.StateVO;
 import com.efitops.basesetup.entity.TSBankVO;
@@ -343,6 +349,37 @@ public interface CommonMasterService {
 
 		ServiceAccMasterResponseDTO getServiceAccMasterById(Long id) throws ApplicationException;
 
+		
+		//dailyexrate
+		Map<String, Object> updateCreateDailyExRate(@Valid DailyExchangeRateDTO dailyExchangeRateDTO)
+				throws ApplicationException;
+
+		DailyExchangeRateVO getDailyExRateById(Long id) throws ApplicationException;
+
+		List<DailyExchangeRateVO> getDailyExRateByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+		Map<String, Object> getCurrency(Long orgId) throws ApplicationException;
+
+		
+		//documenttypemapping
+
+
+		Map<String, Object> updateCreateDocumentTypeMapping(DocumentTypeMappingDTO documentTypeMappingDTO)
+				throws ApplicationException;
+
+		DocumentTypeMappingVO getDocumentTypeMappingById(Long id) throws ApplicationException;
+
+		List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+		//saleszonemaster
+		
+		Map<String, Object> createUpdateSalesZoneMaster(SalesZoneMasterDTO salesZoneMasterDTO)
+		        throws ApplicationException;
+
+
+		Optional<SalesZoneMasterVO> getSalesZoneMasterById(Long id);
+
+		List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId, Long branch);
 		
 
 		

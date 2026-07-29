@@ -1,5 +1,7 @@
 package com.efitops.basesetup.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,6 +18,6 @@ public interface EmployeeMasterRepo extends JpaRepository<EmployeeMasterVO, Long
 	EmployeeMasterVO getEmployeeMasterById(Long id);
 
 	@Query(nativeQuery = true, value = "select * from employeemaster where org_id=?1 and branch=?2 and active=1 and cancel=0")
-	EmployeeMasterVO getEmployeeMasterByOrgId(Long orgId, Long branchId);
+	List<EmployeeMasterVO> getEmployeeMasterByOrgId(Long orgId, Long branchId);
 
 }

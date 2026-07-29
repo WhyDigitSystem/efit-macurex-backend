@@ -28,5 +28,12 @@ public interface CurrencyRepo extends JpaRepository<CurrencyVO, Long> {
 
 	@Query(value = "select currency,country FROM currency where org_id=?1 and country=?2", nativeQuery = true)
 	Set<Object[]> getCurrencyForPartyMaster(Long orgId, String country);
+	
+	@Query(value = "SELECT currency_id, currency, main_currencysymbol " +
+	        "FROM currency " +
+	        "WHERE org_id = ?1 " +
+	        "AND active = 1",
+	        nativeQuery = true)
+	List<Object[]> getCurrency(Long orgId);
 
 }

@@ -53,7 +53,7 @@ public class UserVO {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "employee")
-	private EmployeeVO employee;
+	private EmployeeMasterVO employeeMaster;
 	
 	@Column(name = "nickname")
 	private String nickName;
@@ -119,8 +119,7 @@ public class UserVO {
 	}
 
 	public boolean isActive() {
-		// TODO Auto-generated method stub
-		return false;
+	    return active;
 	}
 
 	

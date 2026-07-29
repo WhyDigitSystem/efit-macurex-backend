@@ -28,7 +28,7 @@ public class SignUpFormDTO {
 	private String password;
 	private Long employee; 
 //	private String nickName;
-//	private String email;
+	private String email;
 	private Long orgId;
 //	private String mobileNo;
 	private String userType;

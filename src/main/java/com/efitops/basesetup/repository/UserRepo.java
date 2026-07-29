@@ -13,7 +13,7 @@ import com.efitops.basesetup.entity.UserVO;
 @Repository
 public interface UserRepo extends JpaRepository<UserVO, Long> {
 
-	  boolean existsByUserNameOrEmployee_Email(String userName, String email);
+	  boolean existsByUserNameOrEmployeeMaster_Email(String userName, String email);
 
 	@Query("select a from UserVO a where a.userName=?1")
 	UserVO findByUserName(String userName);
@@ -27,10 +27,10 @@ public interface UserRepo extends JpaRepository<UserVO, Long> {
 	@Query(value = "select u from UserVO u where u.orgId =?1")
 	List<UserVO> findAllByOrgId(Long orgId);
 
-	@Query("SELECT u.id FROM UserVO u WHERE u.employee.employeeCode IN :empCodes")
+	@Query("SELECT u.id FROM UserVO u WHERE u.employeeMaster.employeeId IN :empCodes")
 	List<Long> findUserIdsByEmployeeCodes(@Param("empCodes") List<String> empCodes);
 
-	UserVO findByUserNameOrEmailOrMobileNoOrEmployee_EmployeeName(
+	UserVO findByUserNameOrEmailOrMobileNoOrEmployeeMaster_EmployeeName(
 	        String userName,
 	        String email,
 	        String mobileNo,
@@ -38,10 +38,12 @@ public interface UserRepo extends JpaRepository<UserVO, Long> {
 
 	  Optional<UserVO> findByEmail(String email);
 
-	  UserVO findByEmployee_EmployeeName(String employeeName);
+	  UserVO findByEmployeeMaster_EmployeeName(String employeeName);
 //	UserVO findByUserNameAndUsersId(String userName, Long usersId);
 
-	  UserVO findByUserNameOrEmployee_Email(String userName, String email);
+	  UserVO findByUserNameOrEmployeeMaster_Email(String userName, String email);
+
+	 
 
 
 

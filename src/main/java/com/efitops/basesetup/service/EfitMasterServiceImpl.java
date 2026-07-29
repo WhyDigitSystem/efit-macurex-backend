@@ -53,13 +53,7 @@ import com.efitops.basesetup.repository.CountryRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DesignationRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
-import com.efitops.basesetup.repository.EmployeeCommunicationDetailsRepo;
-import com.efitops.basesetup.repository.EmployeeComplianceDetailsRepo;
-import com.efitops.basesetup.repository.EmployeeDetailsRepo;
-import com.efitops.basesetup.repository.EmployeeFinanceInformationRepo;
-import com.efitops.basesetup.repository.EmployeeLoanDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
-import com.efitops.basesetup.repository.EmployeePersonalDetailsRepo;
 import com.efitops.basesetup.repository.MaterialTypeDetailRepo;
 import com.efitops.basesetup.repository.MaterialTypeRepo;
 import com.efitops.basesetup.repository.StateRepo;
@@ -94,24 +88,6 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 
 	@Autowired
 	EmployeeMasterRepo employeeMasterRepo;
-
-	@Autowired
-	EmployeeDetailsRepo employeeDetailsRepo;
-
-	@Autowired
-	EmployeePersonalDetailsRepo employeePersonalRepo;
-
-	@Autowired
-	EmployeeCommunicationDetailsRepo employeeCommunicationRepo;
-
-	@Autowired
-	EmployeeComplianceDetailsRepo employeeComplianceRepo;
-
-	@Autowired
-	EmployeeFinanceInformationRepo employeeFinanceRepo;
-
-	@Autowired
-	EmployeeLoanDetailsRepo employeeLoanRepo;
 
 	@Autowired
 	UserRepo userRepo;

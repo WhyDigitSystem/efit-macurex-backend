@@ -98,7 +98,6 @@ import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.DocumentTypeMasterRepo;
-import com.efitops.basesetup.repository.DocumnentTypeMappingRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.FinScreenRepo;
 import com.efitops.basesetup.repository.FinancialYearRepo;
@@ -217,9 +216,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	@Autowired
 	private GSTStateMasterRepo gstStateMasterRepo;
-
-	@Autowired
-	private DocumnentTypeMappingRepo documnentTypeMappingRepo;
 
 	@Autowired
 	private DocumentTypeMasterRepo documentTypeMasterRepo;

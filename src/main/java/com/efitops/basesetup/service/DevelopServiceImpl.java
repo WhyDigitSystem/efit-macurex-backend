@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,17 +20,19 @@ import org.springframework.util.ObjectUtils;
 
 import com.efitops.basesetup.dto.DocumentTypeMappingDTO;
 import com.efitops.basesetup.dto.DocumentTypeMappingDetailsDTO;
-
+import com.efitops.basesetup.dto.SalesZoneMasterDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
+import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingRepo;
 
 import com.efitops.basesetup.repository.FinancialYearRepo;
+import com.efitops.basesetup.repository.SalesZoneMasterRepo;
 
 
 @Service
@@ -46,6 +49,9 @@ public class DevelopServiceImpl implements DevelopService {
     
     @Autowired
     private DocumentTypeMappingRepo documentTypeMappingRepo;
+    
+    @Autowired
+    private SalesZoneMasterRepo salesZoneMasterRepo;
     
 	@Autowired
 	BranchRepo branchRepo;
@@ -166,7 +172,81 @@ private EntityManager entityManager;
 
         return documentTypeMappingRepo.findByOrgIdAndBranch(orgId, branch);
     }
-	}
+	
+
+//saleszonemaster
+
+
+@Override
+@Transactional
+public Map<String, Object> createUpdateSalesZoneMaster(
+        SalesZoneMasterDTO salesZoneMasterDTO)
+        throws ApplicationException {
+
+    Map<String, Object> response = new HashMap<>();
+    String message = "";
+
+    SalesZoneMasterVO salesZoneMasterVO;
+
+    BranchVO branchVO = branchRepo.findById(salesZoneMasterDTO.getBranch())
+            .orElseThrow(() -> new ApplicationException(
+                    "Branch not found with id : " + salesZoneMasterDTO.getBranch()));
+
+    if (ObjectUtils.isEmpty(salesZoneMasterDTO.getId())) {
+
+        if (salesZoneMasterRepo.existsByOrgIdAndZoneIdAndBranch_Id(
+                salesZoneMasterDTO.getOrgId(),
+                salesZoneMasterDTO.getZoneId(),
+                salesZoneMasterDTO.getBranch())) {
+
+            throw new ApplicationException("Sales Zone already exists.");
+        }
+
+        salesZoneMasterVO = new SalesZoneMasterVO();
+
+        salesZoneMasterVO.setCreatedBy(salesZoneMasterDTO.getCreatedBy());
+
+        message = "Sales Zone Created Successfully";
+
+    } else {
+
+        salesZoneMasterVO = salesZoneMasterRepo.findById(salesZoneMasterDTO.getId())
+                .orElseThrow(() -> new ApplicationException(
+                        "Sales Zone not found"));
+
+        salesZoneMasterVO.setUpdatedBy(salesZoneMasterDTO.getCreatedBy());
+
+        message = "Sales Zone Updated Successfully";
+    }
+
+    salesZoneMasterVO.setZoneId(salesZoneMasterDTO.getZoneId());
+    salesZoneMasterVO.setZonedescription(salesZoneMasterDTO.getZonedescription());
+    salesZoneMasterVO.setOrgId(salesZoneMasterDTO.getOrgId());
+    salesZoneMasterVO.setActive(salesZoneMasterDTO.isActive());
+    salesZoneMasterVO.setCancelRemarks(salesZoneMasterDTO.getCancelRemarks());
+    salesZoneMasterVO.setBranch(branchVO);
+
+    salesZoneMasterRepo.save(salesZoneMasterVO);
+
+    response.put("message", message);
+    response.put("salesZoneMasterVO", salesZoneMasterVO);
+
+    return response;
+}
+
+@Override
+public Optional<SalesZoneMasterVO> getSalesZoneMasterById(Long id) {
+
+    return salesZoneMasterRepo.findById(id);
+}
+
+@Override
+public List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId, Long branch) {
+
+    return salesZoneMasterRepo.findByOrgIdAndBranch(orgId, branch);
+}
+}
+
 
 
 

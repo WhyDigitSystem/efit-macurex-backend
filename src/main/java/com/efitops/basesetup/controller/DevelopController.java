@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,9 @@ import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.DocumentTypeMappingDTO;
 
 import com.efitops.basesetup.dto.ResponseDTO;
+import com.efitops.basesetup.dto.SalesZoneMasterDTO;
 import com.efitops.basesetup.entity.DocumentTypeMappingVO;
+import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.service.DevelopService;
 
 
@@ -143,6 +147,113 @@ public class  DevelopController extends BaseController {
   		    return ResponseEntity.ok().body(responseDTO);
   		}
 	
+
+
+
+//saleszonemaster
+
+
+@PutMapping("/createUpdateSalesZoneMaster")
+public ResponseEntity<ResponseDTO> createUpdateSalesZoneMaster(
+        @RequestBody SalesZoneMasterDTO salesZoneMasterDTO) {
+
+    String methodName = "createUpdateSalesZoneMaster()";
+    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+    String errorMsg = null;
+    Map<String, Object> responseObjectsMap = new HashMap<>();
+    ResponseDTO responseDTO = null;
+
+    try {
+
+        Map<String, Object> salesZoneMasterVO =
+        		developService.createUpdateSalesZoneMaster(salesZoneMasterDTO);
+
+        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+                salesZoneMasterVO.get("message"));
+        responseObjectsMap.put("salesZoneMasterVO",
+                salesZoneMasterVO.get("salesZoneMasterVO"));
+
+        responseDTO = createServiceResponse(responseObjectsMap);
+
+    } catch (Exception e) {
+
+        errorMsg = e.getMessage();
+        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+    }
+
+    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+    return ResponseEntity.ok().body(responseDTO);
+}
+
+@GetMapping("/getSalesZoneMasterById")
+public ResponseEntity<ResponseDTO> getSalesZoneMasterById(@RequestParam Long id) {
+
+    String methodName = "getSalesZoneMasterById()";
+    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+    Map<String, Object> responseObjectsMap = new HashMap<>();
+    String errorMsg = null;
+    ResponseDTO responseDTO = null;
+
+    try {
+
+        SalesZoneMasterVO salesZoneMasterVO =
+        		developService.getSalesZoneMasterById(id).orElse(null);
+
+        responseObjectsMap.put("salesZoneMasterVO", salesZoneMasterVO);
+
+        responseDTO = createServiceResponse(responseObjectsMap);
+
+    } catch (Exception e) {
+
+        errorMsg = e.getMessage();
+        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+    }
+
+    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+    return ResponseEntity.ok().body(responseDTO);
+}
+
+@GetMapping("/getSalesZoneMasterByOrgId")
+public ResponseEntity<ResponseDTO> getSalesZoneMasterByOrgId(
+        @RequestParam Long orgId,
+        @RequestParam Long branch) {
+
+    String methodName = "getSalesZoneMasterByOrgId()";
+    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+    Map<String, Object> responseObjectsMap = new HashMap<>();
+    String errorMsg = null;
+    ResponseDTO responseDTO = null;
+
+    try {
+
+        List<SalesZoneMasterVO> salesZoneMasterList =
+        		developService.getSalesZoneMasterByOrgId(orgId, branch);
+
+        responseObjectsMap.put("salesZoneMasterList", salesZoneMasterList);
+
+        responseDTO = createServiceResponse(responseObjectsMap);
+
+    } catch (Exception e) {
+
+        errorMsg = e.getMessage();
+        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+    }
+
+    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+    return ResponseEntity.ok().body(responseDTO);
+}
 }
 	
 	

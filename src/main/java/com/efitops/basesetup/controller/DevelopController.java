@@ -1,5 +1,6 @@
 package com.efitops.basesetup.controller;
 
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
-import com.efitops.basesetup.dto.DocumnentTypeMappingDTO;
+import com.efitops.basesetup.dto.DocumentTypeMappingDTO;
+
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.entity.DocumentTypeMappingVO;
 import com.efitops.basesetup.service.DevelopService;
@@ -35,15 +37,14 @@ public class  DevelopController extends BaseController {
     @Autowired
     private DevelopService developService;
     
-    //HSN
     
   //documenttypemapping
 	
-  		@PutMapping("/updateCreateDocumnentTypeMapping")
+  		@PutMapping("/updateCreateDocumentTypeMapping")
   		public ResponseEntity<ResponseDTO> updateCreateDocumnentTypeMapping(
-  		        @RequestBody DocumnentTypeMappingDTO documentTypeMappingDTO) {
+  		        @RequestBody DocumentTypeMappingDTO documentTypeMappingDTO) {
 
-  		    String methodName = "updateCreateDocumnentTypeMapping()";
+  		    String methodName = "updateCreateDocumentTypeMapping()";
   		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
   		    String errorMsg = null;
@@ -53,7 +54,7 @@ public class  DevelopController extends BaseController {
   		    try {
 
   		        Map<String, Object> documentTypeMappingVO =
-  		        		developService.updateCreateDocumnentTypeMapping(documentTypeMappingDTO);
+  		        		developService.updateCreateDocumentTypeMapping(documentTypeMappingDTO);
 
   		        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
   		                documentTypeMappingVO.get("message"));
@@ -76,10 +77,10 @@ public class  DevelopController extends BaseController {
   		    return ResponseEntity.ok().body(responseDTO);
   		}
   		
-  		@GetMapping("/getDocumnentTypeMappingById")
-  		public ResponseEntity<ResponseDTO> getDocumnentTypeMappingById(@RequestParam Long id) {
+  		@GetMapping("/getDocumentTypeMappingById")
+  		public ResponseEntity<ResponseDTO> getDocumentTypeMappingById(@RequestParam Long id) {
 
-  		    String methodName = "getDocumnentTypeMappingById()";
+  		    String methodName = "getDocumentTypeMappingById()";
   		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
   		    Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -89,7 +90,7 @@ public class  DevelopController extends BaseController {
   		    try {
 
   		    	DocumentTypeMappingVO documentTypeMappingVO =
-  		        		developService.getDocumnentTypeMappingById(id);
+  		        		developService.getDocumentTypeMappingById(id);
 
   		        responseObjectsMap.put("documentTypeMappingMasterVO", documentTypeMappingVO);
 

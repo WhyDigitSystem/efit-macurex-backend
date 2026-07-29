@@ -1,5 +1,6 @@
 package com.efitops.basesetup.service;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import com.efitops.basesetup.dto.DocumentTypeMappingDTO;
 import com.efitops.basesetup.dto.DocumentTypeMappingDetailsDTO;
-import com.efitops.basesetup.dto.DocumnentTypeMappingDTO;
+
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingVO;
@@ -25,7 +27,8 @@ import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
-import com.efitops.basesetup.repository.DocumnentTypeMappingRepo;
+import com.efitops.basesetup.repository.DocumentTypeMappingRepo;
+
 import com.efitops.basesetup.repository.FinancialYearRepo;
 
 
@@ -42,7 +45,7 @@ public class DevelopServiceImpl implements DevelopService {
     private DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
     
     @Autowired
-    private DocumnentTypeMappingRepo documnentTypeMappingRepo;
+    private DocumentTypeMappingRepo documentTypeMappingRepo;
     
 	@Autowired
 	BranchRepo branchRepo;
@@ -57,8 +60,8 @@ private EntityManager entityManager;
     
     @Override
     @Transactional
-    public Map<String, Object> updateCreateDocumnentTypeMapping(
-    		DocumnentTypeMappingDTO documnentTypeMappingDTO)
+    public Map<String, Object> updateCreateDocumentTypeMapping(
+    		DocumentTypeMappingDTO documentTypeMappingDTO)
             throws ApplicationException {
 
         Map<String, Object> response = new HashMap<>();
@@ -66,64 +69,67 @@ private EntityManager entityManager;
 
         DocumentTypeMappingVO masterVO;
 
-        BranchVO branchVO = branchRepo.findById(documnentTypeMappingDTO.getBranch())
+        BranchVO branchVO = branchRepo.findById(documentTypeMappingDTO.getBranch())
                 .orElseThrow(() -> new ApplicationException(
-                        "Branch not found with id : " + documnentTypeMappingDTO.getBranch()));
+                        "Branch not found with id : " + documentTypeMappingDTO.getBranch()));
 
-        FinancialYearVO financialYearVO = financialYearRepo.findById(documnentTypeMappingDTO.getFinancialYear())
+        FinancialYearVO financialYearVO = financialYearRepo.findById(documentTypeMappingDTO.getFinancialYear())
                 .orElseThrow(() -> new ApplicationException(
-                        "Financial Year not found with id : " + documnentTypeMappingDTO.getFinancialYear()));
+                        "Financial Year not found with id : " + documentTypeMappingDTO.getFinancialYear()));
 
-        if (ObjectUtils.isEmpty(documnentTypeMappingDTO.getId())) {
+        if (ObjectUtils.isEmpty(documentTypeMappingDTO.getId())) {
 
-        	if (documnentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(
-        	        documnentTypeMappingDTO.getBranch(),
-        	        documnentTypeMappingDTO.getFinancialYear(),
-        	        documnentTypeMappingDTO.getOrgId())) {
+        	if (documentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(
+        	        documentTypeMappingDTO.getBranch(),
+        	        documentTypeMappingDTO.getFinancialYear(),
+        	        documentTypeMappingDTO.getOrgId())) {
 
                 throw new ApplicationException("Document Type Mapping already exists.");
             }
 
             masterVO = new DocumentTypeMappingVO();
 
-            masterVO.setCreatedBy(documnentTypeMappingDTO.getCreatedBy());
+            masterVO.setCreatedBy(documentTypeMappingDTO.getCreatedBy());
 
             message = "Document Type Mapping Created Successfully";
 
         } else {
 
-            masterVO = documnentTypeMappingRepo.findById(documnentTypeMappingDTO.getId())
+            masterVO = documentTypeMappingRepo.findById(documentTypeMappingDTO.getId())
                     .orElseThrow(() -> new ApplicationException("Document Type Mapping not found"));
 
-            masterVO.setUpdatedBy(documnentTypeMappingDTO.getCreatedBy());
+            masterVO.setUpdatedBy(documentTypeMappingDTO.getCreatedBy());
 
             message = "Document Type Mapping Updated Successfully";
         }
 
         masterVO.setBranch(branchVO);
         masterVO.setFinancialYear(financialYearVO);
-        masterVO.setOrgId(documnentTypeMappingDTO.getOrgId());
-        masterVO.setActive(documnentTypeMappingDTO.isActive());
-        masterVO.setCancelRemarks(documnentTypeMappingDTO.getCancelRemarks());
+        masterVO.setOrgId(documentTypeMappingDTO.getOrgId());
+        masterVO.setActive(documentTypeMappingDTO.isActive());
+        masterVO.setCancelRemarks(documentTypeMappingDTO.getCancelRemarks());
 
         List<DocumentTypeMappingDetailsVO> details = new ArrayList<>();
 
-        if (CollectionUtils.isNotEmpty(documnentTypeMappingDTO.getDetails())) {
+        if (CollectionUtils.isNotEmpty(documentTypeMappingDTO.getDetails())) {
 
-            for (DocumentTypeMappingDetailsDTO dto : documnentTypeMappingDTO.getDetails()) {
+            for (DocumentTypeMappingDetailsDTO dto : documentTypeMappingDTO.getDetails()) {
 
                 DocumentTypeMappingDetailsVO detailVO;
 
-                if (ObjectUtils.isEmpty(dto.getId())) {
+                if (ObjectUtils.isEmpty(dto.getId()) || dto.getId() == 0) {
 
-                    detailVO = documentTypeMappingDetailsRepo.findById(dto.getId())
-                            .orElse(new DocumentTypeMappingDetailsVO());
+                    // Create new detail
+                    detailVO = new DocumentTypeMappingDetailsVO();
 
                 } else {
 
-                    detailVO = new DocumentTypeMappingDetailsVO();
+                    // Update existing detail
+                    detailVO = documentTypeMappingDetailsRepo.findById(dto.getId())
+                            .orElseThrow(() ->
+                                    new ApplicationException(
+                                            "Document Type Mapping Detail not found with id : " + dto.getId()));
                 }
-
                 detailVO.setScreenName(dto.getScreenName());
                 detailVO.setScreenCode(dto.getScreenCode());
                 detailVO.setDocCode(dto.getDocCode());
@@ -137,7 +143,7 @@ private EntityManager entityManager;
 
         masterVO.setDetails(details);
 
-        documnentTypeMappingRepo.save(masterVO);
+        documentTypeMappingRepo.save(masterVO);
 
         response.put("message", message);
         response.put("documentTypeMappingMasterVO", masterVO);
@@ -146,20 +152,19 @@ private EntityManager entityManager;
     }
 
     @Override
-    public DocumentTypeMappingVO getDocumnentTypeMappingById(Long id)
+    public DocumentTypeMappingVO getDocumentTypeMappingById(Long id)
             throws ApplicationException {
 
-        return documnentTypeMappingRepo.findById(id)
+        return documentTypeMappingRepo.findById(id)
                 .orElseThrow(() ->
                         new ApplicationException("Document Type Mapping not found with id : " + id));
     }
-	
 
     @Override
     public List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch)
             throws ApplicationException {
 
-        return documnentTypeMappingRepo.findByOrgIdAndBranch(orgId, branch);
+        return documentTypeMappingRepo.findByOrgIdAndBranch(orgId, branch);
     }
 	}
 

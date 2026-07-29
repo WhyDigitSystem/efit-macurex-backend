@@ -53,13 +53,7 @@ import com.efitops.basesetup.repository.CountryRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DesignationRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
-import com.efitops.basesetup.repository.EmployeeCommunicationDetailsRepo;
-import com.efitops.basesetup.repository.EmployeeComplianceDetailsRepo;
-import com.efitops.basesetup.repository.EmployeeDetailsRepo;
-import com.efitops.basesetup.repository.EmployeeFinanceInformationRepo;
-import com.efitops.basesetup.repository.EmployeeLoanDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
-import com.efitops.basesetup.repository.EmployeePersonalDetailsRepo;
 import com.efitops.basesetup.repository.MaterialTypeDetailRepo;
 import com.efitops.basesetup.repository.MaterialTypeRepo;
 import com.efitops.basesetup.repository.StateRepo;
@@ -94,24 +88,6 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 
 	@Autowired
 	EmployeeMasterRepo employeeMasterRepo;
-
-	@Autowired
-	EmployeeDetailsRepo employeeDetailsRepo;
-
-	@Autowired
-	EmployeePersonalDetailsRepo employeePersonalRepo;
-
-	@Autowired
-	EmployeeCommunicationDetailsRepo employeeCommunicationRepo;
-
-	@Autowired
-	EmployeeComplianceDetailsRepo employeeComplianceRepo;
-
-	@Autowired
-	EmployeeFinanceInformationRepo employeeFinanceRepo;
-
-	@Autowired
-	EmployeeLoanDetailsRepo employeeLoanRepo;
 
 	@Autowired
 	UserRepo userRepo;
@@ -747,15 +723,15 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			message = "Employee Updated Successfully";
 		} else {
 //
-//			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
-//
-//			employeeMasterVO.setEmployeeId(docId);
-//
-////						// GETDOCID LASTNO +1
-//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-//					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
-//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
+
+			employeeMasterVO.setEmployeeId(docId);
+
+//						// GETDOCID LASTNO +1
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			employeeMasterVO.setCreatedBy(employeeMasterDTO.getCreatedBy());
 			employeeMasterVO.setUpdatedBy(employeeMasterDTO.getCreatedBy());
@@ -865,12 +841,20 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setReferenceBy(employeeMasterVO.getReferenceBy());
 
 		if (employeeMasterVO.getOkdBy() != null) {
-			EmployeeResponseDTO primaryUnitDTO = new EmployeeResponseDTO();
-			primaryUnitDTO.setId(employeeMasterVO.getOkdBy().getId());
-			primaryUnitDTO.setEmployeeName(employeeMasterVO.getOkdBy().getSurName());
-			responseDTO.setOkdBy(primaryUnitDTO);
+
+			EmployeeResponseDTO employeeDTO = new EmployeeResponseDTO();
+			employeeDTO.setId(employeeMasterVO.getOkdBy().getId());
+			employeeDTO.setEmployeeName(employeeMasterVO.getOkdBy().getEmployeeName());
+
+			responseDTO.setOkdBy(employeeDTO);
 		}
 
+		if (employeeMasterVO.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(employeeMasterVO.getBranch().getId());
+			branchDTO.setBranchName(employeeMasterVO.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
 		responseDTO.setModeOfPayment(employeeMasterVO.getModeOfPayment());
 		responseDTO.setBankAccountNo(employeeMasterVO.getBankAccountNo());
 		responseDTO.setBankName(employeeMasterVO.getBankName());
@@ -998,7 +982,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setOverTimeApplicable(employeeMasterDTO.getOverTimeApplicable());
 		employeeMasterVO.setReferenceBy(employeeMasterDTO.getReferenceBy());
 
-		if (employeeMasterDTO.getOkdById() != null) {
+		if (employeeMasterDTO.getOkdById() != null && employeeMasterDTO.getOkdById() > 0) {
 
 			EmployeeMasterVO employee = employeeMasterRepo.findById(employeeMasterDTO.getOkdById())
 					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
@@ -1057,15 +1041,22 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 	}
 
 	@Override
-	public EmployeeMasterResponseDTO getEmployeeMasterByOrgId(Long orgId, Long branchId) throws ApplicationException {
+	public List<EmployeeMasterResponseDTO> getEmployeeMasterByOrgId(Long orgId, Long branchId)
+			throws ApplicationException {
 
-		EmployeeMasterVO employeeMasterVO = employeeMasterRepo.getEmployeeMasterByOrgId(orgId, branchId);
+		List<EmployeeMasterVO> employeeList = employeeMasterRepo.getEmployeeMasterByOrgId(orgId, branchId);
 
-		if (employeeMasterVO == null) {
+		if (employeeList == null || employeeList.isEmpty()) {
 			throw new ApplicationException("Employee Master Not Found");
 		}
 
-		return buildEmployeeMasterResponse(employeeMasterVO);
+		List<EmployeeMasterResponseDTO> responseList = new ArrayList<>();
+
+		for (EmployeeMasterVO employeeMasterVO : employeeList) {
+			responseList.add(buildEmployeeMasterResponse(employeeMasterVO));
+		}
+
+		return responseList;
 	}
 
 }

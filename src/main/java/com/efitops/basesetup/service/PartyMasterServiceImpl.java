@@ -16,23 +16,29 @@ import com.efitops.basesetup.ResponseDTO.BranchResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CityResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerContactDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CustomerItemDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerShippingDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PartyCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StateResponseDTO;
+import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.CustomerContactDetailsDTO;
 import com.efitops.basesetup.dto.CustomerDTO;
+import com.efitops.basesetup.dto.CustomerItemDetailsDTO;
 import com.efitops.basesetup.dto.CustomerShippingDetailsDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CustomerContactDetailsVO;
+import com.efitops.basesetup.entity.CustomerItemDetailsVO;
 import com.efitops.basesetup.entity.CustomerShippingDetailsVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
+import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.StateVO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -40,10 +46,12 @@ import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CityRepo;
 import com.efitops.basesetup.repository.CountryRepo;
 import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
+import com.efitops.basesetup.repository.CustomerItemDetailsRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.CustomerShippingDetailsRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
+import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesRepo;
 import com.efitops.basesetup.repository.StateRepo;
 
@@ -81,6 +89,13 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	
 	@Autowired
 	CustomerShippingDetailsRepo customerShippingDetailsRepo;
+	
+	@Autowired
+	CustomerItemDetailsRepo customerItemDetailsRepo;
+	
+	@Autowired
+	ItemMasterRepo itemMasterRepo;
+	
 //	@Autowired
 //	TransportRepo transportMasterRepo;
 //	
@@ -347,6 +362,36 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	}
 
 	customerVO.setCustomerShippingDetails(shippingDetails);
+	
+	List<CustomerItemDetailsVO> itemDetails = new ArrayList<>();
+
+	// Only for Update
+	if (dto.getId() != null) {
+
+	    List<CustomerItemDetailsVO> oldItems =
+	            customerItemDetailsRepo.findByCustomerVO(customerVO);
+
+	    customerItemDetailsRepo.deleteAll(oldItems);
+	}
+
+	// Common for Create & Update
+	if (dto.getCustomerItemDetailsDTO() != null) {
+
+	    for (CustomerItemDetailsDTO itemDTO : dto.getCustomerItemDetailsDTO()) {
+
+	        CustomerItemDetailsVO vo = new CustomerItemDetailsVO();
+
+	        ItemMasterVO itemMaster = itemMasterRepo.findById(itemDTO.getItemId())
+	                .orElseThrow(() -> new ApplicationException("Item not found"));
+
+	        vo.setItem(itemMaster);
+	        vo.setCustomerVO(customerVO);
+
+	        itemDetails.add(vo);
+	    }
+	}
+
+	customerVO.setCustomerItemDetailsVO(itemDetails);
 }
 	
 	
@@ -577,6 +622,46 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	    }
 
 	    dto.setCustomerShippingDetails(shippingResponseList);
+	    
+	    List<CustomerItemDetailsResponseDTO> itemResponseList = new ArrayList<>();
+
+	    if (customerVO.getCustomerItemDetailsVO() != null) {
+
+	        for (CustomerItemDetailsVO itemVO : customerVO.getCustomerItemDetailsVO()) {
+
+	            CustomerItemDetailsResponseDTO itemResponse =
+	                    new CustomerItemDetailsResponseDTO();
+
+	            itemResponse.setId(itemVO.getId());
+
+	            if (itemVO.getItem() != null) {
+
+	                ItemMasterVO itemMaster = itemVO.getItem();
+
+	                ItemResponseDTO itemDTO = new ItemResponseDTO();
+
+	                itemDTO.setId(itemMaster.getId());
+	                itemDTO.setItemCode(itemMaster.getItemCode());
+	                itemDTO.setItemDescription(itemMaster.getItemDescription());
+
+	                if (itemMaster.getPrimaryUnit() != null) {
+
+	                    UnitResponseDTO unitDTO = new UnitResponseDTO();
+
+	                    unitDTO.setId(itemMaster.getPrimaryUnit().getId());
+	                    unitDTO.setUnitId(itemMaster.getPrimaryUnit().getUnitId());
+
+	                    itemDTO.setUnit(unitDTO);
+	                }
+
+	                itemResponse.setItem(itemDTO);
+	            }
+
+	            itemResponseList.add(itemResponse);
+	        }
+	    }
+
+	    dto.setCustomerItemDetails(itemResponseList);
 
 	    return dto;
 	}

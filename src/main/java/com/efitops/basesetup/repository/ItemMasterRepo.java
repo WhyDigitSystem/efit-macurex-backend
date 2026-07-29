@@ -1,5 +1,7 @@
 package com.efitops.basesetup.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,7 +15,7 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
 	ItemMasterVO getItemMasterById(Long id);
 
 	@Query(nativeQuery = true, value = "select * from item where org_id=?1  and branch=?2 and active=1 and cancel=0")
-	ItemMasterVO getItemMasterByOrgId(Long orgId, Long branchId);
+	List<ItemMasterVO> getItemMasterByOrgId(Long orgId, Long branchId);
 
 	boolean existsByItemCodeAndOrgIdAndBranchId(String itemCode, Long orgId, Long branchId);
 

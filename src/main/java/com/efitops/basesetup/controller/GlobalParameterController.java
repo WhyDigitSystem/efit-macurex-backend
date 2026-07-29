@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.GlobalParameterDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.entity.GlobalParameterVO;
 import com.efitops.basesetup.service.GlobalParameterService;
@@ -64,36 +65,36 @@ public class GlobalParameterController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-//	@PutMapping("/globalparam")
-//	public ResponseEntity<ResponseDTO> updateGlobalParam(@RequestBody GlobalParameterVO globalParameterVO) {
-//		String methodName = "updateGlobalParam()";
-//		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-//		String errorMsg = null;
-//		Map<String, Object> responseObjectsMap = new HashMap<>();
-//		ResponseDTO responseDTO = null;
-//		try {
-//			GlobalParameterVO gloParameterVO = globalParameterService.updateGlobaParameter(globalParameterVO);
-//			if (gloParameterVO != null) {
-//				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Global Parameter Updated successfully");
-//				responseObjectsMap.put("GlobalParameterVO", gloParameterVO);
-//				responseDTO = createServiceResponse(responseObjectsMap);
-//			} else {
-//				errorMsg = "Global Parameter not found for ID: " + globalParameterVO.getId();
-//				responseDTO = createServiceResponseError(responseObjectsMap, "Global Parameter Update failed",
-//						errorMsg);
-//			}
-//		} catch (Exception e) {
-//			errorMsg = e.getMessage();
-//			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-//			responseDTO = createServiceResponseError(responseObjectsMap, "Global Parameter Update failed", errorMsg);
-//		}
-//		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-//		return ResponseEntity.ok().body(responseDTO);
-//	}
+	@PutMapping("/globalparam")
+	public ResponseEntity<ResponseDTO> updateGlobalParam(@RequestBody GlobalParameterDTO globalParameterDTO) {
+		String methodName = "updateGlobalParam()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		try {
+			GlobalParameterVO gloParameterVO = globalParameterService.updateGlobaParameter(globalParameterDTO);
+			if (gloParameterVO != null) {
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Global Parameter Updated successfully");
+				responseObjectsMap.put("GlobalParameterVO", gloParameterVO);
+				responseDTO = createServiceResponse(responseObjectsMap);
+			} else {
+				errorMsg = "Global Parameter not found for ID: " + globalParameterDTO.getId();
+				responseDTO = createServiceResponseError(responseObjectsMap, "Global Parameter Update failed",
+						errorMsg);
+			}
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Global Parameter Update failed", errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
 
 	@GetMapping("/globalparamBranchByUserName")
 	public ResponseEntity<ResponseDTO> getGlobalParameterBranchByUserName(@RequestParam Long orgid,
-			@RequestParam String userName) {
+			@RequestParam Long userName) {
 		String methodName = "getAllGlobalParameterByUserName()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -108,7 +109,7 @@ public class GlobalParameterController extends BaseController {
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 		if (StringUtils.isBlank(errorMsg)) {
-			List<Map<String, String>> formattedParameters = formattParameter(globalParameters);
+			List<Map<String, Object>> formattedParameters = formattParameter(globalParameters);
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
 					"Global Parameter Branch information get successfully");
 			responseObjectsMap.put("GlopalParameters", formattedParameters);
@@ -121,13 +122,16 @@ public class GlobalParameterController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	private List<Map<String, String>> formattParameter(Set<Object[]> globalParameters) {
-		List<Map<String, String>> formattedParameters = new ArrayList<>();
+	private List<Map<String, Object>> formattParameter(Set<Object[]> globalParameters) {
+		List<Map<String, Object>> formattedParameters = new ArrayList<>();
 		for (Object[] parameters : globalParameters) {
-			Map<String, String> param = new HashMap<>();
-			param.put("branch", parameters[0].toString());
-			param.put("branchcode", parameters[1].toString());
-			formattedParameters.add(param);
+		    Map<String, Object> param = new HashMap<>();
+
+		    param.put("branchId", ((Number) parameters[0]).longValue());
+		    param.put("branch", parameters[1].toString());
+		    param.put("branchcode", parameters[2].toString());
+
+		    formattedParameters.add(param);
 		}
 		return formattedParameters;
 	}

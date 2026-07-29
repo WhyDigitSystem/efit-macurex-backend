@@ -287,7 +287,7 @@ public class ItemMasterVO {
 	private ListOfValuesVO itemGroup;
 
 	@ManyToOne
-	@JoinColumn(name = "primary_Unit")
+	@JoinColumn(name = "primary_unit")
 	private UnitMasterVO primaryUnit;
 
 	@ManyToOne
@@ -295,7 +295,7 @@ public class ItemMasterVO {
 	private BranchVO branch;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "hsn_Code")
+	@JoinColumn(name = "hsn_code")
 	private HsnVO hsnCode;
 
 	@ManyToOne

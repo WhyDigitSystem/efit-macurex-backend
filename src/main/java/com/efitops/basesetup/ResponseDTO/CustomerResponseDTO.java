@@ -110,4 +110,7 @@ public class CustomerResponseDTO {
 	    private List<CustomerContactDetailsResponseDTO> customerContactDetails;
 	    
 	    private List<CustomerShippingDetailsResponseDTO> customerShippingDetails;
+	    
+	    private List<CustomerItemDetailsResponseDTO> customerItemDetails;
+
 }

@@ -55,7 +55,7 @@ import com.efitops.basesetup.entity.CompanyVO;
 import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.DocumentTypeMasterVO;
-import com.efitops.basesetup.entity.EmployeeVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
@@ -83,7 +83,7 @@ import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.DocumentTypeMasterRepo;
 import com.efitops.basesetup.repository.DocumnentTypeMappingRepo;
-import com.efitops.basesetup.repository.EmployeeRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.FinScreenRepo;
 import com.efitops.basesetup.repository.FinancialYearRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
@@ -150,7 +150,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	BankDetailsRepo bankDetailsRepo;
 
 	@Autowired
-	EmployeeRepo employeeRepo;
+	EmployeeMasterRepo employeeRepo;
 	
 	@Autowired
 	BranchRepo branchRepo;
@@ -227,7 +227,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		mapCreateCompanyDTOToVO(companyVO, companyDTO);
 		companyRepo.save(companyVO);
 
-		EmployeeVO employeeVO = new EmployeeVO();
+		EmployeeMasterVO employeeVO = new EmployeeMasterVO();
 		employeeVO.setEmployeeName(companyVO.getAdminName());
 //		employeeVO.setEmployeeCode(companyVO.getCompanyCode());
 		employeeVO.setActive(true);
@@ -236,7 +236,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		UserVO userVO = new UserVO();
 		userVO.setUserName(companyVO.getAdminName());
-		userVO.setEmployee(employeeVO);
+		userVO.setEmployeeMaster(employeeVO);
 		//		userVO.setEmployeeCode(companyVO.getCompanyCode());
 		userVO.setEmail(companyVO.getAdminEmail());
 		userVO.setMobileNo(companyVO.getAdminMobileNo());
@@ -645,22 +645,36 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			countryVO = countryRepo.findById(countryDTO.getId())
 					.orElseThrow(() -> new ApplicationException("Branch not found with id: " + countryDTO.getId()));
 			countryVO.setUpdatedBy(countryDTO.getCreatedBy());
-			if (!countryVO.getCountryCode().equalsIgnoreCase(countryDTO.getCountryCode())) {
-				if (countryRepo.existsByCountryCodeAndOrgId(countryDTO.getCountryCode(), countryDTO.getOrgId())) {
-					String errorMessage = String.format("The CountryCode: %s already exists This Organization.",
-							countryDTO.getCountryCode());
-					throw new ApplicationException(errorMessage);
-				}
-				countryVO.setCountryCode(countryDTO.getCountryCode().toUpperCase());
-			}
-			if (!countryVO.getCountryName().equalsIgnoreCase(countryDTO.getCountryName())) {
-				if (countryRepo.existsByCountryNameAndOrgId(countryDTO.getCountryName(), countryDTO.getOrgId())) {
-					String errorMessage = String.format("The CountryName: %s already exists This Organization.",
-							countryDTO.getCountryName());
-					throw new ApplicationException(errorMessage);
-				}
-				countryVO.setCountryName(countryDTO.getCountryName().toUpperCase());
+			if (countryDTO.getCountryCode() != null
+			        && !countryVO.getCountryCode().equalsIgnoreCase(countryDTO.getCountryCode())) {
 
+			    if (countryRepo.existsByCountryCodeIgnoreCaseAndOrgIdAndIdNot(
+			            countryDTO.getCountryCode(),
+			            countryDTO.getOrgId(),
+			            countryVO.getId())) {
+
+			        throw new ApplicationException(
+			                String.format("The CountryCode: %s already exists in this Organization.",
+			                        countryDTO.getCountryCode()));
+			    }
+
+			    countryVO.setCountryCode(countryDTO.getCountryCode().toUpperCase());
+			}
+
+			if (countryDTO.getCountryName() != null
+			        && !countryVO.getCountryName().equalsIgnoreCase(countryDTO.getCountryName())) {
+
+			    if (countryRepo.existsByCountryNameIgnoreCaseAndOrgIdAndIdNot(
+			            countryDTO.getCountryName(),
+			            countryDTO.getOrgId(),
+			            countryVO.getId())) {
+
+			        throw new ApplicationException(
+			                String.format("The CountryName: %s already exists in this Organization.",
+			                        countryDTO.getCountryName()));
+			    }
+
+			    countryVO.setCountryName(countryDTO.getCountryName().toUpperCase());
 			}
 			message = "Country Update Successfully";
 		}
@@ -2928,7 +2942,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 								    gstStateMasterVO.setOrgId(gstStateMasterDTO.getOrgId());
 								    gstStateMasterVO.setActive(gstStateMasterDTO.isActive());
 								    gstStateMasterVO.setCancelRemarks(
-								            gstStateMasterDTO.getCancelRemarks());
+								            gstStateMasterDTO.getCancelRemarks());	
 
 								    if (gstStateMasterDTO.getBranch() != null
 								            && gstStateMasterDTO.getBranch() != 0) {

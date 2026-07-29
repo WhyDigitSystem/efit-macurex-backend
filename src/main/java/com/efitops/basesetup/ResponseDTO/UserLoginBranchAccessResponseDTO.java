@@ -11,7 +11,7 @@ public class UserLoginBranchAccessResponseDTO {
 
     private Long id;
 
-    private Long branchId;
+//    private Long branchId;
 
     private String branchCode;
 

@@ -654,16 +654,15 @@ public class EfitMasterController extends BaseController {
 		String methodName = "getEmployeeMasterByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO = null;
+		ResponseDTO responseDTO;
 
 		try {
 
-			EmployeeMasterResponseDTO employeeMasterResponseDTO = efitMasterService.getEmployeeMasterByOrgId(orgId,
-					branchId);
+			List<EmployeeMasterResponseDTO> employeeMasterResponseDTO = efitMasterService
+					.getEmployeeMasterByOrgId(orgId, branchId);
 
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "EmployeeMaster information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Employee Master information retrieved successfully");
 
 			responseObjectsMap.put("employeeMasterVO", employeeMasterResponseDTO);
 
@@ -671,11 +670,10 @@ public class EfitMasterController extends BaseController {
 
 		} catch (Exception e) {
 
-			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-			responseDTO = createServiceResponseError(responseObjectsMap, "EmployeeMaster information retrieval failed",
-					errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Employee Master information retrieval failed",
+					e.getMessage());
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

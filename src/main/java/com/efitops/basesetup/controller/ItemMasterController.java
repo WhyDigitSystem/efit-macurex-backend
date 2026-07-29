@@ -78,13 +78,12 @@ public class ItemMasterController extends BaseController {
 		String methodName = "getItemMasterByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO = null;
+		ResponseDTO responseDTO;
 
 		try {
 
-			ItemMasterResponseDTO itemMasterResponseDTO = itemMasterService.getItemMasterByOrgId(orgId, branchId);
+			List<ItemMasterResponseDTO> itemMasterResponseDTO = itemMasterService.getItemMasterByOrgId(orgId, branchId);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "ItemMaster information retrieved successfully");
 
@@ -94,11 +93,10 @@ public class ItemMasterController extends BaseController {
 
 		} catch (Exception e) {
 
-			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
 			responseDTO = createServiceResponseError(responseObjectsMap, "ItemMaster information retrieval failed",
-					errorMsg);
+					e.getMessage());
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

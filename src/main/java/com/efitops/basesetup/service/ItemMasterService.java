@@ -26,7 +26,7 @@ public interface ItemMasterService {
 
 	ResponseEntity<byte[]> viewItemMasterImages(HttpServletRequest request) throws IOException;
 
-	ItemMasterResponseDTO getItemMasterByOrgId(Long orgId, Long branchId) throws ApplicationException;
+	List<ItemMasterResponseDTO> getItemMasterByOrgId(Long orgId, Long branchId) throws ApplicationException;
 
 
 }

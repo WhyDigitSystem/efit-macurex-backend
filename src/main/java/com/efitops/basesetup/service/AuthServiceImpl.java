@@ -23,6 +23,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.efitops.basesetup.ResponseDTO.UserLoginRolesResponseDTO;
 import com.efitops.basesetup.common.AuthConstant;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
@@ -35,10 +36,13 @@ import com.efitops.basesetup.dto.RolesDTO;
 import com.efitops.basesetup.dto.RolesResponsibilityDTO;
 import com.efitops.basesetup.dto.ScreensDTO;
 import com.efitops.basesetup.dto.SignUpFormDTO;
+import com.efitops.basesetup.dto.UserBranchResponseDTO;
 import com.efitops.basesetup.dto.UserLoginBranchAccessDTO;
 import com.efitops.basesetup.dto.UserLoginRoleAccessDTO;
 import com.efitops.basesetup.dto.UserResponseDTO;
+import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CompanyVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.ResponsibilityVO;
 import com.efitops.basesetup.entity.RolesResponsibilityVO;
 import com.efitops.basesetup.entity.RolesVO;
@@ -48,7 +52,9 @@ import com.efitops.basesetup.entity.UserLoginBranchAccessibleVO;
 import com.efitops.basesetup.entity.UserLoginRolesVO;
 import com.efitops.basesetup.entity.UserVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CompanyRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.ResponsibilitiesRepo;
 import com.efitops.basesetup.repository.RolesRepo;
 import com.efitops.basesetup.repository.RolesResponsibilityRepo;
@@ -113,19 +119,123 @@ public class AuthServiceImpl implements AuthService {
 	@Autowired
 	private JavaMailSender mailSender;
 	
+	@Autowired
+	BranchRepo branchRepo;
+	
+	@Autowired
+	EmployeeMasterRepo employeeRepo;
+	
 	
 //	@Autowired
 //	ClientAccessRepo clientAccessRepo;
 
+//	@Override
+//	public void signup(SignUpFormDTO signUpRequest) {
+//		String methodName = "signup()";
+//		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//		if (ObjectUtils.isEmpty(signUpRequest) || StringUtils.isBlank(signUpRequest.getEmail())
+//				|| StringUtils.isBlank(signUpRequest.getUserName())) {
+//			throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_REGISTER_INFORMATION);
+//		}
+////		else if (userRepo.existsByUserNameOrEmail(signUpRequest.getUserName(), signUpRequest.getEmail())) 
+////		{
+////			throw new ApplicationContextException(UserConstants.ERRROR_MSG_USER_INFORMATION_ALREADY_REGISTERED);
+////		}
+//		UserVO userVO = getUserVOFromSignUpFormDTO(signUpRequest);
+//		userRepo.save(userVO);
+//		userService.createUserAction(userVO.getUserName(), userVO.getId(), UserConstants.USER_ACTION_ADD_ACCOUNT);
+//		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//	}
+//
+//	private UserVO getUserVOFromSignUpFormDTO(SignUpFormDTO signUpFormDTO) {
+//
+//		UserVO userVO = new UserVO();
+//
+////		userVO=userRepo.findByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(), signUpFormDTO.getEmail());
+//		if (userRepo.existsByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(),
+//				signUpFormDTO.getEmail())) {
+//			userVO = userRepo.findByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(),
+//					signUpFormDTO.getEmail());
+//
+//			List<UserLoginRolesVO> roles = loginRolesRepo.findByUserVO(userVO);
+//			loginRolesRepo.deleteAll(roles);
+////			List<UserLoginClientAccessVO> client = clientAccessRepo.findByUserVO(userVO);
+////			clientAccessRepo.deleteAll(client);
+//			List<UserLoginBranchAccessibleVO> branch = branchAccessRepo.findByUserVO(userVO);
+//			branchAccessRepo.deleteAll(branch);
+//		}
+//		userVO.setUserName(signUpFormDTO.getUserName());
+//		if (ObjectUtils.isEmpty(userVO.getId())) {
+//			try {
+//				userVO.setPassword(encoder.encode(CryptoUtils.getDecrypt(signUpFormDTO.getPassword())));
+//			} catch (Exception e) {
+//				LOGGER.error(e.getMessage());
+//				throw new ApplicationContextException(UserConstants.ERRROR_MSG_UNABLE_TO_ENCODE_USER_PASSWORD);
+//			}
+//		}
+//		userVO.setEmployeeName(signUpFormDTO.getEmployeeName());
+//		userVO.setNickName(signUpFormDTO.getNickName());
+//		userVO.setEmail(signUpFormDTO.getEmail());
+//		userVO.setEmployeeCode(signUpFormDTO.getEmployeeCode());
+//		userVO.setMobileNo(signUpFormDTO.getMobileNo());
+//		userVO.setUserType(signUpFormDTO.getUserType());
+//		userVO.setActive(signUpFormDTO.isActive());
+//		userVO.setOrgId(signUpFormDTO.getOrgId());
+//		userVO.setAllIndiaAcces(signUpFormDTO.isAllIndiaAcces());
+//
+//		List<UserLoginRolesVO> rolesVO = new ArrayList<>();
+//		if (signUpFormDTO.getRoleAccessDTO() != null) {
+//			for (UserLoginRoleAccessDTO accessDTO : signUpFormDTO.getRoleAccessDTO()) {
+//
+//				UserLoginRolesVO loginRolesVO = new UserLoginRolesVO();
+//				loginRolesVO.setRole(accessDTO.getRole());
+//				loginRolesVO.setRoleId(accessDTO.getRoleId());
+//				loginRolesVO.setStartDate(accessDTO.getStartDate());
+//				loginRolesVO.setEndDate(accessDTO.getEndDate());
+//				loginRolesVO.setUserVO(userVO);
+//				rolesVO.add(loginRolesVO);
+//			}
+//		}
+//
+//		userVO.setRoleAccessVO(rolesVO);
+//
+////		List<UserLoginClientAccessVO> clientAccessVOList = new ArrayList<>();
+////		if (signUpFormDTO.getClientAccessDTOList() != null) {
+////			for (UserLoginClientAccessDTO clientAccessDTO : signUpFormDTO.getClientAccessDTOList()) {
+////				UserLoginClientAccessVO clientAccessVO = new UserLoginClientAccessVO();
+////				clientAccessVO.setClient(clientAccessDTO.getClient());
+////				clientAccessVO.setCustomer(clientAccessDTO.getCustomer());
+////				clientAccessVO.setUserVO(userVO);
+////				clientAccessVOList.add(clientAccessVO);
+////			}
+////		}
+////		userVO.setClientAccessVO(clientAccessVOList);
+//
+//
+//		CompanyVO companyVO = companyRepo.findById(signUpFormDTO.getOrgId())
+//			    .orElseThrow(() -> new RuntimeException(
+//			        "Company not found with ID: " + signUpFormDTO.getOrgId()));
+//
+//			userVO.setCompanyVO(companyVO);
+//		return userVO;
+//	}
+
+	
 	@Override
-	public void signup(SignUpFormDTO signUpRequest) {
+	public void signup(SignUpFormDTO signUpRequest) throws ApplicationException {
 		String methodName = "signup()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-		if (ObjectUtils.isEmpty(signUpRequest) || StringUtils.isBlank(signUpRequest.getEmail())
+		if (ObjectUtils.isEmpty(signUpRequest)
 				|| StringUtils.isBlank(signUpRequest.getUserName())) {
 			throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_REGISTER_INFORMATION);
 		}
-//		else if (userRepo.existsByUserNameOrEmail(signUpRequest.getUserName(), signUpRequest.getEmail())) 
+		EmployeeMasterVO employeeVO = employeeRepo.findById(signUpRequest.getEmployee())
+		        .orElseThrow(() -> new ApplicationException("Employee not found"));
+
+		if (StringUtils.isBlank(employeeVO.getEmail())) {
+		    throw new ApplicationException("Employee email is missing");
+		}
+//		else if (userRepo.existsByUserNameOrEmployeeMaster_Email(signUpRequest.getUserName(), signUpRequest.getEmail())) 
 //		{
 //			throw new ApplicationContextException(UserConstants.ERRROR_MSG_USER_INFORMATION_ALREADY_REGISTERED);
 //		}
@@ -135,22 +245,48 @@ public class AuthServiceImpl implements AuthService {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 	}
 
-	private UserVO getUserVOFromSignUpFormDTO(SignUpFormDTO signUpFormDTO) {
+	private UserVO getUserVOFromSignUpFormDTO(SignUpFormDTO signUpFormDTO) throws ApplicationException {
 
-		UserVO userVO = new UserVO();
-
+//		UserVO userVO = new UserVO();
+		EmployeeMasterVO employeeVO = employeeRepo.findById(signUpFormDTO.getEmployee())
+		        .orElseThrow(() -> new ApplicationException("Employee not found"));
 //		userVO=userRepo.findByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(), signUpFormDTO.getEmail());
-		if (userRepo.existsByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(),
-				signUpFormDTO.getEmail())) {
-			userVO = userRepo.findByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(),
-					signUpFormDTO.getEmail());
+		UserVO userVO;
 
-			List<UserLoginRolesVO> roles = loginRolesRepo.findByUserVO(userVO);
-			loginRolesRepo.deleteAll(roles);
-//			List<UserLoginClientAccessVO> client = clientAccessRepo.findByUserVO(userVO);
-//			clientAccessRepo.deleteAll(client);
-			List<UserLoginBranchAccessibleVO> branch = branchAccessRepo.findByUserVO(userVO);
-			branchAccessRepo.deleteAll(branch);
+		if (signUpFormDTO.getId() != null && signUpFormDTO.getId() != 0) {
+
+		    // UPDATE
+		    userVO = userRepo.findById(signUpFormDTO.getId())
+		            .orElseThrow(() -> new ApplicationException("User not found"));
+
+		    // Delete old roles
+		    List<UserLoginRolesVO> roles = loginRolesRepo.findByUserVO(userVO);
+		    if (roles != null && !roles.isEmpty()) {
+		        loginRolesRepo.deleteAll(roles);
+		    }
+
+		    // Delete old branches
+		    List<UserLoginBranchAccessibleVO> branches = branchAccessRepo.findByUserVO(userVO);
+		    if (branches != null && !branches.isEmpty()) {
+		        branchAccessRepo.deleteAll(branches);
+		    }
+
+		} else {
+
+		    // CREATE
+		    if (userRepo.existsByUserNameOrEmployeeMaster_Email(
+		            signUpFormDTO.getUserName(),
+		            employeeVO.getEmail())) {
+		    	
+		    	System.out.println( signUpFormDTO.getUserName());	   
+		    	System.out.println( employeeVO.getEmail());	   
+
+		    	throw new ApplicationContextException(
+		                UserConstants.ERRROR_MSG_USER_INFORMATION_ALREADY_REGISTERED);
+		    }
+		    
+
+		    userVO = new UserVO();
 		}
 		userVO.setUserName(signUpFormDTO.getUserName());
 		if (ObjectUtils.isEmpty(userVO.getId())) {
@@ -161,32 +297,52 @@ public class AuthServiceImpl implements AuthService {
 				throw new ApplicationContextException(UserConstants.ERRROR_MSG_UNABLE_TO_ENCODE_USER_PASSWORD);
 			}
 		}
-		userVO.setEmployeeName(signUpFormDTO.getEmployeeName());
-		userVO.setNickName(signUpFormDTO.getNickName());
-		userVO.setEmail(signUpFormDTO.getEmail());
-		userVO.setEmployeeCode(signUpFormDTO.getEmployeeCode());
-		userVO.setMobileNo(signUpFormDTO.getMobileNo());
+//		userVO.setEmployeeName(signUpFormDTO.getEmployeeName());
+//		userVO.setEmployeeCode(signUpFormDTO.getEmployeeCode());
+		if (signUpFormDTO.getEmployee() != null) {
+
+		    EmployeeMasterVO employeesVO = employeeRepo.findById(signUpFormDTO.getEmployee())
+		            .orElseThrow(() -> new ApplicationException("Employee not found"));
+
+		    userVO.setEmployeeMaster(employeesVO);
+		}
+		CompanyVO companyVO = companyRepo.findById(signUpFormDTO.getOrgId())
+		        .orElseThrow(() -> new ApplicationException("Company not found"));
+
+		userVO.setCompanyVO(companyVO);
+		
+//		userVO.setNickName(signUpFormDTO.getNickName());
+//		userVO.setEmail(signUpFormDTO.getEmail());
+//		userVO.setMobileNo(signUpFormDTO.getMobileNo());
 		userVO.setUserType(signUpFormDTO.getUserType());
 		userVO.setActive(signUpFormDTO.isActive());
 		userVO.setOrgId(signUpFormDTO.getOrgId());
 		userVO.setAllIndiaAcces(signUpFormDTO.isAllIndiaAcces());
+		userVO.setCreatedby(signUpFormDTO.getCreatedBy());
+		userVO.setUpdatedby(signUpFormDTO.getCreatedBy());
 
 		List<UserLoginRolesVO> rolesVO = new ArrayList<>();
-		if (signUpFormDTO.getRoleAccessDTO() != null) {
-			for (UserLoginRoleAccessDTO accessDTO : signUpFormDTO.getRoleAccessDTO()) {
 
-				UserLoginRolesVO loginRolesVO = new UserLoginRolesVO();
-				loginRolesVO.setRole(accessDTO.getRole());
-				loginRolesVO.setRoleId(accessDTO.getRoleId());
-				loginRolesVO.setStartDate(accessDTO.getStartDate());
-				loginRolesVO.setEndDate(accessDTO.getEndDate());
-				loginRolesVO.setUserVO(userVO);
-				rolesVO.add(loginRolesVO);
-			}
+		if (signUpFormDTO.getRoleAccessDTO() != null) {
+
+		    for (UserLoginRoleAccessDTO accessDTO : signUpFormDTO.getRoleAccessDTO()) {
+
+		        UserLoginRolesVO loginRolesVO = new UserLoginRolesVO();
+
+		        RolesVO roleVO = rolesRepo.findById(accessDTO.getRoleId())
+		                .orElseThrow(() -> new ApplicationException("Role not found"));
+
+		        loginRolesVO.setRoles(roleVO);
+		        loginRolesVO.setStartDate(accessDTO.getStartDate());
+		        loginRolesVO.setEndDate(accessDTO.getEndDate());
+		        loginRolesVO.setUserVO(userVO);
+
+		        rolesVO.add(loginRolesVO);
+		    }
 		}
 
 		userVO.setRoleAccessVO(rolesVO);
-
+		userVO.setRoleAccessVO(rolesVO);
 //		List<UserLoginClientAccessVO> clientAccessVOList = new ArrayList<>();
 //		if (signUpFormDTO.getClientAccessDTOList() != null) {
 //			for (UserLoginClientAccessDTO clientAccessDTO : signUpFormDTO.getClientAccessDTOList()) {
@@ -203,22 +359,26 @@ public class AuthServiceImpl implements AuthService {
 		if (signUpFormDTO.getBranchAccessDTOList() != null) {
 			for (UserLoginBranchAccessDTO userLoginBranchAccessDTO : signUpFormDTO.getBranchAccessDTOList()) {
 				UserLoginBranchAccessibleVO branchAccessibleVO = new UserLoginBranchAccessibleVO();
-				branchAccessibleVO.setBranch(userLoginBranchAccessDTO.getBranch());
-				branchAccessibleVO.setBranchcode(userLoginBranchAccessDTO.getBranchCode());
+//				branchAccessibleVO.setBranch(userLoginBranchAccessDTO.getBranch());
+//				branchAccessibleVO.setBranchcode(userLoginBranchAccessDTO.getBranchCode());
+				 if (userLoginBranchAccessDTO.getBranch() != null && userLoginBranchAccessDTO.getBranch() != 0) {
+
+			            BranchVO branch = branchRepo.findById(userLoginBranchAccessDTO.getBranch())
+			                    .orElseThrow(() ->
+			                            new ApplicationException("Branch Not Found"));
+
+			            branchAccessibleVO.setBranch(branch);
+			        }
 				branchAccessibleVO.setUserVO(userVO);
 				branchAccessList.add(branchAccessibleVO);
 			}
 		}
 		userVO.setBranchAccessibleVO(branchAccessList);
 
-		CompanyVO companyVO = companyRepo.findById(signUpFormDTO.getOrgId())
-			    .orElseThrow(() -> new RuntimeException(
-			        "Company not found with ID: " + signUpFormDTO.getOrgId()));
-
-			userVO.setCompanyVO(companyVO);
 		return userVO;
 	}
-
+	
+	
 	@Override
 	public UserResponseDTO login(LoginFormDTO loginRequest, HttpServletRequest request) throws ApplicationException {
 		String methodName = "login()";
@@ -227,7 +387,7 @@ public class AuthServiceImpl implements AuthService {
 				|| StringUtils.isBlank(loginRequest.getPassword())) {
 			throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_LOGIN_INFORMATION);
 		}
-		UserVO userVO = userRepo.findByUserNameOrEmailOrMobileNoOrEmployeeName(loginRequest.getUserName(), loginRequest.getUserName(),
+		UserVO userVO = userRepo.findByUserNameOrEmailOrMobileNoOrEmployeeMaster_EmployeeName(loginRequest.getUserName(), loginRequest.getUserName(),
 				loginRequest.getUserName(),loginRequest.getUserName());
 
 		if (ObjectUtils.isNotEmpty(userVO)) {
@@ -245,46 +405,95 @@ public class AuthServiceImpl implements AuthService {
 					UserConstants.ERRROR_MSG_USER_INFORMATION_NOT_FOUND_AND_ASKING_SIGNUP);
 		}
 		UserResponseDTO userResponseDTO = mapUserVOToDTO(userVO);
+		
+		List<UserBranchResponseDTO> branchList = new ArrayList<>();
+
+		if (userVO.getBranchAccessibleVO() != null) {
+		    for (UserLoginBranchAccessibleVO branchVO : userVO.getBranchAccessibleVO()) {
+
+		        UserBranchResponseDTO dto = new UserBranchResponseDTO();
+
+		        dto.setId(branchVO.getId());
+
+		        if (branchVO.getBranch() != null) {
+		            dto.setId(branchVO.getBranch().getId());
+		            dto.setBranch(branchVO.getBranch().getBranchName());
+		            dto.setBranchCode(branchVO.getBranch().getBranchCode());
+		        }
+
+		        branchList.add(dto);
+		    }
+		}
+
+
+		userResponseDTO.setBranches(branchList);
 
 		List<Map<String, Object>> roleVOList = new ArrayList<>();
 
 		// Iterate through UserLoginRolesVO to fetch roles and responsibilities
 		for (UserLoginRolesVO loginRolesVO : userVO.getRoleAccessVO()) {
 			Map<String, Object> roleMap = new HashMap<>();
-			roleMap.put("role", loginRolesVO.getRole());
-			roleMap.put("roleId", loginRolesVO.getRoleId());
+			 if (loginRolesVO.getRoles() != null) {
+			        roleMap.put("roleId", loginRolesVO.getRoles().getId());
+			        roleMap.put("role", loginRolesVO.getRoles().getRole());
+			    }
 			roleMap.put("startDate", loginRolesVO.getStartDate());
 			roleMap.put("endDate", loginRolesVO.getEndDate());
 			// Initialize the list for responsibilities under this role
 			List<Map<String, Object>> responsibilityVOList = new ArrayList<>();
 
 			// Fetch the RolesVO using loginRolesVO.getRoleId()
-			RolesVO rolesVO = rolesRepo.findById(loginRolesVO.getRoleId()).orElse(null);
-			if (rolesVO != null && rolesVO.getRolesReposibilitiesVO() != null) {
-				for (RolesResponsibilityVO rolesResponsibilityVO : rolesVO.getRolesReposibilitiesVO()) {
-					Map<String, Object> responsibilityMap = new HashMap<>();
-					responsibilityMap.put("responsibilityName", rolesResponsibilityVO.getResponsibility());
+			RolesVO rolesVO = loginRolesVO.getRoles();
 
-					ResponsibilityVO responsibilityVO = responsibilityRepo
-							.findById(rolesResponsibilityVO.getResponsibilityId()).orElse(null);
-					if (loginRolesVO.getEndDate() == null || !loginRolesVO.getEndDate().isBefore(LocalDate.now())) {
-						if (responsibilityVO != null && responsibilityVO.getScreensVO() != null) {
-							List<String> screensList = new ArrayList<>();
-							for (ScreensVO screenVO : responsibilityVO.getScreensVO()) {
-								screensList.add(screenVO.getScreenName());
-							}
-							responsibilityMap.put("screensVO", screensList);
-						}
-						responsibilityVOList.add(responsibilityMap);
-					} else {
-						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-						String endDateFormatted = loginRolesVO.getEndDate().format(formatter);
-						responsibilityMap.put("screensVO", null);
-						responsibilityMap.put("expiredMessage",
-								"Your Role " + loginRolesVO.getRole() + " was expired on " + endDateFormatted);
-						responsibilityVOList.add(responsibilityMap);
-					}
-				}
+			if (rolesVO != null && rolesVO.getRolesReposibilitiesVO() != null) {
+
+			    for (RolesResponsibilityVO rolesResponsibilityVO : rolesVO.getRolesReposibilitiesVO()) {
+
+			        Map<String, Object> responsibilityMap = new HashMap<>();
+
+			        responsibilityMap.put("responsibilityName",
+			                rolesResponsibilityVO.getResponsibility());
+
+			        ResponsibilityVO responsibilityVO = responsibilityRepo
+			                .findById(rolesResponsibilityVO.getResponsibilityId())
+			                .orElse(null);
+
+			        if (loginRolesVO.getEndDate() == null
+			                || !loginRolesVO.getEndDate().isBefore(LocalDate.now())) {
+
+			            if (responsibilityVO != null
+			                    && responsibilityVO.getScreensVO() != null) {
+
+			                List<String> screensList = new ArrayList<>();
+
+			                for (ScreensVO screenVO : responsibilityVO.getScreensVO()) {
+			                    screensList.add(screenVO.getScreenName());
+			                }
+
+			                responsibilityMap.put("screensVO", screensList);
+			            }
+
+			            responsibilityVOList.add(responsibilityMap);
+
+			        } else {
+
+			            DateTimeFormatter formatter =
+			                    DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+			            String endDateFormatted =
+			                    loginRolesVO.getEndDate().format(formatter);
+
+			            responsibilityMap.put("screensVO", null);
+			            responsibilityMap.put(
+			                    "expiredMessage",
+			                    "Your Role "
+			                            + rolesVO.getRole()     // or getRoleName(), depending on RolesVO
+			                            + " was expired on "
+			                            + endDateFormatted);
+
+			            responsibilityVOList.add(responsibilityMap);
+			        }
+			    }
 			}
 
 			// Add the responsibilities list to the role map
@@ -437,8 +646,15 @@ public class AuthServiceImpl implements AuthService {
 	public static UserResponseDTO mapUserVOToDTO(UserVO userVO) {
 		UserResponseDTO userDTO = new UserResponseDTO();
 		userDTO.setUsersId(userVO.getId());
-		userDTO.setEmployeeName(userVO.getEmployeeName());
-		userDTO.setEmployeeCode(userVO.getEmployeeCode());
+//		userDTO.setEmployeeName(userVO.getEmployeeName());
+//		userDTO.setEmployeeCode(userVO.getEmployeeCode());
+		if (userVO.getEmployeeMaster() != null) {
+
+		    userDTO.setEmployeeId(String.valueOf(userVO.getEmployeeMaster().getId()));
+		    userDTO.setEmployeeName(userVO.getEmployeeMaster().getEmployeeName());
+		    userDTO.setEmployeeCode(userVO.getEmployeeMaster().getEmployeeId());
+
+		}
 		userDTO.setCustomer(userVO.getCustomer());
 		userDTO.setClient(userVO.getClient());
 		userDTO.setOrgId(userVO.getOrgId());
@@ -453,6 +669,57 @@ public class AuthServiceImpl implements AuthService {
 		userDTO.setAccountRemovedDate(userVO.getAccountRemovedDate());
 
 		List<UserLoginRolesVO> loginRolesVOs = userVO.getRoleAccessVO();
+		
+		List<UserBranchResponseDTO> branchResponseList = new ArrayList<>();
+
+		if (userVO.getBranchAccessibleVO() != null) {
+
+		    for (UserLoginBranchAccessibleVO branchVO : userVO.getBranchAccessibleVO()) {
+
+		        UserBranchResponseDTO branchDTO = new UserBranchResponseDTO();
+
+//		        branchDTO.setId(branchVO.getId());
+
+		        if (branchVO.getBranch() != null) {
+		        	System.out.println(branchVO.getBranch().getId());
+		        	System.out.println(branchVO.getBranch().getId());
+		        	System.out.println(branchVO.getBranch().getId());
+		        	branchDTO.setId(branchVO.getBranch().getId());
+		            branchDTO.setBranchCode(branchVO.getBranch().getBranchCode());
+		            branchDTO.setBranch(branchVO.getBranch().getBranchName());
+		        }
+
+		        branchResponseList.add(branchDTO);
+		    }
+		}
+
+		userDTO.setBranches(branchResponseList);
+		
+		
+		List<UserLoginRolesResponseDTO> roleResponseList = new ArrayList<>();
+
+		if (userVO.getRoleAccessVO() != null) {
+
+		    for (UserLoginRolesVO roleVO : userVO.getRoleAccessVO()) {
+
+		        UserLoginRolesResponseDTO roleDTO = new UserLoginRolesResponseDTO();
+
+		        roleDTO.setId(roleVO.getId());
+
+		        if (roleVO.getRoles() != null) {
+		            roleDTO.setRoleId(roleVO.getRoles().getId());
+		            roleDTO.setRole(roleVO.getRoles().getRole());
+		        }
+
+		        roleDTO.setStartDate(roleVO.getStartDate());
+		        roleDTO.setEndDate(roleVO.getEndDate());
+
+		        roleResponseList.add(roleDTO);
+		    }
+		}
+
+		userDTO.setRoles(roleResponseList);
+		
 		return userDTO;
 	}
 
@@ -663,26 +930,43 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public List<UserVO> getAllUsersByOrgId(Long orgId) {
-		// TODO Auto-generated method stub
-		return userRepo.findAllByOrgId(orgId);
-	}
+	public List<UserResponseDTO> getAllUsersByOrgId(Long orgId) {
 
+	    List<UserVO> userList = userRepo.findAllByOrgId(orgId);
+
+	    List<UserResponseDTO> responseList = new ArrayList<>();
+
+	    for (UserVO userVO : userList) {
+	        UserResponseDTO dto = mapUserVOToDTO(userVO);
+	        responseList.add(dto);
+	    }
+
+	    return responseList;
+	}
+	
+	
+	
 	@Override
-	public UserVO getUserById(Long usersId) {
-		String methodName = "getUserById()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-		if (ObjectUtils.isEmpty(usersId)) {
-			throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_ID);
-		}
-		UserVO userVO = userRepo.getUserById(usersId);
-		if (ObjectUtils.isEmpty(userVO)) {
-			throw new ApplicationContextException(UserConstants.ERRROR_MSG_USER_INFORMATION_NOT_FOUND);
-		}
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-		return userVO;
-	}
+	public UserResponseDTO getUserById(Long usersId) {
 
+	    String methodName = "getUserById()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    if (ObjectUtils.isEmpty(usersId)) {
+	        throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_ID);
+	    }
+
+	    UserVO userVO = userRepo.getUserById(usersId);
+
+	    if (ObjectUtils.isEmpty(userVO)) {
+	        throw new ApplicationContextException(UserConstants.ERRROR_MSG_USER_INFORMATION_NOT_FOUND);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return mapUserVOToDTO(userVO);
+	}
+	
 	@Override
 	public UserVO getUserByUserName(String userName) {
 		String methodName = "getUserByUserName()";
@@ -703,7 +987,7 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public Map<String, Object> sendOtp(String userName) {
 
-	    UserVO user = userRepo.findByEmployeeName(userName);
+	    UserVO user = userRepo.findByEmployeeMaster_EmployeeName(userName);
 
 	    if (user == null) {
 	        throw new RuntimeException("User not found");
@@ -720,14 +1004,14 @@ public class AuthServiceImpl implements AuthService {
 	    // 🔹 Send email
 	    emailService.sendOtpEmail(
 	            user.getEmail(),
-	            user.getEmployeeName(),
+	            user.getEmployeeMaster().getEmployeeName(),
 	            otp
 	    );
 
 	    // 🔹 Response map
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("message", "OTP sent successfully");
-	    response.put("userName", user.getEmployeeName());
+	    response.put("userName", user.getEmployeeMaster().getEmployeeName());
 
 	    return response;
 	}

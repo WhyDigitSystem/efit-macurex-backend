@@ -17,28 +17,25 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DocumentTypeMappingDetailsVO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "documenttypemappingdetailsgen")
-    @SequenceGenerator(name = "documenttypemappingdetailsgen",
-            sequenceName = "documenttypemappingdetailsseq",
-            initialValue = 1000000001,
-            allocationSize = 1)
-    @Column(name = "documenttypemappingdetails_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "documenttypemappingdetailsgen")
+	@SequenceGenerator(name = "documenttypemappingdetailsgen", sequenceName = "documenttypemappingdetailsseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "documenttypemappingdetails_id")
+	private Long id;
 
-    @Column(name = "screen_name")
-    private String screenName;
+	@Column(name = "screen_name")
+	private String screenName;
 
-    @Column(name = "screen_code")
-    private String screenCode;
+	@Column(name = "screen_code")
+	private String screenCode;
 
-    @Column(name = "doc_code")
-    private String docCode;
+	@Column(name = "doc_code")
+	private String docCode;
 
-    @Column(name = "prefix")
-    private String prefix;
+	@Column(name = "prefix")
+	private String prefix;
 
-    @Column(name = "org_id")
+	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "active")
 	private boolean active;
@@ -47,26 +44,26 @@ public class DocumentTypeMappingDetailsVO {
 	@Column(name = "modified_by")
 	private String updatedBy;
 	@Column(name = "cancel")
-	private boolean cancel=false;
+	private boolean cancel = false;
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 	
-	
+	@Column(name = "last_no")
+	private Long lastNo;
+
 	@JsonGetter("active")
 	public String getActive() {
 		return active ? "Active" : "In-Active";
 	}
 
-	
+
 	@JsonGetter("cancel")
 	public String getCancel() {
 		return cancel ? "T" : "F";
 	}
-	
 
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-	
 
 	@ManyToOne
 	@JoinColumn(name = "documenttypemappingmaster_id")

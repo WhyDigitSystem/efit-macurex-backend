@@ -169,8 +169,8 @@ private EntityManager entityManager;
     @Override
     public List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch)
             throws ApplicationException {
-
         return documentTypeMappingRepo.findByOrgIdAndBranch(orgId, branch);
+
     }
 	
 

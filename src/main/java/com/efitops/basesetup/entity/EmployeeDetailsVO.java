@@ -58,11 +58,11 @@ public class EmployeeDetailsVO {
 	@Column(name = "dateofleaving")
 	private LocalDate dateOfLeaving;
 
-	@OneToOne
-	@JoinColumn(name = "employeemasterid")  // ★ MUST BE UNIQUE
-	@JsonBackReference
-//	@JsonIgnore
-	private EmployeeMasterVO employeeMasterVO;
+//	@OneToOne
+//	@JoinColumn(name = "employeemasterid")  // ★ MUST BE UNIQUE
+//	@JsonBackReference
+////	@JsonIgnore
+//	private EmployeeMasterVO employeeMasterVO;
 
 
 	@Embedded

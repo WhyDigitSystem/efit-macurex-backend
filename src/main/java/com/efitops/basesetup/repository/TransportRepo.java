@@ -18,12 +18,12 @@ public interface TransportRepo extends JpaRepository<TransportMasterVO, Long>{
 	        SELECT *
 	        FROM transport
 	        WHERE org_id = :orgId
-	          AND branch_code = :branchCode
+	          AND branch = :branch
 	          AND cancel = false and active = 1
 	        ORDER BY transport_name
 	        """, nativeQuery = true)
 	List<TransportMasterVO> findByOrgIdAndBranch(@Param("orgId") Long orgId,
-	                                             @Param("branchCode") String branchCode);
+	                                             @Param("branch") Long branch);
 
 
 }

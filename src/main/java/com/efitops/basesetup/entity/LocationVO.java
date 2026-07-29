@@ -42,6 +42,8 @@ public class LocationVO {
 	@JoinColumn(name = "belongs_to")
 	private ListOfValuesVO belongsTo;
 	
+	@Column(name = "location_name")
+	private String locationName;
 	
 	@Column(name = "location_id")
 	private String locationId;

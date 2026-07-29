@@ -176,7 +176,7 @@ public interface CommonMasterService {
 	TransportMasterVO getTransportNameById(Long id) throws ApplicationException;
 
 
-	List<TransportMasterVO> getTransportNameByOrgId(Long orgId, String branchCode) throws ApplicationException;
+	List<TransportMasterVO> getTransportNameByOrgId(Long orgId, Long branchCode) throws ApplicationException;
 
 	//listofvalues
 
@@ -185,6 +185,9 @@ public interface CommonMasterService {
 	ListOfValuesVO getListOfValuesById(Long id);
 
 	List<ListOfValuesVO> getListOfValuesByOrgId(Long orgId, Long branchCode);
+	
+	List<Map<String, Object>> getBudgetGroup(Long orgId, String name) throws ApplicationException;
+
 
 	//gstratemaster
 	
@@ -290,6 +293,7 @@ public interface CommonMasterService {
 	Map<String, Object> createUpdateDocumentTypeMaster(
 	        DocumentTypeMasterDTO documentTypeMasterDTO)
 	        throws ApplicationException;
+
 	
 
 	

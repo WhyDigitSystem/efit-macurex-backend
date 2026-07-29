@@ -1,16 +1,6 @@
 package com.efitops.basesetup.service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,79 +9,47 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.efitops.basesetup.ResponseDTO.CityResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.dto.BomDTO;
 import com.efitops.basesetup.dto.BomDetailsDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.DepartmentDTO;
 import com.efitops.basesetup.dto.DesignationDTO;
-import com.efitops.basesetup.dto.EmployeeCommunicationDetailsDTO;
-import com.efitops.basesetup.dto.EmployeeComplianceDetailsDTO;
-import com.efitops.basesetup.dto.EmployeeDetailsDTO;
-import com.efitops.basesetup.dto.EmployeeFinanceInformationDTO;
-import com.efitops.basesetup.dto.EmployeeLoanDetailsDTO;
+import com.efitops.basesetup.dto.DesignationResponseDTO;
 import com.efitops.basesetup.dto.EmployeeMasterDTO;
 import com.efitops.basesetup.dto.EmployeeMasterResponseDTO;
-import com.efitops.basesetup.dto.EmployeePersonalDetailsDTO;
-import com.efitops.basesetup.dto.HsnResponseImageDTO;
-import com.efitops.basesetup.dto.ItemDrawingDTO;
-import com.efitops.basesetup.dto.ItemMasterResponseDTO;
-import com.efitops.basesetup.dto.ListOfImageResponseDTO;
-import com.efitops.basesetup.dto.ListOfImageResponseDetailsDTO;
-import com.efitops.basesetup.dto.LocationImageDTO;
+import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.MaterialTypeDTO;
 import com.efitops.basesetup.dto.MaterialTypeDetailsDTO;
-import com.efitops.basesetup.dto.PartyResponseDTO;
-import com.efitops.basesetup.dto.PrimaryUnitImageDTO;
 import com.efitops.basesetup.dto.StateResponseDTO;
 import com.efitops.basesetup.dto.UomDTO;
 import com.efitops.basesetup.entity.BomDetailsVO;
 import com.efitops.basesetup.entity.BomVO;
 import com.efitops.basesetup.entity.BranchVO;
-import com.efitops.basesetup.entity.CityVO;
-import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DesignationVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
-import com.efitops.basesetup.entity.EmployeeCommunicationDetailsVO;
-import com.efitops.basesetup.entity.EmployeeComplianceDetailsVO;
-import com.efitops.basesetup.entity.EmployeeDetailsVO;
-import com.efitops.basesetup.entity.EmployeeFinanceInformationVO;
-import com.efitops.basesetup.entity.EmployeeLoanDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
-import com.efitops.basesetup.entity.EmployeePersonalDetailsVO;
-import com.efitops.basesetup.entity.HsnVO;
-import com.efitops.basesetup.entity.ItemDrawingVO;
-import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
-import com.efitops.basesetup.entity.ListOfValuesVO;
-import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.MaterialTypeDetailsVO;
 import com.efitops.basesetup.entity.MaterialTypeVO;
 import com.efitops.basesetup.entity.StateVO;
-import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.entity.UomVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BomDetailsRepo;
 import com.efitops.basesetup.repository.BomRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CityRepo;
+import com.efitops.basesetup.repository.CountryRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DesignationRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
@@ -172,6 +130,9 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 
 	@Autowired
 	DesignationRepo designationRepo;
+
+	@Autowired
+	CountryRepo countryRepo;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -857,11 +818,17 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setPermanentCity(employeeMasterVO.getPermanentCity());
 
 		if (employeeMasterVO.getPermanentState() != null) {
-			responseDTO.setPermanentStateId(employeeMasterVO.getPermanentState().getId());
+			StateResponseDTO primaryUnitDTO = new StateResponseDTO();
+			primaryUnitDTO.setId(employeeMasterVO.getPermanentState().getId());
+			primaryUnitDTO.setStateName(employeeMasterVO.getPermanentState().getStateName());
+			responseDTO.setPermanentState(primaryUnitDTO);
 		}
 
 		if (employeeMasterVO.getPermanentCountry() != null) {
-			responseDTO.setPermanentCountryId(employeeMasterVO.getPermanentCountry().getId());
+			CountryResponseDTO primaryUnitDTO = new CountryResponseDTO();
+			primaryUnitDTO.setId(employeeMasterVO.getPermanentCountry().getId());
+			primaryUnitDTO.setCountryName(employeeMasterVO.getPermanentCountry().getCountryName());
+			responseDTO.setPermanentCountry(primaryUnitDTO);
 		}
 
 		responseDTO.setPermanentPincode(employeeMasterVO.getPermanentPincode());
@@ -873,23 +840,35 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setDateOfJoining(employeeMasterVO.getDateOfJoining());
 
 		if (employeeMasterVO.getPlantId() != null) {
-			responseDTO.setPlantId(employeeMasterVO.getPlantId().getId());
+			BranchResponseDTO primaryUnitDTO = new BranchResponseDTO();
+			primaryUnitDTO.setId(employeeMasterVO.getPlantId().getId());
+			primaryUnitDTO.setBranchName(employeeMasterVO.getPlantId().getBranchName());
+			responseDTO.setPlant(primaryUnitDTO);
 		}
 
 		if (employeeMasterVO.getDepartment() != null) {
-			responseDTO.setDepartmentId(employeeMasterVO.getDepartment().getId());
+			DepartmentResponseDTO primaryUnitDTO = new DepartmentResponseDTO();
+			primaryUnitDTO.setId(employeeMasterVO.getDepartment().getId());
+			primaryUnitDTO.setDepartmentName(employeeMasterVO.getDepartment().getDepartmentName());
+			responseDTO.setDepartment(primaryUnitDTO);
 		}
 
 		if (employeeMasterVO.getDesignation() != null) {
-			responseDTO.setDesignationId(employeeMasterVO.getDesignationId().getId());
+			DesignationResponseDTO primaryUnitDTO = new DesignationResponseDTO();
+			primaryUnitDTO.setId(employeeMasterVO.getDesignation().getId());
+			primaryUnitDTO.setDesignationName(employeeMasterVO.getDesignation().getDesignation());
+			responseDTO.setDesignation(primaryUnitDTO);
 		}
 
 		responseDTO.setNatureOfEmployment(employeeMasterVO.getNatureOfEmployment());
 		responseDTO.setOverTimeApplicable(employeeMasterVO.getOverTimeApplicable());
 		responseDTO.setReferenceBy(employeeMasterVO.getReferenceBy());
 
-		if (employeeMasterVO.getOkdBy() != null) {
-			responseDTO.setOkdById(employeeMasterVO.getOkdBy().getId());
+		if (employeeMasterVO.getOkdBy() == null) {
+			EmployeeResponseDTO primaryUnitDTO = new EmployeeResponseDTO();
+			primaryUnitDTO.setId(employeeMasterVO.getOkdBy().getId());
+			primaryUnitDTO.setEmployeeName(employeeMasterVO.getOkdBy().getSurName());
+			responseDTO.setOkdBy(primaryUnitDTO);
 		}
 
 		responseDTO.setModeOfPayment(employeeMasterVO.getModeOfPayment());
@@ -900,7 +879,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setEsiDispName(employeeMasterVO.getEsiDispName());
 		responseDTO.setVpfPercentage(employeeMasterVO.getVpfPercentage());
 		responseDTO.setDateOfConfirmation(employeeMasterVO.getDateOfConfirmation());
-		responseDTO.setInformation_active(employeeMasterVO.getInformation_active());
+		responseDTO.setInformationActive(employeeMasterVO.getInformation_active());
 		responseDTO.setTrainingStartDate(employeeMasterVO.getTrainingStartDate());
 		responseDTO.setTrainingEndDate(employeeMasterVO.getTrainingEndDate());
 		responseDTO.setNoticePeriod(employeeMasterVO.getNoticePeriod());
@@ -955,16 +934,13 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 
 		if (employeeMasterDTO.getTempCountryId() != null && employeeMasterDTO.getTempCountryId() != 0) {
 
-			CityVO city = cityRepo.findById(employeeMasterDTO.getTempCountryId())
+			CountryVO city = countryRepo.findById(employeeMasterDTO.getTempCountryId())
 					.orElseThrow(() -> new ApplicationException("Temporary Country Not Found"));
 
 			employeeMasterVO.setTempCountry(city);
 		}
 
 		employeeMasterVO.setTempPincode(employeeMasterDTO.getTempPincode());
-
-		// Permanent Address
-
 		employeeMasterVO.setPermanentAddressLine(employeeMasterDTO.getPermanentAddressLine());
 		employeeMasterVO.setPermanentCity(employeeMasterDTO.getPermanentCity());
 
@@ -978,10 +954,10 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 
 		if (employeeMasterDTO.getPermanentCountryId() != null && employeeMasterDTO.getPermanentCountryId() != 0) {
 
-			CityVO city = cityRepo.findById(employeeMasterDTO.getPermanentCountryId())
+			CountryVO country = countryRepo.findById(employeeMasterDTO.getPermanentCountryId())
 					.orElseThrow(() -> new ApplicationException("Permanent Country Not Found"));
 
-			employeeMasterVO.setPermanentCountry(city);
+			employeeMasterVO.setPermanentCountry(country);
 		}
 
 		employeeMasterVO.setPermanentPincode(employeeMasterDTO.getPermanentPincode());
@@ -1060,28 +1036,28 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		}
 	}
 
-//	@Override
-//	public EmployeeMasterResponseDTO getEmployeeMasterById(Long id) throws ApplicationException {
-//
-//		EmployeeMasterVO employeeMasterVO = employeeMasterRepo.getEmployeeMasterById(id);
-//
-//		if (employeeMasterVO == null) {
-//			throw new ApplicationException("Item Master Not Found");
-//		}
-//
-//		return buildItemMasterResponse(employeeMasterVO);
-//	}
-//
-//	@Override
-//	public ItemMasterResponseDTO getItemMasterByOrgId(Long orgId, Long branchId) throws ApplicationException {
-//
-//		employeeMasterVO employeeMasterVO = employeeMasterRepo.getItemMasterByOrgId(orgId, branchId);
-//
-//		if (employeeMasterVO == null) {
-//			throw new ApplicationException("Item Master Not Found");
-//		}
-//
-//		return buildItemMasterResponse(employeeMasterVO);
-//	}
+	@Override
+	public EmployeeMasterResponseDTO getEmployeeMasterById(Long id) throws ApplicationException {
+
+		EmployeeMasterVO employeeMasterVO = employeeMasterRepo.getEmployeeMasterById(id);
+
+		if (employeeMasterVO == null) {
+			throw new ApplicationException("Employee Master Not Found");
+		}
+
+		return buildEmployeeMasterResponse(employeeMasterVO);
+	}
+
+	@Override
+	public EmployeeMasterResponseDTO getEmployeeMasterByOrgId(Long orgId, Long branchId) throws ApplicationException {
+
+		EmployeeMasterVO employeeMasterVO = employeeMasterRepo.getEmployeeMasterByOrgId(orgId, branchId);
+
+		if (employeeMasterVO == null) {
+			throw new ApplicationException("Employee Master Not Found");
+		}
+
+		return buildEmployeeMasterResponse(employeeMasterVO);
+	}
 
 }

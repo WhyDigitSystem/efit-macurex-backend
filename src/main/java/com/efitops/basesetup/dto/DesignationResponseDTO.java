@@ -1,5 +1,13 @@
 package com.efitops.basesetup.dto;
 
-public class DesignationResponseDTO {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class DesignationResponseDTO {
+	private Long id;
+	private String designationName;
 }

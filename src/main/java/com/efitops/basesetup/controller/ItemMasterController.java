@@ -38,34 +38,6 @@ public class ItemMasterController extends BaseController {
 	@Autowired
 	ItemMasterService itemMasterService;
 
-	// TaxInvoice
-
-//	@GetMapping("/getItemMasterById")
-//	public ResponseEntity<ResponseDTO> getItemMasterById(@RequestParam Long id) {
-//		String methodName = "getItemMasterById()";
-//		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-//		String errorMsg = null;
-//		Map<String, Object> responseObjectsMap = new HashMap<>();
-//		ResponseDTO responseDTO = null;
-//		ItemMasterVO itemMasterVO = new ItemMasterVO();
-//		try {
-//			itemMasterVO = itemMasterService.getItemMasterById(id);
-//		} catch (Exception e) {
-//			errorMsg = e.getMessage();
-//			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-//		}
-//		if (StringUtils.isBlank(errorMsg)) {
-//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "ItemMaster information get successfully By id");
-//			responseObjectsMap.put("itemMasterVO", itemMasterVO);
-//			responseDTO = createServiceResponse(responseObjectsMap);
-//		} else {
-//			responseDTO = createServiceResponseError(responseObjectsMap, "ItemMaster information receive failedByOrgId",
-//					errorMsg);
-//		}
-//		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-//		return ResponseEntity.ok().body(responseDTO);
-//	}
-
 	@GetMapping("/getItemMasterById")
 	public ResponseEntity<ResponseDTO> getItemMasterById(@RequestParam Long id) {
 

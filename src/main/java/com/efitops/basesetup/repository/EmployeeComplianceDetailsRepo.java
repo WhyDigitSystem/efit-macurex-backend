@@ -15,7 +15,7 @@ public interface EmployeeComplianceDetailsRepo extends JpaRepository<EmployeeCom
 //	@Query("delete from EmployeeComplianceDetailsVO c where c.employeeMasterVO = :vo")
 //	int deleteByEmployeeMasterVO(@Param("vo") EmployeeMasterVO vo);
 
-	EmployeeComplianceDetailsVO findByEmployeeMasterVO(EmployeeMasterVO saved);
+//	EmployeeComplianceDetailsVO findByEmployeeMasterVO(EmployeeMasterVO saved);
 	
 
 }

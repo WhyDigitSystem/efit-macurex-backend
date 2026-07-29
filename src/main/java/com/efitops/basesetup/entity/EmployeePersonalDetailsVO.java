@@ -56,11 +56,11 @@ public class EmployeePersonalDetailsVO {
 	
 	
 
-	@OneToOne
-	@JoinColumn(name = "employeemasterid")  // ★ MUST BE UNIQUE
-	@JsonBackReference
-//	@JsonIgnore
-	private EmployeeMasterVO employeeMasterVO;
+//	@OneToOne
+//	@JoinColumn(name = "employeemasterid")  // ★ MUST BE UNIQUE
+//	@JsonBackReference
+////	@JsonIgnore
+//	private EmployeeMasterVO employeeMasterVO;
 
 
 	@Embedded

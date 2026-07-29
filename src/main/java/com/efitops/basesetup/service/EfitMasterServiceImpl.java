@@ -747,15 +747,15 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			message = "Employee Updated Successfully";
 		} else {
 //
-//			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
-//
-//			employeeMasterVO.setEmployeeId(docId);
-//
-////						// GETDOCID LASTNO +1
-//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-//					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
-//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
+
+			employeeMasterVO.setEmployeeId(docId);
+
+//						// GETDOCID LASTNO +1
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			employeeMasterVO.setCreatedBy(employeeMasterDTO.getCreatedBy());
 			employeeMasterVO.setUpdatedBy(employeeMasterDTO.getCreatedBy());

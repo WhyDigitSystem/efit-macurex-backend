@@ -123,7 +123,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 					.orElseThrow(() -> new ApplicationException("Item not found"));
 
 			if (!itemMasterVO.getItemCode().equals(itemMasterDTO.getItemCode())) {
-				if (itemMasterRepo.existsByItemCodeAndOrgId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId())) {
+				if (itemMasterRepo.existsByItemCodeAndOrgIdAndBranchId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId(),itemMasterDTO.getBranchId())) {
 
 					String errorMessage = String.format("This ItemCode: %s already exists for this organization.",
 							itemMasterDTO.getItemCode());
@@ -137,7 +137,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			message = "Item Updated Successfully";
 		} else {
 
-			if (itemMasterRepo.existsByItemCodeAndOrgId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId())) {
+			if (itemMasterRepo.existsByItemCodeAndOrgIdAndBranchId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId(),itemMasterDTO.getBranchId())) {
 
 				String errorMessage = String.format("This ItemCode: %s already exists for this organization.",
 						itemMasterDTO.getItemCode());

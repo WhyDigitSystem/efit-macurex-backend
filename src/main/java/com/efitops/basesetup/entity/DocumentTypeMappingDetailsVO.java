@@ -56,6 +56,7 @@ public class DocumentTypeMappingDetailsVO {
 		return active ? "Active" : "In-Active";
 	}
 
+
 	@JsonGetter("cancel")
 	public String getCancel() {
 		return cancel ? "T" : "F";

@@ -8,7 +8,7 @@ package com.efitops.basesetup.repository;
 
 	import com.efitops.basesetup.entity.DocumentTypeMappingVO;
 
-	public interface DocumnentTypeMappingRepo extends JpaRepository<DocumentTypeMappingVO, Long> {
+	public interface DocumentTypeMappingRepo extends JpaRepository<DocumentTypeMappingVO, Long> {
 
 	    @Query(value = """
 	            SELECT *

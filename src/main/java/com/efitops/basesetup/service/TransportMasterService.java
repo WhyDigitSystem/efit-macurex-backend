@@ -26,54 +26,6 @@ import com.efitops.basesetup.repository.PartyProjection;
 
 public interface TransportMasterService {
 
-	//TS bank
-	Map<String, Object> createUpdateBankMaster(TSBankDTO tSBankDTO) throws ApplicationException;
-
-	TSBankVO getBankMasterById(Long id) throws ApplicationException;
-
-	List<TSBankVO> getBankMasterByOrgId(Long orgId) throws ApplicationException;
-	
-	//Tax Definition
-	
-
-	TaxDefinitionVO getTaxDefinitionById(Long id) throws ApplicationException;
-
-	List<TaxDefinitionVO> 
-	getTaxDefinitionByOrgId(Long orgId,Long branch) throws ApplicationException;
-
-	Map<String, Object> updateCreateTaxDefinition(TaxDefinitionDTO taxDefinitionDTO) throws ApplicationException;
-
-	//Holiday Master
-	
-	Map<String, Object> updateCreateHolidayMaster(HolidayMasterDTO holidayMasterDTO) throws ApplicationException;
-
-	HolidayMasterVO getHolidayMasterById(Long id);
-
-	List<HolidayMasterVO> getHolidayMasterByOrgId(Long orgId, Long branchId);
-
-	//Mapping of party to account
-	
-	Map<String, Object> updateCreateMappingOfPartyToAcc(MappingOfPartyToAccDTO mappingOfPartyToAccDTO) throws ApplicationException;
-
-	MappingOfPartyToAccVO getMappingOfPartyToAccById(Long id);
-
-	List<MappingOfPartyToAccVO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch);
-	
-	Map<String, Object> getCustomerCategory(Long orgId)
-	        throws ApplicationException;
-	
-	Map<String, Object> getParty(Long category,
-            Long orgId,
-            Long branch)
-throws ApplicationException;
-
-	
-
-	
-
-	
-	
-
 	
 	
 

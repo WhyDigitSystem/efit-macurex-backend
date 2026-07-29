@@ -355,14 +355,14 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 //		responseDTO.setDefaultSupplier(itemMasterVO.getDefaultSupplier());
 //		responseDTO.setAlternativeSupplier(itemMasterVO.getAlternativeSupplier());
 
-		if (itemMasterVO.getDefaultSupplier() == null || itemMasterVO.getDefaultSupplier() != null) {
+		if (itemMasterVO.getDefaultSupplier() != null) {
 			PartyResponseDTO primaryUnitDTO = new PartyResponseDTO();
 			primaryUnitDTO.setId(itemMasterVO.getDefaultSupplier().getId());
 			primaryUnitDTO.setPartyName(itemMasterVO.getDefaultSupplier().getCustomerName());
 			responseDTO.setDefaultPartyResponse(primaryUnitDTO);
 		}
 
-		if (itemMasterVO.getAlternativeSupplier() == null || itemMasterVO.getAlternativeSupplier() != null) {
+		if (itemMasterVO.getAlternativeSupplier() != null) {
 			PartyResponseDTO primaryUnitDTO = new PartyResponseDTO();
 			primaryUnitDTO.setId(itemMasterVO.getAlternativeSupplier().getId());
 			primaryUnitDTO.setPartyName(itemMasterVO.getAlternativeSupplier().getCustomerName());
@@ -562,7 +562,8 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		itemMasterVO.setToolOwner(itemMasterDTO.getToolOwner());
 		itemMasterVO.setToolNo(itemMasterDTO.getToolNo());
 
-		if (itemMasterDTO.getAlternativeSupplierId() == null || itemMasterDTO.getAlternativeSupplierId() != null) {
+
+		if (itemMasterDTO.getAlternativeSupplierId() != null && itemMasterDTO.getAlternativeSupplierId() >0 ) {
 
 			CustomerVO party = customerRepo.findById(itemMasterDTO.getAlternativeSupplierId())
 					.orElseThrow(() -> new ApplicationException("AlternativeSupplier Not Found"));
@@ -570,7 +571,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			itemMasterVO.setAlternativeSupplier(party);
 		}
 
-		if (itemMasterDTO.getDefaultSupplierId() == null || itemMasterDTO.getDefaultSupplierId() != null) {
+		if (itemMasterDTO.getDefaultSupplierId() != null && itemMasterDTO.getDefaultSupplierId() > 0 ) {
 
 			CustomerVO party = customerRepo.findById(itemMasterDTO.getDefaultSupplierId())
 					.orElseThrow(() -> new ApplicationException("DefaultSupplier Not Found"));

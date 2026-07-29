@@ -865,12 +865,20 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setReferenceBy(employeeMasterVO.getReferenceBy());
 
 		if (employeeMasterVO.getOkdBy() != null) {
-			EmployeeResponseDTO primaryUnitDTO = new EmployeeResponseDTO();
-			primaryUnitDTO.setId(employeeMasterVO.getOkdBy().getId());
-			primaryUnitDTO.setEmployeeName(employeeMasterVO.getOkdBy().getSurName());
-			responseDTO.setOkdBy(primaryUnitDTO);
+
+			EmployeeResponseDTO employeeDTO = new EmployeeResponseDTO();
+			employeeDTO.setId(employeeMasterVO.getOkdBy().getId());
+			employeeDTO.setEmployeeName(employeeMasterVO.getOkdBy().getEmployeeName());
+
+			responseDTO.setOkdBy(employeeDTO);
 		}
 
+		if (employeeMasterVO.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(employeeMasterVO.getBranch().getId());
+			branchDTO.setBranchName(employeeMasterVO.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
 		responseDTO.setModeOfPayment(employeeMasterVO.getModeOfPayment());
 		responseDTO.setBankAccountNo(employeeMasterVO.getBankAccountNo());
 		responseDTO.setBankName(employeeMasterVO.getBankName());
@@ -998,7 +1006,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setOverTimeApplicable(employeeMasterDTO.getOverTimeApplicable());
 		employeeMasterVO.setReferenceBy(employeeMasterDTO.getReferenceBy());
 
-		if (employeeMasterDTO.getOkdById() != null) {
+		if (employeeMasterDTO.getOkdById() != null && employeeMasterDTO.getOkdById() > 0) {
 
 			EmployeeMasterVO employee = employeeMasterRepo.findById(employeeMasterDTO.getOkdById())
 					.orElseThrow(() -> new ApplicationException("Employee Not Found"));

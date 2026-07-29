@@ -3,6 +3,7 @@ package com.efitops.basesetup.entity;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,8 +38,10 @@ public class ServiceAccMasterVO {
 	@Column(name = "service_description")
 	private String serviceDescription;
 	
-	@Column(name = "hsn_code")
-	private String hsncode;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "hsnc_ode")
+	private HsnVO hsnCode;
 		
 	@Column(name = "org_id")
 	private Long orgId;

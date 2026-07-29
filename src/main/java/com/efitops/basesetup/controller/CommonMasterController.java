@@ -33,6 +33,7 @@ import com.efitops.basesetup.dto.CountryDTO;
 import com.efitops.basesetup.dto.CurrencyDTO;
 import com.efitops.basesetup.dto.DocumentTypeMasterDTO;
 import com.efitops.basesetup.dto.DocumnentTypeMappingDTO;
+import com.efitops.basesetup.dto.EmployeeMasterResponseDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
 import com.efitops.basesetup.dto.GSTRateMasterDTO;
@@ -46,6 +47,7 @@ import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
+import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
 import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
@@ -539,7 +541,7 @@ public class CommonMasterController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
 	@GetMapping("/getAllCurrencyForExRate")
 	public ResponseEntity<ResponseDTO> getAllCurrencyForExRate(@RequestParam Long orgId) {
 		String methodName = "getAllCurrencyForExRate()";
@@ -928,9 +930,7 @@ public class CommonMasterController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
-	
+
 //	@GetMapping("getBankDetailsByOrgId")
 //	public ResponseEntity<ResponseDTO> getCompanyByOrgId(@RequestParam Long orgId) {
 //		String methodName = "getCompanyByOrgId()";
@@ -957,1349 +957,1332 @@ public class CommonMasterController extends BaseController {
 //		return ResponseEntity.ok().body(responseDTO);
 //	}
 
-	
-	 @PostMapping("/uploadCompanyLogoInBloob")
-	    public ResponseEntity<ResponseDTO> uploadCompanyLogoInBloob(@RequestParam("file") MultipartFile file,
-	            @RequestParam Long id) {
-	        String methodName = "uploadCompanyLogoInBloob()";
-	        LOGGER.debug("Starting Method: " + methodName);
-	        String errorMsg = null;
-	        Map<String, Object> responseObjectsMap = new HashMap<>();
-	        ResponseDTO responseDTO = null;
-	        CompanyVO companyVO = null;
-
-	        try {
-	            companyVO = commonMasterService.uploadCompanyLogoInBloob(file, id);
-	        } catch (Exception e) {
-	            errorMsg = e.getMessage();
-	            LOGGER.error("Unable to Upload Company Logo: " + errorMsg);
-	        }
-
-	        if (StringUtils.isBlank(errorMsg)) {
-	            responseObjectsMap.put("message", "Company Logo Successfully Uploaded");
-	            responseObjectsMap.put("companyVO", companyVO);
-	            responseDTO = createServiceResponse(responseObjectsMap);  // Assuming this is your custom response method
-	        } else {
-	            responseDTO = createServiceResponseError(responseObjectsMap, "Company Logo Upload Failed", errorMsg);
-	        }
-
-	        LOGGER.debug("Ending Method: " + methodName);
-	        return ResponseEntity.ok().body(responseDTO);
-	    }
-	 
-	 @PostMapping("/createUpdateBranch")
-	 public ResponseEntity<ResponseDTO> createUpdateBranch(@RequestBody BranchDTO branchDTO) {
-
-	     String methodName = "createUpdateBranch()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	         Map<String, Object> createdBranchVO = commonMasterService.createUpdateBranch(branchDTO);
-
-	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE, createdBranchVO.get("message"));
-	         responseObjectsMap.put("branchVO", createdBranchVO.get("branchVO"));
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @GetMapping("/getBranchById")
-		public ResponseEntity<ResponseDTO> getBranchById(@RequestParam Long id) {
-			String methodName = "getBranchById()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			BranchVO branchVO = new BranchVO();
-			try {
-				branchVO = commonMasterService.getBranchById(id);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-			}
-			if (StringUtils.isBlank(errorMsg)) {
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "branch information get successfully");
-				responseObjectsMap.put("branchVO", branchVO);
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} else {
-				responseDTO = createServiceResponseError(responseObjectsMap, "branch information receive failed",
-						errorMsg);
-			}
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-	 
-	 @GetMapping("/getBranchByOrgId")
-	 public ResponseEntity<ResponseDTO> getBranchByOrgId(@RequestParam Long orgId) {
-	     String methodName = "getBranchByOrgId()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     String errorMsg = null;
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     ResponseDTO responseDTO = null;
-	     List<BranchVO> branchList = new ArrayList<>();
-
-	     try {
-	         branchList = commonMasterService.getBranchByOrgId(orgId);
-	     } catch (Exception e) {
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-	     }
-
-	     if (StringUtils.isBlank(errorMsg)) {
-	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Branch information retrieved successfully");
-	         responseObjectsMap.put("branchList", branchList);
-	         responseDTO = createServiceResponse(responseObjectsMap);
-	     } else {
-	         responseDTO = createServiceResponseError(responseObjectsMap,
-	                 "Branch information retrieval failed", errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 //transport
-	 
-	 @PutMapping("/updateCreateTransportMaster")
-		public ResponseEntity<ResponseDTO> updateCreateTransportMaster(@RequestBody TransportMasterDTO transportMasterDTO) {
-			String methodName = "updateCreateTransportMaster()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			try {
-				Map<String, Object> transportMasterVO = commonMasterService.updateCreateTransportMaster(transportMasterDTO);
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, transportMasterVO.get("message"));
-				responseObjectsMap.put("transportMasterVO", transportMasterVO.get("transportMasterVO"));
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-			}
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		
-	 @GetMapping("/getTransportById")
-	 public ResponseEntity<ResponseDTO> getTransportById(@RequestParam Long id) {
-
-	     String methodName = "getTransportById()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	         TransportMasterVO transportVO = commonMasterService.getTransportNameById(id);
-
-	         responseObjectsMap.put("transportVO", transportVO);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @GetMapping("/getTransportByOrgId")
-	 public ResponseEntity<ResponseDTO> getTransportByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
-
-	     String methodName = "getTransportByOrgId()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	         List<TransportMasterVO> transportList = commonMasterService.getTransportNameByOrgId(orgId,branch);
-
-	         responseObjectsMap.put("transportList", transportList);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @PutMapping("/updateCreateListOfValues")
-		public ResponseEntity<ResponseDTO> updateCreateListOfValues(@RequestBody ListOfValuesDTO listOfValuesDTO) {
-			String methodName = "updateCreateListOfValues()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			try {
-				Map<String, Object> listOfValuesVO = commonMasterService.updateCreateListOfValues(listOfValuesDTO);
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, listOfValuesVO.get("message"));
-				responseObjectsMap.put("listOfValuesVO", listOfValuesVO.get("listOfValuesVO"));
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-			}
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		
-	 @GetMapping("/getListOfValuesById")
-	 public ResponseEntity<ResponseDTO> getListOfValuesById(@RequestParam Long id) {
-
-	     String methodName = "getListOfValuesById()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	    	 ListOfValuesVO listOfValuesVO = commonMasterService.getListOfValuesById(id);
-
-	         responseObjectsMap.put("listOfValuesVO", listOfValuesVO);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @GetMapping("/getListOfValuesByOrgId")
-	 public ResponseEntity<ResponseDTO> getListOfValuesByOrgId(@RequestParam Long orgId,@RequestParam Long branchId) {
-
-	     String methodName = "getListOfValuesByOrgId()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	         List<ListOfValuesVO> listOfVlaues = commonMasterService.getListOfValuesByOrgId(orgId,branchId);
-
-	         responseObjectsMap.put("listOfValues", listOfVlaues);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	//GST Rate Master
-	 
-	 @PutMapping("/updateCreateGSTRateMaster")
-		public ResponseEntity<ResponseDTO> updateCreateGSTRateMaster(@RequestBody GSTRateMasterDTO gSTRateMasterDTO) {
-			String methodName = "updateCreateGSTRateMaster()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			try {
-				Map<String, Object> gSTRateMasterVO = commonMasterService.updateCreateGSTRateMaster(gSTRateMasterDTO);
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, gSTRateMasterVO.get("message"));
-				responseObjectsMap.put("gSTRateMasterVO", gSTRateMasterVO.get("gSTRateMasterVO"));
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-			}
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		
-	 @GetMapping("/getGSTRateMasterById")
-	 public ResponseEntity<ResponseDTO> getGSTRateMasterById(@RequestParam Long id) {
-
-	     String methodName = "getGSTRateMasterById()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	    	 GSTRateMasterVO gSTRateMasterVO = commonMasterService.getGSTRateMasterById(id);
-
-	         responseObjectsMap.put("gSTRateMasterVO", gSTRateMasterVO);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @GetMapping("/getGSTRateByOrgId")
-	 public ResponseEntity<ResponseDTO> getGSTRateByOrgId(@RequestParam Long orgId,@RequestParam Long branchId) {
-
-	     String methodName = "getGSTRateByOrgId()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	         List<GSTRateMasterVO> transportList = commonMasterService.getGSTRateByOrgId(orgId,branchId);
-
-	         responseObjectsMap.put("transportList", transportList);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 //Service Accounting Masters
-	 
-	 @PutMapping("/updateCreateServiceAccMaster")
-		public ResponseEntity<ResponseDTO> updateCreateServiceAccMaster(@RequestBody ServiceAccMasterDTO serviceAccMasterDTO) {
-			String methodName = "updateCreateServiceAccMaster()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			try {
-				Map<String, Object> serviceAccMasterVO = commonMasterService.updateCreateServiceAccMaster(serviceAccMasterDTO);
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, serviceAccMasterVO.get("message"));
-				responseObjectsMap.put("serviceAccMasterVO", serviceAccMasterVO.get("serviceAccMasterVO"));
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-			}
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		
-	 @GetMapping("/getServiceAccMasterById")
-	 public ResponseEntity<ResponseDTO> getServiceAccMasterById(@RequestParam Long id) {
-
-	     String methodName = "getServiceAccMasterById()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	    	 ServiceAccMasterVO serviceAccMasterVO = commonMasterService.getServiceNameById(id);
-
-	         responseObjectsMap.put("serviceAccMasterVO", serviceAccMasterVO);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @GetMapping("/getServiceAccMasterByOrgId")
-	 public ResponseEntity<ResponseDTO> getServiceAccMasterByOrgId(@RequestParam Long orgId,@RequestParam Long branchId) {
-
-	     String methodName = "getServiceAccMasterByOrgId()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	         List<ServiceAccMasterVO> transportList = commonMasterService.getServiceNameByOrgId(orgId,branchId);
-
-	         responseObjectsMap.put("transportList", transportList);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @PutMapping("/updateCreateLocationMaster")
-		public ResponseEntity<ResponseDTO> updateCreateLocationMaster(@RequestBody LocationDTO locationDTO) {
-			String methodName = "updateCreateLocationMaster()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			try {
-				Map<String, Object> LocationVO = commonMasterService.updateCreateLocationMaster(locationDTO);
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, LocationVO.get("message"));
-				responseObjectsMap.put("locationVO", LocationVO.get("locationVO"));
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-			}
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		
-	 @GetMapping("/getLocationMasterById")
-	 public ResponseEntity<ResponseDTO> getLocationMasterById(@RequestParam Long id) {
-
-	     String methodName = "getLocationMasterById()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	    	 LocationVO locationVO = commonMasterService.getLocationById(id);
-
-	         responseObjectsMap.put("locationVO", locationVO);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @GetMapping("/getLocationByOrgId")
-	 public ResponseEntity<ResponseDTO> getLocationByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
-
-	     String methodName = "getLocationByOrgId()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	         List<LocationVO> transportList = commonMasterService.getLocationByOrgId(orgId,branch);
-
-	         responseObjectsMap.put("transportList", transportList);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-
-	 //LME 
-	 @PutMapping("/updateCreateLMEMaster")
-		public ResponseEntity<ResponseDTO> updateCreateLMEMaster(@RequestBody LMEDTO lMEDTO) {
-			String methodName = "updateCreateLMEMaster()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			try {
-				Map<String, Object> LMEVO = commonMasterService.updateCreateLMEMaster(lMEDTO);
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, LMEVO.get("message"));
-				responseObjectsMap.put("lMEVO", LMEVO.get("lMEVO"));
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-			}
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		
-	 @GetMapping("/getLMEMasterById")
-	 public ResponseEntity<ResponseDTO> getLMEMasterById(@RequestParam Long id) {
-
-	     String methodName = "getLMEMasterById()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	    	 LMEVO lMEVO = commonMasterService.getLMEById(id);
-
-	         responseObjectsMap.put("lMEVO", lMEVO);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @GetMapping("/getLMEByOrgId")
-	 public ResponseEntity<ResponseDTO> getLMEByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
-
-	     String methodName = "getLMEByOrgId()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	         List<LMEVO> transportList = commonMasterService.getLMEByOrgId(orgId,branch);
-
-	         responseObjectsMap.put("transportList", transportList);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 //Financial Year
-	 @PostMapping("/createUpdateFinancialYear")
-	 public ResponseEntity<ResponseDTO> createUpdateFinancialYear(@RequestBody FinancialYearDTO financialYearDTO) {
-
-	     String methodName = "createUpdateFinancialYear()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
-
-	     try {
-
-	         Map<String, Object> createdFinancialYearVO = commonMasterService.createUpdateFinancialYear(financialYearDTO);
-
-	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE, createdFinancialYearVO.get("message"));
-	         responseObjectsMap.put("financialYearVO", createdFinancialYearVO.get("financialYearVO"));
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         errorMsg = e.getMessage();
-
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @GetMapping("/geFinancialYearById")
-		public ResponseEntity<ResponseDTO> geFinancialYearById(@RequestParam Long id) {
-			String methodName = "geFinancialYearById()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			FinancialYearVO financialYearVO = new FinancialYearVO();
-			try {
-				financialYearVO = commonMasterService.getFinancialYearById(id);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-			}
-			if (StringUtils.isBlank(errorMsg)) {
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Financial Year information get successfully");
-				responseObjectsMap.put("financialYearVO", financialYearVO);
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} else {
-				responseDTO = createServiceResponseError(responseObjectsMap, "Financial Year information receive failed",
-						errorMsg);
-			}
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
-		}
-	 
-	 @GetMapping("/getFinancialYearByOrgId")
-	 public ResponseEntity<ResponseDTO> getFinancialYearByOrgId(@RequestParam Long orgId) {
-	     String methodName = "getFinancialYearByOrgId()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	     String errorMsg = null;
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     ResponseDTO responseDTO = null;
-	     List<FinancialYearVO> branchList = new ArrayList<>();
-
-	     try {
-	         branchList = commonMasterService.getFinancialYearByOrgId(orgId);
-	     } catch (Exception e) {
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-	     }
-
-	     if (StringUtils.isBlank(errorMsg)) {
-	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Financial Year information retrieved successfully");
-	         responseObjectsMap.put("branchList", branchList);
-	         responseDTO = createServiceResponse(responseObjectsMap);
-	     } else {
-	         responseDTO = createServiceResponseError(responseObjectsMap,
-	                 "Financial Year information retrieval failed", errorMsg);
-	     }
-
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	
-	 //HSN
-	  
-	    @PutMapping("/createUpdateHSN")
-	    public ResponseEntity<ResponseDTO> createUpdateHSN(@RequestBody HsnDTO hsnDTO) {
-
-	        String methodName = "createUpdateHSN()";
-	        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	        String errorMsg = null;
-	        Map<String, Object> responseObjectsMap = new HashMap<>();
-	        ResponseDTO responseDTO = null;
-
-	        try {
-
-				Map<String, Object> hsnVO = commonMasterService.createUpdateHSN(hsnDTO);
-
-	            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, hsnVO.get("message"));
-	            responseObjectsMap.put("hsnVO", hsnVO.get("hsnVO"));
-
-	            responseDTO = createServiceResponse(responseObjectsMap);
-
-	        } catch (Exception e) {
-
-	            errorMsg = e.getMessage();
-	            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	            responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	        }
-
-	        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	        return ResponseEntity.ok().body(responseDTO);
-	    }
-
-
-	    @GetMapping("/getHSNById")
-	    public ResponseEntity<ResponseDTO> getHSNById(@RequestParam Long id) {
-
-	        String methodName = "getHSNById()";
-	        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	        Map<String, Object> responseObjectsMap = new HashMap<>();
-	        String errorMsg = null;
-	        ResponseDTO responseDTO = null;
-
-	        try {
-
-	            HsnVO hsnVO = commonMasterService.getHSNById(id).orElse(null);
-
-	            responseObjectsMap.put("hsnVO", hsnVO);
-
-	            responseDTO = createServiceResponse(responseObjectsMap);
-
-	        } catch (Exception e) {
-
-	            errorMsg = e.getMessage();
-	            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	            responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	        }
-
-	        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	        return ResponseEntity.ok().body(responseDTO);
-	    }
-	    
-	    @GetMapping("/getHsnByOrgId")
-	    public ResponseEntity<ResponseDTO> getHsnByOrgId(@RequestParam Long orgId,
-	                                                     @RequestParam Long branch) {
-
-	        String methodName = "getHsnByOrgId()";
-	        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	        Map<String, Object> responseObjectsMap = new HashMap<>();
-	        String errorMsg = null;
-	        ResponseDTO responseDTO = null;
-
-	        try {
-
-	            List<HsnVO> hsnList = commonMasterService.getHsnByOrgId(orgId, branch);
-
-	            responseObjectsMap.put("hsnList", hsnList);
-
-	            responseDTO = createServiceResponse(responseObjectsMap);
-
-	        } catch (Exception e) {
-
-	            errorMsg = e.getMessage();
-	            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	            responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	        }
-
-	        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	        return ResponseEntity.ok().body(responseDTO);
-	    }
-		 
-		
-	    //Unit Master
-	    @PutMapping("/createUpdateUnitMaster")
-	    public ResponseEntity<ResponseDTO> createUpdateUnitMaster(@RequestBody UnitMasterDTO unitMasterDTO) {
-
-	        String methodName = "createUpdateUnitMaster()";
-	        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	        String errorMsg = null;
-	        Map<String, Object> responseObjectsMap = new HashMap<>();
-	        ResponseDTO responseDTO = null;
-
-	        try {
-
-	            Map<String, Object> unitMasterVO = commonMasterService.createUpdateUnitMaster(unitMasterDTO);
-
-	            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, unitMasterVO.get("message"));
-	            responseObjectsMap.put("unitMasterVO", unitMasterVO.get("unitMasterVO"));
-
-	            responseDTO = createServiceResponse(responseObjectsMap);
-
-	        } catch (Exception e) {
-
-	            errorMsg = e.getMessage();
-	            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	            responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	        }
-
-	        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	        return ResponseEntity.ok().body(responseDTO);
-	    }
-
-	    @GetMapping("/getUnitMasterById")
-	    public ResponseEntity<ResponseDTO> getUnitMasterById(@RequestParam Long id) {
-
-	        String methodName = "getUnitMasterById()";
-	        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	        Map<String, Object> responseObjectsMap = new HashMap<>();
-	        String errorMsg = null;
-	        ResponseDTO responseDTO = null;
-
-	        try {
-
-	            UnitMasterVO unitMasterVO = commonMasterService.getUnitMasterById(id).orElse(null);
-
-	            responseObjectsMap.put("unitMasterVO", unitMasterVO);
-
-	            responseDTO = createServiceResponse(responseObjectsMap);
-
-	        } catch (Exception e) {
-
-	            errorMsg = e.getMessage();
-	            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	            responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	        }
-
-	        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	        return ResponseEntity.ok().body(responseDTO);
-	    }
-	    
-	    @GetMapping("/getUnitMasterByOrgId")
-	    public ResponseEntity<ResponseDTO> getUnitMasterByOrgId(@RequestParam Long orgId,
-	                                                            @RequestParam Long branch) {
-
-	        String methodName = "getUnitMasterByOrgId()";
-	        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	        Map<String, Object> responseObjectsMap = new HashMap<>();
-	        String errorMsg = null;
-	        ResponseDTO responseDTO = null;
-
-	        try {
-
-	            List<UnitMasterVO> unitMasterList = commonMasterService.getUnitMasterByOrgId(orgId, branch);
-
-	            responseObjectsMap.put("unitMasterList", unitMasterList);
-
-	            responseDTO = createServiceResponse(responseObjectsMap);
-
-	        } catch (Exception e) {
-
-	            errorMsg = e.getMessage();
-	            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	            responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	        }
-
-	        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	        return ResponseEntity.ok().body(responseDTO);
-	    }
-	    
-	    //Uom Conversion
-	    
-	    @PutMapping("/createUpdateUomConversion")
-		public ResponseEntity<ResponseDTO> createUpdateUomConversion(
-				@RequestBody UomConversionDTO uomConversionDTO) {
-
-			String methodName = "createUpdateUomConversion()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-
-			try {
-
-				Map<String, Object> uomConversionVO = commonMasterService
-						.createUpdateUomConversion(uomConversionDTO);
-
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-						uomConversionVO.get("message"));
-				responseObjectsMap.put("uomConversionVO",
-						uomConversionVO.get("uomConversionVO"));
-
-				responseDTO = createServiceResponse(responseObjectsMap);
-
-			} catch (Exception e) {
-
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-				responseDTO = createServiceResponseError(responseObjectsMap,
-						errorMsg, errorMsg);
-			}
-
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-			return ResponseEntity.ok().body(responseDTO);
+	@PostMapping("/uploadCompanyLogoInBloob")
+	public ResponseEntity<ResponseDTO> uploadCompanyLogoInBloob(@RequestParam("file") MultipartFile file,
+			@RequestParam Long id) {
+		String methodName = "uploadCompanyLogoInBloob()";
+		LOGGER.debug("Starting Method: " + methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		CompanyVO companyVO = null;
+
+		try {
+			companyVO = commonMasterService.uploadCompanyLogoInBloob(file, id);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error("Unable to Upload Company Logo: " + errorMsg);
 		}
 
-	    @GetMapping("/getUomConversionById")
-	    public ResponseEntity<ResponseDTO> getUomConversionById(@RequestParam Long id) {
-
-	        String methodName = "getUomConversionById()";
-	        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	        Map<String, Object> responseObjectsMap = new HashMap<>();
-	        String errorMsg = null;
-	        ResponseDTO responseDTO = null;
-
-	        try {
-
-	            UomConversionVO uomConversionVO = commonMasterService.getUomConversionById(id).orElse(null);
-
-	            responseObjectsMap.put("uomConversionVO", uomConversionVO);
-
-	            responseDTO = createServiceResponse(responseObjectsMap);
-
-	        } catch (Exception e) {
-
-	            errorMsg = e.getMessage();
-	            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	            responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	        }
-
-	        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	        return ResponseEntity.ok().body(responseDTO);
-	    }
-	    
-	    @GetMapping("/getUomConversionByOrgId")
-	    public ResponseEntity<ResponseDTO> getUomConversionByOrgId(@RequestParam Long orgId,
-	                                                               @RequestParam Long branch) {
-
-	        String methodName = "getUomConversionByOrgId()";
-	        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	        Map<String, Object> responseObjectsMap = new HashMap<>();
-	        String errorMsg = null;
-	        ResponseDTO responseDTO = null;
-
-	        try {
-
-	            List<UomConversionVO> uomConversionList = commonMasterService.getUomConversionByOrgId(orgId, branch);
-
-	            responseObjectsMap.put("uomConversionList", uomConversionList);
-
-	            responseDTO = createServiceResponse(responseObjectsMap);
-
-	        } catch (Exception e) {
-
-	            errorMsg = e.getMessage();
-	            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-	            responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	        }
-
-	        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	        return ResponseEntity.ok().body(responseDTO);
-	    }
-		//Grade Master
-		
-		@PutMapping("/createUpdateGradeMaster")
-		public ResponseEntity<ResponseDTO> createUpdateGradeMaster(@RequestBody GradeMasterDTO gradeMasterDTO) {
-
-			String methodName = "createUpdateGradeMaster()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-
-			try {
-
-				Map<String, Object> gradeMasterVO = commonMasterService.createUpdateGradeMaster(gradeMasterDTO);
-
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, gradeMasterVO.get("message"));
-				responseObjectsMap.put("gradeMasterVO", gradeMasterVO.get("gradeMasterVO"));
-
-				responseDTO = createServiceResponse(responseObjectsMap);
-
-			} catch (Exception e) {
-
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-			}
-
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-			return ResponseEntity.ok().body(responseDTO);
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put("message", "Company Logo Successfully Uploaded");
+			responseObjectsMap.put("companyVO", companyVO);
+			responseDTO = createServiceResponse(responseObjectsMap); // Assuming this is your custom response method
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Company Logo Upload Failed", errorMsg);
 		}
 
-		@GetMapping("/getGradeMasterById")
-		public ResponseEntity<ResponseDTO> getGradeMasterById(@RequestParam Long id) {
+		LOGGER.debug("Ending Method: " + methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
 
-		    String methodName = "getGradeMasterById()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+	@PostMapping("/createUpdateBranch")
+	public ResponseEntity<ResponseDTO> createUpdateBranch(@RequestBody BranchDTO branchDTO) {
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    String errorMsg = null;
-		    ResponseDTO responseDTO = null;
+		String methodName = "createUpdateBranch()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		    try {
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
 
-		        GradeMasterVO gradeMasterVO = commonMasterService.getGradeMasterById(id).orElse(null);
+		try {
 
-		        responseObjectsMap.put("gradeMasterVO", gradeMasterVO);
+			Map<String, Object> createdBranchVO = commonMasterService.createUpdateBranch(branchDTO);
 
-		        responseDTO = createServiceResponse(responseObjectsMap);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, createdBranchVO.get("message"));
+			responseObjectsMap.put("branchVO", createdBranchVO.get("branchVO"));
 
-		    } catch (Exception e) {
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-		        errorMsg = e.getMessage();
-		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		} catch (Exception e) {
 
-		        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		    }
+			errorMsg = e.getMessage();
 
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-		    return ResponseEntity.ok().body(responseDTO);
-		}
-		
-		@GetMapping("/getGradeMasterByOrgId")
-		public ResponseEntity<ResponseDTO> getGradeMasterByOrgId(@RequestParam Long orgId,
-		                                                         @RequestParam Long branch) {
-
-		    String methodName = "getGradeMasterByOrgId()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    String errorMsg = null;
-		    ResponseDTO responseDTO = null;
-
-		    try {
-
-		        List<GradeMasterVO> gradeMasterList = commonMasterService.getGradeMasterByOrgId(orgId, branch);
-
-		        responseObjectsMap.put("gradeMasterList", gradeMasterList);
-
-		        responseDTO = createServiceResponse(responseObjectsMap);
-
-		    } catch (Exception e) {
-
-		        errorMsg = e.getMessage();
-		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-		        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok().body(responseDTO);
-		}
-		
-		
-		//GSTStateMaster
-		
-		@PutMapping("/createUpdateGSTStateMaster")
-		public ResponseEntity<ResponseDTO> createUpdateGSTStateMaster(
-		        @RequestBody GSTStateMasterDTO gstStateMasterDTO) {
-
-		    String methodName = "createUpdateGSTStateMaster()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-		    String errorMsg = null;
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO = null;
-
-		    try {
-
-		        Map<String, Object> gstStateMasterVO =
-		                commonMasterService.createUpdateGSTStateMaster(gstStateMasterDTO);
-
-		        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-		                gstStateMasterVO.get("message"));
-		        responseObjectsMap.put("gstStateMasterVO",
-		                gstStateMasterVO.get("gstStateMasterVO"));
-
-		        responseDTO = createServiceResponse(responseObjectsMap);
-
-		    } catch (Exception e) {
-
-		        errorMsg = e.getMessage();
-		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName, errorMsg);
-
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap, errorMsg, errorMsg);
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok().body(responseDTO);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
 		}
 
-		@GetMapping("/getGSTStateMasterById")
-		public ResponseEntity<ResponseDTO> getGSTStateMasterById(@RequestParam Long id) {
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		    String methodName = "getGSTStateMasterById()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    String errorMsg = null;
-		    ResponseDTO responseDTO = null;
-
-		    try {
-
-		        GSTStateMasterVO gstStateMasterVO = commonMasterService.getGSTStateMasterById(id).orElse(null);
-
-		        responseObjectsMap.put("gstStateMasterVO", gstStateMasterVO);
-
-		        responseDTO = createServiceResponse(responseObjectsMap);
-
-		    } catch (Exception e) {
-
-		        errorMsg = e.getMessage();
-		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-		        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok().body(responseDTO);
+	@GetMapping("/getBranchById")
+	public ResponseEntity<ResponseDTO> getBranchById(@RequestParam Long id) {
+		String methodName = "getBranchById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		BranchVO branchVO = new BranchVO();
+		try {
+			branchVO = commonMasterService.getBranchById(id);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
-		
-		@GetMapping("/getGSTStateMasterByOrgId")
-		public ResponseEntity<ResponseDTO> getGSTStateMasterByOrgId(@RequestParam Long orgId,
-		                                                            @RequestParam Long branch) {
-
-		    String methodName = "getGSTStateMasterByOrgId()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    String errorMsg = null;
-		    ResponseDTO responseDTO = null;
-
-		    try {
-
-		        List<GSTStateMasterVO> gstStateMasterList = commonMasterService.getGSTStateMasterByOrgId(orgId, branch);
-
-		        responseObjectsMap.put("gstStateMasterList", gstStateMasterList);
-
-		        responseDTO = createServiceResponse(responseObjectsMap);
-
-		    } catch (Exception e) {
-
-		        errorMsg = e.getMessage();
-		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-		        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok().body(responseDTO);
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "branch information get successfully");
+			responseObjectsMap.put("branchVO", branchVO);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "branch information receive failed", errorMsg);
 		}
-		
-		
-		//DocumentTypeMaster
-		
-		
-		// Document Type Master
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
 
-		@PutMapping("/createUpdateDocumentTypeMaster")
-		public ResponseEntity<ResponseDTO> createUpdateDocumentTypeMaster(
-		        @RequestBody DocumentTypeMasterDTO documentTypeMasterDTO) {
+	@GetMapping("/getBranchByOrgId")
+	public ResponseEntity<ResponseDTO> getBranchByOrgId(@RequestParam Long orgId) {
+		String methodName = "getBranchByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		    String methodName = "createUpdateDocumentTypeMaster()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<BranchVO> branchList = new ArrayList<>();
 
-		    String errorMsg = null;
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO = null;
-
-		    try {
-
-		        Map<String, Object> documentTypeMasterVO =
-		                commonMasterService.createUpdateDocumentTypeMaster(documentTypeMasterDTO);
-
-		        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-		                documentTypeMasterVO.get("message"));
-		        responseObjectsMap.put("documentTypeMasterVO",
-		                documentTypeMasterVO.get("documentTypeMasterVO"));
-
-		        responseDTO = createServiceResponse(responseObjectsMap);
-
-		    } catch (Exception e) {
-
-		        errorMsg = e.getMessage();
-		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName, errorMsg);
-
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap, errorMsg, errorMsg);
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok().body(responseDTO);
+		try {
+			branchList = commonMasterService.getBranchByOrgId(orgId);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 
-		@GetMapping("/getDocumentTypeMasterById")
-		public ResponseEntity<ResponseDTO> getDocumentTypeMasterById(@RequestParam Long id) {
-
-		    String methodName = "getDocumentTypeMasterById()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    String errorMsg = null;
-		    ResponseDTO responseDTO = null;
-
-		    try {
-
-		        DocumentTypeMasterVO documentTypeMasterVO = commonMasterService.getDocumentTypeMasterById(id).orElse(null);
-
-		        responseObjectsMap.put("documentTypeMasterVO", documentTypeMasterVO);
-
-		        responseDTO = createServiceResponse(responseObjectsMap);
-
-		    } catch (Exception e) {
-
-		        errorMsg = e.getMessage();
-		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-		        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok().body(responseDTO);
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Branch information retrieved successfully");
+			responseObjectsMap.put("branchList", branchList);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Branch information retrieval failed",
+					errorMsg);
 		}
-		
-		@GetMapping("/getDocumentTypeMasterByOrgId")
-		public ResponseEntity<ResponseDTO> getDocumentTypeMasterByOrgId(@RequestParam Long orgId,
-		                                                                @RequestParam Long branch) {
 
-		    String methodName = "getDocumentTypeMasterByOrgId()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    String errorMsg = null;
-		    ResponseDTO responseDTO = null;
+	// transport
 
-		    try {
-
-		        List<DocumentTypeMasterVO> documentTypeMasterList =
-		                commonMasterService.getDocumentTypeMasterByOrgId(orgId, branch);
-
-		        responseObjectsMap.put("documentTypeMasterList", documentTypeMasterList);
-
-		        responseDTO = createServiceResponse(responseObjectsMap);
-
-		    } catch (Exception e) {
-
-		        errorMsg = e.getMessage();
-		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-		        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok().body(responseDTO);
+	@PutMapping("/updateCreateTransportMaster")
+	public ResponseEntity<ResponseDTO> updateCreateTransportMaster(@RequestBody TransportMasterDTO transportMasterDTO) {
+		String methodName = "updateCreateTransportMaster()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		try {
+			Map<String, Object> transportMasterVO = commonMasterService.updateCreateTransportMaster(transportMasterDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, transportMasterVO.get("message"));
+			responseObjectsMap.put("transportMasterVO", transportMasterVO.get("transportMasterVO"));
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
 		}
-		
-		@GetMapping("/getListValuesGroup")
-		public ResponseEntity<ResponseDTO> getListValuesGroup(@RequestParam Long orgId, @RequestParam String listDescription) {
-			String methodName = "getListValuesGroup()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			List<Map<String, Object>> listValues = new ArrayList<>();
-			try {
-				listValues = commonMasterService.getBudgetGroup(orgId, listDescription);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-			}
-			if (StringUtils.isBlank(errorMsg)) {
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "List Values information get successfully");
-				responseObjectsMap.put("listValues", listValues);
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} else {
-				responseDTO = createServiceResponseError(responseObjectsMap, "List Values information receive failed",
-						errorMsg);
-			}
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getTransportById")
+	public ResponseEntity<ResponseDTO> getTransportById(@RequestParam Long id) {
+
+		String methodName = "getTransportById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			TransportMasterVO transportVO = commonMasterService.getTransportNameById(id);
+
+			responseObjectsMap.put("transportVO", transportVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
 		}
-		
-		
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getTransportByOrgId")
+	public ResponseEntity<ResponseDTO> getTransportByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getTransportByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<TransportMasterVO> transportList = commonMasterService.getTransportNameByOrgId(orgId, branch);
+
+			responseObjectsMap.put("transportList", transportList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping("/updateCreateListOfValues")
+	public ResponseEntity<ResponseDTO> updateCreateListOfValues(@RequestBody ListOfValuesDTO listOfValuesDTO) {
+		String methodName = "updateCreateListOfValues()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		try {
+			Map<String, Object> listOfValuesVO = commonMasterService.updateCreateListOfValues(listOfValuesDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, listOfValuesVO.get("message"));
+			responseObjectsMap.put("listOfValuesVO", listOfValuesVO.get("listOfValuesVO"));
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getListOfValuesById")
+	public ResponseEntity<ResponseDTO> getListOfValuesById(@RequestParam Long id) {
+
+		String methodName = "getListOfValuesById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ListOfValuesVO listOfValuesVO = commonMasterService.getListOfValuesById(id);
+
+			responseObjectsMap.put("listOfValuesVO", listOfValuesVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getListOfValuesByOrgId")
+	public ResponseEntity<ResponseDTO> getListOfValuesByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
+
+		String methodName = "getListOfValuesByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<ListOfValuesVO> listOfVlaues = commonMasterService.getListOfValuesByOrgId(orgId, branchId);
+
+			responseObjectsMap.put("listOfValues", listOfVlaues);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	// GST Rate Master
+
+	@PutMapping("/updateCreateGSTRateMaster")
+	public ResponseEntity<ResponseDTO> updateCreateGSTRateMaster(@RequestBody GSTRateMasterDTO gSTRateMasterDTO) {
+		String methodName = "updateCreateGSTRateMaster()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		try {
+			Map<String, Object> gSTRateMasterVO = commonMasterService.updateCreateGSTRateMaster(gSTRateMasterDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, gSTRateMasterVO.get("message"));
+			responseObjectsMap.put("gSTRateMasterVO", gSTRateMasterVO.get("gSTRateMasterVO"));
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getGSTRateMasterById")
+	public ResponseEntity<ResponseDTO> getGSTRateMasterById(@RequestParam Long id) {
+
+		String methodName = "getGSTRateMasterById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			GSTRateMasterVO gSTRateMasterVO = commonMasterService.getGSTRateMasterById(id);
+
+			responseObjectsMap.put("gSTRateMasterVO", gSTRateMasterVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getGSTRateByOrgId")
+	public ResponseEntity<ResponseDTO> getGSTRateByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
+
+		String methodName = "getGSTRateByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<GSTRateMasterVO> transportList = commonMasterService.getGSTRateByOrgId(orgId, branchId);
+
+			responseObjectsMap.put("transportList", transportList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	// Service Accounting Masters
+
+	@PutMapping("/updateCreateServiceAccMaster")
+	public ResponseEntity<ResponseDTO> updateCreateServiceAccMaster(
+			@RequestBody ServiceAccMasterDTO serviceAccMasterDTO) {
+		String methodName = "updateCreateServiceAccMaster()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		try {
+			Map<String, Object> serviceAccMasterVO = commonMasterService
+					.updateCreateServiceAccMaster(serviceAccMasterDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, serviceAccMasterVO.get("message"));
+			responseObjectsMap.put("serviceAccMasterVO", serviceAccMasterVO.get("serviceAccMasterVO"));
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getServiceAccMasterById")
+	public ResponseEntity<ResponseDTO> getServiceAccMasterById(@RequestParam Long id) {
+
+		String methodName = "getServiceAccMasterById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ServiceAccMasterResponseDTO serviceAccMasterResponseDTO = commonMasterService.getServiceAccMasterById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"ServiceAccountingMaster information retrieved successfully");
+
+			responseObjectsMap.put("serviceAccMasterVO", serviceAccMasterResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"ServiceAccountingMaster information retrieval failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getServiceAccMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getServiceAccMasterByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branchId) {
+
+		String methodName = "getServiceAccMasterByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<ServiceAccMasterResponseDTO> serviceAccMasterResponseDTO = commonMasterService
+					.getServiceAccMasterByOrgId(orgId, branchId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"ServiceAccountingMaster information retrieved successfully");
+
+			responseObjectsMap.put("serviceAccMasterVO", serviceAccMasterResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"ServiceAccountingMaster information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@PutMapping("/updateCreateLocationMaster")
+	public ResponseEntity<ResponseDTO> updateCreateLocationMaster(@RequestBody LocationDTO locationDTO) {
+		String methodName = "updateCreateLocationMaster()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		try {
+			Map<String, Object> LocationVO = commonMasterService.updateCreateLocationMaster(locationDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, LocationVO.get("message"));
+			responseObjectsMap.put("locationVO", LocationVO.get("locationVO"));
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getLocationMasterById")
+	public ResponseEntity<ResponseDTO> getLocationMasterById(@RequestParam Long id) {
+
+		String methodName = "getLocationMasterById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			LocationVO locationVO = commonMasterService.getLocationById(id);
+
+			responseObjectsMap.put("locationVO", locationVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getLocationByOrgId")
+	public ResponseEntity<ResponseDTO> getLocationByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getLocationByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<LocationVO> transportList = commonMasterService.getLocationByOrgId(orgId, branch);
+
+			responseObjectsMap.put("transportList", transportList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// LME
+	@PutMapping("/updateCreateLMEMaster")
+	public ResponseEntity<ResponseDTO> updateCreateLMEMaster(@RequestBody LMEDTO lMEDTO) {
+		String methodName = "updateCreateLMEMaster()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		try {
+			Map<String, Object> LMEVO = commonMasterService.updateCreateLMEMaster(lMEDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, LMEVO.get("message"));
+			responseObjectsMap.put("lMEVO", LMEVO.get("lMEVO"));
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getLMEMasterById")
+	public ResponseEntity<ResponseDTO> getLMEMasterById(@RequestParam Long id) {
+
+		String methodName = "getLMEMasterById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			LMEVO lMEVO = commonMasterService.getLMEById(id);
+
+			responseObjectsMap.put("lMEVO", lMEVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getLMEByOrgId")
+	public ResponseEntity<ResponseDTO> getLMEByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getLMEByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<LMEVO> transportList = commonMasterService.getLMEByOrgId(orgId, branch);
+
+			responseObjectsMap.put("transportList", transportList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// Financial Year
+	@PostMapping("/createUpdateFinancialYear")
+	public ResponseEntity<ResponseDTO> createUpdateFinancialYear(@RequestBody FinancialYearDTO financialYearDTO) {
+
+		String methodName = "createUpdateFinancialYear()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> createdFinancialYearVO = commonMasterService
+					.createUpdateFinancialYear(financialYearDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, createdFinancialYearVO.get("message"));
+			responseObjectsMap.put("financialYearVO", createdFinancialYearVO.get("financialYearVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/geFinancialYearById")
+	public ResponseEntity<ResponseDTO> geFinancialYearById(@RequestParam Long id) {
+		String methodName = "geFinancialYearById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		FinancialYearVO financialYearVO = new FinancialYearVO();
+		try {
+			financialYearVO = commonMasterService.getFinancialYearById(id);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Financial Year information get successfully");
+			responseObjectsMap.put("financialYearVO", financialYearVO);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Financial Year information receive failed",
+					errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getFinancialYearByOrgId")
+	public ResponseEntity<ResponseDTO> getFinancialYearByOrgId(@RequestParam Long orgId) {
+		String methodName = "getFinancialYearByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<FinancialYearVO> branchList = new ArrayList<>();
+
+		try {
+			branchList = commonMasterService.getFinancialYearByOrgId(orgId);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Financial Year information retrieved successfully");
+			responseObjectsMap.put("branchList", branchList);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Financial Year information retrieval failed",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// HSN
+
+	@PutMapping("/createUpdateHSN")
+	public ResponseEntity<ResponseDTO> createUpdateHSN(@RequestBody HsnDTO hsnDTO) {
+
+		String methodName = "createUpdateHSN()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> hsnVO = commonMasterService.createUpdateHSN(hsnDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, hsnVO.get("message"));
+			responseObjectsMap.put("hsnVO", hsnVO.get("hsnVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getHSNById")
+	public ResponseEntity<ResponseDTO> getHSNById(@RequestParam Long id) {
+
+		String methodName = "getHSNById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			HsnVO hsnVO = commonMasterService.getHSNById(id).orElse(null);
+
+			responseObjectsMap.put("hsnVO", hsnVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getHsnByOrgId")
+	public ResponseEntity<ResponseDTO> getHsnByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getHsnByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<HsnVO> hsnList = commonMasterService.getHsnByOrgId(orgId, branch);
+
+			responseObjectsMap.put("hsnList", hsnList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// Unit Master
+	@PutMapping("/createUpdateUnitMaster")
+	public ResponseEntity<ResponseDTO> createUpdateUnitMaster(@RequestBody UnitMasterDTO unitMasterDTO) {
+
+		String methodName = "createUpdateUnitMaster()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> unitMasterVO = commonMasterService.createUpdateUnitMaster(unitMasterDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, unitMasterVO.get("message"));
+			responseObjectsMap.put("unitMasterVO", unitMasterVO.get("unitMasterVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getUnitMasterById")
+	public ResponseEntity<ResponseDTO> getUnitMasterById(@RequestParam Long id) {
+
+		String methodName = "getUnitMasterById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			UnitMasterVO unitMasterVO = commonMasterService.getUnitMasterById(id).orElse(null);
+
+			responseObjectsMap.put("unitMasterVO", unitMasterVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getUnitMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getUnitMasterByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getUnitMasterByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<UnitMasterVO> unitMasterList = commonMasterService.getUnitMasterByOrgId(orgId, branch);
+
+			responseObjectsMap.put("unitMasterList", unitMasterList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// Uom Conversion
+
+	@PutMapping("/createUpdateUomConversion")
+	public ResponseEntity<ResponseDTO> createUpdateUomConversion(@RequestBody UomConversionDTO uomConversionDTO) {
+
+		String methodName = "createUpdateUomConversion()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> uomConversionVO = commonMasterService.createUpdateUomConversion(uomConversionDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, uomConversionVO.get("message"));
+			responseObjectsMap.put("uomConversionVO", uomConversionVO.get("uomConversionVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getUomConversionById")
+	public ResponseEntity<ResponseDTO> getUomConversionById(@RequestParam Long id) {
+
+		String methodName = "getUomConversionById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			UomConversionVO uomConversionVO = commonMasterService.getUomConversionById(id).orElse(null);
+
+			responseObjectsMap.put("uomConversionVO", uomConversionVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getUomConversionByOrgId")
+	public ResponseEntity<ResponseDTO> getUomConversionByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getUomConversionByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<UomConversionVO> uomConversionList = commonMasterService.getUomConversionByOrgId(orgId, branch);
+
+			responseObjectsMap.put("uomConversionList", uomConversionList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	// Grade Master
+
+	@PutMapping("/createUpdateGradeMaster")
+	public ResponseEntity<ResponseDTO> createUpdateGradeMaster(@RequestBody GradeMasterDTO gradeMasterDTO) {
+
+		String methodName = "createUpdateGradeMaster()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> gradeMasterVO = commonMasterService.createUpdateGradeMaster(gradeMasterDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, gradeMasterVO.get("message"));
+			responseObjectsMap.put("gradeMasterVO", gradeMasterVO.get("gradeMasterVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getGradeMasterById")
+	public ResponseEntity<ResponseDTO> getGradeMasterById(@RequestParam Long id) {
+
+		String methodName = "getGradeMasterById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			GradeMasterVO gradeMasterVO = commonMasterService.getGradeMasterById(id).orElse(null);
+
+			responseObjectsMap.put("gradeMasterVO", gradeMasterVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getGradeMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getGradeMasterByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getGradeMasterByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<GradeMasterVO> gradeMasterList = commonMasterService.getGradeMasterByOrgId(orgId, branch);
+
+			responseObjectsMap.put("gradeMasterList", gradeMasterList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// GSTStateMaster
+
+	@PutMapping("/createUpdateGSTStateMaster")
+	public ResponseEntity<ResponseDTO> createUpdateGSTStateMaster(@RequestBody GSTStateMasterDTO gstStateMasterDTO) {
+
+		String methodName = "createUpdateGSTStateMaster()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> gstStateMasterVO = commonMasterService.createUpdateGSTStateMaster(gstStateMasterDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, gstStateMasterVO.get("message"));
+			responseObjectsMap.put("gstStateMasterVO", gstStateMasterVO.get("gstStateMasterVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getGSTStateMasterById")
+	public ResponseEntity<ResponseDTO> getGSTStateMasterById(@RequestParam Long id) {
+
+		String methodName = "getGSTStateMasterById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			GSTStateMasterVO gstStateMasterVO = commonMasterService.getGSTStateMasterById(id).orElse(null);
+
+			responseObjectsMap.put("gstStateMasterVO", gstStateMasterVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getGSTStateMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getGSTStateMasterByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getGSTStateMasterByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<GSTStateMasterVO> gstStateMasterList = commonMasterService.getGSTStateMasterByOrgId(orgId, branch);
+
+			responseObjectsMap.put("gstStateMasterList", gstStateMasterList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// DocumentTypeMaster
+
+	// Document Type Master
+
+	@PutMapping("/createUpdateDocumentTypeMaster")
+	public ResponseEntity<ResponseDTO> createUpdateDocumentTypeMaster(
+			@RequestBody DocumentTypeMasterDTO documentTypeMasterDTO) {
+
+		String methodName = "createUpdateDocumentTypeMaster()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> documentTypeMasterVO = commonMasterService
+					.createUpdateDocumentTypeMaster(documentTypeMasterDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, documentTypeMasterVO.get("message"));
+			responseObjectsMap.put("documentTypeMasterVO", documentTypeMasterVO.get("documentTypeMasterVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getDocumentTypeMasterById")
+	public ResponseEntity<ResponseDTO> getDocumentTypeMasterById(@RequestParam Long id) {
+
+		String methodName = "getDocumentTypeMasterById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			DocumentTypeMasterVO documentTypeMasterVO = commonMasterService.getDocumentTypeMasterById(id).orElse(null);
+
+			responseObjectsMap.put("documentTypeMasterVO", documentTypeMasterVO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getDocumentTypeMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getDocumentTypeMasterByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getDocumentTypeMasterByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<DocumentTypeMasterVO> documentTypeMasterList = commonMasterService.getDocumentTypeMasterByOrgId(orgId,
+					branch);
+
+			responseObjectsMap.put("documentTypeMasterList", documentTypeMasterList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getListValuesGroup")
+	public ResponseEntity<ResponseDTO> getListValuesGroup(@RequestParam Long orgId,
+			@RequestParam String listDescription) {
+		String methodName = "getListValuesGroup()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> listValues = new ArrayList<>();
+		try {
+			listValues = commonMasterService.getBudgetGroup(orgId, listDescription);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "List Values information get successfully");
+			responseObjectsMap.put("listValues", listValues);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "List Values information receive failed",
+					errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
 }

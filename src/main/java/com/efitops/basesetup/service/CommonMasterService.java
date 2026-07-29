@@ -30,6 +30,7 @@ import com.efitops.basesetup.dto.LocationDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
+import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
 import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
@@ -132,7 +133,6 @@ public interface CommonMasterService {
 
 //	List<Map<String, Object>> getCompanyByOrgId(Long orgId);
 
-
 	// FINANCIAL YEAR
 
 //	Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
@@ -159,64 +159,56 @@ public interface CommonMasterService {
 
 	List<Map<String, Object>> getAllCurrencyForExRate(Long orgId);
 
-	CompanyVO uploadCompanyLogoInBloob(MultipartFile file, Long id) throws IOException  ;
+	CompanyVO uploadCompanyLogoInBloob(MultipartFile file, Long id) throws IOException;
 
-	//branch
-	
+	// branch
+
 	Map<String, Object> createUpdateBranch(BranchDTO branchDTO) throws ApplicationException;
 
 	BranchVO getBranchById(Long id) throws ApplicationException;
-	
+
 	List<BranchVO> getBranchByOrgId(Long orgId) throws ApplicationException;
 
-	//transport
-	
+	// transport
+
 	Map<String, Object> updateCreateTransportMaster(TransportMasterDTO transportMasterDTO) throws ApplicationException;
 
 	TransportMasterVO getTransportNameById(Long id) throws ApplicationException;
 
-
 	List<TransportMasterVO> getTransportNameByOrgId(Long orgId, Long branchCode) throws ApplicationException;
 
-	//listofvalues
+	// listofvalues
 
 	Map<String, Object> updateCreateListOfValues(@Valid ListOfValuesDTO dto) throws ApplicationException;
-	
+
 	ListOfValuesVO getListOfValuesById(Long id);
 
 	List<ListOfValuesVO> getListOfValuesByOrgId(Long orgId, Long branchCode);
-	
+
 	List<Map<String, Object>> getBudgetGroup(Long orgId, String name) throws ApplicationException;
 
+	// gstratemaster
 
-	//gstratemaster
-	
 	Map<String, Object> updateCreateGSTRateMaster(@Valid GSTRateMasterDTO gSTRateMasterDTO) throws ApplicationException;
 
 	GSTRateMasterVO getGSTRateMasterById(Long id) throws ApplicationException;
 
 	List<GSTRateMasterVO> getGSTRateByOrgId(Long orgId, Long branchId) throws ApplicationException;
 
-	//serviceacc
-	
+	// serviceacc
+
 	Map<String, Object> updateCreateServiceAccMaster(@Valid ServiceAccMasterDTO serviceAccMasterDTO)
 			throws ApplicationException;
 
-	ServiceAccMasterVO getServiceNameById(Long id) throws ApplicationException;
-
-	List<ServiceAccMasterVO> getServiceNameByOrgId(Long orgId, Long branchId) throws ApplicationException;
-
-	//locationmaster
+	// locationmaster
 
 	Map<String, Object> updateCreateLocationMaster(LocationDTO locationDTO) throws ApplicationException;
 
 	LocationVO getLocationById(Long id) throws ApplicationException;
 
-	
-
 	List<LocationVO> getLocationByOrgId(Long orgId, Long branch) throws ApplicationException;
-	
-	//LME
+
+	// LME
 
 	Map<String, Object> updateCreateLMEMaster(LMEDTO lMEDTO) throws ApplicationException;
 
@@ -224,81 +216,64 @@ public interface CommonMasterService {
 
 	List<LMEVO> getLMEByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-	//FIN YEAR
+	// FIN YEAR
 	Map<String, Object> createUpdateFinancialYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
-
 
 	List<FinancialYearVO> getFinancialYearByOrgId(Long orgId) throws ApplicationException;
 
 	FinancialYearVO getFinancialYearById(Long id) throws ApplicationException;
 
+	// HSN
 
-
-  //HSN
-	
 	List<HsnVO> getHsnByOrgId(Long orgId, Long branch);
 
 	Optional<HsnVO> getHSNById(Long hsnId);
 
 	Map<String, Object> createUpdateHSN(HsnDTO hsnDTO) throws ApplicationException;
-	
+
 	// Unit Master
-	
+
 	List<UnitMasterVO> getUnitMasterByOrgId(Long orgId, Long branch);
 
 	Optional<UnitMasterVO> getUnitMasterById(Long id);
 
-	Map<String, Object> createUpdateUnitMaster(UnitMasterDTO unitMasterDTO)
-	        throws ApplicationException;
+	Map<String, Object> createUpdateUnitMaster(UnitMasterDTO unitMasterDTO) throws ApplicationException;
 
-	//uom
-	
-	Map<String, Object> createUpdateUomConversion(UomConversionDTO uomConversionDTO)
-	       throws ApplicationException;
+	// uom
 
+	Map<String, Object> createUpdateUomConversion(UomConversionDTO uomConversionDTO) throws ApplicationException;
 
 	List<UomConversionVO> getUomConversionByOrgId(Long orgId, Long branch);
 
 	Optional<UomConversionVO> getUomConversionById(Long id);
-	
-	//grademaster
 
-	Map<String, Object> createUpdateGradeMaster(GradeMasterDTO gradeMasterDTO)
-			throws ApplicationException;
+	// grademaster
 
+	Map<String, Object> createUpdateGradeMaster(GradeMasterDTO gradeMasterDTO) throws ApplicationException;
 
-
-	List<GradeMasterVO> getGradeMasterByOrgId(Long orgId,Long branch);
+	List<GradeMasterVO> getGradeMasterByOrgId(Long orgId, Long branch);
 
 	Optional<GradeMasterVO> getGradeMasterById(Long id);
-	
-	//GSTStateMaster
-	
+
+	// GSTStateMaster
+
 	List<GSTStateMasterVO> getGSTStateMasterByOrgId(Long orgId, Long branch);
 
 	Optional<GSTStateMasterVO> getGSTStateMasterById(Long id);
 
-	Map<String, Object> createUpdateGSTStateMaster(
-	        GSTStateMasterDTO gstStateMasterDTO)
-	        throws ApplicationException;
-	
-	
-	//DocumentTypeMaster
-	
-	
+	Map<String, Object> createUpdateGSTStateMaster(GSTStateMasterDTO gstStateMasterDTO) throws ApplicationException;
+
+	// DocumentTypeMaster
+
 	List<DocumentTypeMasterVO> getDocumentTypeMasterByOrgId(Long orgId, Long branch);
 
 	Optional<DocumentTypeMasterVO> getDocumentTypeMasterById(Long id);
 
-	Map<String, Object> createUpdateDocumentTypeMaster(
-	        DocumentTypeMasterDTO documentTypeMasterDTO)
-	        throws ApplicationException;
+	Map<String, Object> createUpdateDocumentTypeMaster(DocumentTypeMasterDTO documentTypeMasterDTO)
+			throws ApplicationException;
 
-	
+	List<ServiceAccMasterResponseDTO> getServiceAccMasterByOrgId(Long orgId, Long branchId) throws ApplicationException;
 
-	
-	
-	
-	
+	ServiceAccMasterResponseDTO getServiceAccMasterById(Long id) throws ApplicationException;
 
 }

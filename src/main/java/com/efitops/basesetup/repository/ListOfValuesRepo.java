@@ -30,7 +30,15 @@ public interface ListOfValuesRepo extends JpaRepository<ListOfValuesVO, Long> {
 	
 	@Query(nativeQuery = true, value = "select * from listofvalues where listofvalues_id=?1")
 	ListOfValuesVO getListOfValuesById(Long id);
-
+	
+	@Query(value = "SELECT listofvalues_id, list_code,list_description " +
+	        "FROM listofvalues " +
+	        "WHERE list_code = 'CUSTOMERCATEGORY' " +
+	        "AND org_id = ?1 " +
+	        "AND active = 1 " +
+	        "AND cancel = 0",
+	        nativeQuery = true)
+	List<Object[]> getCustomerCategory(Long orgId);
 
 
         

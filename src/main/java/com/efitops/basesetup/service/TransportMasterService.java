@@ -9,15 +9,20 @@ import com.efitops.basesetup.dto.FinancialYearDTO;
 import com.efitops.basesetup.dto.HolidayMasterDTO;
 import com.efitops.basesetup.dto.LMEDTO;
 import com.efitops.basesetup.dto.LocationDTO;
+import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.TSBankDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDTO;
+import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.HolidayMasterVO;
 import com.efitops.basesetup.entity.LMEVO;
+import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.MappingOfPartyToAccVO;
 import com.efitops.basesetup.entity.TSBankVO;
 import com.efitops.basesetup.entity.TaxDefinitionVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.PartyProjection;
 
 public interface TransportMasterService {
 
@@ -33,7 +38,8 @@ public interface TransportMasterService {
 
 	TaxDefinitionVO getTaxDefinitionById(Long id) throws ApplicationException;
 
-	List<TaxDefinitionVO> getTaxDefinitionByOrgId(Long orgId,Long branch) throws ApplicationException;
+	List<TaxDefinitionVO> 
+	getTaxDefinitionByOrgId(Long orgId,Long branch) throws ApplicationException;
 
 	Map<String, Object> updateCreateTaxDefinition(TaxDefinitionDTO taxDefinitionDTO) throws ApplicationException;
 
@@ -45,6 +51,23 @@ public interface TransportMasterService {
 
 	List<HolidayMasterVO> getHolidayMasterByOrgId(Long orgId, Long branchId);
 
+	//Mapping of party to account
+	
+	Map<String, Object> updateCreateMappingOfPartyToAcc(MappingOfPartyToAccDTO mappingOfPartyToAccDTO) throws ApplicationException;
+
+	MappingOfPartyToAccVO getMappingOfPartyToAccById(Long id);
+
+	List<MappingOfPartyToAccVO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch);
+	
+	Map<String, Object> getCustomerCategory(Long orgId)
+	        throws ApplicationException;
+	
+	Map<String, Object> getParty(Long category,
+            Long orgId,
+            Long branch)
+throws ApplicationException;
+
+	
 
 	
 

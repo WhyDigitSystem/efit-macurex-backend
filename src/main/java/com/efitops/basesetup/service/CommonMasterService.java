@@ -208,10 +208,6 @@ public interface CommonMasterService {
 	Map<String, Object> updateCreateServiceAccMaster(@Valid ServiceAccMasterDTO serviceAccMasterDTO)
 			throws ApplicationException;
 
-	ServiceAccMasterVO getServiceNameById(Long id) throws ApplicationException;
-
-	List<ServiceAccMasterVO> getServiceNameByOrgId(Long orgId, Long branchId) throws ApplicationException;
-
 	//locationmaster
 
 	Map<String, Object> updateCreateLocationMaster(LocationDTO locationDTO) throws ApplicationException;
@@ -343,7 +339,9 @@ public interface CommonMasterService {
 	            Long branch)
 	throws ApplicationException;
 
-		
+		List<ServiceAccMasterResponseDTO> getServiceAccMasterByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+		ServiceAccMasterResponseDTO getServiceAccMasterById(Long id) throws ApplicationException;
 
 		
 

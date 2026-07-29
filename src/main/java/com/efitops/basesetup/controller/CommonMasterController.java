@@ -1336,14 +1336,16 @@ public class CommonMasterController extends BaseController {
 	 //Service Accounting Masters
 	 
 	 @PutMapping("/updateCreateServiceAccMaster")
-		public ResponseEntity<ResponseDTO> updateCreateServiceAccMaster(@RequestBody ServiceAccMasterDTO serviceAccMasterDTO) {
+		public ResponseEntity<ResponseDTO> updateCreateServiceAccMaster(
+				@RequestBody ServiceAccMasterDTO serviceAccMasterDTO) {
 			String methodName = "updateCreateServiceAccMaster()";
 			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 			String errorMsg = null;
 			Map<String, Object> responseObjectsMap = new HashMap<>();
 			ResponseDTO responseDTO = null;
 			try {
-				Map<String, Object> serviceAccMasterVO = commonMasterService.updateCreateServiceAccMaster(serviceAccMasterDTO);
+				Map<String, Object> serviceAccMasterVO = commonMasterService
+						.updateCreateServiceAccMaster(serviceAccMasterDTO);
 				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, serviceAccMasterVO.get("message"));
 				responseObjectsMap.put("serviceAccMasterVO", serviceAccMasterVO.get("serviceAccMasterVO"));
 				responseDTO = createServiceResponse(responseObjectsMap);
@@ -1355,68 +1357,76 @@ public class CommonMasterController extends BaseController {
 			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 			return ResponseEntity.ok().body(responseDTO);
 		}
-		
-	 @GetMapping("/getServiceAccMasterById")
-	 public ResponseEntity<ResponseDTO> getServiceAccMasterById(@RequestParam Long id) {
 
-	     String methodName = "getServiceAccMasterById()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		@GetMapping("/getServiceAccMasterById")
+		public ResponseEntity<ResponseDTO> getServiceAccMasterById(@RequestParam Long id) {
 
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
+			String methodName = "getServiceAccMasterById()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	     try {
+			String errorMsg = null;
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			ResponseDTO responseDTO = null;
 
-	    	 ServiceAccMasterVO serviceAccMasterVO = commonMasterService.getServiceNameById(id);
+			try {
 
-	         responseObjectsMap.put("serviceAccMasterVO", serviceAccMasterVO);
+				ServiceAccMasterResponseDTO serviceAccMasterResponseDTO = commonMasterService.getServiceAccMasterById(id);
 
-	         responseDTO = createServiceResponse(responseObjectsMap);
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+						"ServiceAccountingMaster information retrieved successfully");
 
-	     } catch (Exception e) {
+				responseObjectsMap.put("serviceAccMasterVO", serviceAccMasterResponseDTO);
 
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+				responseDTO = createServiceResponse(responseObjectsMap);
 
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
+			} catch (Exception e) {
 
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+				errorMsg = e.getMessage();
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @GetMapping("/getServiceAccMasterByOrgId")
-	 public ResponseEntity<ResponseDTO> getServiceAccMasterByOrgId(@RequestParam Long orgId,@RequestParam Long branchId) {
+				responseDTO = createServiceResponseError(responseObjectsMap,
+						"ServiceAccountingMaster information retrieval failed", errorMsg);
+			}
 
-	     String methodName = "getServiceAccMasterByOrgId()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
+			return ResponseEntity.ok(responseDTO);
+		}
 
-	     try {
+		@GetMapping("/getServiceAccMasterByOrgId")
+		public ResponseEntity<ResponseDTO> getServiceAccMasterByOrgId(@RequestParam Long orgId,
+				@RequestParam Long branchId) {
 
-	         List<ServiceAccMasterVO> transportList = commonMasterService.getServiceNameByOrgId(orgId,branchId);
+			String methodName = "getServiceAccMasterByOrgId()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	         responseObjectsMap.put("transportList", transportList);
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			ResponseDTO responseDTO;
 
-	         responseDTO = createServiceResponse(responseObjectsMap);
+			try {
 
-	     } catch (Exception e) {
+				List<ServiceAccMasterResponseDTO> serviceAccMasterResponseDTO = commonMasterService
+						.getServiceAccMasterByOrgId(orgId, branchId);
 
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+						"ServiceAccountingMaster information retrieved successfully");
 
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
+				responseObjectsMap.put("serviceAccMasterVO", serviceAccMasterResponseDTO);
 
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+				responseDTO = createServiceResponse(responseObjectsMap);
 
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
+			} catch (Exception e) {
+
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+				responseDTO = createServiceResponseError(responseObjectsMap,
+						"ServiceAccountingMaster information retrieval failed", e.getMessage());
+			}
+
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+			return ResponseEntity.ok(responseDTO);
+		}
 	 
 	 @PutMapping("/updateCreateLocationMaster")
 		public ResponseEntity<ResponseDTO> updateCreateLocationMaster(@RequestBody LocationDTO locationDTO) {

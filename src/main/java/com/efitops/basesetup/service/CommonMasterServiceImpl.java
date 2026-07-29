@@ -1912,7 +1912,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateServiceAccMaster(@Valid ServiceAccMasterDTO serviceAccMasterDTO)
+	public Map<String, Object> updateCreateServiceAccMaster(ServiceAccMasterDTO serviceAccMasterDTO)
 			throws ApplicationException {
 
 		ServiceAccMasterVO serviceAccMasterVO = new ServiceAccMasterVO();
@@ -1921,7 +1921,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		if (ObjectUtils.isNotEmpty(serviceAccMasterDTO.getId())) {
 
 			serviceAccMasterVO = serviceAccMasterRepo.findById(serviceAccMasterDTO.getId())
-					.orElseThrow(() -> new ApplicationException("Invalid Service Accounting Master Details"));
+					.orElseThrow(() -> new ApplicationException("Service Accounting Master Not Found"));
 
 			if (!serviceAccMasterVO.getServiceName().equalsIgnoreCase(serviceAccMasterDTO.getServiceName())) {
 
@@ -1933,9 +1933,9 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				}
 			}
 
-			createUpdateServiceAccMasterVOByServiceAccMasterDTO(serviceAccMasterDTO, serviceAccMasterVO);
-
 			serviceAccMasterVO.setUpdatedBy(serviceAccMasterDTO.getCreatedBy());
+
+			createUpdateServiceAccMasterVOByServiceAccMasterDTO(serviceAccMasterDTO, serviceAccMasterVO);
 
 			message = "Service Accounting Master Updated Successfully";
 
@@ -1948,20 +1948,57 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 						+ " already exists in this Organization.");
 			}
 
-			createUpdateServiceAccMasterVOByServiceAccMasterDTO(serviceAccMasterDTO, serviceAccMasterVO);
 			serviceAccMasterVO.setCreatedBy(serviceAccMasterDTO.getCreatedBy());
 			serviceAccMasterVO.setUpdatedBy(serviceAccMasterDTO.getCreatedBy());
+
+			createUpdateServiceAccMasterVOByServiceAccMasterDTO(serviceAccMasterDTO, serviceAccMasterVO);
 
 			message = "Service Accounting Master Created Successfully";
 		}
 
-		serviceAccMasterRepo.save(serviceAccMasterVO);
+		ServiceAccMasterVO savedServiceMaster = serviceAccMasterRepo.save(serviceAccMasterVO);
 
 		Map<String, Object> response = new HashMap<>();
-		response.put("serviceAccMasterVO", serviceAccMasterVO);
 		response.put("message", message);
+		response.put("serviceAccMasterVO", buildServiceAccMasterResponse(savedServiceMaster));
 
 		return response;
+	}
+
+	private ServiceAccMasterResponseDTO buildServiceAccMasterResponse(ServiceAccMasterVO serviceAccMasterVO) {
+
+		ServiceAccMasterResponseDTO responseDTO = new ServiceAccMasterResponseDTO();
+
+		responseDTO.setId(serviceAccMasterVO.getId());
+		responseDTO.setServiceName(serviceAccMasterVO.getServiceName());
+		responseDTO.setServiceDescription(serviceAccMasterVO.getServiceDescription());
+
+		if (serviceAccMasterVO.getBranch() != null) {
+
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(serviceAccMasterVO.getBranch().getId());
+			branchDTO.setBranchName(serviceAccMasterVO.getBranch().getBranchName());
+
+			responseDTO.setBranch(branchDTO);
+		}
+
+		if (serviceAccMasterVO.getHsnCode() != null) {
+
+			HsnResponseImageDTO hsnDTO = new HsnResponseImageDTO();
+			hsnDTO.setId(serviceAccMasterVO.getHsnCode().getId());
+			hsnDTO.setHsnCode(serviceAccMasterVO.getHsnCode().getHsn());
+
+			responseDTO.setItemHsn(hsnDTO);
+		}
+
+		responseDTO.setOrgId(serviceAccMasterVO.getOrgId());
+
+		responseDTO.setCreatedBy(serviceAccMasterVO.getCreatedBy());
+		responseDTO.setUpdatedBy(serviceAccMasterVO.getUpdatedBy());
+
+		responseDTO.setCancelRemarks(serviceAccMasterVO.getCancelRemarks());
+
+		return responseDTO;
 	}
 
 	private void createUpdateServiceAccMasterVOByServiceAccMasterDTO(@Valid ServiceAccMasterDTO serviceAccMasterDTO,
@@ -1970,9 +2007,10 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		serviceAccMasterVO.setServiceName(serviceAccMasterDTO.getServiceName().toUpperCase());
 		serviceAccMasterVO.setServiceDescription(serviceAccMasterDTO.getServiceDescription());
 		serviceAccMasterVO.setOrgId(serviceAccMasterDTO.getOrgId());
-		serviceAccMasterVO.setHsncode(serviceAccMasterDTO.getHsncode());
+
 		serviceAccMasterVO.setActive(serviceAccMasterDTO.isActive());
 		serviceAccMasterVO.setCancelRemarks(serviceAccMasterDTO.getCancelRemarks());
+
 		if (serviceAccMasterDTO.getBranchId() != null && serviceAccMasterDTO.getBranchId() != 0) {
 
 			BranchVO branch = branchRepo.findById(serviceAccMasterDTO.getBranchId())
@@ -1981,27 +2019,46 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			serviceAccMasterVO.setBranch(branch);
 		}
 
-	}
+		if (serviceAccMasterDTO.getHsnId() != null && serviceAccMasterDTO.getHsnId() != 0) {
 
-	@Override
-	public ServiceAccMasterVO getServiceNameById(Long id) throws ApplicationException {
+			HsnVO hsnVO = hsnRepo.findById(serviceAccMasterDTO.getBranchId())
+					.orElseThrow(() -> new ApplicationException("HSN Not Found"));
 
-		return serviceAccMasterRepo.findById(id)
-				.orElseThrow(() -> new ApplicationException("Invalid  Service Accounting Master Details"));
-	}
-
-	@Override
-	public List<ServiceAccMasterVO> getServiceNameByOrgId(Long orgId, Long branchId) throws ApplicationException {
-
-		List<ServiceAccMasterVO> serviceAccMasterVO = serviceAccMasterRepo.findByOrgIdAndBranch(orgId, branchId);
-
-		if (serviceAccMasterVO.isEmpty()) {
-			throw new ApplicationException("No Service Accounting Master Details Found");
+			serviceAccMasterVO.setHsnCode(hsnVO);
 		}
 
-		return serviceAccMasterVO;
 	}
 
+	@Override
+	public ServiceAccMasterResponseDTO getServiceAccMasterById(Long id) throws ApplicationException {
+
+		ServiceAccMasterVO ServiceAccMasterVO = serviceAccMasterRepo.getServiceAccMasterById(id);
+
+		if (ServiceAccMasterVO == null) {
+			throw new ApplicationException("ServiceAccountingMaster  Not Found");
+		}
+
+		return buildServiceAccMasterResponse(ServiceAccMasterVO);
+	}
+
+	@Override
+	public List<ServiceAccMasterResponseDTO> getServiceAccMasterByOrgId(Long orgId, Long branchId)
+			throws ApplicationException {
+
+		List<ServiceAccMasterVO> employeeList = serviceAccMasterRepo.getServiceAccMasterByOrgId(orgId, branchId);
+
+		if (employeeList == null || employeeList.isEmpty()) {
+			throw new ApplicationException("ServiceAccountingMaster Not Found");
+		}
+
+		List<ServiceAccMasterResponseDTO> responseList = new ArrayList<>();
+
+		for (ServiceAccMasterVO employeeMasterVO : employeeList) {
+			responseList.add(buildServiceAccMasterResponse(employeeMasterVO));
+		}
+
+		return responseList;
+	}
 	// locationmaster
 
 	@Override

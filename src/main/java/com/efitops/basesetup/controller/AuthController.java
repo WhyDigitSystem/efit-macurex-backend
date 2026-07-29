@@ -58,7 +58,7 @@ public class AuthController extends BaseController {
 			authService.signup(signUpRequest);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME_WITH_USER_NAME, methodName, signUpRequest.getEmail(),
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME_WITH_USER_NAME, methodName,
 					errorMsg);
 		}
 		if (StringUtils.isBlank(errorMsg)) {
@@ -437,7 +437,7 @@ public class AuthController extends BaseController {
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO = null;
-		List<UserVO> userVO = new ArrayList<>();
+		List<UserResponseDTO> userVO = new ArrayList<>();
 		try {
 			userVO = authService.getAllUsersByOrgId(orgId);
 		} catch (Exception e) {

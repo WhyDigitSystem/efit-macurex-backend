@@ -224,9 +224,15 @@ public class AuthServiceImpl implements AuthService {
 	public void signup(SignUpFormDTO signUpRequest) throws ApplicationException {
 		String methodName = "signup()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-		if (ObjectUtils.isEmpty(signUpRequest) || StringUtils.isBlank(signUpRequest.getEmail())
+		if (ObjectUtils.isEmpty(signUpRequest)
 				|| StringUtils.isBlank(signUpRequest.getUserName())) {
 			throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_REGISTER_INFORMATION);
+		}
+		EmployeeVO employeeVO = employeeRepo.findById(signUpRequest.getEmployee())
+		        .orElseThrow(() -> new ApplicationException("Employee not found"));
+
+		if (StringUtils.isBlank(employeeVO.getEmail())) {
+		    throw new ApplicationException("Employee email is missing");
 		}
 //		else if (userRepo.existsByUserNameOrEmail(signUpRequest.getUserName(), signUpRequest.getEmail())) 
 //		{
@@ -241,19 +247,22 @@ public class AuthServiceImpl implements AuthService {
 	private UserVO getUserVOFromSignUpFormDTO(SignUpFormDTO signUpFormDTO) throws ApplicationException {
 
 		UserVO userVO = new UserVO();
-
+		EmployeeVO employeeVO = employeeRepo.findById(signUpFormDTO.getEmployee())
+		        .orElseThrow(() -> new ApplicationException("Employee not found"));
 //		userVO=userRepo.findByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(), signUpFormDTO.getEmail());
-		if (userRepo.existsByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(),
-				signUpFormDTO.getEmail())) {
-			userVO = userRepo.findByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(),
-					signUpFormDTO.getEmail());
+		if (userRepo.existsByUserNameOrEmployee_Email(
+		        signUpFormDTO.getUserName(),
+		        employeeVO.getEmail())) {
 
-			List<UserLoginRolesVO> roles = loginRolesRepo.findByUserVO(userVO);
-			loginRolesRepo.deleteAll(roles);
-//			List<UserLoginClientAccessVO> client = clientAccessRepo.findByUserVO(userVO);
-//			clientAccessRepo.deleteAll(client);
-			List<UserLoginBranchAccessibleVO> branch = branchAccessRepo.findByUserVO(userVO);
-			branchAccessRepo.deleteAll(branch);
+		    userVO = userRepo.findByUserNameOrEmployee_Email(
+		            signUpFormDTO.getUserName(),
+		            employeeVO.getEmail());
+
+		    List<UserLoginRolesVO> roles = loginRolesRepo.findByUserVO(userVO);
+		    loginRolesRepo.deleteAll(roles);
+
+		    List<UserLoginBranchAccessibleVO> branch = branchAccessRepo.findByUserVO(userVO);
+		    branchAccessRepo.deleteAll(branch);
 		}
 		userVO.setUserName(signUpFormDTO.getUserName());
 		if (ObjectUtils.isEmpty(userVO.getId())) {
@@ -268,19 +277,19 @@ public class AuthServiceImpl implements AuthService {
 //		userVO.setEmployeeCode(signUpFormDTO.getEmployeeCode());
 		if (signUpFormDTO.getEmployee() != null) {
 
-		    EmployeeVO employeeVO = employeeRepo.findById(signUpFormDTO.getEmployee())
+		    EmployeeVO employeesVO = employeeRepo.findById(signUpFormDTO.getEmployee())
 		            .orElseThrow(() -> new ApplicationException("Employee not found"));
 
-		    userVO.setEmployee(employeeVO);
+		    userVO.setEmployee(employeesVO);
 		}
 		CompanyVO companyVO = companyRepo.findById(signUpFormDTO.getOrgId())
 		        .orElseThrow(() -> new ApplicationException("Company not found"));
 
 		userVO.setCompanyVO(companyVO);
 		
-		userVO.setNickName(signUpFormDTO.getNickName());
-		userVO.setEmail(signUpFormDTO.getEmail());
-		userVO.setMobileNo(signUpFormDTO.getMobileNo());
+//		userVO.setNickName(signUpFormDTO.getNickName());
+//		userVO.setEmail(signUpFormDTO.getEmail());
+//		userVO.setMobileNo(signUpFormDTO.getMobileNo());
 		userVO.setUserType(signUpFormDTO.getUserType());
 		userVO.setActive(signUpFormDTO.isActive());
 		userVO.setOrgId(signUpFormDTO.getOrgId());
@@ -846,11 +855,22 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public List<UserVO> getAllUsersByOrgId(Long orgId) {
-		// TODO Auto-generated method stub
-		return userRepo.findAllByOrgId(orgId);
-	}
+	public List<UserResponseDTO> getAllUsersByOrgId(Long orgId) {
 
+	    List<UserVO> userList = userRepo.findAllByOrgId(orgId);
+
+	    List<UserResponseDTO> responseList = new ArrayList<>();
+
+	    for (UserVO userVO : userList) {
+	        UserResponseDTO dto = mapUserVOToDTO(userVO);
+	        responseList.add(dto);
+	    }
+
+	    return responseList;
+	}
+	
+	
+	
 	@Override
 	public UserVO getUserById(Long usersId) {
 		String methodName = "getUserById()";

@@ -38,8 +38,8 @@ public class UserLoginBranchAccessibleVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 	
-	@JsonBackReference
 	@ManyToOne
+	@JsonBackReference
     @JoinColumn(name = "user_id")
     private UserVO userVO;
 	

@@ -25,8 +25,8 @@ public class UserResponseDTO {
 	private String userType;
 	private Long orgId;
 	private String customer;
-	private String warehouse;
-	private String branch;
+//	private String warehouse;
+//	private String branch;
 	private String client;
 	private boolean loginStatus;
 	private boolean active;
@@ -47,6 +47,9 @@ public class UserResponseDTO {
 	public String getActive() {
 		return active ? "Active" : "In-Active";
 	}
+
+
+	
     // Setter method to accept List<Map<String, Object>>
    
    

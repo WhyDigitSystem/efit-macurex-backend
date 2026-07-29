@@ -30,6 +30,22 @@ public interface ListOfValuesRepo extends JpaRepository<ListOfValuesVO, Long> {
 	
 	@Query(nativeQuery = true, value = "select * from listofvalues where listofvalues_id=?1")
 	ListOfValuesVO getListOfValuesById(Long id);
+
+
+	@Query(value = """
+		    SELECT a.listofvaluesdetails_id,
+		           a.value_description
+		    FROM listofvaluesdetails a
+		    JOIN listofvalues b
+		      ON a.listofvalues_id = b.listofvalues_id
+		    WHERE b.org_id = ?1
+		      AND b.list_description = ?2
+		      AND a.active = 1
+		    GROUP BY a.listofvaluesdetails_id, a.value_description
+		    """, nativeQuery = true)
+		Set<Object[]> getListValuesDetailsForBudget(Long orgId, String name);
+
+
 	
 	@Query(value = "SELECT listofvalues_id, list_code,list_description " +
 	        "FROM listofvalues " +
@@ -39,6 +55,7 @@ public interface ListOfValuesRepo extends JpaRepository<ListOfValuesVO, Long> {
 	        "AND cancel = 0",
 	        nativeQuery = true)
 	List<Object[]> getCustomerCategory(Long orgId);
+
 
 
         

@@ -27,18 +27,18 @@ public class SignUpFormDTO {
 	private String userName;
 	private String password;
 	private Long employee; 
-	private String nickName;
+//	private String nickName;
 	private String email;
 	private Long orgId;
-	private String mobileNo;
+//	private String mobileNo;
 	private String userType;
 	private boolean isActive;
 	private boolean allIndiaAcces;
-	private String branch;
-	private String branchcode;
-	private String department;
-	private String designation;
-	private String companyName;
+//	private String branch;
+//	private String branchcode;
+//	private String department;
+//	private String designation;
+//	private String companyName;
 	private String createdBy;
 
 	private List<UserLoginRoleAccessDTO> roleAccessDTO;

@@ -53,9 +53,9 @@ public interface AuthService {
 	
 	ResponsibilityVO getResponsibilityById(Long id) throws ApplicationException;
 	
-	List<UserVO>getAllUsersByOrgId(Long orgId);
+	List<UserResponseDTO> getAllUsersByOrgId(Long orgId);
 	
-	public UserVO getUserById(Long userId);
+	public UserResponseDTO getUserById(Long userId);
 
 	public UserVO getUserByUserName(String userName);
 

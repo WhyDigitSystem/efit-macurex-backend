@@ -1,4 +1,4 @@
-package com.efitops.basesetup.dto;
+package com.efitops.basesetup.ResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserBranchResponseDTO {
+public class UserLoginBranchAccessResponseDTO {
 
-	private Long id;
+    private Long id;
+
 //    private Long branchId;
-    private String branch;
+
     private String branchCode;
+
+    private String branchName;
+
 }

@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.persistence.Embedded;
 
+import com.efitops.basesetup.ResponseDTO.UserLoginBranchAccessResponseDTO;
+import com.efitops.basesetup.ResponseDTO.UserLoginRolesResponseDTO;
 import com.fasterxml.jackson.annotation.JsonGetter;
 
 import lombok.AllArgsConstructor;
@@ -25,8 +27,8 @@ public class UserResponseDTO {
 	private String userType;
 	private Long orgId;
 	private String customer;
-	private String warehouse;
-	private String branch;
+//	private String warehouse;
+//	private String branch;
 	private String client;
 	private boolean loginStatus;
 	private boolean active;
@@ -35,6 +37,8 @@ public class UserResponseDTO {
 //	private List<Map<String, Object>> responsibilityVO;
 //	private List<Map<String, Object>> screensVO;
 	private List<UserBranchResponseDTO> branches;
+	private List<UserLoginRolesResponseDTO> roles;
+
 	
     @Embedded
     private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
@@ -47,6 +51,13 @@ public class UserResponseDTO {
 	public String getActive() {
 		return active ? "Active" : "In-Active";
 	}
+
+
+
+	
+
+
+	
     // Setter method to accept List<Map<String, Object>>
    
    

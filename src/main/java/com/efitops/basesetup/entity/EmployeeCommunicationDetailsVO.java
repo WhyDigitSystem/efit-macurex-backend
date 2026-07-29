@@ -48,11 +48,11 @@ public class EmployeeCommunicationDetailsVO {
 	@Column(name = "country")
 	private String country;
 	
-	@OneToOne
-	@JoinColumn(name = "employeemasterid")  // ★ MUST BE UNIQUE
-	@JsonBackReference
-//	@JsonIgnore
-	private EmployeeMasterVO employeeMasterVO;
+//	@OneToOne
+//	@JoinColumn(name = "employeemasterid")  // ★ MUST BE UNIQUE
+//	@JsonBackReference
+////	@JsonIgnore
+//	private EmployeeMasterVO employeeMasterVO;
 
 
 	@Embedded

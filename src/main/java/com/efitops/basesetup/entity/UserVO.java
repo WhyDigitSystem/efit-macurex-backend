@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.efitops.basesetup.dto.Role;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -52,7 +53,7 @@ public class UserVO {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "employee")
-	private EmployeeVO employee;
+	private EmployeeMasterVO employeeMaster;
 	
 	@Column(name = "nickname")
 	private String nickName;
@@ -95,19 +96,22 @@ public class UserVO {
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 
 	@OneToMany(mappedBy = "userVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<UserLoginRolesVO> roleAccessVO;
 
 //	@OneToMany(mappedBy = "userVO", cascade = CascadeType.ALL)
 //	private List<UserLoginClientAccessVO> clientAccessVO;
 
 	@OneToMany(mappedBy = "userVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<UserLoginBranchAccessibleVO> branchAccessibleVO;
 	
 	private Date accountRemovedDate;
 	
-	@ManyToOne
-	@JoinColumn(name="companyid")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="company")
 	private CompanyVO companyVO;
+	
 	
 	@JsonGetter("active")
 	public String getActive() {
@@ -115,8 +119,7 @@ public class UserVO {
 	}
 
 	public boolean isActive() {
-		// TODO Auto-generated method stub
-		return false;
+	    return active;
 	}
 
 	

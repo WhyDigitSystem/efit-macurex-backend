@@ -5,12 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserBranchResponseDTO {
-
+@NoArgsConstructor
+public class DesignationResponseDTO {
 	private Long id;
-//    private Long branchId;
-    private String branch;
-    private String branchCode;
+	private String designationName;
 }

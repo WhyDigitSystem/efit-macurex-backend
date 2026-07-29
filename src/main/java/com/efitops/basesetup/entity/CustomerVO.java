@@ -248,6 +248,10 @@ public class CustomerVO {
 	@OneToMany(mappedBy = "customerVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<CustomerShippingDetailsVO> customerShippingDetails = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "customerVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<CustomerItemDetailsVO> CustomerItemDetailsVO = new ArrayList<>();
 
 	@JsonGetter("active")
 	public String getActive() {

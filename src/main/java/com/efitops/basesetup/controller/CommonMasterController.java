@@ -1131,7 +1131,7 @@ public class CommonMasterController extends BaseController {
 	 }
 	 
 	 @GetMapping("/getTransportByOrgId")
-	 public ResponseEntity<ResponseDTO> getTransportByOrgId(@RequestParam Long orgId,@RequestParam String branchCode) {
+	 public ResponseEntity<ResponseDTO> getTransportByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
 
 	     String methodName = "getTransportByOrgId()";
 	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -1142,7 +1142,7 @@ public class CommonMasterController extends BaseController {
 
 	     try {
 
-	         List<TransportMasterVO> transportList = commonMasterService.getTransportNameByOrgId(orgId,branchCode);
+	         List<TransportMasterVO> transportList = commonMasterService.getTransportNameByOrgId(orgId,branch);
 
 	         responseObjectsMap.put("transportList", transportList);
 
@@ -2275,7 +2275,31 @@ public class CommonMasterController extends BaseController {
 		    return ResponseEntity.ok().body(responseDTO);
 		}
 		
-		
+		@GetMapping("/getListValuesGroup")
+		public ResponseEntity<ResponseDTO> getListValuesGroup(@RequestParam Long orgId, @RequestParam String listDescription) {
+			String methodName = "getListValuesGroup()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+			String errorMsg = null;
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			ResponseDTO responseDTO = null;
+			List<Map<String, Object>> listValues = new ArrayList<>();
+			try {
+				listValues = commonMasterService.getBudgetGroup(orgId, listDescription);
+			} catch (Exception e) {
+				errorMsg = e.getMessage();
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			}
+			if (StringUtils.isBlank(errorMsg)) {
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "List Values information get successfully");
+				responseObjectsMap.put("listValues", listValues);
+				responseDTO = createServiceResponse(responseObjectsMap);
+			} else {
+				responseDTO = createServiceResponseError(responseObjectsMap, "List Values information receive failed",
+						errorMsg);
+			}
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			return ResponseEntity.ok().body(responseDTO);
+		}
 		
 		
 }

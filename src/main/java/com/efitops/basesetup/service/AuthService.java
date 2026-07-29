@@ -23,7 +23,7 @@ import com.efitops.basesetup.exception.ApplicationException;
 @Service
 public interface AuthService {
 
-	public void signup(SignUpFormDTO signUpRequest);
+	public void signup(SignUpFormDTO signUpRequest) throws ApplicationException;
 
 	public UserResponseDTO login(LoginFormDTO loginRequest, HttpServletRequest request) throws ApplicationException;
 
@@ -53,9 +53,9 @@ public interface AuthService {
 	
 	ResponsibilityVO getResponsibilityById(Long id) throws ApplicationException;
 	
-	List<UserVO>getAllUsersByOrgId(Long orgId);
+	List<UserResponseDTO> getAllUsersByOrgId(Long orgId);
 	
-	public UserVO getUserById(Long userId);
+	public UserResponseDTO getUserById(Long userId);
 
 	public UserVO getUserByUserName(String userName);
 

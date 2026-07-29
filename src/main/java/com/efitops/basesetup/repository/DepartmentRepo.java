@@ -11,7 +11,7 @@ import com.efitops.basesetup.entity.DepartmentVO;
 @Repository
 public interface DepartmentRepo extends JpaRepository<DepartmentVO, Long> {
 
-	@Query(nativeQuery = true, value = "select * from department  where orgid=?1 and branch=?2")
+	@Query(nativeQuery = true, value = "select * from department  where org_id=?1 and branch=?2 and active=1 and cancel=0")
 	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, Long branch);
 
 	@Query(nativeQuery = true, value = "select * from department where departmentid=?1")

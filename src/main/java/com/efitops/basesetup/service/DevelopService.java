@@ -19,7 +19,6 @@ public interface DevelopService {
 
 	List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-	//documenttypemapping
 
 	
 	

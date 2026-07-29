@@ -50,11 +50,11 @@ public class EmployeeComplianceDetailsVO {
 	@Column(name = "esi")
 	private boolean esi;
 	
-	@OneToOne
-	@JoinColumn(name = "employeemasterid")  // ★ MUST BE UNIQUE
-	@JsonBackReference
-//	@JsonIgnore
-	private EmployeeMasterVO employeeMasterVO;
+//	@OneToOne
+//	@JoinColumn(name = "employeemasterid")  // ★ MUST BE UNIQUE
+//	@JsonBackReference
+////	@JsonIgnore
+//	private EmployeeMasterVO employeeMasterVO;
 
 
 	@Embedded

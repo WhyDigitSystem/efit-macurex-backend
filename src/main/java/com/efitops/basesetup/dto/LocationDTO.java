@@ -1,7 +1,5 @@
 package com.efitops.basesetup.dto;
 
-import com.efitops.basesetup.entity.BranchVO;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +14,8 @@ public class LocationDTO {
 	private Long locationType;
 	private Long belongsTo;
 	private String locationId;
+	private String locationName;
+
 	private String address;
 	private Long phoneNo;
 	private Long faxNo;

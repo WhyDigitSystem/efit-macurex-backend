@@ -38,15 +38,19 @@ import com.efitops.basesetup.dto.FinancialYearDTO;
 import com.efitops.basesetup.dto.GSTRateMasterDTO;
 import com.efitops.basesetup.dto.GSTStateMasterDTO;
 import com.efitops.basesetup.dto.GradeMasterDTO;
+import com.efitops.basesetup.dto.HolidayMasterDTO;
 import com.efitops.basesetup.dto.HsnDTO;
 import com.efitops.basesetup.dto.LMEDTO;
 import com.efitops.basesetup.dto.ListOfValuesDTO;
 import com.efitops.basesetup.dto.LocationDTO;
+import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
 import com.efitops.basesetup.dto.StateDTO;
+import com.efitops.basesetup.dto.TSBankDTO;
+import com.efitops.basesetup.dto.TaxDefinitionDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
 import com.efitops.basesetup.dto.UomConversionDTO;
@@ -61,14 +65,18 @@ import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.GradeMasterVO;
+import com.efitops.basesetup.entity.HolidayMasterVO;
 import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.LMEVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.MappingOfPartyToAccVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.entity.StateVO;
+import com.efitops.basesetup.entity.TSBankVO;
+import com.efitops.basesetup.entity.TaxDefinitionVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.entity.UomConversionVO;
@@ -2300,6 +2308,419 @@ public class CommonMasterController extends BaseController {
 			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 			return ResponseEntity.ok().body(responseDTO);
 		}
+		
+		//Ts bank master
+		 
+		@PostMapping("/createUpdateBankMaster")
+		 public ResponseEntity<ResponseDTO> createUpdateBankMaster(@RequestBody TSBankDTO tSBankDTO) {
+
+		     String methodName = "createUpdateBankMaster()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		         Map<String, Object> createdTSBankVO = commonMasterService.createUpdateBankMaster(tSBankDTO);
+
+		         responseObjectsMap.put(CommonConstant.STRING_MESSAGE, createdTSBankVO.get("message"));
+		         responseObjectsMap.put("tSBankVO", createdTSBankVO.get("tSBankVO"));
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
+		 
+		 @GetMapping("/getBankMasterById")
+			public ResponseEntity<ResponseDTO> getBankMasterById(@RequestParam Long id) {
+				String methodName = "getBankMasterById()";
+				LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+				String errorMsg = null;
+				Map<String, Object> responseObjectsMap = new HashMap<>();
+				ResponseDTO responseDTO = null;
+				TSBankVO tSBankVO = new TSBankVO();
+				try {
+					tSBankVO = commonMasterService.getBankMasterById(id);
+				} catch (Exception e) {
+					errorMsg = e.getMessage();
+					LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+				}
+				if (StringUtils.isBlank(errorMsg)) {
+					responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Bank information get successfully");
+					responseObjectsMap.put("tSBankVO", tSBankVO);
+					responseDTO = createServiceResponse(responseObjectsMap);
+				} else {
+					responseDTO = createServiceResponseError(responseObjectsMap, "Bank information receive failed",
+							errorMsg);
+				}
+				LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+				return ResponseEntity.ok().body(responseDTO);
+			}
+		 
+		 @GetMapping("/getBankMasterByOrgId")
+		 public ResponseEntity<ResponseDTO> getBankMasterByOrgId(@RequestParam Long orgId) {
+		     String methodName = "getBankMasterByOrgId()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     String errorMsg = null;
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     ResponseDTO responseDTO = null;
+		     List<TSBankVO> bankList = new ArrayList<>();
+
+		     try {
+		    	 bankList = commonMasterService.getBankMasterByOrgId(orgId);
+		     } catch (Exception e) {
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		     }
+
+		     if (StringUtils.isBlank(errorMsg)) {
+		         responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Bank information retrieved successfully");
+		         responseObjectsMap.put("bankList", bankList);
+		         responseDTO = createServiceResponse(responseObjectsMap);
+		     } else {
+		         responseDTO = createServiceResponseError(responseObjectsMap,
+		                 "Bank information retrieval failed", errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
+		 
+		//Tax Definition 
+		 
+		 @PostMapping("/updateCreateTaxDefinition")
+		 public ResponseEntity<ResponseDTO> updateCreateTaxDefinition(@RequestBody TaxDefinitionDTO taxDefinitionDTO) {
+
+		     String methodName = "updateCreateTaxDefinition()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		         Map<String, Object> createdTaxDefinitionVO = commonMasterService.updateCreateTaxDefinition(taxDefinitionDTO);
+
+		         responseObjectsMap.put(CommonConstant.STRING_MESSAGE, createdTaxDefinitionVO.get("message"));
+		         responseObjectsMap.put("taxDefinitionVO", createdTaxDefinitionVO.get("taxDefinitionVO"));
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
+		 
+		 @GetMapping("/getTaxDefinitionById")
+			public ResponseEntity<ResponseDTO> getTaxDefinitionById(@RequestParam Long id) {
+				String methodName = "getTaxDefinitionById()";
+				LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+				String errorMsg = null;
+				Map<String, Object> responseObjectsMap = new HashMap<>();
+				ResponseDTO responseDTO = null;
+				TaxDefinitionVO taxDefinitionVO = new TaxDefinitionVO();
+				try {
+					taxDefinitionVO = commonMasterService.getTaxDefinitionById(id);
+				} catch (Exception e) {
+					errorMsg = e.getMessage();
+					LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+				}
+				if (StringUtils.isBlank(errorMsg)) {
+					responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "TaxDefinition  information get successfully");
+					responseObjectsMap.put("taxDefinitionVO", taxDefinitionVO);
+					responseDTO = createServiceResponse(responseObjectsMap);
+				} else {
+					responseDTO = createServiceResponseError(responseObjectsMap, "TaxDefinition  information receive failed",
+							errorMsg);
+				}
+				LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+				return ResponseEntity.ok().body(responseDTO);
+			}
+		 
+		 @GetMapping("/getTaxDefinitionByOrgId")
+		 public ResponseEntity<ResponseDTO> getTaxDefinitionByOrgId(@RequestParam Long orgId , @RequestParam Long branch) {
+		     String methodName = "getTaxDefinitionByOrgId()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     String errorMsg = null;
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     ResponseDTO responseDTO = null;
+		     List<TaxDefinitionVO> taxList = new ArrayList<>();
+
+		     try {
+		    	 taxList = commonMasterService.getTaxDefinitionByOrgId(orgId,branch);
+		     } catch (Exception e) {
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		     }
+
+		     if (StringUtils.isBlank(errorMsg)) {
+		         responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "TaxDefinition information retrieved successfully");
+		         responseObjectsMap.put("taxList", taxList);
+		         responseDTO = createServiceResponse(responseObjectsMap);
+		     } else {
+		         responseDTO = createServiceResponseError(responseObjectsMap,
+		                 "TaxDefinition information retrieval failed", errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
+		
+		 
+		 //Holiday Master
+		 
+		 @PutMapping("/updateCreateHolidayMaster")
+			public ResponseEntity<ResponseDTO> updateCreateHolidayMaster(@RequestBody HolidayMasterDTO holidayMasterDTO) {
+				String methodName = "updateCreateHolidayMaster()";
+				LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+				String errorMsg = null;
+				Map<String, Object> responseObjectsMap = new HashMap<>();
+				ResponseDTO responseDTO = null;
+				try {
+					Map<String, Object> holidayMasterVO = commonMasterService.updateCreateHolidayMaster(holidayMasterDTO);
+					responseObjectsMap.put(CommonConstant.STRING_MESSAGE, holidayMasterVO.get("message"));
+					responseObjectsMap.put("holidayMasterVO", holidayMasterVO.get("holidayMasterVO"));
+					responseDTO = createServiceResponse(responseObjectsMap);
+				} catch (Exception e) {
+					errorMsg = e.getMessage();
+					LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+					responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+				}
+				LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+				return ResponseEntity.ok().body(responseDTO);
+			}
+			
+		 @GetMapping("/getHolidayMasterById")
+		 public ResponseEntity<ResponseDTO> getHolidayMasterById(@RequestParam Long id) {
+
+		     String methodName = "getHolidayMasterById()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		    	 HolidayMasterVO holidayMasterVO = commonMasterService.getHolidayMasterById(id);
+
+		         responseObjectsMap.put("holidayMasterVO", holidayMasterVO);
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
+		 
+		 @GetMapping("/getHolidayMasterByOrgId")
+		 public ResponseEntity<ResponseDTO> getHolidayMasterByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
+
+		     String methodName = "getHolidayMasterByOrgId()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		         List<HolidayMasterVO> holidayMasterVO = commonMasterService.getHolidayMasterByOrgId(orgId,branch);
+
+		         responseObjectsMap.put("holidayMasterVO", holidayMasterVO);
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
+
+		 //Mapping of party to acc
+		 @PutMapping("/updateCreateMappingOfPartyToAcc")
+			public ResponseEntity<ResponseDTO> updateCreateMappingOfPartyToAcc(@RequestBody MappingOfPartyToAccDTO mappingOfPartyToAccDTO) {
+				String methodName = "updateCreateMappingOfPartyToAcc()";
+				LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+				String errorMsg = null;
+				Map<String, Object> responseObjectsMap = new HashMap<>();
+				ResponseDTO responseDTO = null;
+				try {
+					Map<String, Object> mappingOfPartyToAccVO = commonMasterService.updateCreateMappingOfPartyToAcc(mappingOfPartyToAccDTO);
+					responseObjectsMap.put(CommonConstant.STRING_MESSAGE, mappingOfPartyToAccVO.get("message"));
+					responseObjectsMap.put("mappingOfPartyToAccVO", mappingOfPartyToAccVO.get("mappingOfPartyToAccVO"));
+					responseDTO = createServiceResponse(responseObjectsMap);
+				} catch (Exception e) {
+					errorMsg = e.getMessage();
+					LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+					responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+				}
+				LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+				return ResponseEntity.ok().body(responseDTO);
+			}
+			
+		 @GetMapping("/getMappingOfPartyToAccById")
+		 public ResponseEntity<ResponseDTO> getMappingOfPartyToAccById(@RequestParam Long id) {
+
+		     String methodName = "getMappingOfPartyToAccById()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		    	 MappingOfPartyToAccVO mappingOfPartyToAccVO = commonMasterService.getMappingOfPartyToAccById(id);
+
+		         responseObjectsMap.put("mappingOfPartyToAccVO", mappingOfPartyToAccVO);
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
+		 
+		 @GetMapping("/getMappingOfPartyToAccByOrgId")
+		 public ResponseEntity<ResponseDTO> getMappingOfPartyToAccByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
+
+		     String methodName = "getMappingOfPartyToAccByOrgId()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		         List<MappingOfPartyToAccVO> mappingOfPartyToAccVO = commonMasterService.getMappingOfPartyToAccByOrgId(orgId,branch);
+
+		         responseObjectsMap.put("mappingOfPartyToAccVO", mappingOfPartyToAccVO);
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
+
+		// Drop Down for Customer Category
+		 @GetMapping("/getCustomerCategory")
+		 public ResponseEntity<ResponseDTO> getCustomerCategory(@RequestParam Long orgId) {
+
+		     String methodName = "getCustomerCategory()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		         responseObjectsMap = commonMasterService.getCustomerCategory(orgId);
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }	 
+		 //drop down for party
+		 @GetMapping("/getParty")
+		 public ResponseEntity<ResponseDTO> getParty(@RequestParam Long category,
+		                                             @RequestParam Long orgId,
+		                                             @RequestParam Long branch) {
+
+		     String methodName = "getParty()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		         responseObjectsMap = commonMasterService.getParty(category, orgId, branch);
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
 		
 		
 }

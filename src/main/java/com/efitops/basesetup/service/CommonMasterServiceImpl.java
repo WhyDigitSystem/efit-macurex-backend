@@ -1763,6 +1763,23 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				return listOfValuesRepo.getListOfValuesByOrgId(orgId,branchId);
 			}
 
+			@Override
+			public List<Map<String, Object>> getBudgetGroup(Long orgId, String name) throws ApplicationException {
+
+				Set<Object[]> obj = listOfValuesRepo.getListValuesDetailsForBudget(orgId, name);
+				return ListofValue(obj);
+			}
+
+			private List<Map<String, Object>> ListofValue(Set<Object[]> obj) {
+				List<Map<String, Object>> details = new ArrayList<>();
+				for (Object[] det : obj) {
+					Map<String, Object> mp = new HashMap<>();
+					mp.put("id", det[0] != null ? det[0].toString() : "");
+					mp.put("valuesDescription", det[1] != null ? det[1].toString() : "");
+					details.add(mp);
+				}
+				return details;
+			}
 			
 			//GST Rate Master
 			

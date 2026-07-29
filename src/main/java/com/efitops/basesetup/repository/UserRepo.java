@@ -13,7 +13,7 @@ import com.efitops.basesetup.entity.UserVO;
 @Repository
 public interface UserRepo extends JpaRepository<UserVO, Long> {
 
-	boolean existsByUserNameOrEmail(String userName, String email);
+	  boolean existsByUserNameOrEmployee_Email(String userName, String email);
 
 	@Query("select a from UserVO a where a.userName=?1")
 	UserVO findByUserName(String userName);
@@ -26,8 +26,6 @@ public interface UserRepo extends JpaRepository<UserVO, Long> {
 
 	@Query(value = "select u from UserVO u where u.orgId =?1")
 	List<UserVO> findAllByOrgId(Long orgId);
-
-	boolean existsByUserNameOrEmailOrMobileNo(String userName, String email, String email2);
 
 	@Query("SELECT u.id FROM UserVO u WHERE u.employee.employeeCode IN :empCodes")
 	List<Long> findUserIdsByEmployeeCodes(@Param("empCodes") List<String> empCodes);
@@ -42,6 +40,9 @@ public interface UserRepo extends JpaRepository<UserVO, Long> {
 
 	  UserVO findByEmployee_EmployeeName(String employeeName);
 //	UserVO findByUserNameAndUsersId(String userName, Long usersId);
+
+	  UserVO findByUserNameOrEmployee_Email(String userName, String email);
+
 
 
 

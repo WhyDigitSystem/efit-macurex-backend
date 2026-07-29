@@ -40,14 +40,14 @@ public class UserLoginRolesVO {
 	@JoinColumn(name = "roles")
 	private RolesVO roles;
 	
-	@Column(name="startdate")
+	@Column(name="start_date")
 	private LocalDate startDate;
-	@Column(name="enddate")
+	@Column(name="end_date")
 	private LocalDate endDate;
 	
-	@JsonBackReference
 	@ManyToOne
-    @JoinColumn(name = "usersid")
+	@JsonBackReference
+    @JoinColumn(name = "users_id")
     private UserVO userVO;
 	
 	

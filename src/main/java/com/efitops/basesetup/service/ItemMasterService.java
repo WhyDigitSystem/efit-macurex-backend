@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.dto.ItemMasterDTO;
-import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.dto.ItemMasterResponseDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
 public interface ItemMasterService {
 
-	ItemMasterVO getItemMasterById(Long id);
+	ItemMasterResponseDTO getItemMasterById(Long id) throws ApplicationException;
 
 	Map<String, Object> updateCreateItemMaster(ItemMasterDTO itemMasterDTO) throws ApplicationException;
 
@@ -25,6 +25,8 @@ public interface ItemMasterService {
 			List<Long> itemDrawingId) throws ApplicationException, IOException;
 
 	ResponseEntity<byte[]> viewItemMasterImages(HttpServletRequest request) throws IOException;
+
+	ItemMasterResponseDTO getItemMasterByOrgId(Long orgId, Long branchId) throws ApplicationException;
 
 
 }

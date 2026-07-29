@@ -52,12 +52,12 @@ public class EmployeeFinanceInformationVO {
 	@Column(name = "date")
 	private LocalDate date;
 	
-
-	@ManyToOne
-	@JsonBackReference
-//	@JsonIgnore
-	@JoinColumn(name = "employeemasterid")
-	EmployeeMasterVO employeeMasterVO;
+//
+//	@ManyToOne
+//	@JsonBackReference
+////	@JsonIgnore
+//	@JoinColumn(name = "employeemasterid")
+//	EmployeeMasterVO employeeMasterVO;
 
 	@Embedded
 	@Builder.Default

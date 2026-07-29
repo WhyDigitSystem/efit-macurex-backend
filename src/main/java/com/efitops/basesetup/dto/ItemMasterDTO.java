@@ -4,11 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
-import com.efitops.basesetup.entity.UnitMasterVO;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -95,9 +90,9 @@ public class ItemMasterDTO {
 
 	private String manufacturedOrBoughtout;
 
-	private String defaultLocation;
+	private Long defaultLocationId;
 
-	private String alternativeLocation;
+	private Long alternativeLocationId;
 
 	private BigDecimal leadTime;
 
@@ -123,9 +118,9 @@ public class ItemMasterDTO {
 
 	// Purchase
 
-	private String defaultSupplier;
+	private Long defaultSupplierId;
 
-	private String alternativeSupplier;
+	private Long alternativeSupplierId;
 
 	private String pruchaseTalerance;
 
@@ -173,7 +168,7 @@ public class ItemMasterDTO {
 
 	private String screenCode;
 
-	private Long org;
+	private Long orgId;
 
 	private String financialYear;
 

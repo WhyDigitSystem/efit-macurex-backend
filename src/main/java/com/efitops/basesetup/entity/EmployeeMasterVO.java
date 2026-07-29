@@ -1,21 +1,19 @@
 package com.efitops.basesetup.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,116 +29,209 @@ public class EmployeeMasterVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "employeemastergen")
 	@SequenceGenerator(name = "employeemastergen", sequenceName = "employeemasterseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "employeemasterid")
+	@Column(name = "employeemaster_id")
 	private Long id;
-	@Column(name = "employeecode" , unique = true)
-	private String employeeCode;
-	@Column(name = "firstname")
-	private String firstName;
-	@Column(name = "lastname")
-	private String lastName;
-	@Column(name = "employeename")
-	private String employeeName;
-	@Column(name = "fathername")
-	private String fatherName;
-	@Column(name = "gender")
-	private String gender;
-	@Column(name = "bloodgroup")
-	private String bloodGroup;
-	@Column(name = "salutation")
-	private String salutation;
-	@Column(name = "aadhaarno", unique = true)
-//	@Pattern(regexp = "\\d{12}", message = "Aadhaar number must be exactly 12 digits")
-	private String aadhaarNo;
-	@Column(name = "dateofbirth")
+
+	@Column(name = "employee_id")
+	private String employeeId;
+
+	@Column(name = "sur_name")
+	private String surName;
+
+	@Column(name = "middle_name")
+	private String middleName;
+
+	@Column(name = "father_husband_name")
+	private String fatherHusbandName;
+
+	@Column(name = "title")
+	private String title;
+
+	@Column(name = "account_head")
+	private String accountHead;
+
+	@Column(name = "sex")
+	private String sex;
+
+	@Column(name = "date_of_birth")
 	private LocalDate dateOfBirth;
-	@Column(name = "maritalstatus")
-	private String maritalStatus;
-	
-	
-	@Column(name = "createdby")
+
+	@Column(name = "telephone")
+	private Long telephone;
+
+	@Column(name = "mobile")
+	private Long mobile;
+
+	@Column(name = "email")
+	private String email;
+
+	@Column(name = "qualification")
+	private String qualification;
+
+	@Column(name = "grade")
+	private String grade;
+
+	@Column(name = "passport_no")
+	private String passportNo;
+
+	@Column(name = "pan_no")
+	private String panNo;
+
+	@Column(name = "blood_group")
+	private String bloodGroup;
+
+	@Column(name = "nominee")
+	private String nominee;
+
+	// Temporary Address
+
+	@Column(name = "temp_address_line")
+	private String tempAddressLine;
+
+	@Column(name = "temp_city")
+	private String tempCity;
+
+	@ManyToOne
+	@JoinColumn(name = "temp_state")
+	private StateVO tempState;
+
+	@ManyToOne
+	@JoinColumn(name = "temp_country")
+	private CountryVO tempCountry;
+
+	@Column(name = "temp_pincode")
+	private Long tempPincode;
+
+	// Permanent Address
+
+	@Column(name = "permanent_address_line")
+	private String permanentAddressLine;
+
+	@Column(name = "permanent_city")
+	private String permanentCity;
+
+	@ManyToOne
+	@JoinColumn(name = "permanent_state")
+	private StateVO permanentState;
+
+	@ManyToOne
+	@JoinColumn(name = "permanent_country")
+	private CountryVO permanentCountry;
+
+	@Column(name = "permanent_pincode")
+	private Long permanentPincode;
+
+	// OtherInformation
+
+	@Column(name = "card_no")
+	private String cardNo;
+
+	@Column(name = "temporary_card_no")
+	private String temporaryCardNo;
+
+	@Column(name = "date_of_joining")
+	private LocalDate dateOfJoining;
+
+	@ManyToOne
+	@JoinColumn(name = "plant_id")
+	private BranchVO plantId;
+
+	@ManyToOne
+	@JoinColumn(name = "department")
+	private DepartmentVO department;
+
+	@ManyToOne
+	@JoinColumn(name = "designation")
+	private DesignationVO designation;
+
+	@Column(name = "nature_of_employment")
+	private String natureOfEmployment;
+
+	@Column(name = "over_time_applicable")
+	private String overTimeApplicable;
+
+	@Column(name = "reference_by")
+	private String referenceBy;
+
+	@ManyToOne
+	@JoinColumn(name = "okd_by")
+	private EmployeeMasterVO okdBy;
+
+	@Column(name = "mode_of_payment")
+	private String modeOfPayment;
+
+	@Column(name = "bank_account_no")
+	private String bankAccountNo;
+
+	@Column(name = "bank_name")
+	private String bankName;
+
+	@Column(name = "pf_no")
+	private String pfNo;
+
+	@Column(name = "esi_no")
+	private String esiNo;
+
+	@Column(name = "esi_disp_name")
+	private String esiDispName;
+
+	@Column(name = "vpf_percentage")
+	private BigDecimal vpfPercentage;
+
+	@Column(name = "date_of_confirmation")
+	private LocalDate dateOfConfirmation;
+
+	@Column(name = "information_active")
+	private String information_active;
+
+	@Column(name = "training_start_date")
+	private LocalDate trainingStartDate;
+
+	@Column(name = "training_end_date")
+	private LocalDate trainingEndDate;
+
+	@Column(name = "notice_period")
+	private Integer noticePeriod;
+
+	@Column(name = "current_salary_period_start")
+	private LocalDate currentSalaryPeriodStart;
+
+	@Column(name = "current_salary_period_end")
+	private LocalDate currentSalaryPeriodEnd;
+
+	// Common Fields
+
+	@Column(name = "created_by")
 	private String createdBy;
-	@Column(name = "modifiedby")
-	private String updatedBy;
-	@Column(name = "cancelremarks")
-	private String cancelRemarks;
+
+	@Column(name = "active")
+	private boolean active = true;
+
 	@Column(name = "cancel")
 	private boolean cancel = false;
-	@Column(name = "active")
-	private boolean active;
-	@Column(name = "orgid")
+
+	@Column(name = "updated_by")
+	private String updatedBy;
+
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
+
+	@Column(name = "screen_name")
+	private String screenName;
+
+	@Column(name = "screen_code")
+	private String screenCode;
+
+	@Column(name = "org_id")
 	private Long orgId;
 
-	@Column(name = "branch", length = 25)
-	private String branch;
+	@Column(name = "financial_year")
+	private String financialYear;
 
-	@Column(name = "branchcode", length = 20)
-	private String branchCode;
-	
-    @Column(name = "finyear", length = 5)
-    private String finYear;
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
 
-    @Column(name = "screencode", length = 5)
-    private String screenCode = "EM";
-
-    @Column(name = "screenname", length = 25)
-    private String screenName = "EMPLOYEEMASTER";
-
-//	@OneToOne(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-//	@JsonManagedReference
-//	private EmployeeDetailsVO employeeDetailsVO;
-//
-//	@OneToOne(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-//	@JsonManagedReference
-//	private EmployeePersonalDetailsVO employeePersonalDetailsVO;
-//	
-//	@OneToMany(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-//	@JsonManagedReference
-//	private List<EmployeeFinanceInformationVO> employeeFinanceInformationVO;
-//	
-//	@OneToOne(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-//	@JsonManagedReference
-//	private EmployeeCommunicationDetailsVO employeeCommunicationDetailsVO;
-//	
-//	@OneToOne(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-//	@JsonManagedReference
-//	private EmployeeComplianceDetailsVO employeeComplianceDetailsVO;
-//	
-//	@OneToMany(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-//	@JsonManagedReference
-//	private List<EmployeeLoanDetailsVO> employeeLoanDetailsVO;
-
-    @OneToOne(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private EmployeeDetailsVO employeeDetailsVO;
-
-    @OneToOne(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private EmployeePersonalDetailsVO employeePersonalDetailsVO;
-
-    @OneToOne(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private EmployeeCommunicationDetailsVO employeeCommunicationDetailsVO;
-
-    @OneToOne(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private EmployeeComplianceDetailsVO employeeComplianceDetailsVO;
-
-    @OneToMany(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<EmployeeFinanceInformationVO> employeeFinanceInformationVO;
-
-    @OneToMany(mappedBy = "employeeMasterVO", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<EmployeeLoanDetailsVO> employeeLoanDetailsVO;
-    
-    @OneToMany(mappedBy = "employeeMasterVO",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
- @JsonManagedReference
- private List<EmployeeAttachmentVO> documents;
-
-	
 	@JsonGetter("active")
 	public String getActive() {
 		return active ? "Active" : "In-Active";
@@ -152,5 +243,3 @@ public class EmployeeMasterVO {
 		return cancel ? "T" : "F";
 	}
 }
-
-

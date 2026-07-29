@@ -46,10 +46,10 @@ public class EmployeeAttachmentVO {
 	@Column(name = "uploadOn")
 	private LocalDateTime uploadOn;
 
-	@ManyToOne
-	@JoinColumn(name = "employeemasterid")
-	@JsonBackReference
-//	@JsonIgnore
-	private EmployeeMasterVO employeeMasterVO;
+//	@ManyToOne
+//	@JoinColumn(name = "employeemasterid")
+//	@JsonBackReference
+////	@JsonIgnore
+//	private EmployeeMasterVO employeeMasterVO;
 
 }

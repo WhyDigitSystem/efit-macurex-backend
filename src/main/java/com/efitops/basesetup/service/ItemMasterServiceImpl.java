@@ -1,6 +1,7 @@
 package com.efitops.basesetup.service;
 
 import java.io.IOException;
+
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -37,16 +38,21 @@ import com.efitops.basesetup.dto.ItemMasterDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDTO;
 import com.efitops.basesetup.dto.ListOfImageResponseDTO;
 import com.efitops.basesetup.dto.ListOfImageResponseDetailsDTO;
+import com.efitops.basesetup.dto.LocationImageDTO;
+import com.efitops.basesetup.dto.PartyResponseDTO;
 import com.efitops.basesetup.dto.PrimaryUnitImageDTO;
 import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.ItemDrawingVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
+import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.HsnRepo;
 import com.efitops.basesetup.repository.ItemDrawingRepo;
 import com.efitops.basesetup.repository.ItemInventoryRepo;
@@ -56,6 +62,7 @@ import com.efitops.basesetup.repository.ItemPurchaseRepo;
 import com.efitops.basesetup.repository.ItemSalesRepo;
 import com.efitops.basesetup.repository.ItemUnitsRepo;
 import com.efitops.basesetup.repository.ListOfValuesRepo;
+import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
@@ -99,11 +106,11 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 	@Autowired
 	HsnRepo hsnRepo;
 
-	@Override
-	public ItemMasterVO getItemMasterById(Long id) {
+	@Autowired
+	LocationRepo locationRepo;
 
-		return itemMasterRepo.getItemMasterById(id);
-	}
+	@Autowired
+	CustomerRepo customerRepo;
 
 	@Override
 	public Map<String, Object> updateCreateItemMaster(ItemMasterDTO itemMasterDTO) throws ApplicationException {
@@ -116,7 +123,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 					.orElseThrow(() -> new ApplicationException("Item not found"));
 
 			if (!itemMasterVO.getItemCode().equals(itemMasterDTO.getItemCode())) {
-				if (itemMasterRepo.existsByItemCodeAndOrg(itemMasterDTO.getItemCode(), itemMasterDTO.getOrg())) {
+				if (itemMasterRepo.existsByItemCodeAndOrgId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId())) {
 
 					String errorMessage = String.format("This ItemCode: %s already exists for this organization.",
 							itemMasterDTO.getItemCode());
@@ -130,7 +137,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			message = "Item Updated Successfully";
 		} else {
 
-			if (itemMasterRepo.existsByItemCodeAndOrg(itemMasterDTO.getItemCode(), itemMasterDTO.getOrg())) {
+			if (itemMasterRepo.existsByItemCodeAndOrgId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId())) {
 
 				String errorMessage = String.format("This ItemCode: %s already exists for this organization.",
 						itemMasterDTO.getItemCode());
@@ -199,7 +206,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			}
 			listOfValuesDTO.setListOfImageResponseDetailsDTO(detailsList);
 
-			responseDTO.setListOfValues(listOfValuesDTO);
+			responseDTO.setListOfGrade(listOfValuesDTO);
 			responseDTO.setListOfValuesId(itemMasterVO.getGrade().getId());
 		}
 
@@ -220,13 +227,13 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			}
 			listOfValuesDTO.setListOfImageResponseDetailsDTO(detailsList);
 
-			responseDTO.setListOfValues(listOfValuesDTO);
+			responseDTO.setListOfGroupDetails(listOfValuesDTO);
 			responseDTO.setListOfValuesId(itemMasterVO.getItemGroup().getId());
 		}
 
 		responseDTO.setItemCode(itemMasterVO.getItemCode());
 //		responseDTO.setExciseTariffNo(itemMasterVO.getExciseTariffNo());
-		
+
 		if (itemMasterVO.getExciseTariffNo() != null) {
 			ListOfImageResponseDTO listOfValuesDTO = new ListOfImageResponseDTO();
 			listOfValuesDTO.setId(itemMasterVO.getExciseTariffNo().getId());
@@ -247,7 +254,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			responseDTO.setListOfValues(listOfValuesDTO);
 			responseDTO.setListOfValuesId(itemMasterVO.getExciseTariffNo().getId());
 		}
-		
+
 		responseDTO.setItemDescription(itemMasterVO.getItemDescription());
 		responseDTO.setThickness(itemMasterVO.getThickness());
 		responseDTO.setIsStock(itemMasterVO.getIsStock());
@@ -284,7 +291,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		}
 
 		responseDTO.setCreatedBy(itemMasterVO.getCreatedBy());
-		responseDTO.setOrg(itemMasterVO.getOrg());
+		responseDTO.setOrgId(itemMasterVO.getOrgId());
 		responseDTO.setUpdatedBy(itemMasterVO.getUpdatedBy());
 		responseDTO.setCancelRemarks(itemMasterVO.getCancelRemarks());
 
@@ -293,7 +300,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 //		responseDTO.setSellingUnit(itemMasterVO.getSellingUnit());
 //		responseDTO.setPricingUnit(itemMasterVO.getPricingUnit());
 //		responseDTO.setSecondaryUnit(itemMasterVO.getSecondaryUnit());
-		
+
 		if (itemMasterVO.getPurchaseUnit() != null) {
 			PrimaryUnitImageDTO primaryUnitDTO = new PrimaryUnitImageDTO();
 			primaryUnitDTO.setId(itemMasterVO.getPurchaseUnit().getId());
@@ -318,11 +325,23 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			primaryUnitDTO.setPrimaryUnit(itemMasterVO.getSecondaryUnit().getUnitId());
 			responseDTO.setSecondaryUnit(primaryUnitDTO);
 		}
-		
 
 		responseDTO.setManufacturedOrBoughtout(itemMasterVO.getManufacturedOrBoughtout());
-		responseDTO.setDefaultLocation(itemMasterVO.getDefaultLocation());
-		responseDTO.setAlternativeLocation(itemMasterVO.getAlternativeLocation());
+
+		if (itemMasterVO.getDefaultLocation() != null) {
+			LocationImageDTO primaryUnitDTO = new LocationImageDTO();
+			primaryUnitDTO.setId(itemMasterVO.getDefaultLocation().getId());
+			primaryUnitDTO.setLocationName(itemMasterVO.getDefaultLocation().getLocationName());
+			responseDTO.setLocationDefalutReponse(primaryUnitDTO);
+		}
+
+		if (itemMasterVO.getAlternativeLocation() != null) {
+			LocationImageDTO primaryUnitDTO = new LocationImageDTO();
+			primaryUnitDTO.setId(itemMasterVO.getAlternativeLocation().getId());
+			primaryUnitDTO.setLocationName(itemMasterVO.getAlternativeLocation().getLocationName());
+			responseDTO.setLocationAlterReponse(primaryUnitDTO);
+		}
+
 		responseDTO.setLeadTime(itemMasterVO.getLeadTime());
 		responseDTO.setReorderLevel(itemMasterVO.getReorderLevel());
 		responseDTO.setRackNo(itemMasterVO.getRackNo());
@@ -333,8 +352,23 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		responseDTO.setBinSize(itemMasterVO.getBinSize());
 		responseDTO.setBinQty(itemMasterVO.getBinQty());
 
-		responseDTO.setDefaultSupplier(itemMasterVO.getDefaultSupplier());
-		responseDTO.setAlternativeSupplier(itemMasterVO.getAlternativeSupplier());
+//		responseDTO.setDefaultSupplier(itemMasterVO.getDefaultSupplier());
+//		responseDTO.setAlternativeSupplier(itemMasterVO.getAlternativeSupplier());
+
+		if (itemMasterVO.getDefaultSupplier() == null || itemMasterVO.getDefaultSupplier() != null) {
+			PartyResponseDTO primaryUnitDTO = new PartyResponseDTO();
+			primaryUnitDTO.setId(itemMasterVO.getDefaultSupplier().getId());
+			primaryUnitDTO.setPartyName(itemMasterVO.getDefaultSupplier().getCustomerName());
+			responseDTO.setDefaultPartyResponse(primaryUnitDTO);
+		}
+
+		if (itemMasterVO.getAlternativeSupplier() == null || itemMasterVO.getAlternativeSupplier() != null) {
+			PartyResponseDTO primaryUnitDTO = new PartyResponseDTO();
+			primaryUnitDTO.setId(itemMasterVO.getAlternativeSupplier().getId());
+			primaryUnitDTO.setPartyName(itemMasterVO.getAlternativeSupplier().getCustomerName());
+			responseDTO.setAlterPartyResponse(primaryUnitDTO);
+		}
+
 		responseDTO.setLeadTime(itemMasterVO.getLeadTime());
 		responseDTO.setPruchaseTalerance(itemMasterVO.getPruchaseTalerance());
 		responseDTO.setRate(itemMasterVO.getRate());
@@ -379,7 +413,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 	private void createUpdateItemMasterVOByItemMasterDTO(ItemMasterDTO itemMasterDTO, ItemMasterVO itemMasterVO)
 			throws ApplicationException {
 
-		itemMasterVO.setOrg(itemMasterDTO.getOrg());
+		itemMasterVO.setOrgId(itemMasterDTO.getOrgId());
 		itemMasterVO.setCreatedBy(itemMasterDTO.getCreatedBy());
 
 		if (itemMasterDTO.getListOfValuesId() != null && itemMasterDTO.getListOfValuesId() != 0) {
@@ -401,8 +435,6 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 		}
 
-//		itemMasterVO.setGrade(itemMasterDTO.getGrade());
-
 		if (itemMasterDTO.getGradeId() != null && itemMasterDTO.getGradeId() != 0) {
 
 			ListOfValuesVO listofvalues = listOfValuesRepo.findById(itemMasterDTO.getGradeId())
@@ -412,7 +444,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 		}
 		itemMasterVO.setItemCode(itemMasterDTO.getItemCode());
-		
+
 		if (itemMasterDTO.getExciseTariffNoId() != null && itemMasterDTO.getExciseTariffNoId() != 0) {
 
 			ListOfValuesVO listofvalues = listOfValuesRepo.findById(itemMasterDTO.getExciseTariffNoId())
@@ -421,7 +453,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			itemMasterVO.setExciseTariffNo(listofvalues);
 
 		}
-//		itemMasterVO.setExciseTariffNo(itemMasterDTO.getExciseTariffNo());
+
 		itemMasterVO.setItemDescription(itemMasterDTO.getItemDescription());
 
 		itemMasterVO.setThickness(itemMasterDTO.getThickness());
@@ -453,7 +485,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		if (itemMasterDTO.getHsnId() != null && itemMasterDTO.getHsnId() != 0) {
 
 			HsnVO hsn = hsnRepo.findById(itemMasterDTO.getHsnId())
-					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("HsnCode Not Found"));
 
 			itemMasterVO.setHsnCode(hsn);
 		}
@@ -461,50 +493,57 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		itemMasterVO.setCreatedBy(itemMasterDTO.getCreatedBy());
 		itemMasterVO.setUpdatedBy(itemMasterDTO.getUpdatedBy());
 		itemMasterVO.setCancelRemarks(itemMasterDTO.getCancelRemarks());
-		
-		
-//
-//		itemMasterVO.setPurchaseUnit(itemMasterDTO.getPurchaseUnit());
-//		itemMasterVO.setSellingUnit(itemMasterDTO.getSellingUnit());
-//		itemMasterVO.setPricingUnit(itemMasterDTO.getPricingUnit());
-//		itemMasterVO.setSecondaryUnit(itemMasterDTO.getSecondaryUnit());
-		
+
 		if (itemMasterDTO.getPurchaseUnitId() != null && itemMasterDTO.getPurchaseUnitId() != 0) {
 
 			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getPurchaseUnitId())
-					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("PurchaseUnit Not Found"));
 
 			itemMasterVO.setPurchaseUnit(branch);
 		}
-		
+
 		if (itemMasterDTO.getSellingUnitId() != null && itemMasterDTO.getSellingUnitId() != 0) {
 
 			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getSellingUnitId())
-					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("SellingUnit Not Found"));
 
 			itemMasterVO.setSellingUnit(branch);
 		}
-		
+
 		if (itemMasterDTO.getPricingUnitId() != null && itemMasterDTO.getPricingUnitId() != 0) {
 
 			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getPricingUnitId())
-					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("PricingUnit Not Found"));
 
 			itemMasterVO.setPricingUnit(branch);
 		}
-		
+
 		if (itemMasterDTO.getSecondaryUnitId() != null && itemMasterDTO.getSecondaryUnitId() != 0) {
 
 			UnitMasterVO branch = unitMasterRepo.findById(itemMasterDTO.getSecondaryUnitId())
-					.orElseThrow(() -> new ApplicationException("UnitMaster Not Found"));
+					.orElseThrow(() -> new ApplicationException("SecondaryUnit Not Found"));
 
 			itemMasterVO.setSecondaryUnit(branch);
 		}
-		
 
 		itemMasterVO.setManufacturedOrBoughtout(itemMasterDTO.getManufacturedOrBoughtout());
-		itemMasterVO.setDefaultLocation(itemMasterDTO.getDefaultLocation());
-		itemMasterVO.setAlternativeLocation(itemMasterDTO.getAlternativeLocation());
+
+		if (itemMasterDTO.getDefaultLocationId() != null && itemMasterDTO.getDefaultLocationId() != 0) {
+
+			LocationVO location = locationRepo.findById(itemMasterDTO.getDefaultLocationId())
+					.orElseThrow(() -> new ApplicationException("DefaultLocation Not Found"));
+
+			itemMasterVO.setDefaultLocation(location);
+		}
+
+		if (itemMasterDTO.getAlternativeLocationId() != null && itemMasterDTO.getAlternativeLocationId() != 0) {
+
+			LocationVO location = locationRepo.findById(itemMasterDTO.getAlternativeLocationId())
+					.orElseThrow(() -> new ApplicationException("tAlternativeLocation Not Found"));
+
+			itemMasterVO.setAlternativeLocation(location);
+		}
+
 		itemMasterVO.setLeadTime(itemMasterDTO.getLeadTime());
 		itemMasterVO.setReorderLevel(itemMasterDTO.getReorderLevel());
 		itemMasterVO.setRackNo(itemMasterDTO.getRackNo());
@@ -515,8 +554,6 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		itemMasterVO.setBinSize(itemMasterDTO.getBinSize());
 		itemMasterVO.setBinQty(itemMasterDTO.getBinQty());
 
-		itemMasterVO.setDefaultSupplier(itemMasterDTO.getDefaultSupplier());
-		itemMasterVO.setAlternativeSupplier(itemMasterDTO.getAlternativeSupplier());
 		itemMasterVO.setLeadTime(itemMasterDTO.getLeadTime());
 		itemMasterVO.setPruchaseTalerance(itemMasterDTO.getPruchaseTalerance());
 		itemMasterVO.setRate(itemMasterDTO.getRate());
@@ -524,6 +561,22 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		itemMasterVO.setLandedCostRate(itemMasterDTO.getLandedCostRate());
 		itemMasterVO.setToolOwner(itemMasterDTO.getToolOwner());
 		itemMasterVO.setToolNo(itemMasterDTO.getToolNo());
+
+		if (itemMasterDTO.getAlternativeSupplierId() == null || itemMasterDTO.getAlternativeSupplierId() != null) {
+
+			CustomerVO party = customerRepo.findById(itemMasterDTO.getAlternativeSupplierId())
+					.orElseThrow(() -> new ApplicationException("AlternativeSupplier Not Found"));
+
+			itemMasterVO.setAlternativeSupplier(party);
+		}
+
+		if (itemMasterDTO.getDefaultSupplierId() == null || itemMasterDTO.getDefaultSupplierId() != null) {
+
+			CustomerVO party = customerRepo.findById(itemMasterDTO.getDefaultSupplierId())
+					.orElseThrow(() -> new ApplicationException("DefaultSupplier Not Found"));
+
+			itemMasterVO.setDefaultSupplier(party);
+		}
 
 		itemMasterVO.setIsItemBlockedForInvoicing(itemMasterDTO.getIsItemBlockedForInvoicing());
 		itemMasterVO.setMinSellPrice(itemMasterDTO.getMinSellPrice());
@@ -754,5 +807,29 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
 				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+
+	@Override
+	public ItemMasterResponseDTO getItemMasterById(Long id) throws ApplicationException {
+
+		ItemMasterVO itemMasterVO = itemMasterRepo.getItemMasterById(id);
+
+		if (itemMasterVO == null) {
+			throw new ApplicationException("Item Master Not Found");
+		}
+
+		return buildItemMasterResponse(itemMasterVO);
+	}
+
+	@Override
+	public ItemMasterResponseDTO getItemMasterByOrgId(Long orgId, Long branchId) throws ApplicationException {
+
+		ItemMasterVO itemMasterVO = itemMasterRepo.getItemMasterByOrgId(orgId, branchId);
+
+		if (itemMasterVO == null) {
+			throw new ApplicationException("Item Master Not Found");
+		}
+
+		return buildItemMasterResponse(itemMasterVO);
 	}
 }

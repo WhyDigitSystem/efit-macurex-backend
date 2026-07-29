@@ -464,7 +464,7 @@ public class AuthController extends BaseController {
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO = null;
-		UserVO userVO = null;
+		UserResponseDTO userVO = null;
 		try {
 			userVO = authService.getUserById(userId);
 		} catch (Exception e) {

@@ -55,7 +55,7 @@ public interface AuthService {
 	
 	List<UserResponseDTO> getAllUsersByOrgId(Long orgId);
 	
-	public UserVO getUserById(Long userId);
+	public UserResponseDTO getUserById(Long userId);
 
 	public UserVO getUserByUserName(String userName);
 

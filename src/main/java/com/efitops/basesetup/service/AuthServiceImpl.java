@@ -23,6 +23,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.efitops.basesetup.ResponseDTO.UserLoginRolesResponseDTO;
 import com.efitops.basesetup.common.AuthConstant;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
@@ -41,7 +42,7 @@ import com.efitops.basesetup.dto.UserLoginRoleAccessDTO;
 import com.efitops.basesetup.dto.UserResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CompanyVO;
-import com.efitops.basesetup.entity.EmployeeVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.ResponsibilityVO;
 import com.efitops.basesetup.entity.RolesResponsibilityVO;
 import com.efitops.basesetup.entity.RolesVO;
@@ -53,7 +54,7 @@ import com.efitops.basesetup.entity.UserVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CompanyRepo;
-import com.efitops.basesetup.repository.EmployeeRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.ResponsibilitiesRepo;
 import com.efitops.basesetup.repository.RolesRepo;
 import com.efitops.basesetup.repository.RolesResponsibilityRepo;
@@ -122,7 +123,7 @@ public class AuthServiceImpl implements AuthService {
 	BranchRepo branchRepo;
 	
 	@Autowired
-	EmployeeRepo employeeRepo;
+	EmployeeMasterRepo employeeRepo;
 	
 	
 //	@Autowired
@@ -228,13 +229,13 @@ public class AuthServiceImpl implements AuthService {
 				|| StringUtils.isBlank(signUpRequest.getUserName())) {
 			throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_REGISTER_INFORMATION);
 		}
-		EmployeeVO employeeVO = employeeRepo.findById(signUpRequest.getEmployee())
+		EmployeeMasterVO employeeVO = employeeRepo.findById(signUpRequest.getEmployee())
 		        .orElseThrow(() -> new ApplicationException("Employee not found"));
 
 		if (StringUtils.isBlank(employeeVO.getEmail())) {
 		    throw new ApplicationException("Employee email is missing");
 		}
-//		else if (userRepo.existsByUserNameOrEmail(signUpRequest.getUserName(), signUpRequest.getEmail())) 
+//		else if (userRepo.existsByUserNameOrEmployeeMaster_Email(signUpRequest.getUserName(), signUpRequest.getEmail())) 
 //		{
 //			throw new ApplicationContextException(UserConstants.ERRROR_MSG_USER_INFORMATION_ALREADY_REGISTERED);
 //		}
@@ -246,23 +247,46 @@ public class AuthServiceImpl implements AuthService {
 
 	private UserVO getUserVOFromSignUpFormDTO(SignUpFormDTO signUpFormDTO) throws ApplicationException {
 
-		UserVO userVO = new UserVO();
-		EmployeeVO employeeVO = employeeRepo.findById(signUpFormDTO.getEmployee())
+//		UserVO userVO = new UserVO();
+		EmployeeMasterVO employeeVO = employeeRepo.findById(signUpFormDTO.getEmployee())
 		        .orElseThrow(() -> new ApplicationException("Employee not found"));
 //		userVO=userRepo.findByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(), signUpFormDTO.getEmail());
-		if (userRepo.existsByUserNameOrEmployee_Email(
-		        signUpFormDTO.getUserName(),
-		        employeeVO.getEmail())) {
+		UserVO userVO;
 
-		    userVO = userRepo.findByUserNameOrEmployee_Email(
-		            signUpFormDTO.getUserName(),
-		            employeeVO.getEmail());
+		if (signUpFormDTO.getId() != null && signUpFormDTO.getId() != 0) {
 
+		    // UPDATE
+		    userVO = userRepo.findById(signUpFormDTO.getId())
+		            .orElseThrow(() -> new ApplicationException("User not found"));
+
+		    // Delete old roles
 		    List<UserLoginRolesVO> roles = loginRolesRepo.findByUserVO(userVO);
-		    loginRolesRepo.deleteAll(roles);
+		    if (roles != null && !roles.isEmpty()) {
+		        loginRolesRepo.deleteAll(roles);
+		    }
 
-		    List<UserLoginBranchAccessibleVO> branch = branchAccessRepo.findByUserVO(userVO);
-		    branchAccessRepo.deleteAll(branch);
+		    // Delete old branches
+		    List<UserLoginBranchAccessibleVO> branches = branchAccessRepo.findByUserVO(userVO);
+		    if (branches != null && !branches.isEmpty()) {
+		        branchAccessRepo.deleteAll(branches);
+		    }
+
+		} else {
+
+		    // CREATE
+		    if (userRepo.existsByUserNameOrEmployeeMaster_Email(
+		            signUpFormDTO.getUserName(),
+		            employeeVO.getEmail())) {
+		    	
+		    	System.out.println( signUpFormDTO.getUserName());	   
+		    	System.out.println( employeeVO.getEmail());	   
+
+		    	throw new ApplicationContextException(
+		                UserConstants.ERRROR_MSG_USER_INFORMATION_ALREADY_REGISTERED);
+		    }
+		    
+
+		    userVO = new UserVO();
 		}
 		userVO.setUserName(signUpFormDTO.getUserName());
 		if (ObjectUtils.isEmpty(userVO.getId())) {
@@ -277,10 +301,10 @@ public class AuthServiceImpl implements AuthService {
 //		userVO.setEmployeeCode(signUpFormDTO.getEmployeeCode());
 		if (signUpFormDTO.getEmployee() != null) {
 
-		    EmployeeVO employeesVO = employeeRepo.findById(signUpFormDTO.getEmployee())
+		    EmployeeMasterVO employeesVO = employeeRepo.findById(signUpFormDTO.getEmployee())
 		            .orElseThrow(() -> new ApplicationException("Employee not found"));
 
-		    userVO.setEmployee(employeesVO);
+		    userVO.setEmployeeMaster(employeesVO);
 		}
 		CompanyVO companyVO = companyRepo.findById(signUpFormDTO.getOrgId())
 		        .orElseThrow(() -> new ApplicationException("Company not found"));
@@ -363,7 +387,7 @@ public class AuthServiceImpl implements AuthService {
 				|| StringUtils.isBlank(loginRequest.getPassword())) {
 			throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_LOGIN_INFORMATION);
 		}
-		UserVO userVO = userRepo.findByUserNameOrEmailOrMobileNoOrEmployee_EmployeeName(loginRequest.getUserName(), loginRequest.getUserName(),
+		UserVO userVO = userRepo.findByUserNameOrEmailOrMobileNoOrEmployeeMaster_EmployeeName(loginRequest.getUserName(), loginRequest.getUserName(),
 				loginRequest.getUserName(),loginRequest.getUserName());
 
 		if (ObjectUtils.isNotEmpty(userVO)) {
@@ -392,7 +416,7 @@ public class AuthServiceImpl implements AuthService {
 		        dto.setId(branchVO.getId());
 
 		        if (branchVO.getBranch() != null) {
-		            dto.setBranchId(branchVO.getBranch().getId());
+		            dto.setId(branchVO.getBranch().getId());
 		            dto.setBranch(branchVO.getBranch().getBranchName());
 		            dto.setBranchCode(branchVO.getBranch().getBranchCode());
 		        }
@@ -624,11 +648,11 @@ public class AuthServiceImpl implements AuthService {
 		userDTO.setUsersId(userVO.getId());
 //		userDTO.setEmployeeName(userVO.getEmployeeName());
 //		userDTO.setEmployeeCode(userVO.getEmployeeCode());
-		if (userVO.getEmployee() != null) {
+		if (userVO.getEmployeeMaster() != null) {
 
-		    userDTO.setEmployeeId(String.valueOf(userVO.getEmployee().getId()));
-		    userDTO.setEmployeeName(userVO.getEmployee().getEmployeeName());
-		    userDTO.setEmployeeCode(userVO.getEmployee().getEmployeeCode());
+		    userDTO.setEmployeeId(String.valueOf(userVO.getEmployeeMaster().getId()));
+		    userDTO.setEmployeeName(userVO.getEmployeeMaster().getEmployeeName());
+		    userDTO.setEmployeeCode(userVO.getEmployeeMaster().getEmployeeId());
 
 		}
 		userDTO.setCustomer(userVO.getCustomer());
@@ -645,6 +669,57 @@ public class AuthServiceImpl implements AuthService {
 		userDTO.setAccountRemovedDate(userVO.getAccountRemovedDate());
 
 		List<UserLoginRolesVO> loginRolesVOs = userVO.getRoleAccessVO();
+		
+		List<UserBranchResponseDTO> branchResponseList = new ArrayList<>();
+
+		if (userVO.getBranchAccessibleVO() != null) {
+
+		    for (UserLoginBranchAccessibleVO branchVO : userVO.getBranchAccessibleVO()) {
+
+		        UserBranchResponseDTO branchDTO = new UserBranchResponseDTO();
+
+//		        branchDTO.setId(branchVO.getId());
+
+		        if (branchVO.getBranch() != null) {
+		        	System.out.println(branchVO.getBranch().getId());
+		        	System.out.println(branchVO.getBranch().getId());
+		        	System.out.println(branchVO.getBranch().getId());
+		        	branchDTO.setId(branchVO.getBranch().getId());
+		            branchDTO.setBranchCode(branchVO.getBranch().getBranchCode());
+		            branchDTO.setBranch(branchVO.getBranch().getBranchName());
+		        }
+
+		        branchResponseList.add(branchDTO);
+		    }
+		}
+
+		userDTO.setBranches(branchResponseList);
+		
+		
+		List<UserLoginRolesResponseDTO> roleResponseList = new ArrayList<>();
+
+		if (userVO.getRoleAccessVO() != null) {
+
+		    for (UserLoginRolesVO roleVO : userVO.getRoleAccessVO()) {
+
+		        UserLoginRolesResponseDTO roleDTO = new UserLoginRolesResponseDTO();
+
+		        roleDTO.setId(roleVO.getId());
+
+		        if (roleVO.getRoles() != null) {
+		            roleDTO.setRoleId(roleVO.getRoles().getId());
+		            roleDTO.setRole(roleVO.getRoles().getRole());
+		        }
+
+		        roleDTO.setStartDate(roleVO.getStartDate());
+		        roleDTO.setEndDate(roleVO.getEndDate());
+
+		        roleResponseList.add(roleDTO);
+		    }
+		}
+
+		userDTO.setRoles(roleResponseList);
+		
 		return userDTO;
 	}
 
@@ -872,18 +947,24 @@ public class AuthServiceImpl implements AuthService {
 	
 	
 	@Override
-	public UserVO getUserById(Long usersId) {
-		String methodName = "getUserById()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-		if (ObjectUtils.isEmpty(usersId)) {
-			throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_ID);
-		}
-		UserVO userVO = userRepo.getUserById(usersId);
-		if (ObjectUtils.isEmpty(userVO)) {
-			throw new ApplicationContextException(UserConstants.ERRROR_MSG_USER_INFORMATION_NOT_FOUND);
-		}
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-		return userVO;
+	public UserResponseDTO getUserById(Long usersId) {
+
+	    String methodName = "getUserById()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    if (ObjectUtils.isEmpty(usersId)) {
+	        throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_ID);
+	    }
+
+	    UserVO userVO = userRepo.getUserById(usersId);
+
+	    if (ObjectUtils.isEmpty(userVO)) {
+	        throw new ApplicationContextException(UserConstants.ERRROR_MSG_USER_INFORMATION_NOT_FOUND);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return mapUserVOToDTO(userVO);
 	}
 	
 	@Override
@@ -906,7 +987,7 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public Map<String, Object> sendOtp(String userName) {
 
-	    UserVO user = userRepo.findByEmployee_EmployeeName(userName);
+	    UserVO user = userRepo.findByEmployeeMaster_EmployeeName(userName);
 
 	    if (user == null) {
 	        throw new RuntimeException("User not found");
@@ -923,14 +1004,14 @@ public class AuthServiceImpl implements AuthService {
 	    // 🔹 Send email
 	    emailService.sendOtpEmail(
 	            user.getEmail(),
-	            user.getEmployee().getEmployeeName(),
+	            user.getEmployeeMaster().getEmployeeName(),
 	            otp
 	    );
 
 	    // 🔹 Response map
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("message", "OTP sent successfully");
-	    response.put("userName", user.getEmployee().getEmployeeName());
+	    response.put("userName", user.getEmployeeMaster().getEmployeeName());
 
 	    return response;
 	}

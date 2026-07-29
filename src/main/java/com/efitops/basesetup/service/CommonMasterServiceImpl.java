@@ -13,6 +13,7 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,8 @@ import com.efitops.basesetup.dto.CompanyDTO;
 import com.efitops.basesetup.dto.CountryDTO;
 import com.efitops.basesetup.dto.CurrencyDTO;
 import com.efitops.basesetup.dto.DailyExchangeRateDTO;
+import com.efitops.basesetup.dto.DocumentTypeMappingDTO;
+import com.efitops.basesetup.dto.DocumentTypeMappingDetailsDTO;
 import com.efitops.basesetup.dto.DocumentTypeMasterDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
@@ -49,6 +52,7 @@ import com.efitops.basesetup.dto.MappingDetailsDTO;
 import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.Role;
+import com.efitops.basesetup.dto.SalesZoneMasterDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
@@ -67,6 +71,8 @@ import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DailyExchangeRateVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingVO;
 import com.efitops.basesetup.entity.DocumentTypeMasterVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
@@ -83,6 +89,7 @@ import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.MappingDetailsVO;
 import com.efitops.basesetup.entity.MappingOfPartyToAccVO;
 import com.efitops.basesetup.entity.RegionVO;
+import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.entity.StateVO;
@@ -103,6 +110,7 @@ import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DailyExchangeRateRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
+import com.efitops.basesetup.repository.DocumentTypeMappingRepo;
 import com.efitops.basesetup.repository.DocumentTypeMasterRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.FinScreenRepo;
@@ -122,6 +130,7 @@ import com.efitops.basesetup.repository.MappingPartyToAccRepo;
 import com.efitops.basesetup.repository.PartyProjection;
 import com.efitops.basesetup.repository.RegionRepo;
 import com.efitops.basesetup.repository.ResponsibilitiesRepo;
+import com.efitops.basesetup.repository.SalesZoneMasterRepo;
 import com.efitops.basesetup.repository.ScreenNamesRepo;
 import com.efitops.basesetup.repository.ServiceAccMasterRepo;
 import com.efitops.basesetup.repository.StateRepo;
@@ -252,10 +261,15 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	@Autowired
 	CustomerRepo customerRepo;
-	
+
 	@Autowired
 	DailyExchangeRateRepo dailyExchangeRateRepo;
-	
+
+	@Autowired
+	private DocumentTypeMappingRepo documentTypeMappingRepo;
+
+	@Autowired
+	private SalesZoneMasterRepo salesZoneMasterRepo;
 
 	// Company
 
@@ -3503,73 +3517,30 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		return response;
 	}
-	
-	
-	
-	//Daily Exchange rate
-		@Override
-		@Transactional
-		public Map<String, Object> updateCreateDailyExRate(@Valid DailyExchangeRateDTO dailyExchangeRateDTO)
-				throws ApplicationException {
 
-			DailyExchangeRateVO dailyExchangeRateVO = new DailyExchangeRateVO();
-			String message;
+	// Daily Exchange rate
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateDailyExRate(@Valid DailyExchangeRateDTO dailyExchangeRateDTO)
+			throws ApplicationException {
 
-			if (ObjectUtils.isNotEmpty(dailyExchangeRateDTO.getId())) {
+		DailyExchangeRateVO dailyExchangeRateVO = new DailyExchangeRateVO();
+		String message;
 
-			    dailyExchangeRateVO = dailyExchangeRateRepo.findById(dailyExchangeRateDTO.getId())
-			            .orElseThrow(() -> new ApplicationException("Invalid Daily Exchange Rate Master Details"));
+		if (ObjectUtils.isNotEmpty(dailyExchangeRateDTO.getId())) {
 
-			    createUpdateDailyExchangeRateVOByDailyExchangeRateDTO(dailyExchangeRateDTO, dailyExchangeRateVO);
+			dailyExchangeRateVO = dailyExchangeRateRepo.findById(dailyExchangeRateDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Daily Exchange Rate Master Details"));
 
-			    dailyExchangeRateVO.setUpdatedBy(dailyExchangeRateDTO.getCreatedBy());
+			createUpdateDailyExchangeRateVOByDailyExchangeRateDTO(dailyExchangeRateDTO, dailyExchangeRateVO);
 
-			    message = "Daily Exchange Rate Master Updated Successfully";
+			dailyExchangeRateVO.setUpdatedBy(dailyExchangeRateDTO.getCreatedBy());
 
-			} else {
+			message = "Daily Exchange Rate Master Updated Successfully";
 
-			    createUpdateDailyExchangeRateVOByDailyExchangeRateDTO(dailyExchangeRateDTO, dailyExchangeRateVO);
+		} else {
 
-			    if (dailyExchangeRateDTO.getCurrency() != null && dailyExchangeRateDTO.getCurrency() != 0) {
-
-					CurrencyVO currency = currencyRepo.findById(dailyExchangeRateDTO.getCurrency())
-							.orElseThrow(() -> new ApplicationException("currency Not Found"));
-
-					dailyExchangeRateVO.setCurrency(currency);
-				}
-			    dailyExchangeRateVO.setCreatedBy(dailyExchangeRateDTO.getCreatedBy());
-			    dailyExchangeRateVO.setUpdatedBy(dailyExchangeRateDTO.getCreatedBy());
-			    dailyExchangeRateVO.setEffectiveFrom(dailyExchangeRateDTO.getEffectiveFrom());
-			    dailyExchangeRateVO.setBuyingExRate(dailyExchangeRateDTO.getBuyingExRate());
-			    dailyExchangeRateVO.setSellingExRate(dailyExchangeRateDTO.getSellingExRate());
-			    dailyExchangeRateVO.setMonth(dailyExchangeRateDTO.getMonth());
-			    dailyExchangeRateVO.setYear(dailyExchangeRateDTO.getYear());
-			    dailyExchangeRateVO.setActive(dailyExchangeRateDTO.isActive());
-			    dailyExchangeRateVO.setCancelRemarks(dailyExchangeRateDTO.getCancelRemarks());
-			    if (dailyExchangeRateDTO.getBranch() != null && dailyExchangeRateDTO.getBranch() != 0) {
-
-					BranchVO branch = branchRepo.findById(dailyExchangeRateDTO.getBranch())
-							.orElseThrow(() -> new ApplicationException("branch Not Found"));
-
-					dailyExchangeRateVO.setBranch(branch);
-				}
-
-
-
-			    message = "Daily Exchange Rate Master Created Successfully";
-			}
-	        dailyExchangeRateRepo.save(dailyExchangeRateVO);
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("dailyExchangeRateVO", dailyExchangeRateVO);
-			response.put("message", message);
-
-			return response;
-			
-			}
-
-		private void createUpdateDailyExchangeRateVOByDailyExchangeRateDTO(@Valid DailyExchangeRateDTO dailyExchangeRateDTO,
-				DailyExchangeRateVO dailyExchangeRateVO) throws ApplicationException {
+			createUpdateDailyExchangeRateVOByDailyExchangeRateDTO(dailyExchangeRateDTO, dailyExchangeRateVO);
 
 			if (dailyExchangeRateDTO.getCurrency() != null && dailyExchangeRateDTO.getCurrency() != 0) {
 
@@ -3578,15 +3549,15 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 				dailyExchangeRateVO.setCurrency(currency);
 			}
+			dailyExchangeRateVO.setCreatedBy(dailyExchangeRateDTO.getCreatedBy());
+			dailyExchangeRateVO.setUpdatedBy(dailyExchangeRateDTO.getCreatedBy());
 			dailyExchangeRateVO.setEffectiveFrom(dailyExchangeRateDTO.getEffectiveFrom());
 			dailyExchangeRateVO.setBuyingExRate(dailyExchangeRateDTO.getBuyingExRate());
-			dailyExchangeRateVO.setOrgId(dailyExchangeRateDTO.getOrgId());
 			dailyExchangeRateVO.setSellingExRate(dailyExchangeRateDTO.getSellingExRate());
-			dailyExchangeRateVO.setActive(dailyExchangeRateDTO.isActive());
-			dailyExchangeRateVO.setCancelRemarks(dailyExchangeRateDTO.getCancelRemarks());
 			dailyExchangeRateVO.setMonth(dailyExchangeRateDTO.getMonth());
 			dailyExchangeRateVO.setYear(dailyExchangeRateDTO.getYear());
-			dailyExchangeRateVO.setCreatedBy(dailyExchangeRateDTO.getCreatedBy());;
+			dailyExchangeRateVO.setActive(dailyExchangeRateDTO.isActive());
+			dailyExchangeRateVO.setCancelRemarks(dailyExchangeRateDTO.getCancelRemarks());
 			if (dailyExchangeRateDTO.getBranch() != null && dailyExchangeRateDTO.getBranch() != 0) {
 
 				BranchVO branch = branchRepo.findById(dailyExchangeRateDTO.getBranch())
@@ -3595,60 +3566,269 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				dailyExchangeRateVO.setBranch(branch);
 			}
 
+			message = "Daily Exchange Rate Master Created Successfully";
+		}
+		dailyExchangeRateRepo.save(dailyExchangeRateVO);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("dailyExchangeRateVO", dailyExchangeRateVO);
+		response.put("message", message);
+
+		return response;
+
+	}
+
+	private void createUpdateDailyExchangeRateVOByDailyExchangeRateDTO(@Valid DailyExchangeRateDTO dailyExchangeRateDTO,
+			DailyExchangeRateVO dailyExchangeRateVO) throws ApplicationException {
+
+		if (dailyExchangeRateDTO.getCurrency() != null && dailyExchangeRateDTO.getCurrency() != 0) {
+
+			CurrencyVO currency = currencyRepo.findById(dailyExchangeRateDTO.getCurrency())
+					.orElseThrow(() -> new ApplicationException("currency Not Found"));
+
+			dailyExchangeRateVO.setCurrency(currency);
+		}
+		dailyExchangeRateVO.setEffectiveFrom(dailyExchangeRateDTO.getEffectiveFrom());
+		dailyExchangeRateVO.setBuyingExRate(dailyExchangeRateDTO.getBuyingExRate());
+		dailyExchangeRateVO.setOrgId(dailyExchangeRateDTO.getOrgId());
+		dailyExchangeRateVO.setSellingExRate(dailyExchangeRateDTO.getSellingExRate());
+		dailyExchangeRateVO.setActive(dailyExchangeRateDTO.isActive());
+		dailyExchangeRateVO.setCancelRemarks(dailyExchangeRateDTO.getCancelRemarks());
+		dailyExchangeRateVO.setMonth(dailyExchangeRateDTO.getMonth());
+		dailyExchangeRateVO.setYear(dailyExchangeRateDTO.getYear());
+		dailyExchangeRateVO.setCreatedBy(dailyExchangeRateDTO.getCreatedBy());
+		;
+		if (dailyExchangeRateDTO.getBranch() != null && dailyExchangeRateDTO.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(dailyExchangeRateDTO.getBranch())
+					.orElseThrow(() -> new ApplicationException("branch Not Found"));
+
+			dailyExchangeRateVO.setBranch(branch);
 		}
 
-		@Override
-		public DailyExchangeRateVO getDailyExRateById(Long id) throws ApplicationException {
+	}
 
-			return dailyExchangeRateRepo.findById(id)
-					.orElseThrow(() -> new ApplicationException("Invalid Daily Exchange Rate Master Details"));
+	@Override
+	public DailyExchangeRateVO getDailyExRateById(Long id) throws ApplicationException {
+
+		return dailyExchangeRateRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Daily Exchange Rate Master Details"));
+	}
+
+	@Override
+	public List<DailyExchangeRateVO> getDailyExRateByOrgId(Long orgId, Long branch) throws ApplicationException {
+
+		List<DailyExchangeRateVO> dailyExchangeRateVO = dailyExchangeRateRepo.findByOrgIdAndBranch(orgId, branch);
+
+		if (dailyExchangeRateVO.isEmpty()) {
+			throw new ApplicationException("No  Daily Exchange Master Details Found");
 		}
 
-		@Override
-		public List<DailyExchangeRateVO> getDailyExRateByOrgId(Long orgId, Long branch) throws ApplicationException {
+		return dailyExchangeRateVO;
+	}
+	// dropdown for currency field
 
-			List<DailyExchangeRateVO> dailyExchangeRateVO = dailyExchangeRateRepo.findByOrgIdAndBranch(orgId, branch);
+	@Override
+	public Map<String, Object> getCurrency(Long orgId) throws ApplicationException {
 
-			if (dailyExchangeRateVO.isEmpty()) {
-				throw new ApplicationException("No  Daily Exchange Master Details Found");
+		List<Object[]> currencyList = currencyRepo.getCurrency(orgId);
+
+		if (currencyList.isEmpty()) {
+			throw new ApplicationException("No Currency Found");
+		}
+
+		return getCurrencyResponse(currencyList);
+	}
+
+	private Map<String, Object> getCurrencyResponse(List<Object[]> currencyList) {
+
+		Map<String, Object> response = new HashMap<>();
+
+		List<Map<String, Object>> currencyDropdown = new ArrayList<>();
+
+		for (Object[] row : currencyList) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("id", row[0]);
+			map.put("currency", row[1]);
+			map.put("mainCurrencySymbol", row[2]);
+
+			currencyDropdown.add(map);
+		}
+
+		response.put("currencyList", currencyDropdown);
+
+		return response;
+	}
+
+	// documenttypemapping
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateDocumentTypeMapping(DocumentTypeMappingDTO documentTypeMappingDTO)
+			throws ApplicationException {
+
+		Map<String, Object> response = new HashMap<>();
+		String message = "";
+
+		DocumentTypeMappingVO masterVO;
+
+		BranchVO branchVO = branchRepo.findById(documentTypeMappingDTO.getBranch()).orElseThrow(
+				() -> new ApplicationException("Branch not found with id : " + documentTypeMappingDTO.getBranch()));
+
+		FinancialYearVO financialYearVO = financialYearRepo.findById(documentTypeMappingDTO.getFinancialYear())
+				.orElseThrow(() -> new ApplicationException(
+						"Financial Year not found with id : " + documentTypeMappingDTO.getFinancialYear()));
+
+		if (ObjectUtils.isEmpty(documentTypeMappingDTO.getId())) {
+
+			if (documentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(documentTypeMappingDTO.getBranch(),
+					documentTypeMappingDTO.getFinancialYear(), documentTypeMappingDTO.getOrgId())) {
+
+				throw new ApplicationException("Document Type Mapping already exists.");
 			}
 
-			return dailyExchangeRateVO;
-		}
-		// dropdown for currency field
-		
-		@Override
-		public Map<String, Object> getCurrency(Long orgId)
-		        throws ApplicationException {
+			masterVO = new DocumentTypeMappingVO();
 
-		    List<Object[]> currencyList = currencyRepo.getCurrency(orgId);
+			masterVO.setCreatedBy(documentTypeMappingDTO.getCreatedBy());
 
-		    if (currencyList.isEmpty()) {
-		        throw new ApplicationException("No Currency Found");
-		    }
+			message = "Document Type Mapping Created Successfully";
 
-		    return getCurrencyResponse(currencyList);
-		}
-		private Map<String, Object> getCurrencyResponse(List<Object[]> currencyList) {
+		} else {
 
-		    Map<String, Object> response = new HashMap<>();
+			masterVO = documentTypeMappingRepo.findById(documentTypeMappingDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Document Type Mapping not found"));
 
-		    List<Map<String, Object>> currencyDropdown = new ArrayList<>();
+			masterVO.setUpdatedBy(documentTypeMappingDTO.getCreatedBy());
 
-		    for (Object[] row : currencyList) {
-
-		        Map<String, Object> map = new HashMap<>();
-		        map.put("id", row[0]);
-		        map.put("currency", row[1]);
-		        map.put("mainCurrencySymbol", row[2]);
-
-		        currencyDropdown.add(map);
-		    }
-
-		    response.put("currencyList", currencyDropdown);
-
-		    return response;
+			message = "Document Type Mapping Updated Successfully";
 		}
 
+		masterVO.setBranch(branchVO);
+		masterVO.setFinancialYear(financialYearVO);
+		masterVO.setOrgId(documentTypeMappingDTO.getOrgId());
+		masterVO.setActive(documentTypeMappingDTO.isActive());
+		masterVO.setCancelRemarks(documentTypeMappingDTO.getCancelRemarks());
+
+		List<DocumentTypeMappingDetailsVO> details = new ArrayList<>();
+
+		if (CollectionUtils.isNotEmpty(documentTypeMappingDTO.getDetails())) {
+
+			for (DocumentTypeMappingDetailsDTO dto : documentTypeMappingDTO.getDetails()) {
+
+				DocumentTypeMappingDetailsVO detailVO;
+
+				if (ObjectUtils.isEmpty(dto.getId()) || dto.getId() == 0) {
+
+					// Create new detail
+					detailVO = new DocumentTypeMappingDetailsVO();
+
+				} else {
+
+					// Update existing detail
+					detailVO = documentTypeMappingDetailsRepo.findById(dto.getId())
+							.orElseThrow(() -> new ApplicationException(
+									"Document Type Mapping Detail not found with id : " + dto.getId()));
+				}
+				detailVO.setScreenName(dto.getScreenName());
+				detailVO.setScreenCode(dto.getScreenCode());
+				detailVO.setDocCode(dto.getDocCode());
+				detailVO.setPrefix(dto.getPrefix());
+				detailVO.setActive(dto.isActive());
+
+				detailVO.setDocumentTypeMappingMasterVO(masterVO);
+				details.add(detailVO);
+			}
+		}
+
+		masterVO.setDetails(details);
+
+		documentTypeMappingRepo.save(masterVO);
+
+		response.put("message", message);
+		response.put("documentTypeMappingMasterVO", masterVO);
+
+		return response;
+	}
+
+	@Override
+	public DocumentTypeMappingVO getDocumentTypeMappingById(Long id) throws ApplicationException {
+
+		return documentTypeMappingRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Document Type Mapping not found with id : " + id));
+	}
+
+	@Override
+	public List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+		return documentTypeMappingRepo.findByOrgIdAndBranch(orgId, branch);
+
+	}
+
+	// saleszonemaster
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateSalesZoneMaster(SalesZoneMasterDTO salesZoneMasterDTO)
+			throws ApplicationException {
+
+		Map<String, Object> response = new HashMap<>();
+		String message = "";
+
+		SalesZoneMasterVO salesZoneMasterVO;
+
+		BranchVO branchVO = branchRepo.findById(salesZoneMasterDTO.getBranch()).orElseThrow(
+				() -> new ApplicationException("Branch not found with id : " + salesZoneMasterDTO.getBranch()));
+
+		if (ObjectUtils.isEmpty(salesZoneMasterDTO.getId())) {
+
+			if (salesZoneMasterRepo.existsByOrgIdAndZoneIdAndBranch_Id(salesZoneMasterDTO.getOrgId(),
+					salesZoneMasterDTO.getZoneId(), salesZoneMasterDTO.getBranch())) {
+
+				throw new ApplicationException("Sales Zone already exists.");
+			}
+
+			salesZoneMasterVO = new SalesZoneMasterVO();
+
+			salesZoneMasterVO.setCreatedBy(salesZoneMasterDTO.getCreatedBy());
+
+			message = "Sales Zone Created Successfully";
+
+		} else {
+
+			salesZoneMasterVO = salesZoneMasterRepo.findById(salesZoneMasterDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Sales Zone not found"));
+
+			salesZoneMasterVO.setUpdatedBy(salesZoneMasterDTO.getCreatedBy());
+
+			message = "Sales Zone Updated Successfully";
+		}
+
+		salesZoneMasterVO.setZoneId(salesZoneMasterDTO.getZoneId());
+		salesZoneMasterVO.setZonedescription(salesZoneMasterDTO.getZonedescription());
+		salesZoneMasterVO.setOrgId(salesZoneMasterDTO.getOrgId());
+		salesZoneMasterVO.setActive(salesZoneMasterDTO.isActive());
+		salesZoneMasterVO.setCancelRemarks(salesZoneMasterDTO.getCancelRemarks());
+		salesZoneMasterVO.setBranch(branchVO);
+
+		salesZoneMasterRepo.save(salesZoneMasterVO);
+
+		response.put("message", message);
+		response.put("salesZoneMasterVO", salesZoneMasterVO);
+
+		return response;
+	}
+
+	@Override
+	public Optional<SalesZoneMasterVO> getSalesZoneMasterById(Long id) {
+
+		return salesZoneMasterRepo.findById(id);
+	}
+
+	@Override
+	public List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId, Long branch) {
+
+		return salesZoneMasterRepo.findByOrgIdAndBranch(orgId, branch);
+	}
 
 }

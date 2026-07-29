@@ -32,6 +32,7 @@ import com.efitops.basesetup.dto.CompanyDTO;
 import com.efitops.basesetup.dto.CountryDTO;
 import com.efitops.basesetup.dto.CurrencyDTO;
 import com.efitops.basesetup.dto.DailyExchangeRateDTO;
+import com.efitops.basesetup.dto.DocumentTypeMappingDTO;
 import com.efitops.basesetup.dto.DocumentTypeMasterDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
@@ -46,6 +47,7 @@ import com.efitops.basesetup.dto.LocationDTO;
 import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
+import com.efitops.basesetup.dto.SalesZoneMasterDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
@@ -61,6 +63,7 @@ import com.efitops.basesetup.entity.CompanyVO;
 import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.DailyExchangeRateVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingVO;
 import com.efitops.basesetup.entity.DocumentTypeMasterVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
@@ -73,6 +76,7 @@ import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.MappingOfPartyToAccVO;
 import com.efitops.basesetup.entity.RegionVO;
+import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.StateVO;
 import com.efitops.basesetup.entity.TSBankVO;
@@ -2848,4 +2852,217 @@ public class CommonMasterController extends BaseController {
 
 		     return ResponseEntity.ok().body(responseDTO);
 		 }
+		 
+		//documenttypemapping
+			
+	  		@PutMapping("/updateCreateDocumentTypeMapping")
+	  		public ResponseEntity<ResponseDTO> updateCreateDocumnentTypeMapping(
+	  		        @RequestBody DocumentTypeMappingDTO documentTypeMappingDTO) {
+
+	  		    String methodName = "updateCreateDocumentTypeMapping()";
+	  		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	  		    String errorMsg = null;
+	  		    Map<String, Object> responseObjectsMap = new HashMap<>();
+	  		    ResponseDTO responseDTO = null;
+
+	  		    try {
+
+	  		        Map<String, Object> documentTypeMappingVO =
+	  		        		commonMasterService.updateCreateDocumentTypeMapping(documentTypeMappingDTO);
+
+	  		        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+	  		                documentTypeMappingVO.get("message"));
+	  		        responseObjectsMap.put(
+	  		                "documentTypeMappingVO",
+	  		                documentTypeMappingVO.get("documentTypeMappingMasterVO"));
+
+	  		        responseDTO = createServiceResponse(responseObjectsMap);
+
+	  		    } catch (Exception e) {
+
+	  		        errorMsg = e.getMessage();
+	  		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	  		        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	  		    }
+
+	  		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	  		    return ResponseEntity.ok().body(responseDTO);
+	  		}
+	  		
+	  		@GetMapping("/getDocumentTypeMappingById")
+	  		public ResponseEntity<ResponseDTO> getDocumentTypeMappingById(@RequestParam Long id) {
+
+	  		    String methodName = "getDocumentTypeMappingById()";
+	  		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	  		    Map<String, Object> responseObjectsMap = new HashMap<>();
+	  		    String errorMsg = null;
+	  		    ResponseDTO responseDTO = null;
+
+	  		    try {
+
+	  		    	DocumentTypeMappingVO documentTypeMappingVO =
+	  		        		commonMasterService.getDocumentTypeMappingById(id);
+
+	  		        responseObjectsMap.put("documentTypeMappingMasterVO", documentTypeMappingVO);
+
+	  		        responseDTO = createServiceResponse(responseObjectsMap);
+
+	  		    } catch (Exception e) {
+
+	  		        errorMsg = e.getMessage();
+	  		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	  		        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	  		    }
+
+	  		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	  		    return ResponseEntity.ok().body(responseDTO);
+	  		}
+	  		
+	  		@GetMapping("/getDocumentTypeMappingByOrgId")
+	  		public ResponseEntity<ResponseDTO> getDocumentTypeMappingByOrgId(
+	  		        @RequestParam Long orgId,
+	  		        @RequestParam Long branch) {
+
+	  		    String methodName = "getDocumentTypeMappingByOrgId()";
+	  		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	  		    Map<String, Object> responseObjectsMap = new HashMap<>();
+	  		    String errorMsg = null;
+	  		    ResponseDTO responseDTO = null;
+
+	  		    try {
+
+	  		        List<DocumentTypeMappingVO> documentTypeMappingList =
+	  		        		commonMasterService.getDocumnentTypeMappingByOrgId(orgId, branch);
+
+	  		        responseObjectsMap.put("documentTypeMappingMasterList", documentTypeMappingList);
+
+	  		        responseDTO = createServiceResponse(responseObjectsMap);
+
+	  		    } catch (Exception e) {
+
+	  		        errorMsg = e.getMessage();
+	  		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	  		        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	  		    }
+
+	  		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	  		    return ResponseEntity.ok().body(responseDTO);
+	  		}
+		
+
+
+
+	//saleszonemaster
+
+
+	@PutMapping("/createUpdateSalesZoneMaster")
+	public ResponseEntity<ResponseDTO> createUpdateSalesZoneMaster(
+	        @RequestBody SalesZoneMasterDTO salesZoneMasterDTO) {
+
+	    String methodName = "createUpdateSalesZoneMaster()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        Map<String, Object> salesZoneMasterVO =
+	        		commonMasterService.createUpdateSalesZoneMaster(salesZoneMasterDTO);
+
+	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+	                salesZoneMasterVO.get("message"));
+	        responseObjectsMap.put("salesZoneMasterVO",
+	                salesZoneMasterVO.get("salesZoneMasterVO"));
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSalesZoneMasterById")
+	public ResponseEntity<ResponseDTO> getSalesZoneMasterById(@RequestParam Long id) {
+
+	    String methodName = "getSalesZoneMasterById()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    String errorMsg = null;
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        SalesZoneMasterVO salesZoneMasterVO =
+	        		commonMasterService.getSalesZoneMasterById(id).orElse(null);
+
+	        responseObjectsMap.put("salesZoneMasterVO", salesZoneMasterVO);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSalesZoneMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getSalesZoneMasterByOrgId(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getSalesZoneMasterByOrgId()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    String errorMsg = null;
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        List<SalesZoneMasterVO> salesZoneMasterList =
+	        		commonMasterService.getSalesZoneMasterByOrgId(orgId, branch);
+
+	        responseObjectsMap.put("salesZoneMasterList", salesZoneMasterList);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
 }

@@ -15,25 +15,6 @@ import com.efitops.basesetup.exception.ApplicationException;
 @Service
 public interface DevelopService {
 	
-	//documenttypemapping
-
-
-	Map<String, Object> updateCreateDocumentTypeMapping(DocumentTypeMappingDTO documentTypeMappingDTO)
-			throws ApplicationException;
-
-	DocumentTypeMappingVO getDocumentTypeMappingById(Long id) throws ApplicationException;
-
-	List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch) throws ApplicationException;
-
-	//saleszonemaster
-	
-	Map<String, Object> createUpdateSalesZoneMaster(SalesZoneMasterDTO salesZoneMasterDTO)
-	        throws ApplicationException;
-
-
-	Optional<SalesZoneMasterVO> getSalesZoneMasterById(Long id);
-
-	List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId, Long branch);
 	
 	
 	

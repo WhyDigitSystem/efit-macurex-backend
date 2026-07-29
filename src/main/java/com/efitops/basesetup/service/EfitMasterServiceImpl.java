@@ -895,7 +895,8 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setScreenCode(employeeMasterVO.getScreenCode());
 		responseDTO.setOrgId(employeeMasterVO.getOrgId());
 		responseDTO.setFinancialYear(employeeMasterVO.getFinancialYear());
-		responseDTO.setEmployeeName(employeeMasterVO.getFinancialYear());
+		responseDTO.setEmployeeName(employeeMasterVO.getEmployeeName());
+		responseDTO.setEmployeeId(employeeMasterVO.getEmployeeId());
 
 		return responseDTO;
 	}
@@ -997,7 +998,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setOverTimeApplicable(employeeMasterDTO.getOverTimeApplicable());
 		employeeMasterVO.setReferenceBy(employeeMasterDTO.getReferenceBy());
 
-		if (employeeMasterDTO.getOkdById() == null || employeeMasterDTO.getOkdById() != null) {
+		if (employeeMasterDTO.getOkdById() != null) {
 
 			EmployeeMasterVO employee = employeeMasterRepo.findById(employeeMasterDTO.getOkdById())
 					.orElseThrow(() -> new ApplicationException("Employee Not Found"));

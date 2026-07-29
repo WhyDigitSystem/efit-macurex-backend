@@ -746,16 +746,16 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			createUpdateEmployeeMasterVOByEmployeeMasterDTO(employeeMasterDTO, employeeMasterVO);
 			message = "Employee Updated Successfully";
 		} else {
-
-			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
-
-			employeeMasterVO.setEmployeeId(docId);
-
-//						// GETDOCID LASTNO +1
-			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
-			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//
+//			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
+//
+//			employeeMasterVO.setEmployeeId(docId);
+//
+////						// GETDOCID LASTNO +1
+//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+//					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
+//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			employeeMasterVO.setCreatedBy(employeeMasterDTO.getCreatedBy());
 			employeeMasterVO.setUpdatedBy(employeeMasterDTO.getCreatedBy());
@@ -864,7 +864,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setOverTimeApplicable(employeeMasterVO.getOverTimeApplicable());
 		responseDTO.setReferenceBy(employeeMasterVO.getReferenceBy());
 
-		if (employeeMasterVO.getOkdBy() == null) {
+		if (employeeMasterVO.getOkdBy() != null) {
 			EmployeeResponseDTO primaryUnitDTO = new EmployeeResponseDTO();
 			primaryUnitDTO.setId(employeeMasterVO.getOkdBy().getId());
 			primaryUnitDTO.setEmployeeName(employeeMasterVO.getOkdBy().getSurName());
@@ -895,6 +895,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setScreenCode(employeeMasterVO.getScreenCode());
 		responseDTO.setOrgId(employeeMasterVO.getOrgId());
 		responseDTO.setFinancialYear(employeeMasterVO.getFinancialYear());
+		responseDTO.setEmployeeName(employeeMasterVO.getFinancialYear());
 
 		return responseDTO;
 	}
@@ -996,7 +997,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setOverTimeApplicable(employeeMasterDTO.getOverTimeApplicable());
 		employeeMasterVO.setReferenceBy(employeeMasterDTO.getReferenceBy());
 
-		if (employeeMasterDTO.getOkdById() == null || employeeMasterDTO.getOkdById() != 0) {
+		if (employeeMasterDTO.getOkdById() == null || employeeMasterDTO.getOkdById() != null) {
 
 			EmployeeMasterVO employee = employeeMasterRepo.findById(employeeMasterDTO.getOkdById())
 					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
@@ -1026,6 +1027,12 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setScreenCode(employeeMasterDTO.getScreenCode());
 		employeeMasterVO.setOrgId(employeeMasterDTO.getOrgId());
 		employeeMasterVO.setFinancialYear(employeeMasterDTO.getFinancialYear());
+
+		employeeMasterVO
+				.setEmployeeName(String
+						.join(" ", employeeMasterDTO.getSurName() == null ? "" : employeeMasterDTO.getSurName(),
+								employeeMasterDTO.getMiddleName() == null ? "" : employeeMasterDTO.getMiddleName())
+						.trim());
 
 		if (employeeMasterDTO.getBranchId() != null && employeeMasterDTO.getBranchId() != 0) {
 

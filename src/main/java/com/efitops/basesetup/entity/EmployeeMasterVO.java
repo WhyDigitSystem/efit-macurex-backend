@@ -95,7 +95,7 @@ public class EmployeeMasterVO {
 	@JoinColumn(name = "temp_state")
 	private StateVO tempState;
 
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "temp_country")
 	private CountryVO tempCountry;
 
@@ -198,6 +198,9 @@ public class EmployeeMasterVO {
 
 	@Column(name = "current_salary_period_end")
 	private LocalDate currentSalaryPeriodEnd;
+	
+	@Column(name = "emp_name")
+	private String employeeName;
 
 	// Common Fields
 

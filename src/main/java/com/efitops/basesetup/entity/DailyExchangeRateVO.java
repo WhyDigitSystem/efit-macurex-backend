@@ -1,12 +1,17 @@
 package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -27,23 +32,30 @@ public class DailyExchangeRateVO {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dailyexchangerategen")
 	@SequenceGenerator(name = "dailyexchangerategen", sequenceName = "dailyexchangerateseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "dailyexchangerate_id")
-	private Long dailyExchangeRateId;
+	private Long id;
 	
-	@Column(name = "currency_symbol", length = 10)
-    private String currencySymbol;
-
-    @Column(name = "currency_name", length = 100)
-    private String currencyName;
-
-    @Column(name = "exchange_rate", precision = 18, scale = 4)
-    private BigDecimal exchangeRate;
-
-    @Column(name = "exchange_from_date")
-    private String exchangeFromDate;
-
-    @Column(name = "exchange_to_date")
-    private String exchangeToDate;
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
+	
+	@ManyToOne
+	@JoinColumn(name = "currency")
+	private CurrencyVO Currency;
     
+    @Column(name = "effective_from")
+    private LocalDate effectiveFrom;
+
+    @Column(name = "selling_ex_rate")
+    private Double sellingExRate;
+    
+    @Column(name = "buying_ex_rate")
+    private Double buyingExRate;
+    
+    @Column(name = "month")
+    private Month month;
+    
+    @Column(name = "year")
+    private Year year;
 	
 	@Column(name = "org_id")
 	private Long orgId;

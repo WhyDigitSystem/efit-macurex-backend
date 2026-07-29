@@ -1,6 +1,9 @@
 package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 
 import javax.persistence.Column;
 
@@ -13,17 +16,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DailyExchangeRateDTO {
 
-	private Long dailyExchangeRateId;
+	private Long id;
 
-	private String currencySymbol;
+	private Long branch;
 
-	private String currencyName;
+	private Long currency;
 
-	private BigDecimal exchangeRate;
+	private LocalDate effectiveFrom;
 
-	private String exchangeFromDate;
+	private Double sellingExRate;
 
-	private String exchangeToDate;
+	private Double buyingExRate;
+    private Month month;
+	private Year year;
+
 
 	private Long orgId;
 	private String createdBy;

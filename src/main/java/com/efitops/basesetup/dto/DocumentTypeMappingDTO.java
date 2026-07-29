@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 
-public class DocumnentTypeMappingDTO {
+public class DocumentTypeMappingDTO {
 	
 	 private Long id;
 	 private Long branch;

@@ -43,6 +43,9 @@ public interface UserRepo extends JpaRepository<UserVO, Long> {
 
 	  UserVO findByUserNameOrEmployeeMaster_Email(String userName, String email);
 
+
+	  UserVO findByOrgIdAndId(Long orgId, Long userId);
+
 	 
 
 

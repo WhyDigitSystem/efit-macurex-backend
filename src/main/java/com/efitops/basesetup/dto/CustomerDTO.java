@@ -111,4 +111,6 @@ public class CustomerDTO {
 	    private List<CustomerContactDetailsDTO> customerContactDetails;
 	    
 	    private List<CustomerShippingDetailsDTO> customerShippingDetails;
+	    private List<CustomerItemDetailsDTO> customerItemDetailsDTO;
+
 }

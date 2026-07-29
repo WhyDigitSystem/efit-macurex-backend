@@ -27,4 +27,23 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long>{
 	        """, nativeQuery = true)
 	List<CustomerVO> findByOrgIdAndBranch(@Param("orgId") Long orgId,
 	                                      @Param("branch") Long branch);
+	
+	//dropdown for mapping party to account
+	
+	@Query(value = "SELECT customer_id AS partyId, customer_name AS partyName " +
+	        "FROM customer_header " +
+	        "WHERE active = 1 " +
+	        "AND cancel = 0 " +
+	        "AND org_id = ?2 " +
+	        "AND branch = ?3 " +
+	        "AND (customer_category = ?1 " +
+	        "OR customer_category1 = ?1 " +
+	        "OR customer_category2 = ?1) " +
+	        "ORDER BY customer_name ASC",
+	        nativeQuery = true)
+	List<PartyProjection> getParty(Long category,
+	                                       Long orgId,
+	                                       Long branch);
+	
 }
+	

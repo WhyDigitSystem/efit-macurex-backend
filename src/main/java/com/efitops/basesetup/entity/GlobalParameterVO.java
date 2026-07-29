@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -31,13 +33,12 @@ public class GlobalParameterVO {
 	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "user_id")
-	private Long userid;
-	@Column(name = "branch")
-	private String branch;
-	@Column(name = "branch_code")
-	private String branchcode;
+	private Long userId;
+	@ManyToOne
+	@JoinColumn(name = "branch_id")
+	private BranchVO branch;
 	@Column(name = "financial_year")
-	private String finYear;
+	private String financialYear;
 	
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();

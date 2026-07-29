@@ -16,6 +16,7 @@ import com.efitops.basesetup.dto.CityDTO;
 import com.efitops.basesetup.dto.CompanyDTO;
 import com.efitops.basesetup.dto.CountryDTO;
 import com.efitops.basesetup.dto.CurrencyDTO;
+import com.efitops.basesetup.dto.DailyExchangeRateDTO;
 import com.efitops.basesetup.dto.DocumentTypeMasterDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
@@ -43,6 +44,7 @@ import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CompanyVO;
 import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
+import com.efitops.basesetup.entity.DailyExchangeRateVO;
 import com.efitops.basesetup.entity.DocumentTypeMasterVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
@@ -343,6 +345,18 @@ public interface CommonMasterService {
 
 		ServiceAccMasterResponseDTO getServiceAccMasterById(Long id) throws ApplicationException;
 
+		
+		//dailyexrate
+		Map<String, Object> updateCreateDailyExRate(@Valid DailyExchangeRateDTO dailyExchangeRateDTO)
+				throws ApplicationException;
+
+		DailyExchangeRateVO getDailyExRateById(Long id) throws ApplicationException;
+
+		List<DailyExchangeRateVO> getDailyExRateByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+		Map<String, Object> getCurrency(Long orgId) throws ApplicationException;
+
+		
 		
 
 		

@@ -31,6 +31,7 @@ import com.efitops.basesetup.dto.CityDTO;
 import com.efitops.basesetup.dto.CompanyDTO;
 import com.efitops.basesetup.dto.CountryDTO;
 import com.efitops.basesetup.dto.CurrencyDTO;
+import com.efitops.basesetup.dto.DailyExchangeRateDTO;
 import com.efitops.basesetup.dto.DocumentTypeMasterDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
@@ -59,6 +60,7 @@ import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CompanyVO;
 import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
+import com.efitops.basesetup.entity.DailyExchangeRateVO;
 import com.efitops.basesetup.entity.DocumentTypeMasterVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
@@ -2731,4 +2733,119 @@ public class CommonMasterController extends BaseController {
 		 }
 		
 		
+		 
+		//Daily Exchange Rate
+		 
+		 @PutMapping("/updateCreateDailyExRate")
+			public ResponseEntity<ResponseDTO> updateCreateDailyExRate(@RequestBody DailyExchangeRateDTO dailyExchangeRateDTO) {
+				String methodName = "updateCreateDailyExRate()";
+				LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+				String errorMsg = null;
+				Map<String, Object> responseObjectsMap = new HashMap<>();
+				ResponseDTO responseDTO = null;
+				try {
+					Map<String, Object> dailyExchangeRateVO = commonMasterService.updateCreateDailyExRate(dailyExchangeRateDTO);
+					responseObjectsMap.put(CommonConstant.STRING_MESSAGE, dailyExchangeRateVO.get("message"));
+					responseObjectsMap.put("dailyExchangeRateVO", dailyExchangeRateVO.get("dailyExchangeRateVO"));
+					responseDTO = createServiceResponse(responseObjectsMap);
+				} catch (Exception e) {
+					errorMsg = e.getMessage();
+					LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+					responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+				}
+				LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+				return ResponseEntity.ok().body(responseDTO);
+			}
+			
+		 @GetMapping("/getDailyExRateById")
+		 public ResponseEntity<ResponseDTO> getDailyExRateById(@RequestParam Long id) {
+
+		     String methodName = "getDailyExRateById()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		    	 DailyExchangeRateVO dailyExchangeRateVO = commonMasterService.getDailyExRateById(id);
+
+		         responseObjectsMap.put("dailyExchangeRateVO", dailyExchangeRateVO);
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
+		 
+		 @GetMapping("/getDailyExRateByOrgId")
+		 public ResponseEntity<ResponseDTO> getDailyExRateByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
+
+		     String methodName = "getDailyExRateByOrgId()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		         List<DailyExchangeRateVO> dailyExchangeRateVO = commonMasterService.getDailyExRateByOrgId(orgId,branch);
+
+		         responseObjectsMap.put("dailyExchangeRateVO", dailyExchangeRateVO);
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
+		
+		//dropdown for currency filed
+		 @GetMapping("/getCurrency")
+		 public ResponseEntity<ResponseDTO> getCurrency(@RequestParam Long orgId) {
+
+		     String methodName = "getCurrency()";
+		     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		     Map<String, Object> responseObjectsMap = new HashMap<>();
+		     String errorMsg = null;
+		     ResponseDTO responseDTO = null;
+
+		     try {
+
+		         responseObjectsMap = commonMasterService.getCurrency(orgId);
+
+		         responseDTO = createServiceResponse(responseObjectsMap);
+
+		     } catch (Exception e) {
+
+		         errorMsg = e.getMessage();
+		         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		     }
+
+		     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		     return ResponseEntity.ok().body(responseDTO);
+		 }
 }

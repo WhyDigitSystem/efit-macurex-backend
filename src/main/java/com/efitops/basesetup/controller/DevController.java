@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +29,7 @@ import com.efitops.basesetup.dto.HolidayMasterDTO;
 import com.efitops.basesetup.dto.LMEDTO;
 import com.efitops.basesetup.dto.ListOfValuesDTO;
 import com.efitops.basesetup.dto.LocationDTO;
+import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
 import com.efitops.basesetup.dto.TSBankDTO;
@@ -39,9 +41,11 @@ import com.efitops.basesetup.entity.HolidayMasterVO;
 import com.efitops.basesetup.entity.LMEVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.MappingOfPartyToAccVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.entity.TSBankVO;
 import com.efitops.basesetup.entity.TaxDefinitionVO;
+import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.service.TransportMasterService;
 
 
@@ -323,5 +327,149 @@ public class DevController extends BaseController{
 	     return ResponseEntity.ok().body(responseDTO);
 	 }
 
+	 //Mapping of party to acc
+	 @PutMapping("/updateCreateMappingOfPartyToAcc")
+		public ResponseEntity<ResponseDTO> updateCreateMappingOfPartyToAcc(@RequestBody MappingOfPartyToAccDTO mappingOfPartyToAccDTO) {
+			String methodName = "updateCreateMappingOfPartyToAcc()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+			String errorMsg = null;
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			ResponseDTO responseDTO = null;
+			try {
+				Map<String, Object> mappingOfPartyToAccVO = transportMasterService.updateCreateMappingOfPartyToAcc(mappingOfPartyToAccDTO);
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, mappingOfPartyToAccVO.get("message"));
+				responseObjectsMap.put("mappingOfPartyToAccVO", mappingOfPartyToAccVO.get("mappingOfPartyToAccVO"));
+				responseDTO = createServiceResponse(responseObjectsMap);
+			} catch (Exception e) {
+				errorMsg = e.getMessage();
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+			}
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		
+	 @GetMapping("/getMappingOfPartyToAccById")
+	 public ResponseEntity<ResponseDTO> getMappingOfPartyToAccById(@RequestParam Long id) {
+
+	     String methodName = "getMappingOfPartyToAccById()";
+	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     String errorMsg = null;
+	     ResponseDTO responseDTO = null;
+
+	     try {
+
+	    	 MappingOfPartyToAccVO mappingOfPartyToAccVO = transportMasterService.getMappingOfPartyToAccById(id);
+
+	         responseObjectsMap.put("mappingOfPartyToAccVO", mappingOfPartyToAccVO);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         errorMsg = e.getMessage();
+	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	     }
+
+	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	     return ResponseEntity.ok().body(responseDTO);
+	 }
+	 
+	 @GetMapping("/getMappingOfPartyToAccByOrgId")
+	 public ResponseEntity<ResponseDTO> getMappingOfPartyToAccByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
+
+	     String methodName = "getMappingOfPartyToAccByOrgId()";
+	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     String errorMsg = null;
+	     ResponseDTO responseDTO = null;
+
+	     try {
+
+	         List<MappingOfPartyToAccVO> mappingOfPartyToAccVO = transportMasterService.getMappingOfPartyToAccByOrgId(orgId,branch);
+
+	         responseObjectsMap.put("mappingOfPartyToAccVO", mappingOfPartyToAccVO);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         errorMsg = e.getMessage();
+	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	     }
+
+	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	     return ResponseEntity.ok().body(responseDTO);
+	 }
+
+	// Drop Down for Customer Category
+	 @GetMapping("/getCustomerCategory")
+	 public ResponseEntity<ResponseDTO> getCustomerCategory(@RequestParam Long orgId) {
+
+	     String methodName = "getCustomerCategory()";
+	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     String errorMsg = null;
+	     ResponseDTO responseDTO = null;
+
+	     try {
+
+	         responseObjectsMap = transportMasterService.getCustomerCategory(orgId);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         errorMsg = e.getMessage();
+	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	     }
+
+	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	     return ResponseEntity.ok().body(responseDTO);
+	 }	 
+	 //drop down for party
+	 @GetMapping("/getParty")
+	 public ResponseEntity<ResponseDTO> getParty(@RequestParam Long category,
+	                                             @RequestParam Long orgId,
+	                                             @RequestParam Long branch) {
+
+	     String methodName = "getParty()";
+	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     String errorMsg = null;
+	     ResponseDTO responseDTO = null;
+
+	     try {
+
+	         responseObjectsMap = transportMasterService.getParty(category, orgId, branch);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         errorMsg = e.getMessage();
+	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	     }
+
+	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	     return ResponseEntity.ok().body(responseDTO);
+	 }
 }
 

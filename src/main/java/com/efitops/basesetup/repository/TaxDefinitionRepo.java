@@ -17,8 +17,4 @@ public interface TaxDefinitionRepo extends JpaRepository<TaxDefinitionVO, Long> 
 	List<TaxDefinitionVO> getTaxDefinitionByOrgId(Long orgId, Long branch);
 
 	
-
-	
-
-	
 }

@@ -123,7 +123,8 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 					.orElseThrow(() -> new ApplicationException("Item not found"));
 
 			if (!itemMasterVO.getItemCode().equals(itemMasterDTO.getItemCode())) {
-				if (itemMasterRepo.existsByItemCodeAndOrgIdAndBranchId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId(),itemMasterDTO.getBranchId())) {
+				if (itemMasterRepo.existsByItemCodeAndOrgIdAndBranchId(itemMasterDTO.getItemCode(),
+						itemMasterDTO.getOrgId(), itemMasterDTO.getBranchId())) {
 
 					String errorMessage = String.format("This ItemCode: %s already exists for this organization.",
 							itemMasterDTO.getItemCode());
@@ -137,7 +138,8 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			message = "Item Updated Successfully";
 		} else {
 
-			if (itemMasterRepo.existsByItemCodeAndOrgIdAndBranchId(itemMasterDTO.getItemCode(), itemMasterDTO.getOrgId(),itemMasterDTO.getBranchId())) {
+			if (itemMasterRepo.existsByItemCodeAndOrgIdAndBranchId(itemMasterDTO.getItemCode(),
+					itemMasterDTO.getOrgId(), itemMasterDTO.getBranchId())) {
 
 				String errorMessage = String.format("This ItemCode: %s already exists for this organization.",
 						itemMasterDTO.getItemCode());
@@ -355,14 +357,14 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 //		responseDTO.setDefaultSupplier(itemMasterVO.getDefaultSupplier());
 //		responseDTO.setAlternativeSupplier(itemMasterVO.getAlternativeSupplier());
 
-		if (itemMasterVO.getDefaultSupplier() == null || itemMasterVO.getDefaultSupplier() != null) {
+		if (itemMasterVO.getDefaultSupplier() != null) {
 			PartyResponseDTO primaryUnitDTO = new PartyResponseDTO();
 			primaryUnitDTO.setId(itemMasterVO.getDefaultSupplier().getId());
 			primaryUnitDTO.setPartyName(itemMasterVO.getDefaultSupplier().getCustomerName());
 			responseDTO.setDefaultPartyResponse(primaryUnitDTO);
 		}
 
-		if (itemMasterVO.getAlternativeSupplier() == null || itemMasterVO.getAlternativeSupplier() != null) {
+		if (itemMasterVO.getAlternativeSupplier() != null) {
 			PartyResponseDTO primaryUnitDTO = new PartyResponseDTO();
 			primaryUnitDTO.setId(itemMasterVO.getAlternativeSupplier().getId());
 			primaryUnitDTO.setPartyName(itemMasterVO.getAlternativeSupplier().getCustomerName());
@@ -562,7 +564,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 		itemMasterVO.setToolOwner(itemMasterDTO.getToolOwner());
 		itemMasterVO.setToolNo(itemMasterDTO.getToolNo());
 
-		if (itemMasterDTO.getAlternativeSupplierId() == null || itemMasterDTO.getAlternativeSupplierId() != null) {
+		if (itemMasterDTO.getAlternativeSupplierId() != null && itemMasterDTO.getAlternativeSupplierId() > 0) {
 
 			CustomerVO party = customerRepo.findById(itemMasterDTO.getAlternativeSupplierId())
 					.orElseThrow(() -> new ApplicationException("AlternativeSupplier Not Found"));
@@ -570,7 +572,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			itemMasterVO.setAlternativeSupplier(party);
 		}
 
-		if (itemMasterDTO.getDefaultSupplierId() == null || itemMasterDTO.getDefaultSupplierId() != null) {
+		if (itemMasterDTO.getDefaultSupplierId() != null && itemMasterDTO.getDefaultSupplierId() > 0) {
 
 			CustomerVO party = customerRepo.findById(itemMasterDTO.getDefaultSupplierId())
 					.orElseThrow(() -> new ApplicationException("DefaultSupplier Not Found"));
@@ -822,14 +824,20 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 	}
 
 	@Override
-	public ItemMasterResponseDTO getItemMasterByOrgId(Long orgId, Long branchId) throws ApplicationException {
+	public List<ItemMasterResponseDTO> getItemMasterByOrgId(Long orgId, Long branchId) throws ApplicationException {
 
-		ItemMasterVO itemMasterVO = itemMasterRepo.getItemMasterByOrgId(orgId, branchId);
+		List<ItemMasterVO> itemMasterList = itemMasterRepo.getItemMasterByOrgId(orgId, branchId);
 
-		if (itemMasterVO == null) {
+		if (itemMasterList == null || itemMasterList.isEmpty()) {
 			throw new ApplicationException("Item Master Not Found");
 		}
 
-		return buildItemMasterResponse(itemMasterVO);
+		List<ItemMasterResponseDTO> responseList = new ArrayList<>();
+
+		for (ItemMasterVO itemMasterVO : itemMasterList) {
+			responseList.add(buildItemMasterResponse(itemMasterVO));
+		}
+
+		return responseList;
 	}
 }

@@ -12,7 +12,7 @@ public class ServiceAccMasterDTO {
 	private Long id;
 	private String serviceName;
 	private String serviceDescription;
-	private String hsncode;
+	private Long hsnId;
 	private Long orgId;
 	private boolean active;
 	private String createdBy;;

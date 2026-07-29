@@ -11,7 +11,13 @@ public interface ServiceAccMasterRepo extends JpaRepository<ServiceAccMasterVO, 
 
 	boolean existsByServiceNameAndOrgId(String serviceName, Long orgId);
 
-	@Query(nativeQuery = true, value = "select * from serviceaccmaster where org_id=?1 and branch_id=?2 and active=1 and cancel=0")
-	List<ServiceAccMasterVO> findByOrgIdAndBranch(Long orgId, Long branchId);
+//	@Query(nativeQuery = true, value = "select * from serviceaccmaster where org_id=?1 and branch_id=?2 and active=1 and cancel=0")
+//	List<ServiceAccMasterVO> findByOrgIdAndBranch(Long orgId, Long branchId);
+
+	@Query(nativeQuery = true, value = "select * from serviceaccmaster where serviceaccmaster_id=?1 and active=1 and cancel=0")
+	ServiceAccMasterVO getServiceAccMasterById(Long id);
+
+	@Query(nativeQuery = true, value = "select * from serviceaccmaster where org_id=?1 and branch=?2 and active=1 and cancel=0")
+	List<ServiceAccMasterVO> getServiceAccMasterByOrgId(Long orgId, Long branchId);
 
 }

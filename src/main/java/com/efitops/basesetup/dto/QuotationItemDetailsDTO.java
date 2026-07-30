@@ -32,8 +32,6 @@ public class QuotationItemDetailsDTO {
 
 	private BigDecimal discountPercentage;
 
-	private BigDecimal discountAmount;
-
 	private BigDecimal lastRate;
 	private BigDecimal lRate;
 

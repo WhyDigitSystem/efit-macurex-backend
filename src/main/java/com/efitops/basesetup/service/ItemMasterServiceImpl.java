@@ -597,7 +597,11 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 			itemMasterVO.setBranch(branch);
 		}
 
-		// Set ItemDrawing
+		if (ObjectUtils.isNotEmpty(itemMasterVO.getId())) {
+			List<ItemDrawingVO> taxInvoiceDetailsVO1 = itemDrawingRepo.findByItemMasterVO(itemMasterVO);
+			itemDrawingRepo.deleteAll(taxInvoiceDetailsVO1);
+		}
+
 		List<ItemDrawingVO> itemDrawingVOs = new ArrayList<>();
 		if (itemMasterDTO.getItemDrawingDTO() != null) {
 			for (ItemDrawingDTO dto : itemMasterDTO.getItemDrawingDTO()) {

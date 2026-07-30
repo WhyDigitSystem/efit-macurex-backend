@@ -2644,8 +2644,14 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 					throw new ApplicationException(errorMessage);
 				}
 
-				uomConversionVO.setFromUnit(uomConversionDTO.getFromUnit());
-				uomConversionVO.setToUnit(uomConversionDTO.getToUnit());
+				UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
+				        .orElseThrow(() -> new ApplicationException("From Unit not found"));
+
+				UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
+				        .orElseThrow(() -> new ApplicationException("To Unit not found"));
+
+				uomConversionVO.setFromUnit(fromUnit);
+				uomConversionVO.setToUnit(toUnit);
 			}
 
 			uomConversionVO.setMultiplicationFactor(uomConversionDTO.getMultiplicationFactor());
@@ -2667,8 +2673,14 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	private void getUomConversionVOFromDTO(UomConversionVO uomConversionVO, UomConversionDTO uomConversionDTO)
 			throws ApplicationException {
 
-		uomConversionVO.setFromUnit(uomConversionDTO.getFromUnit());
-		uomConversionVO.setToUnit(uomConversionDTO.getToUnit());
+		UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
+		        .orElseThrow(() -> new ApplicationException("From Unit not found"));
+
+		UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
+		        .orElseThrow(() -> new ApplicationException("To Unit not found"));
+
+		uomConversionVO.setFromUnit(fromUnit);
+		uomConversionVO.setToUnit(toUnit);
 		uomConversionVO.setMultiplicationFactor(uomConversionDTO.getMultiplicationFactor());
 
 		uomConversionVO.setOrgId(uomConversionDTO.getOrgId());

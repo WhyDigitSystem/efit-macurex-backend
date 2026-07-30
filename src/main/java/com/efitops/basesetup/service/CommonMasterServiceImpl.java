@@ -2575,6 +2575,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		unitMasterVO.setOrgId(unitMasterDTO.getOrgId());
 		unitMasterVO.setActive(unitMasterDTO.isActive());
 		unitMasterVO.setCancelRemarks(unitMasterDTO.getCancelRemarks());
+		unitMasterVO.setDescription(unitMasterDTO.getDescription());
 
 		if (unitMasterDTO.getBranch() != null && unitMasterDTO.getBranch() != 0) {
 

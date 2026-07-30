@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CompanyResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MappingOfPartyToAccResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.BranchDTO;
@@ -2625,7 +2626,7 @@ public class CommonMasterController extends BaseController {
 
 		     try {
 
-		    	 MappingOfPartyToAccVO mappingOfPartyToAccVO = commonMasterService.getMappingOfPartyToAccById(id);
+		    	 MappingOfPartyToAccResponseDTO mappingOfPartyToAccVO = commonMasterService.getMappingOfPartyToAccById(id);
 
 		         responseObjectsMap.put("mappingOfPartyToAccVO", mappingOfPartyToAccVO);
 
@@ -2656,7 +2657,7 @@ public class CommonMasterController extends BaseController {
 
 		     try {
 
-		         List<MappingOfPartyToAccVO> mappingOfPartyToAccVO = commonMasterService.getMappingOfPartyToAccByOrgId(orgId,branch);
+		         List<MappingOfPartyToAccResponseDTO> mappingOfPartyToAccVO = commonMasterService.getMappingOfPartyToAccByOrgId(orgId,branch);
 
 		         responseObjectsMap.put("mappingOfPartyToAccVO", mappingOfPartyToAccVO);
 
@@ -2856,7 +2857,7 @@ public class CommonMasterController extends BaseController {
 		//documenttypemapping
 			
 	  		@PutMapping("/updateCreateDocumentTypeMapping")
-	  		public ResponseEntity<ResponseDTO> updateCreateDocumnentTypeMapping(
+	  		public ResponseEntity<ResponseDTO> updateCreateDocumentTypeMapping(
 	  		        @RequestBody DocumentTypeMappingDTO documentTypeMappingDTO) {
 
 	  		    String methodName = "updateCreateDocumentTypeMapping()";
@@ -2875,7 +2876,7 @@ public class CommonMasterController extends BaseController {
 	  		                documentTypeMappingVO.get("message"));
 	  		        responseObjectsMap.put(
 	  		                "documentTypeMappingVO",
-	  		                documentTypeMappingVO.get("documentTypeMappingMasterVO"));
+	  		                documentTypeMappingVO.get("documentTypeMapping"));
 
 	  		        responseDTO = createServiceResponse(responseObjectsMap);
 

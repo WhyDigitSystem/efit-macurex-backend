@@ -31,7 +31,7 @@ public class MappingDetailsVO {
 	
 	@ManyToOne
 	@JoinColumn(name = "party_id")
-	private CustomerVO partId;
+	private CustomerVO partyId;
 	
 	@Column(name = "account_name")
 	private String accountName;

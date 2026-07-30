@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.efitops.basesetup.entity.HsnVO;
+import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
 
 public interface HsnRepo extends JpaRepository<HsnVO, Long> {
@@ -23,7 +24,7 @@ public interface HsnRepo extends JpaRepository<HsnVO, Long> {
 
     boolean existsByOrgIdAndCategoryAndHsnIgnoreCase(
             Long orgId,
-            ListOfValuesVO category,
+            ListOfValuesDetailsVO category,
             String hsn);
 
 }

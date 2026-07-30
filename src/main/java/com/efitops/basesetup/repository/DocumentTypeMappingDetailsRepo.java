@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingVO;
 
 @Repository
 public interface DocumentTypeMappingDetailsRepo extends JpaRepository<DocumentTypeMappingDetailsVO, Long> {
@@ -16,4 +17,7 @@ public interface DocumentTypeMappingDetailsRepo extends JpaRepository<DocumentTy
 	@Query(nativeQuery = true, value = "select * from documenttypemappingdetails where org_id=?1 and screen_code=?2")
 	DocumentTypeMappingDetailsVO findByOrgIdScreenCode(Long orgId, String screenCode);
 
+	List<DocumentTypeMappingDetailsVO> findByDocumentTypeMappingMasterVO(DocumentTypeMappingVO masterVO);
+
+	
 }

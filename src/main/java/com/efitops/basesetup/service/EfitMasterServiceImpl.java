@@ -1041,10 +1041,10 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 	}
 
 	@Override
-	public List<EmployeeMasterResponseDTO> getEmployeeMasterByOrgId(Long orgId, Long branchId)
+	public List<EmployeeMasterResponseDTO> getEmployeeMasterByOrgId(Long orgId)
 			throws ApplicationException {
 
-		List<EmployeeMasterVO> employeeList = employeeMasterRepo.getEmployeeMasterByOrgId(orgId, branchId);
+		List<EmployeeMasterVO> employeeList = employeeMasterRepo.getEmployeeMasterByOrgId(orgId);
 
 		if (employeeList == null || employeeList.isEmpty()) {
 			throw new ApplicationException("Employee Master Not Found");

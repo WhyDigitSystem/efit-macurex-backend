@@ -649,7 +649,7 @@ public class EfitMasterController extends BaseController {
 	}
 
 	@GetMapping("/getEmployeeMasterByOrgId")
-	public ResponseEntity<ResponseDTO> getEmployeeMasterByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
+	public ResponseEntity<ResponseDTO> getEmployeeMasterByOrgId(@RequestParam Long orgId) {
 
 		String methodName = "getEmployeeMasterByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -660,7 +660,7 @@ public class EfitMasterController extends BaseController {
 		try {
 
 			List<EmployeeMasterResponseDTO> employeeMasterResponseDTO = efitMasterService
-					.getEmployeeMasterByOrgId(orgId, branchId);
+					.getEmployeeMasterByOrgId(orgId);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Employee Master information retrieved successfully");
 

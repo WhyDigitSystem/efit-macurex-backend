@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.efitops.basesetup.ResponseDTO.BranchResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingBranchResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CityResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerContactDetailsResponseDTO;
@@ -432,7 +432,7 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 
 	    // Branch
 	    if (customerVO.getBranch() != null) {
-	        dto.setBranch(new BranchResponseDTO(
+	        dto.setBranch(new DocumentTypeMappingBranchResponseDTO(
 	                customerVO.getBranch().getId(),
 	                customerVO.getBranch().getBranchCode(),
 	                customerVO.getBranch().getBranchName()));

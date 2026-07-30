@@ -20,7 +20,7 @@ public class CustomerResponseDTO {
 	    private PartyCategoryResponseDTO customerCategory2;
 	    private PartyCategoryResponseDTO supplierType;
 
-	    private BranchResponseDTO branch;
+	    private DocumentTypeMappingBranchResponseDTO branch;
 
 	    private String docId;
 	    private LocalDate docDate;

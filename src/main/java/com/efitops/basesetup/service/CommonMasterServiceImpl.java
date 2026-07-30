@@ -24,6 +24,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CompanyResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingBranchResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingResponseDTO;
+import com.efitops.basesetup.ResponseDTO.FinancialYearResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MappingBranchResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MappingCategoryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MappingDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MappingOfPartyToAccResponseDTO;
 import com.efitops.basesetup.dto.BankDetailsDTO;
 import com.efitops.basesetup.dto.BranchDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
@@ -50,6 +58,7 @@ import com.efitops.basesetup.dto.ListOfValuesDetailsDTO;
 import com.efitops.basesetup.dto.LocationDTO;
 import com.efitops.basesetup.dto.MappingDetailsDTO;
 import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
+import com.efitops.basesetup.dto.PartyResponseDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.Role;
 import com.efitops.basesetup.dto.SalesZoneMasterDTO;
@@ -2396,7 +2405,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		String message;
 		HsnVO oldHSN = null;
 
-		ListOfValuesVO category = listOfValuesRepo.findById(hsnDTO.getCategory())
+		ListOfValuesDetailsVO category = listOfValuesDetailsRepo.findById(hsnDTO.getCategory())
 				.orElseThrow(() -> new ApplicationException("Category not found with id : " + hsnDTO.getCategory()));
 
 		if (ObjectUtils.isEmpty(hsnDTO.getId())) {
@@ -2473,7 +2482,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		if (hsnDTO.getCategory() != null && hsnDTO.getCategory() != 0) {
 
-			ListOfValuesVO category = listOfValuesRepo.findById(hsnDTO.getCategory()).orElseThrow(
+			ListOfValuesDetailsVO category = listOfValuesDetailsRepo.findById(hsnDTO.getCategory()).orElseThrow(
 					() -> new ApplicationException("Category not found with id : " + hsnDTO.getCategory()));
 
 			hsnVO.setCategory(category);
@@ -3375,8 +3384,10 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		mappingOfPartyToAccVO = mappingPartyToAccRepo.save(mappingOfPartyToAccVO);
 
 		Map<String, Object> response = new HashMap<>();
+		MappingOfPartyToAccResponseDTO responseDTO = convertToResponse(mappingOfPartyToAccVO);
+
 		response.put("message", message);
-		response.put("mappingOfPartyToAccVO", mappingOfPartyToAccVO);
+		response.put("mappingOfPartyToAccVO", responseDTO);
 
 		return response;
 	}
@@ -3423,7 +3434,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				CustomerVO detailLov = customerRepo.findById(detailDTO.getPartyId())
 						.orElseThrow(() -> new RuntimeException("Party details Not Found"));
 
-				detailVO.setPartId(detailLov);
+				detailVO.setPartyId(detailLov);
 			}
 			detailVO.setAccountName(detailDTO.getAccountName());
 
@@ -3435,17 +3446,89 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		mappingOfPartyToAccVO.setMappingDetailsVO(detailList);
 	}
 
-	@Override
-	public MappingOfPartyToAccVO getMappingOfPartyToAccById(Long id) {
+	
+	private MappingOfPartyToAccResponseDTO convertToResponse(MappingOfPartyToAccVO vo) {
 
-		return mappingPartyToAccRepo.getMappingOfPartyToAccById(id);
+	    MappingOfPartyToAccResponseDTO dto = new MappingOfPartyToAccResponseDTO();
 
+	    dto.setId(vo.getId());
+	    dto.setDocId(vo.getDocId());
+	    dto.setDocDate(vo.getDocDate());
+	    dto.setAsOnDate(vo.getAsOnDate());
+	    dto.setOrgId(vo.getOrgId());
+	    dto.setCreatedBy(vo.getCreatedBy());
+	    dto.setUpdatedBy(vo.getUpdatedBy());
+	    dto.setCancelRemarks(vo.getCancelRemarks());
+	    dto.setActive(vo.getActive());
+
+	    if (vo.getBranch() != null) {
+	        dto.setBranch(new MappingBranchResponseDTO(
+	                vo.getBranch().getId(),
+	                vo.getBranch().getBranchCode(),
+	                vo.getBranch().getBranchName()));
+	    }
+
+	    if (vo.getCategory() != null) {
+	        dto.setCategory(new MappingCategoryResponseDTO(
+	                vo.getCategory().getId(),
+	                vo.getCategory().getListCode(),
+	                vo.getCategory().getListDescription()));
+	    }
+
+	    List<MappingDetailsResponseDTO> details = new ArrayList<>();
+
+	    if (vo.getMappingDetailsVO() != null) {
+
+	        for (MappingDetailsVO detailVO : vo.getMappingDetailsVO()) {
+
+	            MappingDetailsResponseDTO detailDTO = new MappingDetailsResponseDTO();
+
+	            detailDTO.setId(detailVO.getId());
+	            detailDTO.setAccountName(detailVO.getAccountName());
+
+	            if (detailVO.getPartyId() != null) {
+
+	                PartyResponseDTO partyDTO = new PartyResponseDTO();
+
+	                partyDTO.setId(detailVO.getPartyId().getId());
+	                partyDTO.setPartyName(detailVO.getPartyId().getCustomerName());
+
+	                detailDTO.setParty(partyDTO);
+	            }
+
+	            details.add(detailDTO);
+	        }
+	    }
+
+	    dto.setDetails(details);
+
+	    return dto;
 	}
-
 	@Override
-	public List<MappingOfPartyToAccVO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch) {
+	public MappingOfPartyToAccResponseDTO getMappingOfPartyToAccById(Long id) {
 
-		return mappingPartyToAccRepo.getMappingOfPartyToAccByOrgId(orgId, branch);
+	    MappingOfPartyToAccVO mappingVO = mappingPartyToAccRepo.getMappingOfPartyToAccById(id);
+
+	    if (mappingVO == null) {
+	        throw new RuntimeException("Mapping Of Party To Account Not Found");
+	    }
+
+	    return convertToResponse(mappingVO);
+	}
+	
+	@Override
+	public List<MappingOfPartyToAccResponseDTO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch) {
+
+	    List<MappingOfPartyToAccVO> mappingList =
+	            mappingPartyToAccRepo.getMappingOfPartyToAccByOrgId(orgId, branch);
+
+	    List<MappingOfPartyToAccResponseDTO> responseList = new ArrayList<>();
+
+	    for (MappingOfPartyToAccVO mappingVO : mappingList) {
+	        responseList.add(convertToResponse(mappingVO));
+	    }
+
+	    return responseList;
 	}
 
 	// dropdown api for category
@@ -3663,92 +3746,240 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	// documenttypemapping
 
+//	@Override
+//	@Transactional
+//	public Map<String, Object> updateCreateDocumentTypeMapping(DocumentTypeMappingDTO documentTypeMappingDTO)
+//			throws ApplicationException {
+//
+//		Map<String, Object> response = new HashMap<>();
+//		String message = "";
+//
+//		DocumentTypeMappingVO masterVO;
+//
+//		BranchVO branchVO = branchRepo.findById(documentTypeMappingDTO.getBranch()).orElseThrow(
+//				() -> new ApplicationException("Branch not found with id : " + documentTypeMappingDTO.getBranch()));
+//
+//		FinancialYearVO financialYearVO = financialYearRepo.findById(documentTypeMappingDTO.getFinancialYear())
+//				.orElseThrow(() -> new ApplicationException(
+//						"Financial Year not found with id : " + documentTypeMappingDTO.getFinancialYear()));
+//
+//		if (ObjectUtils.isNotEmpty(documentTypeMappingDTO.getId())) {
+//
+//			if (documentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(documentTypeMappingDTO.getBranch(),
+//					documentTypeMappingDTO.getFinancialYear(), documentTypeMappingDTO.getOrgId())) {
+//
+//				throw new ApplicationException("Document Type Mapping already exists.");
+//			}
+//
+//			masterVO = new DocumentTypeMappingVO();
+//
+//			masterVO.setCreatedBy(documentTypeMappingDTO.getCreatedBy());
+//
+//			message = "Document Type Mapping Created Successfully";
+//
+//		} else {
+//
+//			masterVO = documentTypeMappingRepo.findById(documentTypeMappingDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("Document Type Mapping not found"));
+//
+//			masterVO.setUpdatedBy(documentTypeMappingDTO.getCreatedBy());
+//
+//			message = "Document Type Mapping Updated Successfully";
+//		}
+//
+//		masterVO.setBranch(branchVO);
+//		masterVO.setFinancialYear(financialYearVO);
+//		masterVO.setOrgId(documentTypeMappingDTO.getOrgId());
+//		masterVO.setActive(documentTypeMappingDTO.isActive());
+//		masterVO.setCancelRemarks(documentTypeMappingDTO.getCancelRemarks());
+//
+//		List<DocumentTypeMappingDetailsVO> details = new ArrayList<>();
+//
+//		if (CollectionUtils.isNotEmpty(documentTypeMappingDTO.getDetails())) {
+//
+//			for (DocumentTypeMappingDetailsDTO dto : documentTypeMappingDTO.getDetails()) {
+//
+//				DocumentTypeMappingDetailsVO detailVO;
+//
+//				if (ObjectUtils.isEmpty(dto.getId()) || dto.getId() == 0) {
+//
+//					// Create new detail
+//					detailVO = new DocumentTypeMappingDetailsVO();
+//
+//				} else {
+//
+//					// Update existing detail
+//					detailVO = documentTypeMappingDetailsRepo.findById(dto.getId())
+//							.orElseThrow(() -> new ApplicationException(
+//									"Document Type Mapping Detail not found with id : " + dto.getId()));
+//				}
+//				detailVO.setScreenName(dto.getScreenName());
+//				detailVO.setScreenCode(dto.getScreenCode());
+//				detailVO.setDocCode(dto.getDocCode());
+//				detailVO.setPrefix(dto.getPrefix());
+//				detailVO.setActive(dto.isActive());
+//
+//				detailVO.setDocumentTypeMappingMasterVO(masterVO);
+//				details.add(detailVO);
+//			}
+//		}
+//
+//		masterVO.setDetails(details);
+//
+//		documentTypeMappingRepo.save(masterVO);
+//
+//		response.put("message", message);
+//		response.put("documentTypeMappingMasterVO", masterVO);
+//
+//		return response;
+//	}
+
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateDocumentTypeMapping(DocumentTypeMappingDTO documentTypeMappingDTO)
-			throws ApplicationException {
+	public Map<String, Object> updateCreateDocumentTypeMapping(DocumentTypeMappingDTO dto) throws ApplicationException {
 
 		Map<String, Object> response = new HashMap<>();
-		String message = "";
+		String message;
 
 		DocumentTypeMappingVO masterVO;
 
-		BranchVO branchVO = branchRepo.findById(documentTypeMappingDTO.getBranch()).orElseThrow(
-				() -> new ApplicationException("Branch not found with id : " + documentTypeMappingDTO.getBranch()));
+		if (ObjectUtils.isEmpty(dto.getId())) {
 
-		FinancialYearVO financialYearVO = financialYearRepo.findById(documentTypeMappingDTO.getFinancialYear())
-				.orElseThrow(() -> new ApplicationException(
-						"Financial Year not found with id : " + documentTypeMappingDTO.getFinancialYear()));
-
-		if (ObjectUtils.isEmpty(documentTypeMappingDTO.getId())) {
-
-			if (documentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(documentTypeMappingDTO.getBranch(),
-					documentTypeMappingDTO.getFinancialYear(), documentTypeMappingDTO.getOrgId())) {
+			if (documentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(dto.getBranch(),
+					dto.getFinancialYear(), dto.getOrgId())) {
 
 				throw new ApplicationException("Document Type Mapping already exists.");
 			}
 
 			masterVO = new DocumentTypeMappingVO();
-
-			masterVO.setCreatedBy(documentTypeMappingDTO.getCreatedBy());
+			masterVO.setCreatedBy(dto.getCreatedBy());
+			masterVO.setUpdatedBy(dto.getCreatedBy());
 
 			message = "Document Type Mapping Created Successfully";
 
 		} else {
 
-			masterVO = documentTypeMappingRepo.findById(documentTypeMappingDTO.getId())
+			masterVO = documentTypeMappingRepo.findById(dto.getId())
 					.orElseThrow(() -> new ApplicationException("Document Type Mapping not found"));
 
-			masterVO.setUpdatedBy(documentTypeMappingDTO.getCreatedBy());
+			List<DocumentTypeMappingDetailsVO> oldDetails = documentTypeMappingDetailsRepo
+					.findByDocumentTypeMappingMasterVO(masterVO);
+
+			documentTypeMappingDetailsRepo.deleteAll(oldDetails);
+			
+			masterVO.setUpdatedBy(dto.getCreatedBy());
 
 			message = "Document Type Mapping Updated Successfully";
 		}
 
-		masterVO.setBranch(branchVO);
-		masterVO.setFinancialYear(financialYearVO);
-		masterVO.setOrgId(documentTypeMappingDTO.getOrgId());
-		masterVO.setActive(documentTypeMappingDTO.isActive());
-		masterVO.setCancelRemarks(documentTypeMappingDTO.getCancelRemarks());
-
-		List<DocumentTypeMappingDetailsVO> details = new ArrayList<>();
-
-		if (CollectionUtils.isNotEmpty(documentTypeMappingDTO.getDetails())) {
-
-			for (DocumentTypeMappingDetailsDTO dto : documentTypeMappingDTO.getDetails()) {
-
-				DocumentTypeMappingDetailsVO detailVO;
-
-				if (ObjectUtils.isEmpty(dto.getId()) || dto.getId() == 0) {
-
-					// Create new detail
-					detailVO = new DocumentTypeMappingDetailsVO();
-
-				} else {
-
-					// Update existing detail
-					detailVO = documentTypeMappingDetailsRepo.findById(dto.getId())
-							.orElseThrow(() -> new ApplicationException(
-									"Document Type Mapping Detail not found with id : " + dto.getId()));
-				}
-				detailVO.setScreenName(dto.getScreenName());
-				detailVO.setScreenCode(dto.getScreenCode());
-				detailVO.setDocCode(dto.getDocCode());
-				detailVO.setPrefix(dto.getPrefix());
-				detailVO.setActive(dto.isActive());
-
-				detailVO.setDocumentTypeMappingMasterVO(masterVO);
-				details.add(detailVO);
-			}
-		}
-
-		masterVO.setDetails(details);
+		createUpdateDocumentTypeMappingVO(dto, masterVO);
 
 		documentTypeMappingRepo.save(masterVO);
 
+		DocumentTypeMappingResponseDTO responseDTO = convertToResponse(masterVO);
+
+		response.put("documentTypeMapping", responseDTO);
 		response.put("message", message);
-		response.put("documentTypeMappingMasterVO", masterVO);
 
 		return response;
+	}
+
+	private void createUpdateDocumentTypeMappingVO(DocumentTypeMappingDTO dto, DocumentTypeMappingVO masterVO)
+			throws ApplicationException {
+
+		BranchVO branchVO = branchRepo.findById(dto.getBranch())
+				.orElseThrow(() -> new ApplicationException("Branch not found with id : " + dto.getBranch()));
+
+		FinancialYearVO financialYearVO = financialYearRepo.findById(dto.getFinancialYear()).orElseThrow(
+				() -> new ApplicationException("Financial Year not found with id : " + dto.getFinancialYear()));
+
+		masterVO.setBranch(branchVO);
+		masterVO.setFinancialYear(financialYearVO);
+		masterVO.setOrgId(dto.getOrgId());
+		masterVO.setActive(dto.isActive());
+		masterVO.setCancelRemarks(dto.getCancelRemarks());
+		masterVO.setDescription(dto.getDescription());
+
+		List<DocumentTypeMappingDetailsVO> detailList = new ArrayList<>();
+
+		if (CollectionUtils.isNotEmpty(dto.getDetails())) {
+
+			for (DocumentTypeMappingDetailsDTO child : dto.getDetails()) {
+
+				DocumentTypeMappingDetailsVO detailVO = new DocumentTypeMappingDetailsVO();
+
+				detailVO.setScreenName(child.getScreenName());
+				detailVO.setScreenCode(child.getScreenCode());
+				detailVO.setDocCode(child.getDocCode());
+				detailVO.setPrefix(child.getPrefix());
+				detailVO.setActive(child.isActive());
+
+				detailVO.setDocumentTypeMappingMasterVO(masterVO);
+
+				detailList.add(detailVO);
+			}
+		}
+
+		masterVO.setDetails(detailList);
+	}
+	
+	
+	private DocumentTypeMappingResponseDTO convertToResponse(DocumentTypeMappingVO vo) {
+
+	    DocumentTypeMappingResponseDTO dto = new DocumentTypeMappingResponseDTO();
+
+	    dto.setId(vo.getId());
+	    dto.setOrgId(vo.getOrgId());
+	    dto.setCreatedBy(vo.getCreatedBy());
+	    dto.setUpdatedBy(vo.getUpdatedBy());
+	    dto.setCancelRemarks(vo.getCancelRemarks());
+	    dto.setActive(vo.getActive());
+		dto.setDescription(vo.getDescription());
+
+	 // Branch
+	    if (vo.getBranch() != null) {
+
+	        dto.setBranch(new DocumentTypeMappingBranchResponseDTO(
+	                vo.getBranch().getId(),
+	                vo.getBranch().getBranchCode(),
+	                vo.getBranch().getBranchName()));
+	    }
+	    
+	    // Financial Year
+	    if (vo.getFinancialYear() != null) {
+
+	        dto.setFinancialYear(new FinancialYearResponseDTO(
+	                vo.getFinancialYear().getId(),
+	                vo.getFinancialYear().getFinYear(),
+	                vo.getFinancialYear().getStartDate(),
+	                vo.getFinancialYear().getEndDate()));
+	    }
+
+	    // Child Details
+	    List<DocumentTypeMappingDetailsResponseDTO> detailList = new ArrayList<>();
+
+	    if (vo.getDetails() != null) {
+
+	        for (DocumentTypeMappingDetailsVO detailVO : vo.getDetails()) {
+
+	            DocumentTypeMappingDetailsResponseDTO detailDTO =
+	                    new DocumentTypeMappingDetailsResponseDTO();
+
+	            detailDTO.setId(detailVO.getId());
+	            detailDTO.setScreenName(detailVO.getScreenName());
+	            detailDTO.setScreenCode(detailVO.getScreenCode());
+	            detailDTO.setDocCode(detailVO.getDocCode());
+	            detailDTO.setPrefix(detailVO.getPrefix());
+	            detailDTO.setLastNo(detailVO.getLastNo());
+	            detailDTO.setActive(detailVO.getActive());
+
+	            detailList.add(detailDTO);
+	        }
+	    }
+
+	    dto.setDocumentTypeMappingDetails(detailList);
+
+	    return dto;
 	}
 
 	@Override

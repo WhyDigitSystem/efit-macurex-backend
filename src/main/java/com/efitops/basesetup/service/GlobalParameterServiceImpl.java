@@ -47,9 +47,9 @@ public class GlobalParameterServiceImpl implements GlobalParameterService{
 	}
 
 	@Override
-	public Set<Object[]> getGlobalParametersBranchAndBranchCodeByOrgIdAndUserName(Long orgid, Long userName) {
+	public Set<Object[]> getGlobalParametersBranchAndBranchCodeByOrgIdAndUserName(Long orgid, Long user) {
 
-		return userBranchAccessRepo.findGlobalParametersBranchByUserName(orgid, userName);
+		return userBranchAccessRepo.findGlobalParametersBranchByUserName(orgid, user);
 	}
 	
 	@Override

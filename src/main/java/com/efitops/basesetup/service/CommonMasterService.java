@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CompanyResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MappingOfPartyToAccResponseDTO;
 import com.efitops.basesetup.dto.BranchDTO;
 import com.efitops.basesetup.dto.CityDTO;
 import com.efitops.basesetup.dto.CompanyDTO;
@@ -333,9 +334,9 @@ public interface CommonMasterService {
 		
 		Map<String, Object> updateCreateMappingOfPartyToAcc(MappingOfPartyToAccDTO mappingOfPartyToAccDTO) throws ApplicationException;
 
-		MappingOfPartyToAccVO getMappingOfPartyToAccById(Long id);
+		MappingOfPartyToAccResponseDTO getMappingOfPartyToAccById(Long id);
 
-		List<MappingOfPartyToAccVO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch);
+		List<MappingOfPartyToAccResponseDTO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch);
 		
 		Map<String, Object> getCustomerCategory(Long orgId)
 		        throws ApplicationException;

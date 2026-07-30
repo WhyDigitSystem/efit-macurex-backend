@@ -52,7 +52,7 @@ public class QuotationVO {
 	private BranchVO plantId;
 	
 	@ManyToOne
-	@Column(name = "party_id")
+	@JoinColumn(name = "party_id")
 	private CustomerVO partyId;
 
 	@Column(name = "with_enquiry")
@@ -98,7 +98,7 @@ public class QuotationVO {
 	private String kindAttention;
 
 	@ManyToOne
-	@Column(name = "tax_code")
+	@JoinColumn(name = "tax_code")
 	private TaxDefinitionVO taxCode;
 
 	@Column(name = "tax_basic_id")

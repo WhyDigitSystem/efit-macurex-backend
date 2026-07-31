@@ -4,6 +4,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import com.efitops.basesetup.entity.GradeMasterVO;
+import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class ItemMasterDTO {
 	private Long id;
 
-	private Long listOfValuesId;
+//	private Long listOfValuesId;
 
 	private Long primaryUnitId;
 
@@ -25,10 +32,6 @@ public class ItemMasterDTO {
 	private Long hsnId;
 
 	private String capitalOrInput;
-
-	private Long itemTypeId;
-
-	private String itemGroupType;
 
 	private Long gradeId;
 
@@ -58,7 +61,7 @@ public class ItemMasterDTO {
 
 	private String drawingNo;
 
-	private String isExciseItem;
+//	private String isExciseItem;
 
 	private BigDecimal lotSize;
 
@@ -171,6 +174,14 @@ public class ItemMasterDTO {
 	private Long orgId;
 
 	private String financialYear;
+
+	private Long itemTypeId;
+
+	private Long itemGroupId;
+
+	private Long capitalOrInputId;
+
+	private Long inspectionId;
 
 //	private String capital;
 //

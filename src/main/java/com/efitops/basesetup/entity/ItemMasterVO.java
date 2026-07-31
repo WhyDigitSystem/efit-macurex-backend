@@ -39,14 +39,11 @@ public class ItemMasterVO {
 	@Column(name = "item_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
-	@Column(name = "capital_or_input")
-	private String capitalOrInput;
-
 //	@Column(name = "item_type")
 //	private String itemType;
 
-	@Column(name = "item_group_type")
-	private String itemGroupType;
+//	@Column(name = "item_group_type")
+//	private String itemGroupType;
 
 //	@Column(name = "grade")
 //	private String grade;
@@ -84,9 +81,6 @@ public class ItemMasterVO {
 	@Column(name = "need_qc_approval")
 	private String needQcApproval;
 
-	@Column(name = "inspection")
-	private String inspection;
-
 	@Column(name = "abc_grade")
 	private String abcGrade;
 
@@ -115,7 +109,7 @@ public class ItemMasterVO {
 	private String rawMaterialsMake;
 
 	@Column(name = "active")
-	private boolean active=true;
+	private boolean active = true;
 
 //	@Column(name = "hsn_code")
 //	private String hsnCode;
@@ -200,7 +194,7 @@ public class ItemMasterVO {
 //
 //	@Column(name = "alternative_supplier")
 //	private String alternativeSupplier;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "default_supplier")
 	private CustomerVO defaultSupplier;
@@ -265,7 +259,7 @@ public class ItemMasterVO {
 	private String updatedBy;
 
 	@Column(name = "cancel")
-	private boolean cancel=false;
+	private boolean cancel = false;
 
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
@@ -283,10 +277,6 @@ public class ItemMasterVO {
 	private String financialYear;
 
 	@ManyToOne
-	@JoinColumn(name = "item_group")
-	private ListOfValuesVO itemGroup;
-
-	@ManyToOne
 	@JoinColumn(name = "primary_unit")
 	private UnitMasterVO primaryUnit;
 
@@ -300,15 +290,27 @@ public class ItemMasterVO {
 
 	@ManyToOne
 	@JoinColumn(name = "itemType")
-	private ListOfValuesVO itemType;
+	private ListOfValuesDetailsVO itemType;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "grade")
-	private ListOfValuesVO grade;
+	private GradeMasterVO grade;
 
 	@ManyToOne
 	@JoinColumn(name = "excise_tariff_no")
-	private ListOfValuesVO exciseTariffNo;
+	private ListOfValuesDetailsVO exciseTariffNo;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "capital_or_input")
+	private ListOfValuesDetailsVO capitalOrInput;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "inspection")
+	private ListOfValuesDetailsVO inspection;
+
+	@ManyToOne
+	@JoinColumn(name = "item_group")
+	private ListOfValuesDetailsVO itemGroup;
 
 	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
 	@JsonManagedReference

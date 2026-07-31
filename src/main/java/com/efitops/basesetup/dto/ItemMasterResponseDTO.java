@@ -14,8 +14,6 @@ public class ItemMasterResponseDTO {
 
 	private Long primaryUnitId;
 
-	private String capitalOrInput;
-
 	private String itemType;
 
 	private Long branchId;
@@ -34,13 +32,9 @@ public class ItemMasterResponseDTO {
 
 	private PartyResponseDTO defaultPartyResponse;
 
-	private String itemGroupType;
-
-	private String grade;
+//	private String grade;
 
 	private String itemCode;
-
-	private String exciseTariffNo;
 
 	private String itemDescription;
 
@@ -59,8 +53,6 @@ public class ItemMasterResponseDTO {
 	private BigDecimal weight;
 
 	private String needQcApproval;
-
-	private String inspection;
 
 	private String abcGrade;
 
@@ -178,11 +170,17 @@ public class ItemMasterResponseDTO {
 
 	private String financialYear;
 
-	private ListOfImageResponseDTO listOfValues;
-	
-	private ListOfImageResponseDTO listOfGrade;
-	
-	private ListOfImageResponseDTO listOfGroupDetails;
+	private ListOfVlauesDetailsResponseDTO itemTypes;
+
+	private ListOfVlauesDetailsResponseDTO itemGroups;
+
+	private ListOfVlauesDetailsResponseDTO exciseTariffNos;
+
+	private ListOfVlauesDetailsResponseDTO inspections;
+
+	private GradeMasterResponseDTO listOfGrades;
+
+	private ListOfVlauesDetailsResponseDTO capitalOrInputs;
 
 	private List<ItemDrawingDTO> itemDrawingDTO;
 }

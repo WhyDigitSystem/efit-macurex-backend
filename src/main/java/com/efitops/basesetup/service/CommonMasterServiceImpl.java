@@ -23,11 +23,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.CategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CompanyResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingBranchResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FinancialYearResponseDTO;
+import com.efitops.basesetup.ResponseDTO.GSTRateMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.HsnResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingBranchResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingDetailsResponseDTO;
@@ -1923,22 +1926,76 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	}
 
 	@Override
-	public GSTRateMasterVO getGSTRateMasterById(Long id) throws ApplicationException {
+	public GSTRateMasterResponseDTO getGSTRateMasterById(Long id) throws ApplicationException {
 
-		return gstRateMasterRepo.findById(id)
-				.orElseThrow(() -> new ApplicationException("Invalid GST Rate Master Details"));
+	    GSTRateMasterVO vo = gstRateMasterRepo.findById(id)
+	            .orElseThrow(() -> new ApplicationException("Invalid GST Rate Master Details"));
+
+	    return convertToResponse(vo);
 	}
-
+	
 	@Override
-	public List<GSTRateMasterVO> getGSTRateByOrgId(Long orgId, Long branchId) throws ApplicationException {
+	public List<GSTRateMasterResponseDTO> getGSTRateByOrgId(Long orgId, Long branchId)
+	        throws ApplicationException {
 
-		List<GSTRateMasterVO> gSTRateMasterVO = gstRateMasterRepo.getGSTRateByOrgId(orgId, branchId);
+	    List<GSTRateMasterVO> voList = gstRateMasterRepo.getGSTRateByOrgId(orgId, branchId);
 
-		if (gSTRateMasterVO.isEmpty()) {
-			throw new ApplicationException("No GST Rate Master Details Found");
-		}
+	    if (voList.isEmpty()) {
+	        throw new ApplicationException("No GST Rate Master Details Found");
+	    }
 
-		return gSTRateMasterVO;
+	    List<GSTRateMasterResponseDTO> responseList = new ArrayList<>();
+
+	    for (GSTRateMasterVO vo : voList) {
+	        responseList.add(convertToResponse(vo));
+	    }
+
+	    return responseList;
+	}
+	
+	private GSTRateMasterResponseDTO convertToResponse(GSTRateMasterVO vo) {
+
+	    GSTRateMasterResponseDTO dto = new GSTRateMasterResponseDTO();
+
+	    dto.setId(vo.getId());
+
+	    if (vo.getCategory() != null) {
+	        dto.setCategory(new CategoryResponseDTO(
+	                vo.getCategory().getId(),
+	                vo.getCategory().getValueCode(),
+	                vo.getCategory().getValueDescription()));
+	    }
+
+	    if (vo.getHsnSacCode() != null) {
+	        dto.setHsnSacCode(new HsnResponseDTO(
+	                vo.getHsnSacCode().getId(),
+	                vo.getHsnSacCode().getHsn(),
+	                vo.getHsnSacCode().getDescription()));
+	    }
+
+	    if (vo.getBranch() != null) {
+	        dto.setBranch(new BranchResponseDTO(
+	                vo.getBranch().getId(),
+	                vo.getBranch().getBranchCode(),
+	                vo.getBranch().getBranchName()));
+	    }
+
+	    dto.setDescription(vo.getDescription());
+	    dto.setWef(vo.getWef());
+	    dto.setTaxable(vo.isTaxable());
+	    dto.setRate(vo.getRate());
+	    dto.setIgst(vo.getIgst());
+	    dto.setSgst(vo.getSgst());
+	    dto.setCgst(vo.getCgst());
+	    dto.setDuplicateCheck(vo.isDuplicateCheck());
+	    dto.setOrgId(vo.getOrgId());
+	    dto.setFinancialYear(vo.getFinancialYear());
+	    dto.setCreatedBy(vo.getCreatedBy());
+	    dto.setUpdatedBy(vo.getUpdatedBy());
+	    dto.setCancelRemarks(vo.getCancelRemarks());
+	    dto.setActive(vo.getActive());
+
+	    return dto;
 	}
 
 	// ServiceAccMaster

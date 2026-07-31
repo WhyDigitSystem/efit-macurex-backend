@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CompanyResponseDTO;
+import com.efitops.basesetup.ResponseDTO.GSTRateMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingOfPartyToAccResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
@@ -67,7 +68,6 @@ import com.efitops.basesetup.entity.DailyExchangeRateVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingVO;
 import com.efitops.basesetup.entity.DocumentTypeMasterVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
-import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.GradeMasterVO;
 import com.efitops.basesetup.entity.HolidayMasterVO;
@@ -75,7 +75,6 @@ import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.LMEVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
-import com.efitops.basesetup.entity.MappingOfPartyToAccVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
@@ -1291,7 +1290,7 @@ public class CommonMasterController extends BaseController {
 
 	     try {
 
-	    	 GSTRateMasterVO gSTRateMasterVO = commonMasterService.getGSTRateMasterById(id);
+	    	 GSTRateMasterResponseDTO gSTRateMasterVO = commonMasterService.getGSTRateMasterById(id);
 
 	         responseObjectsMap.put("gSTRateMasterVO", gSTRateMasterVO);
 
@@ -1322,7 +1321,7 @@ public class CommonMasterController extends BaseController {
 
 	     try {
 
-	         List<GSTRateMasterVO> transportList = commonMasterService.getGSTRateByOrgId(orgId,branchId);
+	         List<GSTRateMasterResponseDTO> transportList = commonMasterService.getGSTRateByOrgId(orgId,branchId);
 
 	         responseObjectsMap.put("transportList", transportList);
 

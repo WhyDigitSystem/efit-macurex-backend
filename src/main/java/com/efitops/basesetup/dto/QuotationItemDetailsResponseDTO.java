@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 public class QuotationItemDetailsResponseDTO {
 
 	private Long id;
-	private ItemMasterResponseDTO itemCodes;
-	private ItemMasterResponseDTO itemDescriptions;
+	private ItemMasterResponseDetailsDTO itemCodes;
+	private ItemMasterResponseDetailsDTO itemDescriptions;
 
 	private UnitResponseDTO unitId;
 

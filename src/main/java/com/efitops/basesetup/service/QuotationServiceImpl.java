@@ -36,6 +36,7 @@ import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDTO;
+import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 import com.efitops.basesetup.dto.QuotationDTO;
 import com.efitops.basesetup.dto.QuotationIemFileUploadDetailsDTO;
 import com.efitops.basesetup.dto.QuotationItemDetailsDTO;
@@ -209,7 +210,7 @@ public class QuotationServiceImpl implements QuotationService {
 		}
 
 		if (quotationVO.getPartyId() != null) {
-			CustomerResponseDTO customerDTO = new CustomerResponseDTO();
+			CustomerResponseDetailsDTO customerDTO = new CustomerResponseDetailsDTO();
 			customerDTO.setId(quotationVO.getPartyId().getId());
 			customerDTO.setCustomerName(quotationVO.getPartyId().getCustomerName());
 
@@ -251,7 +252,7 @@ public class QuotationServiceImpl implements QuotationService {
 
 				if (itemVO.getItemCode() != null) {
 
-					ItemMasterResponseDTO itemCodeDTO = new ItemMasterResponseDTO();
+					ItemMasterResponseDetailsDTO itemCodeDTO = new ItemMasterResponseDetailsDTO();
 					itemCodeDTO.setId(itemVO.getItemCode().getId());
 					itemCodeDTO.setItemCode(itemVO.getItemCode().getItemCode());
 					itemCodeDTO.setItemDescription(itemVO.getItemCode().getItemDescription());
@@ -262,7 +263,7 @@ public class QuotationServiceImpl implements QuotationService {
 				// Item Description
 				if (itemVO.getItemDescription() != null) {
 
-					ItemMasterResponseDTO itemDescDTO = new ItemMasterResponseDTO();
+					ItemMasterResponseDetailsDTO itemDescDTO = new ItemMasterResponseDetailsDTO();
 					itemDescDTO.setId(itemVO.getItemDescription().getId());
 					itemDescDTO.setItemCode(itemVO.getItemDescription().getItemCode());
 					itemDescDTO.setItemDescription(itemVO.getItemDescription().getItemDescription());

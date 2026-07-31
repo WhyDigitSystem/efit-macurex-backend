@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
+import com.efitops.basesetup.service.CustomerResponseDetailsDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +30,7 @@ public class QuotationResponseDTO {
 
 	private Long partyId;
 
-	private CustomerResponseDTO party;
+	private CustomerResponseDetailsDTO party;
 
 	private String withEnquiry;
 

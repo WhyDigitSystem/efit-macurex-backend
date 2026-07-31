@@ -59,6 +59,7 @@ import com.efitops.basesetup.dto.TaxDefinitionDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
 import com.efitops.basesetup.dto.UomConversionDTO;
+import com.efitops.basesetup.dto.UomConversionResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CompanyVO;
@@ -1915,6 +1916,68 @@ public class CommonMasterController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
+//	@GetMapping("/getUomConversionById")
+//	public ResponseEntity<ResponseDTO> getUomConversionById(@RequestParam Long id) {
+//
+//		String methodName = "getUomConversionById()";
+//		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//		String errorMsg = null;
+//		ResponseDTO responseDTO = null;
+//
+//		try {
+//
+//			 uomConversionVO = commonMasterService.getUomConversionById(id).orElse(null);
+//
+//			responseObjectsMap.put("uomConversionVO", uomConversionVO);
+//
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//
+//		} catch (Exception e) {
+//
+//			errorMsg = e.getMessage();
+//			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+//
+//			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+//		}
+//
+//		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//		return ResponseEntity.ok().body(responseDTO);
+//	}
+//
+//	@GetMapping("/getUomConversionByOrgId")
+//	public ResponseEntity<ResponseDTO> getUomConversionByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+//
+//		String methodName = "getUomConversionByOrgId()";
+//		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//		String errorMsg = null;
+//		ResponseDTO responseDTO = null;
+//
+//		try {
+//
+//			List<UomConversionVO> uomConversionList = commonMasterService.getUomConversionByOrgId(orgId, branch);
+//
+//			responseObjectsMap.put("uomConversionList", uomConversionList);
+//
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//
+//		} catch (Exception e) {
+//
+//			errorMsg = e.getMessage();
+//			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+//
+//			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+//		}
+//
+//		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//		return ResponseEntity.ok().body(responseDTO);
+//	}
+
 	@GetMapping("/getUomConversionById")
 	public ResponseEntity<ResponseDTO> getUomConversionById(@RequestParam Long id) {
 
@@ -1927,7 +1990,7 @@ public class CommonMasterController extends BaseController {
 
 		try {
 
-			UomConversionVO uomConversionVO = commonMasterService.getUomConversionById(id).orElse(null);
+			UomConversionResponseDTO uomConversionVO = commonMasterService.getUomConversionById(id);
 
 			responseObjectsMap.put("uomConversionVO", uomConversionVO);
 
@@ -1947,7 +2010,7 @@ public class CommonMasterController extends BaseController {
 	}
 
 	@GetMapping("/getUomConversionByOrgId")
-	public ResponseEntity<ResponseDTO> getUomConversionByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getUomConversionByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
 
 		String methodName = "getUomConversionByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -1958,9 +2021,10 @@ public class CommonMasterController extends BaseController {
 
 		try {
 
-			List<UomConversionVO> uomConversionList = commonMasterService.getUomConversionByOrgId(orgId, branch);
+			List<UomConversionResponseDTO> uomConversionVO = commonMasterService.getUomConversionByOrgId(orgId,
+					branchId);
 
-			responseObjectsMap.put("uomConversionList", uomConversionList);
+			responseObjectsMap.put("uomConversionVO", uomConversionVO);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 
@@ -1976,6 +2040,7 @@ public class CommonMasterController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 	}
+
 	// Grade Master
 
 	@PutMapping("/createUpdateGradeMaster")

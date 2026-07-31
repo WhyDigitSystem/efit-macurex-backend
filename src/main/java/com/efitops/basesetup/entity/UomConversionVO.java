@@ -46,7 +46,7 @@ public class UomConversionVO {
 	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "active")
-	private boolean active;
+	private boolean active=true;
 	@Column(name = "created_by")
 	private String createdBy;
 	@Column(name = "modified_by")

@@ -47,6 +47,9 @@ public class QuotationIemFileUploadDetailsVO {
 
 	@Column(name = "file_path")
 	private String filePath;
+	
+	@Column(name = "file_url")
+	private String fileUrl;
 
 	@Column(name = "name")
 	private String name;

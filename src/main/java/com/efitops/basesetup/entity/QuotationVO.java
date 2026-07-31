@@ -122,10 +122,10 @@ public class QuotationVO {
 	private String cancelRemarks;
 
 	@Column(name = "screen_name")
-	private String screenName;
+	private String screenName="QUOTATION";
 
 	@Column(name = "screen_code")
-	private String screenCode;
+	private String screenCode="QO";
 
 	@Column(name = "org_id")
 	private Long orgId;

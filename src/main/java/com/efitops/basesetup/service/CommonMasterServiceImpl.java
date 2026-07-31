@@ -74,7 +74,9 @@ import com.efitops.basesetup.dto.TaxDefinitionDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDetailsDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.dto.UomConversionDTO;
+import com.efitops.basesetup.dto.UomConversionResponseDTO;
 import com.efitops.basesetup.entity.BankDetailsVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
@@ -2641,15 +2643,121 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	}
 	// Uom Conversion
 
+//	@Override
+//	public List<UomConversionVO> getUomConversionByOrgId(Long orgId, Long branch) {
+//		return uomConversionRepo.findByOrgIdAndBranch(orgId, branch);
+//	}
+//
+//	@Override
+//	public Optional<UomConversionVO> getUomConversionById(Long id) {
+//		return uomConversionRepo.findById(id);
+//	}\
+
 	@Override
-	public List<UomConversionVO> getUomConversionByOrgId(Long orgId, Long branch) {
-		return uomConversionRepo.findByOrgIdAndBranch(orgId, branch);
+	public UomConversionResponseDTO getUomConversionById(Long id) throws ApplicationException {
+
+		UomConversionVO vo = uomConversionRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Uom Master Details"));
+
+		return convertToResponseUom(vo);
 	}
 
 	@Override
-	public Optional<UomConversionVO> getUomConversionById(Long id) {
-		return uomConversionRepo.findById(id);
+	public List<UomConversionResponseDTO> getUomConversionByOrgId(Long orgId, Long branchId)
+			throws ApplicationException {
+
+		List<UomConversionVO> voList = uomConversionRepo.findByOrgIdAndBranch(orgId, branchId);
+
+		if (voList.isEmpty()) {
+			throw new ApplicationException("No GST Rate Master Details Found");
+		}
+
+		List<UomConversionResponseDTO> responseList = new ArrayList<>();
+
+		for (UomConversionVO vo : voList) {
+			responseList.add(convertToResponseUom(vo));
+		}
+
+		return responseList;
 	}
+
+//	@Override
+//	@Transactional
+//	public Map<String, Object> createUpdateUomConversion(UomConversionDTO uomConversionDTO)
+//			throws ApplicationException {
+//
+//		UomConversionVO uomConversionVO;
+//		String message = null;
+//		UomConversionVO oldUomConversion = null;
+//
+//		if (ObjectUtils.isEmpty(uomConversionDTO.getId())) {
+//
+//			if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(),
+//					uomConversionDTO.getFromUnit(), uomConversionDTO.getToUnit())) {
+//
+//				String errorMessage = String.format("This Conversion Already Exists in This Organization.");
+//
+//				throw new ApplicationException(errorMessage);
+//			}
+//
+//			uomConversionVO = new UomConversionVO();
+//			uomConversionVO.setCreatedBy(uomConversionDTO.getCreatedBy());
+//			uomConversionVO.setUpdatedBy(uomConversionDTO.getCreatedBy());
+//
+//			message = "UOM Conversion Created Successfully";
+//
+//		} else {
+//
+//			oldUomConversion = uomConversionRepo.findById(uomConversionDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("UOM Conversion not found"));
+//
+//			entityManager.detach(oldUomConversion);
+//
+//			uomConversionVO = uomConversionRepo.findById(uomConversionDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("This Id Is Not Found : " + uomConversionDTO.getId()));
+//
+//			uomConversionVO.setUpdatedBy(uomConversionDTO.getCreatedBy());
+//
+//			if (!uomConversionVO.getFromUnit().equals(uomConversionDTO.getFromUnit())
+//					|| !uomConversionVO.getToUnit().equals(uomConversionDTO.getToUnit())) {
+//
+//				if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(),
+//						uomConversionDTO.getFromUnit(), uomConversionDTO.getToUnit())) {
+//
+//					String errorMessage = "This Conversion Already Exists in This Organization.";
+//					throw new ApplicationException(errorMessage);
+//				}
+//
+//				UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
+//						.orElseThrow(() -> new ApplicationException("From Unit not found"));
+//
+//				UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
+//						.orElseThrow(() -> new ApplicationException("To Unit not found"));
+//
+//				uomConversionVO.setFromUnit(fromUnit);
+//				uomConversionVO.setToUnit(toUnit);
+//			}
+//
+//			uomConversionVO.setMultiplicationFactor(uomConversionDTO.getMultiplicationFactor());
+//
+//			message = "UOM Conversion Updated Successfully";
+//		}
+//
+//		getUomConversionVOFromDTO(uomConversionVO, uomConversionDTO);
+//
+//		UomConversionVO saveVOs = uomConversionRepo.save(uomConversionVO);
+//
+//		Map<String, Object> response = new HashMap<>();
+//
+//		// Convert Entity to Response DTO
+//		UomConversionResponseDTO responseDTO = convertToResponseUom(saveVOs);
+//
+//		Map<String, Object> map = new HashMap<>();
+//		map.put("uomConversionVO", responseDTO);
+//		map.put("message", message);
+//
+//		return response;
+//	}
 
 	@Override
 	@Transactional
@@ -2657,17 +2765,19 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			throws ApplicationException {
 
 		UomConversionVO uomConversionVO;
-		String message = null;
-		UomConversionVO oldUomConversion = null;
+		String message;
+
+		UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
+				.orElseThrow(() -> new ApplicationException("From Unit not found"));
+
+		UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
+				.orElseThrow(() -> new ApplicationException("To Unit not found"));
 
 		if (ObjectUtils.isEmpty(uomConversionDTO.getId())) {
 
-			if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(),
-					uomConversionDTO.getFromUnit(), uomConversionDTO.getToUnit())) {
+			if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(), fromUnit, toUnit)) {
 
-				String errorMessage = String.format("This Conversion Already Exists in This Organization.");
-
-				throw new ApplicationException(errorMessage);
+				throw new ApplicationException("This Conversion Already Exists in This Organization.");
 			}
 
 			uomConversionVO = new UomConversionVO();
@@ -2678,48 +2788,38 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		} else {
 
-			oldUomConversion = uomConversionRepo.findById(uomConversionDTO.getId())
+			UomConversionVO oldVO = uomConversionRepo.findById(uomConversionDTO.getId())
 					.orElseThrow(() -> new ApplicationException("UOM Conversion not found"));
 
-			entityManager.detach(oldUomConversion);
+			entityManager.detach(oldVO);
 
 			uomConversionVO = uomConversionRepo.findById(uomConversionDTO.getId())
-					.orElseThrow(() -> new ApplicationException("This Id Is Not Found : " + uomConversionDTO.getId()));
+					.orElseThrow(() -> new ApplicationException("UOM Conversion not found"));
 
-			uomConversionVO.setUpdatedBy(uomConversionDTO.getCreatedBy());
+			if ((!uomConversionVO.getFromUnit().getId().equals(uomConversionDTO.getFromUnit()))
+					|| (!uomConversionVO.getToUnit().getId().equals(uomConversionDTO.getToUnit()))) {
 
-			if (!uomConversionVO.getFromUnit().equals(uomConversionDTO.getFromUnit())
-					|| !uomConversionVO.getToUnit().equals(uomConversionDTO.getToUnit())) {
+				if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(), fromUnit,
+						toUnit)) {
 
-				if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(),
-						uomConversionDTO.getFromUnit(), uomConversionDTO.getToUnit())) {
-
-					String errorMessage = "This Conversion Already Exists in This Organization.";
-					throw new ApplicationException(errorMessage);
+					throw new ApplicationException("This Conversion Already Exists in This Organization.");
 				}
-
-				UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
-						.orElseThrow(() -> new ApplicationException("From Unit not found"));
-
-				UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
-						.orElseThrow(() -> new ApplicationException("To Unit not found"));
-
-				uomConversionVO.setFromUnit(fromUnit);
-				uomConversionVO.setToUnit(toUnit);
 			}
 
-			uomConversionVO.setMultiplicationFactor(uomConversionDTO.getMultiplicationFactor());
+			uomConversionVO.setUpdatedBy(uomConversionDTO.getCreatedBy());
 
 			message = "UOM Conversion Updated Successfully";
 		}
 
 		getUomConversionVOFromDTO(uomConversionVO, uomConversionDTO);
 
-		uomConversionRepo.save(uomConversionVO);
+		UomConversionVO savedVO = uomConversionRepo.save(uomConversionVO);
+
+		UomConversionResponseDTO responseDTO = convertToResponseUom(savedVO);
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", message);
-		response.put("uomConversionVO", uomConversionVO);
+		response.put("uomConversionVO", responseDTO);
 
 		return response;
 	}
@@ -2751,6 +2851,48 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	}
 
+	private UomConversionResponseDTO convertToResponseUom(UomConversionVO vo) {
+
+		UomConversionResponseDTO dto = new UomConversionResponseDTO();
+
+		dto.setId(vo.getId());
+
+		if (vo.getFromUnit() != null) {
+
+			UnitMasterResponseDTO fromUnit = new UnitMasterResponseDTO();
+			fromUnit.setId(vo.getFromUnit().getId());
+			fromUnit.setUnitId(vo.getFromUnit().getUnitId());
+			fromUnit.setUnitDescription(vo.getFromUnit().getDescription());
+
+			dto.setFromUnit(fromUnit);
+		}
+
+		if (vo.getToUnit() != null) {
+
+			UnitMasterResponseDTO toUnit = new UnitMasterResponseDTO();
+			toUnit.setId(vo.getToUnit().getId());
+			toUnit.setUnitId(vo.getToUnit().getUnitId());
+			toUnit.setUnitDescription(vo.getToUnit().getDescription());
+
+			dto.setToUnit(toUnit);
+		}
+
+		if (vo.getBranch() != null) {
+
+			dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+					vo.getBranch().getBranchName()));
+		}
+
+		dto.setMultiplicationFactor(vo.getMultiplicationFactor());
+		dto.setOrgId(vo.getOrgId());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
+		dto.setCancelRemarks(vo.getCancelRemarks());
+//		dto.setDescription(vo.getDescription());
+//		dto.setActive(vo.getActive());
+
+		return dto;
+	}
 	// Grade Master
 
 	@Override

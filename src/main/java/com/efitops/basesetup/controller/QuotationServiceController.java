@@ -106,39 +106,39 @@ public class QuotationServiceController extends BaseController {
 		return ResponseEntity.ok(responseDTO);
 	}
 
-	@PostMapping(value = "/createUpdateQuotationImages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ResponseDTO> createUpdateQuotationImages(
-			@RequestPart(value = "files", required = false) MultipartFile[] files, @RequestParam String docId,
-			@RequestParam String screenName, @RequestParam String module, @RequestParam List<String> fileNames) {
-
-		String methodName = "createUpdateQuotationImages()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-		Map<String, Object> responseMap = new HashMap<>();
-
-		try {
-			Map<String, Object> serviceResponse = quotationService.createUpdateQuotationImages(files, docId, screenName,
-					module, fileNames);
-
-			responseMap.put("message", serviceResponse.get("message"));
-			responseMap.put("quotationImages", serviceResponse.get("quotationImagesVO"));
-
-			ResponseDTO responseDTO = createServiceResponse(responseMap);
-			return ResponseEntity.ok(responseDTO);
-
-		} catch (Exception e) {
-
-			LOGGER.error("{} - Unexpected Error: {}", methodName, e.getMessage(), e);
-
-			ResponseDTO errorDTO = createServiceResponseError(responseMap, "Unexpected Error", e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorDTO);
+			@PostMapping(value = "/createUpdateQuotationImages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+			public ResponseEntity<ResponseDTO> createUpdateQuotationImages(
+					@RequestPart(value = "files", required = false) MultipartFile[] files, @RequestParam String docId,
+					@RequestParam String screenName, @RequestParam String module, @RequestParam List<String> fileNames) {
+		
+				String methodName = "createUpdateQuotationImages()";
+				LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		
+				Map<String, Object> responseMap = new HashMap<>();
+		
+				try {
+					Map<String, Object> serviceResponse = quotationService.createUpdateQuotationImages(files, docId, screenName,
+							module, fileNames);
+		
+					responseMap.put("message", serviceResponse.get("message"));
+					responseMap.put("quotationImages", serviceResponse.get("quotationImagesVO"));
+		
+					ResponseDTO responseDTO = createServiceResponse(responseMap);
+					return ResponseEntity.ok(responseDTO);
+		
+				} catch (Exception e) {
+		
+					LOGGER.error("{} - Unexpected Error: {}", methodName, e.getMessage(), e);
+		
+					ResponseDTO errorDTO = createServiceResponseError(responseMap, "Unexpected Error", e.getMessage());
+					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorDTO);
+				}
+			}
+	
+		@GetMapping("/viewQuotationImages/**")
+		public ResponseEntity<byte[]> viewQuotationImages(HttpServletRequest request) throws IOException {
+			return quotationService.viewQuotationImages(request);
 		}
-	}
-
-	@GetMapping("/viewQuotationImages/**")
-	public ResponseEntity<byte[]> viewQuotationImages(HttpServletRequest request) throws IOException {
-		return quotationService.viewQuotationImages(request);
-	}
 
 	@PutMapping("/updateCreateQuotation")
 	public ResponseEntity<ResponseDTO> updateCreateQuotation(@RequestBody QuotationDTO quotationDTO) {

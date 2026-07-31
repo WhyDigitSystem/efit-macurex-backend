@@ -591,13 +591,24 @@ public class QuotationServiceImpl implements QuotationService {
 
 		QuotationVO quotationVO = quotationRepo.findByDocId(docId);
 
-		quotationVO = quotationRepo.save(quotationVO);
+		if (quotationVO == null) {
+			throw new ApplicationException("Quotation Not Found");
+		}
 
 		Path docFolder = Paths.get(uploadBasePath, module, screenName, docId);
+
 		createDirectory(docFolder);
 
 		List<QuotationIemFileUploadDetailsVO> oldDocs = quotationIemFileUploadDetailsRepo
 				.findByQuotationVO(quotationVO);
+
+		// Delete old physical files
+		for (QuotationIemFileUploadDetailsVO doc : oldDocs) {
+
+			deleteFileSafely(doc.getFilePath());
+
+		}
+
 		quotationIemFileUploadDetailsRepo.deleteAll(oldDocs);
 
 		if (quotationVO.getQuotationIemFileUploadDetailsVO() != null) {
@@ -606,109 +617,129 @@ public class QuotationServiceImpl implements QuotationService {
 			quotationVO.setQuotationIemFileUploadDetailsVO(new ArrayList<>());
 		}
 
-		// Delete old physical files
-		for (QuotationIemFileUploadDetailsVO doc : oldDocs) {
-			deleteFileSafely(doc.getFilePath());
-		}
+		replaceDocuments(quotationVO, files, docFolder, docId, module, screenName, fileNames);
 
-		// Save new files
-		replaceDocuments(quotationVO, files, docFolder, docId, fileNames);
+		quotationRepo.save(quotationVO);
 
 		Map<String, Object> response = new HashMap<>();
-		response.put("thirdPartyquotationVOVO", quotationVO);
+		response.put("quotationVO", quotationVO);
 
 		return response;
 	}
 
 	private void replaceDocuments(QuotationVO quotationVO, MultipartFile[] files, Path docFolder, String docId,
-			List<String> fileNames) throws IOException {
+			String module, String screenName, List<String> fileNames) throws IOException {
 
 		if (files == null || files.length == 0) {
 			return;
 		}
 
-		saveFiles(quotationVO, files, docFolder, docId, fileNames);
+		saveFiles(quotationVO, files, docFolder, docId, module, screenName, fileNames);
+
 	}
 
-	private void saveFiles(QuotationVO quotationVO, MultipartFile[] files, Path docFolder, String docId,
-			List<String> fileNames) throws IOException {
+	private void saveFiles(QuotationVO quotationVO, MultipartFile[] files, Path docFolder, String docId, String module,
+			String screenName, List<String> fileNames) throws IOException {
 
-		try {
-			createDirectory(docFolder);
+		createDirectory(docFolder);
 
-			for (int i = 0; i < files.length; i++) {
+		for (int i = 0; i < files.length; i++) {
 
-				MultipartFile file = files[i];
+			MultipartFile file = files[i];
 
-				String currentFileName = null;
-				if (fileNames != null && fileNames.size() > i) {
-					currentFileName = fileNames.get(i);
-				}
+			String originalName = file.getOriginalFilename();
 
-				String originalName = file.getOriginalFilename();
-				if (originalName == null) {
-					originalName = "file";
-				}
-
-				String extension = "";
-				if (originalName.contains(".")) {
-					extension = originalName.substring(originalName.lastIndexOf("."));
-					originalName = originalName.substring(0, originalName.lastIndexOf("."));
-				}
-
-				String fileName = originalName + "_" + docId + extension;
-
-				Path filePath = docFolder.resolve(fileName);
-
-				try (InputStream is = file.getInputStream()) {
-					Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
-				}
-
-				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-						.path("/api/purchase/viewQuotationImages/").toUriString();
-
-				String relativePath = uploadBasePath.replace("\\", "/");
-
-				relativePath = filePath.toString().replace("\\", "/").replace(relativePath + "/", "");
-
-				QuotationIemFileUploadDetailsVO attach = new QuotationIemFileUploadDetailsVO();
-				attach.setQuotationVO(quotationVO);
-				attach.setFileName(fileName);
-				attach.setFilePath(baseUrl + relativePath);
-//				attach.setFil(file.getContentType());
-				attach.setFileSize(file.getSize());
-//				attach.setFileNames(currentFileName);
-				attach.setUploadOn(LocalDateTime.now());
-
-				quotationVO.getQuotationIemFileUploadDetailsVO().add(attach);
+			if (originalName == null) {
+				originalName = "file";
 			}
 
-		} catch (IOException e) {
-			throw new RuntimeException("File upload failed", e);
+			String extension = "";
+
+			if (originalName.contains(".")) {
+
+				extension = originalName.substring(originalName.lastIndexOf("."));
+
+				originalName = originalName.substring(0, originalName.lastIndexOf("."));
+
+			}
+
+			String fileName = originalName + "_" + docId + extension;
+
+			Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+			Path filePath = docFolder.resolve(fileName);
+
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+			// Create relative path
+			String relativePath = baseDir.relativize(filePath).toString().replace("\\", "/");
+
+			// Create URL
+			String fileUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+					.path("/api/quotationservice/viewQuotationImages/").path(relativePath).toUriString();
+
+			QuotationIemFileUploadDetailsVO attach = new QuotationIemFileUploadDetailsVO();
+
+			attach.setQuotationVO(quotationVO);
+
+			attach.setFileName(fileName);
+
+			attach.setFilePath(filePath.toString()); // Physical path
+
+			attach.setFileUrl(fileUrl); // URL
+
+			attach.setFileSize(file.getSize());
+
+			attach.setUploadOn(LocalDateTime.now());
+
+			quotationVO.getQuotationIemFileUploadDetailsVO().add(attach);
 		}
+
 	}
 
 	private void deleteFileSafely(String path) {
+
 		try {
-			Path filePath = Paths.get(path);
-			if (Files.exists(filePath)) {
-				Files.delete(filePath);
+
+			if (path == null || path.isEmpty()) {
+				return;
 			}
+
+			Path file = Paths.get(path);
+
+			if (Files.exists(file)) {
+				Files.delete(file);
+			}
+
 		} catch (Exception e) {
-			System.err.println("Unable to delete file: " + path);
+
+			System.out.println("Unable to delete file : " + path);
+
 		}
+
 	}
 
 	private void createDirectory(Path path) throws IOException {
+
 		if (!Files.exists(path)) {
+
 			Files.createDirectories(path);
+
 		}
+
 	}
 
 	@Override
 	public ResponseEntity<byte[]> viewQuotationImages(HttpServletRequest request) throws IOException {
-		return serveFile(request, "/api/purchase/viewQuotationImages/", uploadBasePath);
+
+		return serveFile(request, "/api/quotationservice/viewQuotationImages/", uploadBasePath);
+
 	}
+
+//	@Override
+//	public ResponseEntity<byte[]> viewQuotationImages(HttpServletRequest request) throws IOException {
+//		return serveFile(request, "/api/quotationservice/viewQuotationImages/", uploadBasePath);
+//	}
 
 	private ResponseEntity<byte[]> serveFile(HttpServletRequest request, String apiPrefix, String uploadBasePath)
 			throws IOException {
@@ -719,30 +750,35 @@ public class QuotationServiceImpl implements QuotationService {
 
 		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
 
-		if (relativePath.startsWith("uploads/")) {
-			relativePath = relativePath.substring("uploads/".length());
-		}
-
 		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
 		Path filePath = baseDir.resolve(relativePath).normalize();
 
 		if (!filePath.startsWith(baseDir)) {
+
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
 		}
 
 		if (!Files.exists(filePath)) {
+
 			return ResponseEntity.notFound().build();
+
 		}
 
 		String contentType = Files.probeContentType(filePath);
+
 		if (contentType == null) {
+
 			contentType = "application/octet-stream";
+
 		}
 
-		byte[] data = Files.readAllBytes(filePath);
+		byte[] bytes = Files.readAllBytes(filePath);
 
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
-				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(bytes);
+
 	}
 
 	@Override

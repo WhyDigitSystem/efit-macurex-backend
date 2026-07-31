@@ -14,7 +14,6 @@ public interface QuotationRepo extends JpaRepository<QuotationVO, Long> {
 	@Query(nativeQuery = true, value = "select * from quotation where quotation_id=?1 and active=1 and cancel=0")
 	QuotationVO getQuotationById(Long id);
 
-	@Query(nativeQuery = true, value = "select * from quotation where doc_id=?1")
 	QuotationVO findByDocId(String docId);
 
 	@Query(nativeQuery = true, value = "select * from quotation where org_id=?1  and branch=?2 and active=1 and cancel=0")

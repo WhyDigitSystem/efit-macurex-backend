@@ -1953,6 +1953,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	    return responseList;
 	}
 	
+	
+	
 	private GSTRateMasterResponseDTO convertToResponse(GSTRateMasterVO vo) {
 
 	    GSTRateMasterResponseDTO dto = new GSTRateMasterResponseDTO();

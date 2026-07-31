@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.efitops.basesetup.ResponseDTO.CityResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.dto.BomDTO;
@@ -35,6 +36,7 @@ import com.efitops.basesetup.dto.UomDTO;
 import com.efitops.basesetup.entity.BomDetailsVO;
 import com.efitops.basesetup.entity.BomVO;
 import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DesignationVO;
@@ -723,15 +725,15 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			message = "Employee Updated Successfully";
 		} else {
 //
-			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
-
-			employeeMasterVO.setEmployeeId(docId);
-
-//						// GETDOCID LASTNO +1
-			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
-			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
+//
+//			employeeMasterVO.setEmployeeId(docId);
+//
+////						// GETDOCID LASTNO +1
+//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+//					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
+//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			employeeMasterVO.setCreatedBy(employeeMasterDTO.getCreatedBy());
 			employeeMasterVO.setUpdatedBy(employeeMasterDTO.getCreatedBy());
@@ -772,7 +774,13 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setNominee(employeeMasterVO.getNominee());
 
 		responseDTO.setTempAddressLine(employeeMasterVO.getTempAddressLine());
-		responseDTO.setTempCity(employeeMasterVO.getTempCity());
+
+		if (employeeMasterVO.getTempCity() != null) {
+			CityResponseDTO primaryUnitDTO = new CityResponseDTO();
+			primaryUnitDTO.setId(employeeMasterVO.getTempCity().getId());
+			primaryUnitDTO.setCityName(employeeMasterVO.getTempCity().getCityName());
+			responseDTO.setTempCitys(primaryUnitDTO);
+		}
 
 		if (employeeMasterVO.getTempState() != null) {
 			StateResponseDTO primaryUnitDTO = new StateResponseDTO();
@@ -791,7 +799,13 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setTempPincode(employeeMasterVO.getTempPincode());
 
 		responseDTO.setPermanentAddressLine(employeeMasterVO.getPermanentAddressLine());
-		responseDTO.setPermanentCity(employeeMasterVO.getPermanentCity());
+
+		if (employeeMasterVO.getPermanentCity() != null) {
+			CityResponseDTO primaryUnitDTO = new CityResponseDTO();
+			primaryUnitDTO.setId(employeeMasterVO.getTempCity().getId());
+			primaryUnitDTO.setCityName(employeeMasterVO.getTempCity().getCityName());
+			responseDTO.setPermanentCitys(primaryUnitDTO);
+		}
 
 		if (employeeMasterVO.getPermanentState() != null) {
 			StateResponseDTO primaryUnitDTO = new StateResponseDTO();
@@ -908,7 +922,14 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		// Temporary Address
 
 		employeeMasterVO.setTempAddressLine(employeeMasterDTO.getTempAddressLine());
-		employeeMasterVO.setTempCity(employeeMasterDTO.getTempCity());
+
+		if (employeeMasterDTO.getTempCityId() != null && employeeMasterDTO.getTempCityId() != 0) {
+
+			CityVO cityVO = cityRepo.findById(employeeMasterDTO.getTempCityId())
+					.orElseThrow(() -> new ApplicationException("City Not Found"));
+
+			employeeMasterVO.setTempCity(cityVO);
+		}
 
 		if (employeeMasterDTO.getTempStateId() != null && employeeMasterDTO.getTempStateId() != 0) {
 
@@ -926,9 +947,24 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			employeeMasterVO.setTempCountry(city);
 		}
 
+		if (employeeMasterDTO.getTempCountryId() != null && employeeMasterDTO.getTempCountryId() != 0) {
+
+			CountryVO city = countryRepo.findById(employeeMasterDTO.getTempCountryId())
+					.orElseThrow(() -> new ApplicationException("Temporary Country Not Found"));
+
+			employeeMasterVO.setTempCountry(city);
+		}
+
 		employeeMasterVO.setTempPincode(employeeMasterDTO.getTempPincode());
 		employeeMasterVO.setPermanentAddressLine(employeeMasterDTO.getPermanentAddressLine());
-		employeeMasterVO.setPermanentCity(employeeMasterDTO.getPermanentCity());
+
+		if (employeeMasterDTO.getPermanentCity() != null && employeeMasterDTO.getPermanentCity() != 0) {
+
+			CityVO city = cityRepo.findById(employeeMasterDTO.getPermanentCity())
+					.orElseThrow(() -> new ApplicationException(" State Not Found"));
+
+			employeeMasterVO.setPermanentCity(city);
+		}
 
 		if (employeeMasterDTO.getPermanentStateId() != null && employeeMasterDTO.getPermanentStateId() != 0) {
 

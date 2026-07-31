@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.ItemMasterDTO;
 import com.efitops.basesetup.dto.QuotationDTO;
 import com.efitops.basesetup.dto.QuotationResponseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
@@ -137,6 +138,27 @@ public class QuotationServiceController extends BaseController {
 	@GetMapping("/viewQuotationImages/**")
 	public ResponseEntity<byte[]> viewQuotationImages(HttpServletRequest request) throws IOException {
 		return quotationService.viewQuotationImages(request);
+	}
+
+	@PutMapping("/updateCreateQuotation")
+	public ResponseEntity<ResponseDTO> updateCreateQuotation(@RequestBody QuotationDTO quotationDTO) {
+		String methodName = "updateCreateQuotation()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		try {
+			Map<String, Object> quotationVO = quotationService.updateCreateQuotation(quotationDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, quotationVO.get("message"));
+			responseObjectsMap.put("quotationVO", quotationVO.get("quotationVO"));
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
 	}
 
 }

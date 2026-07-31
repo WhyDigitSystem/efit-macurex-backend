@@ -135,15 +135,15 @@ public class QuotationServiceImpl implements QuotationService {
 			message = "Quotation Updated Successfully";
 		} else {
 
-			String docId = quotationRepo.getQuotationByDocId(quotationDTO.getOrgId(), screenCode);
-
-			quotationVO.setDocId(docId);
-
-//						// GETDOCID LASTNO +1
-			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdScreenCode(quotationDTO.getOrgId(), screenCode);
-			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//			String docId = quotationRepo.getQuotationByDocId(quotationDTO.getOrgId(), screenCode);
+//
+//			quotationVO.setDocId(docId);
+//
+////						// GETDOCID LASTNO +1
+//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+//					.findByOrgIdScreenCode(quotationDTO.getOrgId(), screenCode);
+//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 			createUpdateQuotationVOByQuotationDTO(quotationDTO, quotationVO);
 			quotationVO.setCreatedBy(quotationDTO.getCreatedBy());
 			quotationVO.setUpdatedBy(quotationDTO.getCreatedBy());

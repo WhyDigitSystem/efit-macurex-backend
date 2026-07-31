@@ -88,8 +88,9 @@ public class EmployeeMasterVO {
 	@Column(name = "temp_address_line")
 	private String tempAddressLine;
 
-	@Column(name = "temp_city")
-	private String tempCity;
+	@ManyToOne
+	@JoinColumn(name = "temp_city")
+	private CityVO tempCity;
 
 	@ManyToOne
 	@JoinColumn(name = "temp_state")
@@ -107,8 +108,9 @@ public class EmployeeMasterVO {
 	@Column(name = "permanent_address_line")
 	private String permanentAddressLine;
 
-	@Column(name = "permanent_city")
-	private String permanentCity;
+	@ManyToOne
+	@JoinColumn(name = "permanent_city")
+	private CityVO permanentCity;
 
 	@ManyToOne
 	@JoinColumn(name = "permanent_state")

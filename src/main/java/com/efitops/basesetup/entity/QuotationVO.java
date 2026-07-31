@@ -57,7 +57,7 @@ public class QuotationVO {
 
 	@Column(name = "with_enquiry")
 	private String withEnquiry;
-
+	
 	@Column(name = "party_name")
 	private String partyName;
 

@@ -2108,7 +2108,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		if (serviceAccMasterDTO.getHsnId() != null && serviceAccMasterDTO.getHsnId() != 0) {
 
-			HsnVO hsnVO = hsnRepo.findById(serviceAccMasterDTO.getBranchId())
+			HsnVO hsnVO = hsnRepo.findById(serviceAccMasterDTO.getHsnId())
 					.orElseThrow(() -> new ApplicationException("HSN Not Found"));
 
 			serviceAccMasterVO.setHsnCode(hsnVO);

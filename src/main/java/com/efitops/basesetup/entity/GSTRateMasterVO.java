@@ -1,6 +1,7 @@
 package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -36,7 +37,7 @@ public class GSTRateMasterVO {
 
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category")
-    private ListOfValuesVO category;
+    private ListOfValuesDetailsVO category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hsn_sac_code")
@@ -46,7 +47,7 @@ public class GSTRateMasterVO {
     private String description;
 
     @Column(name = "wef", precision = 10, scale = 2)
-    private BigDecimal wef;
+    private LocalDate  wef;
 
     @Column(name = "taxable")
     private boolean taxable;

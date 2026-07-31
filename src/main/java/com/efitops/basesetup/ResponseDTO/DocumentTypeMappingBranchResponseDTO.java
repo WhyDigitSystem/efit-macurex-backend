@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BranchResponseDTO {
+public class DocumentTypeMappingBranchResponseDTO {
 
     private Long id;
     private String branchCode;

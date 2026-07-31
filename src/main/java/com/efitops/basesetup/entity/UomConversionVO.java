@@ -3,6 +3,7 @@ package com.efitops.basesetup.entity;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,10 +32,14 @@ public class UomConversionVO {
 	@Column(name = "uomconversion_id")
     private Long id;
 	
-	@Column(name = "from_unit")
-    private Long fromUnit;
-	@Column(name = "to_unit")
-    private Long toUnit;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "from_unit")
+	private UnitMasterVO fromUnit;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "to_unit")
+	private UnitMasterVO toUnit;
+	
 	@Column(name = "multiplication_factor")
     private  double multiplicationFactor;
 	

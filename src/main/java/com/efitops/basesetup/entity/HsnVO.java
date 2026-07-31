@@ -32,7 +32,7 @@ public class HsnVO {
 	
 	@ManyToOne
 	@JoinColumn(name = "category")
-	private ListOfValuesVO category;
+	private ListOfValuesDetailsVO category;
 	
 	@Column(name = "hsn")
 	private String hsn;
@@ -72,6 +72,8 @@ public class HsnVO {
 	
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
+
+	
 	
 
 }

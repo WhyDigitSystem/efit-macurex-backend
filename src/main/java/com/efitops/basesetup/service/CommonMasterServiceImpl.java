@@ -1871,14 +1871,18 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 			message = "GST Rate Master Created Successfully";
 		}
+		// Save Entity
+		GSTRateMasterVO savedVO = gstRateMasterRepo.save(vo);
 
-		gstRateMasterRepo.save(vo);
+		// Convert Entity to Response DTO
+		GSTRateMasterResponseDTO responseDTO = convertToResponse(savedVO);
 
 		Map<String, Object> map = new HashMap<>();
-		map.put("gSTRateMasterVO", vo);
+		map.put("gSTRateMasterVO", responseDTO);
 		map.put("message", message);
 
 		return map;
+
 	}
 
 	private void createUpdateGSTRateMasterVOByDTO(GSTRateMasterDTO dto, GSTRateMasterVO vo)
@@ -1928,76 +1932,67 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	@Override
 	public GSTRateMasterResponseDTO getGSTRateMasterById(Long id) throws ApplicationException {
 
-	    GSTRateMasterVO vo = gstRateMasterRepo.findById(id)
-	            .orElseThrow(() -> new ApplicationException("Invalid GST Rate Master Details"));
+		GSTRateMasterVO vo = gstRateMasterRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid GST Rate Master Details"));
 
-	    return convertToResponse(vo);
+		return convertToResponse(vo);
 	}
-	
+
 	@Override
-	public List<GSTRateMasterResponseDTO> getGSTRateByOrgId(Long orgId, Long branchId)
-	        throws ApplicationException {
+	public List<GSTRateMasterResponseDTO> getGSTRateByOrgId(Long orgId, Long branchId) throws ApplicationException {
 
-	    List<GSTRateMasterVO> voList = gstRateMasterRepo.getGSTRateByOrgId(orgId, branchId);
+		List<GSTRateMasterVO> voList = gstRateMasterRepo.getGSTRateByOrgId(orgId, branchId);
 
-	    if (voList.isEmpty()) {
-	        throw new ApplicationException("No GST Rate Master Details Found");
-	    }
+		if (voList.isEmpty()) {
+			throw new ApplicationException("No GST Rate Master Details Found");
+		}
 
-	    List<GSTRateMasterResponseDTO> responseList = new ArrayList<>();
+		List<GSTRateMasterResponseDTO> responseList = new ArrayList<>();
 
-	    for (GSTRateMasterVO vo : voList) {
-	        responseList.add(convertToResponse(vo));
-	    }
+		for (GSTRateMasterVO vo : voList) {
+			responseList.add(convertToResponse(vo));
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	
-	
+
 	private GSTRateMasterResponseDTO convertToResponse(GSTRateMasterVO vo) {
 
-	    GSTRateMasterResponseDTO dto = new GSTRateMasterResponseDTO();
+		GSTRateMasterResponseDTO dto = new GSTRateMasterResponseDTO();
 
-	    dto.setId(vo.getId());
+		dto.setId(vo.getId());
 
-	    if (vo.getCategory() != null) {
-	        dto.setCategory(new CategoryResponseDTO(
-	                vo.getCategory().getId(),
-	                vo.getCategory().getValueCode(),
-	                vo.getCategory().getValueDescription()));
-	    }
+		if (vo.getCategory() != null) {
+			dto.setCategory(new CategoryResponseDTO(vo.getCategory().getId(), vo.getCategory().getValueCode(),
+					vo.getCategory().getValueDescription()));
+		}
 
-	    if (vo.getHsnSacCode() != null) {
-	        dto.setHsnSacCode(new HsnResponseDTO(
-	                vo.getHsnSacCode().getId(),
-	                vo.getHsnSacCode().getHsn(),
-	                vo.getHsnSacCode().getDescription()));
-	    }
+		if (vo.getHsnSacCode() != null) {
+			dto.setHsnSacCode(new HsnResponseDTO(vo.getHsnSacCode().getId(), vo.getHsnSacCode().getHsn(),
+					vo.getHsnSacCode().getDescription()));
+		}
 
-	    if (vo.getBranch() != null) {
-	        dto.setBranch(new BranchResponseDTO(
-	                vo.getBranch().getId(),
-	                vo.getBranch().getBranchCode(),
-	                vo.getBranch().getBranchName()));
-	    }
+		if (vo.getBranch() != null) {
+			dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+					vo.getBranch().getBranchName()));
+		}
 
-	    dto.setDescription(vo.getDescription());
-	    dto.setWef(vo.getWef());
-	    dto.setTaxable(vo.isTaxable());
-	    dto.setRate(vo.getRate());
-	    dto.setIgst(vo.getIgst());
-	    dto.setSgst(vo.getSgst());
-	    dto.setCgst(vo.getCgst());
-	    dto.setDuplicateCheck(vo.isDuplicateCheck());
-	    dto.setOrgId(vo.getOrgId());
-	    dto.setFinancialYear(vo.getFinancialYear());
-	    dto.setCreatedBy(vo.getCreatedBy());
-	    dto.setUpdatedBy(vo.getUpdatedBy());
-	    dto.setCancelRemarks(vo.getCancelRemarks());
-	    dto.setActive(vo.getActive());
+		dto.setDescription(vo.getDescription());
+		dto.setWef(vo.getWef());
+		dto.setTaxable(vo.isTaxable());
+		dto.setRate(vo.getRate());
+		dto.setIgst(vo.getIgst());
+		dto.setSgst(vo.getSgst());
+		dto.setCgst(vo.getCgst());
+		dto.setDuplicateCheck(vo.isDuplicateCheck());
+		dto.setOrgId(vo.getOrgId());
+		dto.setFinancialYear(vo.getFinancialYear());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
+		dto.setCancelRemarks(vo.getCancelRemarks());
+		dto.setActive(vo.getActive());
 
-	    return dto;
+		return dto;
 	}
 
 	// ServiceAccMaster
@@ -2704,10 +2699,10 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				}
 
 				UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
-				        .orElseThrow(() -> new ApplicationException("From Unit not found"));
+						.orElseThrow(() -> new ApplicationException("From Unit not found"));
 
 				UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
-				        .orElseThrow(() -> new ApplicationException("To Unit not found"));
+						.orElseThrow(() -> new ApplicationException("To Unit not found"));
 
 				uomConversionVO.setFromUnit(fromUnit);
 				uomConversionVO.setToUnit(toUnit);
@@ -2733,10 +2728,10 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			throws ApplicationException {
 
 		UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
-		        .orElseThrow(() -> new ApplicationException("From Unit not found"));
+				.orElseThrow(() -> new ApplicationException("From Unit not found"));
 
 		UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
-		        .orElseThrow(() -> new ApplicationException("To Unit not found"));
+				.orElseThrow(() -> new ApplicationException("To Unit not found"));
 
 		uomConversionVO.setFromUnit(fromUnit);
 		uomConversionVO.setToUnit(toUnit);
@@ -3518,89 +3513,84 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		mappingOfPartyToAccVO.setMappingDetailsVO(detailList);
 	}
 
-	
 	private MappingOfPartyToAccResponseDTO convertToResponse(MappingOfPartyToAccVO vo) {
 
-	    MappingOfPartyToAccResponseDTO dto = new MappingOfPartyToAccResponseDTO();
+		MappingOfPartyToAccResponseDTO dto = new MappingOfPartyToAccResponseDTO();
 
-	    dto.setId(vo.getId());
-	    dto.setDocId(vo.getDocId());
-	    dto.setDocDate(vo.getDocDate());
-	    dto.setAsOnDate(vo.getAsOnDate());
-	    dto.setOrgId(vo.getOrgId());
-	    dto.setCreatedBy(vo.getCreatedBy());
-	    dto.setUpdatedBy(vo.getUpdatedBy());
-	    dto.setCancelRemarks(vo.getCancelRemarks());
-	    dto.setActive(vo.getActive());
+		dto.setId(vo.getId());
+		dto.setDocId(vo.getDocId());
+		dto.setDocDate(vo.getDocDate());
+		dto.setAsOnDate(vo.getAsOnDate());
+		dto.setOrgId(vo.getOrgId());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
+		dto.setCancelRemarks(vo.getCancelRemarks());
+		dto.setActive(vo.getActive());
 
-	    if (vo.getBranch() != null) {
-	        dto.setBranch(new MappingBranchResponseDTO(
-	                vo.getBranch().getId(),
-	                vo.getBranch().getBranchCode(),
-	                vo.getBranch().getBranchName()));
-	    }
+		if (vo.getBranch() != null) {
+			dto.setBranch(new MappingBranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+					vo.getBranch().getBranchName()));
+		}
 
-	    if (vo.getCategory() != null) {
-	        dto.setCategory(new MappingCategoryResponseDTO(
-	                vo.getCategory().getId(),
-	                vo.getCategory().getListCode(),
-	                vo.getCategory().getListDescription()));
-	    }
+		if (vo.getCategory() != null) {
+			dto.setCategory(new MappingCategoryResponseDTO(vo.getCategory().getId(), vo.getCategory().getListCode(),
+					vo.getCategory().getListDescription()));
+		}
 
-	    List<MappingDetailsResponseDTO> details = new ArrayList<>();
+		List<MappingDetailsResponseDTO> details = new ArrayList<>();
 
-	    if (vo.getMappingDetailsVO() != null) {
+		if (vo.getMappingDetailsVO() != null) {
 
-	        for (MappingDetailsVO detailVO : vo.getMappingDetailsVO()) {
+			for (MappingDetailsVO detailVO : vo.getMappingDetailsVO()) {
 
-	            MappingDetailsResponseDTO detailDTO = new MappingDetailsResponseDTO();
+				MappingDetailsResponseDTO detailDTO = new MappingDetailsResponseDTO();
 
-	            detailDTO.setId(detailVO.getId());
-	            detailDTO.setAccountName(detailVO.getAccountName());
+				detailDTO.setId(detailVO.getId());
+				detailDTO.setAccountName(detailVO.getAccountName());
 
-	            if (detailVO.getPartyId() != null) {
+				if (detailVO.getPartyId() != null) {
 
-	                PartyResponseDTO partyDTO = new PartyResponseDTO();
+					PartyResponseDTO partyDTO = new PartyResponseDTO();
 
-	                partyDTO.setId(detailVO.getPartyId().getId());
-	                partyDTO.setPartyName(detailVO.getPartyId().getCustomerName());
+					partyDTO.setId(detailVO.getPartyId().getId());
+					partyDTO.setPartyName(detailVO.getPartyId().getCustomerName());
 
-	                detailDTO.setParty(partyDTO);
-	            }
+					detailDTO.setParty(partyDTO);
+				}
 
-	            details.add(detailDTO);
-	        }
-	    }
+				details.add(detailDTO);
+			}
+		}
 
-	    dto.setDetails(details);
+		dto.setDetails(details);
 
-	    return dto;
+		return dto;
 	}
+
 	@Override
 	public MappingOfPartyToAccResponseDTO getMappingOfPartyToAccById(Long id) {
 
-	    MappingOfPartyToAccVO mappingVO = mappingPartyToAccRepo.getMappingOfPartyToAccById(id);
+		MappingOfPartyToAccVO mappingVO = mappingPartyToAccRepo.getMappingOfPartyToAccById(id);
 
-	    if (mappingVO == null) {
-	        throw new RuntimeException("Mapping Of Party To Account Not Found");
-	    }
+		if (mappingVO == null) {
+			throw new RuntimeException("Mapping Of Party To Account Not Found");
+		}
 
-	    return convertToResponse(mappingVO);
+		return convertToResponse(mappingVO);
 	}
-	
+
 	@Override
 	public List<MappingOfPartyToAccResponseDTO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch) {
 
-	    List<MappingOfPartyToAccVO> mappingList =
-	            mappingPartyToAccRepo.getMappingOfPartyToAccByOrgId(orgId, branch);
+		List<MappingOfPartyToAccVO> mappingList = mappingPartyToAccRepo.getMappingOfPartyToAccByOrgId(orgId, branch);
 
-	    List<MappingOfPartyToAccResponseDTO> responseList = new ArrayList<>();
+		List<MappingOfPartyToAccResponseDTO> responseList = new ArrayList<>();
 
-	    for (MappingOfPartyToAccVO mappingVO : mappingList) {
-	        responseList.add(convertToResponse(mappingVO));
-	    }
+		for (MappingOfPartyToAccVO mappingVO : mappingList) {
+			responseList.add(convertToResponse(mappingVO));
+		}
 
-	    return responseList;
+		return responseList;
 	}
 
 	// dropdown api for category
@@ -3938,7 +3928,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 					.findByDocumentTypeMappingMasterVO(masterVO);
 
 			documentTypeMappingDetailsRepo.deleteAll(oldDetails);
-			
+
 			masterVO.setUpdatedBy(dto.getCreatedBy());
 
 			message = "Document Type Mapping Updated Successfully";
@@ -3994,64 +3984,58 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		masterVO.setDetails(detailList);
 	}
-	
-	
+
 	private DocumentTypeMappingResponseDTO convertToResponse(DocumentTypeMappingVO vo) {
 
-	    DocumentTypeMappingResponseDTO dto = new DocumentTypeMappingResponseDTO();
+		DocumentTypeMappingResponseDTO dto = new DocumentTypeMappingResponseDTO();
 
-	    dto.setId(vo.getId());
-	    dto.setOrgId(vo.getOrgId());
-	    dto.setCreatedBy(vo.getCreatedBy());
-	    dto.setUpdatedBy(vo.getUpdatedBy());
-	    dto.setCancelRemarks(vo.getCancelRemarks());
-	    dto.setActive(vo.getActive());
+		dto.setId(vo.getId());
+		dto.setOrgId(vo.getOrgId());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
+		dto.setCancelRemarks(vo.getCancelRemarks());
+		dto.setActive(vo.getActive());
 		dto.setDescription(vo.getDescription());
 
-	 // Branch
-	    if (vo.getBranch() != null) {
+		// Branch
+		if (vo.getBranch() != null) {
 
-	        dto.setBranch(new DocumentTypeMappingBranchResponseDTO(
-	                vo.getBranch().getId(),
-	                vo.getBranch().getBranchCode(),
-	                vo.getBranch().getBranchName()));
-	    }
-	    
-	    // Financial Year
-	    if (vo.getFinancialYear() != null) {
+			dto.setBranch(new DocumentTypeMappingBranchResponseDTO(vo.getBranch().getId(),
+					vo.getBranch().getBranchCode(), vo.getBranch().getBranchName()));
+		}
 
-	        dto.setFinancialYear(new FinancialYearResponseDTO(
-	                vo.getFinancialYear().getId(),
-	                vo.getFinancialYear().getFinYear(),
-	                vo.getFinancialYear().getStartDate(),
-	                vo.getFinancialYear().getEndDate()));
-	    }
+		// Financial Year
+		if (vo.getFinancialYear() != null) {
 
-	    // Child Details
-	    List<DocumentTypeMappingDetailsResponseDTO> detailList = new ArrayList<>();
+			dto.setFinancialYear(
+					new FinancialYearResponseDTO(vo.getFinancialYear().getId(), vo.getFinancialYear().getFinYear(),
+							vo.getFinancialYear().getStartDate(), vo.getFinancialYear().getEndDate()));
+		}
 
-	    if (vo.getDetails() != null) {
+		// Child Details
+		List<DocumentTypeMappingDetailsResponseDTO> detailList = new ArrayList<>();
 
-	        for (DocumentTypeMappingDetailsVO detailVO : vo.getDetails()) {
+		if (vo.getDetails() != null) {
 
-	            DocumentTypeMappingDetailsResponseDTO detailDTO =
-	                    new DocumentTypeMappingDetailsResponseDTO();
+			for (DocumentTypeMappingDetailsVO detailVO : vo.getDetails()) {
 
-	            detailDTO.setId(detailVO.getId());
-	            detailDTO.setScreenName(detailVO.getScreenName());
-	            detailDTO.setScreenCode(detailVO.getScreenCode());
-	            detailDTO.setDocCode(detailVO.getDocCode());
-	            detailDTO.setPrefix(detailVO.getPrefix());
-	            detailDTO.setLastNo(detailVO.getLastNo());
-	            detailDTO.setActive(detailVO.getActive());
+				DocumentTypeMappingDetailsResponseDTO detailDTO = new DocumentTypeMappingDetailsResponseDTO();
 
-	            detailList.add(detailDTO);
-	        }
-	    }
+				detailDTO.setId(detailVO.getId());
+				detailDTO.setScreenName(detailVO.getScreenName());
+				detailDTO.setScreenCode(detailVO.getScreenCode());
+				detailDTO.setDocCode(detailVO.getDocCode());
+				detailDTO.setPrefix(detailVO.getPrefix());
+				detailDTO.setLastNo(detailVO.getLastNo());
+				detailDTO.setActive(detailVO.getActive());
 
-	    dto.setDocumentTypeMappingDetails(detailList);
+				detailList.add(detailDTO);
+			}
+		}
 
-	    return dto;
+		dto.setDocumentTypeMappingDetails(detailList);
+
+		return dto;
 	}
 
 	@Override

@@ -1884,7 +1884,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		// Category
 		if (dto.getCategory() != null) {
 
-			ListOfValuesVO category = listOfValuesRepo.findById(dto.getCategory())
+			ListOfValuesDetailsVO category = listOfValuesDetailsRepo.findById(dto.getCategory())
 					.orElseThrow(() -> new ApplicationException("Category Not Found"));
 
 			vo.setCategory(category);

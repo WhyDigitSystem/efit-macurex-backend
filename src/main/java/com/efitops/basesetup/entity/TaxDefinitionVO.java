@@ -32,38 +32,36 @@ import lombok.NoArgsConstructor;
 public class TaxDefinitionVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "taxbasicgen")
-	@SequenceGenerator(name = "taxbasicgen", sequenceName = "taxbasicseq", initialValue = 1000000001, allocationSize = 1)
+	@SequenceGenerator(name = "taxbasicgen", sequenceName = "taxbasicseq", initialValue = 1000000002, allocationSize = 1)
 	@Column(name = "taxbasic_id")
 	private Long id;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "module")
-	private ListOfValuesVO module;
-	
+	private ListOfValuesDetailsVO module;
+
 	@Column(name = "tax_no")
 	private Long taxNo;
-	
+
 	@Column(name = "tax_description")
 	private String taxDescription;
-	
+
 	@Column(name = "doc_date")
 	private LocalDate docDate;
-	
+
 	@Column(name = "effective_date")
 	private LocalDate effectiveDate;
-	
+
 	@Column(name = "fill_copy_of")
 	private String fillCopyOF;
-	
+
 	@Column(name = "print_name")
 	private String PrintName;
-	
-	
-	
+
 	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "created_by", length = 25)
@@ -73,14 +71,12 @@ public class TaxDefinitionVO {
 	@Column(name = "cancel_remarks", length = 150)
 	private String cancelRemarks;
 	@Column(name = "active")
-	private boolean active;
+	private boolean active = true;
 	@Column(name = "cancel")
-	private boolean cancel=false;
-	
-	
-	
-    @Column(name = "finyear", length = 5)
-    private String finYear;
+	private boolean cancel = false;
+
+	@Column(name = "finyear", length = 5)
+	private String finYear;
 	@Column(name = "screencode", length = 30)
 	private String screenCode = "TD";
 	@Column(name = "screenname", length = 30)
@@ -95,12 +91,12 @@ public class TaxDefinitionVO {
 	public String getCancel() {
 		return cancel ? "T" : "F";
 	}
+
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-	
+
 	@OneToMany(mappedBy = "taxDefinitionVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<TaxDefinitionDetailsVO> taxDefinitionDetailsVO;
-
 
 }

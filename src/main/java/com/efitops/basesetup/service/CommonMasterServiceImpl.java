@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -58,6 +59,7 @@ import com.efitops.basesetup.dto.HsnResponseImageDTO;
 import com.efitops.basesetup.dto.LMEDTO;
 import com.efitops.basesetup.dto.ListOfValuesDTO;
 import com.efitops.basesetup.dto.ListOfValuesDetailsDTO;
+import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
 import com.efitops.basesetup.dto.LocationDTO;
 import com.efitops.basesetup.dto.MappingDetailsDTO;
 import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
@@ -72,6 +74,8 @@ import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TSBankDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDetailsDTO;
+import com.efitops.basesetup.dto.TaxDefinitionDetailsResponseDTO;
+import com.efitops.basesetup.dto.TaxDefinitionMasterResponseDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
@@ -3352,13 +3356,16 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			message = "Tax Definition Created Successfully";
 		}
 
-		taxDefinitionRepo.save(taxDefinitionVO);
+		TaxDefinitionVO savedVO = taxDefinitionRepo.save(taxDefinitionVO);
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("taxDefinitionVO", taxDefinitionVO);
-		response.put("message", message);
+		// Convert Entity to Response DTO
+		TaxDefinitionMasterResponseDTO responseDTO = convertToResponseTaxDefination(savedVO);
 
-		return response;
+		Map<String, Object> map = new HashMap<>();
+		map.put("taxDefinitionVO", responseDTO);
+		map.put("message", message);
+
+		return map;
 	}
 
 	private void createUpdateTaxDefinitionVO(TaxDefinitionDTO dto, TaxDefinitionVO taxDefinitionVO) {
@@ -3373,7 +3380,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		// Parent Mapping
 		if (dto.getModule() != null) {
 
-			ListOfValuesVO lov = listOfValuesRepo.findById(dto.getModule())
+			ListOfValuesDetailsVO lov = listOfValuesDetailsRepo.findById(dto.getModule())
 					.orElseThrow(() -> new RuntimeException("Module Not Found"));
 
 			taxDefinitionVO.setModule(lov);
@@ -3408,14 +3415,13 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 				if (detailDTO.getTaxType() != null) {
 
-					ListOfValuesVO detailLov = listOfValuesRepo.findById(detailDTO.getTaxType())
+					ListOfValuesDetailsVO detailLov = listOfValuesDetailsRepo.findById(detailDTO.getTaxType())
 							.orElseThrow(() -> new RuntimeException("List Of Value Not Found"));
 
 					detailVO.setTaxType(detailLov);
 				}
 				if (detailDTO.getTaxName() != null) {
-
-					ListOfValuesVO detailLov = listOfValuesRepo.findById(detailDTO.getTaxName())
+					ListOfValuesDetailsVO detailLov = listOfValuesDetailsRepo.findById(detailDTO.getTaxName())
 							.orElseThrow(() -> new RuntimeException("List Of Value Not Found"));
 
 					detailVO.setTaxName(detailLov);
@@ -3441,18 +3447,87 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		taxDefinitionVO.setTaxDefinitionDetailsVO(detailsList);
 	}
 
-	@Override
-	public TaxDefinitionVO getTaxDefinitionById(Long id) throws ApplicationException {
+	private TaxDefinitionMasterResponseDTO convertToResponseTaxDefination(TaxDefinitionVO vo) {
 
-		if (ObjectUtils.isEmpty(id)) {
-			throw new ApplicationException("Invalid Id");
+		TaxDefinitionMasterResponseDTO dto = new TaxDefinitionMasterResponseDTO();
+
+		dto.setId(vo.getId());
+
+		if (vo.getModule() != null) {
+
+			dto.setModule(new ListOfVlauesDetailsResponseDTO(vo.getModule().getId(), vo.getModule().getValueCode(),
+					vo.getModule().getValueDescription()));
 		}
 
-		return taxDefinitionRepo.findById(id).orElseThrow(() -> new ApplicationException("Tax Definition Not Found"));
+		if (vo.getBranch() != null) {
+
+			dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+					vo.getBranch().getBranchName()));
+		}
+
+		dto.setTaxNo(vo.getTaxNo());
+		dto.setTaxDescription(vo.getTaxDescription());
+		dto.setDocDate(vo.getDocDate());
+		dto.setEffectiveDate(vo.getEffectiveDate());
+		dto.setFillCopyOF(vo.getFillCopyOF());
+		dto.setPrintName(vo.getPrintName());
+		dto.setOrgId(vo.getOrgId());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
+
+		dto.setCancelRemarks(vo.getCancelRemarks());
+
+		List<TaxDefinitionDetailsResponseDTO> detailResponses = new ArrayList<>();
+
+		if (vo.getTaxDefinitionDetailsVO() != null) {
+
+			for (TaxDefinitionDetailsVO detail : vo.getTaxDefinitionDetailsVO()) {
+
+				TaxDefinitionDetailsResponseDTO detailDTO = new TaxDefinitionDetailsResponseDTO();
+
+				if (detail.getTaxType() != null) {
+
+					detailDTO.setTaxType(new ListOfVlauesDetailsResponseDTO(detail.getTaxType().getId(),
+							detail.getTaxType().getValueCode(), detail.getTaxType().getValueDescription()));
+				}
+
+				if (detail.getTaxName() != null) {
+
+					detailDTO.setTaxName(new ListOfVlauesDetailsResponseDTO(detail.getTaxName().getId(),
+							detail.getTaxName().getValueCode(), detail.getTaxName().getValueDescription()));
+				}
+
+				detailDTO.setAddLess(detail.getAddLess());
+				detailDTO.setTaxPercent(detail.getTaxPercent());
+				detailDTO.setTaxId(detail.getTaxId());
+				detailDTO.setFormula(detail.getFormula());
+				detailDTO.setPostToFinance(detail.getPostToFinance());
+				detailDTO.setDbCr(detail.getDbCr());
+				detailDTO.setGlAccountName(detail.getGlAccountName());
+				detailDTO.setPrint(detail.getPrint());
+				detailDTO.setTaxPost(detail.getTaxPost());
+
+				detailResponses.add(detailDTO);
+			}
+		}
+
+		dto.setDetails(detailResponses);
+
+		return dto;
 	}
 
 	@Override
-	public List<TaxDefinitionVO> getTaxDefinitionByOrgId(Long orgId, Long branch) throws ApplicationException {
+	public TaxDefinitionMasterResponseDTO getTaxDefinitionById(Long id) throws ApplicationException {
+
+		TaxDefinitionVO vo = taxDefinitionRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Tax Definition Not Found"));
+
+		return convertToResponseTaxDefination(vo);
+	}
+
+	@Override
+	public List<TaxDefinitionMasterResponseDTO> getTaxDefinitionByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
 
 		List<TaxDefinitionVO> list = taxDefinitionRepo.getTaxDefinitionByOrgId(orgId, branch);
 
@@ -3460,7 +3535,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			throw new ApplicationException("No Tax Definition Found");
 		}
 
-		return list;
+		return list.stream().map(this::convertToResponseTaxDefination).collect(Collectors.toList());
 	}
 
 	// Holliday Master

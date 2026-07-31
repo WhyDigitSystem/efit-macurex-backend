@@ -40,6 +40,8 @@ import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
 import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TSBankDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDTO;
+import com.efitops.basesetup.dto.TaxDefinitionDetailsResponseDTO;
+import com.efitops.basesetup.dto.TaxDefinitionMasterResponseDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
 import com.efitops.basesetup.dto.UomConversionDTO;
@@ -291,9 +293,9 @@ public interface CommonMasterService {
 
 	// Tax Definition
 
-	TaxDefinitionVO getTaxDefinitionById(Long id) throws ApplicationException;
+	TaxDefinitionMasterResponseDTO getTaxDefinitionById(Long id) throws ApplicationException;
 
-	List<TaxDefinitionVO> getTaxDefinitionByOrgId(Long orgId, Long branch) throws ApplicationException;
+	List<TaxDefinitionMasterResponseDTO> getTaxDefinitionByOrgId(Long orgId, Long branch) throws ApplicationException;
 
 	Map<String, Object> updateCreateTaxDefinition(TaxDefinitionDTO taxDefinitionDTO) throws ApplicationException;
 

@@ -56,6 +56,7 @@ import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
 import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TSBankDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDTO;
+import com.efitops.basesetup.dto.TaxDefinitionMasterResponseDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
 import com.efitops.basesetup.dto.UomConversionDTO;
@@ -2453,7 +2454,7 @@ public class CommonMasterController extends BaseController {
 
 	// Tax Definition
 
-	@PostMapping("/updateCreateTaxDefinition")
+	@PutMapping("/updateCreateTaxDefinition")
 	public ResponseEntity<ResponseDTO> updateCreateTaxDefinition(@RequestBody TaxDefinitionDTO taxDefinitionDTO) {
 
 		String methodName = "updateCreateTaxDefinition()";
@@ -2494,7 +2495,7 @@ public class CommonMasterController extends BaseController {
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO = null;
-		TaxDefinitionVO taxDefinitionVO = new TaxDefinitionVO();
+		TaxDefinitionMasterResponseDTO taxDefinitionVO = new TaxDefinitionMasterResponseDTO();
 		try {
 			taxDefinitionVO = commonMasterService.getTaxDefinitionById(id);
 		} catch (Exception e) {
@@ -2521,7 +2522,7 @@ public class CommonMasterController extends BaseController {
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO = null;
-		List<TaxDefinitionVO> taxList = new ArrayList<>();
+		List<TaxDefinitionMasterResponseDTO> taxList = new ArrayList<>();
 
 		try {
 			taxList = commonMasterService.getTaxDefinitionByOrgId(orgId, branch);

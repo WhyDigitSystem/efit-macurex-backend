@@ -40,7 +40,7 @@ public class ItemMasterResponseDTO {
 
 	private BigDecimal thickness;
 
-	private String isStock;
+	private String stock;
 
 	private BigDecimal width;
 
@@ -169,6 +169,12 @@ public class ItemMasterResponseDTO {
 	private Long orgId;
 
 	private String financialYear;
+
+	private String groupItem;
+
+	private String excisbleItem;
+
+	private String shelfLifePart;
 
 	private ListOfVlauesDetailsResponseDTO itemTypes;
 

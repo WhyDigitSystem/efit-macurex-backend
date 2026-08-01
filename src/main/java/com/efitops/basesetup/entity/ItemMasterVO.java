@@ -39,29 +39,12 @@ public class ItemMasterVO {
 	@Column(name = "item_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
-//	@Column(name = "item_type")
-//	private String itemType;
-
-//	@Column(name = "item_group_type")
-//	private String itemGroupType;
-
-//	@Column(name = "grade")
-//	private String grade;
-
-	@Column(name = "item_code")
-	private String itemCode;
-
-//	@Column(name = "excise_tariff_no")
-//	private String exciseTariffNo;
-
 	@Column(name = "item_description")
 	private String itemDescription;
 
 	@Column(name = "thickness", precision = 10, scale = 2)
 	private BigDecimal thickness;
 
-	@Column(name = "is_stock")
-	private String isStock;
 
 	@Column(name = "width", precision = 10, scale = 2)
 	private BigDecimal width;
@@ -311,6 +294,21 @@ public class ItemMasterVO {
 	@ManyToOne
 	@JoinColumn(name = "item_group")
 	private ListOfValuesDetailsVO itemGroup;
+
+	@Column(name = "item_code")
+	private String itemCode;
+
+	@Column(name = "group_item")
+	private String groupItem;
+
+	@Column(name = "stock")
+	private String stock;
+
+	@Column(name = "excisble_item")
+	private String excisbleItem;
+
+	@Column(name = "shelf_life_part")
+	private String shelfLifePart;
 
 	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
 	@JsonManagedReference

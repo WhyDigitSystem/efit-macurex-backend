@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Column;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
@@ -226,7 +227,7 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 		responseDTO.setItemDescription(itemMasterVO.getItemDescription());
 		responseDTO.setThickness(itemMasterVO.getThickness());
-		responseDTO.setIsStock(itemMasterVO.getIsStock());
+		responseDTO.setStock(itemMasterVO.getStock());
 		responseDTO.setWidth(itemMasterVO.getWidth());
 		responseDTO.setPrototype(itemMasterVO.getPrototype());
 		responseDTO.setLength(itemMasterVO.getLength());
@@ -372,6 +373,11 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 		responseDTO.setTechSpec(itemMasterVO.getTechSpec());
 		responseDTO.setSupplierPartNo(itemMasterVO.getSupplierPartNo());
+
+		responseDTO.setGroupItem(itemMasterVO.getGroupItem());
+		responseDTO.setStock(itemMasterVO.getStock());
+		responseDTO.setExcisbleItem(itemMasterVO.getExcisbleItem());
+		responseDTO.setShelfLifePart(itemMasterVO.getShelfLifePart());
 
 		List<ItemDrawingDTO> drawingResponseList = new ArrayList<>();
 		if (itemMasterVO.getItemDrawingVO() != null) {
@@ -579,6 +585,11 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 		itemMasterVO.setTechSpec(itemMasterDTO.getTechSpec());
 		itemMasterVO.setSupplierPartNo(itemMasterDTO.getSupplierPartNo());
+
+		itemMasterVO.setGroupItem(itemMasterDTO.getGroupItem());
+		itemMasterVO.setStock(itemMasterDTO.getStock());
+		itemMasterVO.setExcisbleItem(itemMasterDTO.getExcisbleItem());
+		itemMasterVO.setShelfLifePart(itemMasterDTO.getShelfLifePart());
 
 		if (itemMasterDTO.getBranchId() != null && itemMasterDTO.getBranchId() != 0) {
 

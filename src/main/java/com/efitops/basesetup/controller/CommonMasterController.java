@@ -46,6 +46,7 @@ import com.efitops.basesetup.dto.HsnDTO;
 import com.efitops.basesetup.dto.LMEDTO;
 import com.efitops.basesetup.dto.ListOfValuesDTO;
 import com.efitops.basesetup.dto.LocationDTO;
+import com.efitops.basesetup.dto.LocationResponseDTO;
 import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
@@ -1467,7 +1468,7 @@ public class CommonMasterController extends BaseController {
 
 		try {
 
-			LocationVO locationVO = commonMasterService.getLocationById(id);
+			LocationResponseDTO locationVO = commonMasterService.getLocationById(id);
 
 			responseObjectsMap.put("locationVO", locationVO);
 
@@ -1498,7 +1499,7 @@ public class CommonMasterController extends BaseController {
 
 		try {
 
-			List<LocationVO> transportList = commonMasterService.getLocationByOrgId(orgId, branch);
+			List<LocationResponseDTO> transportList = commonMasterService.getLocationByOrgId(orgId, branch);
 
 			responseObjectsMap.put("transportList", transportList);
 

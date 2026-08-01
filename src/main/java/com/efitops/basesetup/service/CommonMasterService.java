@@ -31,6 +31,7 @@ import com.efitops.basesetup.dto.HsnDTO;
 import com.efitops.basesetup.dto.LMEDTO;
 import com.efitops.basesetup.dto.ListOfValuesDTO;
 import com.efitops.basesetup.dto.LocationDTO;
+import com.efitops.basesetup.dto.LocationResponseDTO;
 import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.SalesZoneMasterDTO;
@@ -218,9 +219,9 @@ public interface CommonMasterService {
 
 	Map<String, Object> updateCreateLocationMaster(LocationDTO locationDTO) throws ApplicationException;
 
-	LocationVO getLocationById(Long id) throws ApplicationException;
+	LocationResponseDTO getLocationById(Long id) throws ApplicationException;
 
-	List<LocationVO> getLocationByOrgId(Long orgId, Long branch) throws ApplicationException;
+	List<LocationResponseDTO> getLocationByOrgId(Long orgId, Long branch) throws ApplicationException;
 
 	// LME
 

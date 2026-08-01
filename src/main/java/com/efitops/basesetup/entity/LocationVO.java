@@ -29,44 +29,52 @@ public class LocationVO {
 	@SequenceGenerator(name = "locationgen", sequenceName = "locationseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "id")
 	private Long id;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
-	
+
+	@ManyToOne
+	@JoinColumn(name = "plant_id")
+	private BranchVO plantId;
+
 	@ManyToOne
 	@JoinColumn(name = "location_type")
-	private ListOfValuesVO locationType;
-	
+	private ListOfValuesDetailsVO locationType;
+
 	@ManyToOne
 	@JoinColumn(name = "belongs_to")
-	private ListOfValuesVO belongsTo;
-	
+	private ListOfValuesDetailsVO belongsTo;
+
 	@Column(name = "location_name")
 	private String locationName;
-	
+
 	@Column(name = "location_id")
 	private String locationId;
-	
+
 	@ManyToOne
-	@JoinColumn(name = "listofvalues_id")
-	private ListOfValuesVO listOfValues;
-	
+	@JoinColumn(name = "contact_person_name")
+	private EmployeeMasterVO contactPersonName;
+
+	@ManyToOne
+	@JoinColumn(name = "party_name")
+	private CustomerVO partyName;
+
 	@Column(name = "address")
 	private String address;
-	
+
 	@Column(name = "phone_no")
 	private Long phoneNo;
-	
+
 	@Column(name = "fax_no")
-	private Long faxNo;
-	
+	private String faxNo;
+
 	@Column(name = "email")
 	private String email;
-	
+
 	@Column(name = "consider_mrp")
 	private String considerMrp;
-	
+
 	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "created_by", length = 25)
@@ -76,12 +84,13 @@ public class LocationVO {
 	@Column(name = "cancel_remarks", length = 150)
 	private String cancelRemarks;
 	@Column(name = "active")
-	private boolean active;
+	private boolean active = true;
 	@Column(name = "cancel")
-	private boolean cancel=false;
-	
-    @Column(name = "finyear", length = 5)
-    private String finYear;
+	private boolean cancel = false;
+
+	@Column(name = "financial_year")
+	private String financialYear;
+
 	@Column(name = "screen_code", length = 30)
 	private String screenCode = "LM";
 	@Column(name = "screen_name", length = 30)
@@ -97,9 +106,6 @@ public class LocationVO {
 		return cancel ? "T" : "F";
 	}
 
-	
-	
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-
 
 }

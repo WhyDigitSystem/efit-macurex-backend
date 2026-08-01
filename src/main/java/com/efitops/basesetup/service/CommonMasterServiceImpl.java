@@ -47,6 +47,9 @@ import com.efitops.basesetup.dto.DailyExchangeRateDTO;
 import com.efitops.basesetup.dto.DocumentTypeMappingDTO;
 import com.efitops.basesetup.dto.DocumentTypeMappingDetailsDTO;
 import com.efitops.basesetup.dto.DocumentTypeMasterDTO;
+import com.efitops.basesetup.dto.EmployeeMasterDetailsReponseDTO;
+import com.efitops.basesetup.dto.EmployeeMasterResponseDTO;
+import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
 import com.efitops.basesetup.dto.GSTRateMasterDTO;
@@ -61,6 +64,7 @@ import com.efitops.basesetup.dto.ListOfValuesDTO;
 import com.efitops.basesetup.dto.ListOfValuesDetailsDTO;
 import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
 import com.efitops.basesetup.dto.LocationDTO;
+import com.efitops.basesetup.dto.LocationResponseDTO;
 import com.efitops.basesetup.dto.MappingDetailsDTO;
 import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.PartyResponseDTO;
@@ -2196,12 +2200,83 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 			message = "Location Created Successfully";
 		}
-
-		locationRepo.save(locationVO);
+		LocationVO savedLocation = locationRepo.save(locationVO);
 
 		Map<String, Object> response = new HashMap<>();
-		response.put("locationVO", locationVO);
 		response.put("message", message);
+		response.put("locationVO", buildLocationResponse(savedLocation));
+
+		return response;
+	}
+
+	private LocationResponseDTO buildLocationResponse(LocationVO locationVO) {
+
+		LocationResponseDTO response = new LocationResponseDTO();
+
+		response.setId(locationVO.getId());
+		response.setOrgId(locationVO.getOrgId());
+		response.setLocationId(locationVO.getLocationId());
+		response.setLocationName(locationVO.getLocationName());
+		response.setAddress(locationVO.getAddress());
+		response.setPhoneNo(locationVO.getPhoneNo());
+		response.setFaxNo(locationVO.getFaxNo());
+		response.setEmail(locationVO.getEmail());
+		response.setConsiderMrp(locationVO.getConsiderMrp());
+		response.setCreatedBy(locationVO.getCreatedBy());
+		response.setCancelRemarks(locationVO.getCancelRemarks());
+		response.setFinancialYear(locationVO.getFinancialYear());
+
+		if (locationVO.getBranch() != null) {
+
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(locationVO.getBranch().getId());
+			branchDTO.setBranchName(locationVO.getBranch().getBranchName());
+
+			response.setBranchId(branchDTO);
+		}
+
+		if (locationVO.getPlantId() != null) {
+			BranchResponseDTO plantDTO = new BranchResponseDTO();
+			plantDTO.setId(locationVO.getPlantId().getId());
+			plantDTO.setBranchName(locationVO.getPlantId().getBranchName());
+			response.setPlantId(plantDTO);
+		}
+
+		if (locationVO.getLocationType() != null) {
+
+			ListOfVlauesDetailsResponseDTO dto = new ListOfVlauesDetailsResponseDTO();
+			dto.setId(locationVO.getLocationType().getId());
+			dto.setValueCode(locationVO.getLocationType().getValueCode());
+			dto.setValueDescription(locationVO.getLocationType().getValueDescription());
+			response.setLocationTypeId(dto);
+		}
+
+		if (locationVO.getBelongsTo() != null) {
+
+			ListOfVlauesDetailsResponseDTO dto = new ListOfVlauesDetailsResponseDTO();
+			dto.setId(locationVO.getBelongsTo().getId());
+			dto.setValueCode(locationVO.getBelongsTo().getValueCode());
+			dto.setValueDescription(locationVO.getBelongsTo().getValueDescription());
+			response.setBelongsToId(dto);
+		}
+
+		if (locationVO.getContactPersonName() != null) {
+
+			EmployeeMasterDetailsReponseDTO employeeDTO = new EmployeeMasterDetailsReponseDTO();
+			employeeDTO.setId(locationVO.getContactPersonName().getId());
+			employeeDTO.setEmployeeName(locationVO.getContactPersonName().getEmployeeName());
+
+			response.setContactPersonNameId(employeeDTO);
+		}
+
+		if (locationVO.getPartyName() != null) {
+
+			CustomerResponseDetailsDTO customerDTO = new CustomerResponseDetailsDTO();
+			customerDTO.setId(locationVO.getPartyName().getId());
+			customerDTO.setCustomerName(locationVO.getPartyName().getCustomerName());
+
+			response.setPartyNameId(customerDTO);
+		}
 
 		return response;
 	}
@@ -2220,46 +2295,80 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		locationVO.setLocationName(locationDTO.getLocationName());
 
 		locationVO.setCancelRemarks(locationDTO.getCancelRemarks());
-		if (locationDTO.getBranch() != null && locationDTO.getBranch() != 0) {
+		if (locationDTO.getBranchId() != null && locationDTO.getBranchId() != 0) {
 
-			BranchVO branch = branchRepo.findById(locationDTO.getBranch())
+			BranchVO branch = branchRepo.findById(locationDTO.getBranchId())
 					.orElseThrow(() -> new ApplicationException("branch Not Found"));
 
 			locationVO.setBranch(branch);
 		}
-		if (locationDTO.getLocationType() != null && locationDTO.getLocationType() != 0) {
+		if (locationDTO.getLocationTypeId() != null && locationDTO.getLocationTypeId() != 0) {
 
-			ListOfValuesVO listOfValues = listOfValuesRepo.findById(locationDTO.getLocationType())
+			ListOfValuesDetailsVO listOfValues = listOfValuesDetailsRepo.findById(locationDTO.getLocationTypeId())
 					.orElseThrow(() -> new ApplicationException("location type Not Found"));
 
 			locationVO.setLocationType(listOfValues);
 		}
-		if (locationDTO.getBelongsTo() != null && locationDTO.getBelongsTo() != 0) {
+		if (locationDTO.getBelongsToId() != null && locationDTO.getBelongsToId() != 0) {
 
-			ListOfValuesVO listOfValues = listOfValuesRepo.findById(locationDTO.getBelongsTo())
-					.orElseThrow(() -> new ApplicationException(" BelongsTo Not Found"));
+			ListOfValuesDetailsVO listOfValues = listOfValuesDetailsRepo.findById(locationDTO.getBelongsToId())
+					.orElseThrow(() -> new ApplicationException("BelongsTo Not Found"));
 
 			locationVO.setBelongsTo(listOfValues);
 		}
 
+		if (locationDTO.getPlantId() != null && locationDTO.getPlantId() != 0) {
+
+			BranchVO branch = branchRepo.findById(locationDTO.getPlantId())
+					.orElseThrow(() -> new ApplicationException("branch Not Found"));
+
+			locationVO.setPlantId(branch);
+		}
+
+		if (locationDTO.getContactPersonNameId() != null && locationDTO.getContactPersonNameId() != 0) {
+
+			EmployeeMasterVO listOfValues = employeeRepo.findById(locationDTO.getContactPersonNameId())
+					.orElseThrow(() -> new ApplicationException("ContactPersonName Not Found"));
+
+			locationVO.setContactPersonName(listOfValues);
+		}
+
+		if (locationDTO.getPartyNameId() != null && locationDTO.getPartyNameId() != 0) {
+
+			CustomerVO listOfValues = customerRepo.findById(locationDTO.getPartyNameId())
+					.orElseThrow(() -> new ApplicationException("PartyName Not Found"));
+
+			locationVO.setPartyName(listOfValues);
+		}
+
 	}
 
 	@Override
-	public LocationVO getLocationById(Long id) throws ApplicationException {
+	public LocationResponseDTO getLocationById(Long id) throws ApplicationException {
 
-		return locationRepo.findById(id).orElseThrow(() -> new ApplicationException("Invalid Location Details"));
+		LocationVO locationVO = locationRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Location Details"));
+
+		return buildLocationResponse(locationVO);
 	}
 
 	@Override
-	public List<LocationVO> getLocationByOrgId(Long orgId, Long branchCode) throws ApplicationException {
+	public List<LocationResponseDTO> getLocationByOrgId(Long orgId, Long branchCode) throws ApplicationException {
 
-		List<LocationVO> transportList = locationRepo.findByOrgIdAndBranch(orgId, branchCode);
+		List<LocationVO> locationList = locationRepo.findByOrgIdAndBranch(orgId, branchCode);
 
-		if (transportList.isEmpty()) {
+		if (locationList.isEmpty()) {
 			throw new ApplicationException("No Location Details Found");
 		}
 
-		return transportList;
+		List<LocationResponseDTO> responseList = new ArrayList<>();
+
+		for (LocationVO locationVO : locationList) {
+			responseList.add(buildLocationResponse(locationVO));
+		}
+
+		return responseList;
+
 	}
 
 	// LME

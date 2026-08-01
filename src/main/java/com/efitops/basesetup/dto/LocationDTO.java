@@ -10,20 +10,28 @@ import lombok.NoArgsConstructor;
 public class LocationDTO {
 	private Long id;
 	private Long orgId;
-	private Long branch;
-	private Long locationType;
-	private Long belongsTo;
 	private String locationId;
 	private String locationName;
-
 	private String address;
 	private Long phoneNo;
-	private Long faxNo;
+	private String faxNo;
 	private String email;
 	private String considerMrp;
 	private String createdBy;
 	private String cancelRemarks;
-	
-	
+
+	private Long branchId;
+
+	private Long plantId;
+
+	private Long locationTypeId;
+
+	private Long belongsToId;
+
+	private Long contactPersonNameId;
+
+	private Long partyNameId;
+
+	private String financialYear;
 
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -46,6 +47,9 @@ import com.efitops.basesetup.dto.DailyExchangeRateDTO;
 import com.efitops.basesetup.dto.DocumentTypeMappingDTO;
 import com.efitops.basesetup.dto.DocumentTypeMappingDetailsDTO;
 import com.efitops.basesetup.dto.DocumentTypeMasterDTO;
+import com.efitops.basesetup.dto.EmployeeMasterDetailsReponseDTO;
+import com.efitops.basesetup.dto.EmployeeMasterResponseDTO;
+import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
 import com.efitops.basesetup.dto.GSTRateMasterDTO;
@@ -58,7 +62,9 @@ import com.efitops.basesetup.dto.HsnResponseImageDTO;
 import com.efitops.basesetup.dto.LMEDTO;
 import com.efitops.basesetup.dto.ListOfValuesDTO;
 import com.efitops.basesetup.dto.ListOfValuesDetailsDTO;
+import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
 import com.efitops.basesetup.dto.LocationDTO;
+import com.efitops.basesetup.dto.LocationResponseDTO;
 import com.efitops.basesetup.dto.MappingDetailsDTO;
 import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.PartyResponseDTO;
@@ -72,9 +78,13 @@ import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TSBankDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDetailsDTO;
+import com.efitops.basesetup.dto.TaxDefinitionDetailsResponseDTO;
+import com.efitops.basesetup.dto.TaxDefinitionMasterResponseDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.dto.UomConversionDTO;
+import com.efitops.basesetup.dto.UomConversionResponseDTO;
 import com.efitops.basesetup.entity.BankDetailsVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
@@ -1871,14 +1881,18 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 			message = "GST Rate Master Created Successfully";
 		}
+		// Save Entity
+		GSTRateMasterVO savedVO = gstRateMasterRepo.save(vo);
 
-		gstRateMasterRepo.save(vo);
+		// Convert Entity to Response DTO
+		GSTRateMasterResponseDTO responseDTO = convertToResponse(savedVO);
 
 		Map<String, Object> map = new HashMap<>();
-		map.put("gSTRateMasterVO", vo);
+		map.put("gSTRateMasterVO", responseDTO);
 		map.put("message", message);
 
 		return map;
+
 	}
 
 	private void createUpdateGSTRateMasterVOByDTO(GSTRateMasterDTO dto, GSTRateMasterVO vo)
@@ -1928,76 +1942,67 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	@Override
 	public GSTRateMasterResponseDTO getGSTRateMasterById(Long id) throws ApplicationException {
 
-	    GSTRateMasterVO vo = gstRateMasterRepo.findById(id)
-	            .orElseThrow(() -> new ApplicationException("Invalid GST Rate Master Details"));
+		GSTRateMasterVO vo = gstRateMasterRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid GST Rate Master Details"));
 
-	    return convertToResponse(vo);
+		return convertToResponse(vo);
 	}
-	
+
 	@Override
-	public List<GSTRateMasterResponseDTO> getGSTRateByOrgId(Long orgId, Long branchId)
-	        throws ApplicationException {
+	public List<GSTRateMasterResponseDTO> getGSTRateByOrgId(Long orgId, Long branchId) throws ApplicationException {
 
-	    List<GSTRateMasterVO> voList = gstRateMasterRepo.getGSTRateByOrgId(orgId, branchId);
+		List<GSTRateMasterVO> voList = gstRateMasterRepo.getGSTRateByOrgId(orgId, branchId);
 
-	    if (voList.isEmpty()) {
-	        throw new ApplicationException("No GST Rate Master Details Found");
-	    }
+		if (voList.isEmpty()) {
+			throw new ApplicationException("No GST Rate Master Details Found");
+		}
 
-	    List<GSTRateMasterResponseDTO> responseList = new ArrayList<>();
+		List<GSTRateMasterResponseDTO> responseList = new ArrayList<>();
 
-	    for (GSTRateMasterVO vo : voList) {
-	        responseList.add(convertToResponse(vo));
-	    }
+		for (GSTRateMasterVO vo : voList) {
+			responseList.add(convertToResponse(vo));
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	
-	
+
 	private GSTRateMasterResponseDTO convertToResponse(GSTRateMasterVO vo) {
 
-	    GSTRateMasterResponseDTO dto = new GSTRateMasterResponseDTO();
+		GSTRateMasterResponseDTO dto = new GSTRateMasterResponseDTO();
 
-	    dto.setId(vo.getId());
+		dto.setId(vo.getId());
 
-	    if (vo.getCategory() != null) {
-	        dto.setCategory(new CategoryResponseDTO(
-	                vo.getCategory().getId(),
-	                vo.getCategory().getValueCode(),
-	                vo.getCategory().getValueDescription()));
-	    }
+		if (vo.getCategory() != null) {
+			dto.setCategory(new CategoryResponseDTO(vo.getCategory().getId(), vo.getCategory().getValueCode(),
+					vo.getCategory().getValueDescription()));
+		}
 
-	    if (vo.getHsnSacCode() != null) {
-	        dto.setHsnSacCode(new HsnResponseDTO(
-	                vo.getHsnSacCode().getId(),
-	                vo.getHsnSacCode().getHsn(),
-	                vo.getHsnSacCode().getDescription()));
-	    }
+		if (vo.getHsnSacCode() != null) {
+			dto.setHsnSacCode(new HsnResponseDTO(vo.getHsnSacCode().getId(), vo.getHsnSacCode().getHsn(),
+					vo.getHsnSacCode().getDescription()));
+		}
 
-	    if (vo.getBranch() != null) {
-	        dto.setBranch(new BranchResponseDTO(
-	                vo.getBranch().getId(),
-	                vo.getBranch().getBranchCode(),
-	                vo.getBranch().getBranchName()));
-	    }
+		if (vo.getBranch() != null) {
+			dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+					vo.getBranch().getBranchName()));
+		}
 
-	    dto.setDescription(vo.getDescription());
-	    dto.setWef(vo.getWef());
-	    dto.setTaxable(vo.isTaxable());
-	    dto.setRate(vo.getRate());
-	    dto.setIgst(vo.getIgst());
-	    dto.setSgst(vo.getSgst());
-	    dto.setCgst(vo.getCgst());
-	    dto.setDuplicateCheck(vo.isDuplicateCheck());
-	    dto.setOrgId(vo.getOrgId());
-	    dto.setFinancialYear(vo.getFinancialYear());
-	    dto.setCreatedBy(vo.getCreatedBy());
-	    dto.setUpdatedBy(vo.getUpdatedBy());
-	    dto.setCancelRemarks(vo.getCancelRemarks());
-	    dto.setActive(vo.getActive());
+		dto.setDescription(vo.getDescription());
+		dto.setWef(vo.getWef());
+		dto.setTaxable(vo.isTaxable());
+		dto.setRate(vo.getRate());
+		dto.setIgst(vo.getIgst());
+		dto.setSgst(vo.getSgst());
+		dto.setCgst(vo.getCgst());
+		dto.setDuplicateCheck(vo.isDuplicateCheck());
+		dto.setOrgId(vo.getOrgId());
+		dto.setFinancialYear(vo.getFinancialYear());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
+		dto.setCancelRemarks(vo.getCancelRemarks());
+		dto.setActive(vo.getActive());
 
-	    return dto;
+		return dto;
 	}
 
 	// ServiceAccMaster
@@ -2113,7 +2118,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		if (serviceAccMasterDTO.getHsnId() != null && serviceAccMasterDTO.getHsnId() != 0) {
 
-			HsnVO hsnVO = hsnRepo.findById(serviceAccMasterDTO.getBranchId())
+			HsnVO hsnVO = hsnRepo.findById(serviceAccMasterDTO.getHsnId())
 					.orElseThrow(() -> new ApplicationException("HSN Not Found"));
 
 			serviceAccMasterVO.setHsnCode(hsnVO);
@@ -2195,12 +2200,83 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 			message = "Location Created Successfully";
 		}
-
-		locationRepo.save(locationVO);
+		LocationVO savedLocation = locationRepo.save(locationVO);
 
 		Map<String, Object> response = new HashMap<>();
-		response.put("locationVO", locationVO);
 		response.put("message", message);
+		response.put("locationVO", buildLocationResponse(savedLocation));
+
+		return response;
+	}
+
+	private LocationResponseDTO buildLocationResponse(LocationVO locationVO) {
+
+		LocationResponseDTO response = new LocationResponseDTO();
+
+		response.setId(locationVO.getId());
+		response.setOrgId(locationVO.getOrgId());
+		response.setLocationId(locationVO.getLocationId());
+		response.setLocationName(locationVO.getLocationName());
+		response.setAddress(locationVO.getAddress());
+		response.setPhoneNo(locationVO.getPhoneNo());
+		response.setFaxNo(locationVO.getFaxNo());
+		response.setEmail(locationVO.getEmail());
+		response.setConsiderMrp(locationVO.getConsiderMrp());
+		response.setCreatedBy(locationVO.getCreatedBy());
+		response.setCancelRemarks(locationVO.getCancelRemarks());
+		response.setFinancialYear(locationVO.getFinancialYear());
+
+		if (locationVO.getBranch() != null) {
+
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(locationVO.getBranch().getId());
+			branchDTO.setBranchName(locationVO.getBranch().getBranchName());
+
+			response.setBranchId(branchDTO);
+		}
+
+		if (locationVO.getPlantId() != null) {
+			BranchResponseDTO plantDTO = new BranchResponseDTO();
+			plantDTO.setId(locationVO.getPlantId().getId());
+			plantDTO.setBranchName(locationVO.getPlantId().getBranchName());
+			response.setPlantId(plantDTO);
+		}
+
+		if (locationVO.getLocationType() != null) {
+
+			ListOfVlauesDetailsResponseDTO dto = new ListOfVlauesDetailsResponseDTO();
+			dto.setId(locationVO.getLocationType().getId());
+			dto.setValueCode(locationVO.getLocationType().getValueCode());
+			dto.setValueDescription(locationVO.getLocationType().getValueDescription());
+			response.setLocationTypeId(dto);
+		}
+
+		if (locationVO.getBelongsTo() != null) {
+
+			ListOfVlauesDetailsResponseDTO dto = new ListOfVlauesDetailsResponseDTO();
+			dto.setId(locationVO.getBelongsTo().getId());
+			dto.setValueCode(locationVO.getBelongsTo().getValueCode());
+			dto.setValueDescription(locationVO.getBelongsTo().getValueDescription());
+			response.setBelongsToId(dto);
+		}
+
+		if (locationVO.getContactPersonName() != null) {
+
+			EmployeeMasterDetailsReponseDTO employeeDTO = new EmployeeMasterDetailsReponseDTO();
+			employeeDTO.setId(locationVO.getContactPersonName().getId());
+			employeeDTO.setEmployeeName(locationVO.getContactPersonName().getEmployeeName());
+
+			response.setContactPersonNameId(employeeDTO);
+		}
+
+		if (locationVO.getPartyName() != null) {
+
+			CustomerResponseDetailsDTO customerDTO = new CustomerResponseDetailsDTO();
+			customerDTO.setId(locationVO.getPartyName().getId());
+			customerDTO.setCustomerName(locationVO.getPartyName().getCustomerName());
+
+			response.setPartyNameId(customerDTO);
+		}
 
 		return response;
 	}
@@ -2219,46 +2295,80 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		locationVO.setLocationName(locationDTO.getLocationName());
 
 		locationVO.setCancelRemarks(locationDTO.getCancelRemarks());
-		if (locationDTO.getBranch() != null && locationDTO.getBranch() != 0) {
+		if (locationDTO.getBranchId() != null && locationDTO.getBranchId() != 0) {
 
-			BranchVO branch = branchRepo.findById(locationDTO.getBranch())
+			BranchVO branch = branchRepo.findById(locationDTO.getBranchId())
 					.orElseThrow(() -> new ApplicationException("branch Not Found"));
 
 			locationVO.setBranch(branch);
 		}
-		if (locationDTO.getLocationType() != null && locationDTO.getLocationType() != 0) {
+		if (locationDTO.getLocationTypeId() != null && locationDTO.getLocationTypeId() != 0) {
 
-			ListOfValuesVO listOfValues = listOfValuesRepo.findById(locationDTO.getLocationType())
+			ListOfValuesDetailsVO listOfValues = listOfValuesDetailsRepo.findById(locationDTO.getLocationTypeId())
 					.orElseThrow(() -> new ApplicationException("location type Not Found"));
 
 			locationVO.setLocationType(listOfValues);
 		}
-		if (locationDTO.getBelongsTo() != null && locationDTO.getBelongsTo() != 0) {
+		if (locationDTO.getBelongsToId() != null && locationDTO.getBelongsToId() != 0) {
 
-			ListOfValuesVO listOfValues = listOfValuesRepo.findById(locationDTO.getBelongsTo())
-					.orElseThrow(() -> new ApplicationException(" BelongsTo Not Found"));
+			ListOfValuesDetailsVO listOfValues = listOfValuesDetailsRepo.findById(locationDTO.getBelongsToId())
+					.orElseThrow(() -> new ApplicationException("BelongsTo Not Found"));
 
 			locationVO.setBelongsTo(listOfValues);
 		}
 
+		if (locationDTO.getPlantId() != null && locationDTO.getPlantId() != 0) {
+
+			BranchVO branch = branchRepo.findById(locationDTO.getPlantId())
+					.orElseThrow(() -> new ApplicationException("branch Not Found"));
+
+			locationVO.setPlantId(branch);
+		}
+
+		if (locationDTO.getContactPersonNameId() != null && locationDTO.getContactPersonNameId() != 0) {
+
+			EmployeeMasterVO listOfValues = employeeRepo.findById(locationDTO.getContactPersonNameId())
+					.orElseThrow(() -> new ApplicationException("ContactPersonName Not Found"));
+
+			locationVO.setContactPersonName(listOfValues);
+		}
+
+		if (locationDTO.getPartyNameId() != null && locationDTO.getPartyNameId() != 0) {
+
+			CustomerVO listOfValues = customerRepo.findById(locationDTO.getPartyNameId())
+					.orElseThrow(() -> new ApplicationException("PartyName Not Found"));
+
+			locationVO.setPartyName(listOfValues);
+		}
+
 	}
 
 	@Override
-	public LocationVO getLocationById(Long id) throws ApplicationException {
+	public LocationResponseDTO getLocationById(Long id) throws ApplicationException {
 
-		return locationRepo.findById(id).orElseThrow(() -> new ApplicationException("Invalid Location Details"));
+		LocationVO locationVO = locationRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Location Details"));
+
+		return buildLocationResponse(locationVO);
 	}
 
 	@Override
-	public List<LocationVO> getLocationByOrgId(Long orgId, Long branchCode) throws ApplicationException {
+	public List<LocationResponseDTO> getLocationByOrgId(Long orgId, Long branchCode) throws ApplicationException {
 
-		List<LocationVO> transportList = locationRepo.findByOrgIdAndBranch(orgId, branchCode);
+		List<LocationVO> locationList = locationRepo.findByOrgIdAndBranch(orgId, branchCode);
 
-		if (transportList.isEmpty()) {
+		if (locationList.isEmpty()) {
 			throw new ApplicationException("No Location Details Found");
 		}
 
-		return transportList;
+		List<LocationResponseDTO> responseList = new ArrayList<>();
+
+		for (LocationVO locationVO : locationList) {
+			responseList.add(buildLocationResponse(locationVO));
+		}
+
+		return responseList;
+
 	}
 
 	// LME
@@ -2646,15 +2756,121 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	}
 	// Uom Conversion
 
+//	@Override
+//	public List<UomConversionVO> getUomConversionByOrgId(Long orgId, Long branch) {
+//		return uomConversionRepo.findByOrgIdAndBranch(orgId, branch);
+//	}
+//
+//	@Override
+//	public Optional<UomConversionVO> getUomConversionById(Long id) {
+//		return uomConversionRepo.findById(id);
+//	}\
+
 	@Override
-	public List<UomConversionVO> getUomConversionByOrgId(Long orgId, Long branch) {
-		return uomConversionRepo.findByOrgIdAndBranch(orgId, branch);
+	public UomConversionResponseDTO getUomConversionById(Long id) throws ApplicationException {
+
+		UomConversionVO vo = uomConversionRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Uom Master Details"));
+
+		return convertToResponseUom(vo);
 	}
 
 	@Override
-	public Optional<UomConversionVO> getUomConversionById(Long id) {
-		return uomConversionRepo.findById(id);
+	public List<UomConversionResponseDTO> getUomConversionByOrgId(Long orgId, Long branchId)
+			throws ApplicationException {
+
+		List<UomConversionVO> voList = uomConversionRepo.findByOrgIdAndBranch(orgId, branchId);
+
+		if (voList.isEmpty()) {
+			throw new ApplicationException("No GST Rate Master Details Found");
+		}
+
+		List<UomConversionResponseDTO> responseList = new ArrayList<>();
+
+		for (UomConversionVO vo : voList) {
+			responseList.add(convertToResponseUom(vo));
+		}
+
+		return responseList;
 	}
+
+//	@Override
+//	@Transactional
+//	public Map<String, Object> createUpdateUomConversion(UomConversionDTO uomConversionDTO)
+//			throws ApplicationException {
+//
+//		UomConversionVO uomConversionVO;
+//		String message = null;
+//		UomConversionVO oldUomConversion = null;
+//
+//		if (ObjectUtils.isEmpty(uomConversionDTO.getId())) {
+//
+//			if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(),
+//					uomConversionDTO.getFromUnit(), uomConversionDTO.getToUnit())) {
+//
+//				String errorMessage = String.format("This Conversion Already Exists in This Organization.");
+//
+//				throw new ApplicationException(errorMessage);
+//			}
+//
+//			uomConversionVO = new UomConversionVO();
+//			uomConversionVO.setCreatedBy(uomConversionDTO.getCreatedBy());
+//			uomConversionVO.setUpdatedBy(uomConversionDTO.getCreatedBy());
+//
+//			message = "UOM Conversion Created Successfully";
+//
+//		} else {
+//
+//			oldUomConversion = uomConversionRepo.findById(uomConversionDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("UOM Conversion not found"));
+//
+//			entityManager.detach(oldUomConversion);
+//
+//			uomConversionVO = uomConversionRepo.findById(uomConversionDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("This Id Is Not Found : " + uomConversionDTO.getId()));
+//
+//			uomConversionVO.setUpdatedBy(uomConversionDTO.getCreatedBy());
+//
+//			if (!uomConversionVO.getFromUnit().equals(uomConversionDTO.getFromUnit())
+//					|| !uomConversionVO.getToUnit().equals(uomConversionDTO.getToUnit())) {
+//
+//				if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(),
+//						uomConversionDTO.getFromUnit(), uomConversionDTO.getToUnit())) {
+//
+//					String errorMessage = "This Conversion Already Exists in This Organization.";
+//					throw new ApplicationException(errorMessage);
+//				}
+//
+//				UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
+//						.orElseThrow(() -> new ApplicationException("From Unit not found"));
+//
+//				UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
+//						.orElseThrow(() -> new ApplicationException("To Unit not found"));
+//
+//				uomConversionVO.setFromUnit(fromUnit);
+//				uomConversionVO.setToUnit(toUnit);
+//			}
+//
+//			uomConversionVO.setMultiplicationFactor(uomConversionDTO.getMultiplicationFactor());
+//
+//			message = "UOM Conversion Updated Successfully";
+//		}
+//
+//		getUomConversionVOFromDTO(uomConversionVO, uomConversionDTO);
+//
+//		UomConversionVO saveVOs = uomConversionRepo.save(uomConversionVO);
+//
+//		Map<String, Object> response = new HashMap<>();
+//
+//		// Convert Entity to Response DTO
+//		UomConversionResponseDTO responseDTO = convertToResponseUom(saveVOs);
+//
+//		Map<String, Object> map = new HashMap<>();
+//		map.put("uomConversionVO", responseDTO);
+//		map.put("message", message);
+//
+//		return response;
+//	}
 
 	@Override
 	@Transactional
@@ -2662,17 +2878,19 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			throws ApplicationException {
 
 		UomConversionVO uomConversionVO;
-		String message = null;
-		UomConversionVO oldUomConversion = null;
+		String message;
+
+		UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
+				.orElseThrow(() -> new ApplicationException("From Unit not found"));
+
+		UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
+				.orElseThrow(() -> new ApplicationException("To Unit not found"));
 
 		if (ObjectUtils.isEmpty(uomConversionDTO.getId())) {
 
-			if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(),
-					uomConversionDTO.getFromUnit(), uomConversionDTO.getToUnit())) {
+			if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(), fromUnit, toUnit)) {
 
-				String errorMessage = String.format("This Conversion Already Exists in This Organization.");
-
-				throw new ApplicationException(errorMessage);
+				throw new ApplicationException("This Conversion Already Exists in This Organization.");
 			}
 
 			uomConversionVO = new UomConversionVO();
@@ -2683,48 +2901,38 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		} else {
 
-			oldUomConversion = uomConversionRepo.findById(uomConversionDTO.getId())
+			UomConversionVO oldVO = uomConversionRepo.findById(uomConversionDTO.getId())
 					.orElseThrow(() -> new ApplicationException("UOM Conversion not found"));
 
-			entityManager.detach(oldUomConversion);
+			entityManager.detach(oldVO);
 
 			uomConversionVO = uomConversionRepo.findById(uomConversionDTO.getId())
-					.orElseThrow(() -> new ApplicationException("This Id Is Not Found : " + uomConversionDTO.getId()));
+					.orElseThrow(() -> new ApplicationException("UOM Conversion not found"));
 
-			uomConversionVO.setUpdatedBy(uomConversionDTO.getCreatedBy());
+			if ((!uomConversionVO.getFromUnit().getId().equals(uomConversionDTO.getFromUnit()))
+					|| (!uomConversionVO.getToUnit().getId().equals(uomConversionDTO.getToUnit()))) {
 
-			if (!uomConversionVO.getFromUnit().equals(uomConversionDTO.getFromUnit())
-					|| !uomConversionVO.getToUnit().equals(uomConversionDTO.getToUnit())) {
+				if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(), fromUnit,
+						toUnit)) {
 
-				if (uomConversionRepo.existsByOrgIdAndFromUnitAndToUnit(uomConversionDTO.getOrgId(),
-						uomConversionDTO.getFromUnit(), uomConversionDTO.getToUnit())) {
-
-					String errorMessage = "This Conversion Already Exists in This Organization.";
-					throw new ApplicationException(errorMessage);
+					throw new ApplicationException("This Conversion Already Exists in This Organization.");
 				}
-
-				UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
-				        .orElseThrow(() -> new ApplicationException("From Unit not found"));
-
-				UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
-				        .orElseThrow(() -> new ApplicationException("To Unit not found"));
-
-				uomConversionVO.setFromUnit(fromUnit);
-				uomConversionVO.setToUnit(toUnit);
 			}
 
-			uomConversionVO.setMultiplicationFactor(uomConversionDTO.getMultiplicationFactor());
+			uomConversionVO.setUpdatedBy(uomConversionDTO.getCreatedBy());
 
 			message = "UOM Conversion Updated Successfully";
 		}
 
 		getUomConversionVOFromDTO(uomConversionVO, uomConversionDTO);
 
-		uomConversionRepo.save(uomConversionVO);
+		UomConversionVO savedVO = uomConversionRepo.save(uomConversionVO);
+
+		UomConversionResponseDTO responseDTO = convertToResponseUom(savedVO);
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", message);
-		response.put("uomConversionVO", uomConversionVO);
+		response.put("uomConversionVO", responseDTO);
 
 		return response;
 	}
@@ -2733,10 +2941,10 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			throws ApplicationException {
 
 		UnitMasterVO fromUnit = unitMasterRepo.findById(uomConversionDTO.getFromUnit())
-		        .orElseThrow(() -> new ApplicationException("From Unit not found"));
+				.orElseThrow(() -> new ApplicationException("From Unit not found"));
 
 		UnitMasterVO toUnit = unitMasterRepo.findById(uomConversionDTO.getToUnit())
-		        .orElseThrow(() -> new ApplicationException("To Unit not found"));
+				.orElseThrow(() -> new ApplicationException("To Unit not found"));
 
 		uomConversionVO.setFromUnit(fromUnit);
 		uomConversionVO.setToUnit(toUnit);
@@ -2756,6 +2964,48 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	}
 
+	private UomConversionResponseDTO convertToResponseUom(UomConversionVO vo) {
+
+		UomConversionResponseDTO dto = new UomConversionResponseDTO();
+
+		dto.setId(vo.getId());
+
+		if (vo.getFromUnit() != null) {
+
+			UnitMasterResponseDTO fromUnit = new UnitMasterResponseDTO();
+			fromUnit.setId(vo.getFromUnit().getId());
+			fromUnit.setUnitId(vo.getFromUnit().getUnitId());
+			fromUnit.setUnitDescription(vo.getFromUnit().getDescription());
+
+			dto.setFromUnit(fromUnit);
+		}
+
+		if (vo.getToUnit() != null) {
+
+			UnitMasterResponseDTO toUnit = new UnitMasterResponseDTO();
+			toUnit.setId(vo.getToUnit().getId());
+			toUnit.setUnitId(vo.getToUnit().getUnitId());
+			toUnit.setUnitDescription(vo.getToUnit().getDescription());
+
+			dto.setToUnit(toUnit);
+		}
+
+		if (vo.getBranch() != null) {
+
+			dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+					vo.getBranch().getBranchName()));
+		}
+
+		dto.setMultiplicationFactor(vo.getMultiplicationFactor());
+		dto.setOrgId(vo.getOrgId());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
+		dto.setCancelRemarks(vo.getCancelRemarks());
+//		dto.setDescription(vo.getDescription());
+//		dto.setActive(vo.getActive());
+
+		return dto;
+	}
 	// Grade Master
 
 	@Override
@@ -3215,13 +3465,16 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			message = "Tax Definition Created Successfully";
 		}
 
-		taxDefinitionRepo.save(taxDefinitionVO);
+		TaxDefinitionVO savedVO = taxDefinitionRepo.save(taxDefinitionVO);
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("taxDefinitionVO", taxDefinitionVO);
-		response.put("message", message);
+		// Convert Entity to Response DTO
+		TaxDefinitionMasterResponseDTO responseDTO = convertToResponseTaxDefination(savedVO);
 
-		return response;
+		Map<String, Object> map = new HashMap<>();
+		map.put("taxDefinitionVO", responseDTO);
+		map.put("message", message);
+
+		return map;
 	}
 
 	private void createUpdateTaxDefinitionVO(TaxDefinitionDTO dto, TaxDefinitionVO taxDefinitionVO) {
@@ -3236,7 +3489,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		// Parent Mapping
 		if (dto.getModule() != null) {
 
-			ListOfValuesVO lov = listOfValuesRepo.findById(dto.getModule())
+			ListOfValuesDetailsVO lov = listOfValuesDetailsRepo.findById(dto.getModule())
 					.orElseThrow(() -> new RuntimeException("Module Not Found"));
 
 			taxDefinitionVO.setModule(lov);
@@ -3271,14 +3524,13 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 				if (detailDTO.getTaxType() != null) {
 
-					ListOfValuesVO detailLov = listOfValuesRepo.findById(detailDTO.getTaxType())
+					ListOfValuesDetailsVO detailLov = listOfValuesDetailsRepo.findById(detailDTO.getTaxType())
 							.orElseThrow(() -> new RuntimeException("List Of Value Not Found"));
 
 					detailVO.setTaxType(detailLov);
 				}
 				if (detailDTO.getTaxName() != null) {
-
-					ListOfValuesVO detailLov = listOfValuesRepo.findById(detailDTO.getTaxName())
+					ListOfValuesDetailsVO detailLov = listOfValuesDetailsRepo.findById(detailDTO.getTaxName())
 							.orElseThrow(() -> new RuntimeException("List Of Value Not Found"));
 
 					detailVO.setTaxName(detailLov);
@@ -3304,18 +3556,87 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		taxDefinitionVO.setTaxDefinitionDetailsVO(detailsList);
 	}
 
-	@Override
-	public TaxDefinitionVO getTaxDefinitionById(Long id) throws ApplicationException {
+	private TaxDefinitionMasterResponseDTO convertToResponseTaxDefination(TaxDefinitionVO vo) {
 
-		if (ObjectUtils.isEmpty(id)) {
-			throw new ApplicationException("Invalid Id");
+		TaxDefinitionMasterResponseDTO dto = new TaxDefinitionMasterResponseDTO();
+
+		dto.setId(vo.getId());
+
+		if (vo.getModule() != null) {
+
+			dto.setModule(new ListOfVlauesDetailsResponseDTO(vo.getModule().getId(), vo.getModule().getValueCode(),
+					vo.getModule().getValueDescription()));
 		}
 
-		return taxDefinitionRepo.findById(id).orElseThrow(() -> new ApplicationException("Tax Definition Not Found"));
+		if (vo.getBranch() != null) {
+
+			dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+					vo.getBranch().getBranchName()));
+		}
+
+		dto.setTaxNo(vo.getTaxNo());
+		dto.setTaxDescription(vo.getTaxDescription());
+		dto.setDocDate(vo.getDocDate());
+		dto.setEffectiveDate(vo.getEffectiveDate());
+		dto.setFillCopyOF(vo.getFillCopyOF());
+		dto.setPrintName(vo.getPrintName());
+		dto.setOrgId(vo.getOrgId());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
+
+		dto.setCancelRemarks(vo.getCancelRemarks());
+
+		List<TaxDefinitionDetailsResponseDTO> detailResponses = new ArrayList<>();
+
+		if (vo.getTaxDefinitionDetailsVO() != null) {
+
+			for (TaxDefinitionDetailsVO detail : vo.getTaxDefinitionDetailsVO()) {
+
+				TaxDefinitionDetailsResponseDTO detailDTO = new TaxDefinitionDetailsResponseDTO();
+
+				if (detail.getTaxType() != null) {
+
+					detailDTO.setTaxType(new ListOfVlauesDetailsResponseDTO(detail.getTaxType().getId(),
+							detail.getTaxType().getValueCode(), detail.getTaxType().getValueDescription()));
+				}
+
+				if (detail.getTaxName() != null) {
+
+					detailDTO.setTaxName(new ListOfVlauesDetailsResponseDTO(detail.getTaxName().getId(),
+							detail.getTaxName().getValueCode(), detail.getTaxName().getValueDescription()));
+				}
+
+				detailDTO.setAddLess(detail.getAddLess());
+				detailDTO.setTaxPercent(detail.getTaxPercent());
+				detailDTO.setTaxId(detail.getTaxId());
+				detailDTO.setFormula(detail.getFormula());
+				detailDTO.setPostToFinance(detail.getPostToFinance());
+				detailDTO.setDbCr(detail.getDbCr());
+				detailDTO.setGlAccountName(detail.getGlAccountName());
+				detailDTO.setPrint(detail.getPrint());
+				detailDTO.setTaxPost(detail.getTaxPost());
+
+				detailResponses.add(detailDTO);
+			}
+		}
+
+		dto.setDetails(detailResponses);
+
+		return dto;
 	}
 
 	@Override
-	public List<TaxDefinitionVO> getTaxDefinitionByOrgId(Long orgId, Long branch) throws ApplicationException {
+	public TaxDefinitionMasterResponseDTO getTaxDefinitionById(Long id) throws ApplicationException {
+
+		TaxDefinitionVO vo = taxDefinitionRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Tax Definition Not Found"));
+
+		return convertToResponseTaxDefination(vo);
+	}
+
+	@Override
+	public List<TaxDefinitionMasterResponseDTO> getTaxDefinitionByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
 
 		List<TaxDefinitionVO> list = taxDefinitionRepo.getTaxDefinitionByOrgId(orgId, branch);
 
@@ -3323,7 +3644,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			throw new ApplicationException("No Tax Definition Found");
 		}
 
-		return list;
+		return list.stream().map(this::convertToResponseTaxDefination).collect(Collectors.toList());
 	}
 
 	// Holliday Master
@@ -3518,89 +3839,84 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		mappingOfPartyToAccVO.setMappingDetailsVO(detailList);
 	}
 
-	
 	private MappingOfPartyToAccResponseDTO convertToResponse(MappingOfPartyToAccVO vo) {
 
-	    MappingOfPartyToAccResponseDTO dto = new MappingOfPartyToAccResponseDTO();
+		MappingOfPartyToAccResponseDTO dto = new MappingOfPartyToAccResponseDTO();
 
-	    dto.setId(vo.getId());
-	    dto.setDocId(vo.getDocId());
-	    dto.setDocDate(vo.getDocDate());
-	    dto.setAsOnDate(vo.getAsOnDate());
-	    dto.setOrgId(vo.getOrgId());
-	    dto.setCreatedBy(vo.getCreatedBy());
-	    dto.setUpdatedBy(vo.getUpdatedBy());
-	    dto.setCancelRemarks(vo.getCancelRemarks());
-	    dto.setActive(vo.getActive());
+		dto.setId(vo.getId());
+		dto.setDocId(vo.getDocId());
+		dto.setDocDate(vo.getDocDate());
+		dto.setAsOnDate(vo.getAsOnDate());
+		dto.setOrgId(vo.getOrgId());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
+		dto.setCancelRemarks(vo.getCancelRemarks());
+		dto.setActive(vo.getActive());
 
-	    if (vo.getBranch() != null) {
-	        dto.setBranch(new MappingBranchResponseDTO(
-	                vo.getBranch().getId(),
-	                vo.getBranch().getBranchCode(),
-	                vo.getBranch().getBranchName()));
-	    }
+		if (vo.getBranch() != null) {
+			dto.setBranch(new MappingBranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+					vo.getBranch().getBranchName()));
+		}
 
-	    if (vo.getCategory() != null) {
-	        dto.setCategory(new MappingCategoryResponseDTO(
-	                vo.getCategory().getId(),
-	                vo.getCategory().getListCode(),
-	                vo.getCategory().getListDescription()));
-	    }
+		if (vo.getCategory() != null) {
+			dto.setCategory(new MappingCategoryResponseDTO(vo.getCategory().getId(), vo.getCategory().getListCode(),
+					vo.getCategory().getListDescription()));
+		}
 
-	    List<MappingDetailsResponseDTO> details = new ArrayList<>();
+		List<MappingDetailsResponseDTO> details = new ArrayList<>();
 
-	    if (vo.getMappingDetailsVO() != null) {
+		if (vo.getMappingDetailsVO() != null) {
 
-	        for (MappingDetailsVO detailVO : vo.getMappingDetailsVO()) {
+			for (MappingDetailsVO detailVO : vo.getMappingDetailsVO()) {
 
-	            MappingDetailsResponseDTO detailDTO = new MappingDetailsResponseDTO();
+				MappingDetailsResponseDTO detailDTO = new MappingDetailsResponseDTO();
 
-	            detailDTO.setId(detailVO.getId());
-	            detailDTO.setAccountName(detailVO.getAccountName());
+				detailDTO.setId(detailVO.getId());
+				detailDTO.setAccountName(detailVO.getAccountName());
 
-	            if (detailVO.getPartyId() != null) {
+				if (detailVO.getPartyId() != null) {
 
-	                PartyResponseDTO partyDTO = new PartyResponseDTO();
+					PartyResponseDTO partyDTO = new PartyResponseDTO();
 
-	                partyDTO.setId(detailVO.getPartyId().getId());
-	                partyDTO.setPartyName(detailVO.getPartyId().getCustomerName());
+					partyDTO.setId(detailVO.getPartyId().getId());
+					partyDTO.setPartyName(detailVO.getPartyId().getCustomerName());
 
-	                detailDTO.setParty(partyDTO);
-	            }
+					detailDTO.setParty(partyDTO);
+				}
 
-	            details.add(detailDTO);
-	        }
-	    }
+				details.add(detailDTO);
+			}
+		}
 
-	    dto.setDetails(details);
+		dto.setDetails(details);
 
-	    return dto;
+		return dto;
 	}
+
 	@Override
 	public MappingOfPartyToAccResponseDTO getMappingOfPartyToAccById(Long id) {
 
-	    MappingOfPartyToAccVO mappingVO = mappingPartyToAccRepo.getMappingOfPartyToAccById(id);
+		MappingOfPartyToAccVO mappingVO = mappingPartyToAccRepo.getMappingOfPartyToAccById(id);
 
-	    if (mappingVO == null) {
-	        throw new RuntimeException("Mapping Of Party To Account Not Found");
-	    }
+		if (mappingVO == null) {
+			throw new RuntimeException("Mapping Of Party To Account Not Found");
+		}
 
-	    return convertToResponse(mappingVO);
+		return convertToResponse(mappingVO);
 	}
-	
+
 	@Override
 	public List<MappingOfPartyToAccResponseDTO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch) {
 
-	    List<MappingOfPartyToAccVO> mappingList =
-	            mappingPartyToAccRepo.getMappingOfPartyToAccByOrgId(orgId, branch);
+		List<MappingOfPartyToAccVO> mappingList = mappingPartyToAccRepo.getMappingOfPartyToAccByOrgId(orgId, branch);
 
-	    List<MappingOfPartyToAccResponseDTO> responseList = new ArrayList<>();
+		List<MappingOfPartyToAccResponseDTO> responseList = new ArrayList<>();
 
-	    for (MappingOfPartyToAccVO mappingVO : mappingList) {
-	        responseList.add(convertToResponse(mappingVO));
-	    }
+		for (MappingOfPartyToAccVO mappingVO : mappingList) {
+			responseList.add(convertToResponse(mappingVO));
+		}
 
-	    return responseList;
+		return responseList;
 	}
 
 	// dropdown api for category
@@ -3938,7 +4254,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 					.findByDocumentTypeMappingMasterVO(masterVO);
 
 			documentTypeMappingDetailsRepo.deleteAll(oldDetails);
-			
+
 			masterVO.setUpdatedBy(dto.getCreatedBy());
 
 			message = "Document Type Mapping Updated Successfully";
@@ -3994,64 +4310,58 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		masterVO.setDetails(detailList);
 	}
-	
-	
+
 	private DocumentTypeMappingResponseDTO convertToResponse(DocumentTypeMappingVO vo) {
 
-	    DocumentTypeMappingResponseDTO dto = new DocumentTypeMappingResponseDTO();
+		DocumentTypeMappingResponseDTO dto = new DocumentTypeMappingResponseDTO();
 
-	    dto.setId(vo.getId());
-	    dto.setOrgId(vo.getOrgId());
-	    dto.setCreatedBy(vo.getCreatedBy());
-	    dto.setUpdatedBy(vo.getUpdatedBy());
-	    dto.setCancelRemarks(vo.getCancelRemarks());
-	    dto.setActive(vo.getActive());
+		dto.setId(vo.getId());
+		dto.setOrgId(vo.getOrgId());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
+		dto.setCancelRemarks(vo.getCancelRemarks());
+		dto.setActive(vo.getActive());
 		dto.setDescription(vo.getDescription());
 
-	 // Branch
-	    if (vo.getBranch() != null) {
+		// Branch
+		if (vo.getBranch() != null) {
 
-	        dto.setBranch(new DocumentTypeMappingBranchResponseDTO(
-	                vo.getBranch().getId(),
-	                vo.getBranch().getBranchCode(),
-	                vo.getBranch().getBranchName()));
-	    }
-	    
-	    // Financial Year
-	    if (vo.getFinancialYear() != null) {
+			dto.setBranch(new DocumentTypeMappingBranchResponseDTO(vo.getBranch().getId(),
+					vo.getBranch().getBranchCode(), vo.getBranch().getBranchName()));
+		}
 
-	        dto.setFinancialYear(new FinancialYearResponseDTO(
-	                vo.getFinancialYear().getId(),
-	                vo.getFinancialYear().getFinYear(),
-	                vo.getFinancialYear().getStartDate(),
-	                vo.getFinancialYear().getEndDate()));
-	    }
+		// Financial Year
+		if (vo.getFinancialYear() != null) {
 
-	    // Child Details
-	    List<DocumentTypeMappingDetailsResponseDTO> detailList = new ArrayList<>();
+			dto.setFinancialYear(
+					new FinancialYearResponseDTO(vo.getFinancialYear().getId(), vo.getFinancialYear().getFinYear(),
+							vo.getFinancialYear().getStartDate(), vo.getFinancialYear().getEndDate()));
+		}
 
-	    if (vo.getDetails() != null) {
+		// Child Details
+		List<DocumentTypeMappingDetailsResponseDTO> detailList = new ArrayList<>();
 
-	        for (DocumentTypeMappingDetailsVO detailVO : vo.getDetails()) {
+		if (vo.getDetails() != null) {
 
-	            DocumentTypeMappingDetailsResponseDTO detailDTO =
-	                    new DocumentTypeMappingDetailsResponseDTO();
+			for (DocumentTypeMappingDetailsVO detailVO : vo.getDetails()) {
 
-	            detailDTO.setId(detailVO.getId());
-	            detailDTO.setScreenName(detailVO.getScreenName());
-	            detailDTO.setScreenCode(detailVO.getScreenCode());
-	            detailDTO.setDocCode(detailVO.getDocCode());
-	            detailDTO.setPrefix(detailVO.getPrefix());
-	            detailDTO.setLastNo(detailVO.getLastNo());
-	            detailDTO.setActive(detailVO.getActive());
+				DocumentTypeMappingDetailsResponseDTO detailDTO = new DocumentTypeMappingDetailsResponseDTO();
 
-	            detailList.add(detailDTO);
-	        }
-	    }
+				detailDTO.setId(detailVO.getId());
+				detailDTO.setScreenName(detailVO.getScreenName());
+				detailDTO.setScreenCode(detailVO.getScreenCode());
+				detailDTO.setDocCode(detailVO.getDocCode());
+				detailDTO.setPrefix(detailVO.getPrefix());
+				detailDTO.setLastNo(detailVO.getLastNo());
+				detailDTO.setActive(detailVO.getActive());
 
-	    dto.setDocumentTypeMappingDetails(detailList);
+				detailList.add(detailDTO);
+			}
+		}
 
-	    return dto;
+		dto.setDocumentTypeMappingDetails(detailList);
+
+		return dto;
 	}
 
 	@Override

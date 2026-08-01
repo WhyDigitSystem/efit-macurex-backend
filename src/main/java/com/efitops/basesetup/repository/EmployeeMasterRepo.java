@@ -11,7 +11,7 @@ import com.efitops.basesetup.entity.EmployeeMasterVO;
 @Repository
 public interface EmployeeMasterRepo extends JpaRepository<EmployeeMasterVO, Long> {
 
-	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,4,0)) AS docid from documenttypemappingdetails where org_id=?1 and screen_code=?2")
+	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,4,0)) AS docid from documenttypemapping_details where org_id=?1 and screen_code=?2")
 	String getEmployeeByDocId(Long orgId, String screenCode);
 
 	@Query(nativeQuery = true, value = "select * from employeemaster where employeemaster_id=?1 and active=1 and cancel=0")

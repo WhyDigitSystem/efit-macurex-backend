@@ -31,6 +31,7 @@ import com.efitops.basesetup.dto.HsnDTO;
 import com.efitops.basesetup.dto.LMEDTO;
 import com.efitops.basesetup.dto.ListOfValuesDTO;
 import com.efitops.basesetup.dto.LocationDTO;
+import com.efitops.basesetup.dto.LocationResponseDTO;
 import com.efitops.basesetup.dto.MappingOfPartyToAccDTO;
 import com.efitops.basesetup.dto.RegionDTO;
 import com.efitops.basesetup.dto.SalesZoneMasterDTO;
@@ -40,9 +41,12 @@ import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
 import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TSBankDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDTO;
+import com.efitops.basesetup.dto.TaxDefinitionDetailsResponseDTO;
+import com.efitops.basesetup.dto.TaxDefinitionMasterResponseDTO;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.efitops.basesetup.dto.UnitMasterDTO;
 import com.efitops.basesetup.dto.UomConversionDTO;
+import com.efitops.basesetup.dto.UomConversionResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CompanyVO;
@@ -144,7 +148,6 @@ public interface CommonMasterService {
 
 //	List<Map<String, Object>> getCompanyByOrgId(Long orgId);
 
-
 	// FINANCIAL YEAR
 
 //	Map<String, Object> createUpdateFinYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
@@ -171,60 +174,56 @@ public interface CommonMasterService {
 
 	List<Map<String, Object>> getAllCurrencyForExRate(Long orgId);
 
-	CompanyVO uploadCompanyLogoInBloob(MultipartFile file, Long id) throws IOException  ;
+	CompanyVO uploadCompanyLogoInBloob(MultipartFile file, Long id) throws IOException;
 
-	//branch
-	
+	// branch
+
 	Map<String, Object> createUpdateBranch(BranchDTO branchDTO) throws ApplicationException;
 
 	BranchVO getBranchById(Long id) throws ApplicationException;
-	
+
 	List<BranchVO> getBranchByOrgId(Long orgId) throws ApplicationException;
 
-	//transport
-	
+	// transport
+
 	Map<String, Object> updateCreateTransportMaster(TransportMasterDTO transportMasterDTO) throws ApplicationException;
 
 	TransportMasterVO getTransportNameById(Long id) throws ApplicationException;
 
-
 	List<TransportMasterVO> getTransportNameByOrgId(Long orgId, Long branchCode) throws ApplicationException;
 
-	//listofvalues
+	// listofvalues
 
 	Map<String, Object> updateCreateListOfValues(@Valid ListOfValuesDTO dto) throws ApplicationException;
-	
+
 	ListOfValuesVO getListOfValuesById(Long id);
 
 	List<ListOfValuesVO> getListOfValuesByOrgId(Long orgId, Long branchCode);
-	
+
 	List<Map<String, Object>> getBudgetGroup(Long orgId, String name) throws ApplicationException;
 
+	// gstratemaster
 
-	//gstratemaster
-	
 	Map<String, Object> updateCreateGSTRateMaster(@Valid GSTRateMasterDTO gSTRateMasterDTO) throws ApplicationException;
 
 	GSTRateMasterResponseDTO getGSTRateMasterById(Long id) throws ApplicationException;
 
 	List<GSTRateMasterResponseDTO> getGSTRateByOrgId(Long orgId, Long branchId) throws ApplicationException;
 
-	//serviceacc
-	
+	// serviceacc
+
 	Map<String, Object> updateCreateServiceAccMaster(@Valid ServiceAccMasterDTO serviceAccMasterDTO)
 			throws ApplicationException;
 
-	//locationmaster
+	// locationmaster
 
 	Map<String, Object> updateCreateLocationMaster(LocationDTO locationDTO) throws ApplicationException;
 
-	LocationVO getLocationById(Long id) throws ApplicationException;
+	LocationResponseDTO getLocationById(Long id) throws ApplicationException;
 
-	
+	List<LocationResponseDTO> getLocationByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-	List<LocationVO> getLocationByOrgId(Long orgId, Long branch) throws ApplicationException;
-	
-	//LME
+	// LME
 
 	Map<String, Object> updateCreateLMEMaster(LMEDTO lMEDTO) throws ApplicationException;
 
@@ -232,162 +231,129 @@ public interface CommonMasterService {
 
 	List<LMEVO> getLMEByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-	//FIN YEAR
+	// FIN YEAR
 	Map<String, Object> createUpdateFinancialYear(FinancialYearDTO financialYearDTO) throws ApplicationException;
-
 
 	List<FinancialYearVO> getFinancialYearByOrgId(Long orgId) throws ApplicationException;
 
 	FinancialYearVO getFinancialYearById(Long id) throws ApplicationException;
 
+	// HSN
 
-
-  //HSN
-	
 	List<HsnVO> getHsnByOrgId(Long orgId, Long branch);
 
 	Optional<HsnVO> getHSNById(Long hsnId);
 
 	Map<String, Object> createUpdateHSN(HsnDTO hsnDTO) throws ApplicationException;
-	
+
 	// Unit Master
-	
+
 	List<UnitMasterVO> getUnitMasterByOrgId(Long orgId, Long branch);
 
 	Optional<UnitMasterVO> getUnitMasterById(Long id);
 
-	Map<String, Object> createUpdateUnitMaster(UnitMasterDTO unitMasterDTO)
-	        throws ApplicationException;
+	Map<String, Object> createUpdateUnitMaster(UnitMasterDTO unitMasterDTO) throws ApplicationException;
 
-	//uom
-	
-	Map<String, Object> createUpdateUomConversion(UomConversionDTO uomConversionDTO)
-	       throws ApplicationException;
+	// uom
 
+	Map<String, Object> createUpdateUomConversion(UomConversionDTO uomConversionDTO) throws ApplicationException;
 
-	List<UomConversionVO> getUomConversionByOrgId(Long orgId, Long branch);
+//	List<UomConversionResponseDTO> getUomConversionByOrgId(Long orgId, Long branch);
 
-	Optional<UomConversionVO> getUomConversionById(Long id);
-	
-	//grademaster
+	// grademaster
 
-	Map<String, Object> createUpdateGradeMaster(GradeMasterDTO gradeMasterDTO)
-			throws ApplicationException;
+	Map<String, Object> createUpdateGradeMaster(GradeMasterDTO gradeMasterDTO) throws ApplicationException;
 
-
-
-	List<GradeMasterVO> getGradeMasterByOrgId(Long orgId,Long branch);
+	List<GradeMasterVO> getGradeMasterByOrgId(Long orgId, Long branch);
 
 	Optional<GradeMasterVO> getGradeMasterById(Long id);
-	
-	//GSTStateMaster
-	
+
+	// GSTStateMaster
+
 	List<GSTStateMasterVO> getGSTStateMasterByOrgId(Long orgId, Long branch);
 
 	Optional<GSTStateMasterVO> getGSTStateMasterById(Long id);
 
-	Map<String, Object> createUpdateGSTStateMaster(
-	        GSTStateMasterDTO gstStateMasterDTO)
-	        throws ApplicationException;
-	
-	
-	//DocumentTypeMaster
-	
-	
+	Map<String, Object> createUpdateGSTStateMaster(GSTStateMasterDTO gstStateMasterDTO) throws ApplicationException;
+
+	// DocumentTypeMaster
+
 	List<DocumentTypeMasterVO> getDocumentTypeMasterByOrgId(Long orgId, Long branch);
 
 	Optional<DocumentTypeMasterVO> getDocumentTypeMasterById(Long id);
 
-	Map<String, Object> createUpdateDocumentTypeMaster(
-	        DocumentTypeMasterDTO documentTypeMasterDTO)
-	        throws ApplicationException;
+	Map<String, Object> createUpdateDocumentTypeMaster(DocumentTypeMasterDTO documentTypeMasterDTO)
+			throws ApplicationException;
 
-	
+	// TS bank
+	Map<String, Object> createUpdateBankMaster(TSBankDTO tSBankDTO) throws ApplicationException;
 
-	//TS bank
-		Map<String, Object> createUpdateBankMaster(TSBankDTO tSBankDTO) throws ApplicationException;
+	TSBankVO getBankMasterById(Long id) throws ApplicationException;
 
-		TSBankVO getBankMasterById(Long id) throws ApplicationException;
+	List<TSBankVO> getBankMasterByOrgId(Long orgId) throws ApplicationException;
 
-		List<TSBankVO> getBankMasterByOrgId(Long orgId) throws ApplicationException;
-		
-		//Tax Definition
-		
+	// Tax Definition
 
-		TaxDefinitionVO getTaxDefinitionById(Long id) throws ApplicationException;
+	TaxDefinitionMasterResponseDTO getTaxDefinitionById(Long id) throws ApplicationException;
 
-		List<TaxDefinitionVO> 
-		getTaxDefinitionByOrgId(Long orgId,Long branch) throws ApplicationException;
+	List<TaxDefinitionMasterResponseDTO> getTaxDefinitionByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-		Map<String, Object> updateCreateTaxDefinition(TaxDefinitionDTO taxDefinitionDTO) throws ApplicationException;
+	Map<String, Object> updateCreateTaxDefinition(TaxDefinitionDTO taxDefinitionDTO) throws ApplicationException;
 
-		//Holiday Master
-		
-		Map<String, Object> updateCreateHolidayMaster(HolidayMasterDTO holidayMasterDTO) throws ApplicationException;
+	// Holiday Master
 
-		HolidayMasterVO getHolidayMasterById(Long id);
+	Map<String, Object> updateCreateHolidayMaster(HolidayMasterDTO holidayMasterDTO) throws ApplicationException;
 
-		List<HolidayMasterVO> getHolidayMasterByOrgId(Long orgId, Long branchId);
+	HolidayMasterVO getHolidayMasterById(Long id);
 
-		//Mapping of party to account
-		
-		Map<String, Object> updateCreateMappingOfPartyToAcc(MappingOfPartyToAccDTO mappingOfPartyToAccDTO) throws ApplicationException;
+	List<HolidayMasterVO> getHolidayMasterByOrgId(Long orgId, Long branchId);
 
-		MappingOfPartyToAccResponseDTO getMappingOfPartyToAccById(Long id);
+	// Mapping of party to account
 
-		List<MappingOfPartyToAccResponseDTO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch);
-		
-		Map<String, Object> getCustomerCategory(Long orgId)
-		        throws ApplicationException;
-		
-		Map<String, Object> getParty(Long category,
-	            Long orgId,
-	            Long branch)
-	throws ApplicationException;
+	Map<String, Object> updateCreateMappingOfPartyToAcc(MappingOfPartyToAccDTO mappingOfPartyToAccDTO)
+			throws ApplicationException;
 
-		List<ServiceAccMasterResponseDTO> getServiceAccMasterByOrgId(Long orgId, Long branchId) throws ApplicationException;
+	MappingOfPartyToAccResponseDTO getMappingOfPartyToAccById(Long id);
 
-		ServiceAccMasterResponseDTO getServiceAccMasterById(Long id) throws ApplicationException;
+	List<MappingOfPartyToAccResponseDTO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch);
 
-		
-		//dailyexrate
-		Map<String, Object> updateCreateDailyExRate(@Valid DailyExchangeRateDTO dailyExchangeRateDTO)
-				throws ApplicationException;
+	Map<String, Object> getCustomerCategory(Long orgId) throws ApplicationException;
 
-		DailyExchangeRateVO getDailyExRateById(Long id) throws ApplicationException;
+	Map<String, Object> getParty(Long category, Long orgId, Long branch) throws ApplicationException;
 
-		List<DailyExchangeRateVO> getDailyExRateByOrgId(Long orgId, Long branch) throws ApplicationException;
+	List<ServiceAccMasterResponseDTO> getServiceAccMasterByOrgId(Long orgId, Long branchId) throws ApplicationException;
 
-		Map<String, Object> getCurrency(Long orgId) throws ApplicationException;
+	ServiceAccMasterResponseDTO getServiceAccMasterById(Long id) throws ApplicationException;
 
-		
-		//documenttypemapping
+	// dailyexrate
+	Map<String, Object> updateCreateDailyExRate(@Valid DailyExchangeRateDTO dailyExchangeRateDTO)
+			throws ApplicationException;
 
+	DailyExchangeRateVO getDailyExRateById(Long id) throws ApplicationException;
 
-		Map<String, Object> updateCreateDocumentTypeMapping(DocumentTypeMappingDTO documentTypeMappingDTO)
-				throws ApplicationException;
+	List<DailyExchangeRateVO> getDailyExRateByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-		DocumentTypeMappingVO getDocumentTypeMappingById(Long id) throws ApplicationException;
+	Map<String, Object> getCurrency(Long orgId) throws ApplicationException;
 
-		List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch) throws ApplicationException;
+	// documenttypemapping
 
-		//saleszonemaster
-		
-		Map<String, Object> createUpdateSalesZoneMaster(SalesZoneMasterDTO salesZoneMasterDTO)
-		        throws ApplicationException;
+	Map<String, Object> updateCreateDocumentTypeMapping(DocumentTypeMappingDTO documentTypeMappingDTO)
+			throws ApplicationException;
 
+	DocumentTypeMappingVO getDocumentTypeMappingById(Long id) throws ApplicationException;
 
-		Optional<SalesZoneMasterVO> getSalesZoneMasterById(Long id);
+	List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-		List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId, Long branch);
-		
+	// saleszonemaster
 
-		
-		
+	Map<String, Object> createUpdateSalesZoneMaster(SalesZoneMasterDTO salesZoneMasterDTO) throws ApplicationException;
 
-		
-	
-	
-	
+	Optional<SalesZoneMasterVO> getSalesZoneMasterById(Long id);
+
+	List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId, Long branch);
+
+	UomConversionResponseDTO getUomConversionById(Long id) throws ApplicationException;
+
+	List<UomConversionResponseDTO> getUomConversionByOrgId(Long orgId, Long branchId) throws ApplicationException;
 
 }

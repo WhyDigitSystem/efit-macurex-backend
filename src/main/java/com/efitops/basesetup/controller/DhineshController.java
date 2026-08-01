@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.QuotationDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.QuotationItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
@@ -230,4 +231,55 @@ public class DhineshController extends BaseController{
 
         return ResponseEntity.ok().body(responseDTO);
     }
+	
+	@GetMapping("/getQuotationItemDropdown")
+	public ResponseEntity<ResponseDTO> getQuotationItemDropdown(
+	        @RequestParam String quotationNo,
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getQuotationItemDropdown()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+
+	    List<QuotationItemDropdownResponseDTO> itemList = new ArrayList<>();
+
+	    try {
+
+	        itemList = dhineshService.getQuotationItemDropdown(
+	                quotationNo,
+	                orgId,
+	                branch);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+	    }
+
+	    if (errorMsg == null || errorMsg.trim().isEmpty()) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Quotation Item Details fetched successfully");
+
+	        responseObjectsMap.put("items", itemList);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Quotation Item Details fetch failed",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.QuotationDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.QuotationItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.dto.SalesContractDTO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -19,5 +20,7 @@ public interface DhineshService {
 			String oldQuotationNo, Long recId) throws ApplicationException;
 
 	List<CustomerDropdownResponseDTO> getCustomerDropdown(String ctype, Long orgId, Long branch) throws ApplicationException;
+
+	List<QuotationItemDropdownResponseDTO> getQuotationItemDropdown(String quotationNo, Long orgId, Long branch) throws ApplicationException;
 
 }

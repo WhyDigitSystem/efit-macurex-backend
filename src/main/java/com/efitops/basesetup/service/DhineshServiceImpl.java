@@ -18,6 +18,7 @@ import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTRateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.QuotationDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.QuotationItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemResponseDTO;
@@ -509,6 +510,40 @@ public class DhineshServiceImpl implements DhineshService{
 	    return responseList;
 	}
 	
+	
+	@Override
+	public List<QuotationItemDropdownResponseDTO> getQuotationItemDropdown(
+	        String quotationNo,
+	        Long orgId,
+	        Long branch) throws ApplicationException {
+
+	    List<Object[]> list = salesContractRepo.getQuotationItemDropdown(
+	            quotationNo,
+	            orgId,
+	            branch);
+
+	    return convertToQuotationItemDropdownDTO(list);
+	}
+	
+	private List<QuotationItemDropdownResponseDTO> convertToQuotationItemDropdownDTO(List<Object[]> list) {
+
+	    List<QuotationItemDropdownResponseDTO> responseList = new ArrayList<>();
+
+	    for (Object[] obj : list) {
+
+	        QuotationItemDropdownResponseDTO dto = new QuotationItemDropdownResponseDTO();
+
+	        dto.setItemId(obj[0] != null ? ((Number) obj[0]).longValue() : null);
+	        dto.setItemCode(obj[1] != null ? obj[1].toString() : null);
+	        dto.setItemDescription(obj[2] != null ? obj[2].toString() : null);
+	        dto.setHsnCode(obj[3] != null ? obj[3].toString() : null);
+	        dto.setCustomerPartNo(obj[4] != null ? obj[4].toString() : null);
+
+	        responseList.add(dto);
+	    }
+
+	    return responseList;
+	}
 	
 
 }

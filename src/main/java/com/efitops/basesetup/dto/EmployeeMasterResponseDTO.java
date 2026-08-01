@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import com.efitops.basesetup.ResponseDTO.CityResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
-import com.efitops.basesetup.entity.CityVO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -135,7 +134,7 @@ public class EmployeeMasterResponseDTO {
 
 	private String updatedBy;
 
-	private boolean active;
+	private String active;
 
 	private boolean cancel;
 

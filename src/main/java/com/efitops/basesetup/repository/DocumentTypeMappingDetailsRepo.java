@@ -14,7 +14,7 @@ public interface DocumentTypeMappingDetailsRepo extends JpaRepository<DocumentTy
 
 	List<DocumentTypeMappingDetailsVO> findByDocumentTypeMappingMasterVOId(Long id);
 
-	@Query(nativeQuery = true, value = "select * from documenttypemappingdetails where org_id=?1 and screen_code=?2")
+	@Query(nativeQuery = true, value = "select * from documenttypemapping_details where org_id=?1 and screen_code=?2")
 	DocumentTypeMappingDetailsVO findByOrgIdScreenCode(Long orgId, String screenCode);
 
 	List<DocumentTypeMappingDetailsVO> findByDocumentTypeMappingMasterVO(DocumentTypeMappingVO masterVO);

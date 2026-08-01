@@ -895,6 +895,8 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setEmployeeName(employeeMasterVO.getEmployeeName());
 		responseDTO.setEmployeeId(employeeMasterVO.getEmployeeId());
 
+		responseDTO.setActive(employeeMasterVO.getActive());
+
 		return responseDTO;
 	}
 
@@ -946,21 +948,13 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			employeeMasterVO.setTempCountry(city);
 		}
 
-		if (employeeMasterDTO.getTempCountryId() != null && employeeMasterDTO.getTempCountryId() != 0) {
-
-			CountryVO city = countryRepo.findById(employeeMasterDTO.getTempCountryId())
-					.orElseThrow(() -> new ApplicationException("Temporary Country Not Found"));
-
-			employeeMasterVO.setTempCountry(city);
-		}
-
 		employeeMasterVO.setTempPincode(employeeMasterDTO.getTempPincode());
 		employeeMasterVO.setPermanentAddressLine(employeeMasterDTO.getPermanentAddressLine());
 
 		if (employeeMasterDTO.getPermanentCity() != null && employeeMasterDTO.getPermanentCity() != 0) {
 
 			CityVO city = cityRepo.findById(employeeMasterDTO.getPermanentCity())
-					.orElseThrow(() -> new ApplicationException(" State Not Found"));
+					.orElseThrow(() -> new ApplicationException("PermanentCity Not Found"));
 
 			employeeMasterVO.setPermanentCity(city);
 		}
@@ -968,7 +962,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		if (employeeMasterDTO.getPermanentStateId() != null && employeeMasterDTO.getPermanentStateId() != 0) {
 
 			StateVO state = stateRepo.findById(employeeMasterDTO.getPermanentStateId())
-					.orElseThrow(() -> new ApplicationException(" State Not Found"));
+					.orElseThrow(() -> new ApplicationException("PermanentState Not Found"));
 
 			employeeMasterVO.setPermanentState(state);
 		}
@@ -1047,6 +1041,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setScreenCode(employeeMasterDTO.getScreenCode());
 		employeeMasterVO.setOrgId(employeeMasterDTO.getOrgId());
 		employeeMasterVO.setFinancialYear(employeeMasterDTO.getFinancialYear());
+		employeeMasterVO.setActive(employeeMasterDTO.isActive());
 
 		employeeMasterVO
 				.setEmployeeName(String
@@ -1091,6 +1086,12 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		}
 
 		return responseList;
+	}
+
+	@Override
+	public String getEmployeeByDocId(Long orgId, String screenCode) {
+		String result = employeeMasterRepo.getEmployeeByDocId(orgId, screenCode);
+		return result;
 	}
 
 }

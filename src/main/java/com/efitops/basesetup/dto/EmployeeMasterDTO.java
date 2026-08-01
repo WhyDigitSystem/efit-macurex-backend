@@ -149,4 +149,6 @@ public class EmployeeMasterDTO {
 	private String financialYear;
 
 	private Long branchId;
+	
+	private boolean active;
 }

@@ -44,6 +44,23 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long>{
 	List<PartyProjection> getParty(Long category,
 	                                       Long orgId,
 	                                       Long branch);
-	
+
+	// dropdown for Customer in customer complaint entry
+	@Query(value = "SELECT customer_id, customer_name " +
+            "FROM customer_header " +
+            "WHERE cancel = 0 " +
+            "ORDER BY customer_id",
+    nativeQuery = true)
+List<Object[]> getCustomer();
+
+@Query(value = "SELECT customer_id, customer_name " +
+        "FROM customer_header " +
+        "WHERE customer_id = ?1 " +
+        "AND cancel = 0",
+nativeQuery = true)
+List<Object[]> getCustomerDetails(String customerId);
+
 }
-	
+
+
+

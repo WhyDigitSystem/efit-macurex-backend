@@ -41,19 +41,19 @@ public class CustomerVO {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_category")
-	private ListOfValuesVO customerCategory;
+	private ListOfValuesDetailsVO customerCategory;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_category1")
-	private ListOfValuesVO customerCategory1;
+	private ListOfValuesDetailsVO customerCategory1;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_category2")
-	private ListOfValuesVO customerCategory2;
+	private ListOfValuesDetailsVO customerCategory2;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "supplier_type")
-	private ListOfValuesVO supplierType;
+	private ListOfValuesDetailsVO supplierType;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branch")
@@ -74,9 +74,17 @@ public class CustomerVO {
 	@Column(name = "account_name")
 	private String accountName;
 
+	@Column(name = "customer_code")
+	private String customerCode;
+	
 	@Column(name = "customer_name")
 	private String customerName;
 
+	
+	@ManyToOne
+	@JoinColumn(name = "buyer_name")
+	private EmployeeMasterVO buyerName;
+	
 	@Column(name = "customer_legal_name")
 	private String customerLegalName;
 
@@ -85,9 +93,14 @@ public class CustomerVO {
 
 	@Column(name = "is_group_company")
 	private boolean groupCompany;
+//
+//	@Column(name = "zone")
+//	private String zone;
+	
 
-	@Column(name = "zone")
-	private String zone;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "zone")
+	private SalesZoneMasterVO zone;
 
 	@Column(name = "vendor_code")
 	private String vendorCode;
@@ -108,8 +121,12 @@ public class CustomerVO {
 	private int partyCreditPeriod;
 
 	//normalization
-	@Column(name = "belongs_to")
-	private String belongsTo;
+//	@Column(name = "belongs_to")
+//	private String belongsTo;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "belongs_to")
+	private ListOfValuesDetailsVO belongsTo;
+	
 
 	@Column(name = "gst_type")
 	private String gstType;

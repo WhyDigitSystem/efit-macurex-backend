@@ -12,7 +12,7 @@ import com.efitops.basesetup.entity.CustomerVO;
 @Repository
 public interface CustomerRepo extends JpaRepository<CustomerVO, Long>{
 
-	boolean existsByCustomerNameAndOrgId(String customerName, Long orgId);
+	boolean existsByCustomerNameAndOrgId(String string, Long orgId);
 
 	boolean existsByGstNoAndOrgId(String gstNo, Long orgId);
 
@@ -44,6 +44,56 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long>{
 	List<PartyProjection> getParty(Long category,
 	                                       Long orgId,
 	                                       Long branch);
-	
+
+	@Query(value = """
+			SELECT
+			    c.customer_id,
+			    c.customer_code,
+			    c.customer_name,
+			    c.address AS add1,
+			    g.state_name AS GSTState,
+			    c.gst_no,
+			    c.is_gst_applicable,
+			    c.gst_type
+			FROM customer_header c
+			INNER JOIN quotation q
+			    ON q.party_id = c.customer_id
+			INNER JOIN gststatemaster g
+			    ON g.gststatemaster_id = c.gst_state
+			WHERE c.cancel = 0
+			  AND c.active = 1
+			  AND ?1 = 'Flow'
+			  AND q.org_id = ?2
+			  AND q.branch = ?3
+			  AND NOT EXISTS (
+			        SELECT 1
+			        FROM sales_contract sc
+			        WHERE sc.customer = c.customer_id
+			          AND sc.quotation_no = q.doc_id
+			    )
+
+			UNION
+
+			SELECT
+			    c.customer_id,
+			    c.customer_code,
+			    c.customer_name,
+			    c.address AS add1,
+			    g.state_name AS GSTState,
+			    c.gst_no,
+			    c.is_gst_applicable,
+			    c.gst_type
+			FROM customer_header c
+			INNER JOIN gststatemaster g
+			    ON g.gststatemaster_id = c.gst_state
+			WHERE c.cancel = 0
+			  AND c.active = 1
+			  AND ?1 = 'Direct'
+			  AND c.org_id = ?2
+			  AND c.branch = ?3
+			  AND UPPER(c.customer_type) = 'CUSTOMER'
+			ORDER BY customer_code
+			""", nativeQuery = true)
+			List<Object[]> getCustomerDropdown(String ctype, Long orgId, Long branch);	
 }
 	

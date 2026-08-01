@@ -32,9 +32,12 @@ public class CustomerDTO {
 	    private String customerLegalName;
 	    private String tradeName;
 
+	    private Long buyerName;
+
+	    
 	    private boolean groupCompany;
 
-	    private String zone;
+	    private Long zone;
 	    private String vendorCode;
 	    private String groupName;
 
@@ -95,7 +98,7 @@ public class CustomerDTO {
 	    private String bankAccountNo;
 	    private String paymentMode;
 	    private String ifscCode;
-		private String belongsTo;
+		private Long belongsTo;
 
 		
 	    private Long orgId;

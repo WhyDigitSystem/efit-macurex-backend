@@ -1,0 +1,62 @@
+package com.efitops.basesetup.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.efitops.basesetup.entity.SalesContractVO;
+
+@Repository
+public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long>{
+
+	@Query(value = """
+			SELECT
+			    q.quotation_id,
+			    q.doc_id AS quotation_no,
+			    q.doc_date
+			FROM quotation q
+			INNER JOIN customer_header c
+			    ON c.customer_id = q.party_id
+			WHERE q.cancel = 0
+			  AND c.cancel = 0
+			  AND c.active = 1
+			  AND c.customer_code = ?1
+			  AND ?2 = 'Flow'
+			  AND q.org_id = ?3
+			  AND q.branch = ?4
+			  AND NOT EXISTS (
+			        SELECT 1
+			        FROM sales_contract sc
+			        WHERE sc.quotation_no = q.doc_id
+			          AND sc.customer = c.customer_id
+			          AND sc.org_id = ?3
+			          AND sc.branch = ?4
+			          AND sc.cancel = 0
+			    )
+
+			UNION
+
+			SELECT
+			    q.quotation_id,
+			    q.doc_id AS quotation_no,
+			    q.doc_date
+			FROM quotation q
+			WHERE q.cancel = 0
+			  AND q.doc_id = ?5
+			  AND ?6 > 0
+			  AND q.org_id = ?3
+			  AND q.branch = ?4
+
+			ORDER BY quotation_no
+			""", nativeQuery = true)
+			List<Object[]> getQuotationDropdown(
+			        String customerCode,
+			        String ctype,
+			        Long orgId,
+			        Long branch,
+			        String oldQuotationNo,
+			        Long recId);
+
+}

@@ -10,25 +10,35 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingBranchResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CityResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerContactDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerItemDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerShippingDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingBranchResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PartyCategoryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesZoneResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
+import com.efitops.basesetup.common.CommonConstant;
+import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.CustomerContactDetailsDTO;
 import com.efitops.basesetup.dto.CustomerDTO;
 import com.efitops.basesetup.dto.CustomerItemDetailsDTO;
 import com.efitops.basesetup.dto.CustomerShippingDetailsDTO;
+import com.efitops.basesetup.dto.EmployeeResponseDTO;
+import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CountryVO;
@@ -37,9 +47,11 @@ import com.efitops.basesetup.entity.CustomerItemDetailsVO;
 import com.efitops.basesetup.entity.CustomerShippingDetailsVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
-import com.efitops.basesetup.entity.ListOfValuesVO;
+import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
+import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.StateVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -50,9 +62,13 @@ import com.efitops.basesetup.repository.CustomerItemDetailsRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.CustomerShippingDetailsRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
+import com.efitops.basesetup.repository.EmployeeRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesRepo;
+import com.efitops.basesetup.repository.SalesZoneMasterRepo;
 import com.efitops.basesetup.repository.StateRepo;
 
 @Service
@@ -65,6 +81,9 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 //	
 	@Autowired
 	ListOfValuesRepo listOfValuesRepo;
+	
+	@Autowired
+	ListOfValuesDetailsRepo listOfValuesDetailsRepo;
 	
 	@Autowired
 	BranchRepo branchRepo;
@@ -96,6 +115,14 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	@Autowired
 	ItemMasterRepo itemMasterRepo;
 	
+	@Autowired
+	SalesZoneMasterRepo salesZoneMasterRepo;
+	
+	@Autowired
+	EmployeeMasterRepo employeeMasterRepo;
+	
+	@Autowired
+	EmployeeRepo employeeRepo;
 //	@Autowired
 //	TransportRepo transportMasterRepo;
 //	
@@ -182,41 +209,63 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	        throws ApplicationException {
 
 	    // Load Masters
-		ListOfValuesVO customerCategory = listOfValuesRepo
-		        .findById(dto.getCustomerCategory())
-		        .orElseThrow(() -> new ApplicationException("Customer Category Not Found"));
+		ListOfValuesDetailsVO customerCategory = null;
+		if (dto.getCustomerCategory() != null) {
+		    customerCategory = listOfValuesDetailsRepo.findById(dto.getCustomerCategory())
+		            .orElseThrow(() -> new ApplicationException("Customer Category Not Found"));
+		}
 
-		ListOfValuesVO customerCategory1 = listOfValuesRepo
-		        .findById(dto.getCustomerCategory1())
-		        .orElseThrow(() -> new ApplicationException("Customer Category1 Not Found"));
+		ListOfValuesDetailsVO customerCategory1 = null;
+		if (dto.getCustomerCategory1() != null) {
+		    customerCategory1 = listOfValuesDetailsRepo.findById(dto.getCustomerCategory1())
+		            .orElseThrow(() -> new ApplicationException("Customer Category1 Not Found"));
+		}
 
-		ListOfValuesVO customerCategory2 = listOfValuesRepo
-		        .findById(dto.getCustomerCategory2())
-		        .orElseThrow(() -> new ApplicationException("Customer Category2 Not Found"));
+		ListOfValuesDetailsVO customerCategory2 = null;
+		if (dto.getCustomerCategory2() != null) {
+		    customerCategory2 = listOfValuesDetailsRepo.findById(dto.getCustomerCategory2())
+		            .orElseThrow(() -> new ApplicationException("Customer Category2 Not Found"));
+		}
 
-		ListOfValuesVO supplierType = listOfValuesRepo
-		        .findById(dto.getSupplierType())
-		        .orElseThrow(() -> new ApplicationException("Supplier Type Not Found"));
+		ListOfValuesDetailsVO supplierType = null;
+		if (dto.getSupplierType() != null) {
+		    supplierType = listOfValuesDetailsRepo.findById(dto.getSupplierType())
+		            .orElseThrow(() -> new ApplicationException("Supplier Type Not Found"));
+		}
 
-		BranchVO branch = branchRepo
-		        .findById(dto.getBranch())
-		        .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+		BranchVO branch = null;
+		if (dto.getBranch() != null) {
+		    branch = branchRepo.findById(dto.getBranch())
+		            .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+		}
 
-		GSTStateMasterVO gstState = gstStateRepo
-		        .findById(dto.getGstState())
-		        .orElseThrow(() -> new ApplicationException("GST State Not Found"));
+		GSTStateMasterVO gstState = null;
+		if (dto.getGstState() != null) {
+		    gstState = gstStateRepo.findById(dto.getGstState())
+		            .orElseThrow(() -> new ApplicationException("GST State Not Found"));
+		}
 
-		CityVO city = cityRepo
-		        .findById(dto.getCity())
-		        .orElseThrow(() -> new ApplicationException("City Not Found"));
+		CityVO city = null;
+		if (dto.getCity() != null) {
+		    city = cityRepo.getCityById(dto.getCity());
 
-		StateVO state = stateRepo
-		        .findById(dto.getState())
-		        .orElseThrow(() -> new ApplicationException("State Not Found"));
+		    if (city == null) {
+		        throw new ApplicationException("City Not Found");
+		    }
+		}
 
-		CountryVO country = countryRepo
-		        .findById(dto.getCountry())
-		        .orElseThrow(() -> new ApplicationException("Country Not Found"));
+		StateVO state = null;
+		if (dto.getState() != null) {
+		    state = stateRepo.findById(dto.getState())
+		            .orElseThrow(() -> new ApplicationException("State Not Found"));
+		}
+
+		CountryVO country = null;
+		if (dto.getCountry() != null) {
+		    country = countryRepo.findById(dto.getCountry())
+		            .orElseThrow(() -> new ApplicationException("Country Not Found"));
+		}
+		
 		customerVO.setCustomerCategory(customerCategory);
 		customerVO.setCustomerCategory1(customerCategory1);
 		customerVO.setCustomerCategory2(customerCategory2);
@@ -235,10 +284,34 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	    customerVO.setCustomerType(dto.getCustomerType());
 	    customerVO.setAccountName(dto.getAccountName());
 	    customerVO.setCustomerName(dto.getCustomerName());
+	    
+	    EmployeeMasterVO buyerName = null;
+
+	    if (dto.getBuyerName() != null) {
+
+	        buyerName = employeeMasterRepo.findById(dto.getBuyerName())
+	                .orElseThrow(() -> new ApplicationException("Buyer Name Not Found"));
+
+	    }
+
+	    customerVO.setBuyerName(buyerName);
+	    
+	    
 	    customerVO.setCustomerLegalName(dto.getCustomerLegalName());
 	    customerVO.setTradeName(dto.getTradeName());
 	    customerVO.setGroupCompany(dto.isGroupCompany());
-	    customerVO.setZone(dto.getZone());
+	    
+	    SalesZoneMasterVO zone = null;
+
+	    if (dto.getZone() != null) {
+
+	        zone = salesZoneMasterRepo.findById(dto.getZone())
+	                .orElseThrow(() -> new ApplicationException("Sales Zone Not Found"));
+
+	    }
+
+	    customerVO.setZone(zone);	  
+	    
 	    customerVO.setVendorCode(dto.getVendorCode());
 	    customerVO.setGroupName(dto.getGroupName());
 	    customerVO.setRegistered(dto.isRegistered());
@@ -272,7 +345,17 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	    customerVO.setApproved(dto.isApproved());
 	    customerVO.setScopeOfSupply(dto.getScopeOfSupply());
 	    customerVO.setBasisOfApproval(dto.getBasisOfApproval());
-	    customerVO.setBelongsTo(dto.getBelongsTo());
+	    ListOfValuesDetailsVO belongsTo = null;
+
+	    if (dto.getBelongsTo() != null) {
+
+	        belongsTo = listOfValuesDetailsRepo.findById(dto.getBelongsTo())
+	                .orElseThrow(() -> new ApplicationException("Belongs To Not Found"));
+
+	    }
+
+	    customerVO.setBelongsTo(belongsTo);
+	    
 	    customerVO.setBankName(dto.getBankName());
 	    customerVO.setBankAccountNo(dto.getBankAccountNo());
 	    customerVO.setPaymentMode(dto.getPaymentMode());
@@ -339,19 +422,19 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 
 	    if (shippingDTO.getShippingCity() != null) {
 	        CityVO city1 = cityRepo.findById(shippingDTO.getShippingCity())
-	                .orElseThrow(() -> new ApplicationException("City not found"));
+	                .orElseThrow(() -> new ApplicationException("Shipping City not found"));
 	        vo.setShippingCity(city1);
 	    }
 
 	    if (shippingDTO.getShippingState() != null) {
 	        StateVO state1 = stateRepo.findById(shippingDTO.getShippingState())
-	                .orElseThrow(() -> new ApplicationException("State not found"));
+	                .orElseThrow(() -> new ApplicationException("Shipping State not found"));
 	        vo.setShippingState(state1);
 	    }
 
 	    if (shippingDTO.getShippingCountry() != null) {
 	        CountryVO country1 = countryRepo.findById(shippingDTO.getShippingCountry())
-	                .orElseThrow(() -> new ApplicationException("Country not found"));
+	                .orElseThrow(() -> new ApplicationException("Shipping Country not found"));
 	        vo.setShippingCountry(country1);
 	    }
 
@@ -381,9 +464,12 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 
 	        CustomerItemDetailsVO vo = new CustomerItemDetailsVO();
 
-	        ItemMasterVO itemMaster = itemMasterRepo.findById(itemDTO.getItemId())
-	                .orElseThrow(() -> new ApplicationException("Item not found"));
+	        ItemMasterVO itemMaster = itemMasterRepo.getItemById(itemDTO.getItemId());
 
+	        if (itemMaster == null) {
+	            throw new ApplicationException("Item not found");
+	        }	        
+	                
 	        vo.setItem(itemMaster);
 	        vo.setCustomerVO(customerVO);
 
@@ -405,29 +491,29 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	    if (customerVO.getCustomerCategory() != null) {
 	        dto.setCustomerCategory(new PartyCategoryResponseDTO(
 	                customerVO.getCustomerCategory().getId(),
-	                customerVO.getCustomerCategory().getListCode(),
-	                customerVO.getCustomerCategory().getListDescription()));
+	                customerVO.getCustomerCategory().getValueCode(),
+	                customerVO.getCustomerCategory().getValueDescription()));
 	    }
 
 	    if (customerVO.getCustomerCategory1() != null) {
 	        dto.setCustomerCategory1(new PartyCategoryResponseDTO(
 	                customerVO.getCustomerCategory1().getId(),
-	                customerVO.getCustomerCategory1().getListCode(),
-	                customerVO.getCustomerCategory1().getListDescription()));
+	                customerVO.getCustomerCategory1().getValueCode(),
+	                customerVO.getCustomerCategory1().getValueDescription()));
 	    }
 
 	    if (customerVO.getCustomerCategory2() != null) {
 	        dto.setCustomerCategory2(new PartyCategoryResponseDTO(
 	                customerVO.getCustomerCategory2().getId(),
-	                customerVO.getCustomerCategory2().getListCode(),
-	                customerVO.getCustomerCategory2().getListDescription()));
+	                customerVO.getCustomerCategory2().getValueCode(),
+	                customerVO.getCustomerCategory2().getValueDescription()));
 	    }
 
 	    if (customerVO.getSupplierType() != null) {
 	        dto.setSupplierType(new PartyCategoryResponseDTO(
 	                customerVO.getSupplierType().getId(),
-	                customerVO.getSupplierType().getListCode(),
-	                customerVO.getSupplierType().getListDescription()));
+	                customerVO.getSupplierType().getValueCode(),
+	                customerVO.getSupplierType().getValueDescription()));
 	    }
 
 	    // Branch
@@ -480,11 +566,29 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	    dto.setCustomerName(customerVO.getCustomerName());
 	    dto.setCustomerLegalName(customerVO.getCustomerLegalName());
 	    dto.setTradeName(customerVO.getTradeName());
-	    dto.setBelongsTo(customerVO.getBelongsTo());
-
+	    if (customerVO.getBelongsTo() != null) {
+	        dto.setBelongsTo(new PartyCategoryResponseDTO(
+	                customerVO.getBelongsTo().getId(),
+	                customerVO.getBelongsTo().getValueCode(),
+	                customerVO.getBelongsTo().getValueDescription()
+	        ));
+	    }
 	    dto.setGroupCompany(customerVO.isGroupCompany());
 
-	    dto.setZone(customerVO.getZone());
+	    if (customerVO.getZone() != null) {
+	        dto.setZone(new SalesZoneResponseDTO(
+	                customerVO.getZone().getId(),
+	                customerVO.getZone().getZonedescription()
+	        ));
+	    }	
+	    
+	    if (customerVO.getBuyerName() != null) {
+	        dto.setBuyerName(new EmployeeResponseDTO(
+	                customerVO.getBuyerName().getId(),
+	                customerVO.getBuyerName().getEmployeeName()
+	        ));
+	    }
+	    
 	    dto.setVendorCode(customerVO.getVendorCode());
 	    dto.setGroupName(customerVO.getGroupName());
 
@@ -691,5 +795,36 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 
 	    return response;
 	}
+	
+	//dropdown wmployee
+	
+	@Override
+	public List<EmployeeDropdownResponseDTO> getPurchaseEmployees(Long orgId, Long branch)
+	        throws ApplicationException {
+
+	    List<Object[]> list = employeeRepo.getPurchaseEmployees(orgId, branch);
+
+	    return convertToEmployeeDropdownDTO(list);
+	}
+	
+	private List<EmployeeDropdownResponseDTO> convertToEmployeeDropdownDTO(List<Object[]> list) {
+
+	    List<EmployeeDropdownResponseDTO> responseList = new ArrayList<>();
+
+	    for (Object[] obj : list) {
+
+	        EmployeeDropdownResponseDTO dto = new EmployeeDropdownResponseDTO();
+
+	        dto.setEmployeeId(obj[0] != null ? ((Number) obj[0]).longValue() : null);
+	        dto.setEmployeeCode(obj[1] != null ? obj[1].toString() : null);
+	        dto.setEmployeeName(obj[2] != null ? obj[2].toString() : null);
+
+	        responseList.add(dto);
+	    }
+
+	    return responseList;
+	}
+	
+	
 	
 }

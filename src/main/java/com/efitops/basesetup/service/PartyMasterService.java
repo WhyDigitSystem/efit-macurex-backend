@@ -5,7 +5,9 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.dto.CustomerDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
@@ -22,5 +24,8 @@ public interface PartyMasterService {
 	CustomerResponseDTO getCustomerById(Long id) throws ApplicationException;
 
 	List<CustomerResponseDTO> getCustomerByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	List<EmployeeDropdownResponseDTO> getPurchaseEmployees(Long orgId, Long branch) throws ApplicationException;
+
 
 }

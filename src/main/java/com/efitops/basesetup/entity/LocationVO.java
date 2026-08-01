@@ -2,6 +2,7 @@ package com.efitops.basesetup.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -38,11 +39,11 @@ public class LocationVO {
 	@JoinColumn(name = "plant_id")
 	private BranchVO plantId;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "location_type")
 	private ListOfValuesDetailsVO locationType;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "belongs_to")
 	private ListOfValuesDetailsVO belongsTo;
 

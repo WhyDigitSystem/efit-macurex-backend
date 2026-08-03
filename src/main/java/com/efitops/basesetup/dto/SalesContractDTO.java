@@ -58,4 +58,6 @@ public class SalesContractDTO {
     
     private List<SalesContractDetailsDTO> details;
     
+//    private List<SalesContractAttachDTO> attachments;
+    
 }

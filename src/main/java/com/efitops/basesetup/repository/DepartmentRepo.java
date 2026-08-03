@@ -23,6 +23,13 @@ public interface DepartmentRepo extends JpaRepository<DepartmentVO, Long> {
 
 	@Query(nativeQuery = true, value = "select concat(prefixfield,lpad(lastno,5,0)) AS docid from documenttypemappingdetails where orgid=?1 and finyear=?2 and branch=?3 and screencode=?4")
 	String getDepartmentDocId(Long orgId,String finYear,Long long1, String screenCode);
+	
+	@Query(value = "SELECT departmentid, departmen_tname " +
+            "FROM department " +
+            "WHERE cancel = false " +
+            "ORDER BY departmen_tname",
+    nativeQuery = true)
+List<Object[]> getDepartment();
 
 }
 

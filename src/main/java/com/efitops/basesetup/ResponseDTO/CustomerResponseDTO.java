@@ -25,6 +25,12 @@ public class CustomerResponseDTO {
 
 	    private DocumentTypeMappingBranchResponseDTO branch;
 
+	    
+	    
+		private String panNo;
+		private String esiNo;
+		private String tinNo;
+		
 	    private String docId;
 	    private LocalDate docDate;
 		private PartyCategoryResponseDTO belongsTo;

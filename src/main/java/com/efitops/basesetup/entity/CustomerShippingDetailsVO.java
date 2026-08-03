@@ -35,6 +35,18 @@ public class CustomerShippingDetailsVO {
     @Column(name = "shipping_address_type")
     private String shippingAddressType;
 
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "phone_no")
+    private String phoneNo;
+
+    @Column(name = "email")
+    private String email;
+    
+    @Column(name = "fax")
+    private String fax;
+
     @Column(name = "shipping_address")
     private String shippingAddress;
 

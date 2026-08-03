@@ -29,7 +29,7 @@ public interface DevelopService {
 
 	ResponseEntity<byte[]> viewEnquiryAttachment(Long attachmentId) throws ApplicationException;
 
-	Map<String, Object> updateCreateEnquiry(EnquiryDTO enquiryDTO) throws ApplicationException;
+	Map<String, Object> updateCreateEnquiry(EnquiryDTO enquiryDTO, MultipartFile[] files) throws ApplicationException;
 	
 	//enquiry
 	

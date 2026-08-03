@@ -36,6 +36,6 @@ public class EnquiryDTO {
 
 	 private List<EnquiryTermsandCondDTO> enquiryTermsandCond;
 
-	 private List<EnquiryAttachmentDTO> enquiryAttachmentDTO;
+//	 private List<EnquiryAttachmentDTO> enquiryAttachmentDTO;
 	 
 }

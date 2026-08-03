@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.efitops.basesetup.entity.SalesContractAmdDetailsVO;
 import com.efitops.basesetup.entity.SalesContractAmendmentVO;
 
 public interface SalesContractAmdRepo extends JpaRepository<SalesContractAmendmentVO, Long> {
@@ -19,5 +20,7 @@ public interface SalesContractAmdRepo extends JpaRepository<SalesContractAmendme
 	        ORDER BY sale_contract_amendment_basic_id
 	        """, nativeQuery = true)
 	List<SalesContractAmendmentVO> getSalesContractAmendmentByOrgId(@Param("orgId") Long orgId,@Param("branch") Long branch);
+
+//	List<SalesContractAmdDetailsVO> findBySalesContractAmendmentVO(SalesContractAmendmentVO salesContractAmendmentVO);
 
 }

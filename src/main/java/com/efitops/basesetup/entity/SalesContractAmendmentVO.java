@@ -16,8 +16,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -99,9 +97,10 @@ public class SalesContractAmendmentVO {
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
-//	@OneToMany(mappedBy = "salesContractAmendmentVO",
-//	        cascade = CascadeType.ALL
-//	    )
-//	@JsonManagedReference
-//	private List<SalesContractDetailsVO> salesContractDetails;
+	@OneToMany(mappedBy = "salesContractAmendmentVO",
+	        cascade = CascadeType.ALL
+	    )
+	@JsonManagedReference
+	private List<SalesContractAmdDetailsVO> salesContractAmdDetailsVO;
+
 }

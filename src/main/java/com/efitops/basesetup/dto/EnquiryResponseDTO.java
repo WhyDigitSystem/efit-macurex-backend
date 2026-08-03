@@ -29,7 +29,7 @@ public class EnquiryResponseDTO {
 	 private String createdBy;
 	 private String cancelRemarks;
 	 private String description;
-	 private boolean active;
+	 private String active;
 	 
 	 private List<EnquiryDetailsReponseDTO> enquiryDetails;
 

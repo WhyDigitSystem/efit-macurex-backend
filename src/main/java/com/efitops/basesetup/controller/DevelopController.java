@@ -7,24 +7,23 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.EnquiryDTO;
-import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.entity.EnquiryVO;
-import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.service.DevelopService;
 
 @CrossOrigin
@@ -37,42 +36,54 @@ public class DevelopController extends BaseController  {
 
     
     
-	@PostMapping("/updateCreateEnquiry")
-	public ResponseEntity<ResponseDTO> updateCreateEnquiry(
-			@RequestBody EnquiryDTO enquiryDTO) {
+    @PostMapping(
+            value = "/updateCreateEnquiry",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDTO> updateCreateEnquiry(
+            @RequestPart("enquiry") EnquiryDTO enquiryDTO,
+            @RequestPart(value = "files", required = false) MultipartFile[] files) {
 
-		String methodName = "updateCreateEnquiry";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+        String methodName = "updateCreateEnquiry";
+        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		String errorMsg = null;
-		ResponseDTO responseDTO = null;
+        Map<String, Object> responseObjectsMap = new HashMap<>();
+        ResponseDTO responseDTO;
 
-		try {
+        try {
 
-			Map<String, Object> responseMap = developService
-					.updateCreateEnquiry(enquiryDTO);
+            Map<String, Object> responseMap =
+                    developService.updateCreateEnquiry(enquiryDTO, files);
 
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
-			responseObjectsMap.put("enquiryVO",
-					responseMap.get("enquiryVO"));
+            responseObjectsMap.put(
+                    CommonConstant.STRING_MESSAGE,
+                    responseMap.get("message"));
 
-			responseDTO = createServiceResponse(responseObjectsMap);
+            responseObjectsMap.put(
+                    "enquiryVO",
+                    responseMap.get("enquiryVO"));
 
-		} catch (Exception e) {
+            responseDTO = createServiceResponse(responseObjectsMap);
 
-			errorMsg = e.getMessage();
+        } catch (Exception e) {
 
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+            LOGGER.error(
+                    UserConstants.ERROR_MSG_METHOD_NAME,
+                    methodName,
+                    e.getMessage(),
+                    e);
 
-			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		}
+            responseDTO = createServiceResponseError(
+                    responseObjectsMap,
+                    e.getMessage(),
+                    e.getMessage());
+        }
 
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		return ResponseEntity.ok().body(responseDTO);
-	}
-	
+        return ResponseEntity.ok(responseDTO);
+    }
+    
+    
 	@GetMapping("/getEnquiryById")
 	public ResponseEntity<ResponseDTO> getEnquiryById(@RequestParam Long id) {
 

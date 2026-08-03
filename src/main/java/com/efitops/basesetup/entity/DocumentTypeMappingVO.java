@@ -44,7 +44,7 @@ public class DocumentTypeMappingVO {
 	 @JoinColumn(name = "financial_year")
 	 private FinancialYearVO financialYear;
 	 
-	 @Column(name = "org_id")
+	    @Column(name = "org_id")
 		private Long orgId;
 		@Column(name = "active")
 		private boolean active;

@@ -5,9 +5,11 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.dto.CustomerComplaintDTO;
 import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
 import com.efitops.basesetup.dto.DailyExchangeRateDTO;
+import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
 import com.efitops.basesetup.entity.DailyExchangeRateVO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -44,6 +46,16 @@ public interface TransportMasterService {
 
 	Map<String, Object> getCustomer() throws ApplicationException;
 	
+	//SalesContractAmendment
+	Map<String, Object> updateCreateSalesContractAmendment(
+			SalesContractAmendmentDTO salesContractAmendmentDTO)
+			throws ApplicationException;
+
+	SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
+			throws ApplicationException;
+
+	List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
+			throws ApplicationException;
 	
 	
 	 

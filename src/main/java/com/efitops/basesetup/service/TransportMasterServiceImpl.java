@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CustomerComplaintDTO;
 import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
@@ -29,6 +31,8 @@ import com.efitops.basesetup.dto.CustomerDTO;
 import com.efitops.basesetup.dto.DailyExchangeRateDTO;
 import com.efitops.basesetup.dto.HsnResponseImageDTO;
 import com.efitops.basesetup.dto.ItemMasterDTO;
+import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
+import com.efitops.basesetup.dto.SalesContractDetailsDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
@@ -39,6 +43,8 @@ import com.efitops.basesetup.entity.DailyExchangeRateVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.SalesContractAmendmentVO;
+import com.efitops.basesetup.entity.SalesContractDetailsVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -49,6 +55,8 @@ import com.efitops.basesetup.repository.DailyExchangeRateRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.SalesContractAmdRepo;
+import com.efitops.basesetup.repository.SalesContractDetailsRepo;
 
 @Service
 public class TransportMasterServiceImpl implements TransportMasterService {
@@ -57,8 +65,6 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	@Autowired
 	CustomerComplaintRepo customerComplaintRepo;
 
-	@Autowired
-	BranchRepo branchRepo;
 
 	@Autowired
 	CustomerRepo customerRepo;
@@ -66,11 +72,21 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	@Autowired
 	DepartmentRepo departmentRepo;
 
-	@Autowired
-	ItemMasterRepo itemMasterRepo;
-
+	
 	@Autowired
 	EmployeeMasterRepo employeeMasterRepo;
+	
+	@Autowired
+	private SalesContractAmdRepo salesContractAmendmentRepo;
+
+	@Autowired
+	private SalesContractDetailsRepo salesContractDetailsRepo;
+
+	@Autowired
+	private BranchRepo branchRepo;
+
+	@Autowired
+	private ItemMasterRepo itemMasterRepo;
 
 	TransportMasterServiceImpl(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
@@ -550,4 +566,217 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		return response;
 	}
 
+	// Sales Contract amendment
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateSalesContractAmendment(
+			SalesContractAmendmentDTO salesContractAmendmentDTO) throws ApplicationException {
+
+		SalesContractAmendmentVO salesContractAmendmentVO = new SalesContractAmendmentVO();
+
+		String message;
+
+		if (salesContractAmendmentDTO.getId() != null) {
+
+			salesContractAmendmentVO = salesContractAmendmentRepo.findById(salesContractAmendmentDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Sales Contract Amendment Details"));
+
+			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
+
+			message = "Sales Contract Amendment Updated Successfully";
+
+		} else {
+
+			salesContractAmendmentVO.setCreatedBy(salesContractAmendmentDTO.getCreatedBy());
+			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
+
+			message = "Sales Contract Amendment Created Successfully";
+		}
+		createUpdateSalesContractAmendmentVO(
+		        salesContractAmendmentDTO,
+		        salesContractAmendmentVO);
+
+		SalesContractAmendmentVO savedSalesContractAmendment =
+		        salesContractAmendmentRepo.save(salesContractAmendmentVO);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("salesContractAmendmentVO", salesContractResponseResponse(savedSalesContractAmendment));
+
+
+		return response;
+	}
+	private SalesContractAmdResponseDTO salesContractResponseResponse(
+			SalesContractAmendmentVO salesContractAmendmentVO) {
+
+		SalesContractAmdResponseDTO responseDTO = new SalesContractAmdResponseDTO();
+
+		responseDTO.setId(salesContractAmendmentVO.getId());
+		responseDTO.setContractAmdNo(salesContractAmendmentVO.getContractAmdNo());
+		responseDTO.setDate(salesContractAmendmentVO.getDate());
+		responseDTO.setContractNo(salesContractAmendmentVO.getContractNo());
+		responseDTO.setContractDate(salesContractAmendmentVO.getContractDate());
+		responseDTO.setCustPoNo(salesContractAmendmentVO.getCustPoNo());
+		responseDTO.setCustPoDate(salesContractAmendmentVO.getCustPoDate());
+		responseDTO.setRevisionNo(salesContractAmendmentVO.getRevisionNo());
+		responseDTO.setRemarks(salesContractAmendmentVO.getRemarks());
+
+		if (salesContractAmendmentVO.getBranch() != null) {
+
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+
+			branchDTO.setId(salesContractAmendmentVO.getBranch().getId());
+			branchDTO.setBranchName(salesContractAmendmentVO.getBranch().getBranchName());
+
+			responseDTO.setBranch(branchDTO);
+		}
+
+		responseDTO.setOrgId(salesContractAmendmentVO.getOrgId());
+		responseDTO.setCreatedBy(salesContractAmendmentVO.getCreatedBy());
+		responseDTO.setCancelRemarks(salesContractAmendmentVO.getCancelRemarks());
+
+		List<SalesContractDetailResponseDTO> detailResponseList = new ArrayList<>();
+
+		if (salesContractAmendmentVO.getSalesContractDetails() != null
+				&& !salesContractAmendmentVO.getSalesContractDetails().isEmpty()) {
+
+			for (SalesContractDetailsVO detailVO : salesContractAmendmentVO.getSalesContractDetails()) {
+
+				SalesContractDetailResponseDTO detailDTO = new SalesContractDetailResponseDTO();
+
+				detailDTO.setId(detailVO.getId());
+
+				if (detailVO.getItem() != null) {
+
+					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+
+					itemDTO.setId(detailVO.getItem().getId());
+					itemDTO.setItemCode(detailVO.getItem().getItemCode());
+
+					detailDTO.setItem(itemDTO);
+				}
+
+				detailDTO.setOldRate(detailVO.getOldRate());
+				detailDTO.setNewRate(detailVO.getNewRate());
+				detailDTO.setValidFrom(detailVO.getValidFrom());
+				detailDTO.setValidTo(detailVO.getValidTo());
+				detailDTO.setNewValidDate(detailVO.getNewValidDate());
+
+				detailResponseList.add(detailDTO);
+			}
+		}
+
+		responseDTO.setSalesContractDetailResponseDTO(detailResponseList);
+
+		return responseDTO;
+	}
+	private void createUpdateSalesContractAmendmentVO(
+			SalesContractAmendmentDTO dto,
+			SalesContractAmendmentVO salesContractAmendmentVO)
+			throws ApplicationException {
+
+		salesContractAmendmentVO.setContractAmdNo(dto.getContractAmdNo());
+		salesContractAmendmentVO.setDate(dto.getDate());
+		salesContractAmendmentVO.setContractNo(dto.getContractNo());
+		salesContractAmendmentVO.setContractDate(dto.getContractDate());
+		salesContractAmendmentVO.setCustPoNo(dto.getCustPoNo());
+		salesContractAmendmentVO.setCustPoDate(dto.getCustPoDate());
+		salesContractAmendmentVO.setRevisionNo(dto.getRevisionNo());
+		salesContractAmendmentVO.setRemarks(dto.getRemarks());
+
+		salesContractAmendmentVO.setOrgId(dto.getOrgId());
+		salesContractAmendmentVO.setActive(dto.getActive());
+		salesContractAmendmentVO.setCancelRemarks(dto.getCancelRemarks());
+
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			salesContractAmendmentVO.setBranch(branch);
+		}
+
+		//----------------------------------------------------
+		// Delete old child records while updating
+		//----------------------------------------------------
+
+		if (dto.getId() != null) {
+
+			List<SalesContractDetailsVO> oldList = salesContractDetailsRepo
+					.findBySalesContractAmendmentVO(salesContractAmendmentVO);
+
+			salesContractDetailsRepo.deleteAll(oldList);
+		}
+
+		List<SalesContractDetailsVO> detailList = new ArrayList<>();
+
+		if (dto.getSalesContractDetails() != null
+				&& !dto.getSalesContractDetails().isEmpty()) {
+
+			for (SalesContractDetailsDTO detailDTO : dto.getSalesContractDetails()) {
+
+				SalesContractDetailsVO detailVO = new SalesContractDetailsVO();
+
+				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
+
+					ItemMasterVO item = itemMasterRepo.findById(detailDTO.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+					detailVO.setItem(item);
+				}
+
+				detailVO.setOldRate(detailDTO.getOldRate());
+				detailVO.setNewRate(detailDTO.getNewRate());
+				detailVO.setValidFrom(detailDTO.getValidFrom());
+				detailVO.setValidTo(detailDTO.getValidTo());
+				detailVO.setNewValidDate(detailDTO.getNewValidDate());
+
+				// Parent Mapping
+				detailVO.setSalesContractAmendmentVO(salesContractAmendmentVO);
+
+				detailList.add(detailVO);
+			}
+
+			// Set child list to parent
+			salesContractAmendmentVO.setSalesContractDetails(detailList);
+		}
+	}
+	
+	@Override
+	public SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
+			throws ApplicationException {
+
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ApplicationException("Invalid Id");
+		}
+
+		SalesContractAmendmentVO salesContractAmendmentVO = salesContractAmendmentRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Sales Contract Amendment Not Found"));
+
+		return salesContractResponseResponse(salesContractAmendmentVO);
+	}
+	
+	@Override
+	public List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
+	        throws ApplicationException {
+
+	    List<SalesContractAmendmentVO> salesContractAmendmentList =
+	            salesContractAmendmentRepo.getSalesContractAmendmentByOrgId(orgId,branch);
+
+	    if (salesContractAmendmentList.isEmpty()) {
+	        throw new ApplicationException("No Sales Contract Amendment Details Found");
+	    }
+
+	    List<SalesContractAmdResponseDTO> responseList = new ArrayList<>();
+
+	    for (SalesContractAmendmentVO salesContractAmendmentVO : salesContractAmendmentList) {
+
+	        responseList.add(
+	                salesContractResponseResponse(salesContractAmendmentVO));
+	    }
+
+	    return responseList;
+	}
+	
 }

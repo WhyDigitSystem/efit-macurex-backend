@@ -27,7 +27,7 @@ public class SalesContractAmendmentDTO {
 	private Boolean active;
 	private String cancelRemarks;
 	
-	private List<SalesContractDetailsDTO> salesContractDetails;
+	private List<SalesContractAmdDetailsDTO> salesContractAmdDetailsDTO;
 	
 
 }

@@ -29,7 +29,7 @@ public class EnquiryDTO {
 	 private Long orgId;
 	 private String createdBy;
 	 private String cancelRemarks;
-	 private String description;
+//	 private String description;
 	 private boolean active;
 	 
 	 private List<EnquiryDetailsDTO> enquiryDetails;

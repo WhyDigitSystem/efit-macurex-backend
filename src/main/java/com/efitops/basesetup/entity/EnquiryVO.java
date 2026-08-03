@@ -98,15 +98,15 @@ public class EnquiryVO {
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 
-	@OneToMany(mappedBy = "enquiryVO", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "enquiryVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<EnquiryDetailsVO> enquiryDetails;
 
-	@OneToMany(mappedBy = "enquiryVO", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "enquiryVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<EnquiryTermsandCondVO> enquiryTermsandCond;
 
-	@OneToMany(mappedBy = "enquiryVO", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "enquiryVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<EnquiryAttachmentVO> enquiryAttachment;
 

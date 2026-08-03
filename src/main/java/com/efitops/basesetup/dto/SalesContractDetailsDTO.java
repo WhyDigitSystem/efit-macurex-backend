@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+import com.efitops.basesetup.entity.ItemMasterVO;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -53,4 +54,5 @@ public class SalesContractDetailsDTO {
 //    private BigDecimal igstAmount;
 
     private String currency;
+
 }

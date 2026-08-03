@@ -99,9 +99,9 @@ public class SalesContractAmendmentVO {
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
-	@OneToMany(mappedBy = "salesContractAmendmentVO",
-	        cascade = CascadeType.ALL
-	    )
-	@JsonManagedReference
-	private List<SalesContractDetailsVO> salesContractDetails;
+//	@OneToMany(mappedBy = "salesContractAmendmentVO",
+//	        cascade = CascadeType.ALL
+//	    )
+//	@JsonManagedReference
+//	private List<SalesContractDetailsVO> salesContractDetails;
 }

@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -22,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.EnquiryDTO;
+import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.entity.EnquiryVO;
 import com.efitops.basesetup.service.DevelopService;
@@ -94,7 +94,7 @@ public class DevelopController extends BaseController  {
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO = null;
 
-		EnquiryVO Enquiry = null;
+		EnquiryResponseDTO Enquiry = null;
 
 		try {
 
@@ -140,7 +140,7 @@ public class DevelopController extends BaseController  {
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO = null;
 
-		List<EnquiryVO> enquiryList = new ArrayList<>();
+		List<EnquiryResponseDTO> enquiryList = new ArrayList<>();
 
 		try {
 

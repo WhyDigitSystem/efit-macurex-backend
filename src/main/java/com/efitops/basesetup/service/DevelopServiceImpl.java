@@ -2,6 +2,7 @@ package com.efitops.basesetup.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,7 +27,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
+import com.efitops.basesetup.ResponseDTO.EnquiryCusContactResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.EnquiryAttachmentResponseDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
@@ -369,23 +371,24 @@ public class DevelopServiceImpl implements DevelopService {
 	        enquiryTermsandCondRepo.deleteAll(enquiryVO.getEnquiryTermsandCond());
 
 	        // Delete old attachments
-	        if (enquiryVO.getEnquiryAttachment() != null) {
+	        if (enquiryVO.getEnquiryAttachment() != null
+	                && !enquiryVO.getEnquiryAttachment().isEmpty()) {
 
 	            for (EnquiryAttachmentVO attachment : enquiryVO.getEnquiryAttachment()) {
 
 	                try {
-
 	                    if (attachment.getFilePath() != null) {
 	                        Files.deleteIfExists(Paths.get(attachment.getFilePath()));
 	                    }
-
 	                } catch (IOException e) {
-
 	                    e.printStackTrace();
 	                }
 	            }
 
 	            enquiryAttachmentRepo.deleteAll(enquiryVO.getEnquiryAttachment());
+
+	            // IMPORTANT
+	            enquiryVO.getEnquiryAttachment().clear();
 	        }
 
 	        message = "Enquiry Updated Successfully";
@@ -566,10 +569,13 @@ public class DevelopServiceImpl implements DevelopService {
 
 	            Path path = Paths.get(uploadPath, fileName);
 
-	            Files.copy(
-	                    file.getInputStream(),
-	                    path,
-	                    StandardCopyOption.REPLACE_EXISTING);
+	            try (InputStream inputStream = file.getInputStream()) {
+
+	                Files.copy(
+	                        inputStream,
+	                        path,
+	                        StandardCopyOption.REPLACE_EXISTING);
+	            }
 
 	            EnquiryAttachmentVO attachment = new EnquiryAttachmentVO();
 
@@ -626,34 +632,34 @@ public class DevelopServiceImpl implements DevelopService {
 
 	    // ================= Branch =================
 
-//	    if (enquiryVO.getBranch() != null) {
-//
-//	        responseDTO.setBranch(
-//	                new BranchResponseDTO(
-//	                        enquiryVO.getBranch().getId(),
-//	                        enquiryVO.getBranch().getBranchCode(),
-//	                        enquiryVO.getBranch().getBranchName()));
-//	    }
+	    if (enquiryVO.getBranch() != null) {
+
+	        responseDTO.setBranch(
+	                new BranchResponseDTO(
+	                        enquiryVO.getBranch().getId(),
+	                        enquiryVO.getBranch().getBranchCode(),
+	                        enquiryVO.getBranch().getBranchName()));
+	    }
 
 	    // ================= Party =================
 
-//	    if (enquiryVO.getPartyid() != null) {
-//
-//	        responseDTO.setPartyId(
-//	                new CustomerResponseDTO(
-//	                        enquiryVO.getPartyid().getId(),
-//	                        enquiryVO.getPartyid().getCustomerName()));
-//	    }
+	    if (enquiryVO.getPartyid() != null) {
+
+	        responseDTO.setCustomerVO(
+	                new CustomerResonse1DTO(
+	                        enquiryVO.getPartyid().getId(),
+	                        enquiryVO.getPartyid().getCustomerName()));
+	    }
 
 	    // ================= Contact =================
 
-//	    if (enquiryVO.getContactName() != null) {
-//
-//	        responseDTO.setContactName(
-//	                new CustomerContactResponseDTO(
-//	                        enquiryVO.getContactName().getId(),
-//	                        enquiryVO.getContactName().getContactName()));
-//	    }
+	    if (enquiryVO.getContactName() != null) {
+
+	        responseDTO.setContactName(
+	                new EnquiryCusContactResponseDTO(
+	                        enquiryVO.getContactName().getId(),
+	                        enquiryVO.getContactName().getContactName()));
+	    }
 
 	    // ================= Details =================
 
@@ -752,82 +758,96 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	
 	@Override
-	public EnquiryVO getEnquiryById(Long id) throws ApplicationException {
+	public EnquiryResponseDTO getEnquiryById(Long id) throws ApplicationException {
 
-		return enquiryRepo.findById(id).orElseThrow(() -> new ApplicationException("Enquiry Not Found"));
+	    EnquiryVO enquiryVO = enquiryRepo.findById(id)
+	            .orElseThrow(() -> new ApplicationException("Enquiry Not Found"));
+
+	    return buildEnquiryResponse(enquiryVO);
 	}
-
+	
 	@Override
-	public List<EnquiryVO> getEnquiryByOrgId(Long orgId, Long branchId) throws ApplicationException {
+	public List<EnquiryResponseDTO> getEnquiryByOrgId(Long orgId, Long branchId)
+	        throws ApplicationException {
 
-		return enquiryRepo.findByOrgIdAndBranch(orgId, branchId);
+	    List<EnquiryVO> enquiryList = enquiryRepo.findByOrgIdAndBranch(orgId, branchId);
+
+	    List<EnquiryResponseDTO> responseList = new ArrayList<>();
+
+	    for (EnquiryVO enquiryVO : enquiryList) {
+
+	        responseList.add(buildEnquiryResponse(enquiryVO));
+	    }
+
+	    return responseList;
 	}
-
-	@Override
-	@Transactional
-	public Map<String, Object> uploadEnquiryAttachment(Long enquiryId, MultipartFile file) throws ApplicationException {
-
-		EnquiryVO enquiry = enquiryRepo.findById(enquiryId)
-				.orElseThrow(() -> new ApplicationException("Enquiry Not Found"));
-
-		try {
-
-			String uploadDir = "uploads/enquiry/";
-
-			Path uploadPath = Paths.get(uploadDir);
-
-			if (!Files.exists(uploadPath)) {
-				Files.createDirectories(uploadPath);
-			}
-
-			String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-
-			Path filePath = uploadPath.resolve(fileName);
-
-			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-			EnquiryAttachmentVO attachment = new EnquiryAttachmentVO();
-
-			attachment.setName(file.getOriginalFilename());
-			attachment.setFileName(fileName);
-			attachment.setFilePath(filePath.toString());
-			attachment.setFileSize(file.getSize());
-			attachment.setContentType(file.getContentType());
-			attachment.setUploadOn(LocalDateTime.now());
-			attachment.setEnquiryVO(enquiry);
-
-			enquiryAttachmentRepo.save(attachment);
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("message", "Attachment Uploaded Successfully");
-
-			return response;
-
-		} catch (IOException e) {
-
-			throw new ApplicationException("Unable to Upload File");
-		}
-	} // <-- closes uploadEnquiryAttachment()
-
-	@Override
-	public ResponseEntity<byte[]> viewEnquiryAttachment(Long attachmentId) throws ApplicationException {
-
-		EnquiryAttachmentVO attachment = enquiryAttachmentRepo.findById(attachmentId)
-				.orElseThrow(() -> new ApplicationException("Attachment Not Found"));
-
-		try {
-
-			Path path = Paths.get(attachment.getFilePath());
-
-			byte[] data = Files.readAllBytes(path);
-
-			return ResponseEntity.ok()
-					.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + attachment.getFileName() + "\"")
-					.contentType(MediaType.APPLICATION_PDF).body(data);
-
-		} catch (IOException e) {
-
-			throw new ApplicationException("Unable to View Attachment");
-		}
-	}
+	
+	
+//	@Override
+//	@Transactional
+//	public Map<String, Object> uploadEnquiryAttachment(Long enquiryId, MultipartFile file) throws ApplicationException {
+//
+//		EnquiryVO enquiry = enquiryRepo.findById(enquiryId)
+//				.orElseThrow(() -> new ApplicationException("Enquiry Not Found"));
+//
+//		try {
+//
+//			String uploadDir = "uploads/enquiry/";
+//
+//			Path uploadPath = Paths.get(uploadDir);
+//
+//			if (!Files.exists(uploadPath)) {
+//				Files.createDirectories(uploadPath);
+//			}
+//
+//			String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+//
+//			Path filePath = uploadPath.resolve(fileName);
+//
+//			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+//
+//			EnquiryAttachmentVO attachment = new EnquiryAttachmentVO();
+//
+//			attachment.setName(file.getOriginalFilename());
+//			attachment.setFileName(fileName);
+//			attachment.setFilePath(filePath.toString());
+//			attachment.setFileSize(file.getSize());
+//			attachment.setContentType(file.getContentType());
+//			attachment.setUploadOn(LocalDateTime.now());
+//			attachment.setEnquiryVO(enquiry);
+//
+//			enquiryAttachmentRepo.save(attachment);
+//
+//			Map<String, Object> response = new HashMap<>();
+//			response.put("message", "Attachment Uploaded Successfully");
+//
+//			return response;
+//
+//		} catch (IOException e) {
+//
+//			throw new ApplicationException("Unable to Upload File");
+//		}
+//	} // <-- closes uploadEnquiryAttachment()
+//
+//	@Override
+//	public ResponseEntity<byte[]> viewEnquiryAttachment(Long attachmentId) throws ApplicationException {
+//
+//		EnquiryAttachmentVO attachment = enquiryAttachmentRepo.findById(attachmentId)
+//				.orElseThrow(() -> new ApplicationException("Attachment Not Found"));
+//
+//		try {
+//
+//			Path path = Paths.get(attachment.getFilePath());
+//
+//			byte[] data = Files.readAllBytes(path);
+//
+//			return ResponseEntity.ok()
+//					.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + attachment.getFileName() + "\"")
+//					.contentType(MediaType.APPLICATION_PDF).body(data);
+//
+//		} catch (IOException e) {
+//
+//			throw new ApplicationException("Unable to View Attachment");
+//		}
+//	}
 }

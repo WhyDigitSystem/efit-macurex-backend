@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -23,7 +24,6 @@ import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
-import com.efitops.basesetup.entity.EnquiryVO;
 import com.efitops.basesetup.service.DevelopService;
 
 @CrossOrigin
@@ -40,7 +40,7 @@ public class DevelopController extends BaseController  {
             value = "/updateCreateEnquiry",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDTO> updateCreateEnquiry(
-            @RequestPart("enquiry") EnquiryDTO enquiryDTO,
+            @RequestPart("enquiryDTO") EnquiryDTO enquiryDTO,
             @RequestPart(value = "files", required = false) MultipartFile[] files) {
 
         String methodName = "updateCreateEnquiry";

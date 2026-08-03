@@ -40,7 +40,7 @@ public class ServiceAccMasterVO {
 	
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "hsnc_ode")
+	@JoinColumn(name = "hsn_code")
 	private HsnVO hsnCode;
 		
 	@Column(name = "org_id")

@@ -81,6 +81,8 @@ public interface EfitMasterService {
 
 	EmployeeMasterResponseDTO getEmployeeMasterById(Long id) throws ApplicationException;
 
-	List<EmployeeMasterResponseDTO> getEmployeeMasterByOrgId(Long orgId, Long branchId) throws ApplicationException;
+	List<EmployeeMasterResponseDTO> getEmployeeMasterByOrgId(Long orgId) throws ApplicationException;
+
+	String getEmployeeByDocId(Long orgId, String screenCode);
 
 }

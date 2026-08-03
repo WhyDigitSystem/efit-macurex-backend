@@ -39,32 +39,12 @@ public class ItemMasterVO {
 	@Column(name = "item_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
-	@Column(name = "capital_or_input")
-	private String capitalOrInput;
-
-//	@Column(name = "item_type")
-//	private String itemType;
-
-	@Column(name = "item_group_type")
-	private String itemGroupType;
-
-//	@Column(name = "grade")
-//	private String grade;
-
-	@Column(name = "item_code")
-	private String itemCode;
-
-//	@Column(name = "excise_tariff_no")
-//	private String exciseTariffNo;
-
 	@Column(name = "item_description")
 	private String itemDescription;
 
 	@Column(name = "thickness", precision = 10, scale = 2)
 	private BigDecimal thickness;
 
-	@Column(name = "is_stock")
-	private String isStock;
 
 	@Column(name = "width", precision = 10, scale = 2)
 	private BigDecimal width;
@@ -83,9 +63,6 @@ public class ItemMasterVO {
 
 	@Column(name = "need_qc_approval")
 	private String needQcApproval;
-
-	@Column(name = "inspection")
-	private String inspection;
 
 	@Column(name = "abc_grade")
 	private String abcGrade;
@@ -115,7 +92,7 @@ public class ItemMasterVO {
 	private String rawMaterialsMake;
 
 	@Column(name = "active")
-	private boolean active=true;
+	private boolean active = true;
 
 //	@Column(name = "hsn_code")
 //	private String hsnCode;
@@ -200,7 +177,7 @@ public class ItemMasterVO {
 //
 //	@Column(name = "alternative_supplier")
 //	private String alternativeSupplier;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "default_supplier")
 	private CustomerVO defaultSupplier;
@@ -265,7 +242,7 @@ public class ItemMasterVO {
 	private String updatedBy;
 
 	@Column(name = "cancel")
-	private boolean cancel=false;
+	private boolean cancel = false;
 
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
@@ -283,10 +260,6 @@ public class ItemMasterVO {
 	private String financialYear;
 
 	@ManyToOne
-	@JoinColumn(name = "item_group")
-	private ListOfValuesVO itemGroup;
-
-	@ManyToOne
 	@JoinColumn(name = "primary_unit")
 	private UnitMasterVO primaryUnit;
 
@@ -300,15 +273,42 @@ public class ItemMasterVO {
 
 	@ManyToOne
 	@JoinColumn(name = "itemType")
-	private ListOfValuesVO itemType;
+	private ListOfValuesDetailsVO itemType;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "grade")
-	private ListOfValuesVO grade;
+	private GradeMasterVO grade;
 
 	@ManyToOne
 	@JoinColumn(name = "excise_tariff_no")
-	private ListOfValuesVO exciseTariffNo;
+	private ListOfValuesDetailsVO exciseTariffNo;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "capital_or_input")
+	private ListOfValuesDetailsVO capitalOrInput;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "inspection")
+	private ListOfValuesDetailsVO inspection;
+
+	@ManyToOne
+	@JoinColumn(name = "item_group")
+	private ListOfValuesDetailsVO itemGroup;
+
+	@Column(name = "item_code")
+	private String itemCode;
+
+	@Column(name = "group_item")
+	private String groupItem;
+
+	@Column(name = "stock")
+	private String stock;
+
+	@Column(name = "excisble_item")
+	private String excisbleItem;
+
+	@Column(name = "shelf_life_part")
+	private String shelfLifePart;
 
 	@OneToMany(mappedBy = "itemMasterVO", cascade = CascadeType.ALL)
 	@JsonManagedReference

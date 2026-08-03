@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CustomerShippingDetailsDTO {
 
-    private Long id;
+//    private Long id;
 
     private String shippingAddressType;
 

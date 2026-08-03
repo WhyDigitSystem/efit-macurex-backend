@@ -32,6 +32,9 @@ public class UnitMasterVO {
 	
     @Column(name = "unit_id")
     private String unitId;
+    @Column(name = "description")
+    private String description;
+    
 	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "active")

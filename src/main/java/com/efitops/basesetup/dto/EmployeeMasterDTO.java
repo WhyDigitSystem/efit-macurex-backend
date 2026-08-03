@@ -2,9 +2,7 @@ package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -64,7 +62,7 @@ public class EmployeeMasterDTO {
 
 	private String tempAddressLine;
 
-	private String tempCity;
+	private Long tempCityId;
 
 	private Long tempStateId;
 
@@ -76,7 +74,7 @@ public class EmployeeMasterDTO {
 
 	private String permanentAddressLine;
 
-	private String permanentCity;
+	private Long permanentCity;
 
 	private Long permanentStateId;
 
@@ -151,4 +149,6 @@ public class EmployeeMasterDTO {
 	private String financialYear;
 
 	private Long branchId;
+	
+	private boolean active;
 }

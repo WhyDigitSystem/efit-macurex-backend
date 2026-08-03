@@ -15,7 +15,6 @@ import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -33,11 +32,11 @@ public class TaxDefinitionDetailsVO {
 
 	@ManyToOne
 	@JoinColumn(name = "tax_type")
-	private ListOfValuesVO taxType; 
+	private ListOfValuesDetailsVO taxType; 
 	
 	@ManyToOne
 	@JoinColumn(name = "tax_name")
-	private ListOfValuesVO taxName; 
+	private ListOfValuesDetailsVO taxName; 
 	
 	@Column(name = "add_less")
 	private String addLess;

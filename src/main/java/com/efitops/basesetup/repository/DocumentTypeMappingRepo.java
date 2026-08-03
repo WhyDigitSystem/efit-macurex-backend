@@ -12,7 +12,7 @@ package com.efitops.basesetup.repository;
 
 	    @Query(value = """
 	            SELECT *
-	            FROM documenttypemappingmaster
+	            FROM documenttype_mapping
 	            WHERE org_id = :orgId
 	              AND branch = :branch
 	              AND cancel = false

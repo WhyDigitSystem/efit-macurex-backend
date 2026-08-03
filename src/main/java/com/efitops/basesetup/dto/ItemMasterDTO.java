@@ -4,6 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import com.efitops.basesetup.entity.GradeMasterVO;
+import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class ItemMasterDTO {
 	private Long id;
 
-	private Long listOfValuesId;
+//	private Long listOfValuesId;
 
 	private Long primaryUnitId;
 
@@ -24,11 +32,7 @@ public class ItemMasterDTO {
 
 	private Long hsnId;
 
-	private String capitalOrInput;
-
-	private Long itemTypeId;
-
-	private String itemGroupType;
+//	private String capitalOrInput;
 
 	private Long gradeId;
 
@@ -58,7 +62,7 @@ public class ItemMasterDTO {
 
 	private String drawingNo;
 
-	private String isExciseItem;
+//	private String isExciseItem;
 
 	private BigDecimal lotSize;
 
@@ -172,77 +176,22 @@ public class ItemMasterDTO {
 
 	private String financialYear;
 
-//	private String capital;
-//
-//	private String itemType;
-//
-//	private String group;
-//
-//	private String grade;
-//
-//	private String itemCode;
-//
-//	private String exciseTariffNo;
-//
-//	private String itemDescription;
-//	private BigDecimal thickness;
-//
-//	private String stock;
-//
-//	private BigDecimal width;
-//
-//	private String protoType;
-//
-//	private BigDecimal lenth;
-//
-//	private String psw;
-//
-//	private BigDecimal weight;
-//
-//	private String needQcApproval;
-//
-//	private String primaryUnit;
-//
-//	private String inspection;
-//
-//	private String abcGrade;
-//
-//	private String drawingNo;
-//
-//	private String excisbleItem;
-//
-//	private BigDecimal lotSize;
-//
-//	private String shelfLifePart;
-//
-//	private String importLocal;
-//
-//	private String safetyStock;
-//
-//	private String grnRequired;
-//
-//	private String rowmaterials;
-//
-//	private String hsnSacCode;
-//
-//	private String createdBy;
-//
-//	private Long orgId;
-//
-//	private String updatedBy;
-//
-//	private String cancelRemarks;
-//
-//	private List<ItemUnitsDTO> itemUnitsDTO;
-//
-//	private List<ItemInventoryDTO> itemInventoryDTO;
-//
-//	private List<ItemPurchaseDTO> itemPurchaseDTO;
-//
-//	private List<ItemSalesDTO> itemSalesDTO;
-//
-//	private List<ItemOthersDTO> itemOthersDTO;
+	private Long itemTypeId;
 
+	private Long itemGroupId;
+
+	private Long capitalOrInputId;
+
+	private Long inspectionId;
+
+	private String groupItem;
+
+	private String stock;
+
+	private String excisbleItem;
+
+	private String shelfLifePart;
+	
 	private List<ItemDrawingDTO> itemDrawingDTO;
 
 }

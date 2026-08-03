@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.Column;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +23,10 @@ public class CustomerDTO {
 	    private Long supplierType;
 
 	    private Long branch;
+	    
+		private String panNo;
+		private String esiNo;
+		private String tinNo;
 
 	    private String docId;
 	    private LocalDate docDate;
@@ -32,9 +38,12 @@ public class CustomerDTO {
 	    private String customerLegalName;
 	    private String tradeName;
 
+	    private Long buyerName;
+
+	    
 	    private boolean groupCompany;
 
-	    private String zone;
+	    private Long zone;
 	    private String vendorCode;
 	    private String groupName;
 
@@ -95,7 +104,7 @@ public class CustomerDTO {
 	    private String bankAccountNo;
 	    private String paymentMode;
 	    private String ifscCode;
-		private String belongsTo;
+		private Long belongsTo;
 
 		
 	    private Long orgId;

@@ -1,5 +1,6 @@
 package com.efitops.basesetup.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.CustomerDTO;
@@ -39,7 +41,7 @@ public class PartyMasterController extends BaseController {
     @Autowired
     private PartyMasterService partyMasterService;
 
-    @PostMapping("/createUpdateCustomer")
+    @PutMapping("/createUpdateCustomer")
     public ResponseEntity<ResponseDTO> createUpdateCustomer(
             @Valid @RequestBody CustomerDTO customerDTO) {
 
@@ -176,5 +178,52 @@ public class PartyMasterController extends BaseController {
 
         return ResponseEntity.ok().body(responseDTO);
     }
+    
+    @GetMapping("/getPurchaseEmployees")
+    public ResponseEntity<ResponseDTO> getPurchaseEmployees(
+            @RequestParam Long orgId,
+            @RequestParam Long branch) {
+
+        String methodName = "getPurchaseEmployees()";
+        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+        String errorMsg = null;
+        Map<String, Object> responseObjectsMap = new HashMap<>();
+        ResponseDTO responseDTO = null;
+
+        List<EmployeeDropdownResponseDTO> employeeList = new ArrayList<>();
+
+        try {
+
+            employeeList = partyMasterService.getPurchaseEmployees(orgId, branch);
+
+        } catch (Exception e) {
+
+            errorMsg = e.getMessage();
+            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+        }
+
+        if (errorMsg == null || errorMsg.trim().isEmpty()) {
+
+            responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+                    "Purchase Employees fetched successfully");
+            responseObjectsMap.put("employees", employeeList);
+
+            responseDTO = createServiceResponse(responseObjectsMap);
+
+        } else {
+
+            responseDTO = createServiceResponseError(
+                    responseObjectsMap,
+                    "Purchase Employees fetch failed",
+                    errorMsg);
+        }
+
+        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+        return ResponseEntity.ok(responseDTO);
+    }
+    
+    
 
 }

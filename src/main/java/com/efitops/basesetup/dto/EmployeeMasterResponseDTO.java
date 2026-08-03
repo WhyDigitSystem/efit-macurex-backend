@@ -3,6 +3,7 @@ package com.efitops.basesetup.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.efitops.basesetup.ResponseDTO.CityResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 
@@ -18,7 +19,7 @@ public class EmployeeMasterResponseDTO {
 	private Long id;
 
 	private String employeeId;
-	
+
 	private String employeeName;
 
 	private String surName;
@@ -57,7 +58,7 @@ public class EmployeeMasterResponseDTO {
 
 	private String tempAddressLine;
 
-	private String tempCity;
+	private CityResponseDTO tempCitys;
 
 	private StateResponseDTO tempState;
 
@@ -69,7 +70,7 @@ public class EmployeeMasterResponseDTO {
 
 	private String permanentAddressLine;
 
-	private String permanentCity;
+	private CityResponseDTO permanentCitys;
 
 	private StateResponseDTO permanentState;
 
@@ -133,7 +134,7 @@ public class EmployeeMasterResponseDTO {
 
 	private String updatedBy;
 
-	private boolean active;
+	private String active;
 
 	private boolean cancel;
 

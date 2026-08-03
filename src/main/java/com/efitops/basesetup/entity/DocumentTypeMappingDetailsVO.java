@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "documenttypemappingdetails")
+@Table(name = "documenttypemapping_details")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

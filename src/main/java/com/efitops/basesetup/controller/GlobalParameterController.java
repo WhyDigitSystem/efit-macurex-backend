@@ -94,7 +94,7 @@ public class GlobalParameterController extends BaseController {
 
 	@GetMapping("/globalparamBranchByUserName")
 	public ResponseEntity<ResponseDTO> getGlobalParameterBranchByUserName(@RequestParam Long orgid,
-			@RequestParam Long userName) {
+			@RequestParam Long user) {
 		String methodName = "getAllGlobalParameterByUserName()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -103,7 +103,7 @@ public class GlobalParameterController extends BaseController {
 		Set<Object[]> globalParameters = new HashSet<>();
 		try {
 			globalParameters = globalParameterService.getGlobalParametersBranchAndBranchCodeByOrgIdAndUserName(orgid,
-					userName);
+					user);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -112,7 +112,7 @@ public class GlobalParameterController extends BaseController {
 			List<Map<String, Object>> formattedParameters = formattParameter(globalParameters);
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
 					"Global Parameter Branch information get successfully");
-			responseObjectsMap.put("GlopalParameters", formattedParameters);
+			responseObjectsMap.put("GlobalParameters", formattedParameters);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
 			responseDTO = createServiceResponseError(responseObjectsMap,

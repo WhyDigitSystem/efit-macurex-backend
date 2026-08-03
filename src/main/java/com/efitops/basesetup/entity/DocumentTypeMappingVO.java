@@ -24,7 +24,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "documenttypemappingmaster")
+@Table(name = "documenttype_mapping")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,7 +44,9 @@ public class DocumentTypeMappingVO {
 	 @JoinColumn(name = "financial_year")
 	 private FinancialYearVO financialYear;
 	 
-	 @Column(name = "org_id")
+	 @Column(name = "description")
+		private String description;
+	    @Column(name = "org_id")
 		private Long orgId;
 		@Column(name = "active")
 		private boolean active;
@@ -78,8 +80,7 @@ public class DocumentTypeMappingVO {
 		
 		@OneToMany(
 		        mappedBy = "documentTypeMappingMasterVO",
-		        cascade = CascadeType.ALL,
-		        orphanRemoval = true)
+		        cascade = CascadeType.ALL)
 		@JsonManagedReference
 		private List<DocumentTypeMappingDetailsVO> details;
 		

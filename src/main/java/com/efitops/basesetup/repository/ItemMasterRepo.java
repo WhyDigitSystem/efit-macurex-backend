@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.efitops.basesetup.entity.ItemMasterVO;
@@ -35,4 +36,36 @@ List<Object[]> getItem();
         "AND cancel = false",
 nativeQuery = true)
 List<Object[]> getItemDetails(Long itemId);
+
+	@Query(value = """
+		    SELECT
+		        i.item_id,
+		        i.item_code,
+		        i.item_description,
+		        u.unit_id,
+		        i.min_sell_price,
+		        h.hsn,
+		        i.customer_part_no
+		    FROM item i
+		    INNER JOIN unitmaster u
+		        ON u.unitmaster_id = i.primary_unit
+		    INNER JOIN hsn h
+		        ON h.hsn_id = i.hsn_code
+		    WHERE i.cancel = 0
+		      AND i.org_id = :orgId
+		      AND i.branch = :branch
+		      AND EXISTS (
+		            SELECT 1
+		            FROM listofvaluesdetails l
+		            WHERE l.listofvalues_id = i.item_type
+		              AND l.value_code = 'FG'
+		      )
+		    ORDER BY i.item_code
+		    """, nativeQuery = true)
+		List<Object[]> getFinishedGoodsItems(@Param("orgId") Long orgId,
+		                                     @Param("branch") Long branch);
+		
+		
+		@Query(value = "SELECT * FROM item WHERE item_id = ?1", nativeQuery = true)
+		ItemMasterVO getItemById(Long itemId);
 }

@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.efitops.basesetup.dto.EmployeeResponseDTO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,11 +23,18 @@ public class CustomerResponseDTO {
 	    private PartyCategoryResponseDTO customerCategory2;
 	    private PartyCategoryResponseDTO supplierType;
 
-	    private BranchResponseDTO branch;
+	    private DocumentTypeMappingBranchResponseDTO branch;
 
+	    
+	    
+		private String panNo;
+		private String esiNo;
+		private String tinNo;
+		
 	    private String docId;
 	    private LocalDate docDate;
-		private String belongsTo;
+		private PartyCategoryResponseDTO belongsTo;
+		private EmployeeResponseDTO buyerName;
 
 	    private String salutation;
 	    private String customerType;
@@ -35,7 +45,7 @@ public class CustomerResponseDTO {
 
 	    private boolean groupCompany;
 
-	    private String zone;
+	    private SalesZoneResponseDTO zone;
 	    private String vendorCode;
 	    private String groupName;
 

@@ -1,6 +1,7 @@
 package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import javax.validation.constraints.NotNull;
 
@@ -22,7 +23,7 @@ public class GSTRateMasterDTO {
 
 	    private String description;
 
-	    private BigDecimal wef;
+	    private LocalDate wef;
 
 	    private boolean taxable;
 

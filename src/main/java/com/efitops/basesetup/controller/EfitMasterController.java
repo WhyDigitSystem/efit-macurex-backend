@@ -649,7 +649,7 @@ public class EfitMasterController extends BaseController {
 	}
 
 	@GetMapping("/getEmployeeMasterByOrgId")
-	public ResponseEntity<ResponseDTO> getEmployeeMasterByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
+	public ResponseEntity<ResponseDTO> getEmployeeMasterByOrgId(@RequestParam Long orgId) {
 
 		String methodName = "getEmployeeMasterByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -660,7 +660,7 @@ public class EfitMasterController extends BaseController {
 		try {
 
 			List<EmployeeMasterResponseDTO> employeeMasterResponseDTO = efitMasterService
-					.getEmployeeMasterByOrgId(orgId, branchId);
+					.getEmployeeMasterByOrgId(orgId);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Employee Master information retrieved successfully");
 
@@ -680,5 +680,37 @@ public class EfitMasterController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
+	
+	@GetMapping("/getEmployeeByDocId")
+	public ResponseEntity<ResponseDTO> getEmployeeByDocId(@RequestParam Long orgId,@RequestParam String screenCode) {
+
+		String methodName = "getEmployeeByDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+			mapp = efitMasterService.getEmployeeByDocId(orgId,screenCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"EmployeeDocid DocId information retrieved successfully");
+			responseObjectsMap.put("chartCostCenterDocId", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve EmployeeDocid", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
 
 }

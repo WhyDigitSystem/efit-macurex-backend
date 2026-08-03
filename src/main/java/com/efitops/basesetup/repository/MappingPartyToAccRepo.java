@@ -11,7 +11,7 @@ public interface MappingPartyToAccRepo extends JpaRepository<MappingOfPartyToAcc
 
 	MappingOfPartyToAccVO getMappingOfPartyToAccById(Long id);
 
-	@Query(value = "SELECT * FROM mappingofpartytoacc WHERE org_id = ?1 AND branch = ?2", nativeQuery = true)
+	@Query(value = "SELECT * FROM partyacc WHERE org_id = ?1 AND branch = ?2", nativeQuery = true)
 	List<MappingOfPartyToAccVO> getMappingOfPartyToAccByOrgId(Long orgId, Long branch);
 
 }

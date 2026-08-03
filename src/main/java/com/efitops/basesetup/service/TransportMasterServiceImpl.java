@@ -31,6 +31,7 @@ import com.efitops.basesetup.dto.CustomerDTO;
 import com.efitops.basesetup.dto.DailyExchangeRateDTO;
 import com.efitops.basesetup.dto.HsnResponseImageDTO;
 import com.efitops.basesetup.dto.ItemMasterDTO;
+import com.efitops.basesetup.dto.SalesContractAmdDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.SalesContractDetailsDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
@@ -43,6 +44,7 @@ import com.efitops.basesetup.entity.DailyExchangeRateVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.SalesContractAmdDetailsVO;
 import com.efitops.basesetup.entity.SalesContractAmendmentVO;
 import com.efitops.basesetup.entity.SalesContractDetailsVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
@@ -55,6 +57,7 @@ import com.efitops.basesetup.repository.DailyExchangeRateRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.SalesContractAmdDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractAmdRepo;
 import com.efitops.basesetup.repository.SalesContractDetailsRepo;
 
@@ -80,7 +83,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	private SalesContractAmdRepo salesContractAmendmentRepo;
 
 	@Autowired
-	private SalesContractDetailsRepo salesContractDetailsRepo;
+	private SalesContractAmdDetailsRepo slesContractAmdDetailsRepo;
 
 	@Autowired
 	private BranchRepo branchRepo;
@@ -638,10 +641,10 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 		List<SalesContractDetailResponseDTO> detailResponseList = new ArrayList<>();
 
-		if (salesContractAmendmentVO.getSalesContractDetails() != null
-				&& !salesContractAmendmentVO.getSalesContractDetails().isEmpty()) {
+		if (salesContractAmendmentVO.getSalesContractAmdDetailsVO() != null
+				&& !salesContractAmendmentVO.getSalesContractAmdDetailsVO().isEmpty()) {
 
-			for (SalesContractDetailsVO detailVO : salesContractAmendmentVO.getSalesContractDetails()) {
+			for (SalesContractAmdDetailsVO detailVO : salesContractAmendmentVO.getSalesContractAmdDetailsVO()) {
 
 				SalesContractDetailResponseDTO detailDTO = new SalesContractDetailResponseDTO();
 
@@ -703,20 +706,20 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 		if (dto.getId() != null) {
 
-			List<SalesContractDetailsVO> oldList = salesContractDetailsRepo
+			List<SalesContractAmdDetailsVO> oldList = slesContractAmdDetailsRepo
 					.findBySalesContractAmendmentVO(salesContractAmendmentVO);
 
-			salesContractDetailsRepo.deleteAll(oldList);
+			slesContractAmdDetailsRepo.deleteAll(oldList);
 		}
 
-		List<SalesContractDetailsVO> detailList = new ArrayList<>();
+		List<SalesContractAmdDetailsVO> detailList = new ArrayList<>();
 
-		if (dto.getSalesContractDetails() != null
-				&& !dto.getSalesContractDetails().isEmpty()) {
+		if (dto.getSalesContractAmdDetailsDTO() != null
+				&& !dto.getSalesContractAmdDetailsDTO().isEmpty()) {
 
-			for (SalesContractDetailsDTO detailDTO : dto.getSalesContractDetails()) {
+			for (SalesContractAmdDetailsDTO detailDTO : dto.getSalesContractAmdDetailsDTO()) {
 
-				SalesContractDetailsVO detailVO = new SalesContractDetailsVO();
+				SalesContractAmdDetailsVO detailVO = new SalesContractAmdDetailsVO();
 
 				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
 
@@ -739,7 +742,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			}
 
 			// Set child list to parent
-			salesContractAmendmentVO.setSalesContractDetails(detailList);
+			salesContractAmendmentVO.setSalesContractAmdDetailsVO(detailList);
 		}
 	}
 	

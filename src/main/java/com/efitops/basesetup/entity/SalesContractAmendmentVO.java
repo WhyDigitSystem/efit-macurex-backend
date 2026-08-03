@@ -103,5 +103,5 @@ public class SalesContractAmendmentVO {
 	        cascade = CascadeType.ALL
 	    )
 	@JsonManagedReference
-	private List<SalesContractDetailsVO> salesContractDetails;
+	private List<SalesContractAmdDetailsVO> salesContractAmdDetailsVO;
 }

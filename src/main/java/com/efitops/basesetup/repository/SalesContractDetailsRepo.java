@@ -15,6 +15,7 @@ public interface SalesContractDetailsRepo extends JpaRepository<SalesContractDet
 
 
 
-	List<SalesContractAmdDetailsVO> findBySalesContractAmendmentVO(SalesContractAmendmentVO salesContractAmendmentVO);
+
+	List<SalesContractDetailsVO> findBySalesContract(SalesContractVO salesContractVO);
 
 }

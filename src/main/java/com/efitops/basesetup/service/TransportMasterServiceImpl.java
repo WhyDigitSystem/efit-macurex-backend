@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.validation.Valid;
-import com.efitops.basesetup.security.TokenProvider;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,39 +27,25 @@ import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CustomerComplaintDTO;
 import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
-import com.efitops.basesetup.dto.CustomerDTO;
-import com.efitops.basesetup.dto.DailyExchangeRateDTO;
-import com.efitops.basesetup.dto.HsnResponseImageDTO;
-import com.efitops.basesetup.dto.ItemMasterDTO;
 import com.efitops.basesetup.dto.SalesContractAmdDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
-import com.efitops.basesetup.dto.SalesContractDetailsDTO;
-import com.efitops.basesetup.dto.ServiceAccMasterDTO;
-import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
-import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
 import com.efitops.basesetup.entity.CustomerVO;
-import com.efitops.basesetup.entity.DailyExchangeRateVO;
 import com.efitops.basesetup.entity.DepartmentVO;
-import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.SalesContractAmdDetailsVO;
 import com.efitops.basesetup.entity.SalesContractAmendmentVO;
-import com.efitops.basesetup.entity.SalesContractDetailsVO;
-import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
-import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerComplaintRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
-import com.efitops.basesetup.repository.DailyExchangeRateRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.SalesContractAmdDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractAmdRepo;
-import com.efitops.basesetup.repository.SalesContractDetailsRepo;
+import com.efitops.basesetup.security.TokenProvider;
 
 @Service
 public class TransportMasterServiceImpl implements TransportMasterService {
@@ -83,7 +69,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	private SalesContractAmdRepo salesContractAmendmentRepo;
 
 	@Autowired
-	private SalesContractAmdDetailsRepo slesContractAmdDetailsRepo;
+	private SalesContractAmdDetailsRepo salesContractAmdDetailsRepo;
 
 	@Autowired
 	private BranchRepo branchRepo;
@@ -569,6 +555,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		return response;
 	}
 
+
 	// Sales Contract amendment
 
 	@Override
@@ -706,10 +693,10 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 		if (dto.getId() != null) {
 
-			List<SalesContractAmdDetailsVO> oldList = slesContractAmdDetailsRepo
+			List<SalesContractAmdDetailsVO> oldList = salesContractAmdDetailsRepo
 					.findBySalesContractAmendmentVO(salesContractAmendmentVO);
 
-			slesContractAmdDetailsRepo.deleteAll(oldList);
+			salesContractAmdDetailsRepo.deleteAll(oldList);
 		}
 
 		List<SalesContractAmdDetailsVO> detailList = new ArrayList<>();

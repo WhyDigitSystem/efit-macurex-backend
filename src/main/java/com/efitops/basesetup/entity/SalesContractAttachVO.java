@@ -13,35 +13,31 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@Table(name = "customer_item_details")
-@Getter
-@Setter
-@NoArgsConstructor
+@Table(name = "sales_contract_attach")
+@Data
 @AllArgsConstructor
-public class CustomerItemDetailsVO {
+@NoArgsConstructor
+public class SalesContractAttachVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator = "customeritemdetailsgen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_contract_attachgen")
     @SequenceGenerator(
-            name = "customeritemdetailsgen",
-            sequenceName = "customeritemdetailsseq",
+            name = "sales_contract_attachgen",
+            sequenceName = "sales_contract_attachseq",
             initialValue = 1000000001,
             allocationSize = 1)
-    @Column(name = "customer_item_details_id")
+    @Column(name = "sales_contract_attach_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "item")
-    private ItemMasterVO item;
-    
-    @ManyToOne
+    @JoinColumn(name = "salescontract_id")
     @JsonBackReference
-    @JoinColumn(name = "customer_id")
-    private CustomerVO customerVO;
-}
+    private SalesContractVO salesContract;
+
+    @Column(name = "pdf_attached")
+    private String pdfAttached;
+}	

@@ -1,5 +1,7 @@
 package com.efitops.basesetup.dto;
 
+import com.efitops.basesetup.entity.UnitMasterVO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,5 +13,6 @@ public class ItemMasterResponseDetailsDTO {
 	private Long id;
 	private String itemDescription;
 	private String itemCode;
+	private UnitMasterResponseDTO unit;
 
 }

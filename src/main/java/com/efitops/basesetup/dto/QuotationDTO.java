@@ -17,17 +17,15 @@ public class QuotationDTO {
 
 	private String userCategory;
 
-	private String docId;
+//	private Long plantId;
 
-	private LocalDate docDate = LocalDate.now();
-
-	private Long plantId;
-
-	private Long partyId;
+	private Long customer;
 
 	private String withEnquiry;
 
 	private String partyName;
+
+	private BigDecimal amount;
 
 	private String oldEnquryNo;
 
@@ -43,6 +41,7 @@ public class QuotationDTO {
 
 	private String quotationSerialNo;
 
+
 	private String customerEnquiryNo;
 
 	private String customerEnquiryDate;
@@ -51,11 +50,10 @@ public class QuotationDTO {
 
 	private Long validTill;
 
+	private LocalDate date;
+	
+
 	private String kindAttention;
-
-	private Long taxCode;
-
-	private String taxBasicId;
 
 	// Common Fields
 
@@ -84,6 +82,7 @@ public class QuotationDTO {
 
 	private String freightBy;
 
+	private BigDecimal totalAmount;
 
 	private String terms;
 
@@ -93,6 +92,6 @@ public class QuotationDTO {
 
 	private List<QuotationItemTaxDetailsDTO> quotationItemTaxDetailsDTO;
 
-	private List<QuotationIemFileUploadDetailsDTO> quotationIemFileUploadDetailsDTO;
+//	private List<QuotationIemFileUploadDetailsDTO> quotationIemFileUploadDetailsDTO;
 
 }

@@ -12,57 +12,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class QuotationItemDetailsDTO {
 
-	private Long id;
-	private Long itemCodeId;
-	private Long itemDescriptionId;
-
-	private Long unitId;
-
-	private String taxName;
-
-	private String taxCode;
+	private Long item;
 
 	private BigDecimal qtyOffered;
-
-	private BigDecimal minPrice;
-
-	private BigDecimal enquiryPrice;
 
 	private BigDecimal basicPrice;
 
 	private BigDecimal discountPercentage;
 
-	private BigDecimal lastRate;
-	private BigDecimal lRate;
-
 	private BigDecimal quotationAmount;
+	
+	private BigDecimal discountAmount;
 
-	private BigDecimal edPercentage;
 
-	private BigDecimal edValue;
-
-	private BigDecimal eduPercentage;
-
-	private BigDecimal eduVal;
-
-	private BigDecimal vatPercentage;
-
-	private BigDecimal vatValue;
-
-	private BigDecimal quotRatePiece;
-
-	private BigDecimal amount;
+	private int qty;
 
 	private LocalDate deliveryDate;
 
-	private Long currencyNameId;
-
-	private String currencySymbol;
-
-	private String enqDetailId;
-
-	private String offerControl;
-
-	private String enquiryItem;
+	private Long currencyName;
 
 }

@@ -193,10 +193,14 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 
 	    createUpdateCustomerVO(customerDTO, customerVO);
 
+	    System.out.println("Before save");
 	    customerRepo.save(customerVO);
+	    System.out.println("After save");
 
+	    System.out.println("Before convert");
 	    CustomerResponseDTO responseDTO = convertToResponse(customerVO);
-
+	    System.out.println("After convert");
+	    
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("customer", responseDTO);
 	    response.put("message", message);
@@ -285,6 +289,10 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	    customerVO.setAccountName(dto.getAccountName());
 	    customerVO.setCustomerName(dto.getCustomerName());
 	    
+	    customerVO.setPanNo(dto.getPanNo());
+	    customerVO.setEsiNo(dto.getEsiNo());
+	    customerVO.setTinNo(dto.getTinNo());
+
 	    EmployeeMasterVO buyerName = null;
 
 	    if (dto.getBuyerName() != null) {
@@ -439,6 +447,11 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	    }
 
 	    vo.setShippingPincode(shippingDTO.getShippingPincode());
+	    vo.setName(shippingDTO.getName());
+	    vo.setFax(shippingDTO.getFax());
+	    vo.setEmail(shippingDTO.getEmail());
+	    vo.setPhoneNo(shippingDTO.getPhoneNo());
+
 	    vo.setCustomerVO(customerVO);
 
 	    shippingDetails.add(vo);
@@ -597,7 +610,9 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 
 	    dto.setPartyCreditLimit(customerVO.getPartyCreditLimit());
 	    dto.setPartyCreditPeriod(customerVO.getPartyCreditPeriod());
-
+	    dto.setPanNo(customerVO.getPanNo());
+	    dto.setEsiNo(customerVO.getEsiNo());
+	    dto.setTinNo(customerVO.getTinNo());
 	    // GST
 	    dto.setGstType(customerVO.getGstType());
 	    dto.setGstNo(customerVO.getGstNo());
@@ -720,7 +735,11 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	            }
 
 	            shippingDTO.setShippingPincode(shippingVO.getShippingPincode());
-
+	            shippingDTO.setName(shippingVO.getName());
+	            shippingDTO.setFax(shippingVO.getFax());
+	            shippingDTO.setEmail(shippingVO.getEmail());
+	            shippingDTO.setPhoneNo(shippingVO.getPhoneNo());
+	            
 	            shippingResponseList.add(shippingDTO);
 	        }
 	    }
@@ -759,10 +778,17 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	                }
 
 	                itemResponse.setItem(itemDTO);
+	                
+	                System.out.println("Item Id : " + itemMaster.getId());
+	                System.out.println("Item Code : " + itemMaster.getItemCode());
+	                System.out.println("Primary Unit : " +
+	                        (itemMaster.getPrimaryUnit() == null ? "NULL" : itemMaster.getPrimaryUnit().getId()));
 	            }
 
 	            itemResponseList.add(itemResponse);
 	        }
+	        
+	        
 	    }
 
 	    dto.setCustomerItemDetails(itemResponseList);
@@ -818,6 +844,7 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	        dto.setEmployeeId(obj[0] != null ? ((Number) obj[0]).longValue() : null);
 	        dto.setEmployeeCode(obj[1] != null ? obj[1].toString() : null);
 	        dto.setEmployeeName(obj[2] != null ? obj[2].toString() : null);
+	        dto.setEmail(obj[3] != null ? obj[3].toString() : null);
 
 	        responseList.add(dto);
 	    }

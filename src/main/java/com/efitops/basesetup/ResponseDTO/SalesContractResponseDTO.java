@@ -61,5 +61,6 @@ public class SalesContractResponseDTO {
     
     private List<SalesContractDetailsResponseDTO> details;
     
+    private List<SalesContractAttachResponseDTO> attachments;
     
 }

@@ -21,7 +21,7 @@ public interface EmployeeRepo extends JpaRepository<EmployeeVO, Long> {
 				        SELECT
 			    e.employeemaster_id,
 			    e.employee_id,
-			    e.emp_name
+			    e.emp_name,email
 			FROM employeemaster e
 			INNER JOIN designation d
 			    ON d.designation_id = e.designation

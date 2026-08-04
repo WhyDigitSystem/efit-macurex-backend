@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.Column;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +23,10 @@ public class CustomerDTO {
 	    private Long supplierType;
 
 	    private Long branch;
+	    
+		private String panNo;
+		private String esiNo;
+		private String tinNo;
 
 	    private String docId;
 	    private LocalDate docDate;

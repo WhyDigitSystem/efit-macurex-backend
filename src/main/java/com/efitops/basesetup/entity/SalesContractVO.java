@@ -25,7 +25,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "sales_contract")
+@Table(name = "sales_contract_basic")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -123,6 +123,15 @@ public class SalesContractVO {
 	        cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<SalesContractDetailsVO> salesContractDetailsVO = new ArrayList<>();
+	
+	
+	@OneToMany(
+	        mappedBy = "salesContract",
+	        cascade = CascadeType.ALL,
+	        orphanRemoval = true)
+	@JsonManagedReference
+	private List<SalesContractAttachVO> attachments = new ArrayList<>();
+	
 	
     @Embedded
     private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();

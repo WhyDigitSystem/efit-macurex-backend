@@ -23,5 +23,12 @@ public interface BranchRepo extends JpaRepository<BranchVO, Long>{
 	        ORDER BY code 
 	        """, nativeQuery = true)
 	List<BranchVO> getBranchByOrgId(Long orgId);
+	
+	@Query(value = "SELECT branch_id, branch, branch_name " +
+            "FROM branch " +
+            "WHERE cancel = false " +
+            "ORDER BY branch",
+    nativeQuery = true)
+List<Object[]> getBranch();
 
 }

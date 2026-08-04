@@ -1,5 +1,7 @@
 package com.efitops.basesetup.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -21,7 +23,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "sales_contract_details")
+@Table(name = "sales_contract_detail")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

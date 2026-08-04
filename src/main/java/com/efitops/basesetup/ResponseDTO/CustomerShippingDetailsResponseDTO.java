@@ -1,5 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import javax.persistence.Column;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +25,14 @@ public class CustomerShippingDetailsResponseDTO {
 
     private CountryResponseDTO shippingCountry;
 
+    private String name;
+
+    private String phoneNo;
+
+    private String email;
+
+    private String fax;
+    
     private String shippingPincode;
 
 }

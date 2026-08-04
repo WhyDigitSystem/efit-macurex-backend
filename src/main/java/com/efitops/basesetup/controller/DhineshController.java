@@ -8,14 +8,16 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.QuotationDropdownResponseDTO;
@@ -39,21 +41,60 @@ public class DhineshController extends BaseController{
 	public static final Logger LOGGER = LoggerFactory.getLogger(DhineshController.class);
 	
 	
-	@PostMapping("/createUpdateSalesContract")
+//	@PostMapping("/createUpdateSalesContract")
+//	public ResponseEntity<ResponseDTO> createUpdateSalesContract(
+//	        @RequestBody SalesContractDTO salesContractDTO) {
+//
+//	    String methodName = "createUpdateSalesContract()";
+//	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//	    Map<String, Object> responseObjectsMap = new HashMap<>();
+//	    String errorMsg = null;
+//	    ResponseDTO responseDTO = null;
+//
+//	    try {
+//
+//	        Map<String, Object> createdSalesContractVO =
+//	        		dhineshService.createUpdateSalesContract(salesContractDTO);
+//
+//	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+//	                createdSalesContractVO.get("message"));
+//
+//	        responseObjectsMap.put("salesContractVO",
+//	                createdSalesContractVO.get("salesContract"));
+//
+//	        responseDTO = createServiceResponse(responseObjectsMap);
+//
+//	    } catch (Exception e) {
+//
+//	        errorMsg = e.getMessage();
+//
+//	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+//
+//	        responseDTO = createServiceResponseError(
+//	                responseObjectsMap, errorMsg, errorMsg);
+//	    }
+//
+//	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//	    return ResponseEntity.ok().body(responseDTO);
+//	}
+//	
+	
+	@PostMapping(value = "/createUpdateSalesContract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdateSalesContract(
-	        @RequestBody SalesContractDTO salesContractDTO) {
+	        @RequestPart("salesContract") SalesContractDTO salesContractDTO,
+	        @RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 	    String methodName = "createUpdateSalesContract()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    String errorMsg = null;
-	    ResponseDTO responseDTO = null;
+	    ResponseDTO responseDTO;
 
 	    try {
 
 	        Map<String, Object> createdSalesContractVO =
-	        		dhineshService.createUpdateSalesContract(salesContractDTO);
+	                dhineshService.createUpdateSalesContract(salesContractDTO, files);
 
 	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
 	                createdSalesContractVO.get("message"));
@@ -65,19 +106,25 @@ public class DhineshController extends BaseController{
 
 	    } catch (Exception e) {
 
-	        errorMsg = e.getMessage();
-
-	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
 	        responseDTO = createServiceResponseError(
-	                responseObjectsMap, errorMsg, errorMsg);
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
 	    }
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	    return ResponseEntity.ok().body(responseDTO);
+	    return ResponseEntity.ok(responseDTO);
 	}
 	
+//	@PostMapping(value = "/createUpdateSalesContract",
+//	        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//	public ResponseEntity<String> createUpdateSalesContract(
+//	        @RequestPart("salesContract") String salesContract,
+//	        @RequestPart(value = "files", required = false) MultipartFile[] files) {
+//
+//	    System.out.println(salesContract);
+//
+//	    return ResponseEntity.ok("Success");
+//	}
 	
 	@GetMapping("/getFinishedGoodsItems")
 	public ResponseEntity<ResponseDTO> getFinishedGoodsItems(

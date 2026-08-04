@@ -165,8 +165,7 @@ public class QuotationServiceController extends BaseController {
 	@PostMapping(value = "/createUpdateQuotation",
 	        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdateQuotation(
-//	        @RequestPart("quotation") QuotationDTO quotationDTO,
-	        @RequestBody QuotationDTO quotationDTO,
+	        @RequestPart("quotation") QuotationDTO quotationDTO,
 	        @RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 	    Map<String, Object> responseObjectsMap = new HashMap<>();

@@ -32,7 +32,7 @@ public class ItemMasterDTO {
 
 	private Long hsnId;
 
-	private String capitalOrInput;
+//	private String capitalOrInput;
 
 	private Long gradeId;
 

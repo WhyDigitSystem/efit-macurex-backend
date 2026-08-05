@@ -14,13 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
@@ -42,7 +41,7 @@ public class PartyMasterController extends BaseController {
     @Autowired
     private PartyMasterService partyMasterService;
 
-    @PostMapping("/createUpdateCustomer")
+    @PutMapping("/createUpdateCustomer")
     public ResponseEntity<ResponseDTO> createUpdateCustomer(
             @Valid @RequestBody CustomerDTO customerDTO) {
 

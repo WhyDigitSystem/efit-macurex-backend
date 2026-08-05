@@ -1,10 +1,17 @@
 package com.efitops.basesetup.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -12,12 +19,16 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTRateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.QuotationDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.QuotationItemDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractAttachResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemResponseDTO;
@@ -31,6 +42,7 @@ import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.SalesContractAttachVO;
 import com.efitops.basesetup.entity.SalesContractDetailsVO;
 import com.efitops.basesetup.entity.SalesContractVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
@@ -39,476 +51,608 @@ import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.GstRateMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.SalesContractAttachRepo;
 import com.efitops.basesetup.repository.SalesContractDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
-
 @Service
-public class DhineshServiceImpl implements DhineshService{
-	
+public class DhineshServiceImpl implements DhineshService {
+
 	public static final Logger LOGGER = LoggerFactory.getLogger(DhineshServiceImpl.class);
 
 	@Autowired
 	SalesContractRepo salesContractRepo;
-	
+
 	@Autowired
 	BranchRepo branchRepo;
-	
+
 	@Autowired
 	CustomerRepo customerRepo;
-	
+
 	@Autowired
 	SalesContractDetailsRepo salesContractDetailsRepo;
-	
+
 	@Autowired
 	ItemMasterRepo itemMasterRepo;
-	
+
 	@Autowired
 	UnitMasterRepo unitMasterRepo;
-	
+
 	@Autowired
 	GstRateMasterRepo gstRateRepo;
-	
+
 	@Autowired
 	ItemMasterRepo itemRepo;
+
+	@Value("${sales.contract.upload.path}")
+	private String uploadPath;
 	
+	@Autowired
+	SalesContractAttachRepo salesContractAttachRepo;
+
 	@Override
 	@Transactional
-	public Map<String, Object> createUpdateSalesContract(SalesContractDTO dto) throws ApplicationException {
+	public Map<String, Object> createUpdateSalesContract(SalesContractDTO dto, MultipartFile[] files)
+			throws ApplicationException {
 
-	    Map<String, Object> response = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 
-	    String message;
+		String message;
 
-	    SalesContractVO salesContractVO;
+		SalesContractVO salesContractVO;
 
-	    if (ObjectUtils.isEmpty(dto.getId())) {
+		if (ObjectUtils.isEmpty(dto.getId())) {
 
-	        salesContractVO = new SalesContractVO();
+			salesContractVO = new SalesContractVO();
 
-	        salesContractVO.setCreatedBy(dto.getCreatedBy());
-	        salesContractVO.setUpdatedBy(dto.getCreatedBy());
+			salesContractVO.setCreatedBy(dto.getCreatedBy());
+			salesContractVO.setUpdatedBy(dto.getCreatedBy());
 
-	        message = "Sales Contract Created Successfully";
+			message = "Sales Contract Created Successfully";
 
-	    } else {
+		} else {
 
-	        salesContractVO = salesContractRepo.findById(dto.getId())
-	                .orElseThrow(() -> new ApplicationException("Sales Contract Not Found"));
+			salesContractVO = salesContractRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Sales Contract Not Found"));
 
-	        List<SalesContractDetailsVO> oldDetails =
-	                salesContractDetailsRepo.findBySalesContract(salesContractVO);
+			List<SalesContractDetailsVO> oldDetails = salesContractDetailsRepo.findBySalesContract(salesContractVO);
 
-	        salesContractDetailsRepo.deleteAll(oldDetails);
-	        
-	        salesContractVO.setUpdatedBy(dto.getCreatedBy());
+			salesContractDetailsRepo.deleteAll(oldDetails);
 
-	        message = "Sales Contract Updated Successfully";
-	    }
+			salesContractVO.setUpdatedBy(dto.getCreatedBy());
 
-	    getSalesContractVOFromDTO(dto, salesContractVO);
+			message = "Sales Contract Updated Successfully";
+		}
+		
+		System.out.println("Branch : " + dto.getBranch());
+		System.out.println("Customer : " + dto.getCustomer());
+		System.out.println("OrgId : " + dto.getOrgId());
 
-	    salesContractVO = salesContractRepo.save(salesContractVO);
+		for (SalesContractDetailsDTO detail : dto.getDetails()) {
+		    System.out.println("Item : " + detail.getItem());
+		    System.out.println("Unit : " + detail.getUnit());
+		    System.out.println("Tax : " + detail.getTaxPercentage());
+		}
+		System.out.println("Files : " + (files == null ? "NULL" : files.length));
 
-	    SalesContractResponseDTO responseDTO = convertToResponse(salesContractVO);
+		System.out.println("1. Before getSalesContractVOFromDTO");
+		getSalesContractVOFromDTO(dto, salesContractVO);
+		System.out.println("2. After getSalesContractVOFromDTO");
+		
+		System.out.println("3. Before save");
+		salesContractVO = salesContractRepo.save(salesContractVO);
+		System.out.println("4. After save");
+		
+		// Save uploaded files
+		System.out.println("5. Before saveAttachments");
+		saveAttachments(files, salesContractVO);
+		System.out.println("6. After saveAttachments");
+		
+		System.out.println("7. Before convertToResponse");
+		SalesContractResponseDTO responseDTO = convertToResponse(salesContractVO);
+		System.out.println("8. After convertToResponse");
+		
+		response.put("message", message);
+		response.put("salesContract", responseDTO);
 
-	    response.put("message", message);
-	    response.put("salesContract", responseDTO);
-
-	    return response;
+		return response;
 	}
-	
+
 	private void getSalesContractVOFromDTO(SalesContractDTO dto, SalesContractVO salesContractVO)
-	        throws ApplicationException {
+			throws ApplicationException {
 
-	    BranchVO branch = branchRepo.findById(dto.getBranch())
-	            .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+		System.out.println("A");
 
-	    CustomerVO customer = customerRepo.findById(dto.getCustomer())
-	            .orElseThrow(() -> new ApplicationException("Customer Not Found"));
+		BranchVO branch = branchRepo.findById(dto.getBranch())
+		        .orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
-	    salesContractVO.setCustomerContractNo(dto.getCustomerContractNo());
-	    salesContractVO.setContractDate(dto.getContractDate());
+		System.out.println("B");
 
-	    salesContractVO.setBranch(branch);
+		CustomerVO customer = customerRepo.findById(dto.getCustomer())
+		        .orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
-	    salesContractVO.setBelongsTo(dto.getBelongsTo());
-	    salesContractVO.setContractType(dto.getContractType());
-	    salesContractVO.setWithQuotation(dto.getWithQuotation());
-	    salesContractVO.setInvoiceType(dto.getInvoiceType());
+		System.out.println("C");
 
-	    salesContractVO.setCustomer(customer);
+		salesContractVO.setCustomerContractNo(dto.getCustomerContractNo());
+		salesContractVO.setContractDate(dto.getContractDate());
 
-	    salesContractVO.setQuotationNo(dto.getQuotationNo());
-	    salesContractVO.setQuotationDate(dto.getQuotationDate());
+		salesContractVO.setBranch(branch);
 
-	    salesContractVO.setCustomerPoNo(dto.getCustomerPoNo());
-	    salesContractVO.setCustomerPoDate(dto.getCustomerPoDate());
+		salesContractVO.setBelongsTo(dto.getBelongsTo());
+		salesContractVO.setContractType(dto.getContractType());
+		salesContractVO.setWithQuotation(dto.getWithQuotation());
+		salesContractVO.setInvoiceType(dto.getInvoiceType());
 
-	    salesContractVO.setEffectiveFrom(dto.getEffectiveFrom());
-	    salesContractVO.setEffectiveTo(dto.getEffectiveTo());
+		salesContractVO.setCustomer(customer);
 
-	    salesContractVO.setPostRate(dto.getPostRate());
+		salesContractVO.setQuotationNo(dto.getQuotationNo());
+		salesContractVO.setQuotationDate(dto.getQuotationDate());
 
-	    salesContractVO.setOrgId(dto.getOrgId());
-	    salesContractVO.setFinancialYear(dto.getFinancialYear());
+		salesContractVO.setCustomerPoNo(dto.getCustomerPoNo());
+		salesContractVO.setCustomerPoDate(dto.getCustomerPoDate());
 
-	    salesContractVO.setCancelRemarks(dto.getCancelRemarks());
-	    salesContractVO.setActive(dto.isActive());
-	    
-	    List<SalesContractDetailsVO> detailList = new ArrayList<>();
+		salesContractVO.setEffectiveFrom(dto.getEffectiveFrom());
+		salesContractVO.setEffectiveTo(dto.getEffectiveTo());
 
-	    if (dto.getDetails() != null && !dto.getDetails().isEmpty()) {
+		salesContractVO.setPostRate(dto.getPostRate());
 
-	        for (SalesContractDetailsDTO child : dto.getDetails()) {
+		salesContractVO.setOrgId(dto.getOrgId());
+		salesContractVO.setFinancialYear(dto.getFinancialYear());
 
-	            SalesContractDetailsVO detailVO = new SalesContractDetailsVO();
+		salesContractVO.setCancelRemarks(dto.getCancelRemarks());
+		salesContractVO.setActive(dto.isActive());
 
-	            ItemMasterVO item = itemMasterRepo.findById(child.getItem())
-	                    .orElseThrow(() -> new ApplicationException("Item Not Found"));
+		List<SalesContractDetailsVO> detailList = new ArrayList<>();
 
-	            UnitMasterVO unit = unitMasterRepo.findById(child.getUnit())
-	                    .orElseThrow(() -> new ApplicationException("Unit Not Found"));
-	            
-	            GSTRateMasterVO gstRateVO = gstRateRepo.findById(child.getTaxPercentage())
-	                    .orElseThrow(() -> new ApplicationException("GST Rate Not Found"));
+		if (dto.getDetails() != null && !dto.getDetails().isEmpty()) {
 
-	            detailVO.setItem(item);
-	            detailVO.setTaxType(child.getTaxType());
-	            detailVO.setTaxPercentage(gstRateVO);
-	            detailVO.setGstRate(gstRateVO);
+			for (SalesContractDetailsDTO child : dto.getDetails()) {
 
-	            detailVO.setUnit(unit);
-	            detailVO.setQuantity(child.getQuantity());
-	            detailVO.setQuotationRate(child.getQuotationRate());
-	            detailVO.setOrderRate(child.getOrderRate());
-	            detailVO.setEffectiveFrom(child.getEffectiveFrom());
-	            detailVO.setEffectiveTo(child.getEffectiveTo());
+				SalesContractDetailsVO detailVO = new SalesContractDetailsVO();
 
-	            detailVO.setDiscountPercentage(child.getDiscountPercentage());
+				System.out.println("D");
 
-	            BigDecimal quantity = child.getQuantity() == null
-	                    ? BigDecimal.ZERO
-	                    : child.getQuantity();
+			    ItemMasterVO item = itemMasterRepo.findById(child.getItem())
+			            .orElseThrow(() -> new ApplicationException("Item Not Found"));
 
-	            BigDecimal orderRate = child.getOrderRate() == null
-	                    ? BigDecimal.ZERO
-	                    : child.getOrderRate();
+			    System.out.println("E");
 
-	            BigDecimal discountPercentage = child.getDiscountPercentage() == null
-	                    ? BigDecimal.ZERO
-	                    : child.getDiscountPercentage();
+			    UnitMasterVO unit = unitMasterRepo.findById(child.getUnit())
+			            .orElseThrow(() -> new ApplicationException("Unit Not Found"));
 
-	            // Order Amount = Qty × Order Rate
-	         // Order Amount
-	            BigDecimal orderAmount = quantity.multiply(orderRate);
+			    System.out.println("F");
 
-	            // Discount Amount
-	            BigDecimal discountAmount = orderAmount
-	                    .multiply(discountPercentage)
-	                    .divide(BigDecimal.valueOf(100));
+			    GSTRateMasterVO gstRateVO = gstRateRepo.findById(child.getTaxPercentage())
+			            .orElseThrow(() -> new ApplicationException("GST Rate Not Found"));
 
-	            // Amount after Discount
-	            BigDecimal amount = orderAmount.subtract(discountAmount);
+			    System.out.println("G");
+				detailVO.setItem(item);
+				detailVO.setTaxType(child.getTaxType());
+				detailVO.setTaxPercentage(gstRateVO);
+				detailVO.setGstRate(gstRateVO);
 
-	            detailVO.setDiscountAmount(discountAmount);
-	            detailVO.setAmount(amount);
+				detailVO.setUnit(unit);
+				detailVO.setQuantity(child.getQuantity());
+				detailVO.setQuotationRate(child.getQuotationRate());
+				detailVO.setOrderRate(child.getOrderRate());
+				detailVO.setEffectiveFrom(child.getEffectiveFrom());
+				detailVO.setEffectiveTo(child.getEffectiveTo());
+				salesContractVO.setIsIgstApplicable(dto.getIsIgstApplicable());
+				detailVO.setDiscountPercentage(child.getDiscountPercentage());
 
-	            BigDecimal finalAmount;
+				BigDecimal quantity = child.getQuantity() == null ? BigDecimal.ZERO : child.getQuantity();
 
-	            if (Boolean.TRUE.equals(salesContractVO.getIsIgstApplicable())) {
+				BigDecimal orderRate = child.getOrderRate() == null ? BigDecimal.ZERO : child.getOrderRate();
 
-	                BigDecimal igstAmount = amount
-	                        .multiply(gstRateVO.getIgst())
-	                        .divide(BigDecimal.valueOf(100));
+				BigDecimal discountPercentage = child.getDiscountPercentage() == null ? BigDecimal.ZERO
+						: child.getDiscountPercentage();
 
-	                detailVO.setIgstAmount(igstAmount);
-	                detailVO.setCgstAmount(BigDecimal.ZERO);
-	                detailVO.setSgstAmount(BigDecimal.ZERO);
+				// Order Amount = Qty × Order Rate
+				// Order Amount
+				BigDecimal orderAmount = quantity.multiply(orderRate);
 
-	                // Final Amount
-	                finalAmount = amount.subtract(igstAmount);
+				// Discount Amount
+				BigDecimal discountAmount = orderAmount.multiply(discountPercentage).divide(BigDecimal.valueOf(100));
 
-	            } else {
+				// Amount after Discount
+				BigDecimal amount = orderAmount.subtract(discountAmount);
 
-	                BigDecimal cgstAmount = amount
-	                        .multiply(gstRateVO.getCgst())
-	                        .divide(BigDecimal.valueOf(100));
+				detailVO.setDiscountAmount(discountAmount);
+				detailVO.setAmount(amount);
 
-	                BigDecimal sgstAmount = amount
-	                        .multiply(gstRateVO.getSgst())
-	                        .divide(BigDecimal.valueOf(100));
+				BigDecimal finalAmount;
 
-	                detailVO.setCgstAmount(cgstAmount);
-	                detailVO.setSgstAmount(sgstAmount);
-	                detailVO.setIgstAmount(BigDecimal.ZERO);
+//				if (Boolean.TRUE.equals(salesContractVO.getIsIgstApplicable())) 	{
+//					BigDecimal igstAmount = amount.multiply(gstRateVO.getIgst()).divide(BigDecimal.valueOf(100));
+//
+//					detailVO.setIgstAmount(igstAmount);
+//					detailVO.setCgstAmount(BigDecimal.ZERO);
+//					detailVO.setSgstAmount(BigDecimal.ZERO);
+//
+//					// Final Amount
+//					finalAmount = amount.subtract(igstAmount);
+//
+//				} else {
+//
+//					BigDecimal cgstAmount = amount.multiply(gstRateVO.getCgst()).divide(BigDecimal.valueOf(100));
+//
+//					BigDecimal sgstAmount = amount.multiply(gstRateVO.getSgst()).divide(BigDecimal.valueOf(100));
+//
+//					detailVO.setCgstAmount(cgstAmount);
+//					detailVO.setSgstAmount(sgstAmount);
+//					detailVO.setIgstAmount(BigDecimal.ZERO);
+//
+//					// Final Amount
+//					finalAmount = amount.subtract(cgstAmount.add(sgstAmount));
+//				}
+				
+				System.out.println("IGST Applicable : " + salesContractVO.getIsIgstApplicable());
+				System.out.println("IGST Applicable : " + salesContractVO.getIsIgstApplicable());
+				if ("YES".equalsIgnoreCase(salesContractVO.getIsIgstApplicable())) {
 
-	                // Final Amount
-	                finalAmount = amount.subtract(cgstAmount.add(sgstAmount));
-	            }
+				    BigDecimal igstAmount = amount.multiply(gstRateVO.getIgst())
+				            .divide(BigDecimal.valueOf(100));
 
-	            detailVO.setFinalAmount(finalAmount);
+				    // Rate
+				    detailVO.setIgstRate(gstRateVO.getIgst());
+				    detailVO.setCgstRate(BigDecimal.ZERO);
+				    detailVO.setSgstRate(BigDecimal.ZERO);
 
-	            detailVO.setCurrency(child.getCurrency());
-	            
-	            // Header mapping
-	            detailVO.setSalesContract(salesContractVO);
+				    // Amount
+				    detailVO.setIgstAmount(igstAmount);
+				    detailVO.setCgstAmount(BigDecimal.ZERO);
+				    detailVO.setSgstAmount(BigDecimal.ZERO);
 
-	            detailList.add(detailVO);
-	        }
-	    }
+				    finalAmount = amount.add(igstAmount);
 
-	    salesContractVO.setSalesContractDetailsVO(detailList);
+				} else {
+
+				    BigDecimal cgstAmount = amount.multiply(gstRateVO.getCgst())
+				            .divide(BigDecimal.valueOf(100));
+
+				    BigDecimal sgstAmount = amount.multiply(gstRateVO.getSgst())
+				            .divide(BigDecimal.valueOf(100));
+
+				    // Rate
+				    detailVO.setCgstRate(gstRateVO.getCgst());
+				    detailVO.setSgstRate(gstRateVO.getSgst());
+				    detailVO.setIgstRate(BigDecimal.ZERO);
+
+				    // Amount
+				    detailVO.setCgstAmount(cgstAmount);
+				    detailVO.setSgstAmount(sgstAmount);
+				    detailVO.setIgstAmount(BigDecimal.ZERO);
+
+				    finalAmount = amount.add(cgstAmount).add(sgstAmount);
+				}
+
+				detailVO.setFinalAmount(finalAmount);
+
+				detailVO.setCurrency(child.getCurrency());
+
+				// Header mapping
+				detailVO.setSalesContract(salesContractVO);
+
+				detailList.add(detailVO);
+			}
+		}
+
+		salesContractVO.setSalesContractDetailsVO(detailList);
 	}
-	
+
+	private void saveAttachments(MultipartFile[] files, SalesContractVO salesContractVO) throws ApplicationException {
+
+		if (files == null || files.length == 0) {
+			return;
+		}
+
+		try {
+
+			File folder = new File(uploadPath);
+
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
+
+			List<SalesContractAttachVO> attachList = new ArrayList<>();
+
+			for (MultipartFile file : files) {
+
+				if (file == null || file.isEmpty()) {
+					continue;
+				}
+
+				String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+
+				Path path = Paths.get(uploadPath, fileName);
+
+				Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
+				SalesContractAttachVO attach = new SalesContractAttachVO();
+
+				attach.setSalesContract(salesContractVO);
+				attach.setPdfAttached(path.toString());
+
+				attachList.add(attach);
+			}
+
+			List<SalesContractAttachVO> savedAttachments =
+			        salesContractAttachRepo.saveAll(attachList);
+
+			salesContractVO.setAttachments(savedAttachments);
+
+		} catch (IOException e) {
+			throw new ApplicationException("File upload failed : " + e.getMessage());
+		}
+	}
+
 	private SalesContractResponseDTO convertToResponse(SalesContractVO vo) {
 
-	    SalesContractResponseDTO dto = new SalesContractResponseDTO();
+		SalesContractResponseDTO dto = new SalesContractResponseDTO();
 
-	    dto.setId(vo.getId());
-	    dto.setCustomerContractNo(vo.getCustomerContractNo());
-	    dto.setContractDate(vo.getContractDate());
+		dto.setId(vo.getId());
+		dto.setCustomerContractNo(vo.getCustomerContractNo());
+		dto.setContractDate(vo.getContractDate());
 
-	    if (vo.getBranch() != null) {
-	        dto.setBranch(new BranchResponseDTO(
-	                vo.getBranch().getId(),
-	                vo.getBranch().getBranchCode(),
-	                vo.getBranch().getBranchName()));
-	    }
+		if (vo.getBranch() != null) {
+			dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+					vo.getBranch().getBranchName()));
+		}
 
-	    if (vo.getCustomer() != null) {
+		if (vo.getCustomer() != null) {
 
-	        SalesCustomerResponseDTO customerDTO = new SalesCustomerResponseDTO();
+			SalesCustomerResponseDTO customerDTO = new SalesCustomerResponseDTO();
 
-	        customerDTO.setCustomerId(vo.getCustomer().getId());
-	        customerDTO.setCustomerName(vo.getCustomer().getCustomerName());
-	        customerDTO.setCustomerType(vo.getCustomer().getCustomerType());
+			customerDTO.setCustomerId(vo.getCustomer().getId());
+			customerDTO.setCustomerName(vo.getCustomer().getCustomerName());
+			customerDTO.setCustomerType(vo.getCustomer().getCustomerType());
 
-	        if (vo.getCustomer().getGstState() != null) {
-	            customerDTO.setGstState(
-	                new GSTStateResponseDTO(
-	                    vo.getCustomer().getGstState().getId(),
-	                    vo.getCustomer().getGstState().getStateCode(),
-	                    vo.getCustomer().getGstState().getStateName(),
-	                    vo.getCustomer().getGstState().getGstStateId()
-	                )
-	            );
-	        }
+			if (vo.getCustomer().getGstState() != null) {
+				customerDTO.setGstState(new GSTStateResponseDTO(vo.getCustomer().getGstState().getId(),
+						vo.getCustomer().getGstState().getStateCode(), vo.getCustomer().getGstState().getStateName(),
+						vo.getCustomer().getGstState().getGstStateId()));
+			}
 
-	        customerDTO.setIgstApplicable(vo.getCustomer().isGstApplicable());
-	        customerDTO.setGstnNo(vo.getCustomer().getGstNo());
+			customerDTO.setIgstApplicable(vo.getCustomer().isGstApplicable());
+			customerDTO.setGstnNo(vo.getCustomer().getGstNo());
 
-	        dto.setCustomer(customerDTO);
-	    }
+			dto.setCustomer(customerDTO);
+		}
 
-	    dto.setBelongsTo(vo.getBelongsTo());
-	    dto.setContractType(vo.getContractType());
-	    dto.setWithQuotation(vo.getWithQuotation());
-	    dto.setInvoiceType(vo.getInvoiceType());
+		dto.setBelongsTo(vo.getBelongsTo());
+		dto.setContractType(vo.getContractType());
+		dto.setWithQuotation(vo.getWithQuotation());
+		dto.setInvoiceType(vo.getInvoiceType());
 
-	    dto.setQuotationNo(vo.getQuotationNo());
-	    dto.setQuotationDate(vo.getQuotationDate());
+		dto.setQuotationNo(vo.getQuotationNo());
+		dto.setQuotationDate(vo.getQuotationDate());
 
-	    dto.setCustomerPoNo(vo.getCustomerPoNo());
-	    dto.setCustomerPoDate(vo.getCustomerPoDate());
+		dto.setCustomerPoNo(vo.getCustomerPoNo());
+		dto.setCustomerPoDate(vo.getCustomerPoDate());
 
-	    dto.setEffectiveFrom(vo.getEffectiveFrom());
-	    dto.setEffectiveTo(vo.getEffectiveTo());
+		dto.setEffectiveFrom(vo.getEffectiveFrom());
+		dto.setEffectiveTo(vo.getEffectiveTo());
 
-	    dto.setPostRate(vo.getPostRate());
+		dto.setPostRate(vo.getPostRate());
 
-	    dto.setOrgId(vo.getOrgId());
-	    dto.setFinancialYear(vo.getFinancialYear());
+		dto.setOrgId(vo.getOrgId());
+		dto.setFinancialYear(vo.getFinancialYear());
 
-	    dto.setCreatedBy(vo.getCreatedBy());
-	    dto.setUpdatedBy(vo.getUpdatedBy());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setUpdatedBy(vo.getUpdatedBy());
 
-	    dto.setCancelRemarks(vo.getCancelRemarks());
-	    dto.setActive(vo.isActive());
-	    
-	    
-	    // Details Mapping
-	    List<SalesContractDetailsResponseDTO> detailResponse = new ArrayList<>();
+		dto.setCancelRemarks(vo.getCancelRemarks());
+		dto.setActive(vo.isActive());
 
-	    if (vo.getSalesContractDetailsVO() != null) {
+		// Details Mapping
+		List<SalesContractDetailsResponseDTO> detailResponse = new ArrayList<>();
 
-	        for (SalesContractDetailsVO detail : vo.getSalesContractDetailsVO()) {
+		if (vo.getSalesContractDetailsVO() != null) {
 
-	            SalesContractDetailsResponseDTO detailDTO = new SalesContractDetailsResponseDTO();
+			for (SalesContractDetailsVO detail : vo.getSalesContractDetailsVO()) {
 
-	            detailDTO.setId(detail.getId());
+				SalesContractDetailsResponseDTO detailDTO = new SalesContractDetailsResponseDTO();
 
-	            if (detail.getItem() != null) {
-	            	detailDTO.setItem(new SalesContractItemResponseDTO(
-	            	        detail.getItem().getId(),
-	            	        detail.getItem().getItemCode(),
-	            	        detail.getItem().getItemDescription(),
-	            	        detail.getItem().getHsnCode() != null
-	                        ? detail.getItem().getHsnCode().getHsn()
-	                        : null,
-	            	        vo.getQuotationNo() != null ? vo.getCustomerPoNo() : null
-	            	));
-	            }
+				detailDTO.setId(detail.getId());
 
-	            detailDTO.setTaxType(detail.getTaxType());
-	            if (detail.getTaxPercentage() != null) {
+				if (detail.getItem() != null) {
+					detailDTO.setItem(new SalesContractItemResponseDTO(detail.getItem().getId(),
+							detail.getItem().getItemCode(), detail.getItem().getItemDescription(),
+							detail.getItem().getHsnCode() != null ? detail.getItem().getHsnCode().getHsn() : null,
+							vo.getQuotationNo() != null ? vo.getCustomerPoNo() : null));
+				}
 
-	                GSTRateResponseDTO gstRateDTO = new GSTRateResponseDTO();
+				detailDTO.setTaxType(detail.getTaxType());
+				if (detail.getTaxPercentage() != null) {
 
-	                gstRateDTO.setId(detail.getTaxPercentage().getId());
-	                gstRateDTO.setTaxPercentage(detail.getTaxPercentage().getRate()); // or getGstRate()
+					GSTRateResponseDTO gstRateDTO = new GSTRateResponseDTO();
 
-	                detailDTO.setTaxPercentage(gstRateDTO);
-	            }
-	            if (detail.getUnit() != null) {
-	                detailDTO.setUnit(new UnitResponseDTO(
-	                        detail.getUnit().getId(),
-	                        detail.getUnit().getUnitId()));
-	            }
+					gstRateDTO.setId(detail.getTaxPercentage().getId());
+					gstRateDTO.setTaxPercentage(detail.getTaxPercentage().getRate()); // or getGstRate()
 
-	            detailDTO.setQuantity(detail.getQuantity());
-	            detailDTO.setQuotationRate(detail.getQuotationRate());
-	            detailDTO.setOrderRate(detail.getOrderRate());
+					detailDTO.setTaxPercentage(gstRateDTO);
+				}
+				if (detail.getUnit() != null) {
+					detailDTO.setUnit(new UnitResponseDTO(detail.getUnit().getId(), detail.getUnit().getUnitId()));
+				}
 
-	            detailDTO.setDiscountPercentage(detail.getDiscountPercentage());
-	            detailDTO.setEffectiveFrom(detail.getEffectiveFrom());
-	            detailDTO.setEffectiveTo(detail.getEffectiveTo());
+				detailDTO.setQuantity(detail.getQuantity());
+				detailDTO.setQuotationRate(detail.getQuotationRate());
+				detailDTO.setOrderRate(detail.getOrderRate());
 
-	            detailDTO.setDiscountAmount(detail.getDiscountAmount());
-	            detailDTO.setAmount(detail.getAmount());
-	            detailDTO.setFinalAmount(detail.getFinalAmount());
+				detailDTO.setDiscountPercentage(detail.getDiscountPercentage());
+				detailDTO.setEffectiveFrom(detail.getEffectiveFrom());
+				detailDTO.setEffectiveTo(detail.getEffectiveTo());
 
-	            detailDTO.setSgstRate(detail.getSgstRate());
-	            detailDTO.setSgstAmount(detail.getSgstAmount());
+				detailDTO.setDiscountAmount(detail.getDiscountAmount());
+				detailDTO.setAmount(detail.getAmount());
+				detailDTO.setFinalAmount(detail.getFinalAmount());
 
-	            detailDTO.setCgstRate(detail.getCgstRate());
-	            detailDTO.setCgstAmount(detail.getCgstAmount());
+				detailDTO.setSgstRate(detail.getSgstRate());
+				detailDTO.setSgstAmount(detail.getSgstAmount());
 
-	            detailDTO.setIgstRate(detail.getIgstRate());
-	            detailDTO.setIgstAmount(detail.getIgstAmount());
+				detailDTO.setCgstRate(detail.getCgstRate());
+				detailDTO.setCgstAmount(detail.getCgstAmount());
 
-	            detailDTO.setCurrency(detail.getCurrency());
+				detailDTO.setIgstRate(detail.getIgstRate());
+				detailDTO.setIgstAmount(detail.getIgstAmount());
 
-	            detailResponse.add(detailDTO);
-	        }
-	    }
+				detailDTO.setCurrency(detail.getCurrency());
 
-	    dto.setDetails(detailResponse);
+				detailResponse.add(detailDTO);
+				
+				
+			}
+		}
 
-	    return dto;
+		dto.setDetails(detailResponse);
+		
+		// Attachment Mapping
+		List<SalesContractAttachResponseDTO> attachmentResponse = new ArrayList<>();
+
+		if (vo.getAttachments() != null) {
+
+		    for (SalesContractAttachVO attachment : vo.getAttachments()) {
+
+		        SalesContractAttachResponseDTO attachmentDTO =
+		                new SalesContractAttachResponseDTO();
+
+		        attachmentDTO.setId(attachment.getId());
+		        attachmentDTO.setPdfAttached(attachment.getPdfAttached());
+
+		        attachmentResponse.add(attachmentDTO);
+		    }
+		}
+
+		dto.setAttachments(attachmentResponse);
+		
+		System.out.println("Upload Path : " + uploadPath);
+
+		return dto;
 	}
-	
-	
-	//dropdown
-	
-	
+
+	// dropdown
+
 	@Override
 	public List<SalesContractItemDropdownResponseDTO> getFinishedGoodsItems(Long orgId, Long branch)
-	        throws ApplicationException {
+			throws ApplicationException {
 
-	    List<Object[]> itemList = itemRepo.getFinishedGoodsItems(orgId, branch);
+		List<Object[]> itemList = itemRepo.getFinishedGoodsItems(orgId, branch);
 
-	    List<SalesContractItemDropdownResponseDTO> responseList = new ArrayList<>();
+		List<SalesContractItemDropdownResponseDTO> responseList = new ArrayList<>();
 
-	    for (Object[] obj : itemList) {
-	        responseList.add(mapToFinishedGoodsResponseDTO(obj));
-	    }
+		for (Object[] obj : itemList) {
+			responseList.add(mapToFinishedGoodsResponseDTO(obj));
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
+
 	private SalesContractItemDropdownResponseDTO mapToFinishedGoodsResponseDTO(Object[] obj) {
 
-	    SalesContractItemDropdownResponseDTO dto = new SalesContractItemDropdownResponseDTO();
+		SalesContractItemDropdownResponseDTO dto = new SalesContractItemDropdownResponseDTO();
 
-	    dto.setItemId(((Number) obj[0]).longValue());
-	    dto.setItemCode((String) obj[1]);
-	    dto.setItemDescription((String) obj[2]);
-	    dto.setUnitId((String) obj[3]);
-	    dto.setMinimumSellPrice((BigDecimal) obj[4]);
-	    dto.setHsnCode((String) obj[5]);
-	    dto.setCustomerPartNo((String) obj[6]);
+		dto.setItemId(((Number) obj[0]).longValue());
+		dto.setItemCode((String) obj[1]);
+		dto.setItemDescription((String) obj[2]);
+		dto.setUnitId((String) obj[3]);
+		dto.setMinimumSellPrice((BigDecimal) obj[4]);
+		dto.setHsnCode((String) obj[5]);
+		dto.setCustomerPartNo((String) obj[6]);
 
-	    return dto;
+		return dto;
 	}
-	
-	
+
 	@Override
-	public List<QuotationDropdownResponseDTO> getQuotationDropdown(
-	        String customerCode,
-	        String ctype,
-	        Long orgId,
-	        Long branch,
-	        String oldQuotationNo,
-	        Long recId) throws ApplicationException {
+	public List<QuotationDropdownResponseDTO> getQuotationDropdown(String customerCode, String ctype, Long orgId,
+			Long branch, String oldQuotationNo, Long recId) throws ApplicationException {
 
-	    List<Object[]> list = salesContractRepo.getQuotationDropdown(
-	            customerCode,
-	            ctype,
-	            orgId,
-	            branch,
-	            oldQuotationNo,
-	            recId);
+		List<Object[]> list = salesContractRepo.getQuotationDropdown(customerCode, ctype, orgId, branch, oldQuotationNo,
+				recId);
 
-	    return convertToQuotationDropdownDTO(list);
+		return convertToQuotationDropdownDTO(list);
 	}
-	
+
 	private List<QuotationDropdownResponseDTO> convertToQuotationDropdownDTO(List<Object[]> list) {
 
-	    List<QuotationDropdownResponseDTO> responseList = new ArrayList<>();
+		List<QuotationDropdownResponseDTO> responseList = new ArrayList<>();
 
-	    for (Object[] obj : list) {
+		for (Object[] obj : list) {
 
-	        QuotationDropdownResponseDTO dto = new QuotationDropdownResponseDTO();
+			QuotationDropdownResponseDTO dto = new QuotationDropdownResponseDTO();
 
-	        dto.setQuotationId(
-	                obj[0] != null ? ((Number) obj[0]).longValue() : null);
+			dto.setQuotationId(obj[0] != null ? ((Number) obj[0]).longValue() : null);
 
-	        dto.setQuotationNo(
-	                obj[1] != null ? obj[1].toString() : null);
+			dto.setQuotationNo(obj[1] != null ? obj[1].toString() : null);
 
-	        dto.setQuotationDate(
-	                obj[2] != null ? ((java.sql.Date) obj[2]).toLocalDate() : null);
+			dto.setQuotationDate(obj[2] != null ? ((java.sql.Date) obj[2]).toLocalDate() : null);
 
-	        responseList.add(dto);
-	    }
+			responseList.add(dto);
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
+
 	@Override
 	public List<CustomerDropdownResponseDTO> getCustomerDropdown(String ctype, Long orgId, Long branch)
-	        throws ApplicationException {
+			throws ApplicationException {
 
-	    List<Object[]> list = customerRepo.getCustomerDropdown(ctype, orgId, branch);
+		List<Object[]> list = customerRepo.getCustomerDropdown(ctype, orgId, branch);
 
-	    return convertToCustomerDropdownDTO(list);
+		return convertToCustomerDropdownDTO(list);
 	}
 
 	private List<CustomerDropdownResponseDTO> convertToCustomerDropdownDTO(List<Object[]> list) {
 
-	    List<CustomerDropdownResponseDTO> responseList = new ArrayList<>();
+		List<CustomerDropdownResponseDTO> responseList = new ArrayList<>();
 
-	    for (Object[] obj : list) {
+		for (Object[] obj : list) {
 
-	        CustomerDropdownResponseDTO dto = new CustomerDropdownResponseDTO();
+			CustomerDropdownResponseDTO dto = new CustomerDropdownResponseDTO();
 
-	        dto.setCustomerId(obj[0] != null ? ((Number) obj[0]).longValue() : null);
-	        dto.setCustomerCode(obj[1] != null ? obj[1].toString() : null);
-	        dto.setCustomerName(obj[2] != null ? obj[2].toString() : null);
-	        dto.setAddress(obj[3] != null ? obj[3].toString() : null);
-	        dto.setGstState(obj[4] != null ? obj[4].toString() : null);
-	        dto.setGstNo(obj[5] != null ? obj[5].toString() : null);
-	        dto.setIgstApplicable(obj[6] != null ? (Boolean) obj[6] : false);
-	        dto.setGstType(obj[7] != null ? obj[7].toString() : null);
+			dto.setCustomerId(obj[0] != null ? ((Number) obj[0]).longValue() : null);
+			dto.setCustomerCode(obj[1] != null ? obj[1].toString() : null);
+			dto.setCustomerName(obj[2] != null ? obj[2].toString() : null);
+			dto.setAddress(obj[3] != null ? obj[3].toString() : null);
+			dto.setGstState(obj[4] != null ? obj[4].toString() : null);
+			dto.setGstNo(obj[5] != null ? obj[5].toString() : null);
+			dto.setIgstApplicable(obj[6] != null ? (Boolean) obj[6] : false);
+			dto.setGstType(obj[7] != null ? obj[7].toString() : null);
 
-	        responseList.add(dto);
-	    }
+			responseList.add(dto);
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	
+
+	@Override
+	public List<QuotationItemDropdownResponseDTO> getQuotationItemDropdown(String quotationNo, Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> list = salesContractRepo.getQuotationItemDropdown(quotationNo, orgId, branch);
+
+		return convertToQuotationItemDropdownDTO(list);
+	}
+
+	private List<QuotationItemDropdownResponseDTO> convertToQuotationItemDropdownDTO(List<Object[]> list) {
+
+		List<QuotationItemDropdownResponseDTO> responseList = new ArrayList<>();
+
+		for (Object[] obj : list) {
+
+			QuotationItemDropdownResponseDTO dto = new QuotationItemDropdownResponseDTO();
+
+			dto.setItemId(obj[0] != null ? ((Number) obj[0]).longValue() : null);
+			dto.setItemCode(obj[1] != null ? obj[1].toString() : null);
+			dto.setItemDescription(obj[2] != null ? obj[2].toString() : null);
+			dto.setHsnCode(obj[3] != null ? obj[3].toString() : null);
+			dto.setCustomerPartNo(obj[4] != null ? obj[4].toString() : null);
+
+			responseList.add(dto);
+		}
+
+		return responseList;
+	}
 
 }

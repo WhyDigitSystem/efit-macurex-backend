@@ -68,6 +68,13 @@ public class CustomerVO {
 	@Column(name = "salutation")
 	private String salutation;
 
+	@Column(name = "pan_no")
+	private String panNo;
+	@Column(name = "esi_no")
+	private String esiNo;
+	@Column(name = "tin_no")
+	private String tinNo;
+	
 	@Column(name = "customer_type")
 	private String customerType;
 

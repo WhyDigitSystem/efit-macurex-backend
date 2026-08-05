@@ -19,6 +19,23 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
 	List<ItemMasterVO> getItemMasterByOrgId(Long orgId, Long branchId);
 
 	boolean existsByItemCodeAndOrgIdAndBranchId(String itemCode, Long orgId, Long branchId);
+	
+	//dropdown for item
+	
+	@Query(value = "SELECT item_id, item_code " +
+            "FROM item " +
+            "WHERE cancel = false " +
+            "ORDER BY item_code",
+    nativeQuery = true)
+List<Object[]> getItem();
+
+
+@Query(value = "SELECT item_id, item_code, item_description, customer_part_no " +
+        "FROM item " +
+        "WHERE item_id = ?1 " +
+        "AND cancel = false",
+nativeQuery = true)
+List<Object[]> getItemDetails(Long itemId);
 
 	@Query(value = """
 		    SELECT

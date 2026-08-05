@@ -19,16 +19,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "quotationitemtaxdetails")
+@Table(name = "quotation_tax_detail")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuotationItemTaxDetailsVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quotationitemtaxdetailsgen")
-	@SequenceGenerator(name = "quotationitemtaxdetailsgen", sequenceName = "quotationitemtaxdetailsseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "quotationitemtaxdetails_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quotation_tax_detailgen")
+	@SequenceGenerator(name = "quotation_tax_detailgen", sequenceName = "quotation_tax_detailseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "quotation_tax_detail_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "particulars")

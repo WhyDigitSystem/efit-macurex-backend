@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QuotationItemTaxDetailsDTO {
 
+	private Long id;
 	private String particulars;
 
 	private BigDecimal amount;

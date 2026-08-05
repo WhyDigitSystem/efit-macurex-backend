@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SalesContractDetailsDTO {
 
-    private Long id;
+//    private Long id;
 
     private Long item;
 

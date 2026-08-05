@@ -48,7 +48,7 @@ public class QuotationDTO {
 
 	private String enqBasicId;
 
-	private Long validTill;
+	private LocalDate validTill;
 
 	private LocalDate date;
 	

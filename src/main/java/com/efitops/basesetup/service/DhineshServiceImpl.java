@@ -2,6 +2,7 @@ package com.efitops.basesetup.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTRateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.QuotationDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.QuotationItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAttachResponseDTO;
@@ -33,17 +35,21 @@ import com.efitops.basesetup.ResponseDTO.SalesContractDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractResponseTaxDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.SalesCustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.SalesContractDTO;
 import com.efitops.basesetup.dto.SalesContractDetailsDTO;
+import com.efitops.basesetup.dto.SalesContractTaxDetailsDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.SalesContractAttachVO;
 import com.efitops.basesetup.entity.SalesContractDetailsVO;
+import com.efitops.basesetup.entity.SalesContractTaxDetailsVO;
 import com.efitops.basesetup.entity.SalesContractVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -51,9 +57,11 @@ import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.GstRateMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractAttachRepo;
 import com.efitops.basesetup.repository.SalesContractDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractRepo;
+import com.efitops.basesetup.repository.SalesContractTaxDetailsRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
@@ -87,9 +95,15 @@ public class DhineshServiceImpl implements DhineshService {
 
 	@Value("${sales.contract.upload.path}")
 	private String uploadPath;
-	
+
 	@Autowired
 	SalesContractAttachRepo salesContractAttachRepo;
+
+	@Autowired
+	ListOfValuesDetailsRepo listOfValuesDetailsRepo;
+
+	@Autowired
+	SalesContractTaxDetailsRepo salesContractTaxDetailsRepo;
 
 	@Override
 	@Transactional
@@ -99,7 +113,6 @@ public class DhineshServiceImpl implements DhineshService {
 		Map<String, Object> response = new HashMap<>();
 
 		String message;
-
 		SalesContractVO salesContractVO;
 
 		if (ObjectUtils.isEmpty(dto.getId())) {
@@ -116,43 +129,66 @@ public class DhineshServiceImpl implements DhineshService {
 			salesContractVO = salesContractRepo.findById(dto.getId())
 					.orElseThrow(() -> new ApplicationException("Sales Contract Not Found"));
 
-			List<SalesContractDetailsVO> oldDetails = salesContractDetailsRepo.findBySalesContract(salesContractVO);
+			// Delete old details
+//			salesContractDetailsRepo.deleteAll(salesContractDetailsRepo.findBySalesContract(salesContractVO));
+			// Delete existing child records from DB
+			salesContractDetailsRepo.deleteAll(
+			        salesContractDetailsRepo.findBySalesContract(salesContractVO));
 
-			salesContractDetailsRepo.deleteAll(oldDetails);
+			salesContractTaxDetailsRepo.deleteAll(
+			        salesContractTaxDetailsRepo.findBySalesContract(salesContractVO));
+
+			salesContractAttachRepo.deleteAll(
+			        salesContractAttachRepo.findBySalesContract(salesContractVO));
+
+//			salesContractVO.getSalesContractDetailsVO().clear();
+//			salesContractVO.getSalesContractTaxDetails().clear();
+//			salesContractVO.getAttachments().clear();
+
+			// Clear managed collections
+			
+			// Delete physical files only if a new file is uploaded
+			if (files != null && files.length > 0 && files[0] != null && !files[0].isEmpty()) {
+
+			    for (SalesContractAttachVO attach : salesContractVO.getAttachments()) {
+
+			        if (attach.getPdfAttached() != null) {
+
+			            File oldFile = new File(attach.getPdfAttached());
+
+			            if (oldFile.exists()) {
+			                oldFile.delete();
+			            }
+			        }
+			    }
+
+			    // Delete attachment records
+			    salesContractAttachRepo.deleteAll(salesContractVO.getAttachments());
+
+			    // Clear parent collection
+			    salesContractVO.getAttachments().clear();
+			}
+			salesContractVO.getSalesContractDetailsVO().clear();
+			salesContractVO.getSalesContractTaxDetails().clear();
 
 			salesContractVO.setUpdatedBy(dto.getCreatedBy());
 
 			message = "Sales Contract Updated Successfully";
 		}
-		
-		System.out.println("Branch : " + dto.getBranch());
-		System.out.println("Customer : " + dto.getCustomer());
-		System.out.println("OrgId : " + dto.getOrgId());
 
-		for (SalesContractDetailsDTO detail : dto.getDetails()) {
-		    System.out.println("Item : " + detail.getItem());
-		    System.out.println("Unit : " + detail.getUnit());
-		    System.out.println("Tax : " + detail.getTaxPercentage());
-		}
-		System.out.println("Files : " + (files == null ? "NULL" : files.length));
-
-		System.out.println("1. Before getSalesContractVOFromDTO");
+		// Header + Child Mapping
 		getSalesContractVOFromDTO(dto, salesContractVO);
-		System.out.println("2. After getSalesContractVOFromDTO");
-		
-		System.out.println("3. Before save");
-		salesContractVO = salesContractRepo.save(salesContractVO);
-		System.out.println("4. After save");
-		
-		// Save uploaded files
-		System.out.println("5. Before saveAttachments");
+
+		// Save Header
+		salesContractVO = salesContractRepo.saveAndFlush(salesContractVO);
+
 		saveAttachments(files, salesContractVO);
-		System.out.println("6. After saveAttachments");
-		
-		System.out.println("7. Before convertToResponse");
+
+		salesContractVO = salesContractRepo.findById(salesContractVO.getId())
+		        .orElseThrow(() -> new ApplicationException("Sales Contract Not Found"));
+
 		SalesContractResponseDTO responseDTO = convertToResponse(salesContractVO);
-		System.out.println("8. After convertToResponse");
-		
+
 		response.put("message", message);
 		response.put("salesContract", responseDTO);
 
@@ -165,12 +201,12 @@ public class DhineshServiceImpl implements DhineshService {
 		System.out.println("A");
 
 		BranchVO branch = branchRepo.findById(dto.getBranch())
-		        .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+				.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 		System.out.println("B");
 
 		CustomerVO customer = customerRepo.findById(dto.getCustomer())
-		        .orElseThrow(() -> new ApplicationException("Customer Not Found"));
+				.orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
 		System.out.println("C");
 
@@ -203,6 +239,13 @@ public class DhineshServiceImpl implements DhineshService {
 		salesContractVO.setCancelRemarks(dto.getCancelRemarks());
 		salesContractVO.setActive(dto.isActive());
 
+		salesContractVO.setTotalAmount(dto.getTotalAmount());
+		salesContractVO.setAmountInWords(dto.getAmountInWords());
+		salesContractVO.setPaymentTerms(dto.getPaymentTerms());
+		salesContractVO.setPriceTerms(dto.getPriceTerms());
+		salesContractVO.setTerms(dto.getTerms());
+		salesContractVO.setNotes(dto.getNotes());
+
 		List<SalesContractDetailsVO> detailList = new ArrayList<>();
 
 		if (dto.getDetails() != null && !dto.getDetails().isEmpty()) {
@@ -213,20 +256,20 @@ public class DhineshServiceImpl implements DhineshService {
 
 				System.out.println("D");
 
-			    ItemMasterVO item = itemMasterRepo.findById(child.getItem())
-			            .orElseThrow(() -> new ApplicationException("Item Not Found"));
+				ItemMasterVO item = itemMasterRepo.findById(child.getItem())
+						.orElseThrow(() -> new ApplicationException("Item Not Found"));
 
-			    System.out.println("E");
+				System.out.println("E");
 
-			    UnitMasterVO unit = unitMasterRepo.findById(child.getUnit())
-			            .orElseThrow(() -> new ApplicationException("Unit Not Found"));
+				UnitMasterVO unit = unitMasterRepo.findById(child.getUnit())
+						.orElseThrow(() -> new ApplicationException("Unit Not Found"));
 
-			    System.out.println("F");
+				System.out.println("F");
 
-			    GSTRateMasterVO gstRateVO = gstRateRepo.findById(child.getTaxPercentage())
-			            .orElseThrow(() -> new ApplicationException("GST Rate Not Found"));
+				GSTRateMasterVO gstRateVO = gstRateRepo.findById(child.getTaxPercentage())
+						.orElseThrow(() -> new ApplicationException("GST Rate Not Found"));
 
-			    System.out.println("G");
+				System.out.println("G");
 				detailVO.setItem(item);
 				detailVO.setTaxType(child.getTaxType());
 				detailVO.setTaxPercentage(gstRateVO);
@@ -263,68 +306,41 @@ public class DhineshServiceImpl implements DhineshService {
 
 				BigDecimal finalAmount;
 
-//				if (Boolean.TRUE.equals(salesContractVO.getIsIgstApplicable())) 	{
-//					BigDecimal igstAmount = amount.multiply(gstRateVO.getIgst()).divide(BigDecimal.valueOf(100));
-//
-//					detailVO.setIgstAmount(igstAmount);
-//					detailVO.setCgstAmount(BigDecimal.ZERO);
-//					detailVO.setSgstAmount(BigDecimal.ZERO);
-//
-//					// Final Amount
-//					finalAmount = amount.subtract(igstAmount);
-//
-//				} else {
-//
-//					BigDecimal cgstAmount = amount.multiply(gstRateVO.getCgst()).divide(BigDecimal.valueOf(100));
-//
-//					BigDecimal sgstAmount = amount.multiply(gstRateVO.getSgst()).divide(BigDecimal.valueOf(100));
-//
-//					detailVO.setCgstAmount(cgstAmount);
-//					detailVO.setSgstAmount(sgstAmount);
-//					detailVO.setIgstAmount(BigDecimal.ZERO);
-//
-//					// Final Amount
-//					finalAmount = amount.subtract(cgstAmount.add(sgstAmount));
-//				}
-				
 				System.out.println("IGST Applicable : " + salesContractVO.getIsIgstApplicable());
 				System.out.println("IGST Applicable : " + salesContractVO.getIsIgstApplicable());
 				if ("YES".equalsIgnoreCase(salesContractVO.getIsIgstApplicable())) {
 
-				    BigDecimal igstAmount = amount.multiply(gstRateVO.getIgst())
-				            .divide(BigDecimal.valueOf(100));
+					BigDecimal igstAmount = amount.multiply(gstRateVO.getIgst()).divide(BigDecimal.valueOf(100));
 
-				    // Rate
-				    detailVO.setIgstRate(gstRateVO.getIgst());
-				    detailVO.setCgstRate(BigDecimal.ZERO);
-				    detailVO.setSgstRate(BigDecimal.ZERO);
+					// Rate
+					detailVO.setIgstRate(gstRateVO.getIgst());
+					detailVO.setCgstRate(BigDecimal.ZERO);
+					detailVO.setSgstRate(BigDecimal.ZERO);
 
-				    // Amount
-				    detailVO.setIgstAmount(igstAmount);
-				    detailVO.setCgstAmount(BigDecimal.ZERO);
-				    detailVO.setSgstAmount(BigDecimal.ZERO);
+					// Amount
+					detailVO.setIgstAmount(igstAmount);
+					detailVO.setCgstAmount(BigDecimal.ZERO);
+					detailVO.setSgstAmount(BigDecimal.ZERO);
 
-				    finalAmount = amount.add(igstAmount);
+					finalAmount = amount.add(igstAmount);
 
 				} else {
 
-				    BigDecimal cgstAmount = amount.multiply(gstRateVO.getCgst())
-				            .divide(BigDecimal.valueOf(100));
+					BigDecimal cgstAmount = amount.multiply(gstRateVO.getCgst()).divide(BigDecimal.valueOf(100));
 
-				    BigDecimal sgstAmount = amount.multiply(gstRateVO.getSgst())
-				            .divide(BigDecimal.valueOf(100));
+					BigDecimal sgstAmount = amount.multiply(gstRateVO.getSgst()).divide(BigDecimal.valueOf(100));
 
-				    // Rate
-				    detailVO.setCgstRate(gstRateVO.getCgst());
-				    detailVO.setSgstRate(gstRateVO.getSgst());
-				    detailVO.setIgstRate(BigDecimal.ZERO);
+					// Rate
+					detailVO.setCgstRate(gstRateVO.getCgst());
+					detailVO.setSgstRate(gstRateVO.getSgst());
+					detailVO.setIgstRate(BigDecimal.ZERO);
 
-				    // Amount
-				    detailVO.setCgstAmount(cgstAmount);
-				    detailVO.setSgstAmount(sgstAmount);
-				    detailVO.setIgstAmount(BigDecimal.ZERO);
+					// Amount
+					detailVO.setCgstAmount(cgstAmount);
+					detailVO.setSgstAmount(sgstAmount);
+					detailVO.setIgstAmount(BigDecimal.ZERO);
 
-				    finalAmount = amount.add(cgstAmount).add(sgstAmount);
+					finalAmount = amount.add(cgstAmount).add(sgstAmount);
 				}
 
 				detailVO.setFinalAmount(finalAmount);
@@ -338,53 +354,83 @@ public class DhineshServiceImpl implements DhineshService {
 			}
 		}
 
-		salesContractVO.setSalesContractDetailsVO(detailList);
+//		salesContractVO.setSalesContractDetailsVO(detailList);
+		salesContractVO.getSalesContractDetailsVO().clear();
+
+		for (SalesContractDetailsVO detail : detailList) {
+		    detail.setSalesContract(salesContractVO);
+		    salesContractVO.getSalesContractDetailsVO().add(detail);
+		}
+
+		// ================= TAX DETAILS =================
+
+		List<SalesContractTaxDetailsVO> taxDetailList = new ArrayList<>();
+
+		if (dto.getSalesContractTaxDetailsDTO() != null && !dto.getSalesContractTaxDetailsDTO().isEmpty()) {
+
+			for (SalesContractTaxDetailsDTO taxDTO : dto.getSalesContractTaxDetailsDTO()) {
+
+				SalesContractTaxDetailsVO taxVO = new SalesContractTaxDetailsVO();
+
+				ListOfValuesDetailsVO particulars = listOfValuesDetailsRepo.findById(taxDTO.getParticulars())
+						.orElseThrow(() -> new ApplicationException("Particulars Not Found"));
+
+				taxVO.setParticulars(particulars);
+
+				taxVO.setAmount(taxDTO.getAmount());
+
+				taxVO.setSalesContract(salesContractVO);
+
+				taxDetailList.add(taxVO);
+			}
+		}
+
+		salesContractVO.setSalesContractTaxDetails(taxDetailList);
 	}
 
-	private void saveAttachments(MultipartFile[] files, SalesContractVO salesContractVO) throws ApplicationException {
+	private void saveAttachments(MultipartFile[] files, SalesContractVO salesContractVO)
+	        throws ApplicationException {
 
-		if (files == null || files.length == 0) {
-			return;
-		}
+	    if (files == null || files.length == 0) {
+	        return;
+	    }
 
-		try {
+	    try {
 
-			File folder = new File(uploadPath);
+	        File folder = new File(uploadPath);
 
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
+	        if (!folder.exists()) {
+	            folder.mkdirs();
+	        }
 
-			List<SalesContractAttachVO> attachList = new ArrayList<>();
+	        for (MultipartFile file : files) {
 
-			for (MultipartFile file : files) {
+	            if (file == null || file.isEmpty()) {
+	                continue;
+	            }
 
-				if (file == null || file.isEmpty()) {
-					continue;
-				}
+	            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-				String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+	            Path path = Paths.get(uploadPath, fileName);
 
-				Path path = Paths.get(uploadPath, fileName);
+	            // Copy file and automatically close InputStream
+	            try (InputStream inputStream = file.getInputStream()) {
+	                Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+	            }
 
-				Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+	            SalesContractAttachVO attach = new SalesContractAttachVO();
+	            attach.setSalesContract(salesContractVO);
+	            attach.setPdfAttached(path.toString());
 
-				SalesContractAttachVO attach = new SalesContractAttachVO();
+	            salesContractVO.getAttachments().add(attach);
+	        }
 
-				attach.setSalesContract(salesContractVO);
-				attach.setPdfAttached(path.toString());
+	        salesContractRepo.saveAndFlush(salesContractVO);
 
-				attachList.add(attach);
-			}
-
-			List<SalesContractAttachVO> savedAttachments =
-			        salesContractAttachRepo.saveAll(attachList);
-
-			salesContractVO.setAttachments(savedAttachments);
-
-		} catch (IOException e) {
-			throw new ApplicationException("File upload failed : " + e.getMessage());
-		}
+	    } catch (IOException e) {
+	        throw new ApplicationException("File upload failed : " + e.getMessage(), e);
+	    }
+	
 	}
 
 	private SalesContractResponseDTO convertToResponse(SalesContractVO vo) {
@@ -445,6 +491,13 @@ public class DhineshServiceImpl implements DhineshService {
 		dto.setCancelRemarks(vo.getCancelRemarks());
 		dto.setActive(vo.isActive());
 
+		dto.setTotalAmount(vo.getTotalAmount());
+		dto.setAmountInWords(vo.getAmountInWords());
+		dto.setPaymentTerms(vo.getPaymentTerms());
+		dto.setPriceTerms(vo.getPriceTerms());
+		dto.setTerms(vo.getTerms());
+		dto.setNotes(vo.getNotes());
+
 		// Details Mapping
 		List<SalesContractDetailsResponseDTO> detailResponse = new ArrayList<>();
 
@@ -501,33 +554,62 @@ public class DhineshServiceImpl implements DhineshService {
 				detailDTO.setCurrency(detail.getCurrency());
 
 				detailResponse.add(detailDTO);
-				
-				
+
 			}
 		}
 
 		dto.setDetails(detailResponse);
-		
+
 		// Attachment Mapping
 		List<SalesContractAttachResponseDTO> attachmentResponse = new ArrayList<>();
 
 		if (vo.getAttachments() != null) {
 
-		    for (SalesContractAttachVO attachment : vo.getAttachments()) {
+			for (SalesContractAttachVO attachment : vo.getAttachments()) {
 
-		        SalesContractAttachResponseDTO attachmentDTO =
-		                new SalesContractAttachResponseDTO();
+				SalesContractAttachResponseDTO attachmentDTO = new SalesContractAttachResponseDTO();
 
-		        attachmentDTO.setId(attachment.getId());
-		        attachmentDTO.setPdfAttached(attachment.getPdfAttached());
+				attachmentDTO.setId(attachment.getId());
+				attachmentDTO.setPdfAttached(attachment.getPdfAttached());
 
-		        attachmentResponse.add(attachmentDTO);
-		    }
+				attachmentResponse.add(attachmentDTO);
+			}
 		}
 
 		dto.setAttachments(attachmentResponse);
-		
+
 		System.out.println("Upload Path : " + uploadPath);
+
+		// ===================== Tax Details Mapping =====================
+
+		List<SalesContractResponseTaxDetailsDTO> taxResponse = new ArrayList<>();
+
+		if (vo.getSalesContractTaxDetails() != null) {
+
+			for (SalesContractTaxDetailsVO tax : vo.getSalesContractTaxDetails()) {
+
+				SalesContractResponseTaxDetailsDTO taxDTO = new SalesContractResponseTaxDetailsDTO();
+
+				taxDTO.setId(tax.getId());
+
+				if (tax.getParticulars() != null) {
+
+					ListOfValuesDetailsResponseDTO particularsDTO = new ListOfValuesDetailsResponseDTO();
+
+					particularsDTO.setId(tax.getParticulars().getId());
+					particularsDTO.setCode(tax.getParticulars().getValueCode());
+					particularsDTO.setDescription(tax.getParticulars().getValueDescription());
+
+					taxDTO.setParticulars(particularsDTO);
+				}
+
+				taxDTO.setAmount(tax.getAmount());
+
+				taxResponse.add(taxDTO);
+			}
+		}
+
+		dto.setSalesContractTaxDetailsDTO(taxResponse);
 
 		return dto;
 	}
@@ -560,6 +642,12 @@ public class DhineshServiceImpl implements DhineshService {
 		dto.setMinimumSellPrice((BigDecimal) obj[4]);
 		dto.setHsnCode((String) obj[5]);
 		dto.setCustomerPartNo((String) obj[6]);
+		dto.setRate((BigDecimal) obj[7]);
+		dto.setCgst((BigDecimal) obj[8]);
+		dto.setSgst((BigDecimal) obj[9]);
+		dto.setIgst((BigDecimal) obj[10]);
+		dto.setUnitMasterId(((Number) obj[11]).longValue());
+		//		dto.setUnitId((String) obj[10]);
 
 		return dto;
 	}
@@ -648,6 +736,12 @@ public class DhineshServiceImpl implements DhineshService {
 			dto.setItemDescription(obj[2] != null ? obj[2].toString() : null);
 			dto.setHsnCode(obj[3] != null ? obj[3].toString() : null);
 			dto.setCustomerPartNo(obj[4] != null ? obj[4].toString() : null);
+			dto.setRate(obj[5] != null ? (BigDecimal) obj[5] : null);
+			dto.setCgst(obj[6] != null ? (BigDecimal) obj[6] : null);
+			dto.setSgst(obj[7] != null ? (BigDecimal) obj[7] : null);
+			dto.setIgst(obj[8] != null ? (BigDecimal) obj[8] : null);
+			dto.setUnitMasterId(obj[9] != null ? ((Number) obj[9]).longValue() : null);
+			dto.setUnitId(obj[10] != null ? obj[10].toString() : null);
 
 			responseList.add(dto);
 		}

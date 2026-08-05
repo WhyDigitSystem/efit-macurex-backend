@@ -1,16 +1,29 @@
 package com.efitops.basesetup.entity;
 
-import com.efitops.basesetup.dto.CreatedUpdatedDate;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import com.efitops.basesetup.dto.CreatedUpdatedDate;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -32,8 +45,8 @@ public class TransportBillVO {
 
     // Plant ID is linked to Branch
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id")
-    private BranchVO plant;
+    @JoinColumn(name = "branch")
+    private BranchVO branch;
 
     // Doc. No is linked to Document Type Master, docNo is the generated/entered number
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,11 +79,14 @@ public class TransportBillVO {
     @Column(name = "acc_received_date")
     private LocalDate accReceivedDate;
 
-    @Column(name = "received_by")
-    private String receivedBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "received_by")
+    private EmployeeMasterVO receivedBy;
 
-    @Column(name = "acc_received_by")
-    private String accReceivedBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "acc_received_by")
+    private EmployeeMasterVO accReceivedBy;
+    
     @Column(name = "org_id")
     private Long orgId;
     @Column(name = "active")
@@ -84,11 +100,18 @@ public class TransportBillVO {
     @Column(name = "cancel_remarks")
     private String cancelRemarks;
 
+	@Column(name = "financial_year", length = 5)
+	private String financialYear;
+	@Column(name = "screen_code", length = 30)
+	private String screenCode = "TB";
+	@Column(name = "screen_name", length = 30)
+	private String screenName = "TRANSPORTBILL";
+	
     @OneToMany(mappedBy = "transportBillVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<TransportBillPaymentDetailsVO> paymentDetails1 = new ArrayList<>();
 
-    @OneToMany(mappedBy = "transportBillVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<TransportBillPaymentDetails2VO> paymentDetails2 = new ArrayList<>();
+//    @OneToMany(mappedBy = "transportBillVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+//    private List<TransportBillPaymentDetails2VO> paymentDetails2 = new ArrayList<>();
 
     public Boolean getActive() {
         return active;

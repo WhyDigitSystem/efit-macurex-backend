@@ -7,31 +7,29 @@ import java.util.Map;
 
 import javax.transaction.Transactional;
 
-import com.efitops.basesetup.dto.BranchResponseDTO;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.efitops.basesetup.ResponseDTO.MappingBranchResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DocumentTypeResponseDTO;
-import com.efitops.basesetup.ResponseDTO.TransportBillPaymentDetails2ResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransportBillPaymentDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransportBillResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
+import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.TransportBillDTO;
-import com.efitops.basesetup.dto.TransportBillPaymentDetails2DTO;
 import com.efitops.basesetup.dto.TransportBillPaymentDetailsDTO;
 import com.efitops.basesetup.entity.BranchVO;
-import com.efitops.basesetup.entity.DocumentTypeMasterVO;
-import com.efitops.basesetup.entity.TransportBillPaymentDetails2VO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.TransportBillPaymentDetailsVO;
 import com.efitops.basesetup.entity.TransportBillVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.DocumentTypeMasterRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.TransportBillPaymentDetails2Repo;
 import com.efitops.basesetup.repository.TransportBillPaymentDetailsRepo;
 import com.efitops.basesetup.repository.TransportBillRepo;
@@ -59,6 +57,9 @@ public class TransportBillServiceImpl implements TransportBillService {
 
     @Autowired
     private TransportRepo transportRepo;
+    
+    @Autowired
+    EmployeeMasterRepo employeeMasterRepo;
 
     // ================== Transport Bill ==================
 
@@ -87,15 +88,6 @@ public class TransportBillServiceImpl implements TransportBillService {
                 }
             }
 
-            if (dto.getDocNo() != null && !dto.getDocNo().equalsIgnoreCase(transportBillVO.getDocNo())) {
-
-                if (transportBillRepo.existsByDocNoAndOrgIdAndIdNot(dto.getDocNo(), dto.getOrgId(), dto.getId())) {
-
-                    throw new ApplicationException(
-                            "The Doc No : " + dto.getDocNo() + " already exists in this Organization.");
-                }
-            }
-
             transportBillVO.setUpdatedBy(dto.getCreatedBy());
 
             message = "Transport Bill Updated Successfully";
@@ -106,12 +98,6 @@ public class TransportBillServiceImpl implements TransportBillService {
 
                 throw new ApplicationException(
                         "The Bill No : " + dto.getBillNo() + " already exists in this Organization.");
-            }
-
-            if (dto.getDocNo() != null && transportBillRepo.existsByDocNoAndOrgId(dto.getDocNo(), dto.getOrgId())) {
-
-                throw new ApplicationException(
-                        "The Doc No : " + dto.getDocNo() + " already exists in this Organization.");
             }
 
             transportBillVO = new TransportBillVO();
@@ -167,8 +153,19 @@ public class TransportBillServiceImpl implements TransportBillService {
         transportBillVO.setTotalAmount(dto.getTotalAmount());
         transportBillVO.setBillReceivedDate(dto.getBillReceivedDate());
         transportBillVO.setAccReceivedDate(dto.getAccReceivedDate());
-        transportBillVO.setReceivedBy(dto.getReceivedBy());
-        transportBillVO.setAccReceivedBy(dto.getAccReceivedBy());
+        EmployeeMasterVO receivedBy = null;
+        if (dto.getReceivedBy() != null) {
+            receivedBy = employeeMasterRepo.findById(dto.getReceivedBy())
+                    .orElseThrow(() -> new ApplicationException("Invalid Received By Employee"));
+        }
+        transportBillVO.setReceivedBy(receivedBy);
+
+        EmployeeMasterVO accReceivedBy = null;
+        if (dto.getAccReceivedBy() != null) {
+            accReceivedBy = employeeMasterRepo.findById(dto.getAccReceivedBy())
+                    .orElseThrow(() -> new ApplicationException("Invalid Accounts Received By Employee"));
+        }
+        transportBillVO.setAccReceivedBy(accReceivedBy);
         transportBillVO.setOrgId(dto.getOrgId());
         transportBillVO.setActive(dto.isActive());
         transportBillVO.setCancelRemarks(dto.getCancelRemarks());
@@ -179,17 +176,17 @@ public class TransportBillServiceImpl implements TransportBillService {
             BranchVO branch = branchRepo.findById(dto.getBranch())
                     .orElseThrow(() -> new ApplicationException("Plant (Branch) Not Found"));
 
-            transportBillVO.setPlant(branch);
+            transportBillVO.setBranch(branch);
         }
 
         // Doc. No -> Document Type Master
-        if (dto.getDocumentType() != null && dto.getDocumentType() != 0) {
-
-            DocumentTypeMasterVO documentType = documentTypeMasterRepo.findById(dto.getDocumentType())
-                    .orElseThrow(() -> new ApplicationException("Document Type Not Found"));
-
-            transportBillVO.setDocumentType(documentType);
-        }
+//        if (dto.getDocumentType() != null && dto.getDocumentType() != 0) {
+//
+//            DocumentTypeMasterVO documentType = documentTypeMasterRepo.findById(dto.getDocumentType())
+//                    .orElseThrow(() -> new ApplicationException("Document Type Not Found"));
+//
+//            transportBillVO.setDocumentType(documentType);
+//        }
 
         // Transport Name -> Transport Master
         if (dto.getTransportName() != null && dto.getTransportName() != 0) {
@@ -236,33 +233,12 @@ public class TransportBillServiceImpl implements TransportBillService {
             }
         }
 
-        // Payment Details Grid 2
-        transportBillVO.getPaymentDetails2().clear();
-
-        if (dto.getPaymentDetails2() != null) {
-
-            for (TransportBillPaymentDetails2DTO detailDTO : dto.getPaymentDetails2()) {
-
-                TransportBillPaymentDetails2VO detailVO = new TransportBillPaymentDetails2VO();
-
-                detailVO.setChequeRtgsNo(detailDTO.getChequeRtgsNo());
-                detailVO.setChequeDate(detailDTO.getChequeDate());
-                detailVO.setPendingAmount(detailDTO.getPendingAmount());
-                detailVO.setPaidAmount(detailDTO.getPaidAmount());
-                detailVO.setTotalPaidAmount(detailDTO.getTotalPaidAmount());
-
-                // Parent Mapping
-                detailVO.setTransportBillVO(transportBillVO);
-
-                transportBillVO.getPaymentDetails2().add(detailVO);
-            }
-        }
+      
     }
 
     private TransportBillResponseDTO buildTransportBillResponse(TransportBillVO vo) {
 
         TransportBillResponseDTO dto = new TransportBillResponseDTO();
-
         dto.setId(vo.getId());
         dto.setDocNo(vo.getDocNo());
         dto.setDocDate(vo.getDocDate());
@@ -271,22 +247,34 @@ public class TransportBillServiceImpl implements TransportBillService {
         dto.setTotalAmount(vo.getTotalAmount());
         dto.setBillReceivedDate(vo.getBillReceivedDate());
         dto.setAccReceivedDate(vo.getAccReceivedDate());
-        dto.setReceivedBy(vo.getReceivedBy());
-        dto.setAccReceivedBy(vo.getAccReceivedBy());
+        if (vo.getReceivedBy() != null) {
+            EmployeeDropdownResponseDTO receivedByDto = new EmployeeDropdownResponseDTO();
+            receivedByDto.setEmployeeId(vo.getReceivedBy().getId());
+            receivedByDto.setEmployeeCode(vo.getReceivedBy().getEmployeeId());
+            receivedByDto.setEmployeeName(vo.getReceivedBy().getEmployeeName());
+            receivedByDto.setEmail(vo.getReceivedBy().getEmail());
+
+            dto.setReceivedBy(receivedByDto);
+        }
+
+        if (vo.getAccReceivedBy() != null) {
+            EmployeeDropdownResponseDTO accReceivedByDto = new EmployeeDropdownResponseDTO();
+            accReceivedByDto.setEmployeeId(vo.getAccReceivedBy().getId());
+            accReceivedByDto.setEmployeeCode(vo.getAccReceivedBy().getEmployeeId());
+            accReceivedByDto.setEmployeeName(vo.getAccReceivedBy().getEmployeeName());
+            accReceivedByDto.setEmail(vo.getAccReceivedBy().getEmail());
+
+            dto.setAccReceivedBy(accReceivedByDto);
+        }
         dto.setOrgId(vo.getOrgId());
         dto.setActive(vo.getActive());
         dto.setCancelRemarks(vo.getCancelRemarks());
         dto.setCreatedBy(vo.getCreatedBy());
         dto.setUpdatedBy(vo.getUpdatedBy());
 
-        if (vo.getPlant() != null) {
-            dto.setPlant(new BranchResponseDTO(vo.getPlant().getId(), vo.getPlant().getBranchCode(),
-                    vo.getPlant().getBranchName()));
-        }
-
-        if (vo.getDocumentType() != null) {
-            dto.setDocumentType(new DocumentTypeResponseDTO(vo.getDocumentType().getId(),
-                    vo.getDocumentType().getCode(), vo.getDocumentType().getName()));
+        if (vo.getBranch() != null) {
+            dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+                    vo.getBranch().getBranchName()));
         }
 
         if (vo.getTransportName() != null) {
@@ -315,27 +303,6 @@ public class TransportBillServiceImpl implements TransportBillService {
 
         dto.setPaymentDetails1(details1);
 
-        List<TransportBillPaymentDetails2ResponseDTO> details2 = new ArrayList<>();
-
-        if (vo.getPaymentDetails2() != null) {
-
-            for (TransportBillPaymentDetails2VO detailVO : vo.getPaymentDetails2()) {
-
-                TransportBillPaymentDetails2ResponseDTO detailDTO = new TransportBillPaymentDetails2ResponseDTO();
-
-                detailDTO.setId(detailVO.getId());
-                detailDTO.setChequeRtgsNo(detailVO.getChequeRtgsNo());
-                detailDTO.setChequeDate(detailVO.getChequeDate());
-                detailDTO.setPendingAmount(detailVO.getPendingAmount());
-                detailDTO.setPaidAmount(detailVO.getPaidAmount());
-                detailDTO.setTotalPaidAmount(detailVO.getTotalPaidAmount());
-
-                details2.add(detailDTO);
-            }
-        }
-
-        dto.setPaymentDetails2(details2);
-
         return dto;
     }
 
@@ -352,7 +319,7 @@ public class TransportBillServiceImpl implements TransportBillService {
     public List<TransportBillResponseDTO> getTransportBillByOrgId(Long orgId, Long branch)
             throws ApplicationException {
 
-        List<TransportBillVO> voList = transportBillRepo.findByOrgIdAndPlant_Id(orgId, branch);
+        List<TransportBillVO> voList = transportBillRepo.findByOrgIdAndBranch(orgId, branch);
 
         if (voList.isEmpty()) {
             throw new ApplicationException("No Transport Bill Details Found");

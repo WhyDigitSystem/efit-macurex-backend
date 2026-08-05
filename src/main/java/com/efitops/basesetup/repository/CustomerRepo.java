@@ -72,8 +72,8 @@ List<Object[]> getCustomerDetails(String customerId);
 			    c.is_gst_applicable,
 			    c.gst_type
 			FROM customer_header c
-			INNER JOIN quotation q
-			    ON q.party_id = c.customer_id
+			INNER JOIN quotation_header q
+			    ON q.customer = c.customer_id
 			INNER JOIN gststatemaster g
 			    ON g.gststatemaster_id = c.gst_state
 			WHERE c.cancel = 0
@@ -83,7 +83,7 @@ List<Object[]> getCustomerDetails(String customerId);
 			  AND q.branch = ?3
 			  AND NOT EXISTS (
 			        SELECT 1
-			        FROM sales_contract sc
+			        FROM sales_contract_basic sc
 			        WHERE sc.customer = c.customer_id
 			          AND sc.quotation_no = q.doc_id
 			    )

@@ -15,7 +15,7 @@ public class OrderAcceptanceDTO {
 
 	private Long id;
 	private String orderNo;
-
+	private String docId;
 	private String belongsTo;
 
 	private String soType;

@@ -19,8 +19,6 @@ public class OrderAcceptanceDetailsResponseDTO {
 
 	private ItemMasterResponseTaxDTO items;
 
-	private String customerPartNo;
-
 	private UnitResponseDTO unit;
 
 	private GSTRateResponseDTO taxPercentage;

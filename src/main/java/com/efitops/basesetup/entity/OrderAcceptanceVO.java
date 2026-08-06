@@ -111,7 +111,7 @@ public class OrderAcceptanceVO {
 	private String createdBy;
 
 	@Column(name = "active")
-	private boolean active;
+	private boolean active=true;
 
 	@Column(name = "cancel")
 	private boolean cancel = false;

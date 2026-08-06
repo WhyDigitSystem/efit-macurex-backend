@@ -1,6 +1,5 @@
 package com.efitops.basesetup.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -278,8 +276,8 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		orderAcceptanceVO.setUpdatedBy(orderAcceptanceDTO.getUpdatedBy());
 		orderAcceptanceVO.setOrgId(orderAcceptanceDTO.getOrgId());
 		orderAcceptanceVO.setFinancialYear(orderAcceptanceDTO.getFinancialYear());
-
 		orderAcceptanceVO.setGstApproval(orderAcceptanceDTO.getGstApproval());
+		orderAcceptanceVO.setDocId(orderAcceptanceDTO.getDocId());
 
 		if (orderAcceptanceDTO.getBranchId() != null && orderAcceptanceDTO.getBranchId() > 0) {
 
@@ -330,6 +328,8 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				GSTRateMasterVO gstRateVO = gstRateRepo.findById(dto.getTaxPercentage())
 						.orElseThrow(() -> new ApplicationException("GST Rate Not Found"));
 
+				detailsVO.setTaxPercentage(gstRateVO);
+
 				detailsVO.setLastInvoiceDate(dto.getLastInvoiceDate());
 
 				detailsVO.setQuantity(dto.getQuantity());
@@ -344,9 +344,9 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 				detailsVO.setOrderAmount(dto.getQuantity().multiply(dto.getOrderRate()));
 
-				orderAcceptanceVO.setGstApproval(orderAcceptanceDTO.getGstApproval());
-
 				detailsVO.setDiscount(dto.getDiscount());
+				
+				detailsVO.setTaxType(dto.getTaxType());
 
 				BigDecimal quantity = dto.getQuantity() == null ? BigDecimal.ZERO : dto.getQuantity();
 
@@ -564,7 +564,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setDocId(orderAcceptanceVO.getDocId());
 		responseDTO.setDocDate(orderAcceptanceVO.getDocDate());
 		responseDTO.setOrderNo(orderAcceptanceVO.getOrderNo());
-		responseDTO.setGstApproval(orderAcceptanceVO.getGstApproval());
 		responseDTO.setBelongsTo(orderAcceptanceVO.getBelongsTo());
 		responseDTO.setSoType(orderAcceptanceVO.getSoType());
 		responseDTO.setWithQuotation(orderAcceptanceVO.getWithQuotation());
@@ -590,11 +589,16 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setPaymentTerms(orderAcceptanceVO.getPaymentTerms());
 		responseDTO.setSpecification(orderAcceptanceVO.getSpecification());
 		responseDTO.setNote(orderAcceptanceVO.getNote());
-		responseDTO.setGstApproval(orderAcceptanceVO.getGstApproval());
 
-		if (responseDTO.getBranch() != null) {
-			responseDTO.setBranch(new BranchResponseDTO(orderAcceptanceVO.getBranch().getId(),
-					orderAcceptanceVO.getBranch().getBranchCode(), orderAcceptanceVO.getBranch().getBranchName()));
+		if (orderAcceptanceVO.getBranch() != null) {
+
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+
+			branchDTO.setId(orderAcceptanceVO.getBranch().getId());
+			branchDTO.setBranchCode(orderAcceptanceVO.getBranch().getBranchCode());
+			branchDTO.setBranchName(orderAcceptanceVO.getBranch().getBranchName());
+
+			responseDTO.setBranch(branchDTO);
 		}
 
 		if (orderAcceptanceVO.getCustomerId() != null) {
@@ -630,7 +634,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 									: null));
 				}
 
-				detailsDTO.setCustomerPartNo(detailsVO.getCustomerPartNo());
+//				detailsDTO.setCustomerPartNo(detailsVO.getCustomerPartNo());
 
 				if (detailsVO.getUnit() != null) {
 					detailsDTO
@@ -638,10 +642,14 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				}
 
 				if (detailsVO.getTaxPercentage() != null) {
+
 					GSTRateResponseDTO gstDTO = new GSTRateResponseDTO();
 					gstDTO.setId(detailsVO.getTaxPercentage().getId());
 					gstDTO.setTaxPercentage(detailsVO.getTaxPercentage().getRate());
+
 					detailsDTO.setTaxPercentage(gstDTO);
+				} else {
+					System.out.println("Tax Percentage is NULL");
 				}
 
 				detailsDTO.setLastInvoiceDate(detailsVO.getLastInvoiceDate());

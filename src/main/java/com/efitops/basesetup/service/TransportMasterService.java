@@ -80,14 +80,14 @@ public interface TransportMasterService {
 	List<DocketInvoiceResponseDTO> getDocketInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException;
 
 	//StockTransferChallan
-//	Map<String, Object> updateCreateStockTransferChallan(StockTransferChallanDTO stockTransferChallanDTO) throws ApplicationException;
-//
-//	StockTransferChallanResponseDTO getStockTransferChallanById(Long id);
-//
-//	List<StockTransferChallanResponseDTO> getStockTransferChallanByOrgId(Long orgId, Long branch);
-//
-//
-//	
+	Map<String, Object> updateCreateStockTransferChallan(StockTransferChallanDTO stockTransferChallanDTO) throws ApplicationException;
+
+	StockTransferChallanResponseDTO getStockTransferChallanById(Long id) throws ApplicationException;
+
+	List<StockTransferChallanResponseDTO> getStockTransferChallanByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+
+	
 
 
 	

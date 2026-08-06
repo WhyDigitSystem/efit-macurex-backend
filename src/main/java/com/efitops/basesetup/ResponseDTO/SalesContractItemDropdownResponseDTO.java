@@ -24,5 +24,14 @@ public class SalesContractItemDropdownResponseDTO {
     private String hsnCode;
 
     private String customerPartNo;
+    
+    private BigDecimal rate;
+    private BigDecimal cgst;
+    private BigDecimal sgst;
+    private BigDecimal igst;
+    
+    private Long unitMasterId;
+
+    private Long gstRateMasterId;
 
 }

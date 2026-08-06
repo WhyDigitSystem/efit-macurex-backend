@@ -63,6 +63,8 @@ public class SalesContractAmendmentVO {
 	private String revisionNo;
 	
 	
+	
+	
 	@Column(name = "remarks")
 	private String remarks;
 	

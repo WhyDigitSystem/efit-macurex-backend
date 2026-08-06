@@ -23,11 +23,11 @@ public interface EmployeeMasterRepo extends JpaRepository<EmployeeMasterVO, Long
 	@Query(nativeQuery = true,
 		       value = "SELECT employeemaster_id, employee_id, emp_name " +
 		               "FROM employeemaster " +
-		               "WHERE department = ?1 " +
+		               "WHERE org_id=?1 and branch=?2 and department = ?3 " +
 		               "AND active = 1 " +
 		               "AND cancel = 0 " +
 		               "ORDER BY emp_name")
-		List<Object[]> getPreparedBy(Long departmentId);
+		List<Object[]> getPreparedBy(Long departmentId, Long branch, Long departmentId2);
   
 	@Query(nativeQuery = true, value = "select * from employeemaster where org_id=?1 and active=1 and cancel=0")
 	List<EmployeeMasterVO> getEmployeeMasterByOrgId(Long orgId);

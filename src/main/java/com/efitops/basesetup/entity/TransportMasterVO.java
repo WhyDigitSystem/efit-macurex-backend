@@ -12,6 +12,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.Valid;
 
+import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.efitops.basesetup.dto.TransportMasterDTO;
 import com.fasterxml.jackson.annotation.JsonGetter;

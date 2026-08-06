@@ -3,21 +3,18 @@ package com.efitops.basesetup.service;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.Valid;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.DespatchInstructionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
 import com.efitops.basesetup.dto.CustomerComplaintDTO;
 import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
-import com.efitops.basesetup.dto.DailyExchangeRateDTO;
 import com.efitops.basesetup.dto.DespatchInstructionDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
-import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
-import com.efitops.basesetup.entity.DailyExchangeRateVO;
+import com.efitops.basesetup.dto.StockTransferChallanDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 
@@ -82,7 +79,15 @@ public interface TransportMasterService {
 
 	List<DocketInvoiceResponseDTO> getDocketInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-	
+	//StockTransferChallan
+//	Map<String, Object> updateCreateStockTransferChallan(StockTransferChallanDTO stockTransferChallanDTO) throws ApplicationException;
+//
+//	StockTransferChallanResponseDTO getStockTransferChallanById(Long id);
+//
+//	List<StockTransferChallanResponseDTO> getStockTransferChallanByOrgId(Long orgId, Long branch);
+//
+//
+//	
 
 
 	

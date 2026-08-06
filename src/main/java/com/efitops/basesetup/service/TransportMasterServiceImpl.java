@@ -19,8 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
@@ -33,6 +36,8 @@ import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
+import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
@@ -42,8 +47,10 @@ import com.efitops.basesetup.dto.DespatchInstructionDTO;
 import com.efitops.basesetup.dto.DespatchInstructionDetailsDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDetailsDTO;
+import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesContractAmdDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
+import com.efitops.basesetup.dto.StockTransferChallanDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
@@ -54,10 +61,12 @@ import com.efitops.basesetup.entity.DespatchInstructionVO;
 import com.efitops.basesetup.entity.DocketInvoiceDetailsVO;
 import com.efitops.basesetup.entity.DocketInvoiceVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.SalesContractAmdDetailsVO;
 import com.efitops.basesetup.entity.SalesContractAmendmentVO;
 import com.efitops.basesetup.entity.SalesContractVO;
+import com.efitops.basesetup.entity.StockTransferChallanVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -71,10 +80,12 @@ import com.efitops.basesetup.repository.DocketInvoiceDetRepo;
 import com.efitops.basesetup.repository.DocketInvoiceRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.ListOfValuesRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.SalesContractAmdDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractAmdRepo;
 import com.efitops.basesetup.repository.SalesContractRepo;
+import com.efitops.basesetup.repository.StockTransferChallanRepo;
 import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.security.TokenProvider;
 
@@ -134,6 +145,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	@Autowired
 	private TransportRepo transportRepo;
 
+	@Autowired
+	private StockTransferChallanRepo stockTransferChallanRepo;
+	
+	@Autowired
+	private ListOfValuesRepo listOfValuesRepo;
+	
 	TransportMasterServiceImpl(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
 	}
@@ -1176,8 +1193,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	    if (docketInvoiceVO.getBranch() != null) {
 
-	        responseDTO.setBranch(
-	                docketInvoiceVO.getBranch().getId());
+	        BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+
+	        branchResponseDTO.setId(docketInvoiceVO.getBranch().getId());
+	        branchResponseDTO.setBranchName(docketInvoiceVO.getBranch().getBranchName());
+
+	        responseDTO.setBranch(branchResponseDTO);
 	    }
 
 	    // =========================
@@ -1186,8 +1207,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	    if (docketInvoiceVO.getTransport() != null) {
 
-	        responseDTO.setTransport(
-	                docketInvoiceVO.getTransport().getId());
+	        TransportResponseDTO transportResponseDTO = new TransportResponseDTO();
+
+	        transportResponseDTO.setId(docketInvoiceVO.getTransport().getId());
+	        transportResponseDTO.setTransportName(docketInvoiceVO.getTransport().getTransportName());
+
+	        responseDTO.setTransport(transportResponseDTO);
 	    }
 
 	    // =========================
@@ -1355,4 +1380,162 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	    return responseList;
 	}
+	
+	// Stock Transfer Challan
+//	@Override
+//	@Transactional
+//	public Map<String, Object> updateCreateStockTransferChallan(
+//	        StockTransferChallanDTO stockTransferChallanDTO)
+//	        throws ApplicationException {
+//
+//	    StockTransferChallanVO stockTransferChallanVO =
+//	            new StockTransferChallanVO();
+//
+//	    String message;
+//
+//	    if (ObjectUtils.isNotEmpty(stockTransferChallanDTO.getId())) {
+//
+//	        stockTransferChallanVO = stockTransferChallanRepo
+//	                .findById(stockTransferChallanDTO.getId())
+//	                .orElseThrow(() ->
+//	                        new ApplicationException("Invalid Stock Transfer Challan Details"));
+//
+//	        stockTransferChallanVO.setUpdated_By(
+//	                stockTransferChallanDTO.getCreatedBy());
+//
+//	        message = "Stock Transfer Challan Updated Successfully";
+//
+//	    } else {
+//
+//	        stockTransferChallanVO.setCreatedBy(
+//	                stockTransferChallanDTO.getCreatedBy());
+//
+//	        stockTransferChallanVO.setUpdated_By(
+//	                stockTransferChallanDTO.getCreatedBy());
+//
+//	        message = "Stock Transfer Challan Created Successfully";
+//	    }
+//
+//	    createUpdateStockTransferChallanVO(
+//	            stockTransferChallanDTO,
+//	            stockTransferChallanVO);
+//
+//	    StockTransferChallanVO savedStockTransferChallan =
+//	            stockTransferChallanRepo.save(stockTransferChallanVO);
+//
+//	    Map<String, Object> response = new HashMap<>();
+//
+//	    response.put("message", message);
+//
+//	    response.put(
+//	            "stockTransferChallanVO",
+//	            stockTransferChallanResponse(savedStockTransferChallan));
+//
+//	    return response;
+//	}
+//	private StockTransferChallanResponseDTO stockTransferChallanResponse(
+//	        StockTransferChallanVO stockTransferChallanVO) {
+//
+//	    StockTransferChallanResponseDTO responseDTO =
+//	            new StockTransferChallanResponseDTO();
+//
+//	    responseDTO.setId(stockTransferChallanVO.getId());
+//	    responseDTO.setDocID(stockTransferChallanVO.getDocID());
+//	    responseDTO.setTransferDate(stockTransferChallanVO.getTransferDate());
+//	    responseDTO.setStockPosting(stockTransferChallanVO.getStockPosting());
+//	    responseDTO.setDate(stockTransferChallanVO.getDate());
+//	    responseDTO.setNoOfPackages(stockTransferChallanVO.getNoOfPackages());
+//	    responseDTO.setOtherPackages(stockTransferChallanVO.getOtherPackages());
+//	    responseDTO.setImportLocal(stockTransferChallanVO.getImportLocal());
+//
+//	    if (stockTransferChallanVO.get() != null) {
+//	        responseDTO.setListOfValues(
+//	                stockTransferChallanVO.getListOfValues().getId());
+//	    }
+//	    if (stockTransferChallanVO.getListOfValues() != null) {
+//	        responseDTO.setListOfValues(
+//	                stockTransferChallanVO.getListOfValues().getId());
+//	    }
+//
+//	    if (stockTransferChallanVO.getCustomer() != null) {
+//	        responseDTO.setCustomer(
+//	                stockTransferChallanVO.getCustomer().getId());
+//	    }
+//
+//	    if (stockTransferChallanVO.getLocation() != null) {
+//	        responseDTO.setLocation(
+//	                stockTransferChallanVO.getLocation().getId());
+//	    }
+//
+//	    return responseDTO;
+//	}
+//	
+//	private void createUpdateStockTransferChallanVO(
+//	        StockTransferChallanDTO dto,
+//	        StockTransferChallanVO stockTransferChallanVO)
+//	        throws ApplicationException {
+//
+//	    stockTransferChallanVO.setDocID(dto.getDocID());
+//	    stockTransferChallanVO.setTransferDate(dto.getTransferDate());
+//	    stockTransferChallanVO.setStockPosting(dto.getStockPosting());
+//	    stockTransferChallanVO.setDate(dto.getDate());
+//	    stockTransferChallanVO.setNoOfPackages(dto.getNoOfPackages());
+//	    stockTransferChallanVO.setOtherPackages(dto.getOtherPackages());
+//	    stockTransferChallanVO.setImportLocal(dto.getImportLocal());
+//	    
+//	    //branch mapping
+//	    if (dto.getBranch() != null && dto.getBranch() != 0) {
+//
+//	        BranchVO branchVO =
+//	                branchRepo.findById(dto.getBranch())
+//	                .orElseThrow(() ->
+//	                        new ApplicationException("branch Not Found"));
+//
+//	        stockTransferChallanVO.setBranch(branchVO);
+//	    }
+//
+//
+//	    // =========================
+//	    // List Of Values Mapping
+//	    // =========================
+//
+//	    if (dto.getListOfValues() != null && dto.getListOfValues() != 0) {
+//
+//	        ListOfValuesVO listOfValuesVO =
+//	                listOfValuesRepo.findById(dto.getListOfValues())
+//	                .orElseThrow(() ->
+//	                        new ApplicationException("List Of Values Not Found"));
+//
+//	        stockTransferChallanVO.setListOfValues(listOfValuesVO);
+//	    }
+//
+//	    // =========================
+//	    // Customer Mapping
+//	    // =========================
+//
+//	    if (dto.getCustomer() != null && dto.getCustomer() != 0) {
+//
+//	        CustomerVO customerVO =
+//	                customerRepo.findById(dto.getCustomer())
+//	                .orElseThrow(() ->
+//	                        new ApplicationException("Customer Not Found"));
+//
+//	        stockTransferChallanVO.setCustomer(customerVO);
+//	    }
+//
+//	    // =========================
+//	    // Location Mapping
+//	    // =========================
+//
+//	    if (dto.getLocation() != null && dto.getLocation() != 0) {
+//
+//	        LocationVO locationVO =
+//	                locationRepo.findById(dto.getLocation())
+//	                .orElseThrow(() ->
+//	                        new ApplicationException("Location Not Found"));
+//
+//	        stockTransferChallanVO.setLocation(locationVO);
+//	    }
+//	}
+//	
 }

@@ -10,7 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -103,7 +104,7 @@ public class OrderAcceptanceContoller extends BaseController {
 		return ResponseEntity.ok(responseDTO);
 	}
 
-	@PostMapping(value = "/createUpdateOrderAcceptance", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PutMapping(value = "/createUpdateOrderAcceptance", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdateOrderAcceptance(
 			@RequestPart("orderAcceptance") OrderAcceptanceDTO orderAcceptanceDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
@@ -204,9 +205,10 @@ public class OrderAcceptanceContoller extends BaseController {
 		return ResponseEntity.ok(responseDTO);
 	}
 
-	@PostMapping(value = "/createUpdateSalesOrderShort", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PutMapping(value = "/createUpdateSalesOrderShort", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdateSalesOrderShort(
 			@RequestPart("salesOrderShort") SalesOrderShortCloseDTO salesOrderShortCloseDTO,
+//			@RequestBody SalesOrderShortCloseDTO salesOrderShortCloseDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -219,7 +221,7 @@ public class OrderAcceptanceContoller extends BaseController {
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, quotationMap.get("message"));
 
-			responseObjectsMap.put("orderAcceptanceVO", quotationMap.get("orderAcceptanceVO"));
+			responseObjectsMap.put("salesOrderShortCloseVO", quotationMap.get("salesOrderShortCloseVO"));
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 

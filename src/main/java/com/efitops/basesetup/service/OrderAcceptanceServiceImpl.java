@@ -31,6 +31,7 @@ import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.CustomerResponseGstDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
+import com.efitops.basesetup.dto.ItemMasterResponseGstDetailsDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDetailsDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDetailsResponseDTO;
@@ -742,7 +743,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", message);
-		response.put("orderAcceptanceVO", responseDTO);
+		response.put("salesOrderShortCloseVO", responseDTO);
 
 		return response;
 	}
@@ -752,7 +753,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		if (salesOrderShortCloseDTO.getCustomerId() != null && salesOrderShortCloseDTO.getCustomerId() > 0) {
 
-			CustomerVO customer = customerRepo.findById(salesOrderShortCloseDTO.getBranchId())
+			CustomerVO customer = customerRepo.findById(salesOrderShortCloseDTO.getCustomerId())
 					.orElseThrow(() -> new ApplicationException("Party Not Found"));
 
 			salesOrderShortCloseVO.setCustomerId(customer);
@@ -792,25 +793,29 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 				SalesOrderShortCloseDetailsVO detailsVO = new SalesOrderShortCloseDetailsVO();
 
-				if (dto.getItemId() != null && dto.getItemId() != 0) {
-					ItemMasterVO itemCode = itemMasterRepo.findById(dto.getItemId())
-							.orElseThrow(() -> new ApplicationException("Item Code Not Found"));
+				detailsVO.setSalesOrderShortCloseVO(salesOrderShortCloseVO);
 
-					detailsVO.setItem(itemCode);
+				if (dto.getItemId() != null && dto.getItemId() != 0) {
+
+					ItemMasterVO item = itemMasterRepo.findById(dto.getItemId())
+							.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+					detailsVO.setItem(item);
 				}
 
 				detailsVO.setOrderQty(dto.getOrderQty());
-
 				detailsVO.setSuppliedQty(dto.getSuppliedQty());
 
-				detailsVO.setPendingQty(dto.getOrderQty().subtract(dto.getSuppliedQty()));
+				BigDecimal pendingQty = dto.getOrderQty().subtract(dto.getSuppliedQty());
 
+				detailsVO.setPendingQty(pendingQty);
 				detailsVO.setRequiredQty(dto.getRequiredQty());
+				detailsVO.setShortCloseQty(pendingQty.subtract(dto.getRequiredQty()));
 
-				detailsVO.setPendingQty(detailsVO.getPendingQty().subtract(dto.getRequiredQty()));
-
+				itemDetailsList.add(detailsVO);
 			}
 		}
+
 		salesOrderShortCloseVO.setSalesOrderShortCloseDetailsVO(itemDetailsList);
 
 	}
@@ -920,7 +925,8 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		List<SalesOrderShortCloseDetailsResponseDTO> detailsResponseList = new ArrayList<>();
 
-		if (salesOrderShortCloseVO.getSalesOrderShortCloseDetailsVO() != null) {
+		if (salesOrderShortCloseVO.getSalesOrderShortCloseDetailsVO() != null
+				&& !salesOrderShortCloseVO.getSalesOrderShortCloseDetailsVO().isEmpty()) {
 
 			for (SalesOrderShortCloseDetailsVO detailsVO : salesOrderShortCloseVO.getSalesOrderShortCloseDetailsVO()) {
 
@@ -930,16 +936,14 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 				if (detailsVO.getItem() != null) {
 
-					ItemMasterResponseDTO itemCodeDTO = new ItemMasterResponseDTO();
+					ItemMasterResponseGstDetailsDTO itemDTO = new ItemMasterResponseGstDetailsDTO();
 
-					itemCodeDTO.setId(detailsVO.getItem().getId());
-					itemCodeDTO.setItemCode(detailsVO.getItem().getItemCode());
-					itemCodeDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+					itemDTO.setId(detailsVO.getItem().getId());
+					itemDTO.setItemCode(detailsVO.getItem().getItemCode());
+					itemDTO.setItemDescription(detailsVO.getItem().getItemDescription());
 
-					detailsDTO.setItem(itemCodeDTO);
+					detailsDTO.setItem(itemDTO);
 				}
-
-				detailsDTO.setPendingQty(detailsVO.getPendingQty());
 
 				detailsDTO.setOrderQty(detailsVO.getOrderQty());
 				detailsDTO.setSuppliedQty(detailsVO.getSuppliedQty());
@@ -955,7 +959,8 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		List<SalesOrderShortCloseFileDetailsResponseDTO> fileResponseList = new ArrayList<>();
 
-		if (salesOrderShortCloseVO.getSalesOrderShortCloseFileDetailsVO() != null) {
+		if (salesOrderShortCloseVO.getSalesOrderShortCloseFileDetailsVO() != null
+				&& !salesOrderShortCloseVO.getSalesOrderShortCloseFileDetailsVO().isEmpty()) {
 
 			for (SalesOrderShortCloseFileDetailsVO fileVO : salesOrderShortCloseVO
 					.getSalesOrderShortCloseFileDetailsVO()) {

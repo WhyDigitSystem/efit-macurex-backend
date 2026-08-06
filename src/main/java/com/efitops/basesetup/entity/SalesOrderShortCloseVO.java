@@ -53,7 +53,7 @@ public class SalesOrderShortCloseVO {
 	private String createdBy;
 
 	@Column(name = "active")
-	private boolean active;
+	private boolean active=true;
 
 	@Column(name = "cancel")
 	private boolean cancel = false;

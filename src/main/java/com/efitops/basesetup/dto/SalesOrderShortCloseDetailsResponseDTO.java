@@ -13,7 +13,7 @@ public class SalesOrderShortCloseDetailsResponseDTO {
 
 	private Long id;
 
-	private ItemMasterResponseDTO item;
+	private ItemMasterResponseGstDetailsDTO item;
 
 	private BigDecimal orderQty;
 

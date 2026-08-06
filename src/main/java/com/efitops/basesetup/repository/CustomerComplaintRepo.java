@@ -25,13 +25,13 @@ public interface CustomerComplaintRepo extends JpaRepository<CustomerComplaintEn
 	List<CustomerComplaintEntryVO> getCustomerComplaintByOrgId(@Param("orgId") Long orgId,
 			@Param("branch") Long branch);
 
-	@Query(value =
-		       "SELECT 'APPLIANCES' AS type " +
-		       "UNION " +
-		       "SELECT 'BOSCH' AS type " +
-		       "ORDER BY type",
-		       nativeQuery = true)
-		List<Object[]> getTypeDropdown();
+//	@Query(value =
+//		       "SELECT 'APPLIANCES' AS type " +
+//		       "UNION " +
+//		       "SELECT 'BOSCH' AS type " +
+//		       "ORDER BY type",
+//		       nativeQuery = true)
+//		List<Object[]> getTypeDropdown();
 
 	
 }

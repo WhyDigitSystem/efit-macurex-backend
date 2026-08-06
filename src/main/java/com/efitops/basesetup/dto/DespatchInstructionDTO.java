@@ -1,0 +1,35 @@
+package com.efitops.basesetup.dto;
+
+
+
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class DespatchInstructionDTO {
+	private Long id;
+	private Long branch;
+	private String diNo;
+	private Long customer;
+	private String schduleNo;
+	private String invoiceType;
+	private String schduleDate;
+	private Long location;
+	private String paymentTerms;
+	private String modeOfTransport;
+	private int netWeight;
+	private int grossWeight;
+	private String deliveryInstructions;
+	private String Consignee;
+	private Long orgId;
+	private Boolean active;
+	private String createdBy;
+	private String cancelRemarks;
+	private List<DespatchInstructionDetailsDTO> despatchInstructionDetailsDTO;
+
+}

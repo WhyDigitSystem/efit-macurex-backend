@@ -45,20 +45,12 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long>{
 	                                       Long orgId,
 	                                       Long branch);
 
-	// dropdown for Customer in customer complaint entry
-	@Query(value = "SELECT customer_id, customer_name " +
-            "FROM customer_header " +
-            "WHERE cancel = 0 " +
-            "ORDER BY customer_id",
-    nativeQuery = true)
-List<Object[]> getCustomer();
-
 @Query(value = "SELECT customer_id, customer_name " +
         "FROM customer_header " +
-        "WHERE customer_id = ?1 " +
-        "AND cancel = 0",
+        "WHERE org_id = ?1 and branch=?2  " +
+        "AND cancel = 0 and active=1",
 nativeQuery = true)
-List<Object[]> getCustomerDetails(String customerId);
+List<Object[]> getCustomerDetails(Long orgId, Long branch);	
 
 
 	@Query(value = """
@@ -72,8 +64,8 @@ List<Object[]> getCustomerDetails(String customerId);
 			    c.is_gst_applicable,
 			    c.gst_type
 			FROM customer_header c
-			INNER JOIN quotation q
-			    ON q.party_id = c.customer_id
+			INNER JOIN quotation_header q
+			    ON q.customer = c.customer_id
 			INNER JOIN gststatemaster g
 			    ON g.gststatemaster_id = c.gst_state
 			WHERE c.cancel = 0
@@ -83,7 +75,7 @@ List<Object[]> getCustomerDetails(String customerId);
 			  AND q.branch = ?3
 			  AND NOT EXISTS (
 			        SELECT 1
-			        FROM sales_contract sc
+			        FROM sales_contract_basic sc
 			        WHERE sc.customer = c.customer_id
 			          AND sc.quotation_no = q.doc_id
 			    )
@@ -110,7 +102,8 @@ List<Object[]> getCustomerDetails(String customerId);
 			  AND UPPER(c.customer_type) = 'CUSTOMER'
 			ORDER BY customer_code
 			""", nativeQuery = true)
-			List<Object[]> getCustomerDropdown(String ctype, Long orgId, Long branch);	
+			List<Object[]> getCustomerDropdown(String ctype, Long orgId, Long branch);
+
 }
 
 

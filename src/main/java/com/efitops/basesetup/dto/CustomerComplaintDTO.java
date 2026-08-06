@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class CustomerComplaintDTO {
 	private Long id;
 	private Long qtyNo;
-	private MultipartFile[] images;
+//	private MultipartFile[] images;
 	private String remarks;
 	private Long branch;
 	private Long  customerName;

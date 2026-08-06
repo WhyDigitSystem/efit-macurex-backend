@@ -46,7 +46,7 @@ public class DevelopController extends BaseController  {
             value = "/updateCreateEnquiry",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDTO> updateCreateEnquiry(
-            @RequestPart("enquiry") EnquiryDTO enquiryDTO,
+            @RequestPart("enquiryDTO") EnquiryDTO enquiryDTO,
             @RequestPart(value = "files", required = false) MultipartFile[] files) {
 
         String methodName = "updateCreateEnquiry";

@@ -50,7 +50,7 @@ public class SalesContractDetailsResponseDTO {
 
     private BigDecimal igstAmount;
 
-    private BigDecimal finalAmount;
+//    private BigDecimal finalAmount;
 
     private String currency;
 }

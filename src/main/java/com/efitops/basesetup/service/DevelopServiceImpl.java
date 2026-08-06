@@ -21,9 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +28,7 @@ import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
 import com.efitops.basesetup.ResponseDTO.EnquiryCusContactResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.EnquiryAttachmentResponseDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryDetailsDTO;
@@ -47,8 +45,8 @@ import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.dto.SalesReturnDTO;
 import com.efitops.basesetup.dto.SalesReturnResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
-import com.efitops.basesetup.entity.CustomerContactDetailsVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.EnquiryAttachmentVO;
 import com.efitops.basesetup.entity.EnquiryDetailsVO;
 import com.efitops.basesetup.entity.EnquiryTermsandCondVO;
@@ -66,6 +64,7 @@ import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.EnquiryAttachmentRepo;
 import com.efitops.basesetup.repository.EnquiryDetailsRepo;
 import com.efitops.basesetup.repository.EnquiryRepo;
@@ -144,6 +143,8 @@ public class DevelopServiceImpl implements DevelopService {
 	
 
 
+	@Autowired
+	EmployeeMasterRepo employeeMasterRepo;
 	
 	
 	
@@ -522,8 +523,8 @@ public class DevelopServiceImpl implements DevelopService {
 
 	    if (enquiryDTO.getContactNameId() != null) {
 
-	        CustomerContactDetailsVO contact =
-	                customerContactDetailsRepo.findById(enquiryDTO.getContactNameId())
+	        EmployeeMasterVO contact =
+	        		employeeMasterRepo.findById(enquiryDTO.getContactNameId())
 	                        .orElseThrow(() -> new ApplicationException("Contact Not Found"));
 
 	        enquiryVO.setContactName(contact);
@@ -539,13 +540,15 @@ public class DevelopServiceImpl implements DevelopService {
 
 	            EnquiryDetailsVO detail = new EnquiryDetailsVO();
 
-	            if (dto.getItemcode() != null) {
-
-	                ItemMasterVO item = itemMasterRepo.findById(dto.getItemcode())
-	                        .orElseThrow(() -> new ApplicationException("Item Not Found"));
-
-	                detail.setItemcode(item);
-	            }
+//	            if (dto.getItemcode() != null) {
+//
+//	                ItemMasterVO item = itemMasterRepo.findById(dto.getItemcode())
+//	                        .orElseThrow(() -> new ApplicationException("Item Not Found"));
+//
+//	                detail.setItemcode(item);
+//	            }
+	            detail.setItemCode(dto.getItemcode());
+	            detail.setItemDescription(dto.getItemDescription());
 
 	            detail.setAnnualquantity(dto.getAnnualquantity());
 	            detail.setDlrydate(dto.getDlrydate());
@@ -716,9 +719,9 @@ public class DevelopServiceImpl implements DevelopService {
 	    if (enquiryVO.getContactName() != null) {
 
 	        responseDTO.setContactName(
-	                new EnquiryCusContactResponseDTO(
+	                new EmployeeResponseDTO(
 	                        enquiryVO.getContactName().getId(),
-	                        enquiryVO.getContactName().getContactName()));
+	                        enquiryVO.getContactName().getEmployeeName()));
 	    }
 
 	    // ================= Details =================
@@ -734,10 +737,12 @@ public class DevelopServiceImpl implements DevelopService {
 
 	            detailDTO.setId(detail.getId());
 
-	            if (detail.getItemcode() != null) {
-
-	                detailDTO.setItemcode(detail.getItemcode().getId());
-	            }
+//	            if (detail.getItemcode() != null) {
+//
+//	                detailDTO.setItemcode(detail.getItemcode().getId());
+//	            }
+	            detailDTO.setItemCode(detail.getItemCode());
+	            detailDTO.setItemDescription(detail.getItemDescription());
 
 	            detailDTO.setAnnualquantity(detail.getAnnualquantity());
 	            detailDTO.setDlrydate(detail.getDlrydate());

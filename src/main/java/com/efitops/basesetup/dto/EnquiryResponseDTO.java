@@ -19,7 +19,7 @@ public class EnquiryResponseDTO {
 	 private String enquiryNo;
 	 private BranchResponseDTO branch;
 	 private CustomerResonse1DTO customerVO;
-	 private EnquiryCusContactResponseDTO contactName;
+	 private EmployeeResponseDTO contactName;
 	 private String enquiryType;
 	 private LocalDate enquiryDate;
 	 private String partyName;

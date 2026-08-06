@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.efitops.basesetup.entity.SalesContractVO;
@@ -69,7 +70,8 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			    gr.sgst,
 			    gr.igst,
 			    u.unitmaster_id,
-			    u.unit_id
+			    u.unit_id,
+			    gr.gstratemaster_id
 			FROM quotation_header q
 			INNER JOIN quotation_detail qd
 			    ON q.quotation_id = qd.quotation_id
@@ -93,5 +95,16 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 											""", nativeQuery = true)
 	List<Object[]> getQuotationItemDropdown(String quotationNo, Long orgId, Long branch);
 
+
+	@Query(value = """
+	        SELECT *
+	        FROM sales_contract_basic
+	        WHERE org_id = :orgId
+	          AND branch = :branch
+	          AND cancel = 0 and active=1
+	        ORDER BY salescontract_id DESC
+	        """, nativeQuery = true)
+	List<SalesContractVO> findByOrgIdAndBranch(@Param("orgId") Long orgId,
+	                                           @Param("branch") Long branch);
 }
 

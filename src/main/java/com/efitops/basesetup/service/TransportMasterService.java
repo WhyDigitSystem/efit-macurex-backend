@@ -34,26 +34,20 @@ public interface TransportMasterService {
 
 
 	// dropdown for preparedby
-	Map<String, Object> getPreparedBy(Long departmentId)
+	Map<String, Object> getPreparedBy(Long departmentId, Long branch, Long departmentId2)
 	        throws ApplicationException;
 
 	//dropdown for item	
-	Map<String, Object> getItem() throws ApplicationException;
+//	Map<String, Object> getItem() throws ApplicationException;
 
-	Map<String, Object> getItemDetails(Long itemId) throws ApplicationException;
+	Map<String, Object> getCustomerComplaintItemDetails(Long itemId, Long branch) throws ApplicationException;
    
 	//dropdown for branch
-	Map<String, Object> getBranch() throws ApplicationException;
-
-	Map<String, Object> getTypeDropdown() throws ApplicationException;
+	Map<String, Object> getAllBranch(Long orgId) throws ApplicationException;
 	
-	//department dropdown
-	Map<String, Object> getDepartment() throws ApplicationException;
-
 	//customer dropdown
-	Map<String, Object> getCustomerDetails(String customerId) throws ApplicationException;
+	Map<String, Object> getCustomerDetails(Long orgId , Long branch) throws ApplicationException;
 
-	Map<String, Object> getCustomer() throws ApplicationException;
 	
 	//SalesContractAmendment
 	Map<String, Object> updateCreateSalesContractAmendment(

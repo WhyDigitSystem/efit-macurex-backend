@@ -22,5 +22,7 @@ public class QuotationItemDropdownResponseDTO {
     private BigDecimal igst;
     private Long unitMasterId;
     private String unitId;
+    private Long gstRateMasterId;
+
 
 }

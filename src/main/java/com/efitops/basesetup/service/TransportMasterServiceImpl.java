@@ -174,7 +174,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		CustomerComplaintEntryVO savedCustomerComplaint = customerComplaintRepo.save(customerComplaintEntryVO);
 		
 		// Save Images
-		saveImages(customerComplaintDTO.getImages(), savedCustomerComplaint);
+		saveImages(images, savedCustomerComplaint);
 
 		// Reload latest data
 		savedCustomerComplaint = customerComplaintRepo.findById(savedCustomerComplaint.getId())
@@ -434,11 +434,11 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	// dropdown api
 	@Override
 
-	public Map<String, Object> getPreparedBy(Long departmentId) throws ApplicationException {
+	public Map<String, Object> getPreparedBy(Long orgId, Long branch ,Long departmentId) throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> employeeList = employeeMasterRepo.getPreparedBy(departmentId);
+		List<Object[]> employeeList = employeeMasterRepo.getPreparedBy(orgId , branch , departmentId);
 
 		List<Map<String, Object>> preparedByList = new ArrayList<>();
 
@@ -459,154 +459,64 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	}
 
 	// dropdown for item
-	@Override
-	public Map<String, Object> getItem() throws ApplicationException {
-
-		List<Object[]> list = itemMasterRepo.getItem();
-
-		List<Map<String, Object>> responseList = new ArrayList<>();
-
-		for (Object[] obj : list) {
-
-			Map<String, Object> map = new HashMap<>();
-
-			map.put("id", obj[0]);
-			map.put("itemCode", obj[1]);
-
-			responseList.add(map);
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("itemList", responseList);
-
-		return response;
-	}
 
 	@Override
-	public Map<String, Object> getItemDetails(Long itemId) throws ApplicationException {
+	public Map<String, Object> getCustomerComplaintItemDetails(Long orgId, Long branch)
+	        throws ApplicationException {
 
-		List<Object[]> list = itemMasterRepo.getItemDetails(itemId);
+	    List<Object[]> list = itemMasterRepo.getCustomerComplaintItemDetails(orgId, branch);
 
-		if (list == null || list.isEmpty()) {
-			throw new ApplicationException("Item Not Found");
-		}
+	    List<Map<String, Object>> itemList = new ArrayList<>();
 
-		Object[] obj = list.get(0);
+	    for (Object[] obj : list) {
 
-		Map<String, Object> itemMap = new HashMap<>();
+	        Map<String, Object> itemMap = new HashMap<>();
 
-		itemMap.put("id", obj[0]);
-		itemMap.put("itemCode", obj[1]);
-		itemMap.put("itemDescription", obj[2]);
-		itemMap.put("customerPartNo", obj[3]);
+	        itemMap.put("id", obj[0]);
+	        itemMap.put("itemCode", obj[1]);
+	        itemMap.put("itemDescription", obj[2]);
+	        itemMap.put("customerPartNo", obj[3]);
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("itemDetails", itemMap);
+	        itemList.add(itemMap);
+	    }
 
-		return response;
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("itemDetails", itemList);
+
+	    return response;
 	}
 
 	// dropdown for branch
 
 	@Override
-	public Map<String, Object> getBranch() throws ApplicationException {
+	public Map<String, Object> getAllBranch(Long orgId) throws ApplicationException {
 
-		List<Object[]> list = branchRepo.getBranch();
+	    List<Object[]> list = branchRepo.getAllBranch(orgId);
 
-		List<Map<String, Object>> responseList = new ArrayList<>();
+	    List<Map<String, Object>> responseList = new ArrayList<>();
 
-		for (Object[] obj : list) {
+	    for (Object[] obj : list) {
 
-			Map<String, Object> map = new HashMap<>();
+	        Map<String, Object> map = new HashMap<>();
 
-			map.put("id", obj[0]);
-			map.put("branchCode", obj[1]);
-			map.put("branchName", obj[2]);
+	        map.put("id", obj[0]);
+	        map.put("branchCode", obj[1]);
+	        map.put("branchName", obj[2]);
 
-			responseList.add(map);
-		}
+	        responseList.add(map);
+	    }
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("branchList", responseList);
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("branchList", responseList);
 
-		return response;
+	    return response;
 	}
 
-	// belongs to dropdown
+	
 	@Override
-	public Map<String, Object> getTypeDropdown() throws ApplicationException {
+	public Map<String, Object> getCustomerDetails(Long orgId , Long branch) throws ApplicationException {
 
-		List<Object[]> list = customerComplaintRepo.getTypeDropdown();
-
-		List<Map<String, Object>> responseList = new ArrayList<>();
-
-		for (Object[] obj : list) {
-
-			Map<String, Object> map = new HashMap<>();
-			map.put("type", obj[0]);
-
-			responseList.add(map);
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("typeList", responseList);
-
-		return response;
-	}
-
-	// department dropdown
-
-	@Override
-	public Map<String, Object> getDepartment() throws ApplicationException {
-
-		List<Object[]> list = departmentRepo.getDepartment();
-
-		List<Map<String, Object>> responseList = new ArrayList<>();
-
-		for (Object[] obj : list) {
-
-			Map<String, Object> map = new HashMap<>();
-
-			map.put("id", obj[0]);
-			map.put("departmentName", obj[1]);
-
-			responseList.add(map);
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("departmentList", responseList);
-
-		return response;
-	}
-
-	// dropdown for cuatomer
-	@Override
-	public Map<String, Object> getCustomer() throws ApplicationException {
-
-		List<Object[]> list = customerRepo.getCustomer();
-
-		List<Map<String, Object>> responseList = new ArrayList<>();
-
-		for (Object[] obj : list) {
-
-			Map<String, Object> map = new HashMap<>();
-
-			map.put("customerId", obj[0]);
-			map.put("customerName", obj[1]);
-
-			responseList.add(map);
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("customerList", responseList);
-
-		return response;
-	}
-
-	@Override
-	public Map<String, Object> getCustomerDetails(String customerId) throws ApplicationException {
-
-		List<Object[]> list = customerRepo.getCustomerDetails(customerId);
+		List<Object[]> list = customerRepo.getCustomerDetails(orgId,branch);
 
 		if (list.isEmpty()) {
 			throw new ApplicationException("Customer Not Found");

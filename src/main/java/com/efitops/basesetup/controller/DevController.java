@@ -9,12 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +33,6 @@ import com.efitops.basesetup.dto.DespatchInstructionDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
-import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.service.TransportMasterService;
 
@@ -53,9 +50,7 @@ public class DevController extends BaseController{
 	        value = "/updateCreateCustomerComplaint",
 	        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreateCustomerComplaint(
-	        @RequestBody CustomerComplaintDTO customerComplaintDTO,
-
-//	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
+	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
 	        @RequestPart(value = "images", required = false) MultipartFile[] images) {
 
 	    String methodName = "updateCreateCustomerComplaint";
@@ -162,104 +157,134 @@ public class DevController extends BaseController{
 	 //dropdown for preparedby
 	 
 	 @GetMapping("/getPreparedBy")
-	 public ResponseEntity<?> getPreparedBy(
-	         @RequestParam Long departmentId)
-	         throws ApplicationException {
+	 public ResponseEntity<ResponseDTO> getPreparedBy(@RequestParam Long orgId,
+	                                                  @RequestParam Long branch,
+	                                                  @RequestParam Long departmentId) {
 
-	     return ResponseEntity.ok(
-	    		 transportMasterService.getPreparedBy(departmentId));
-	 }
-	 
-	 //drop down for item
-	 @GetMapping("/getItem")
-	 public ResponseEntity<ResponseDTO> getItemDropdown() throws ApplicationException {
+	     String methodName = "getPreparedBy()";
 
-	     ResponseDTO responseDTO = new ResponseDTO();
-	     responseDTO.setStatus(true);
-	     responseDTO.setStatusFlag("Ok");
-	     responseDTO.setParamObjectsMap(transportMasterService.getItem());
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     ResponseDTO responseDTO;
+
+	     try {
+
+	         Map<String, Object> preparedBy =
+	                 transportMasterService.getPreparedBy(orgId, branch, departmentId);
+
+	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+	                 "Prepared By Fetched Successfully");
+
+	         responseObjectsMap.putAll(preparedBy);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         responseDTO = createServiceResponseError(
+	                 responseObjectsMap,
+	                 e.getMessage(),
+	                 e.getMessage());
+	     }
 
 	     return ResponseEntity.ok(responseDTO);
 	 }
 	 
-	 @GetMapping("/getItemDetails/{itemId}")
-	 public ResponseEntity<ResponseDTO> getItemDetails(@RequestParam Long itemId)
-	         throws ApplicationException {
 
-	     ResponseDTO responseDTO = new ResponseDTO();
-	     responseDTO.setStatus(true);
-	     responseDTO.setStatusFlag("Ok");
-	     responseDTO.setParamObjectsMap(transportMasterService.getItemDetails(itemId));
+	 @GetMapping("/getCustomerComplaintItemDetails")
+	 public ResponseEntity<ResponseDTO> getCustomerComplaintItemDetails(@RequestParam Long orgId,@RequestParam Long branch) {
+
+	     String methodName = "getCustomerComplaintItemDetails()";
+
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     ResponseDTO responseDTO;
+
+	     try {
+
+	         Map<String, Object> itemDetails =
+	                 transportMasterService.getCustomerComplaintItemDetails(orgId, branch);
+
+	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+	                 "Item Details Fetched Successfully");
+
+	         responseObjectsMap.put("itemDetails", itemDetails);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         responseDTO = createServiceResponseError(
+	                 responseObjectsMap,
+	                 e.getMessage(),
+	                 e.getMessage());
+	     }
 
 	     return ResponseEntity.ok(responseDTO);
 	 }
 	
 	// branch dropdown
-	 @GetMapping("/getBranch")
-	 public ResponseEntity<ResponseDTO> getBranch() throws ApplicationException {
+	 @GetMapping("/getAllBranch")
+	 public ResponseEntity<ResponseDTO> getAllBranch(@RequestParam Long orgId) {
 
-	     ResponseDTO responseDTO = new ResponseDTO();
+	     String methodName = "getAllBranch()";
 
-	     responseDTO.setStatus(true);
-	     responseDTO.setStatusFlag("Ok");
-	     responseDTO.setParamObjectsMap(transportMasterService.getBranch());
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     ResponseDTO responseDTO;
 
-	     return ResponseEntity.ok(responseDTO);
-	 }
-	 
-	 //belongs to
-	 
-	 @GetMapping("/getBelongsTo")
-	 public ResponseEntity<ResponseDTO> getTypeDropdown() throws ApplicationException {
+	     try {
 
-	     ResponseDTO responseDTO = new ResponseDTO();
-	     responseDTO.setStatus(true);
-	     responseDTO.setStatusFlag("Ok");
-	     responseDTO.setParamObjectsMap(transportMasterService.getTypeDropdown());
+	         Map<String, Object> branch =
+	                 transportMasterService.getAllBranch(orgId);
 
-	     return ResponseEntity.ok(responseDTO);
-	 }
-	 
-	 //department 
-	 @GetMapping("/getDepartment")
-	 public ResponseEntity<ResponseDTO> getDepartment() throws ApplicationException {
+	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+	                 "Branch Fetched Successfully");
 
-	     ResponseDTO responseDTO = new ResponseDTO();
-	     responseDTO.setStatus(true);
-	     responseDTO.setStatusFlag("Ok");
-	     responseDTO.setParamObjectsMap(transportMasterService.getDepartment());
+	         responseObjectsMap.putAll(branch);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         responseDTO = createServiceResponseError(
+	                 responseObjectsMap,
+	                 e.getMessage(),
+	                 e.getMessage());
+	     }
 
 	     return ResponseEntity.ok(responseDTO);
 	 }
+	
 	 
-	 //Customer drowpdown
-	 @GetMapping("/getCustomer")
-	 public ResponseEntity<ResponseDTO> getCustomer() throws ApplicationException {
+	 @GetMapping("/getCustomerDetails")
+	 public ResponseEntity<ResponseDTO> getCustomerDetails(@RequestParam Long orgId,
+	                                                       @RequestParam Long branch) {
 
-	     ResponseDTO responseDTO = new ResponseDTO();
+	     String methodName = "getCustomerDetails()";
 
-	     responseDTO.setStatus(true);
-	     responseDTO.setStatusFlag("Ok");
-	     responseDTO.setParamObjectsMap(transportMasterService.getCustomer());
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     ResponseDTO responseDTO;
+
+	     try {
+
+	         Map<String, Object> customerDetails =
+	                 transportMasterService.getCustomerDetails(orgId, branch);
+
+	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+	                 "Customer Details Fetched Successfully");
+
+	         responseObjectsMap.putAll(customerDetails);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         responseDTO = createServiceResponseError(
+	                 responseObjectsMap,
+	                 e.getMessage(),
+	                 e.getMessage());
+	     }
 
 	     return ResponseEntity.ok(responseDTO);
 	 }
-	 
-	 @GetMapping("/getCustomerDetails/{customerId}")
-	 public ResponseEntity<ResponseDTO> getCustomerDetails(
-	         @RequestParam String customerId)
-	         throws ApplicationException {
-
-	     ResponseDTO responseDTO = new ResponseDTO();
-
-	     responseDTO.setStatus(true);
-	     responseDTO.setStatusFlag("Ok");
-	     responseDTO.setParamObjectsMap(
-	    		 transportMasterService.getCustomerDetails(customerId));
-
-	     return ResponseEntity.ok(responseDTO);
-	 }
-	 
 	 //sales contract amendment
 	 
 		@PostMapping("/updateCreateSalesContractAmendment")

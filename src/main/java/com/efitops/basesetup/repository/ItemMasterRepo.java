@@ -22,13 +22,10 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
 
 	// dropdown for item
 
-	@Query(value = "SELECT item_id, item_code " + "FROM item " + "WHERE cancel = false "
-			+ "ORDER BY item_code", nativeQuery = true)
-	List<Object[]> getItem();
 
 	@Query(value = "SELECT item_id, item_code, item_description, customer_part_no " + "FROM item "
-			+ "WHERE item_id = ?1 " + "AND cancel = false", nativeQuery = true)
-	List<Object[]> getItemDetails(Long itemId);
+			+ "WHERE org_id = ?1  and branch=?2 " + "AND cancel = false and active=1", nativeQuery = true)
+	List<Object[]> getCustomerComplaintItemDetails(Long itemId, Long branch);
 
 	@Query(value = """
 				SELECT
@@ -42,7 +39,7 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
 			    gr.rate,
 			    gr.cgst,
 			    gr.sgst,
-			    gr.igst,u.unitmaster_id
+			    gr.igst,u.unitmaster_id,gr.gstratemaster_id
 			FROM item i
 			INNER JOIN unitmaster u
 			    ON u.unitmaster_id = i.primary_unit

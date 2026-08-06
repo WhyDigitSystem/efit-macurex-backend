@@ -16,7 +16,11 @@ public class OrderAcceptanceDetailsDTO {
 
 	private String customerPartNo;
 
-	private Long hsnSacCodeId;
+	private String taxType;
+
+	private Long taxPercentage;
+
+	private Long unit;
 
 	private LocalDate lastInvoiceDate;
 
@@ -40,8 +44,7 @@ public class OrderAcceptanceDetailsDTO {
 
 	private BigDecimal igstAmount;
 
-	private Long currencyNameId;
+	private String currencyName;
 
-	private BigDecimal taxPercentage;
 
 }

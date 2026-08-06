@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,6 +41,17 @@ public class OrderAcceptanceVO {
 
 	@Column(name = "doc_id")
 	private String docId;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "tax_percentage")
+	private GSTRateMasterVO taxPercentage;
+
+	@Column(name = "tax_type")
+	private String taxType;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "unit")
+	private UnitMasterVO unit;
 
 	@Column(name = "doc_date")
 	private LocalDate docDate = LocalDate.now();
@@ -83,13 +95,13 @@ public class OrderAcceptanceVO {
 
 	@Column(name = "post_rate")
 	private String postRate;
-	
+
 	@Column(name = "customer_type")
 	private String customerType;
-	
+
 	@Column(name = "gst_no")
 	private String gstNo;
-	
+
 	@Column(name = "gst_approval")
 	private String gstApproval;
 
@@ -143,10 +155,10 @@ public class OrderAcceptanceVO {
 
 	@Column(name = "taxable_amount", precision = 10, scale = 2)
 	private BigDecimal taxableAmount;
-	
+
 	@Column(name = "total_tax_amount", precision = 10, scale = 2)
 	private BigDecimal totalTaxAmount;
-	
+
 	@Column(name = "total_discount_amount", precision = 10, scale = 2)
 	private BigDecimal totalDiscountAmount;
 

@@ -49,7 +49,7 @@ public class OrderAcceptanceResponseDTO {
 
 	private String createdBy;
 
-	private boolean active;
+	private boolean active=true;
 
 	private boolean cancel = false;
 
@@ -61,7 +61,7 @@ public class OrderAcceptanceResponseDTO {
 
 	private String financialYear;
 
-	private BranchVO branch;
+	private BranchResponseDTO branch;
 
 	private String destination;
 

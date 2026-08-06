@@ -107,6 +107,7 @@ public class OrderAcceptanceContoller extends BaseController {
 	@PutMapping(value = "/createUpdateOrderAcceptance", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdateOrderAcceptance(
 			@RequestPart("orderAcceptance") OrderAcceptanceDTO orderAcceptanceDTO,
+//			@RequestBody OrderAcceptanceDTO orderAcceptanceDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();

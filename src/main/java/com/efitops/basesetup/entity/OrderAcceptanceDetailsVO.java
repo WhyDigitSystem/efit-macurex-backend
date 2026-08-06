@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -42,12 +43,13 @@ public class OrderAcceptanceDetailsVO {
 	@ManyToOne
 	@JoinColumn(name = "unit")
 	private UnitMasterVO unit;
-	
-	
-	
-	@ManyToOne
-	@JoinColumn(name = "gst")
-	private GSTRateMasterVO gstRate;
+
+	@Column(name = "tax_type")
+	private String taxType;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "tax_percentage")
+	private GSTRateMasterVO taxPercentage;
 
 	@Column(name = "last_invoice_date")
 	private LocalDate lastInvoiceDate;
@@ -63,7 +65,7 @@ public class OrderAcceptanceDetailsVO {
 
 	@Column(name = "discount", precision = 10, scale = 2)
 	private BigDecimal discount;
-	
+
 	@Column(name = "discount_percentage", precision = 10, scale = 2)
 	private BigDecimal discountPercentage;
 
@@ -93,17 +95,12 @@ public class OrderAcceptanceDetailsVO {
 
 	@Column(name = "order_amount", precision = 10, scale = 2)
 	private BigDecimal orderAmount;
-	
 
-	@Column(name = "tax_percentage", precision = 10, scale = 2)
-	private BigDecimal taxPercentage;
-	
 	@Column(name = "total_amount", precision = 10, scale = 2)
 	private BigDecimal totalAmount;
 
-	@ManyToOne
-	@JoinColumn(name = "currency_name")
-	private CurrencyVO currencyName;
+	@Column(name = "currency_name")
+	private String currencyName;
 
 	@ManyToOne
 	@JsonBackReference

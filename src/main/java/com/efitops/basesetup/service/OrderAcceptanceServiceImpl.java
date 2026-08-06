@@ -26,12 +26,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.GSTRateResponseDTO;
+import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractItemResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesCustomerResponseDTO;
+import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.CustomerResponseGstDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseGstDetailsDTO;
+import com.efitops.basesetup.dto.ItemMasterResponseTaxDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDetailsDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDetailsResponseDTO;
@@ -48,6 +55,7 @@ import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.OrderAcceptanceDetailsVO;
 import com.efitops.basesetup.entity.OrderAcceptanceFileUploadDetailsVO;
@@ -56,6 +64,7 @@ import com.efitops.basesetup.entity.OrderAcceptanceVO;
 import com.efitops.basesetup.entity.SalesOrderShortCloseDetailsVO;
 import com.efitops.basesetup.entity.SalesOrderShortCloseFileDetailsVO;
 import com.efitops.basesetup.entity.SalesOrderShortCloseVO;
+import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
@@ -138,6 +147,9 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	@Autowired
 	SalesOrderShortCloseFileDetailsRepo salesOrderShortCloseFileDetailsRepo;
 
+	@Autowired
+	GstRateMasterRepo gstRateRepo;
+
 	@Override
 	public OrderAcceptanceResponseDTO getOrderAcceptanceById(Long id) throws ApplicationException {
 
@@ -196,13 +208,10 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			message = "OrderAcceptance Created Successfully";
 		}
 
-		// Header + Child Mapping
 		createUpdateOrderAcceptanceVOByOrderAcceptanceDTO(orderAcceptanceDTO, orderAcceptanceVO);
 
-		// Save Header
 		orderAcceptanceVO = orderAcceptanceRepo.save(orderAcceptanceVO);
 
-		// Save Attachments
 		saveAttachments(files, orderAcceptanceVO);
 
 		// Response
@@ -222,7 +231,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		if (orderAcceptanceDTO.getCustomerId() != null && orderAcceptanceDTO.getCustomerId() > 0) {
 
-			CustomerVO customer = customerRepo.findById(orderAcceptanceDTO.getBranchId())
+			CustomerVO customer = customerRepo.findById(orderAcceptanceDTO.getCustomerId())
 					.orElseThrow(() -> new ApplicationException("Party Not Found"));
 
 			orderAcceptanceVO.setCustomerId(customer);
@@ -316,16 +325,17 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 					detailsVO.setItem(itemCode);
 				}
 
-				if (dto.getCurrencyNameId() != null && dto.getCurrencyNameId() != 0) {
-					CurrencyVO currency = currencyRepo.findById(dto.getCurrencyNameId())
-							.orElseThrow(() -> new ApplicationException("Currency Not Found"));
+				UnitMasterVO unit = unitMasterRepo.findById(dto.getUnit())
+						.orElseThrow(() -> new ApplicationException("Unit Not Found"));
 
-					detailsVO.setCurrencyName(currency);
-				}
+				GSTRateMasterVO gstRateVO = gstRateRepo.findById(dto.getTaxPercentage())
+						.orElseThrow(() -> new ApplicationException("GST Rate Not Found"));
 
 				detailsVO.setLastInvoiceDate(dto.getLastInvoiceDate());
 
 				detailsVO.setQuantity(dto.getQuantity());
+
+				detailsVO.setUnit(unit);
 
 				detailsVO.setQuantityRate(dto.getQuantityRate());
 
@@ -335,61 +345,57 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 				detailsVO.setOrderAmount(dto.getQuantity().multiply(dto.getOrderRate()));
 
-				BigDecimal discountAmount = detailsVO.getOrderAmount().multiply(dto.getDiscount())
-						.divide(BigDecimal.valueOf(100));
+				orderAcceptanceVO.setGstApproval(orderAcceptanceDTO.getGstApproval());
+
+				detailsVO.setDiscount(dto.getDiscount());
+
+				BigDecimal quantity = dto.getQuantity() == null ? BigDecimal.ZERO : dto.getQuantity();
+
+				BigDecimal orderRate = dto.getOrderRate() == null ? BigDecimal.ZERO : dto.getOrderRate();
+
+				BigDecimal discountPercentage = dto.getDiscount() == null ? BigDecimal.ZERO : dto.getDiscount();
+
+				BigDecimal orderAmount = quantity.multiply(orderRate);
+
+				BigDecimal discountAmount = orderAmount.multiply(discountPercentage).divide(BigDecimal.valueOf(100));
+
+				BigDecimal amount = orderAmount.subtract(discountAmount);
 
 				detailsVO.setDiscountAmount(discountAmount);
+				detailsVO.setAmount(amount);
 
-				totalDiscountAmount = totalDiscountAmount.add(discountAmount);
+				if ("YES".equalsIgnoreCase(orderAcceptanceVO.getGstApproval())) {
 
-				detailsVO.setAmount(detailsVO.getOrderAmount().subtract(discountAmount));
+					BigDecimal igstAmount = amount.multiply(gstRateVO.getIgst()).divide(BigDecimal.valueOf(100));
 
-				BigDecimal taxPercentage = dto.getTaxPercentage() == null ? BigDecimal.ZERO : dto.getTaxPercentage();
+					detailsVO.setIgstRate(gstRateVO.getIgst());
+					detailsVO.setCgstRate(BigDecimal.ZERO);
+					detailsVO.setSgstRate(BigDecimal.ZERO);
 
-				detailsVO.setTaxPercentage(taxPercentage);
-
-				if ("Yes".equalsIgnoreCase(orderAcceptanceDTO.getGstApproval())) {
-
-					BigDecimal igstAmount = detailsVO.getAmount().multiply(taxPercentage)
-							.divide(BigDecimal.valueOf(100));
-
-					detailsVO.setIgstRate(taxPercentage);
 					detailsVO.setIgstAmount(igstAmount);
-
-				} else if ("No".equalsIgnoreCase(orderAcceptanceDTO.getGstApproval())) {
-
-					BigDecimal halfTax = taxPercentage.divide(BigDecimal.valueOf(2));
-
-					BigDecimal cgstAmount = detailsVO.getAmount().multiply(halfTax).divide(BigDecimal.valueOf(100));
-
-					BigDecimal sgstAmount = detailsVO.getAmount().multiply(halfTax).divide(BigDecimal.valueOf(100));
-
-					detailsVO.setCgstRate(halfTax);
-					detailsVO.setCgstAmount(cgstAmount);
-
-					detailsVO.setSgstRate(halfTax);
-					detailsVO.setSgstAmount(sgstAmount);
+					detailsVO.setCgstAmount(BigDecimal.ZERO);
+					detailsVO.setSgstAmount(BigDecimal.ZERO);
 
 				} else {
+
+					BigDecimal cgstAmount = amount.multiply(gstRateVO.getCgst()).divide(BigDecimal.valueOf(100));
+
+					BigDecimal sgstAmount = amount.multiply(gstRateVO.getSgst()).divide(BigDecimal.valueOf(100));
+
+					detailsVO.setCgstRate(gstRateVO.getCgst());
+					detailsVO.setSgstRate(gstRateVO.getSgst());
 					detailsVO.setIgstRate(BigDecimal.ZERO);
+
+					detailsVO.setCgstAmount(cgstAmount);
+					detailsVO.setSgstAmount(sgstAmount);
 					detailsVO.setIgstAmount(BigDecimal.ZERO);
 
-					detailsVO.setCgstRate(BigDecimal.ZERO);
-					detailsVO.setCgstAmount(BigDecimal.ZERO);
-
-					detailsVO.setSgstRate(BigDecimal.ZERO);
-					detailsVO.setSgstAmount(BigDecimal.ZERO);
 				}
 
-				// Total Tax
-				BigDecimal totalItemTax = detailsVO.getIgstAmount().add(detailsVO.getCgstAmount())
-						.add(detailsVO.getSgstAmount());
+				detailsVO.setCurrencyName(dto.getCurrencyName());
+				detailsVO.setOrderAcceptanceVO(orderAcceptanceVO);
 
-				totalTaxAmount = totalTaxAmount.add(totalItemTax);
-				detailsVO.setTotalAmount(detailsVO.getAmount().add(totalItemTax));
-
-				totalAmount = totalAmount.add(detailsVO.getTotalAmount());
-
+				itemDetailsList.add(detailsVO);
 			}
 		}
 		orderAcceptanceVO.setOrderAcceptanceDetailsVO(itemDetailsList);
@@ -494,41 +500,39 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setId(orderAcceptanceVO.getId());
 		responseDTO.setDocId(orderAcceptanceVO.getDocId());
 		responseDTO.setDocDate(orderAcceptanceVO.getDocDate());
-
 		responseDTO.setOrderNo(orderAcceptanceVO.getOrderNo());
+		responseDTO.setGstApproval(orderAcceptanceVO.getGstApproval());
 		responseDTO.setBelongsTo(orderAcceptanceVO.getBelongsTo());
 		responseDTO.setSoType(orderAcceptanceVO.getSoType());
 		responseDTO.setWithQuotation(orderAcceptanceVO.getWithQuotation());
-
-		responseDTO.setQuotationNo(orderAcceptanceVO.getQuotationNo());
 		responseDTO.setQuotationDate(orderAcceptanceVO.getQuotationDate());
-
+		responseDTO.setQuotationNo(orderAcceptanceVO.getQuotationNo());
 		responseDTO.setEnquiryNo(orderAcceptanceVO.getEnquiryNo());
 		responseDTO.setEnquiryDate(orderAcceptanceVO.getEnquiryDate());
-
 		responseDTO.setCustomerPurchaseOrderNo(orderAcceptanceVO.getCustomerPurchaseOrderNo());
 		responseDTO.setCustomerPurchaseOrderDate(orderAcceptanceVO.getCustomerPurchaseOrderDate());
-
 		responseDTO.setPostRate(orderAcceptanceVO.getPostRate());
-
 		responseDTO.setCreatedBy(orderAcceptanceVO.getCreatedBy());
+//		responseDTO.setActive(orderAcceptanceVO.isActive());
+//		responseDTO.setCancel(orderAcceptanceVO.isCancel());
 		responseDTO.setUpdatedBy(orderAcceptanceVO.getUpdatedBy());
-
 		responseDTO.setCancelRemarks(orderAcceptanceVO.getCancelRemarks());
-
 		responseDTO.setOrgId(orderAcceptanceVO.getOrgId());
 		responseDTO.setFinancialYear(orderAcceptanceVO.getFinancialYear());
-
 		responseDTO.setDestination(orderAcceptanceVO.getDestination());
 		responseDTO.setModeOfTransport(orderAcceptanceVO.getModeOfTransport());
 		responseDTO.setGrossalue(orderAcceptanceVO.getGrossalue());
 		responseDTO.setFreight(orderAcceptanceVO.getFreight());
-
 		responseDTO.setDeliveryTerms(orderAcceptanceVO.getDeliveryTerms());
 		responseDTO.setPaymentTerms(orderAcceptanceVO.getPaymentTerms());
 		responseDTO.setSpecification(orderAcceptanceVO.getSpecification());
 		responseDTO.setNote(orderAcceptanceVO.getNote());
 		responseDTO.setGstApproval(orderAcceptanceVO.getGstApproval());
+
+		if (responseDTO.getBranch() != null) {
+			responseDTO.setBranch(new BranchResponseDTO(orderAcceptanceVO.getBranch().getId(),
+					orderAcceptanceVO.getBranch().getBranchCode(), orderAcceptanceVO.getBranch().getBranchName()));
+		}
 
 		if (orderAcceptanceVO.getCustomerId() != null) {
 
@@ -536,23 +540,17 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 			customerDTO.setId(orderAcceptanceVO.getCustomerId().getId());
 			customerDTO.setCustomerName(orderAcceptanceVO.getCustomerId().getCustomerName());
+			customerDTO.setCustomerType(orderAcceptanceVO.getCustomerId().getCustomerType());
 			customerDTO.setCustomerGstNo(orderAcceptanceVO.getCustomerId().getGstNo());
-			customerDTO.setGstApproval(orderAcceptanceVO.getCustomerId().isRegistered());
+
+			customerDTO.setGstApproval(orderAcceptanceVO.getCustomerId().isGstApplicable() ? "Yes" : "No");
+
+			customerDTO.setCustomerGstNo(orderAcceptanceVO.getCustomerId().getGstNo());
+
 			responseDTO.setCustomerId(customerDTO);
 		}
 
-		if (orderAcceptanceVO.getBranch() != null) {
-
-			BranchVO branch = new BranchVO();
-
-			branch.setId(orderAcceptanceVO.getBranch().getId());
-			branch.setBranchCode(orderAcceptanceVO.getBranch().getBranchCode());
-			branch.setBranchName(orderAcceptanceVO.getBranch().getBranchName());
-
-			responseDTO.setBranch(branch);
-		}
-
-		List<OrderAcceptanceDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+		List<OrderAcceptanceDetailsResponseDTO> detailsList = new ArrayList<>();
 
 		if (orderAcceptanceVO.getOrderAcceptanceDetailsVO() != null) {
 
@@ -563,67 +561,48 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				detailsDTO.setId(detailsVO.getId());
 
 				if (detailsVO.getItem() != null) {
-
-					ItemMasterResponseDetailsDTO itemCodeDTO = new ItemMasterResponseDetailsDTO();
-
-					itemCodeDTO.setId(detailsVO.getItem().getId());
-					itemCodeDTO.setItemCode(detailsVO.getItem().getItemCode());
-					itemCodeDTO.setItemDescription(detailsVO.getItem().getItemDescription());
-
-					if (detailsVO.getItem().getPrimaryUnit() != null) {
-
-						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
-
-						unitDTO.setId(detailsVO.getItem().getPrimaryUnit().getId());
-						unitDTO.setUnitId(detailsVO.getItem().getPrimaryUnit().getUnitId());
-						unitDTO.setUnitDescription(detailsVO.getItem().getPrimaryUnit().getDescription());
-
-						itemCodeDTO.setUnit(unitDTO);
-					}
-
-					detailsDTO.setItems(itemCodeDTO);
+					detailsDTO.setItems(new ItemMasterResponseTaxDTO(detailsVO.getItem().getId(),
+							detailsVO.getItem().getItemCode(), detailsVO.getItem().getItemDescription(),
+							detailsVO.getItem().getHsnCode() != null ? detailsVO.getItem().getHsnCode().getHsn()
+									: null));
 				}
 
 				detailsDTO.setCustomerPartNo(detailsVO.getCustomerPartNo());
 
-				detailsDTO.setLastInvoiceDate(detailsVO.getLastInvoiceDate());
+				if (detailsVO.getUnit() != null) {
+					detailsDTO
+							.setUnit(new UnitResponseDTO(detailsVO.getUnit().getId(), detailsVO.getUnit().getUnitId()));
+				}
 
+				if (detailsVO.getTaxPercentage() != null) {
+					GSTRateResponseDTO gstDTO = new GSTRateResponseDTO();
+					gstDTO.setId(detailsVO.getTaxPercentage().getId());
+					gstDTO.setTaxPercentage(detailsVO.getTaxPercentage().getRate());
+					detailsDTO.setTaxPercentage(gstDTO);
+				}
+
+				detailsDTO.setLastInvoiceDate(detailsVO.getLastInvoiceDate());
 				detailsDTO.setQuantity(detailsVO.getQuantity());
 				detailsDTO.setQuantityRate(detailsVO.getQuantityRate());
 				detailsDTO.setOrderRate(detailsVO.getOrderRate());
-
 				detailsDTO.setDiscount(detailsVO.getDiscount());
-
 				detailsDTO.setAmount(detailsVO.getAmount());
-
 				detailsDTO.setSgstRate(detailsVO.getSgstRate());
 				detailsDTO.setSgstAmount(detailsVO.getSgstAmount());
-
 				detailsDTO.setCgstRate(detailsVO.getCgstRate());
 				detailsDTO.setCgstAmount(detailsVO.getCgstAmount());
-
 				detailsDTO.setIgstRate(detailsVO.getIgstRate());
 				detailsDTO.setIgstAmount(detailsVO.getIgstAmount());
+				detailsDTO.setCurrencyName(detailsVO.getCurrencyName());
+				detailsDTO.setTaxType(detailsVO.getTaxType());
 
-				if (detailsVO.getCurrencyName() != null) {
-
-					CurrencyResponseDTO currencyDTO = new CurrencyResponseDTO();
-
-					currencyDTO.setId(detailsVO.getCurrencyName().getId());
-					currencyDTO.setCurrencyName(detailsVO.getCurrencyName().getCurrency());
-
-					detailsDTO.setCurrencyName(currencyDTO);
-				}
-
-				detailsResponseList.add(detailsDTO);
+				detailsList.add(detailsDTO);
 			}
 		}
 
-		responseDTO.setOrderAcceptanceDetailsResponseDTO(detailsResponseList);
+		responseDTO.setOrderAcceptanceDetailsResponseDTO(detailsList);
 
-		// ================ Tax Details ===================
-
-		List<OrderAcceptanceTaxDetailsResponsDTO> taxResponseList = new ArrayList<>();
+		List<OrderAcceptanceTaxDetailsResponsDTO> taxList = new ArrayList<>();
 
 		if (orderAcceptanceVO.getOrderAcceptanceTaxDetailsVO() != null) {
 
@@ -636,15 +615,13 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				taxDTO.setAcceptedQtyAmount(taxVO.getAcceptedQtyAmount());
 				taxDTO.setRevisedAmount(taxVO.getRevisedAmount());
 
-				taxResponseList.add(taxDTO);
+				taxList.add(taxDTO);
 			}
 		}
 
-		responseDTO.setOrderAcceptanceTaxDetailsResponsVO(taxResponseList);
+		responseDTO.setOrderAcceptanceTaxDetailsResponsVO(taxList);
 
-		// ================ File Upload ===================
-
-		List<OrderAcceptanceFileUploadDetailsDTO> fileResponseList = new ArrayList<>();
+		List<OrderAcceptanceFileUploadDetailsDTO> fileList = new ArrayList<>();
 
 		if (orderAcceptanceVO.getOrderAcceptanceFileUploadDetailsVO() != null) {
 
@@ -660,11 +637,11 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				fileDTO.setFileSize(fileVO.getFileSize());
 				fileDTO.setUploadOn(fileVO.getUploadOn());
 
-				fileResponseList.add(fileDTO);
+				fileList.add(fileDTO);
 			}
 		}
 
-		responseDTO.setOrderAcceptanceFileUploadDetailsDTO(fileResponseList);
+		responseDTO.setOrderAcceptanceFileUploadDetailsDTO(fileList);
 
 		return responseDTO;
 	}

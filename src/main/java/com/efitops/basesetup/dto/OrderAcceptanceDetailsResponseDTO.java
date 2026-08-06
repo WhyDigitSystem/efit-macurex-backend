@@ -3,6 +3,9 @@ package com.efitops.basesetup.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.efitops.basesetup.ResponseDTO.GSTRateResponseDTO;
+import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,11 +17,13 @@ public class OrderAcceptanceDetailsResponseDTO {
 
 	private Long id;
 
-	private ItemMasterResponseDetailsDTO items;
+	private ItemMasterResponseTaxDTO items;
 
 	private String customerPartNo;
 
-	private HsnResponseDetailsTaxDTO hsnSacCode;
+	private UnitResponseDTO unit;
+
+	private GSTRateResponseDTO taxPercentage;
 
 	private LocalDate lastInvoiceDate;
 
@@ -44,6 +49,8 @@ public class OrderAcceptanceDetailsResponseDTO {
 
 	private BigDecimal igstAmount;
 
-	private CurrencyResponseDTO currencyName;
+	private String currencyName;
+
+	private String taxType;;
 
 }

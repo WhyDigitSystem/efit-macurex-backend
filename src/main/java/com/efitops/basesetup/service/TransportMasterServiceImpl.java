@@ -2,6 +2,7 @@ package com.efitops.basesetup.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,11 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
@@ -49,7 +47,7 @@ import com.efitops.basesetup.dto.DespatchInstructionDetailsDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDetailsDTO;
 import com.efitops.basesetup.dto.LocationResponseDTO;
-import com.efitops.basesetup.dto.ResponseDTO;
+//github.com/WhyDigitSystem/efit-macurex-backend.git
 import com.efitops.basesetup.dto.SalesContractAmdDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.StockTransferChallanDTO;
@@ -161,7 +159,6 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	@Override
 	@Transactional
-	
 	public Map<String, Object> updateCreateCustomerComplaint(
 	        CustomerComplaintDTO customerComplaintDTO,
 	        MultipartFile[] images)
@@ -251,23 +248,23 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			responseDTO.setDepartment(departmentDTO);
 		}
-		if (customerComplaintEntryVO.getCustomerName() != null) {
+//		if (customerComplaintEntryVO.getCustomerName() != null) {
+//
+//		    CustomerResonse1DTO customerDTO = new CustomerResonse1DTO();
+//
+//		    customerDTO.setId(customerComplaintEntryVO.getCustomerName().getId());
+//		    customerDTO.setCustomerName(customerComplaintEntryVO.getCustomerName().getCustomerName());
+//
+//		    responseDTO.setCustomerName(customerDTO);
+//		}
+		if (customerComplaintEntryVO.getCustomer() != null) {
 
 		    CustomerResonse1DTO customerDTO = new CustomerResonse1DTO();
 
-		    customerDTO.setId(customerComplaintEntryVO.getCustomerName().getId());
-		    customerDTO.setCustomerName(customerComplaintEntryVO.getCustomerName().getCustomerName());
+		    customerDTO.setId(customerComplaintEntryVO.getCustomer().getId());
+		    customerDTO.setCustomerName(customerComplaintEntryVO.getCustomer().getCustomerName());
 
-		    responseDTO.setCustomerName(customerDTO);
-		}
-		if (customerComplaintEntryVO.getCustomerId() != null) {
-
-		    CustomerResonse1DTO customerDTO = new CustomerResonse1DTO();
-
-		    customerDTO.setId(customerComplaintEntryVO.getCustomerId().getId());
-		    customerDTO.setCustomerName(customerComplaintEntryVO.getCustomerId().getCustomerName());
-
-		    responseDTO.setCustomerId(customerDTO);
+		    responseDTO.setCustomer(customerDTO);
 		}
 		if (customerComplaintEntryVO.getItem() != null) {
 
@@ -317,25 +314,24 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			customerComplaintEntryVO.setBranch(branch);
 		}
-		System.out.println("customerName = " + customerComplaintDTO.getCustomerName());
-		if (customerComplaintDTO.getCustomerName() != null && customerComplaintDTO.getCustomerName() != 0) {
+//		if (customerComplaintDTO.getCustomerName() != null && customerComplaintDTO.getCustomerName() != 0) {
+//
+//			System.out.println("Customer Name block executed");
+//
+//			CustomerVO customerVO = customerRepo.findById(customerComplaintDTO.getCustomerName())
+//					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
+//
+//			customerComplaintEntryVO.setCustomerName(customerVO);
+//		}
 
-			System.out.println("Customer Name block executed");
-
-			CustomerVO customerVO = customerRepo.findById(customerComplaintDTO.getCustomerName())
-					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
-
-			customerComplaintEntryVO.setCustomerName(customerVO);
-		}
-
-		if (customerComplaintDTO.getCustomerId() != null && customerComplaintDTO.getCustomerId() != 0) {
+		if (customerComplaintDTO.getCustomer() != null && customerComplaintDTO.getCustomer() != 0) {
 
 			System.out.println("Customer ID block executed");
 
-			CustomerVO customerVO = customerRepo.findById(customerComplaintDTO.getCustomerId())
+			CustomerVO customerVO = customerRepo.findById(customerComplaintDTO.getCustomer())
 					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
-			customerComplaintEntryVO.setCustomerId(customerVO);
+			customerComplaintEntryVO.setCustomer(customerVO);
 		}
 		if (customerComplaintDTO.getDepartment() != null) {
 
@@ -383,10 +379,9 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	            Path path = Paths.get(uploadPath, fileName);
 
-	            Files.copy(
-	                    image.getInputStream(),
-	                    path,
-	                    StandardCopyOption.REPLACE_EXISTING);
+	            try (InputStream inputStream = image.getInputStream()) {
+	                Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+	            }
 
 	            imageNames.add(fileName);
 	        }

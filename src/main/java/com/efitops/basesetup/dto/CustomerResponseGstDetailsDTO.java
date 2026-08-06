@@ -1,4 +1,4 @@
-package com.efitops.basesetup.service;
+package com.efitops.basesetup.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerResponseDetailsDTO {
+public class CustomerResponseGstDetailsDTO {
 	private Long id;
 	private String customerName;
-	private String customerCode;
+	private String custometType;
+	private String customerGstNo;
+	private boolean isGstApproval;
 
 }

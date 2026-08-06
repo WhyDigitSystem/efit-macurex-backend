@@ -2,6 +2,7 @@ package com.efitops.basesetup.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,11 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
@@ -36,7 +34,6 @@ import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
-import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
@@ -47,10 +44,8 @@ import com.efitops.basesetup.dto.DespatchInstructionDTO;
 import com.efitops.basesetup.dto.DespatchInstructionDetailsDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDetailsDTO;
-import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesContractAmdDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
-import com.efitops.basesetup.dto.StockTransferChallanDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
@@ -61,12 +56,10 @@ import com.efitops.basesetup.entity.DespatchInstructionVO;
 import com.efitops.basesetup.entity.DocketInvoiceDetailsVO;
 import com.efitops.basesetup.entity.DocketInvoiceVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
-import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.SalesContractAmdDetailsVO;
 import com.efitops.basesetup.entity.SalesContractAmendmentVO;
 import com.efitops.basesetup.entity.SalesContractVO;
-import com.efitops.basesetup.entity.StockTransferChallanVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -159,7 +152,6 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	@Override
 	@Transactional
-	
 	public Map<String, Object> updateCreateCustomerComplaint(
 	        CustomerComplaintDTO customerComplaintDTO,
 	        MultipartFile[] images)
@@ -380,10 +372,9 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	            Path path = Paths.get(uploadPath, fileName);
 
-	            Files.copy(
-	                    image.getInputStream(),
-	                    path,
-	                    StandardCopyOption.REPLACE_EXISTING);
+	            try (InputStream inputStream = image.getInputStream()) {
+	                Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+	            }
 
 	            imageNames.add(fileName);
 	        }

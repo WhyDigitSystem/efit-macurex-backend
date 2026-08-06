@@ -3,6 +3,8 @@ package com.efitops.basesetup.ResponseDTO;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.efitops.basesetup.dto.BranchResponseDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,8 +15,8 @@ import lombok.NoArgsConstructor;
 public class DocketInvoiceResponseDTO {
 	 private Long id;
 	 private String docNo;
-	 private Long branch;
-	 private Long transport;
+	 private BranchResponseDTO branch;
+	 private TransportResponseDTO transport;
      private LocalDate docDate;
      private String billNo;
      private LocalDate billDate;

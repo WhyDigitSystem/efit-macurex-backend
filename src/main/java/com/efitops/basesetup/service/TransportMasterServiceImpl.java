@@ -33,6 +33,7 @@ import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
+import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
@@ -1263,11 +1264,14 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    // =========================
 	    // Branch Response
 	    // =========================
-
 	    if (docketInvoiceVO.getBranch() != null) {
 
-	        responseDTO.setBranch(
-	                docketInvoiceVO.getBranch().getId());
+	        BranchResponseDTO branchDTO = new BranchResponseDTO();
+
+	        branchDTO.setId(docketInvoiceVO.getBranch().getId());
+	        branchDTO.setBranchName(docketInvoiceVO.getBranch().getBranchName());
+
+	        responseDTO.setBranch(branchDTO);
 	    }
 
 	    // =========================
@@ -1276,10 +1280,14 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	    if (docketInvoiceVO.getTransport() != null) {
 
-	        responseDTO.setTransport(
-	                docketInvoiceVO.getTransport().getId());
-	    }
+	        TransportResponseDTO transportDTO = new TransportResponseDTO();
 
+	        transportDTO.setId(docketInvoiceVO.getTransport().getId());
+	        transportDTO.setTransportName(
+	                docketInvoiceVO.getTransport().getTransportName());
+
+	        responseDTO.setTransport(transportDTO);
+	    }
 	    // =========================
 	    // Child Response
 	    // =========================
@@ -1336,7 +1344,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	    if (dto.getBranch() != null && dto.getBranch() != 0) {
 
-	        BranchVO branch = branchRepo.findById(dto.getBranch())
+	    	System.out.println(dto.getBranch());
+	    	System.out.println(dto.getBranch());	 
+	    	System.out.println(dto.getBranch());	 
+	    	System.out.println(dto.getBranch());	 
+
+	    	BranchVO branch = branchRepo.findById(dto.getBranch())
 	                .orElseThrow(() ->
 	                        new ApplicationException("Branch Not Found"));
 
@@ -1352,7 +1365,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	        TransportMasterVO transport = transportRepo
 	                .findById(dto.getTransport())
 	                .orElseThrow(() ->
-	                        new ApplicationException("Transport Not Found"));
+	                        new ApplicationException("Transport Not Found")); 
 
 	        docketInvoiceVO.setTransport(transport);
 	    }

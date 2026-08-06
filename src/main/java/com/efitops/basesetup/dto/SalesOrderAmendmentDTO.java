@@ -1,6 +1,7 @@
 package com.efitops.basesetup.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class SalesOrderAmendmentDTO {
     private String partyPoAmendmentNo;
     private LocalDate salesOrderDate;
     private LocalDate partyPoAmendmentDate;
+    private LocalDate summary;
     private String poNo;
     private Integer revisionNo;
     private LocalDate poDate;
@@ -33,6 +35,7 @@ public class SalesOrderAmendmentDTO {
     private Long orgId;
     private String createdBy;
     
+    private List<SalesOrderAmendmentDetailsDTO> salesOrderAmendmentDetails;
 	 
 
 }

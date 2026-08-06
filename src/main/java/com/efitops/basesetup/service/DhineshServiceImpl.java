@@ -254,22 +254,15 @@ public class DhineshServiceImpl implements DhineshService {
 
 				SalesContractDetailsVO detailVO = new SalesContractDetailsVO();
 
-				System.out.println("D");
-
 				ItemMasterVO item = itemMasterRepo.findById(child.getItem())
 						.orElseThrow(() -> new ApplicationException("Item Not Found"));
-
-				System.out.println("E");
 
 				UnitMasterVO unit = unitMasterRepo.findById(child.getUnit())
 						.orElseThrow(() -> new ApplicationException("Unit Not Found"));
 
-				System.out.println("F");
-
 				GSTRateMasterVO gstRateVO = gstRateRepo.findById(child.getTaxPercentage())
 						.orElseThrow(() -> new ApplicationException("GST Rate Not Found"));
 
-				System.out.println("G");
 				detailVO.setItem(item);
 				detailVO.setTaxType(child.getTaxType());
 				detailVO.setTaxPercentage(gstRateVO);
@@ -304,10 +297,8 @@ public class DhineshServiceImpl implements DhineshService {
 				detailVO.setDiscountAmount(discountAmount);
 				detailVO.setAmount(amount);
 
-				BigDecimal finalAmount;
+//				BigDecimal finalAmount;
 
-				System.out.println("IGST Applicable : " + salesContractVO.getIsIgstApplicable());
-				System.out.println("IGST Applicable : " + salesContractVO.getIsIgstApplicable());
 				if ("YES".equalsIgnoreCase(salesContractVO.getIsIgstApplicable())) {
 
 					BigDecimal igstAmount = amount.multiply(gstRateVO.getIgst()).divide(BigDecimal.valueOf(100));
@@ -322,7 +313,7 @@ public class DhineshServiceImpl implements DhineshService {
 					detailVO.setCgstAmount(BigDecimal.ZERO);
 					detailVO.setSgstAmount(BigDecimal.ZERO);
 
-					finalAmount = amount.add(igstAmount);
+//					finalAmount = amount.add(igstAmount);
 
 				} else {
 
@@ -340,10 +331,10 @@ public class DhineshServiceImpl implements DhineshService {
 					detailVO.setSgstAmount(sgstAmount);
 					detailVO.setIgstAmount(BigDecimal.ZERO);
 
-					finalAmount = amount.add(cgstAmount).add(sgstAmount);
+//					finalAmount = amount.add(cgstAmount).add(sgstAmount);
 				}
 
-				detailVO.setFinalAmount(finalAmount);
+//				detailVO.setFinalAmount(finalAmount);
 
 				detailVO.setCurrency(child.getCurrency());
 
@@ -540,7 +531,7 @@ public class DhineshServiceImpl implements DhineshService {
 
 				detailDTO.setDiscountAmount(detail.getDiscountAmount());
 				detailDTO.setAmount(detail.getAmount());
-				detailDTO.setFinalAmount(detail.getFinalAmount());
+//				detailDTO.setFinalAmount(detail.getFinalAmount());
 
 				detailDTO.setSgstRate(detail.getSgstRate());
 				detailDTO.setSgstAmount(detail.getSgstAmount());
@@ -647,7 +638,7 @@ public class DhineshServiceImpl implements DhineshService {
 		dto.setSgst((BigDecimal) obj[9]);
 		dto.setIgst((BigDecimal) obj[10]);
 		dto.setUnitMasterId(((Number) obj[11]).longValue());
-		//		dto.setUnitId((String) obj[10]);
+		dto.setGstRateMasterId(((Number) obj[12]).longValue());
 
 		return dto;
 	}
@@ -742,11 +733,40 @@ public class DhineshServiceImpl implements DhineshService {
 			dto.setIgst(obj[8] != null ? (BigDecimal) obj[8] : null);
 			dto.setUnitMasterId(obj[9] != null ? ((Number) obj[9]).longValue() : null);
 			dto.setUnitId(obj[10] != null ? obj[10].toString() : null);
+			dto.setGstRateMasterId(obj[11] != null ? ((Number) obj[11]).longValue() : null);
 
 			responseList.add(dto);
 		}
 
 		return responseList;
+	}
+	
+	@Override
+	public SalesContractResponseDTO getSalesContractById(Long id)
+	        throws ApplicationException {
+
+	    SalesContractVO salesContractVO = salesContractRepo.findById(id)
+	            .orElseThrow(() -> new ApplicationException("Sales Contract Not Found"));
+
+	    return convertToResponse(salesContractVO);
+	}
+	
+	@Override
+	public List<SalesContractResponseDTO> getSalesContractByOrgIdAndBranch(
+	        Long orgId,
+	        Long branch)
+	        throws ApplicationException {
+
+	    List<SalesContractVO> salesContracts =
+	            salesContractRepo.findByOrgIdAndBranch(orgId, branch);
+
+	    List<SalesContractResponseDTO> responseList = new ArrayList<>();
+
+	    for (SalesContractVO vo : salesContracts) {
+	        responseList.add(convertToResponse(vo));
+	    }
+
+	    return responseList;
 	}
 
 }

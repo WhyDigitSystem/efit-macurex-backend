@@ -32,4 +32,6 @@ public class SalesContractItemDropdownResponseDTO {
     
     private Long unitMasterId;
 
+    private Long gstRateMasterId;
+
 }

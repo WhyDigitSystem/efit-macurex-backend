@@ -1,6 +1,6 @@
 package com.efitops.basesetup.entity;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -18,56 +18,65 @@ import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "sale_contract_amendment_basic")
+@Table(name = "despatch_basic")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class SalesContractAmendmentVO {
+public class DespatchInstructionVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "salecontractamendmentbasicgen")
-	@SequenceGenerator(name = "salecontractamendmentbasicgen", sequenceName = "salecontractamendmentbasicseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "sale_contract_amendment_basic_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "despatchbasicgen")
+	@SequenceGenerator(name = "despatchbasicgen", sequenceName = "despatchbasicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "despatch_basic_id")
 	private Long id;
-	
-	@Column(name = "contract_amd_no")
-	private String contractAmdNo;
-	
-	@Column(name = "date")
-	private LocalDate date;
 	
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 	
-	@Column(name = "contract_no")
-	private String contractNo;
+	@Column(name = "di_no")
+	private String diNo;
 	
-	@Column(name = "contract_date")
-	private String contractDate;
+	@ManyToOne
+	@JoinColumn(name = "custumer")
+	private CurrencyVO customer;
 	
-	@Column(name = "cust_po_no")
-	private String custPoNo;
+	@Column(name = "schdule_no")
+	private String schduleNo;
 	
-	@Column(name = "cust_po_date" )
-	private String custPoDate;
+	@Column(name = "invoice_type")
+	private String invoiceType;
 	
-	@Column(name = "revision_no")
-	private String revisionNo;
+	@Column(name = "schdule_date")
+	private String schduleDate;
 	
+	@ManyToOne
+	@JoinColumn(name = "location_name")
+	private LocationVO location;
 	
+	@Column(name = "payment_terms")
+    private String paymentTerms;
 	
+	@Column(name = "mode_of_transport")
+	private String modeOfTransport;
 	
-	@Column(name = "remarks")
-	private String remarks;
+	@Column(name = "net_weight")
+	private int netWeight;
 	
+	@Column(name = "gross_weight")
+	private int grossWeight;
+	
+	@Column(name = "delivery_instructions")
+	private String deliveryInstructions;
+	
+	@Column(name = "Consignee")
+	private String Consignee;
+		
 	@Column(name = "active")
 	private boolean active;
 	@Column(name = "org_id")
@@ -83,9 +92,9 @@ public class SalesContractAmendmentVO {
 	
    
 	@Column(name = "screen_code",length = 10)
-	private String screenCode ="SCA";
+	private String screenCode ="DI";
 	@Column(name = "screen_name",length = 30)
-	private String screenName="Sales Contract Amendment";
+	private String screenName="Despatch Instruction";
 	
 	@JsonGetter("active")
 	public String getActive() {
@@ -99,10 +108,11 @@ public class SalesContractAmendmentVO {
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
-	@OneToMany(mappedBy = "salesContractAmendmentVO",
-	        cascade = CascadeType.ALL
-	    )
-	@JsonManagedReference
-	private List<SalesContractAmdDetailsVO> salesContractAmdDetailsVO;
+	 @OneToMany(
+	            mappedBy = "despatchInstructionVO",
+	            cascade = CascadeType.ALL,
+	            orphanRemoval = true)
+	    private List<DespatchInstructionDetailsVO> details =
+	            new ArrayList<>();
 
 }

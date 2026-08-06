@@ -54,6 +54,31 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 	List<Object[]> getQuotationDropdown(String customerCode, String ctype, Long orgId, Long branch,
 			String oldQuotationNo, Long recId);
 
+			@Query(value = """
+					SELECT
+					    i.item_id,
+					    i.item_code,
+					    i.item_description,
+					    h.hsn,
+					    i.customer_part_no
+					FROM quotation q
+					INNER JOIN quotationitemdetails qd
+					    ON q.quotation_id = qd.quotation_id
+					INNER JOIN item i
+					    ON i.item_id = qd.item_code
+					INNER JOIN hsn h
+					    ON h.hsn_id = i.hsn_code
+					WHERE q.doc_id = ?1
+					  AND q.org_id = ?2
+					  AND q.branch = ?3
+					  AND q.cancel = 0
+					ORDER BY i.item_code
+					""", nativeQuery = true)
+					List<Object[]> getQuotationItemDropdown(String quotationNo, Long orgId, Long branch);
+					
+					@Query(value = "SELECT * FROM sales_contract_basic WHERE active = true AND cancel = false ORDER BY customer_contract_no", nativeQuery = true)
+					List<SalesContractVO> getContractNo();
+             
 	@Query(value = """
 											SELECT
 			    i.item_id,
@@ -89,4 +114,6 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			ORDER BY i.item_code;
 											""", nativeQuery = true)
 	List<Object[]> getQuotationItemDropdown(String quotationNo, Long orgId, Long branch);
+
 }
+

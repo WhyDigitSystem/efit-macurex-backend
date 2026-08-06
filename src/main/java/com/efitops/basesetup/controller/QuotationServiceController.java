@@ -146,49 +146,4 @@ public class QuotationServiceController extends BaseController {
 	    return ResponseEntity.ok(responseDTO);
 	}
 	
-	@Value("${quotation.upload.path}")
-	private String uploadPath;
-	
-	@Value("${server.base-url}")
-	private String serverBaseUrl;
-	
-	@GetMapping("/getFileUrl")
-	public ResponseEntity<ResponseDTO> getFileUrl(@RequestParam String fileName) {
-
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-
-	    try {
-
-	        Path filePath = Paths.get(uploadPath).resolve(fileName).normalize();
-
-	        if (!Files.exists(filePath)) {
-
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-	                    .body(createServiceResponseError(
-	                            responseObjectsMap,
-	                            "File not found",
-	                            "File not found"));
-	        }
-
-	        Map<String, Object> fileDetails = new HashMap<>();
-
-	        fileDetails.put("fileName", fileName);
-	        fileDetails.put("filePath", filePath.toString());
-	        fileDetails.put("fileUrl",
-	                serverBaseUrl + "/api/quotationservice/file/" + fileName);
-
-	        responseObjectsMap.put("message", "File found");
-	        responseObjectsMap.put("fileDetails", fileDetails);
-
-	        return ResponseEntity.ok(createServiceResponse(responseObjectsMap));
-
-	    } catch (Exception e) {
-
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body(createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Failed to get file",
-	                        e.getMessage()));
-	    }
 	}
-}

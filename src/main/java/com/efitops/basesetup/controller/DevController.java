@@ -50,7 +50,8 @@ public class DevController extends BaseController{
 	        value = "/updateCreateCustomerComplaint",
 	        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreateCustomerComplaint(
-	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
+//	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
+	        @RequestBody CustomerComplaintDTO customerComplaintDTO,
 	        @RequestPart(value = "images", required = false) MultipartFile[] images) {
 
 	    String methodName = "updateCreateCustomerComplaint";

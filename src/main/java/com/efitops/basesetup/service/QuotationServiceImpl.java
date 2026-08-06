@@ -105,6 +105,11 @@ public class QuotationServiceImpl implements QuotationService {
 
 	@Autowired
 	CurrencyRepo currencyRepo;
+	
+	@Value("${server.base-url}")
+	private String serverBaseUrl;
+
+	
 
 	@Autowired
 	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
@@ -1220,9 +1225,13 @@ public class QuotationServiceImpl implements QuotationService {
 		        fileDTO.setName(fileVO.getName());
 
 		        fileDTO.setFileName(fileVO.getFileName());
+		        
+		        String urlPath = uploadPath
+		                .replace("C:/", "/")
+		                .replace("\\", "/");
 
-		        fileDTO.setFilePath(fileVO.getFilePath());
-
+		        fileDTO.setFilePath(serverBaseUrl + urlPath + fileVO.getFileName());
+		        
 		        fileDTO.setFileSize(fileVO.getFileSize());
 
 		        fileDTO.setUploadOn(fileVO.getUploadOn());

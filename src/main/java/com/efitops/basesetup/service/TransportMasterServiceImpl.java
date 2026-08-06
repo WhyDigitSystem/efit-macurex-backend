@@ -232,23 +232,23 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			responseDTO.setDepartment(departmentDTO);
 		}
-		if (customerComplaintEntryVO.getCustomerName() != null) {
+//		if (customerComplaintEntryVO.getCustomerName() != null) {
+//
+//		    CustomerResonse1DTO customerDTO = new CustomerResonse1DTO();
+//
+//		    customerDTO.setId(customerComplaintEntryVO.getCustomerName().getId());
+//		    customerDTO.setCustomerName(customerComplaintEntryVO.getCustomerName().getCustomerName());
+//
+//		    responseDTO.setCustomerName(customerDTO);
+//		}
+		if (customerComplaintEntryVO.getCustomer() != null) {
 
 		    CustomerResonse1DTO customerDTO = new CustomerResonse1DTO();
 
-		    customerDTO.setId(customerComplaintEntryVO.getCustomerName().getId());
-		    customerDTO.setCustomerName(customerComplaintEntryVO.getCustomerName().getCustomerName());
+		    customerDTO.setId(customerComplaintEntryVO.getCustomer().getId());
+		    customerDTO.setCustomerName(customerComplaintEntryVO.getCustomer().getCustomerName());
 
-		    responseDTO.setCustomerName(customerDTO);
-		}
-		if (customerComplaintEntryVO.getCustomerId() != null) {
-
-		    CustomerResonse1DTO customerDTO = new CustomerResonse1DTO();
-
-		    customerDTO.setId(customerComplaintEntryVO.getCustomerId().getId());
-		    customerDTO.setCustomerName(customerComplaintEntryVO.getCustomerId().getCustomerName());
-
-		    responseDTO.setCustomerId(customerDTO);
+		    responseDTO.setCustomer(customerDTO);
 		}
 		if (customerComplaintEntryVO.getItem() != null) {
 
@@ -298,25 +298,24 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			customerComplaintEntryVO.setBranch(branch);
 		}
-		System.out.println("customerName = " + customerComplaintDTO.getCustomerName());
-		if (customerComplaintDTO.getCustomerName() != null && customerComplaintDTO.getCustomerName() != 0) {
+//		if (customerComplaintDTO.getCustomerName() != null && customerComplaintDTO.getCustomerName() != 0) {
+//
+//			System.out.println("Customer Name block executed");
+//
+//			CustomerVO customerVO = customerRepo.findById(customerComplaintDTO.getCustomerName())
+//					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
+//
+//			customerComplaintEntryVO.setCustomerName(customerVO);
+//		}
 
-			System.out.println("Customer Name block executed");
-
-			CustomerVO customerVO = customerRepo.findById(customerComplaintDTO.getCustomerName())
-					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
-
-			customerComplaintEntryVO.setCustomerName(customerVO);
-		}
-
-		if (customerComplaintDTO.getCustomerId() != null && customerComplaintDTO.getCustomerId() != 0) {
+		if (customerComplaintDTO.getCustomer() != null && customerComplaintDTO.getCustomer() != 0) {
 
 			System.out.println("Customer ID block executed");
 
-			CustomerVO customerVO = customerRepo.findById(customerComplaintDTO.getCustomerId())
+			CustomerVO customerVO = customerRepo.findById(customerComplaintDTO.getCustomer())
 					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
-			customerComplaintEntryVO.setCustomerId(customerVO);
+			customerComplaintEntryVO.setCustomer(customerVO);
 		}
 		if (customerComplaintDTO.getDepartment() != null) {
 

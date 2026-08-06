@@ -21,7 +21,7 @@ public class CustomerComplaintResponseDTO {
 	private String image;
 	private String remarks;
 	private BranchResponseDTO branch;
-	private CustomerResonse1DTO customerName;
+//	private CustomerResonse1DTO customerName;
 	private String buyerName;
 	private DepartmentResponseDTO department;
 	private ItemResponse1DTO item;
@@ -34,7 +34,7 @@ public class CustomerComplaintResponseDTO {
 	private LocalDate complaintDate;
 	private String complaintType;
 	private String customerRefNo;
-	private CustomerResonse1DTO customerId;
+	private CustomerResonse1DTO customer;
 	private boolean active;
 	private Long orgId;
 	private String createdBy;

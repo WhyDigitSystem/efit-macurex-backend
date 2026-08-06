@@ -12,5 +12,6 @@ public class EmployeeDropdownResponseDTO {
     private Long employeeId;
     private String employeeCode;
     private String employeeName;
+    private String email;
 
 }

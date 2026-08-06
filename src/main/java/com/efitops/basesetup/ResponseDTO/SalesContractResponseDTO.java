@@ -1,5 +1,6 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -59,8 +60,23 @@ public class SalesContractResponseDTO {
     private boolean active;
     
     
-    private List<SalesContractDetailsResponseDTO> details;
+    //summary
     
+  	private BigDecimal totalAmount;
+
+   	private String amountInWords;
+
+   	private String paymentTerms;
+
+   	private String priceTerms;
+
+   	private String terms;
+   	
+   	private String notes;
+    
+    
+    private List<SalesContractDetailsResponseDTO> details;
+    private List<SalesContractResponseTaxDetailsDTO> salesContractTaxDetailsDTO;
     private List<SalesContractAttachResponseDTO> attachments;
     
 }

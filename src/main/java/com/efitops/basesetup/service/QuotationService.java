@@ -17,15 +17,17 @@ import com.efitops.basesetup.exception.ApplicationException;
 @Service
 public interface QuotationService {
 
-	Map<String, Object> updateCreateQuotation(QuotationDTO quotationDTO) throws ApplicationException;
+//	Map<String, Object> updateCreateQuotation(QuotationDTO quotationDTO) throws ApplicationException;
 
-	Map<String, Object> createUpdateQuotationImages(MultipartFile[] files, String docId, String screenName,
-			String module, List<String> fileNames) throws ApplicationException, IOException;
-
-	ResponseEntity<byte[]> viewQuotationImages(HttpServletRequest request) throws IOException;
+//	Map<String, Object> createUpdateQuotationImages(MultipartFile[] files, String docId, String screenName,
+//			String module, List<String> fileNames) throws ApplicationException, IOException;
+//
+//	ResponseEntity<byte[]> viewQuotationImages(HttpServletRequest request) throws IOException;
 
 	QuotationResponseDTO getQuotationById(Long id) throws ApplicationException;
 
 	List<QuotationResponseDTO> getQuotationByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+	Map<String, Object> createUpdateQuotation(QuotationDTO quotationDTO, MultipartFile[] files) throws ApplicationException;
 
 }

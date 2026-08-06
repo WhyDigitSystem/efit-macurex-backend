@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
+import com.efitops.basesetup.ResponseDTO.QuotationIemFileUploadDetailsDTO;
 import com.efitops.basesetup.service.CustomerResponseDetailsDTO;
 
 import lombok.AllArgsConstructor;
@@ -24,17 +24,17 @@ public class QuotationResponseDTO {
 
 	private LocalDate docDate;
 
-	private Long plantId;
+//	private Long plantId;
 
-	private BranchResponseDTO plant;
+//	private BranchResponseDTO plant;
 
 	private Long partyId;
 
-	private CustomerResponseDetailsDTO party;
+	private CustomerResponseDetailsDTO customer;
 
 	private String withEnquiry;
 
-	private String partyName;
+//	private String partyName;
 
 	private String oldEnquryNo;
 
@@ -58,13 +58,9 @@ public class QuotationResponseDTO {
 
 	private LocalDate validTill;
 
+	private LocalDate date;
+
 	private String kindAttention;
-
-	private Long taxCode;
-
-	private TaxDefinitionResponseDTO taxDefinition;
-
-	private String taxBasicId;
 
 	// Common Fields
 
@@ -86,7 +82,7 @@ public class QuotationResponseDTO {
 
 	private String financialYear;
 
-	private BranchResponseDTO branchId;
+//	private BranchResponseDTO branchId;
 
 	private BranchResponseDTO branch;
 

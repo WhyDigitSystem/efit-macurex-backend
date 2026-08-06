@@ -3,7 +3,6 @@ package com.efitops.basesetup.entity;
 import java.time.LocalDate;
 
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,9 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonGetter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,12 +31,12 @@ public class EnquiryDetailsVO {
 	@Column(name = "enquirydetails_id")
 	private Long id;
 	
-	 @ManyToOne
-	 @JoinColumn(name = "item_code")
-	 private ItemMasterVO itemcode;
+	 
+	 @Column(name = "item_code")
+	 private String itemCode;
 	 
 	 @Column(name = "item_description")
-	 private String  itemdescription;
+	 private String  itemDescription;
 	 @Column(name = "annual_quantity")
 	 private Integer annualquantity;
 	 @Column(name = "dlry_date")

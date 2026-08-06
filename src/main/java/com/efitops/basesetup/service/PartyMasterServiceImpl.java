@@ -844,6 +844,7 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	        dto.setEmployeeId(obj[0] != null ? ((Number) obj[0]).longValue() : null);
 	        dto.setEmployeeCode(obj[1] != null ? obj[1].toString() : null);
 	        dto.setEmployeeName(obj[2] != null ? obj[2].toString() : null);
+	        dto.setEmail(obj[3] != null ? obj[3].toString() : null);
 
 	        responseList.add(dto);
 	    }

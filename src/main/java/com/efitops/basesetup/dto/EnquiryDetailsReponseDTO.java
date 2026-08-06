@@ -13,7 +13,9 @@ public class EnquiryDetailsReponseDTO {
 
 	private Long id;
 
-	private Long itemcode;
+	private String itemCode;
+
+	private String itemDescription;
 
 	private Integer annualquantity;
 

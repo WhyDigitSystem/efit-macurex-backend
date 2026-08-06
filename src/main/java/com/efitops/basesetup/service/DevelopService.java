@@ -7,8 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
+import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
+import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
+import com.efitops.basesetup.dto.SalesReturnDTO;
+import com.efitops.basesetup.dto.SalesReturnResponseDTO;
 import com.efitops.basesetup.entity.EnquiryVO;
 import com.efitops.basesetup.exception.ApplicationException;
 
@@ -26,11 +32,48 @@ public interface DevelopService {
 
 	Map<String, Object> updateCreateEnquiry(EnquiryDTO enquiryDTO, MultipartFile[] files) throws ApplicationException;
 	
-	//enquiry
+
+	//salesdeliveryschedule
+	
+	Map<String, Object> createUpdateSalesDeliverySchedule(
+	        SalesDeliveryScheduleDTO salesDeliveryScheduleDTO)
+	        throws ApplicationException;
+
+	SalesDeliveryScheduleResponseDTO getSalesDeliveryScheduleById(Long id)
+	        throws ApplicationException;
+
+	List<SalesDeliveryScheduleResponseDTO> getAllSalesDeliverySchedule(
+	        Long orgId,
+	        Long branchId)
+	        throws ApplicationException;
+	
+	Map<String, Object> getContractNo()
+	        throws ApplicationException;
+
+	Map<String, Object> getItemDropdown(Long salesContractId)
+	        throws ApplicationException;
+	
+	//SALES RETURN
+
+	Map<String, Object> createUpdateSalesReturn(SalesReturnDTO salesReturnDTO) throws ApplicationException;
+
+	SalesReturnResponseDTO getSalesReturnById(Long id)  throws ApplicationException;
+
+
+	List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch) throws ApplicationException;
+
 	
 	
 	
 	
 	
+
 	
 }
+	
+	
+	
+	
+	
+	
+

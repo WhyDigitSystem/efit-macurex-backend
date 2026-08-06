@@ -56,7 +56,10 @@ public class SalesOrderAmendmentVO {
 
     @Column(name = "party_po_amendment_date")
     private LocalDate partyPoAmendmentDate;
-
+    
+    @Column(name = "summary")
+    private LocalDate summary;
+    
     @Column(name = "po_no")
     private String poNo;
 

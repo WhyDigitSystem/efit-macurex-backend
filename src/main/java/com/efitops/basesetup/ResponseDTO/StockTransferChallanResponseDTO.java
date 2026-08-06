@@ -29,6 +29,4 @@ public class StockTransferChallanResponseDTO {
 	private Long orgId;
 	private String createdBy;
 	private String cancelRemarks;
-
-
 }

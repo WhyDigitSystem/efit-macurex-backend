@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
 import com.efitops.basesetup.ResponseDTO.EnquiryCusContactResponseDTO;
+import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.EnquiryAttachmentResponseDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
@@ -37,6 +38,14 @@ import com.efitops.basesetup.dto.EnquiryDetailsReponseDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.EnquiryTermsandCondDTO;
 import com.efitops.basesetup.dto.EnquiryTermsandCondResponseDTO;
+import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
+import com.efitops.basesetup.dto.SalesDeliveryScheduleDetailsDTO;
+import com.efitops.basesetup.dto.SalesDeliveryScheduleDetailsResponseDTO;
+import com.efitops.basesetup.dto.SalesDeliverySchedulePlanDTO;
+import com.efitops.basesetup.dto.SalesDeliverySchedulePlanResponseDTO;
+import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
+import com.efitops.basesetup.dto.SalesReturnDTO;
+import com.efitops.basesetup.dto.SalesReturnResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerContactDetailsVO;
 import com.efitops.basesetup.entity.CustomerVO;
@@ -45,6 +54,14 @@ import com.efitops.basesetup.entity.EnquiryDetailsVO;
 import com.efitops.basesetup.entity.EnquiryTermsandCondVO;
 import com.efitops.basesetup.entity.EnquiryVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
+import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.SalesContractDetailsVO;
+import com.efitops.basesetup.entity.SalesContractVO;
+import com.efitops.basesetup.entity.SalesDeliveryScheduleDetailsVO;
+import com.efitops.basesetup.entity.SalesDeliverySchedulePlanVO;
+import com.efitops.basesetup.entity.SalesDeliveryScheduleVO;
+import com.efitops.basesetup.entity.SalesReturnVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
@@ -54,6 +71,15 @@ import com.efitops.basesetup.repository.EnquiryDetailsRepo;
 import com.efitops.basesetup.repository.EnquiryRepo;
 import com.efitops.basesetup.repository.EnquiryTermsandCondRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
+import com.efitops.basesetup.repository.ListOfValuesRepo;
+import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.SalesContractDetailsRepo;
+import com.efitops.basesetup.repository.SalesContractRepo;
+import com.efitops.basesetup.repository.SalesDeliveryScheduleDetailsRepo;
+import com.efitops.basesetup.repository.SalesDeliverySchedulePlanRepo;
+import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
+import com.efitops.basesetup.repository.SalesReturnRepo;
 
 @Service
 public class DevelopServiceImpl implements DevelopService {
@@ -83,6 +109,40 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	private CustomerContactDetailsRepo customerContactDetailsRepo;
+	
+	@Autowired
+	private SalesDeliveryScheduleRepo salesDeliveryScheduleRepo; 
+	
+	@Autowired
+	private SalesDeliveryScheduleDetailsRepo salesDeliveryScheduleDetailsRepo; 
+	
+	@Autowired
+	private SalesContractRepo salesContractRepo;
+
+	@Autowired
+	private SalesContractDetailsRepo salesContractDetailsRepo;
+	
+	@Autowired
+	private SalesDeliverySchedulePlanRepo salesDeliverySchedulePlanRepo;
+	
+	@Autowired
+	private SalesReturnRepo salesReturnRepo;
+	
+	@Autowired
+	private ListOfValuesRepo listOfValuesRepo;
+	
+	@Autowired
+	private ListOfValuesDetailsRepo listOfValuesDetailsRepo;
+	
+	@Autowired
+	private LocationRepo locationRepo;
+	
+	
+	
+	
+	
+	
+
 
 	
 	
@@ -850,4 +910,888 @@ public class DevelopServiceImpl implements DevelopService {
 //			throw new ApplicationException("Unable to View Attachment");
 //		}
 //	}
+	
+	//salesdeliveryschedule
+	
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateSalesDeliverySchedule(
+	        SalesDeliveryScheduleDTO salesDeliveryScheduleDTO)
+	        throws ApplicationException {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    String message;
+
+	    SalesDeliveryScheduleVO salesDeliveryScheduleVO;
+
+	    if (ObjectUtils.isEmpty(salesDeliveryScheduleDTO.getId())) {
+
+	        salesDeliveryScheduleVO = new SalesDeliveryScheduleVO();
+
+	        salesDeliveryScheduleVO.setCreatedBy(
+	                salesDeliveryScheduleDTO.getCreatedBy());
+
+	        salesDeliveryScheduleVO.setUpdatedBy(
+	                salesDeliveryScheduleDTO.getCreatedBy());
+
+	        message = "Sales Delivery Schedule Created Successfully";
+
+	    } else {
+
+	        salesDeliveryScheduleVO = salesDeliveryScheduleRepo
+	                .findById(salesDeliveryScheduleDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Sales Delivery Schedule Not Found"));
+
+	        salesDeliveryScheduleVO.setUpdatedBy(
+	                salesDeliveryScheduleDTO.getCreatedBy());
+
+	        
+	     // Delete old Grid Details
+	        salesDeliveryScheduleDetailsRepo
+	                .deleteAll(salesDeliveryScheduleVO.getDetails());
+
+	        salesDeliveryScheduleVO.getDetails().clear();
+
+	        // Delete old Delivery Schedule
+	        salesDeliverySchedulePlanRepo
+	                .deleteAll(salesDeliveryScheduleVO.getDeliverySchedules());
+
+	        salesDeliveryScheduleVO.getDeliverySchedules().clear();
+
+	        message = "Sales Delivery Schedule Updated Successfully";
+	        
+	    }
+
+	    // Header + Grid Mapping
+	    createUpdateSalesDeliveryScheduleVOByDTO(
+	            salesDeliveryScheduleDTO,
+	            salesDeliveryScheduleVO);
+
+	    // Save Header + Details
+	    salesDeliveryScheduleVO =
+	            salesDeliveryScheduleRepo.save(salesDeliveryScheduleVO);
+
+	    // Reload Latest Data
+	    salesDeliveryScheduleVO =
+	            salesDeliveryScheduleRepo.findById(
+	                    salesDeliveryScheduleVO.getId())
+	            .orElseThrow(() ->
+	                    new ApplicationException("Sales Delivery Schedule Not Found"));
+
+	    // Response
+	    SalesDeliveryScheduleResponseDTO responseDTO =
+	            buildSalesDeliveryScheduleResponse(
+	                    salesDeliveryScheduleVO);
+
+	    response.put("message", message);
+	    response.put("salesDeliverySchedule", responseDTO);
+
+	    return response;
+	}
+	
+	private void createUpdateSalesDeliveryScheduleVOByDTO(
+	        SalesDeliveryScheduleDTO salesDeliveryScheduleDTO,
+	        SalesDeliveryScheduleVO salesDeliveryScheduleVO)
+	        throws ApplicationException {
+
+	    // ================= Header =================
+
+	    salesDeliveryScheduleVO.setDlvNo(salesDeliveryScheduleDTO.getDlvNo());
+	    salesDeliveryScheduleVO.setDlvDate(salesDeliveryScheduleDTO.getDlvDate());
+	    salesDeliveryScheduleVO.setMonthOfSchedule(salesDeliveryScheduleDTO.getMonthOfSchedule());
+	    salesDeliveryScheduleVO.setBelongsTo(salesDeliveryScheduleDTO.getBelongsTo());
+	    salesDeliveryScheduleVO.setMonthYear(salesDeliveryScheduleDTO.getMonthYear());
+	    salesDeliveryScheduleVO.setRemarks(salesDeliveryScheduleDTO.getRemarks());
+
+	    salesDeliveryScheduleVO.setOrgId(salesDeliveryScheduleDTO.getOrgId());
+	    salesDeliveryScheduleVO.setFinancialYear(salesDeliveryScheduleDTO.getFinancialYear());
+
+	    salesDeliveryScheduleVO.setCancelRemarks(salesDeliveryScheduleDTO.getCancelRemarks());
+
+	    if (salesDeliveryScheduleDTO.getActive() != null) {
+	        salesDeliveryScheduleVO.setActive(salesDeliveryScheduleDTO.getActive());
+	    }
+
+	    if (salesDeliveryScheduleDTO.getCancel() != null) {
+	        salesDeliveryScheduleVO.setCancel(salesDeliveryScheduleDTO.getCancel());
+	    }
+
+	    salesDeliveryScheduleVO.setScreenCode(salesDeliveryScheduleDTO.getScreenCode());
+	    salesDeliveryScheduleVO.setScreenName(salesDeliveryScheduleDTO.getScreenName());
+
+	    // ================= Branch =================
+
+	    if (salesDeliveryScheduleDTO.getBranchId() != null) {
+
+	        BranchVO branch = branchRepo.findById(salesDeliveryScheduleDTO.getBranchId())
+	                .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+	        salesDeliveryScheduleVO.setBranch(branch);
+	    }
+
+	    // ================= Customer =================
+
+	    if (salesDeliveryScheduleDTO.getCustomerId() != null) {
+
+	        CustomerVO customer = customerRepo.findById(salesDeliveryScheduleDTO.getCustomerId())
+	                .orElseThrow(() -> new ApplicationException("Customer Not Found"));
+
+	        salesDeliveryScheduleVO.setCustomer(customer);
+	    }
+
+	    // ================= Details =================
+
+	    List<SalesDeliveryScheduleDetailsVO> detailsList = new ArrayList<>();
+
+	    if (salesDeliveryScheduleDTO.getDetails() != null) {
+
+	        for (SalesDeliveryScheduleDetailsDTO dto : salesDeliveryScheduleDTO.getDetails()) {
+
+	            SalesDeliveryScheduleDetailsVO detail = new SalesDeliveryScheduleDetailsVO();
+
+	            // Sales Contract
+	            if (dto.getSalesContractId() != null) {
+
+	                SalesContractVO salesContract = salesContractRepo.findById(dto.getSalesContractId())
+	                        .orElseThrow(() -> new ApplicationException("Sales Contract Not Found"));
+
+	                detail.setSalesContract(salesContract);
+	            }
+
+	            // Sales Contract Detail
+	            if (dto.getSalesContractDetailsId() != null) {
+
+	                SalesContractDetailsVO salesContractDetails =
+	                        salesContractDetailsRepo.findById(dto.getSalesContractDetailsId())
+	                        .orElseThrow(() -> new ApplicationException("Sales Contract Detail Not Found"));
+
+	                detail.setSalesContractDetails(salesContractDetails);
+	            }
+
+	            // Item
+	            if (dto.getItemId() != null) {
+
+	                ItemMasterVO item = itemMasterRepo.findById(dto.getItemId())
+	                        .orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+	                detail.setItem(item);
+	            }
+
+	            detail.setActualPlannedQty(dto.getActualPlannedQty());
+
+	            detail.setSalesDeliverySchedule(salesDeliveryScheduleVO);
+
+	            detailsList.add(detail);
+	        }
+	    }
+
+	    salesDeliveryScheduleVO.setDetails(detailsList);
+	    
+	 // ================= Delivery Schedule Mapping =================
+
+	    List<SalesDeliverySchedulePlanVO> deliveryPlanList = new ArrayList<>();
+
+	    if (salesDeliveryScheduleDTO.getDeliverySchedule() != null
+	            && !salesDeliveryScheduleDTO.getDeliverySchedule().isEmpty()) {
+
+	        for (SalesDeliverySchedulePlanDTO planDTO
+	                : salesDeliveryScheduleDTO.getDeliverySchedule()) {
+
+	            SalesDeliverySchedulePlanVO planVO =
+	                    new SalesDeliverySchedulePlanVO();
+
+	            // Parent Header
+	            planVO.setSalesDeliverySchedule(salesDeliveryScheduleVO);
+
+	            // Parent Schedule Detail
+	            if (planDTO.getSalesDeliveryScheduleDetailsId() != null) {
+
+	                SalesDeliveryScheduleDetailsVO detailsVO =
+	                        salesDeliveryScheduleDetailsRepo
+	                                .findById(
+	                                        planDTO.getSalesDeliveryScheduleDetailsId())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Sales Delivery Schedule Details Not Found"));
+
+	                planVO.setSalesDeliveryScheduleDetails(detailsVO);
+	            }
+
+	            planVO.setDayNo(planDTO.getDayNo());
+	            planVO.setDeliveryDate(planDTO.getDeliveryDate());
+	            planVO.setWeekNo(planDTO.getWeekNo());
+	            planVO.setDayName(planDTO.getDayName());
+	            planVO.setDeliveryQty(planDTO.getDeliveryQty());
+
+	            deliveryPlanList.add(planVO);
+	        }
+	    }
+
+	    salesDeliveryScheduleVO.setDeliverySchedules(deliveryPlanList);
+	}
+	
+	private SalesDeliveryScheduleResponseDTO buildSalesDeliveryScheduleResponse(
+	        SalesDeliveryScheduleVO salesDeliveryScheduleVO) {
+
+	    SalesDeliveryScheduleResponseDTO responseDTO = new SalesDeliveryScheduleResponseDTO();
+
+	    // ================= Header =================
+
+	    responseDTO.setId(salesDeliveryScheduleVO.getId());
+	    responseDTO.setDlvNo(salesDeliveryScheduleVO.getDlvNo());
+	    responseDTO.setDlvDate(salesDeliveryScheduleVO.getDlvDate());
+	    responseDTO.setMonthOfSchedule(salesDeliveryScheduleVO.getMonthOfSchedule());
+	    responseDTO.setBelongsTo(salesDeliveryScheduleVO.getBelongsTo());
+	    responseDTO.setMonthYear(salesDeliveryScheduleVO.getMonthYear());
+	    responseDTO.setRemarks(salesDeliveryScheduleVO.getRemarks());
+
+	    responseDTO.setOrgId(salesDeliveryScheduleVO.getOrgId());
+	    responseDTO.setFinancialYear(salesDeliveryScheduleVO.getFinancialYear());
+
+	    responseDTO.setCreatedBy(salesDeliveryScheduleVO.getCreatedBy());
+	    responseDTO.setUpdatedBy(salesDeliveryScheduleVO.getUpdatedBy());
+
+	    responseDTO.setCancelRemarks(salesDeliveryScheduleVO.getCancelRemarks());
+
+	    responseDTO.setActive(salesDeliveryScheduleVO.getActive());
+	    responseDTO.setCancel(salesDeliveryScheduleVO.getCancel());
+
+	    responseDTO.setScreenCode(salesDeliveryScheduleVO.getScreenCode());
+	    responseDTO.setScreenName(salesDeliveryScheduleVO.getScreenName());
+
+	    // ================= Branch =================
+
+	    if (salesDeliveryScheduleVO.getBranch() != null) {
+
+	        responseDTO.setBranchId(salesDeliveryScheduleVO.getBranch().getId());
+	        responseDTO.setBranchName(salesDeliveryScheduleVO.getBranch().getBranchName());
+
+	    }
+
+	    // ================= Customer =================
+
+	    if (salesDeliveryScheduleVO.getCustomer() != null) {
+
+	        responseDTO.setCustomerId(salesDeliveryScheduleVO.getCustomer().getId());
+	        responseDTO.setCustomerCode(salesDeliveryScheduleVO.getCustomer().getCustomerCode());
+	        responseDTO.setCustomerName(salesDeliveryScheduleVO.getCustomer().getCustomerName());
+
+	    }
+
+	    // ================= Details =================
+
+	    List<SalesDeliveryScheduleDetailsResponseDTO> detailsResponse =
+	            new ArrayList<>();
+
+	    if (salesDeliveryScheduleVO.getDetails() != null) {
+
+	        for (SalesDeliveryScheduleDetailsVO detailVO :
+	                salesDeliveryScheduleVO.getDetails()) {
+
+	            SalesDeliveryScheduleDetailsResponseDTO detailResponse =
+	                    new SalesDeliveryScheduleDetailsResponseDTO();
+
+	            detailResponse.setId(detailVO.getId());
+
+	            // Sales Contract
+
+	            if (detailVO.getSalesContract() != null) {
+
+	                detailResponse.setSalesContractId(
+	                        detailVO.getSalesContract().getId());
+
+	                detailResponse.setSalesContractNo(
+	                        detailVO.getSalesContract().getCustomerContractNo());
+
+	                detailResponse.setInvoiceType(
+	                        detailVO.getSalesContract().getInvoiceType());
+	            }
+
+	            // Sales Contract Detail
+
+	            if (detailVO.getSalesContractDetails() != null) {
+
+	                detailResponse.setSalesContractDetailsId(
+	                        detailVO.getSalesContractDetails().getId());
+
+	                if (detailVO.getSalesContractDetails().getQuantity() != null) {
+
+	                    detailResponse.setOrderQty(
+	                            detailVO.getSalesContractDetails()
+	                                    .getQuantity()
+	                                    .doubleValue());
+
+	                    // Temporary
+	                    detailResponse.setPendingQty(
+	                            detailVO.getSalesContractDetails()
+	                                    .getQuantity()
+	                                    .doubleValue());
+	                }
+
+	            }
+
+	            // Item
+
+	            if (detailVO.getItem() != null) {
+
+	                detailResponse.setItemId(detailVO.getItem().getId());
+
+	                detailResponse.setItemCode(
+	                        detailVO.getItem().getItemCode());
+
+	                detailResponse.setItemDescription(
+	                        detailVO.getItem().getItemDescription());
+
+	                if (detailVO.getItem().getPrimaryUnit() != null) {
+
+	                    detailResponse.setUnit(
+	                            detailVO.getItem()
+	                                    .getPrimaryUnit()
+	                                    .getDescription());
+
+	                }
+
+	            }
+
+	            detailResponse.setActualPlannedQty(
+	                    detailVO.getActualPlannedQty());
+
+	            detailsResponse.add(detailResponse);
+
+	        }
+
+	    }
+
+	    responseDTO.setDetails(detailsResponse);
+	    
+	    
+	    
+	    List<SalesDeliverySchedulePlanResponseDTO> deliveryResponseList = new ArrayList<>();
+
+	    if (salesDeliveryScheduleVO.getDeliverySchedules() != null) {
+
+	        for (SalesDeliverySchedulePlanVO planVO :
+	                salesDeliveryScheduleVO.getDeliverySchedules()) {
+
+	            SalesDeliverySchedulePlanResponseDTO planResponse =
+	                    new SalesDeliverySchedulePlanResponseDTO();
+
+	            planResponse.setId(planVO.getId());
+
+	            if (planVO.getSalesDeliverySchedule() != null) {
+	                planResponse.setSalesDeliveryScheduleId(
+	                        planVO.getSalesDeliverySchedule().getId());
+	            }
+
+	            if (planVO.getSalesDeliveryScheduleDetails() != null) {
+	                planResponse.setSalesDeliveryScheduleDetailsId(
+	                        planVO.getSalesDeliveryScheduleDetails().getId());
+	            }
+
+	            planResponse.setDayNo(planVO.getDayNo());
+	            planResponse.setDeliveryDate(planVO.getDeliveryDate());
+	            planResponse.setWeekNo(planVO.getWeekNo());
+	            planResponse.setDayName(planVO.getDayName());
+	            planResponse.setDeliveryQty(planVO.getDeliveryQty());
+
+	            deliveryResponseList.add(planResponse);
+	        }
+	    }
+
+	    responseDTO.setDeliverySchedules(deliveryResponseList);
+
+	 
+	    return responseDTO;
+	}
+	
+	@Override
+	public SalesDeliveryScheduleResponseDTO getSalesDeliveryScheduleById(Long id)
+	        throws ApplicationException {
+
+	    SalesDeliveryScheduleVO salesDeliveryScheduleVO =
+	            salesDeliveryScheduleRepo.findById(id)
+	            .orElseThrow(() ->
+	                    new ApplicationException("Sales Delivery Schedule Not Found"));
+
+	    return buildSalesDeliveryScheduleResponse(salesDeliveryScheduleVO);
+	}
+	
+	@Override
+	public List<SalesDeliveryScheduleResponseDTO> getAllSalesDeliverySchedule(
+	        Long orgId,
+	        Long branchId)
+	        throws ApplicationException {
+
+	    List<SalesDeliveryScheduleVO> scheduleList =
+	            salesDeliveryScheduleRepo.findByOrgIdAndBranch(orgId, branchId);
+
+	    List<SalesDeliveryScheduleResponseDTO> responseList = new ArrayList<>();
+
+	    for (SalesDeliveryScheduleVO scheduleVO : scheduleList) {
+
+	        responseList.add(buildSalesDeliveryScheduleResponse(scheduleVO));
+	    }
+
+	    return responseList;
+	}
+	
+	@Override
+	public Map<String, Object> getItemDropdown(Long salesContractId)
+	        throws ApplicationException {
+
+	    List<Object[]> list =
+	            salesContractDetailsRepo.getItemDropdown(salesContractId);
+
+	    List<Map<String, Object>> responseList = new ArrayList<>();
+
+	    for (Object[] obj : list) {
+
+	        Map<String, Object> map = new HashMap<>();
+
+	        map.put("itemId", obj[0]);
+	        map.put("itemCode", obj[1]);
+	        map.put("itemDescription", obj[2]);
+	        map.put("unit", obj[3]);
+	        map.put("orderQty", obj[4]);
+
+	        responseList.add(map);
+	    }
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("message", "Item Dropdown Loaded Successfully");
+	    response.put("itemList", responseList);
+
+	    return response;
+	}
+	
+	@Override
+	public Map<String, Object> getContractNo() throws ApplicationException {
+
+	    String methodName = "getContractNo";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    List<Map<String, Object>> responseList = new ArrayList<>();
+
+	    List<SalesContractVO> contractList = salesContractRepo.getContractNo();
+
+	    for (SalesContractVO vo : contractList) {
+
+	        Map<String, Object> map = new HashMap<>();
+
+	        map.put("id", vo.getId());
+	        map.put("contractNo", vo.getCustomerContractNo());
+	        map.put("invoiceType", vo.getInvoiceType());
+
+	        responseList.add(map);
+	    }
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("message", "Contract No Dropdown Loaded Successfully");
+	    response.put("contractList", responseList);
+
+	    return response;
+	}
+	
+	///SALES RETURN
+	
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateSalesReturn(
+	        SalesReturnDTO salesReturnDTO)
+	        throws ApplicationException {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    String message;
+
+	    SalesReturnVO salesReturnVO;
+
+	    if (ObjectUtils.isEmpty(salesReturnDTO.getId())) {
+
+	        salesReturnVO = new SalesReturnVO();
+
+	        salesReturnVO.setCreatedBy(
+	                salesReturnDTO.getCreatedBy());
+
+	        salesReturnVO.setUpdatedBy(
+	                salesReturnDTO.getCreatedBy());
+
+	        message = "Sales Return Created Successfully";
+
+	    } else {
+
+	        salesReturnVO = salesReturnRepo
+	                .findById(salesReturnDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Sales Return Not Found"));
+
+	        salesReturnVO.setUpdatedBy(
+	                salesReturnDTO.getUpdatedBy());
+
+	        message = "Sales Return Updated Successfully";
+	    }
+
+	    // Header Mapping
+	    createUpdateSalesReturnVOByDTO(
+	            salesReturnDTO,
+	            salesReturnVO);
+
+	    // Save
+	    salesReturnVO =
+	            salesReturnRepo.save(salesReturnVO);
+
+	    // Reload
+	    salesReturnVO =
+	            salesReturnRepo.findById(
+	                    salesReturnVO.getId())
+	            .orElseThrow(() ->
+	                    new ApplicationException("Sales Return Not Found"));
+
+	    // Response
+	    SalesReturnResponseDTO responseDTO =
+	            buildSalesReturnResponse(
+	                    salesReturnVO);
+
+	    response.put("message", message);
+	    response.put("salesReturn", responseDTO);
+
+	    return response;
+	}
+	
+	private void createUpdateSalesReturnVOByDTO(
+	        SalesReturnDTO salesReturnDTO,
+	        SalesReturnVO salesReturnVO)
+	        throws ApplicationException {
+
+	    // ================= Document =================
+
+	    salesReturnVO.setDocNo(salesReturnDTO.getDocNo());
+	    salesReturnVO.setDocDate(salesReturnDTO.getDocDate());
+
+	    // ================= Invoice =================
+
+	    salesReturnVO.setInvoiceNo(salesReturnDTO.getInvoiceNo());
+	    salesReturnVO.setInvoiceDate(salesReturnDTO.getInvoiceDate());
+
+	    salesReturnVO.setCustomerInvoiceNo(
+	            salesReturnDTO.getCustomerInvoiceNo());
+
+	    salesReturnVO.setCustomerInvoiceDate(
+	            salesReturnDTO.getCustomerInvoiceDate());
+
+	    salesReturnVO.setGatePassNo(
+	            salesReturnDTO.getGatePassNo());
+
+	    // ================= Other Details =================
+
+	    salesReturnVO.setApprovedByAccounts(
+	            salesReturnDTO.getApprovedByAccounts());
+
+	    salesReturnVO.setCurrency(
+	            salesReturnDTO.getCurrency());
+
+	    salesReturnVO.setExchangeRate(
+	            salesReturnDTO.getExchangeRate());
+
+	    salesReturnVO.setReferenceNo(
+	            salesReturnDTO.getReferenceNo());
+
+	    salesReturnVO.setReferenceDate(
+	            salesReturnDTO.getReferenceDate());
+
+	    // ================= Common =================
+
+	    salesReturnVO.setOrgId(
+	            salesReturnDTO.getOrgId());
+
+	    salesReturnVO.setFinancialYear(
+	            salesReturnDTO.getFinancialYear());
+
+	    salesReturnVO.setCancelRemarks(
+	            salesReturnDTO.getCancelRemarks());
+
+	    if (salesReturnDTO.getActive() != null) {
+	        salesReturnVO.setActive(
+	                salesReturnDTO.getActive());
+	    }
+
+	    if (salesReturnDTO.getCancel() != null) {
+	        salesReturnVO.setCancel(
+	                salesReturnDTO.getCancel());
+	    }
+
+	    salesReturnVO.setScreenCode(
+	            salesReturnDTO.getScreenCode());
+
+	    salesReturnVO.setScreenName(
+	            salesReturnDTO.getScreenName());
+
+	    // ================= Branch =================
+
+	    if (salesReturnDTO.getBranchId() != null) {
+
+	        BranchVO branch = branchRepo
+	                .findById(salesReturnDTO.getBranchId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Branch Not Found"));
+
+	        salesReturnVO.setBranch(branch);
+	    }
+
+	    // ================= Belongs To =================
+
+	    if (salesReturnDTO.getBelongsToId() != null) {
+
+	        ListOfValuesDetailsVO belongsTo =
+	                listOfValuesDetailsRepo
+	                .findById(salesReturnDTO.getBelongsToId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Belongs To Not Found"));
+
+	        salesReturnVO.setBelongsTo(belongsTo);
+	    }
+
+	    // ================= Customer =================
+
+	    if (salesReturnDTO.getCustomerId() != null) {
+
+	        CustomerVO customer = customerRepo
+	                .findById(salesReturnDTO.getCustomerId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Customer Not Found"));
+
+	        salesReturnVO.setCustomer(customer);
+	    }
+
+	    // ================= Location =================
+
+	    if (salesReturnDTO.getLocationId() != null) {
+
+	        LocationVO location = locationRepo
+	                .findById(salesReturnDTO.getLocationId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Location Not Found"));
+
+	        salesReturnVO.setLocation(location);
+	    }
+
+	    // ================= Return Type =================
+
+	    if (salesReturnDTO.getReturnTypeId() != null) {
+
+	        ListOfValuesDetailsVO returnType =
+	                listOfValuesDetailsRepo
+	                .findById(salesReturnDTO.getReturnTypeId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Return Type Not Found"));
+
+	        salesReturnVO.setReturnType(returnType);
+	    }
+
+	    // ================= Invoice Reference Type =================
+
+	    if (salesReturnDTO.getInvoiceReferenceTypeId() != null) {
+
+	        ListOfValuesDetailsVO invoiceRefType =
+	                listOfValuesDetailsRepo
+	                .findById(salesReturnDTO.getInvoiceReferenceTypeId())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Invoice Reference Type Not Found"));
+
+	        salesReturnVO.setInvoiceReferenceType(
+	                invoiceRefType);
+	    }
+	}
+	    
+
+	    private SalesReturnResponseDTO buildSalesReturnResponse(
+	            SalesReturnVO salesReturnVO) {
+
+	        SalesReturnResponseDTO responseDTO =
+	                new SalesReturnResponseDTO();
+
+	        // ================= Document =================
+
+	        responseDTO.setId(salesReturnVO.getId());
+	        responseDTO.setDocNo(salesReturnVO.getDocNo());
+	        responseDTO.setDocDate(salesReturnVO.getDocDate());
+
+	        // ================= Invoice =================
+
+	        responseDTO.setInvoiceNo(salesReturnVO.getInvoiceNo());
+	        responseDTO.setInvoiceDate(salesReturnVO.getInvoiceDate());
+
+	        responseDTO.setCustomerInvoiceNo(
+	                salesReturnVO.getCustomerInvoiceNo());
+
+	        responseDTO.setCustomerInvoiceDate(
+	                salesReturnVO.getCustomerInvoiceDate());
+
+	        responseDTO.setGatePassNo(
+	                salesReturnVO.getGatePassNo());
+
+	        // ================= Branch =================
+
+	        if (salesReturnVO.getBranch() != null) {
+
+	            responseDTO.setBranchId(
+	                    salesReturnVO.getBranch().getId());
+
+	            responseDTO.setBranchName(
+	                    salesReturnVO.getBranch().getBranchName());
+	        }
+
+	        // ================= Belongs To =================
+
+	        if (salesReturnVO.getBelongsTo() != null) {
+
+	            responseDTO.setBelongsToId(
+	                    salesReturnVO.getBelongsTo().getId());
+
+	            responseDTO.setBelongsTo(
+	            		salesReturnVO.getBelongsTo().getValueDescription());
+	        }
+
+	        // ================= Customer =================
+
+	        if (salesReturnVO.getCustomer() != null) {
+
+	            CustomerVO customer = salesReturnVO.getCustomer();
+
+	            responseDTO.setCustomerId(customer.getId());
+	            responseDTO.setCustomerCode(customer.getCustomerCode());
+	            responseDTO.setCustomerName(customer.getCustomerName());
+
+	            if (customer.getGstState() != null) {
+	                responseDTO.setPartyGSTState(
+	                        customer.getGstState().getStateName());
+	            }
+
+	            responseDTO.setGstNo(customer.getGstNo());
+
+	            responseDTO.setIsIgstApplicable(
+	                    customer.isGstApplicable() ? "YES" : "NO");
+	        }
+
+	        // ================= Location =================
+
+	        if (salesReturnVO.getLocation() != null) {
+
+	            responseDTO.setLocationId(
+	                    salesReturnVO.getLocation().getId());
+
+	            responseDTO.setLocationCode(
+	                    salesReturnVO.getLocation().getLocationId());
+
+	            responseDTO.setLocationName(
+	                    salesReturnVO.getLocation().getLocationName());
+	        }
+
+	        // ================= Return Type =================
+
+	        if (salesReturnVO.getReturnType() != null) {
+
+	            responseDTO.setReturnTypeId(
+	                    salesReturnVO.getReturnType().getId());
+
+	            responseDTO.setReturnType(
+	            		salesReturnVO.getBelongsTo().getValueDescription());
+	        }
+
+	        // ================= Invoice Reference Type =================
+
+	        if (salesReturnVO.getInvoiceReferenceType() != null) {
+
+	            responseDTO.setInvoiceReferenceTypeId(
+	                    salesReturnVO.getInvoiceReferenceType().getId());
+
+	            responseDTO.setInvoiceReferenceType(
+	            		salesReturnVO.getBelongsTo().getValueDescription());
+	        }
+
+	        // ================= Other =================
+
+	        responseDTO.setApprovedByAccounts(
+	                salesReturnVO.getApprovedByAccounts());
+
+	        responseDTO.setCurrency(
+	                salesReturnVO.getCurrency());
+
+	        responseDTO.setExchangeRate(
+	                salesReturnVO.getExchangeRate());
+
+	        responseDTO.setReferenceNo(
+	                salesReturnVO.getReferenceNo());
+
+	        responseDTO.setReferenceDate(
+	                salesReturnVO.getReferenceDate());
+
+	        // ================= Common =================
+
+	        responseDTO.setOrgId(
+	                salesReturnVO.getOrgId());
+
+	        responseDTO.setFinancialYear(
+	                salesReturnVO.getFinancialYear());
+
+	        responseDTO.setCreatedBy(
+	                salesReturnVO.getCreatedBy());
+
+	        responseDTO.setUpdatedBy(
+	                salesReturnVO.getUpdatedBy());
+
+	        responseDTO.setCancelRemarks(
+	                salesReturnVO.getCancelRemarks());
+
+	        responseDTO.setActive(
+	                salesReturnVO.isActive() ? "Active" : "In-Active");
+
+	        responseDTO.setCancel(
+	                salesReturnVO.isCancel() ? "T" : "F");
+
+	        responseDTO.setScreenName(
+	                salesReturnVO.getScreenName());
+
+	        return responseDTO;
+	    
+	}
+	    
+	    
+	    @Override
+	    public SalesReturnResponseDTO getSalesReturnById(Long id)
+	            throws ApplicationException {
+
+	        SalesReturnVO salesReturnVO = salesReturnRepo.findById(id)
+	                .orElseThrow(() ->
+	                        new ApplicationException("Sales Return Not Found"));
+
+	        return buildSalesReturnResponse(salesReturnVO);
+	    }
+	    
+	    
+	    @Override
+	    public List<SalesReturnResponseDTO> getAllSalesReturn(
+	            Long orgId,
+	            Long branch)
+	            throws ApplicationException {
+
+	        List<SalesReturnVO> salesReturnList =
+	                salesReturnRepo.findByOrgIdAndBranch(
+	                        orgId,
+	                        branch);
+
+	        List<SalesReturnResponseDTO> responseList =
+	                new ArrayList<>();
+
+	        for (SalesReturnVO salesReturnVO : salesReturnList) {
+
+	            responseList.add(
+	                    buildSalesReturnResponse(salesReturnVO));
+	        }
+
+	        return responseList;
+	    }
 }

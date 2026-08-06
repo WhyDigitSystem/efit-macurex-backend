@@ -80,4 +80,15 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long>{
 					ORDER BY i.item_code
 					""", nativeQuery = true)
 					List<Object[]> getQuotationItemDropdown(String quotationNo, Long orgId, Long branch);
+					
+					@Query(value = """
+					        SELECT *
+					        FROM sales_contract_basic
+					        WHERE cancel = 0
+					          AND active = 1
+					        ORDER BY customer_contract_no
+					        """, nativeQuery = true)
+				
+
+			List<SalesContractVO> getContractNo();
 }

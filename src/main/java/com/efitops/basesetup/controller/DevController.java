@@ -53,9 +53,7 @@ public class DevController extends BaseController{
 	        value = "/updateCreateCustomerComplaint",
 	        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreateCustomerComplaint(
-	        @RequestBody CustomerComplaintDTO customerComplaintDTO,
-
-//	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
+	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
 	        @RequestPart(value = "images", required = false) MultipartFile[] images) {
 
 	    String methodName = "updateCreateCustomerComplaint";
@@ -171,27 +169,41 @@ public class DevController extends BaseController{
 	 }
 	 
 	 //drop down for item
-	 @GetMapping("/getItem")
-	 public ResponseEntity<ResponseDTO> getItemDropdown() throws ApplicationException {
-
-	     ResponseDTO responseDTO = new ResponseDTO();
-	     responseDTO.setStatus(true);
-	     responseDTO.setStatusFlag("Ok");
-	     responseDTO.setParamObjectsMap(transportMasterService.getItem());
-
-	     return ResponseEntity.ok(responseDTO);
-	 }
 	 
-	 @GetMapping("/getItemDetails/{itemId}")
-	 public ResponseEntity<ResponseDTO> getItemDetails(@RequestParam Long itemId)
-	         throws ApplicationException {
+	 @GetMapping("/getItemDetailsforCustomerComplaint")
+	 public ResponseEntity<ResponseDTO> getItemDetails(
+	         @RequestParam Long orgId ,@RequestParam Long branch) {
 
-	     ResponseDTO responseDTO = new ResponseDTO();
-	     responseDTO.setStatus(true);
-	     responseDTO.setStatusFlag("Ok");
-	     responseDTO.setParamObjectsMap(transportMasterService.getItemDetails(itemId));
+	     String methodName = "getItemDetailsforCustomerComplaint()";
+	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	     return ResponseEntity.ok(responseDTO);
+	     Map<String, Object> responseObjectsMap = new HashMap<>();
+	     String errorMsg = null;
+	     ResponseDTO responseDTO = null;
+
+	     try {
+
+	         responseObjectsMap = transportMasterService.getItemDetailsforCustomerComplaint(orgId , branch);
+
+	         responseDTO = createServiceResponse(responseObjectsMap);
+
+	     } catch (Exception e) {
+
+	         errorMsg = e.getMessage();
+
+	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
+	                 methodName,
+	                 errorMsg);
+
+	         responseDTO = createServiceResponseError(
+	                 responseObjectsMap,
+	                 errorMsg,
+	                 errorMsg);
+	     }
+
+	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	     return ResponseEntity.ok().body(responseDTO);
 	 }
 	
 	// branch dropdown

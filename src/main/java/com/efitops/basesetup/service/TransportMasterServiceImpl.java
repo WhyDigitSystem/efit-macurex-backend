@@ -460,33 +460,11 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	}
 
 	// dropdown for item
+	
 	@Override
-	public Map<String, Object> getItem() throws ApplicationException {
+	public Map<String, Object> getItemDetailsforCustomerComplaint(Long orgId , Long branch) throws ApplicationException {
 
-		List<Object[]> list = itemMasterRepo.getItem();
-
-		List<Map<String, Object>> responseList = new ArrayList<>();
-
-		for (Object[] obj : list) {
-
-			Map<String, Object> map = new HashMap<>();
-
-			map.put("id", obj[0]);
-			map.put("itemCode", obj[1]);
-
-			responseList.add(map);
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("itemList", responseList);
-
-		return response;
-	}
-
-	@Override
-	public Map<String, Object> getItemDetails(Long itemId) throws ApplicationException {
-
-		List<Object[]> list = itemMasterRepo.getItemDetails(itemId);
+		List<Object[]> list = itemMasterRepo.getItemDetailsforCustomerComplaint(orgId , branch);
 
 		if (list == null || list.isEmpty()) {
 			throw new ApplicationException("Item Not Found");
@@ -1344,11 +1322,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	    if (dto.getBranch() != null && dto.getBranch() != 0) {
 
-	    	System.out.println(dto.getBranch());
-	    	System.out.println(dto.getBranch());	 
-	    	System.out.println(dto.getBranch());	 
-	    	System.out.println(dto.getBranch());	 
-
+	    	System.out.println(dto.getBranch());	   
 	    	BranchVO branch = branchRepo.findById(dto.getBranch())
 	                .orElseThrow(() ->
 	                        new ApplicationException("Branch Not Found"));

@@ -38,9 +38,8 @@ public interface TransportMasterService {
 	        throws ApplicationException;
 
 	//dropdown for item	
-	Map<String, Object> getItem() throws ApplicationException;
 
-	Map<String, Object> getItemDetails(Long itemId) throws ApplicationException;
+	Map<String, Object> getItemDetailsforCustomerComplaint(Long orgId, Long branch) throws ApplicationException;
    
 	//dropdown for branch
 	Map<String, Object> getBranch() throws ApplicationException;

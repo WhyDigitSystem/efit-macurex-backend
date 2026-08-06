@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -23,20 +26,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.GSTRateResponseDTO;
-import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
-import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
-import com.efitops.basesetup.ResponseDTO.SalesContractItemResponseDTO;
-import com.efitops.basesetup.ResponseDTO.SalesCustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
-import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.CustomerResponseGstDetailsDTO;
-import com.efitops.basesetup.dto.ItemMasterResponseDTO;
-import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseGstDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseTaxDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDTO;
@@ -51,9 +52,7 @@ import com.efitops.basesetup.dto.SalesOrderShortCloseDetailsDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDetailsResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseFileDetailsResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseResponseDTO;
-import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
-import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
@@ -440,11 +439,9 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		try {
 
-			File folder = new File(uploadPath);
+			Path orderFolder = Paths.get(uploadPath, "orderAcceptance", orderAcceptanceVO.getId().toString());
 
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
+			createDirectory(orderFolder);
 
 			List<OrderAcceptanceFileUploadDetailsVO> attachmentList = new ArrayList<>();
 
@@ -454,43 +451,109 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 					continue;
 				}
 
-				String originalFileName = file.getOriginalFilename();
+				String originalName = file.getOriginalFilename();
 
-				String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
+				if (originalName == null) {
+					originalName = "file";
+				}
 
-				Path path = Paths.get(uploadPath, uniqueFileName);
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+					extension = originalName.substring(originalName.lastIndexOf("."));
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				String fileName = originalName + "_" + orderAcceptanceVO.getId() + extension;
+
+				Path filePath = orderFolder.resolve(fileName);
 
 				try (InputStream inputStream = file.getInputStream()) {
-
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
 				}
+
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/orderAcceptance/viewFile/").toUriString();
+
+				String relativePath = uploadPath.replace("\\", "/");
+
+				relativePath = filePath.toString().replace("\\", "/").replace(relativePath + "/", "");
+
+				String publicUrl = baseUrl + relativePath;
 
 				OrderAcceptanceFileUploadDetailsVO attachment = new OrderAcceptanceFileUploadDetailsVO();
 
 				attachment.setOrderAcceptanceVO(orderAcceptanceVO);
-
-				attachment.setName(originalFileName);
-
-				attachment.setFileName(uniqueFileName);
-
-				attachment.setFilePath(path.toString());
-
+				attachment.setName(file.getOriginalFilename());
+				attachment.setFileName(fileName);
+				attachment.setFilePath(publicUrl);
 				attachment.setFileSize(file.getSize());
-
+				attachment.setContentType(file.getContentType());
 				attachment.setUploadOn(LocalDateTime.now());
 
 				attachmentList.add(attachment);
 			}
 
-			List<OrderAcceptanceFileUploadDetailsVO> savedAttachments = orderAcceptanceFileUploadDetailsRepo
+			List<OrderAcceptanceFileUploadDetailsVO> saved = orderAcceptanceFileUploadDetailsRepo
 					.saveAll(attachmentList);
 
-			orderAcceptanceVO.setOrderAcceptanceFileUploadDetailsVO(savedAttachments);
+			orderAcceptanceVO.setOrderAcceptanceFileUploadDetailsVO(saved);
 
 		} catch (IOException e) {
-
 			throw new ApplicationException("File Upload Failed : " + e.getMessage());
 		}
+	}
+
+	private void createDirectory(Path path) throws IOException {
+
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
+	@Override
+	public ResponseEntity<byte[]> viewOrderAcceptanceFile(HttpServletRequest request) throws IOException {
+
+		return serveFile(request, "/api/orderAcceptance/viewFile/", uploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveFile(HttpServletRequest request, String apiPrefix, String uploadBasePath)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
 	}
 
 	private OrderAcceptanceResponseDTO buildOrderAcceptanceResponse(OrderAcceptanceVO orderAcceptanceVO) {
@@ -800,7 +863,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	@Value("${short.upload.path}")
 	private String uploadPaths;
 
-	private void saveAttachmentss(MultipartFile[] files, SalesOrderShortCloseVO orderAcceptanceVO)
+	private void saveAttachmentss(MultipartFile[] files, SalesOrderShortCloseVO salesOrderShortCloseVO)
 			throws ApplicationException {
 
 		if (files == null || files.length == 0) {
@@ -809,11 +872,10 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		try {
 
-			File folder = new File(uploadPath);
+			Path salesOrderFolder = Paths.get(uploadPath, "salesOrderShortClose",
+					salesOrderShortCloseVO.getId().toString());
 
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
+			createDirectorys(salesOrderFolder);
 
 			List<SalesOrderShortCloseFileDetailsVO> attachmentList = new ArrayList<>();
 
@@ -823,29 +885,50 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 					continue;
 				}
 
-				String originalFileName = file.getOriginalFilename();
+				String originalName = file.getOriginalFilename();
 
-				String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
+				if (originalName == null) {
+					originalName = "file";
+				}
 
-				Path path = Paths.get(uploadPath, uniqueFileName);
+				// Remove spaces
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				// Extension
+				String extension = "";
+
+				if (originalName.contains(".")) {
+					extension = originalName.substring(originalName.lastIndexOf("."));
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				// File Name
+				String fileName = originalName + "_" + salesOrderShortCloseVO.getId() + extension;
+
+				// Save Path
+				Path filePath = salesOrderFolder.resolve(fileName);
 
 				try (InputStream inputStream = file.getInputStream()) {
 
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
 				}
+
+				// Base URL
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/orderAcceptance/viewFileSalesOrder/").toUriString();
+
+				String relativePath = "salesOrderShortClose/" + salesOrderShortCloseVO.getId() + "/" + fileName;
+
+				String publicUrl = baseUrl + relativePath;
 
 				SalesOrderShortCloseFileDetailsVO attachment = new SalesOrderShortCloseFileDetailsVO();
 
-				attachment.setSalesOrderShortCloseVO(orderAcceptanceVO);
-
-				attachment.setName(originalFileName);
-
-				attachment.setFileName(uniqueFileName);
-
-				attachment.setFilePath(path.toString());
-
+				attachment.setSalesOrderShortCloseVO(salesOrderShortCloseVO);
+				attachment.setName(file.getOriginalFilename());
+				attachment.setFileName(fileName);
+				attachment.setFilePath(publicUrl);
 				attachment.setFileSize(file.getSize());
-
+				attachment.setContentType(file.getContentType());
 				attachment.setUploadOn(LocalDateTime.now());
 
 				attachmentList.add(attachment);
@@ -854,12 +937,62 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			List<SalesOrderShortCloseFileDetailsVO> savedAttachments = salesOrderShortCloseFileDetailsRepo
 					.saveAll(attachmentList);
 
-			orderAcceptanceVO.setSalesOrderShortCloseFileDetailsVO(savedAttachments);
+			salesOrderShortCloseVO.setSalesOrderShortCloseFileDetailsVO(savedAttachments);
 
 		} catch (IOException e) {
 
 			throw new ApplicationException("File Upload Failed : " + e.getMessage());
 		}
+	}
+
+	private void createDirectorys(Path path) throws IOException {
+
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
+	@Override
+	public ResponseEntity<byte[]> viewSalesOrderShortCloseFile(HttpServletRequest request) throws IOException {
+
+		return serveFiles(request, "/api/orderAcceptance/viewFileSalesOrder/", uploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveFiles(HttpServletRequest request, String apiPrefix, String uploadBasePath)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
 	}
 
 	private SalesOrderShortCloseResponseDTO buildSalesOrderShortCloseResponse(

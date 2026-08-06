@@ -1,8 +1,12 @@
 package com.efitops.basesetup.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,5 +33,9 @@ public interface OrderAcceptanceService {
 
 	Map<String, Object> createUpdateSalesOrderShort(SalesOrderShortCloseDTO salesOrderShortCloseDTO,
 			MultipartFile[] files) throws ApplicationException;
+
+	ResponseEntity<byte[]> viewOrderAcceptanceFile(HttpServletRequest request) throws IOException;
+
+	ResponseEntity<byte[]> viewSalesOrderShortCloseFile(HttpServletRequest request) throws IOException;
 
 }

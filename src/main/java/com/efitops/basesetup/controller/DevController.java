@@ -63,7 +63,7 @@ public class DevController extends BaseController{
 	    try {
 
 	        Map<String, Object> responseMap =
-	                transportMasterService.updateCreateCustomerComplaint(customerComplaintDTO, null);
+	                transportMasterService.updateCreateCustomerComplaint(customerComplaintDTO, images);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
@@ -751,161 +751,161 @@ public class DevController extends BaseController{
 
 		}
 		//Stock Tranfer Challan
-//		@PostMapping("/updateCreateStockTransferChallan")
-//		public ResponseEntity<ResponseDTO> updateCreateStockTransferChallan(
-//		        @RequestBody StockTransferChallanDTO stockTransferChallanDTO) {
-//
-//			String methodName = "updateCreateStockTransferChallan()";
-//			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-//
-//			Map<String, Object> responseObjectsMap = new HashMap<>();
-//			String errorMsg = null;
-//			ResponseDTO responseDTO = null;
-//
-//			try {
-//
-//				Map<String, Object> responseMap = transportMasterService
-//						.updateCreateStockTransferChallan(stockTransferChallanDTO);
-//
-//				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
-//				responseObjectsMap.put("stockTransferChallanVO",
-//						responseMap.get("stockTransferChallanVO"));
-//
-//				responseDTO = createServiceResponse(responseObjectsMap);
-//
-//			} catch (Exception e) {
-//
-//				errorMsg = e.getMessage();
-//
-//				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-//
-//				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-//			}
-//
-//			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-//
-//			return ResponseEntity.ok().body(responseDTO);
-//		}
-//		
-//		
-//		@GetMapping("/getStockTransferChallanById")
-//		public ResponseEntity<ResponseDTO> getStockTransferChallanById(
-//		        @RequestParam Long id) {
-//
-//		    String methodName = "getStockTransferChallanById()";
-//		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-//
-//		    String errorMsg = null;
-//
-//		    Map<String, Object> responseObjectsMap = new HashMap<>();
-//
-//		    ResponseDTO responseDTO = null;
-//
-//		    StockTransferChallanResponseDTO stockTransferChallanResponseDTO = null;
-//
-//		    try {
-//
-//		    	stockTransferChallanResponseDTO =
-//		                transportMasterService.getStockTransferChallanById(id);
-//
-//		    } catch (Exception e) {
-//
-//		        errorMsg = e.getMessage();
-//
-//		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
-//		                methodName,
-//		                errorMsg);
-//		    }
-//
-//		    if (StringUtils.isBlank(errorMsg)) {
-//
-//		        responseObjectsMap.put(
-//		                CommonConstant.STRING_MESSAGE,
-//		                " Stock Transfer retrieved successfully");
-//
-//		        responseObjectsMap.put(
-//		                "stockTransferChallanResponseDTO",
-//		                stockTransferChallanResponseDTO);
-//
-//		        responseDTO =
-//		                createServiceResponse(responseObjectsMap);
-//
-//		    } else {
-//
-//		        responseDTO =
-//		                createServiceResponseError(
-//		                        responseObjectsMap,
-//		                        " stock Transfer Challan retrieval failed",
-//		                        errorMsg);
-//		    }
-//
-//		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-//
-//		    return ResponseEntity.ok().body(responseDTO);
-//
-//		}
-//		
-//		@GetMapping("/getStockTransferChallanByOrgId")
-//		public ResponseEntity<ResponseDTO> getStockTransferChallanByOrgId(
-//		        @RequestParam Long orgId,
-//		        @RequestParam Long branch) {
-//
-//		    String methodName = "getStockTransferChallanByOrgId()";
-//		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-//
-//		    String errorMsg = null;
-//
-//		    Map<String, Object> responseObjectsMap = new HashMap<>();
-//
-//		    ResponseDTO responseDTO = null;
-//
-//		    List<StockTransferChallanResponseDTO> stockTransferChallanResponseDTO =
-//		            new ArrayList<>();
-//
-//		    try {
-//
-//		    	stockTransferChallanResponseDTO =
-//		                transportMasterService.getStockTransferChallanByOrgId(
-//		                        orgId,
-//		                        branch);
-//
-//		    } catch (Exception e) {
-//
-//		        errorMsg = e.getMessage();
-//
-//		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
-//		                methodName,
-//		                errorMsg);
-//		    }
-//
-//		    if (StringUtils.isBlank(errorMsg)) {
-//
-//		        responseObjectsMap.put(
-//		                CommonConstant.STRING_MESSAGE,
-//		                " Stock Transfer Challan retrieved successfully");
-//
-//		        responseObjectsMap.put(
-//		                "stockTransferChallanResponseDTO",
-//		                stockTransferChallanResponseDTO);
-//
-//		        responseDTO =
-//		                createServiceResponse(responseObjectsMap);
-//
-//		    } else {
-//
-//		        responseDTO =
-//		                createServiceResponseError(
-//		                        responseObjectsMap,
-//		                        "Stock transfer challan retrieval failed",
-//		                        errorMsg);
-//		    }
-//
-//		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-//
-//		    return ResponseEntity.ok().body(responseDTO);
-//
-//		}
-//		
+		@PostMapping("/updateCreateStockTransferChallan")
+		public ResponseEntity<ResponseDTO> updateCreateStockTransferChallan(
+		        @RequestBody StockTransferChallanDTO stockTransferChallanDTO) {
+
+			String methodName = "updateCreateStockTransferChallan()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			String errorMsg = null;
+			ResponseDTO responseDTO = null;
+
+			try {
+
+				Map<String, Object> responseMap = transportMasterService
+						.updateCreateStockTransferChallan(stockTransferChallanDTO);
+
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+				responseObjectsMap.put("stockTransferChallanVO",
+						responseMap.get("stockTransferChallanVO"));
+
+				responseDTO = createServiceResponse(responseObjectsMap);
+
+			} catch (Exception e) {
+
+				errorMsg = e.getMessage();
+
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+			}
+
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		
+		
+		@GetMapping("/getStockTransferChallanById")
+		public ResponseEntity<ResponseDTO> getStockTransferChallanById(
+		        @RequestParam Long id) {
+
+		    String methodName = "getStockTransferChallanById()";
+		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		    String errorMsg = null;
+
+		    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		    ResponseDTO responseDTO = null;
+
+		    StockTransferChallanResponseDTO stockTransferChallanResponseDTO = null;
+
+		    try {
+
+		    	stockTransferChallanResponseDTO =
+		                transportMasterService.getStockTransferChallanById(id);
+
+		    } catch (Exception e) {
+
+		        errorMsg = e.getMessage();
+
+		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
+		                methodName,
+		                errorMsg);
+		    }
+
+		    if (StringUtils.isBlank(errorMsg)) {
+
+		        responseObjectsMap.put(
+		                CommonConstant.STRING_MESSAGE,
+		                " Stock Transfer retrieved successfully");
+
+		        responseObjectsMap.put(
+		                "stockTransferChallanResponseDTO",
+		                stockTransferChallanResponseDTO);
+
+		        responseDTO =
+		                createServiceResponse(responseObjectsMap);
+
+		    } else {
+
+		        responseDTO =
+		                createServiceResponseError(
+		                        responseObjectsMap,
+		                        " stock Transfer Challan retrieval failed",
+		                        errorMsg);
+		    }
+
+		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		    return ResponseEntity.ok().body(responseDTO);
+
+		}
+		
+		@GetMapping("/getStockTransferChallanByOrgId")
+		public ResponseEntity<ResponseDTO> getStockTransferChallanByOrgId(
+		        @RequestParam Long orgId,
+		        @RequestParam Long branch) {
+
+		    String methodName = "getStockTransferChallanByOrgId()";
+		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		    String errorMsg = null;
+
+		    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		    ResponseDTO responseDTO = null;
+
+		    List<StockTransferChallanResponseDTO> stockTransferChallanResponseDTO =
+		            new ArrayList<>();
+
+		    try {
+
+		    	stockTransferChallanResponseDTO =
+		                transportMasterService.getStockTransferChallanByOrgId(
+		                        orgId,
+		                        branch);
+
+		    } catch (Exception e) {
+
+		        errorMsg = e.getMessage();
+
+		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
+		                methodName,
+		                errorMsg);
+		    }
+
+		    if (StringUtils.isBlank(errorMsg)) {
+
+		        responseObjectsMap.put(
+		                CommonConstant.STRING_MESSAGE,
+		                " Stock Transfer Challan retrieved successfully");
+
+		        responseObjectsMap.put(
+		                "stockTransferChallanResponseDTO",
+		                stockTransferChallanResponseDTO);
+
+		        responseDTO =
+		                createServiceResponse(responseObjectsMap);
+
+		    } else {
+
+		        responseDTO =
+		                createServiceResponseError(
+		                        responseObjectsMap,
+		                        "Stock transfer challan retrieval failed",
+		                        errorMsg);
+		    }
+
+		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		    return ResponseEntity.ok().body(responseDTO);
+
+		}
+		
 		
 }
 		

@@ -89,11 +89,7 @@ public class StockTransferChallanVO {
 	@Column(name = "screen_name",length = 30)
 	private String screenName="Stock Tranfer Challan";
 	
-	@JsonGetter("active")
-	public String getActive() {
-		return active ? "Active" : "In-Active";
-	}
-
+	
 	@JsonGetter("cancel")
 	public String getCancel() {
 		return cancel ? "T" : "F";

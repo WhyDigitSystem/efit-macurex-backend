@@ -686,7 +686,7 @@ public class PurchaseContractServiceImpl implements PurchaseContractService {
             for (PurchaseContractAttachmentVO a : vo.getPurchaseContractAttachmentVO()) {
 
                 PurchaseContractAttachmentDTO attachDTO = new PurchaseContractAttachmentDTO();
-
+                attachDTO.setId(a.getId());
                 attachDTO.setName(a.getName());
                 attachDTO.setFileName(a.getFileName());
                 attachDTO.setFilePath(a.getFilePath());

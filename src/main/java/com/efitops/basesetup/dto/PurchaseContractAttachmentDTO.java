@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PurchaseContractAttachmentDTO {
 
-
+    private Long id;
     private String name;
     private String fileName;
     private String filePath;

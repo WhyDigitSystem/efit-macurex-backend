@@ -11,9 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.dto.OrderAcceptanceDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceItemDropdownResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseResponseDTO;
+import com.efitops.basesetup.dto.ShortCloseItemResponseDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -37,5 +39,11 @@ public interface OrderAcceptanceService {
 	ResponseEntity<byte[]> viewOrderAcceptanceFile(HttpServletRequest request) throws IOException;
 
 	ResponseEntity<byte[]> viewSalesOrderShortCloseFile(HttpServletRequest request) throws IOException;
+
+	List<OrderAcceptanceItemDropdownResponseDTO> getOrderAcceptanceItemDetails(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<ShortCloseItemResponseDTO> getSalesOrderItemDetails(Long orgId, Long branch, String docId)
+			throws ApplicationException;
 
 }

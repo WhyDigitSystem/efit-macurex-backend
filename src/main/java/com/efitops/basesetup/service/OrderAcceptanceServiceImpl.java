@@ -42,6 +42,7 @@ import com.efitops.basesetup.dto.OrderAcceptanceDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDetailsDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDetailsResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceFileUploadDetailsDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceItemDropdownResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceTaxDetailsDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceTaxDetailsResponsDTO;
@@ -50,6 +51,7 @@ import com.efitops.basesetup.dto.SalesOrderShortCloseDetailsDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDetailsResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseFileDetailsResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseResponseDTO;
+import com.efitops.basesetup.dto.ShortCloseItemResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
@@ -345,7 +347,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				detailsVO.setOrderAmount(dto.getQuantity().multiply(dto.getOrderRate()));
 
 				detailsVO.setDiscount(dto.getDiscount());
-				
+
 				detailsVO.setTaxType(dto.getTaxType());
 
 				BigDecimal quantity = dto.getQuantity() == null ? BigDecimal.ZERO : dto.getQuantity();
@@ -1100,6 +1102,67 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		return responseDTO;
 
+	}
+
+	@Override
+	public List<OrderAcceptanceItemDropdownResponseDTO> getOrderAcceptanceItemDetails(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> itemList = orderAcceptanceRepo.getOrderAcceptanceItemDetails(orgId, branch);
+
+		List<OrderAcceptanceItemDropdownResponseDTO> responseList = new ArrayList<>();
+
+		for (Object[] obj : itemList) {
+			responseList.add(mapToFinishedGoodsResponseDTO(obj));
+		}
+
+		return responseList;
+	}
+
+	private OrderAcceptanceItemDropdownResponseDTO mapToFinishedGoodsResponseDTO(Object[] obj) {
+
+		OrderAcceptanceItemDropdownResponseDTO dto = new OrderAcceptanceItemDropdownResponseDTO();
+
+		dto.setItemId(((Number) obj[0]).longValue());
+		dto.setItemCode((String) obj[1]);
+		dto.setItemDescription((String) obj[2]);
+		dto.setUnitId((String) obj[3]);
+		dto.setMinimumSellPrice((BigDecimal) obj[4]);
+		dto.setHsnCode((String) obj[5]);
+		dto.setRate((BigDecimal) obj[6]);
+		dto.setCgst((BigDecimal) obj[7]);
+		dto.setSgst((BigDecimal) obj[8]);
+		dto.setIgst((BigDecimal) obj[9]);
+		dto.setUnitMasterId(((Number) obj[10]).longValue());
+		dto.setGstRateMasterId(((Number) obj[11]).longValue());
+
+		return dto;
+	}
+
+	@Override
+	public List<ShortCloseItemResponseDTO> getSalesOrderItemDetails(Long orgId, Long branch, String docId)
+			throws ApplicationException {
+
+		List<Object[]> itemList = salesOrderShortCloseRepo.getSalesOrderItemDetails(orgId, branch, docId);
+
+		List<ShortCloseItemResponseDTO> responseList = new ArrayList<>();
+
+		for (Object[] obj : itemList) {
+			responseList.add(mapToFinishedGoodsResponseDTOs(obj));
+		}
+
+		return responseList;
+	}
+
+	private ShortCloseItemResponseDTO mapToFinishedGoodsResponseDTOs(Object[] obj) {
+
+		ShortCloseItemResponseDTO dto = new ShortCloseItemResponseDTO();
+
+		dto.setItemId(((Number) obj[0]).longValue());
+		dto.setItemCode((String) obj[1]);
+		dto.setItemDescription((String) obj[2]);
+
+		return dto;
 	}
 
 }

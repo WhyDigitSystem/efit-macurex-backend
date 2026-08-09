@@ -36,7 +36,9 @@ public class OrderAcceptanceDTO {
 
 	private String postRate;
 
-	private Long customerId;
+	private Long customer;
+
+	private boolean active;
 
 	// Common Fields
 
@@ -50,7 +52,7 @@ public class OrderAcceptanceDTO {
 
 	private String financialYear;
 
-	private Long branchId;
+	private Long branch;
 
 	private String destination;
 
@@ -67,7 +69,7 @@ public class OrderAcceptanceDTO {
 	private String specification;
 
 	private String note;
-	
+
 	private String gstApproval;
 
 	private List<OrderAcceptanceDetailsDTO> orderAcceptanceDetailsDTO;

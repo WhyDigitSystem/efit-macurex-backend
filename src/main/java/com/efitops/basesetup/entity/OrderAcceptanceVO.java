@@ -27,16 +27,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "orderacceptance")
+@Table(name = "order_accptance_basic")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderAcceptanceVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "orderacceptancegen")
-	@SequenceGenerator(name = "orderacceptancegen", sequenceName = "orderacceptanceseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "orderacceptance_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_accptance_basicgen")
+	@SequenceGenerator(name = "order_accptance_basicgen", sequenceName = "order_accptance_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "order_accptance_basic_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "doc_id")
@@ -69,8 +69,8 @@ public class OrderAcceptanceVO {
 	private String withQuotation;
 
 	@ManyToOne
-	@JoinColumn(name = "customer_id")
-	private CustomerVO customerId;
+	@JoinColumn(name = "customer")
+	private CustomerVO customer;
 
 	@Column(name = "quotation_date")
 	private LocalDate quotationDate;
@@ -111,12 +111,12 @@ public class OrderAcceptanceVO {
 	private String createdBy;
 
 	@Column(name = "active")
-	private boolean active=true;
+	private boolean active;
 
 	@Column(name = "cancel")
 	private boolean cancel = false;
 
-	@Column(name = "updated_by")
+	@Column(name = "modified_by")
 	private String updatedBy;
 
 	@Column(name = "cancel_remarks")

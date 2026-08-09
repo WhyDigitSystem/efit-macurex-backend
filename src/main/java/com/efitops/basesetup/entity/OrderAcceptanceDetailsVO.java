@@ -21,16 +21,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "orderacceptancedetails")
+@Table(name = "order_acceptance_detail")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderAcceptanceDetailsVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "orderacceptancedetailsgen")
-	@SequenceGenerator(name = "orderacceptancedetailsgen", sequenceName = "orderacceptancedetailsseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "orderacceptancedetails_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_acceptance_detailgen")
+	@SequenceGenerator(name = "order_acceptance_detailgen", sequenceName = "order_acceptance_detailseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "order_acceptance_detail_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@ManyToOne
@@ -104,7 +104,7 @@ public class OrderAcceptanceDetailsVO {
 
 	@ManyToOne
 	@JsonBackReference
-	@JoinColumn(name = "orderacceptance_id")
+	@JoinColumn(name = "order_accptance_basic_id")
 	OrderAcceptanceVO orderAcceptanceVO;
 
 }

@@ -11,10 +11,10 @@ import com.efitops.basesetup.entity.SalesOrderShortCloseVO;
 @Repository
 public interface SalesOrderShortCloseRepo extends JpaRepository<SalesOrderShortCloseVO, Long> {
 
-	@Query(nativeQuery = true, value = "select * from salesordershortclose where salesordershortclose_id=?1 and active=1 and cancel=0")
+	@Query(nativeQuery = true, value = "select * from sales_order_short_close_basic where sales_order_short_close_basic_id=?1 and active=1 and cancel=0")
 	SalesOrderShortCloseVO getSalesOrderShortCloseById(Long id);
 
-	@Query(nativeQuery = true, value = "select * from salesordershortclose where org_id=?1  and branch=?2 and active=1 and cancel=0")
+	@Query(nativeQuery = true, value = "select * from sales_order_short_close_basic where org_id=?1  and branch=?2 and active=1 and cancel=0")
 	List<SalesOrderShortCloseVO> getSalesOrderShortCloseByOrgId(Long orgId, Long branchId);
 
 	@Query(nativeQuery = true, value = "select i.item_id, i.item_code,i.item_description from item i  left join quotation_detail a1 on i.item_id=a1.item  join\r\n"

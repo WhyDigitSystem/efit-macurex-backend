@@ -49,7 +49,6 @@ import com.efitops.basesetup.dto.OrderAcceptanceTaxDetailsResponsDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDetailsDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDetailsResponseDTO;
-import com.efitops.basesetup.dto.SalesOrderShortCloseFileDetailsResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseResponseDTO;
 import com.efitops.basesetup.dto.ShortCloseItemResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
@@ -61,7 +60,6 @@ import com.efitops.basesetup.entity.OrderAcceptanceFileUploadDetailsVO;
 import com.efitops.basesetup.entity.OrderAcceptanceTaxDetailsVO;
 import com.efitops.basesetup.entity.OrderAcceptanceVO;
 import com.efitops.basesetup.entity.SalesOrderShortCloseDetailsVO;
-import com.efitops.basesetup.entity.SalesOrderShortCloseFileDetailsVO;
 import com.efitops.basesetup.entity.SalesOrderShortCloseVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -162,10 +160,10 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	}
 
 	@Override
-	public List<OrderAcceptanceResponseDTO> getOrderAcceptanceByOrgId(Long orgId, Long branchId)
+	public List<OrderAcceptanceResponseDTO> getOrderAcceptanceByOrgId(Long orgId, Long branch)
 			throws ApplicationException {
 
-		List<OrderAcceptanceVO> quotationList = orderAcceptanceRepo.getQuotationByOrgId(orgId, branchId);
+		List<OrderAcceptanceVO> quotationList = orderAcceptanceRepo.getQuotationByOrgId(orgId, branch);
 
 		if (quotationList == null || quotationList.isEmpty()) {
 			throw new ApplicationException("Quotation Not Found");
@@ -228,12 +226,12 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		orderAcceptanceVO.setBelongsTo(orderAcceptanceDTO.getBelongsTo());
 
-		if (orderAcceptanceDTO.getCustomerId() != null && orderAcceptanceDTO.getCustomerId() > 0) {
+		if (orderAcceptanceDTO.getCustomer() != null && orderAcceptanceDTO.getCustomer() != 0) {
 
-			CustomerVO customer = customerRepo.findById(orderAcceptanceDTO.getCustomerId())
+			CustomerVO customer = customerRepo.findById(orderAcceptanceDTO.getCustomer())
 					.orElseThrow(() -> new ApplicationException("Party Not Found"));
 
-			orderAcceptanceVO.setCustomerId(customer);
+			orderAcceptanceVO.setCustomer(customer);
 		}
 
 		orderAcceptanceVO.setWithQuotation(orderAcceptanceDTO.getWithQuotation());
@@ -256,8 +254,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		orderAcceptanceVO.setPostRate(orderAcceptanceDTO.getPostRate());
 
-		orderAcceptanceVO.setCreatedBy(orderAcceptanceDTO.getCreatedBy());
-		orderAcceptanceVO.setUpdatedBy(orderAcceptanceDTO.getUpdatedBy());
 		orderAcceptanceVO.setCancelRemarks(orderAcceptanceDTO.getCancelRemarks());
 
 		orderAcceptanceVO.setOrgId(orderAcceptanceDTO.getOrgId());
@@ -274,16 +270,17 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		orderAcceptanceVO.setSpecification(orderAcceptanceDTO.getSpecification());
 		orderAcceptanceVO.setNote(orderAcceptanceDTO.getNote());
 
-		orderAcceptanceVO.setCreatedBy(orderAcceptanceDTO.getCreatedBy());
-		orderAcceptanceVO.setUpdatedBy(orderAcceptanceDTO.getUpdatedBy());
+		orderAcceptanceVO.setOrgId(orderAcceptanceDTO.getOrgId());
+		orderAcceptanceVO.setActive(orderAcceptanceDTO.isActive());
+
 		orderAcceptanceVO.setOrgId(orderAcceptanceDTO.getOrgId());
 		orderAcceptanceVO.setFinancialYear(orderAcceptanceDTO.getFinancialYear());
 		orderAcceptanceVO.setGstApproval(orderAcceptanceDTO.getGstApproval());
 		orderAcceptanceVO.setDocId(orderAcceptanceDTO.getDocId());
 
-		if (orderAcceptanceDTO.getBranchId() != null && orderAcceptanceDTO.getBranchId() > 0) {
+		if (orderAcceptanceDTO.getBranch() != null && orderAcceptanceDTO.getBranch() > 0) {
 
-			BranchVO branch = branchRepo.findById(orderAcceptanceDTO.getBranchId())
+			BranchVO branch = branchRepo.findById(orderAcceptanceDTO.getBranch())
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 			orderAcceptanceVO.setBranch(branch);
@@ -603,18 +600,18 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			responseDTO.setBranch(branchDTO);
 		}
 
-		if (orderAcceptanceVO.getCustomerId() != null) {
+		if (orderAcceptanceVO.getCustomer() != null) {
 
 			CustomerResponseGstDetailsDTO customerDTO = new CustomerResponseGstDetailsDTO();
 
-			customerDTO.setId(orderAcceptanceVO.getCustomerId().getId());
-			customerDTO.setCustomerName(orderAcceptanceVO.getCustomerId().getCustomerName());
-			customerDTO.setCustomerType(orderAcceptanceVO.getCustomerId().getCustomerType());
-			customerDTO.setCustomerGstNo(orderAcceptanceVO.getCustomerId().getGstNo());
+			customerDTO.setId(orderAcceptanceVO.getCustomer().getId());
+			customerDTO.setCustomerName(orderAcceptanceVO.getCustomer().getCustomerName());
+			customerDTO.setCustomerType(orderAcceptanceVO.getCustomer().getCustomerType());
+			customerDTO.setCustomerGstNo(orderAcceptanceVO.getCustomer().getGstNo());
 
-			customerDTO.setGstApproval(orderAcceptanceVO.getCustomerId().isGstApplicable() ? "Yes" : "No");
+			customerDTO.setGstApproval(orderAcceptanceVO.getCustomer().isGstApplicable() ? "Yes" : "No");
 
-			customerDTO.setCustomerGstNo(orderAcceptanceVO.getCustomerId().getGstNo());
+			customerDTO.setCustomerGstNo(orderAcceptanceVO.getCustomer().getGstNo());
 
 			responseDTO.setCustomerId(customerDTO);
 		}
@@ -734,11 +731,11 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	}
 
 	@Override
-	public List<SalesOrderShortCloseResponseDTO> getSalesOrderShortCloseByOrgId(Long orgId, Long branchId)
+	public List<SalesOrderShortCloseResponseDTO> getSalesOrderShortCloseByOrgId(Long orgId, Long Branch)
 			throws ApplicationException {
 
 		List<SalesOrderShortCloseVO> quotationList = salesOrderShortCloseRepo.getSalesOrderShortCloseByOrgId(orgId,
-				branchId);
+				Branch);
 
 		if (quotationList == null || quotationList.isEmpty()) {
 			throw new ApplicationException("Quotation Not Found");
@@ -755,8 +752,8 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 	@Override
 	@Transactional
-	public Map<String, Object> createUpdateSalesOrderShort(SalesOrderShortCloseDTO salesOrderShortCloseDTO,
-			MultipartFile[] files) throws ApplicationException {
+	public Map<String, Object> createUpdateSalesOrderShort(SalesOrderShortCloseDTO salesOrderShortCloseDTO)
+			throws ApplicationException {
 
 		SalesOrderShortCloseVO salesOrderShortCloseVO;
 		String message;
@@ -785,9 +782,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		// Save Header
 		salesOrderShortCloseVO = salesOrderShortCloseRepo.save(salesOrderShortCloseVO);
 
-		// Save Attachments
-		saveAttachmentss(files, salesOrderShortCloseVO);
-
 		// Response
 		SalesOrderShortCloseResponseDTO responseDTO = buildSalesOrderShortCloseResponse(salesOrderShortCloseVO);
 
@@ -801,25 +795,23 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	private void createUpdateSalesOrderVOBySalesOrderDTO(SalesOrderShortCloseDTO salesOrderShortCloseDTO,
 			SalesOrderShortCloseVO salesOrderShortCloseVO) throws ApplicationException {
 
-		if (salesOrderShortCloseDTO.getCustomerId() != null && salesOrderShortCloseDTO.getCustomerId() > 0) {
+		if (salesOrderShortCloseDTO.getCustomer() != null && salesOrderShortCloseDTO.getCustomer() != 0) {
 
-			CustomerVO customer = customerRepo.findById(salesOrderShortCloseDTO.getCustomerId())
+			CustomerVO customer = customerRepo.findById(salesOrderShortCloseDTO.getCustomer())
 					.orElseThrow(() -> new ApplicationException("Party Not Found"));
 
-			salesOrderShortCloseVO.setCustomerId(customer);
+			salesOrderShortCloseVO.setCustomer(customer);
 		}
 
 		salesOrderShortCloseVO.setDocId(salesOrderShortCloseDTO.getDocId());
 
-		salesOrderShortCloseVO.setCreatedBy(salesOrderShortCloseDTO.getCreatedBy());
-		salesOrderShortCloseVO.setUpdatedBy(salesOrderShortCloseDTO.getCreatedBy());
 		salesOrderShortCloseVO.setCancelRemarks(salesOrderShortCloseDTO.getCancelRemarks());
 
 		salesOrderShortCloseVO.setOrgId(salesOrderShortCloseDTO.getOrgId());
 
-		if (salesOrderShortCloseDTO.getBranchId() != null && salesOrderShortCloseDTO.getBranchId() > 0) {
+		if (salesOrderShortCloseDTO.getBranch() != null && salesOrderShortCloseDTO.getBranch() != 0) {
 
-			BranchVO branch = branchRepo.findById(salesOrderShortCloseDTO.getBranchId())
+			BranchVO branch = branchRepo.findById(salesOrderShortCloseDTO.getBranch())
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 			salesOrderShortCloseVO.setBranch(branch);
@@ -830,9 +822,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 					.findBySalesOrderShortCloseVO(salesOrderShortCloseVO);
 			salesOrderShortCloseDetailsRepo.deleteAll(taxInvoiceDetailsVO1);
 
-			List<SalesOrderShortCloseFileDetailsVO> taxInvoiceDetailsVO3 = salesOrderShortCloseFileDetailsRepo
-					.findBySalesOrderShortCloseVO(salesOrderShortCloseVO);
-			salesOrderShortCloseFileDetailsRepo.deleteAll(taxInvoiceDetailsVO3);
 		}
 
 		List<SalesOrderShortCloseDetailsVO> itemDetailsList = new ArrayList<>();
@@ -845,9 +834,9 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 				detailsVO.setSalesOrderShortCloseVO(salesOrderShortCloseVO);
 
-				if (dto.getItemId() != null && dto.getItemId() != 0) {
+				if (dto.getItem() != null && dto.getItem() != 0) {
 
-					ItemMasterVO item = itemMasterRepo.findById(dto.getItemId())
+					ItemMasterVO item = itemMasterRepo.findById(dto.getItem())
 							.orElseThrow(() -> new ApplicationException("Item Not Found"));
 
 					detailsVO.setItem(item);
@@ -870,141 +859,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 	}
 
-	@Value("${short.upload.path}")
-	private String uploadPaths;
-
-	private void saveAttachmentss(MultipartFile[] files, SalesOrderShortCloseVO salesOrderShortCloseVO)
-			throws ApplicationException {
-
-		if (files == null || files.length == 0) {
-			return;
-		}
-
-		try {
-
-			Path salesOrderFolder = Paths.get(uploadPath, "salesOrderShortClose",
-					salesOrderShortCloseVO.getId().toString());
-
-			createDirectorys(salesOrderFolder);
-
-			List<SalesOrderShortCloseFileDetailsVO> attachmentList = new ArrayList<>();
-
-			for (MultipartFile file : files) {
-
-				if (file == null || file.isEmpty()) {
-					continue;
-				}
-
-				String originalName = file.getOriginalFilename();
-
-				if (originalName == null) {
-					originalName = "file";
-				}
-
-				// Remove spaces
-				originalName = originalName.replaceAll("\\s+", "_");
-
-				// Extension
-				String extension = "";
-
-				if (originalName.contains(".")) {
-					extension = originalName.substring(originalName.lastIndexOf("."));
-					originalName = originalName.substring(0, originalName.lastIndexOf("."));
-				}
-
-				// File Name
-				String fileName = originalName + "_" + salesOrderShortCloseVO.getId() + extension;
-
-				// Save Path
-				Path filePath = salesOrderFolder.resolve(fileName);
-
-				try (InputStream inputStream = file.getInputStream()) {
-
-					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-				}
-
-				// Base URL
-				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-						.path("/api/orderAcceptance/viewFileSalesOrder/").toUriString();
-
-				String relativePath = "salesOrderShortClose/" + salesOrderShortCloseVO.getId() + "/" + fileName;
-
-				String publicUrl = baseUrl + relativePath;
-
-				SalesOrderShortCloseFileDetailsVO attachment = new SalesOrderShortCloseFileDetailsVO();
-
-				attachment.setSalesOrderShortCloseVO(salesOrderShortCloseVO);
-				attachment.setName(file.getOriginalFilename());
-				attachment.setFileName(fileName);
-				attachment.setFilePath(publicUrl);
-				attachment.setFileSize(file.getSize());
-				attachment.setContentType(file.getContentType());
-				attachment.setUploadOn(LocalDateTime.now());
-
-				attachmentList.add(attachment);
-			}
-
-			List<SalesOrderShortCloseFileDetailsVO> savedAttachments = salesOrderShortCloseFileDetailsRepo
-					.saveAll(attachmentList);
-
-			salesOrderShortCloseVO.setSalesOrderShortCloseFileDetailsVO(savedAttachments);
-
-		} catch (IOException e) {
-
-			throw new ApplicationException("File Upload Failed : " + e.getMessage());
-		}
-	}
-
-	private void createDirectorys(Path path) throws IOException {
-
-		if (!Files.exists(path)) {
-			Files.createDirectories(path);
-		}
-	}
-
-	@Override
-	public ResponseEntity<byte[]> viewSalesOrderShortCloseFile(HttpServletRequest request) throws IOException {
-
-		return serveFiles(request, "/api/orderAcceptance/viewFileSalesOrder/", uploadPath);
-	}
-
-	private ResponseEntity<byte[]> serveFiles(HttpServletRequest request, String apiPrefix, String uploadBasePath)
-			throws IOException {
-
-		String uri = request.getRequestURI();
-
-		String relativePath = uri.replace(apiPrefix, "");
-
-		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
-
-		if (relativePath.startsWith("uploads/")) {
-			relativePath = relativePath.substring("uploads/".length());
-		}
-
-		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
-
-		Path filePath = baseDir.resolve(relativePath).normalize();
-
-		if (!filePath.startsWith(baseDir)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
-
-		if (!Files.exists(filePath)) {
-			return ResponseEntity.notFound().build();
-		}
-
-		String contentType = Files.probeContentType(filePath);
-
-		if (contentType == null) {
-			contentType = "application/octet-stream";
-		}
-
-		byte[] data = Files.readAllBytes(filePath);
-
-		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
-				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
-	}
-
 	private SalesOrderShortCloseResponseDTO buildSalesOrderShortCloseResponse(
 			SalesOrderShortCloseVO salesOrderShortCloseVO) {
 
@@ -1022,13 +876,13 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setOrgId(salesOrderShortCloseVO.getOrgId());
 		responseDTO.setFinancialYear(salesOrderShortCloseVO.getFinancialYear());
 
-		if (salesOrderShortCloseVO.getCustomerId() != null) {
+		if (salesOrderShortCloseVO.getCustomer() != null) {
 
 			CustomerResponseDetailsDTO customerDTO = new CustomerResponseDetailsDTO();
 
-			customerDTO.setId(salesOrderShortCloseVO.getCustomerId().getId());
-			customerDTO.setCustomerName(salesOrderShortCloseVO.getCustomerId().getCustomerName());
-			customerDTO.setCustomerCode(salesOrderShortCloseVO.getCustomerId().getCustomerCode());
+			customerDTO.setId(salesOrderShortCloseVO.getCustomer().getId());
+			customerDTO.setCustomerName(salesOrderShortCloseVO.getCustomer().getCustomerName());
+			customerDTO.setCustomerCode(salesOrderShortCloseVO.getCustomer().getCustomerCode());
 			responseDTO.setCustomerId(customerDTO);
 		}
 
@@ -1040,7 +894,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			branch.setBranchCode(salesOrderShortCloseVO.getBranch().getBranchCode());
 			branch.setBranchName(salesOrderShortCloseVO.getBranch().getBranchName());
 
-			responseDTO.setBranchId(branch);
+			responseDTO.setBranch(branch);
 		}
 
 		List<SalesOrderShortCloseDetailsResponseDTO> detailsResponseList = new ArrayList<>();
@@ -1076,29 +930,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		}
 
 		responseDTO.setSalesOrderShortCloseDetailsResponseDTO(detailsResponseList);
-
-		List<SalesOrderShortCloseFileDetailsResponseDTO> fileResponseList = new ArrayList<>();
-
-		if (salesOrderShortCloseVO.getSalesOrderShortCloseFileDetailsVO() != null
-				&& !salesOrderShortCloseVO.getSalesOrderShortCloseFileDetailsVO().isEmpty()) {
-
-			for (SalesOrderShortCloseFileDetailsVO fileVO : salesOrderShortCloseVO
-					.getSalesOrderShortCloseFileDetailsVO()) {
-
-				SalesOrderShortCloseFileDetailsResponseDTO fileDTO = new SalesOrderShortCloseFileDetailsResponseDTO();
-
-				fileDTO.setId(fileVO.getId());
-				fileDTO.setName(fileVO.getName());
-				fileDTO.setFileName(fileVO.getFileName());
-				fileDTO.setFilePath(fileVO.getFilePath());
-				fileDTO.setFileSize(fileVO.getFileSize());
-				fileDTO.setUploadOn(fileVO.getUploadOn());
-
-				fileResponseList.add(fileDTO);
-			}
-		}
-
-		responseDTO.setSalesOrderShortCloseFileDetailsResponseDTO(fileResponseList);
 
 		return responseDTO;
 

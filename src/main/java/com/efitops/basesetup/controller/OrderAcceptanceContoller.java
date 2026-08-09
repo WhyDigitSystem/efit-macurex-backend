@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -76,8 +77,7 @@ public class OrderAcceptanceContoller extends BaseController {
 	}
 
 	@GetMapping("/getOrderAcceptanceByOrgId")
-	public ResponseEntity<ResponseDTO> getOrderAcceptanceByOrgId(@RequestParam Long orgId,
-			@RequestParam Long branchId) {
+	public ResponseEntity<ResponseDTO> getOrderAcceptanceByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
 
 		String methodName = "getOrderAcceptanceByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -88,7 +88,7 @@ public class OrderAcceptanceContoller extends BaseController {
 		try {
 
 			List<OrderAcceptanceResponseDTO> orderAcceptanceResponseDTO = orderAcceptanceService
-					.getOrderAcceptanceByOrgId(orgId, branchId);
+					.getOrderAcceptanceByOrgId(orgId, branch);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order information retrieved successfully");
 
@@ -179,7 +179,7 @@ public class OrderAcceptanceContoller extends BaseController {
 
 	@GetMapping("/getSalesOrderShortCloseByOrgId")
 	public ResponseEntity<ResponseDTO> getSalesOrderShortCloseByOrgId(@RequestParam Long orgId,
-			@RequestParam Long branchId) {
+			@RequestParam Long branch) {
 
 		String methodName = "getSalesOrderShortCloseByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -190,7 +190,7 @@ public class OrderAcceptanceContoller extends BaseController {
 		try {
 
 			List<SalesOrderShortCloseResponseDTO> salesOrderShortCloseResponseDTO = orderAcceptanceService
-					.getSalesOrderShortCloseByOrgId(orgId, branchId);
+					.getSalesOrderShortCloseByOrgId(orgId, branch);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order information retrieved successfully");
 
@@ -211,11 +211,9 @@ public class OrderAcceptanceContoller extends BaseController {
 		return ResponseEntity.ok(responseDTO);
 	}
 
-	@PutMapping(value = "/createUpdateSalesOrderShort", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PutMapping(value = "/createUpdateSalesOrderShort")
 	public ResponseEntity<ResponseDTO> createUpdateSalesOrderShort(
-			@RequestPart("salesOrderShort") SalesOrderShortCloseDTO salesOrderShortCloseDTO,
-//			@RequestBody SalesOrderShortCloseDTO salesOrderShortCloseDTO,
-			@RequestPart(value = "files", required = false) MultipartFile[] files) {
+			@RequestBody SalesOrderShortCloseDTO salesOrderShortCloseDTO) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO;
@@ -223,7 +221,7 @@ public class OrderAcceptanceContoller extends BaseController {
 		try {
 
 			Map<String, Object> quotationMap = orderAcceptanceService
-					.createUpdateSalesOrderShort(salesOrderShortCloseDTO, files);
+					.createUpdateSalesOrderShort(salesOrderShortCloseDTO);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, quotationMap.get("message"));
 
@@ -246,12 +244,6 @@ public class OrderAcceptanceContoller extends BaseController {
 	public ResponseEntity<byte[]> viewFile(HttpServletRequest request) throws IOException {
 
 		return orderAcceptanceService.viewOrderAcceptanceFile(request);
-	}
-
-	@GetMapping("/viewFileSalesOrder/**")
-	public ResponseEntity<byte[]> viewFileSalesOrder(HttpServletRequest request) throws IOException {
-
-		return orderAcceptanceService.viewSalesOrderShortCloseFile(request);
 	}
 
 	@GetMapping("/getOrderAcceptanceItemDetails")

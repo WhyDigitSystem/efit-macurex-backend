@@ -33,17 +33,15 @@ public interface OrderAcceptanceService {
 	List<SalesOrderShortCloseResponseDTO> getSalesOrderShortCloseByOrgId(Long orgId, Long branchId)
 			throws ApplicationException;
 
-	Map<String, Object> createUpdateSalesOrderShort(SalesOrderShortCloseDTO salesOrderShortCloseDTO,
-			MultipartFile[] files) throws ApplicationException;
-
 	ResponseEntity<byte[]> viewOrderAcceptanceFile(HttpServletRequest request) throws IOException;
-
-	ResponseEntity<byte[]> viewSalesOrderShortCloseFile(HttpServletRequest request) throws IOException;
 
 	List<OrderAcceptanceItemDropdownResponseDTO> getOrderAcceptanceItemDetails(Long orgId, Long branch)
 			throws ApplicationException;
 
 	List<ShortCloseItemResponseDTO> getSalesOrderItemDetails(Long orgId, Long branch, String docId)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateSalesOrderShort(SalesOrderShortCloseDTO salesOrderShortCloseDTO)
 			throws ApplicationException;
 
 }

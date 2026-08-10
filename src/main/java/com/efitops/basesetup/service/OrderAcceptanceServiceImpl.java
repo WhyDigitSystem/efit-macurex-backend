@@ -1025,8 +1025,14 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		dto.setOrderAccptanceId(((Number) obj[0]).longValue());
 		dto.setDocId((String) obj[1]);
-		dto.setDocDate((LocalDate) obj[2]);
 
+		if (obj[2] != null) {
+			if (obj[2] instanceof java.sql.Date) {
+				dto.setDocDate(((java.sql.Date) obj[2]).toLocalDate());
+			} else if (obj[2] instanceof LocalDate) {
+				dto.setDocDate((LocalDate) obj[2]);
+			}
+		}
 		return dto;
 	}
 

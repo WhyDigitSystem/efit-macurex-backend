@@ -1,6 +1,7 @@
 package com.efitops.basesetup.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -54,10 +55,7 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			""", nativeQuery = true)
 	List<Object[]> getQuotationDropdown(String customerCode, String ctype, Long orgId, Long branch,
 			String oldQuotationNo, Long recId);
-					
-					@Query(value = "SELECT * FROM sales_contract_basic WHERE active = true AND cancel = false ORDER BY customer_contract_no", nativeQuery = true)
-					List<SalesContractVO> getContractNo();
-             
+
 	@Query(value = """
 											SELECT
 			    i.item_id,
@@ -92,52 +90,46 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			  AND q.branch = ?3
 			  AND q.cancel = 0
 			ORDER BY i.item_code;
-											""", nativeQuery = true)
+			""", nativeQuery = true)
 	List<Object[]> getQuotationItemDropdown(String quotationNo, Long orgId, Long branch);
 
-
-			@Query(value = """
-					SELECT
-					    i.item_id,
-					    i.item_code,
-					    i.item_description,
-					    h.hsn,
-					    i.customer_part_no
-					FROM quotation q
-					INNER JOIN quotationitemdetails qd
-					    ON q.quotation_id = qd.quotation_id
-					INNER JOIN item i
-					    ON i.item_id = qd.item_code
-					INNER JOIN hsn h
-					    ON h.hsn_id = i.hsn_code
-					WHERE q.doc_id = ?1
-					  AND q.org_id = ?2
-					  AND q.branch = ?3
-					  AND q.cancel = 0
-					ORDER BY i.item_code
-					""", nativeQuery = true)
-					List<Object[]> getQuotationItemDropdown(String quotationNo, Long orgId, Long branch);
-					
-					@Query(value = """
-					        SELECT *
-					        FROM sales_contract_basic
-					        WHERE cancel = 0
-					          AND active = 1
-					        ORDER BY customer_contract_no
-					        """, nativeQuery = true)
-				
-
-			List<SalesContractVO> getContractNo();
+	@Query(value = """
+			SELECT *
+			FROM sales_contract_basic
+			WHERE cancel = 0
+			  AND active = 1
+			ORDER BY customer_contract_no
+			""", nativeQuery = true)
+	List<SalesContractVO> getContractNo();
+	
+	@Query(value = "SELECT customer_contract_no AS docId, invoice_type AS invoiceType " +
+            "FROM sales_contract_basic " +
+            "WHERE cancel = 0 " +
+            "AND active = 1 " +
+            "AND org_id = :orgId " +
+            "AND branch = :branch " +
+            "UNION ALL " +
+            "SELECT doc_id AS docId, so_type AS invoiceType " +
+            "FROM orderacceptance " +
+            "WHERE cancel = 0 " +
+            "AND active = 1 " +
+            "AND org_id = :orgId " +
+            "AND branch = :branch " +
+            "ORDER BY docId",
+    nativeQuery = true)
+List<Map<String, Object>> getDocIdAndInvoiceType(
+     @Param("orgId") Long orgId,
+     @Param("branch") Long branch);
+	
 
 	@Query(value = """
-	        SELECT *
-	        FROM sales_contract_basic
-	        WHERE org_id = :orgId
-	          AND branch = :branch
-	          AND cancel = 0 and active=1
-	        ORDER BY salescontract_id DESC
-	        """, nativeQuery = true)
-	List<SalesContractVO> findByOrgIdAndBranch(@Param("orgId") Long orgId,
-	                                           @Param("branch") Long branch);
-}
+			SELECT *
+			FROM sales_contract_basic
+			WHERE org_id = :orgId
+			  AND branch = :branch
+			  AND cancel = 0 and active=1
+			ORDER BY salescontract_id DESC
+			""", nativeQuery = true)
+	List<SalesContractVO> findByOrgIdAndBranch(@Param("orgId") Long orgId, @Param("branch") Long branch);
 
+}

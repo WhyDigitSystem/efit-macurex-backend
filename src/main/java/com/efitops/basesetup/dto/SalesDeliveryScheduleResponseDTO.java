@@ -3,6 +3,8 @@ package com.efitops.basesetup.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
+
 import lombok.Data;
 
 @Data
@@ -14,23 +16,17 @@ public class SalesDeliveryScheduleResponseDTO {
 
     private LocalDate dlvDate;
 
-    private Long branchId;
-
-    private String branchName;
+    private BranchResponseDTO branch;
 
     private String monthOfSchedule;
 
     private String belongsTo;
 
     private String monthYear;
-    
+
     private String remarks;
 
-    private Long customerId;
-
-    private String customerCode;
-
-    private String customerName;
+    private CustomerDropdownResponseDTO customer;
 
     private Long orgId;
 
@@ -49,10 +45,6 @@ public class SalesDeliveryScheduleResponseDTO {
     private String screenCode;
 
     private String screenName;
-    
+
     private List<SalesDeliveryScheduleDetailsResponseDTO> details;
-    
-    private List<SalesDeliverySchedulePlanResponseDTO> deliverySchedules;
-    
-    
 }

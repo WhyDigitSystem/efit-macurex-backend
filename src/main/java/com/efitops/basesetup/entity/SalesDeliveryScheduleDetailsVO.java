@@ -15,22 +15,21 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.Data;
 
 @Entity
-@Table(name = "sales_delivery_schedule_details")
+@Table(name = "sdvdet")
 @Data
 public class SalesDeliveryScheduleDetailsVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sales_delivery_schedule_details_seq")
-    @SequenceGenerator(name = "sales_delivery_schedule_details_seq",sequenceName = "sales_delivery_schedule_details_seq", allocationSize = 1)
-    @Column(name = "sales_delivery_schedule_details_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sdvdet_seq")
+    @SequenceGenerator(name = "sdvdet_seq",sequenceName = "sdvdet_seq", allocationSize = 1)
+    @Column(name = "sdvdet_id")
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "sales_delivery_schedule_id")
-    private SalesDeliveryScheduleVO salesDeliverySchedule;
 
     // Sales Contract Header
     @ManyToOne
@@ -50,9 +49,15 @@ public class SalesDeliveryScheduleDetailsVO {
     @Column(name = "actual_planned_qty")
     private Double actualPlannedQty;
     
+    @ManyToOne
+    @JoinColumn(name = "sdvbasic_id")
+    @JsonBackReference
+    private SalesDeliveryScheduleVO salesDeliverySchedule;
+    
     @OneToMany(
             mappedBy = "salesDeliveryScheduleDetails",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
+    @JsonManagedReference
     private List<SalesDeliverySchedulePlanVO> deliverySchedules = new ArrayList<>();
 }

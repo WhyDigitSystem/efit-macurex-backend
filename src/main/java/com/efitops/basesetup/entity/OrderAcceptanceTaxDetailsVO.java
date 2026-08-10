@@ -42,7 +42,7 @@ public class OrderAcceptanceTaxDetailsVO {
 
 	@ManyToOne
 	@JsonBackReference
-	@JoinColumn(name = "order_accptance_basic_id")
+	@JoinColumn(name = "order_acceptance_basic_id")
 	OrderAcceptanceVO orderAcceptanceVO;
 
 }

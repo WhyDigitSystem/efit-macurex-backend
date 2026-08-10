@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.OrderAcceptanceDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceDocIdResponseDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceItemDetailsResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceItemDropdownResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceResponseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
@@ -321,6 +323,88 @@ public class OrderAcceptanceContoller extends BaseController {
 		} else {
 
 			responseDTO = createServiceResponseError(responseObjectsMap, "Order fetch failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getOrderAcceptanceDocIdDetails")
+	public ResponseEntity<ResponseDTO> getOrderAcceptanceDocIdDetails(@RequestParam(required = false) Long customer,
+			@RequestParam(required = false) String docId) {
+
+		String methodName = "getOrderAcceptanceDocIdDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		List<OrderAcceptanceDocIdResponseDTO> itemList = new ArrayList<>();
+
+		try {
+
+			itemList = orderAcceptanceService.getOrderAcceptanceDocIdDetails(customer, docId);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (errorMsg == null || errorMsg.trim().isEmpty()) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order docId fetched successfully");
+			responseObjectsMap.put("items", itemList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Order docId fetch failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getOrderAcceptanceItemDetailsDetails")
+	public ResponseEntity<ResponseDTO> getOrderAcceptanceItemDetailsDetails(
+			@RequestParam(required = false) String docId) {
+
+		String methodName = "getOrderAcceptanceItemDetailsDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		List<OrderAcceptanceItemDetailsResponseDTO> itemList = new ArrayList<>();
+
+		try {
+
+			itemList = orderAcceptanceService.getOrderAcceptanceItemDetailsDetails(docId);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (errorMsg == null || errorMsg.trim().isEmpty()) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order docId fetched successfully");
+			responseObjectsMap.put("items", itemList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Order docId fetch failed", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

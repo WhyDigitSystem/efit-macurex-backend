@@ -41,7 +41,9 @@ import com.efitops.basesetup.dto.ItemMasterResponseTaxDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDetailsDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDetailsResponseDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceDocIdResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceFileUploadDetailsDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceItemDetailsResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceItemDropdownResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceTaxDetailsDTO;
@@ -342,8 +344,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				detailsVO.setDiscount(dto.getDiscount());
 
 				detailsVO.setOrderAmount(dto.getQuantity().multiply(dto.getOrderRate()));
-
-				detailsVO.setDiscount(dto.getDiscount());
 
 				detailsVO.setTaxType(dto.getTaxType());
 
@@ -803,6 +803,14 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			salesOrderShortCloseVO.setCustomer(customer);
 		}
 
+		if (salesOrderShortCloseDTO.getSaleOrderNo() != null && salesOrderShortCloseDTO.getSaleOrderNo() > 0) {
+
+			OrderAcceptanceVO customer = orderAcceptanceRepo.findById(salesOrderShortCloseDTO.getSaleOrderNo())
+					.orElseThrow(() -> new ApplicationException("Party Not Found"));
+
+			salesOrderShortCloseVO.setSaleOrderNo(customer);
+		}
+
 		salesOrderShortCloseVO.setDocId(salesOrderShortCloseDTO.getDocId());
 
 		salesOrderShortCloseVO.setCancelRemarks(salesOrderShortCloseDTO.getCancelRemarks());
@@ -993,6 +1001,59 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		dto.setItemCode((String) obj[1]);
 		dto.setItemDescription((String) obj[2]);
 
+		return dto;
+	}
+
+	@Override
+	public List<OrderAcceptanceDocIdResponseDTO> getOrderAcceptanceDocIdDetails(Long customer, String docId)
+			throws ApplicationException {
+
+		List<Object[]> itemList = salesOrderShortCloseRepo.getOrderAcceptanceDocIdDetails(customer, docId);
+
+		List<OrderAcceptanceDocIdResponseDTO> responseList = new ArrayList<>();
+
+		for (Object[] obj : itemList) {
+			responseList.add(mapToDocIdDTOs(obj));
+		}
+
+		return responseList;
+	}
+
+	private OrderAcceptanceDocIdResponseDTO mapToDocIdDTOs(Object[] obj) {
+
+		OrderAcceptanceDocIdResponseDTO dto = new OrderAcceptanceDocIdResponseDTO();
+
+		dto.setOrderAccptanceId(((Number) obj[0]).longValue());
+		dto.setDocId((String) obj[1]);
+		dto.setDocDate((LocalDate) obj[2]);
+
+		return dto;
+	}
+
+	@Override
+	public List<OrderAcceptanceItemDetailsResponseDTO> getOrderAcceptanceItemDetailsDetails(String docId)
+			throws ApplicationException {
+
+		List<Object[]> itemList = salesOrderShortCloseRepo.getOrderAcceptanceItemDetailsDetails(docId);
+
+		List<OrderAcceptanceItemDetailsResponseDTO> responseList = new ArrayList<>();
+
+		for (Object[] obj : itemList) {
+			responseList.add(mapToDocIdDTOss(obj));
+		}
+
+		return responseList;
+	}
+
+	private OrderAcceptanceItemDetailsResponseDTO mapToDocIdDTOss(Object[] obj) {
+
+		OrderAcceptanceItemDetailsResponseDTO dto = new OrderAcceptanceItemDetailsResponseDTO();
+
+		dto.setItemId(((Number) obj[0]).longValue());
+		dto.setItemCode((String) obj[1]);
+		dto.setItemDescitpion((String) obj[2]);
+		dto.setOrderId(((Number) obj[3]).longValue());
+		dto.setQuantity(((BigDecimal) obj[3]));
 		return dto;
 	}
 

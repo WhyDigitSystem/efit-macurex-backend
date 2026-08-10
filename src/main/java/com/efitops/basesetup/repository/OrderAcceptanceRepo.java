@@ -12,12 +12,12 @@ import com.efitops.basesetup.entity.QuotationVO;
 @Repository
 public interface OrderAcceptanceRepo extends JpaRepository<OrderAcceptanceVO, Long> {
 
-	@Query(nativeQuery = true, value = "select * from orderacceptance where orderacceptance_id=?1 and active=1 and cancel=0")
+	@Query(nativeQuery = true, value = "select * from order_acceptance_basic where order_acceptance_basic_id=?1 and active=1 and cancel=0")
 	OrderAcceptanceVO getOrderAcceptanceById(Long id);
 
 	QuotationVO findByDocId(String docId);
 
-	@Query(nativeQuery = true, value = "select * from orderacceptance where org_id=?1  and branch=?2 and active=1 and cancel=0")
+	@Query(nativeQuery = true, value = "select * from order_acceptance_basic where org_id=?1  and branch=?2 and active=1 and cancel=0")
 	List<OrderAcceptanceVO> getQuotationByOrgId(Long orgId, Long branchId);
 
 	@Query(value = "SELECT\r\n" + "		    i.item_id,\r\n" + "		    i.item_code,\r\n"

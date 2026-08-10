@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.dto.OrderAcceptanceDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceDocIdResponseDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceItemDetailsResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceItemDropdownResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDTO;
@@ -42,6 +44,12 @@ public interface OrderAcceptanceService {
 			throws ApplicationException;
 
 	Map<String, Object> createUpdateSalesOrderShort(SalesOrderShortCloseDTO salesOrderShortCloseDTO)
+			throws ApplicationException;
+
+	List<OrderAcceptanceDocIdResponseDTO> getOrderAcceptanceDocIdDetails(Long customer, String docId)
+			throws ApplicationException;
+
+	List<OrderAcceptanceItemDetailsResponseDTO> getOrderAcceptanceItemDetailsDetails(String docId)
 			throws ApplicationException;
 
 }

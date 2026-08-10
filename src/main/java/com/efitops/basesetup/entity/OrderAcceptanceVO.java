@@ -27,16 +27,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "order_accptance_basic")
+@Table(name = "order_acceptance_basic")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderAcceptanceVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_accptance_basicgen")
-	@SequenceGenerator(name = "order_accptance_basicgen", sequenceName = "order_accptance_basicseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "order_accptance_basic_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_acceptance_basicgen")
+	@SequenceGenerator(name = "order_accptance_basicgen", sequenceName = "order_acceptance_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "order_acceptance_basic_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "doc_id")

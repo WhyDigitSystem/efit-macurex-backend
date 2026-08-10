@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class CustomerResponseDetailsDTO {
 	private Long id;
 	private String customerName;
+	private String customerCode;
 
 }

@@ -50,7 +50,7 @@ public class EnquiryVO {
 
 	@ManyToOne
 	@JoinColumn(name = "contact_name")
-	private CustomerContactDetailsVO contactName;
+	private EmployeeMasterVO contactName;
 
 	@Column(name = "enquiry_type")
 	private String enquiryType;

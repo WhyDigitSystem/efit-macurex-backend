@@ -17,7 +17,8 @@ public class EnquiryDetailsDTO {
 
     private Long id;
 
-    private Long itemcode;
+    private String itemcode;
+    private String itemDescription;
 
     private Integer annualquantity;
 

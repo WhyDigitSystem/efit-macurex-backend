@@ -21,16 +21,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "quotationiemfileuploaddetails")
+@Table(name = "quotation_attach")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class QuotationIemFileUploadDetailsVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quotationiemfileuploaddetailsgen")
-	@SequenceGenerator(name = "quotationiemfileuploaddetailsgen", sequenceName = "quotationiemfileuploaddetailsseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "quotationiemfileuploaddetails_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quotation_attachgen")
+	@SequenceGenerator(name = "quotation_attachgen", sequenceName = "quotation_attachseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "quotation_attach_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "file_size")
@@ -48,8 +48,8 @@ public class QuotationIemFileUploadDetailsVO {
 	@Column(name = "file_path")
 	private String filePath;
 	
-	@Column(name = "file_url")
-	private String fileUrl;
+//	@Column(name = "file_url")
+//	private String fileUrl;
 
 	@Column(name = "name")
 	private String name;

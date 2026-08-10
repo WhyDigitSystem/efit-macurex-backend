@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,41 +15,73 @@ import java.util.UUID;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DespatchInstDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DespatchInstructionResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocketInvoiceDetResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
+import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.CustomerComplaintDTO;
 import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
+import com.efitops.basesetup.dto.DespatchInstructionDTO;
+import com.efitops.basesetup.dto.DespatchInstructionDetailsDTO;
+import com.efitops.basesetup.dto.DocketInvoiceDTO;
+import com.efitops.basesetup.dto.DocketInvoiceDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractAmdDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
+import com.efitops.basesetup.entity.DespatchInstructionDetailsVO;
+import com.efitops.basesetup.entity.DespatchInstructionVO;
+import com.efitops.basesetup.entity.DocketInvoiceDetailsVO;
+import com.efitops.basesetup.entity.DocketInvoiceVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.SalesContractAmdDetailsVO;
 import com.efitops.basesetup.entity.SalesContractAmendmentVO;
+import com.efitops.basesetup.entity.SalesContractVO;
+import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerComplaintRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
+import com.efitops.basesetup.repository.DespatchInstructionDetailsRepo;
+import com.efitops.basesetup.repository.DespatchInstructionRepo;
+import com.efitops.basesetup.repository.DocketInvoiceDetRepo;
+import com.efitops.basesetup.repository.DocketInvoiceRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.SalesContractAmdDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractAmdRepo;
+import com.efitops.basesetup.repository.SalesContractRepo;
+import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.security.TokenProvider;
 
-@Service
+@Service 
 public class TransportMasterServiceImpl implements TransportMasterService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransportMasterServiceImpl.class);
+
 
 	private final TokenProvider tokenProvider;
 	@Autowired
@@ -76,6 +109,30 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	@Autowired
 	private ItemMasterRepo itemMasterRepo;
+	
+	@Autowired
+	private SalesContractRepo salesContractRepo;
+	
+	@Autowired
+	private DespatchInstructionRepo despatchInstructionRepo;
+	
+	@Autowired
+	private DespatchInstructionDetailsRepo despatchInstructionDetailsRepo;
+	
+	@Autowired
+	private CurrencyRepo CurrencyRepo;
+	
+	@Autowired
+	private LocationRepo locationRepo;
+	
+	@Autowired
+	private DocketInvoiceRepo docketInvoiceRepo;
+	
+	@Autowired
+	private DocketInvoiceDetRepo docketInvoiceDetRepo;
+	
+	@Autowired
+	private TransportRepo transportRepo;
 
 	TransportMasterServiceImpl(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
@@ -85,9 +142,11 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateCustomerComplaint(CustomerComplaintDTO customerComplaintDTO)
-			throws ApplicationException {
-
+	
+	public Map<String, Object> updateCreateCustomerComplaint(
+	        CustomerComplaintDTO customerComplaintDTO,
+	        MultipartFile[] images)
+	        throws ApplicationException {
 		CustomerComplaintEntryVO customerComplaintEntryVO = new CustomerComplaintEntryVO();
 		String message;
 
@@ -113,6 +172,13 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		}
 
 		CustomerComplaintEntryVO savedCustomerComplaint = customerComplaintRepo.save(customerComplaintEntryVO);
+		
+		// Save Images
+		saveImages(images, savedCustomerComplaint);
+
+		// Reload latest data
+		savedCustomerComplaint = customerComplaintRepo.findById(savedCustomerComplaint.getId())
+		        .orElseThrow(() -> new ApplicationException("Customer Complaint Not Found"));
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", message);
@@ -266,51 +332,55 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			customerComplaintEntryVO.setItem(item);
 		}
+	}
 		// ================= IMAGE UPLOAD =================
+	@Value("${customer.complaint.upload.path}")
+	private String uploadPath;
+	private void saveImages(MultipartFile[] images,
+	        CustomerComplaintEntryVO customerComplaintEntryVO)
+	        throws ApplicationException {
 
-		if (customerComplaintDTO.getImages() != null && customerComplaintDTO.getImages().length > 0) {
+	    if (images == null || images.length == 0) {
+	        return;
+	    }
 
-			for (MultipartFile file : customerComplaintDTO.getImages()) {
+	    try {
 
-			}
+	        File folder = new File(uploadPath);
 
-			List<String> imageNames = new ArrayList<>();
+	        if (!folder.exists()) {
+	            folder.mkdirs();
+	        }
 
-			String uploadPath = "C:/Uploads/Complaint/";
+	        List<String> imageNames = new ArrayList<>();
 
-			File directory = new File(uploadPath);
+	        for (MultipartFile image : images) {
 
-			if (!directory.exists()) {
-				directory.mkdirs();
-			}
+	            if (image == null || image.isEmpty()) {
+	                continue;
+	            }
 
-			for (MultipartFile file : customerComplaintDTO.getImages()) {
+	            String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
 
-				if (file.isEmpty()) {
-					continue;
-				}
+	            Path path = Paths.get(uploadPath, fileName);
 
-				try {
+	            Files.copy(
+	                    image.getInputStream(),
+	                    path,
+	                    StandardCopyOption.REPLACE_EXISTING);
 
-					String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+	            imageNames.add(fileName);
+	        }
 
-					Path path = Paths.get(uploadPath + fileName);
+	        // Save all image names as comma-separated values
+	        customerComplaintEntryVO.setImage(String.join(",", imageNames));
 
-					Files.write(path, file.getBytes());
+	        customerComplaintRepo.save(customerComplaintEntryVO);
 
-					imageNames.add(fileName);
+	    } catch (IOException e) {
 
-				} catch (IOException e) {
-
-					e.printStackTrace(); // <-- Add this
-
-					throw new ApplicationException("Unable To Upload Image : " + e.getMessage());
-
-				}
-			}
-
-			customerComplaintEntryVO.setImage(String.join(",", imageNames));
-		}
+	        throw new ApplicationException("Image Upload Failed : " + e.getMessage());
+	    }
 	}
 
 	@Override
@@ -364,11 +434,11 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	// dropdown api
 	@Override
 
-	public Map<String, Object> getPreparedBy(Long departmentId) throws ApplicationException {
+	public Map<String, Object> getPreparedBy(Long orgId, Long branch ,Long departmentId) throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> employeeList = employeeMasterRepo.getPreparedBy(departmentId);
+		List<Object[]> employeeList = employeeMasterRepo.getPreparedBy(orgId , branch , departmentId);
 
 		List<Map<String, Object>> preparedByList = new ArrayList<>();
 
@@ -389,154 +459,64 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	}
 
 	// dropdown for item
-	@Override
-	public Map<String, Object> getItem() throws ApplicationException {
-
-		List<Object[]> list = itemMasterRepo.getItem();
-
-		List<Map<String, Object>> responseList = new ArrayList<>();
-
-		for (Object[] obj : list) {
-
-			Map<String, Object> map = new HashMap<>();
-
-			map.put("id", obj[0]);
-			map.put("itemCode", obj[1]);
-
-			responseList.add(map);
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("itemList", responseList);
-
-		return response;
-	}
 
 	@Override
-	public Map<String, Object> getItemDetails(Long itemId) throws ApplicationException {
+	public Map<String, Object> getCustomerComplaintItemDetails(Long orgId, Long branch)
+	        throws ApplicationException {
 
-		List<Object[]> list = itemMasterRepo.getItemDetails(itemId);
+	    List<Object[]> list = itemMasterRepo.getCustomerComplaintItemDetails(orgId, branch);
 
-		if (list == null || list.isEmpty()) {
-			throw new ApplicationException("Item Not Found");
-		}
+	    List<Map<String, Object>> itemList = new ArrayList<>();
 
-		Object[] obj = list.get(0);
+	    for (Object[] obj : list) {
 
-		Map<String, Object> itemMap = new HashMap<>();
+	        Map<String, Object> itemMap = new HashMap<>();
 
-		itemMap.put("id", obj[0]);
-		itemMap.put("itemCode", obj[1]);
-		itemMap.put("itemDescription", obj[2]);
-		itemMap.put("customerPartNo", obj[3]);
+	        itemMap.put("id", obj[0]);
+	        itemMap.put("itemCode", obj[1]);
+	        itemMap.put("itemDescription", obj[2]);
+	        itemMap.put("customerPartNo", obj[3]);
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("itemDetails", itemMap);
+	        itemList.add(itemMap);
+	    }
 
-		return response;
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("itemDetails", itemList);
+
+	    return response;
 	}
 
 	// dropdown for branch
 
 	@Override
-	public Map<String, Object> getBranch() throws ApplicationException {
+	public Map<String, Object> getAllBranch(Long orgId) throws ApplicationException {
 
-		List<Object[]> list = branchRepo.getBranch();
+	    List<Object[]> list = branchRepo.getAllBranch(orgId);
 
-		List<Map<String, Object>> responseList = new ArrayList<>();
+	    List<Map<String, Object>> responseList = new ArrayList<>();
 
-		for (Object[] obj : list) {
+	    for (Object[] obj : list) {
 
-			Map<String, Object> map = new HashMap<>();
+	        Map<String, Object> map = new HashMap<>();
 
-			map.put("id", obj[0]);
-			map.put("branchCode", obj[1]);
-			map.put("branchName", obj[2]);
+	        map.put("id", obj[0]);
+	        map.put("branchCode", obj[1]);
+	        map.put("branchName", obj[2]);
 
-			responseList.add(map);
-		}
+	        responseList.add(map);
+	    }
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("branchList", responseList);
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("branchList", responseList);
 
-		return response;
+	    return response;
 	}
 
-	// belongs to dropdown
+	
 	@Override
-	public Map<String, Object> getTypeDropdown() throws ApplicationException {
+	public Map<String, Object> getCustomerDetails(Long orgId , Long branch) throws ApplicationException {
 
-		List<Object[]> list = customerComplaintRepo.getTypeDropdown();
-
-		List<Map<String, Object>> responseList = new ArrayList<>();
-
-		for (Object[] obj : list) {
-
-			Map<String, Object> map = new HashMap<>();
-			map.put("type", obj[0]);
-
-			responseList.add(map);
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("typeList", responseList);
-
-		return response;
-	}
-
-	// department dropdown
-
-	@Override
-	public Map<String, Object> getDepartment() throws ApplicationException {
-
-		List<Object[]> list = departmentRepo.getDepartment();
-
-		List<Map<String, Object>> responseList = new ArrayList<>();
-
-		for (Object[] obj : list) {
-
-			Map<String, Object> map = new HashMap<>();
-
-			map.put("id", obj[0]);
-			map.put("departmentName", obj[1]);
-
-			responseList.add(map);
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("departmentList", responseList);
-
-		return response;
-	}
-
-	// dropdown for cuatomer
-	@Override
-	public Map<String, Object> getCustomer() throws ApplicationException {
-
-		List<Object[]> list = customerRepo.getCustomer();
-
-		List<Map<String, Object>> responseList = new ArrayList<>();
-
-		for (Object[] obj : list) {
-
-			Map<String, Object> map = new HashMap<>();
-
-			map.put("customerId", obj[0]);
-			map.put("customerName", obj[1]);
-
-			responseList.add(map);
-		}
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("customerList", responseList);
-
-		return response;
-	}
-
-	@Override
-	public Map<String, Object> getCustomerDetails(String customerId) throws ApplicationException {
-
-		List<Object[]> list = customerRepo.getCustomerDetails(customerId);
+		List<Object[]> list = customerRepo.getCustomerDetails(orgId,branch);
 
 		if (list.isEmpty()) {
 			throw new ApplicationException("Customer Not Found");
@@ -769,4 +749,610 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    return responseList;
 	}
 	
+	//dropdown for sales Contract Amendment
+	
+	@Override
+	public Map<String, Object> getContractNo() throws ApplicationException {
+
+	    String methodName = "getContractNo()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    List<Map<String, Object>> responseList = new ArrayList<>();
+
+	    try {
+
+	        List<SalesContractVO> contractList = salesContractRepo.getContractNo();
+
+	        if (contractList != null && !contractList.isEmpty()) {
+
+	            for (SalesContractVO vo : contractList) {
+
+	                Map<String, Object> map = new HashMap<>();
+
+	                map.put("id", vo.getId());
+	                map.put("contractNo", vo.getCustomerContractNo());
+	                map.put("cust_po_no", vo.getCustomerPoNo());
+	                map.put("cust_po_date", vo.getCustomerPoDate());
+
+	                responseList.add(map);
+	            }
+	        }
+
+	    } catch (Exception e) {
+
+	        LOGGER.error("Error in getContractNoDropdown()", e);
+	        throw new ApplicationException(e.getMessage());
+	    }
+
+	    Map<String, Object> responseMap = new HashMap<>();
+	    responseMap.put("message", "Contract No Dropdown Loaded Successfully");
+	    responseMap.put("contractList", responseList);
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return responseMap;
+	}
+	
+	//Despatch Instruction 
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateDespatchInstruction(
+	        DespatchInstructionDTO despatchInstructionDTO)
+	        throws ApplicationException {
+
+	    DespatchInstructionVO despatchInstructionVO = new DespatchInstructionVO();
+
+	    String message;
+
+	    if (ObjectUtils.isNotEmpty(despatchInstructionDTO.getId())) {
+
+	        despatchInstructionVO = despatchInstructionRepo
+	                .findById(despatchInstructionDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Invalid Despatch Instruction Details"));
+
+	        despatchInstructionVO.setUpdated_By(
+	                despatchInstructionDTO.getCreatedBy());
+
+	        message = "Despatch Instruction Updated Successfully";
+
+	    } else {
+
+	        despatchInstructionVO.setCreatedBy(
+	                despatchInstructionDTO.getCreatedBy());
+
+	        despatchInstructionVO.setUpdated_By(
+	                despatchInstructionDTO.getCreatedBy());
+
+	        message = "Despatch Instruction Created Successfully";
+	    }
+
+	    createUpdateDespatchInstructionVO(
+	            despatchInstructionDTO,
+	            despatchInstructionVO);
+
+	    DespatchInstructionVO savedDespatchInstruction =
+	            despatchInstructionRepo.save(despatchInstructionVO);
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    response.put("message", message);
+
+	    response.put(
+	            "despatchInstructionVO",
+	            despatchInstructionResponse(savedDespatchInstruction));
+
+	    return response;   
+	}
+	private DespatchInstructionResponseDTO despatchInstructionResponse(
+	        DespatchInstructionVO despatchInstructionVO) {
+
+	    DespatchInstructionResponseDTO responseDTO = new DespatchInstructionResponseDTO();
+
+	    responseDTO.setId(despatchInstructionVO.getId());
+	    responseDTO.setDiNo(despatchInstructionVO.getDiNo());
+	    responseDTO.setSchduleNo(despatchInstructionVO.getSchduleNo());
+	    responseDTO.setInvoiceType(despatchInstructionVO.getInvoiceType());
+	    responseDTO.setSchduleDate(despatchInstructionVO.getSchduleDate());
+	    responseDTO.setPaymentTerms(despatchInstructionVO.getPaymentTerms());
+	    responseDTO.setModeOfTransport(despatchInstructionVO.getModeOfTransport());
+	    responseDTO.setNetWeight(despatchInstructionVO.getNetWeight());
+	    responseDTO.setGrossWeight(despatchInstructionVO.getGrossWeight());
+	    responseDTO.setDeliveryInstructions(despatchInstructionVO.getDeliveryInstructions());
+	    responseDTO.setConsignee(despatchInstructionVO.getConsignee());
+
+	    responseDTO.setOrgId(despatchInstructionVO.getOrgId());
+	    responseDTO.setCreatedBy(despatchInstructionVO.getCreatedBy());
+	    responseDTO.setCancelRemarks(despatchInstructionVO.getCancelRemarks());
+	    
+	    if (despatchInstructionVO.getBranch() != null) {
+
+	        BranchResponseDTO branchDTO = new BranchResponseDTO();
+
+	        branchDTO.setId(despatchInstructionVO.getBranch().getId());
+	        branchDTO.setBranchName(despatchInstructionVO.getBranch().getBranchName());
+
+	        responseDTO.setBranch(branchDTO);
+	    }
+
+	    if (despatchInstructionVO.getCustomer() != null) {
+
+	        CurrencyResponseDTO customerDTO = new CurrencyResponseDTO();
+
+	        customerDTO.setId(despatchInstructionVO.getCustomer().getId());
+	        customerDTO.setCurrencyName(despatchInstructionVO.getCustomer().getCurrency());
+
+	        responseDTO.setCurrency(customerDTO);
+	    }
+
+	    if (despatchInstructionVO.getLocation() != null) {
+
+	        LocationMasterResponseDTO locationDTO = new LocationMasterResponseDTO();
+
+	        locationDTO.setId(despatchInstructionVO.getLocation().getId());
+	        locationDTO.setLocationName(despatchInstructionVO.getLocation().getLocationName());
+
+	        responseDTO.setLocation(locationDTO);
+	    }
+
+	    List<DespatchInstDetailsResponseDTO> detailResponseList = new ArrayList<>();
+
+	    if (despatchInstructionVO.getDetails() != null
+	            && !despatchInstructionVO.getDetails().isEmpty()) {
+
+	        for (DespatchInstructionDetailsVO detailVO : despatchInstructionVO.getDetails()) {
+
+	            DespatchInstDetailsResponseDTO detailDTO =
+	                    new DespatchInstDetailsResponseDTO();
+
+	            detailDTO.setOrdAccpContrNo(detailVO.getOrdAccpContrNo());
+	            detailDTO.setDate(detailVO.getDate());
+
+	            if (detailVO.getItem() != null) {
+
+	                ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+
+	                itemDTO.setId(detailVO.getItem().getId());
+	                itemDTO.setItemCode(detailVO.getItem().getItemCode());
+	                
+
+	                detailDTO.setItem(itemDTO);
+	            }
+
+	            
+
+	            detailDTO.setPdi(detailVO.getPdi());
+	            detailDTO.setPdiDate(detailVO.getPdiDate());
+	            detailDTO.setSchduleMonth(detailVO.getSchduleMonth());
+	            detailDTO.setPlannedQty(detailVO.getPlannedQty());
+	            detailDTO.setPendingQty(detailVO.getPendingQty());
+	            detailDTO.setAvailableQty(detailVO.getAvailableQty());
+	            detailDTO.setDescQty(detailVO.getDescQty());
+	            detailDTO.setNoOfPackage(detailVO.getNoOfPackage());
+	            detailDTO.setPackageType(detailVO.getPackageType());
+
+	            detailResponseList.add(detailDTO);
+	        }
+	    }
+
+	    responseDTO.setDespatchInstDetailsResponseDTO(detailResponseList);
+
+	    return responseDTO;
+	}
+	
+	private void createUpdateDespatchInstructionVO(
+	        DespatchInstructionDTO dto,
+	        DespatchInstructionVO despatchInstructionVO)
+	        throws ApplicationException {
+
+	    despatchInstructionVO.setDiNo(dto.getDiNo());
+	    despatchInstructionVO.setSchduleNo(dto.getSchduleNo());
+	    despatchInstructionVO.setInvoiceType(dto.getInvoiceType());
+	    despatchInstructionVO.setSchduleDate(dto.getSchduleDate());
+	    despatchInstructionVO.setPaymentTerms(dto.getPaymentTerms());
+	    despatchInstructionVO.setModeOfTransport(dto.getModeOfTransport());
+	    despatchInstructionVO.setNetWeight(dto.getNetWeight());
+	    despatchInstructionVO.setGrossWeight(dto.getGrossWeight());
+	    despatchInstructionVO.setDeliveryInstructions(dto.getDeliveryInstructions());
+	    despatchInstructionVO.setConsignee(dto.getConsignee());
+
+	    despatchInstructionVO.setOrgId(dto.getOrgId());
+	    despatchInstructionVO.setActive(dto.getActive());
+	    despatchInstructionVO.setCancelRemarks(dto.getCancelRemarks());
+
+	    // =========================
+	    // Branch Mapping
+	    // =========================
+
+	    if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+	        BranchVO branch = branchRepo.findById(dto.getBranch())
+	                .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+	        despatchInstructionVO.setBranch(branch);
+	    }
+
+	    // =========================
+	    // Customer Mapping
+	    // =========================
+
+	    if (dto.getCustomer() != null && dto.getCustomer() != 0) {
+
+	        CurrencyVO customer = CurrencyRepo.findById(dto.getCustomer())
+	                .orElseThrow(() -> new ApplicationException("Customer Not Found"));
+
+	        despatchInstructionVO.setCustomer(customer);
+	    }
+
+	    // =========================
+	    // Location Mapping
+	    // =========================
+
+	    if (dto.getLocation() != null && dto.getLocation() != 0) {
+
+	        LocationVO location = locationRepo.findById(dto.getLocation())
+	                .orElseThrow(() -> new ApplicationException("Location Not Found"));
+
+	        despatchInstructionVO.setLocation(location);
+	    }
+
+	    // ======================================
+	    // Delete Existing Child During Update
+	    // ======================================
+
+	    if (dto.getId() != null) {
+
+	        List<DespatchInstructionDetailsVO> oldList =
+	                despatchInstructionDetailsRepo
+	                        .findByDespatchInstructionVO(despatchInstructionVO);
+
+	        despatchInstructionDetailsRepo.deleteAll(oldList);
+	    }
+
+	    // ======================================
+	    // Child Save
+	    // ======================================
+
+	    List<DespatchInstructionDetailsVO> detailList =
+	            new ArrayList<>();
+
+	    if (dto.getDespatchInstructionDetailsDTO() != null
+	            && !dto.getDespatchInstructionDetailsDTO().isEmpty()) {
+
+	        for (DespatchInstructionDetailsDTO detailDTO :
+	                dto.getDespatchInstructionDetailsDTO()) {
+
+	            DespatchInstructionDetailsVO detailVO =
+	                    new DespatchInstructionDetailsVO();
+
+	            detailVO.setOrdAccpContrNo(detailDTO.getOrdAccpContrNo());
+	            detailVO.setDate(detailDTO.getDate());
+
+	            if (detailDTO.getItem() != null
+	                    && detailDTO.getItem() != 0) {
+
+	                ItemMasterVO item =
+	                        itemMasterRepo.findById(detailDTO.getItem())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException("Item Not Found"));
+
+	                detailVO.setItem(item);
+	            }
+
+	            
+	            detailVO.setPdi(detailDTO.getPdi());
+	            detailVO.setPdiDate(detailDTO.getPdiDate());
+	            detailVO.setSchduleMonth(detailDTO.getSchduleMonth());
+	            detailVO.setPlannedQty(detailDTO.getPlannedQty());
+	            detailVO.setPendingQty(detailDTO.getPendingQty());
+	            detailVO.setAvailableQty(detailDTO.getAvailableQty());
+	            detailVO.setDescQty(detailDTO.getDescQty());
+	            detailVO.setNoOfPackage(detailDTO.getNoOfPackage());
+	            detailVO.setPackageType(detailDTO.getPackageType());
+
+	            // Parent Mapping
+	            detailVO.setDespatchInstructionVO(despatchInstructionVO);
+
+	            detailList.add(detailVO);
+	        }
+
+	        despatchInstructionVO.setDetails(detailList);
+	    }
+	}
+	@Override
+	public DespatchInstructionResponseDTO getDespatchInstructionById(Long id)
+	        throws ApplicationException {
+
+	    if (ObjectUtils.isEmpty(id)) {
+	        throw new ApplicationException("Invalid Id");
+	    }
+
+	    DespatchInstructionVO despatchInstructionVO = despatchInstructionRepo
+	            .findById(id)
+	            .orElseThrow(() ->
+	                    new ApplicationException("Despatch Instruction Not Found"));
+
+	    return despatchInstructionResponse(despatchInstructionVO);
+	}
+	
+	
+	@Override
+	public List<DespatchInstructionResponseDTO> getDespatchInstructionByOrgId(
+	        Long orgId,
+	        Long branch)
+	        throws ApplicationException {
+
+	    List<DespatchInstructionVO> despatchInstructionList =
+	            despatchInstructionRepo.getDespatchInstructionByOrgId(orgId, branch);
+
+	    if (despatchInstructionList.isEmpty()) {
+	        throw new ApplicationException("No Despatch Instruction Details Found");
+	    }
+
+	    List<DespatchInstructionResponseDTO> responseList = new ArrayList<>();
+
+	    for (DespatchInstructionVO despatchInstructionVO : despatchInstructionList) {
+
+	        responseList.add(
+	                despatchInstructionResponse(despatchInstructionVO));
+	    }
+
+	    return responseList;
+	}
+	
+	//Docket Invoice
+	
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateDocketInvoice(
+	        DocketInvoiceDTO docketInvoiceDTO)
+	        throws ApplicationException {
+
+	    DocketInvoiceVO docketInvoiceVO = new DocketInvoiceVO();
+
+	    String message;
+
+	    if (ObjectUtils.isNotEmpty(docketInvoiceDTO.getId())) {
+
+	        docketInvoiceVO = docketInvoiceRepo
+	                .findById(docketInvoiceDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Invalid Docket Invoice Details"));
+
+	        docketInvoiceVO.setUpdatedBy(
+	                docketInvoiceDTO.getCreatedBy());
+
+	        message = "Docket Invoice Updated Successfully";
+
+	    } else {
+
+	        docketInvoiceVO.setCreatedBy(
+	                docketInvoiceDTO.getCreatedBy());
+
+	        docketInvoiceVO.setUpdatedBy(
+	                docketInvoiceDTO.getCreatedBy());
+
+	        message = "Docket Invoice Created Successfully";
+	    }
+
+	    createUpdateDocketInvoiceVO(
+	            docketInvoiceDTO,
+	            docketInvoiceVO);
+
+	    DocketInvoiceVO savedDocketInvoice =
+	            docketInvoiceRepo.save(docketInvoiceVO);
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    response.put("message", message);
+
+	    response.put(
+	            "docketInvoiceVO",
+	            docketInvoiceResponse(savedDocketInvoice));
+
+	    return response;
+	}
+	
+	private DocketInvoiceResponseDTO docketInvoiceResponse(
+	        DocketInvoiceVO docketInvoiceVO) {
+
+	    DocketInvoiceResponseDTO responseDTO =
+	            new DocketInvoiceResponseDTO();
+
+	    responseDTO.setId(docketInvoiceVO.getId());
+	    responseDTO.setDocNo(docketInvoiceVO.getDocNo());
+	    responseDTO.setDocDate(docketInvoiceVO.getDocDate());
+	    responseDTO.setBillNo(docketInvoiceVO.getBillNo());
+	    responseDTO.setBillDate(docketInvoiceVO.getBillDate());
+	    responseDTO.setTotalAmount(docketInvoiceVO.getTotalAmount());
+	    responseDTO.setOrgId(docketInvoiceVO.getOrgId());
+	    responseDTO.setActive(docketInvoiceVO.isActive());
+	    responseDTO.setCreatedBy(docketInvoiceVO.getCreatedBy());
+	    responseDTO.setCancelRemarks(docketInvoiceVO.getCancelRemarks());
+
+	    // =========================
+	    // Branch Response
+	    // =========================
+
+	    if (docketInvoiceVO.getBranch() != null) {
+
+	        responseDTO.setBranch(
+	                docketInvoiceVO.getBranch().getId());
+	    }
+
+	    // =========================
+	    // Transport Response
+	    // =========================
+
+	    if (docketInvoiceVO.getTransport() != null) {
+
+	        responseDTO.setTransport(
+	                docketInvoiceVO.getTransport().getId());
+	    }
+
+	    // =========================
+	    // Child Response
+	    // =========================
+
+	    List<DocketInvoiceDetResponseDTO> detailResponseList =
+	            new ArrayList<>();
+
+	    if (docketInvoiceVO.getDetails() != null
+	            && !docketInvoiceVO.getDetails().isEmpty()) {
+
+	        for (DocketInvoiceDetailsVO detailVO
+	                : docketInvoiceVO.getDetails()) {
+
+	            DocketInvoiceDetResponseDTO detailDTO =
+	                    new DocketInvoiceDetResponseDTO();
+
+	            detailDTO.setDocketNo(detailVO.getDocketNo());
+	            detailDTO.setDocketDate(detailVO.getDocketDate());
+	            detailDTO.setInvoiceNo(detailVO.getInvoiceNo());
+	            detailDTO.setNoOfQty(detailVO.getNoOfQty());
+	            detailDTO.setWeight(detailVO.getWeight());
+	            detailDTO.setTotalValue(detailVO.getTotalValue());
+	            detailDTO.setCumulativeValue(detailVO.getCumulativeValue());
+	            detailDTO.setMode(detailVO.getMode());
+
+	            detailResponseList.add(detailDTO);
+	        }
+	    }
+
+	    responseDTO.setDocketInvoiceDetResponseDTO(
+	            detailResponseList);
+
+	    return responseDTO;
+	}
+	
+	private void createUpdateDocketInvoiceVO(
+	        DocketInvoiceDTO dto,
+	        DocketInvoiceVO docketInvoiceVO)
+	        throws ApplicationException {
+
+	    docketInvoiceVO.setDocNo(dto.getDocNo());
+	    docketInvoiceVO.setDocDate(dto.getDocDate());
+	    docketInvoiceVO.setBillNo(dto.getBillNo());
+	    docketInvoiceVO.setBillDate(dto.getBillDate());
+	    docketInvoiceVO.setTotalAmount(dto.getTotalAmount());
+
+	    docketInvoiceVO.setOrgId(dto.getOrgId());
+	    docketInvoiceVO.setActive(dto.getActive());
+	    docketInvoiceVO.setCancelRemarks(dto.getCancelRemarks());
+
+	    // =========================
+	    // Branch Mapping
+	    // =========================
+
+	    if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+	        BranchVO branch = branchRepo.findById(dto.getBranch())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Branch Not Found"));
+
+	        docketInvoiceVO.setBranch(branch);
+	    }
+
+	    // =========================
+	    // Transport Mapping
+	    // =========================
+
+	    if (dto.getTransport() != null && dto.getTransport() != 0) {
+
+	        TransportMasterVO transport = transportRepo
+	                .findById(dto.getTransport())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Transport Not Found"));
+
+	        docketInvoiceVO.setTransport(transport);
+	    }
+
+	    // ======================================
+	    // Delete Existing Child During Update
+	    // ======================================
+
+	    if (dto.getId() != null) {
+
+	        List<DocketInvoiceDetailsVO> oldList =
+	        		docketInvoiceDetRepo
+	                        .findByDocketInvoiceVO(docketInvoiceVO);
+
+	        docketInvoiceDetRepo.deleteAll(oldList);
+	    }
+
+	    // ======================================
+	    // Child Save
+	    // ======================================
+
+	    List<DocketInvoiceDetailsVO> detailList =
+	            new ArrayList<>();
+
+	    if (dto.getDocketInvoiceDetailsDTO() != null
+	            && !dto.getDocketInvoiceDetailsDTO().isEmpty()) {
+
+	        for (DocketInvoiceDetailsDTO detailDTO
+	                : dto.getDocketInvoiceDetailsDTO()) {
+
+	            DocketInvoiceDetailsVO detailVO =
+	                    new DocketInvoiceDetailsVO();
+
+	            detailVO.setDocketNo(detailDTO.getDocketNo());
+	            detailVO.setDocketDate(detailDTO.getDocketDate());
+	            detailVO.setInvoiceNo(detailDTO.getInvoiceNo());
+	            detailVO.setNoOfQty(detailDTO.getNoOfQty());
+	            detailVO.setWeight(detailDTO.getWeight());
+	            detailVO.setTotalValue(detailDTO.getTotalValue());
+	            detailVO.setCumulativeValue(detailDTO.getCumulativeValue());
+	            detailVO.setMode(detailDTO.getMode());
+
+	            // Parent Mapping
+	            detailVO.setDocketInvoiceVO(docketInvoiceVO);
+
+	            detailList.add(detailVO);
+	        }
+
+	        docketInvoiceVO.setDetails(detailList);
+	    }
+	    
+	}
+	@Override
+	public DocketInvoiceResponseDTO getDocketInvoiceById(Long id)
+	        throws ApplicationException {
+
+	    if (ObjectUtils.isEmpty(id)) {
+	        throw new ApplicationException("Invalid Id");
+	    }
+
+	    DocketInvoiceVO docketInvoiceVO = docketInvoiceRepo
+	            .findById(id)
+	            .orElseThrow(() ->
+	                    new ApplicationException("Docket Invoice Not Found"));
+
+	    return docketInvoiceResponse(docketInvoiceVO);
+	}
+	
+	@Override
+	public List<DocketInvoiceResponseDTO> getDocketInvoiceByOrgId(
+	        Long orgId,
+	        Long branch)
+	        throws ApplicationException {
+
+	    List<DocketInvoiceVO> docketInvoiceList =
+	            docketInvoiceRepo.getDocketInvoiceByOrgId(orgId, branch);
+
+	    if (docketInvoiceList.isEmpty()) {
+	        throw new ApplicationException("No Docket Invoice Details Found");
+	    }
+
+	    List<DocketInvoiceResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (DocketInvoiceVO docketInvoiceVO : docketInvoiceList) {
+
+	        responseList.add(
+	                docketInvoiceResponse(docketInvoiceVO));
+	    }
+
+	    return responseList;
+	}
 }

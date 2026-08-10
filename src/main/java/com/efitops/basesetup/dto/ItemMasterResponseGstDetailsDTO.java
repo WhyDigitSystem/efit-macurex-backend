@@ -5,10 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class QuotationIemFileUploadDetailsDTO {
-
+@NoArgsConstructor
+public class ItemMasterResponseGstDetailsDTO {
 	private Long id;
-	private String name;
+	private String itemDescription;
+	private String itemCode;
+
 }

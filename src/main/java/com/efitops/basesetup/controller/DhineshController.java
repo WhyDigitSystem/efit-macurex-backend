@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -23,6 +24,7 @@ import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.QuotationDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.QuotationItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.ResponseDTO;
@@ -39,51 +41,12 @@ public class DhineshController extends BaseController{
 	DhineshService dhineshService;
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(DhineshController.class);
-	
-	
-//	@PostMapping("/createUpdateSalesContract")
-//	public ResponseEntity<ResponseDTO> createUpdateSalesContract(
-//	        @RequestBody SalesContractDTO salesContractDTO) {
-//
-//	    String methodName = "createUpdateSalesContract()";
-//	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-//
-//	    Map<String, Object> responseObjectsMap = new HashMap<>();
-//	    String errorMsg = null;
-//	    ResponseDTO responseDTO = null;
-//
-//	    try {
-//
-//	        Map<String, Object> createdSalesContractVO =
-//	        		dhineshService.createUpdateSalesContract(salesContractDTO);
-//
-//	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-//	                createdSalesContractVO.get("message"));
-//
-//	        responseObjectsMap.put("salesContractVO",
-//	                createdSalesContractVO.get("salesContract"));
-//
-//	        responseDTO = createServiceResponse(responseObjectsMap);
-//
-//	    } catch (Exception e) {
-//
-//	        errorMsg = e.getMessage();
-//
-//	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-//
-//	        responseDTO = createServiceResponseError(
-//	                responseObjectsMap, errorMsg, errorMsg);
-//	    }
-//
-//	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-//
-//	    return ResponseEntity.ok().body(responseDTO);
-//	}
-//	
+
 	
 	@PostMapping(value = "/createUpdateSalesContract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdateSalesContract(
 	        @RequestPart("salesContract") SalesContractDTO salesContractDTO,
+//	        @RequestBody SalesContractDTO salesContractDTO,
 	        @RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 	    String methodName = "createUpdateSalesContract()";
@@ -114,17 +77,6 @@ public class DhineshController extends BaseController{
 
 	    return ResponseEntity.ok(responseDTO);
 	}
-	
-//	@PostMapping(value = "/createUpdateSalesContract",
-//	        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//	public ResponseEntity<String> createUpdateSalesContract(
-//	        @RequestPart("salesContract") String salesContract,
-//	        @RequestPart(value = "files", required = false) MultipartFile[] files) {
-//
-//	    System.out.println(salesContract);
-//
-//	    return ResponseEntity.ok("Success");
-//	}
 	
 	@GetMapping("/getFinishedGoodsItems")
 	public ResponseEntity<ResponseDTO> getFinishedGoodsItems(
@@ -328,5 +280,63 @@ public class DhineshController extends BaseController{
 	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getSalesContractById")
+	public ResponseEntity<ResponseDTO> getSalesContractById(@RequestParam Long id) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        SalesContractResponseDTO salesContract =
+	                dhineshService.getSalesContractById(id);
+
+	        responseObjectsMap.put("salesContract", salesContract);
+	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+	                "Sales Contract fetched successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getSalesContractByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getSalesContractByOrgIdAndBranch(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<SalesContractResponseDTO> salesContracts =
+	                dhineshService.getSalesContractByOrgIdAndBranch(orgId, branch);
+
+	        responseObjectsMap.put("salesContract", salesContracts);
+	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+	                "Sales Contract List fetched successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
 	}
 }

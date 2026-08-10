@@ -26,15 +26,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "quotation")
+@Table(name = "quotation_header")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuotationVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quotationgen")
-	@SequenceGenerator(name = "quotationgen", sequenceName = "quotationseq", initialValue = 1000000001, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quotation_headergen")
+	@SequenceGenerator(name = "quotation_headergen", sequenceName = "quotation_headerseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "quotation_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
@@ -47,19 +47,19 @@ public class QuotationVO {
 	@Column(name = "doc_date")
 	private LocalDate docDate=LocalDate.now();
 	
-	@ManyToOne
-	@JoinColumn(name = "plant_id")
-	private BranchVO plantId;
+//	@ManyToOne
+//	@JoinColumn(name = "plant_id")
+//	private BranchVO plantId;
 	
 	@ManyToOne
-	@JoinColumn(name = "party_id")
-	private CustomerVO partyId;
+	@JoinColumn(name = "customer")
+	private CustomerVO customer;
 
 	@Column(name = "with_enquiry")
 	private String withEnquiry;
 	
-	@Column(name = "party_name")
-	private String partyName;
+//	@Column(name = "party_name")
+//	private String partyName;
 
 	@Column(name = "old_enqury_no")
 	private String oldEnquryNo;
@@ -82,6 +82,7 @@ public class QuotationVO {
 	@Column(name = "quotation_serial_no")
 	private String quotationSerialNo;
 
+
 	@Column(name = "customer_enquiry_no")
 	private String customerEnquiryNo;
 
@@ -93,16 +94,12 @@ public class QuotationVO {
 
 	@Column(name = "valid_till")
 	private LocalDate validTill;
+	
+	@Column(name = "date")
+	private LocalDate date;
 
 	@Column(name = "kind_attention")
 	private String kindAttention;
-
-	@ManyToOne
-	@JoinColumn(name = "tax_code")
-	private TaxDefinitionVO taxCode;
-
-	@Column(name = "tax_basic_id")
-	private String taxBasicId;
 
 	// Common Fields
 
@@ -110,7 +107,7 @@ public class QuotationVO {
 	private String createdBy;
 
 	@Column(name = "active")
-	private boolean active = true;
+	private boolean active;
 
 	@Column(name = "cancel")
 	private boolean cancel = false;

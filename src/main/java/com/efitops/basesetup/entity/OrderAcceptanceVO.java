@@ -35,7 +35,7 @@ public class OrderAcceptanceVO {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_acceptance_basicgen")
-	@SequenceGenerator(name = "order_accptance_basicgen", sequenceName = "order_acceptance_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@SequenceGenerator(name = "order_acceptance_basicgen", sequenceName = "order_acceptance_basicseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "order_acceptance_basic_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 

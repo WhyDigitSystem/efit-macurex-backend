@@ -8,7 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -21,16 +20,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "orderacceptancefileuploaddetails")
+@Table(name = "order_attached_po_copy")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class OrderAcceptanceFileUploadDetailsVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "orderacceptancefileuploaddetailsgen")
-	@SequenceGenerator(name = "orderacceptancefileuploaddetailsgen", sequenceName = "orderacceptancefileuploaddetailseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "orderacceptancefileuploaddetails_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_attached_po_copygen")
+	@SequenceGenerator(name = "order_attached_po_copygen", sequenceName = "order_attached_po_copyseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "order_attached_po_copy_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "file_size")
@@ -51,13 +50,9 @@ public class OrderAcceptanceFileUploadDetailsVO {
 	@Column(name = "name")
 	private String name;
 
-	@Lob
-	@Column(name = "item_attachment_url", columnDefinition = "LONGBLOB")
-	private byte[] itemAttachmentUrl;
-
 	@ManyToOne
 	@JsonBackReference
-	@JoinColumn(name = "orderacceptance_id")
+	@JoinColumn(name = "order_acceptance_basic_id")
 	OrderAcceptanceVO orderAcceptanceVO;
 
 }

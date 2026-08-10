@@ -1,6 +1,7 @@
 package com.efitops.basesetup.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -100,6 +101,26 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			ORDER BY customer_contract_no
 			""", nativeQuery = true)
 	List<SalesContractVO> getContractNo();
+	
+	@Query(value = "SELECT customer_contract_no AS docId, invoice_type AS invoiceType " +
+            "FROM sales_contract_basic " +
+            "WHERE cancel = 0 " +
+            "AND active = 1 " +
+            "AND org_id = :orgId " +
+            "AND branch = :branch " +
+            "UNION ALL " +
+            "SELECT doc_id AS docId, so_type AS invoiceType " +
+            "FROM orderacceptance " +
+            "WHERE cancel = 0 " +
+            "AND active = 1 " +
+            "AND org_id = :orgId " +
+            "AND branch = :branch " +
+            "ORDER BY docId",
+    nativeQuery = true)
+List<Map<String, Object>> getDocIdAndInvoiceType(
+     @Param("orgId") Long orgId,
+     @Param("branch") Long branch);
+	
 
 	@Query(value = """
 			SELECT *
@@ -110,4 +131,5 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			ORDER BY salescontract_id DESC
 			""", nativeQuery = true)
 	List<SalesContractVO> findByOrgIdAndBranch(@Param("orgId") Long orgId, @Param("branch") Long branch);
+
 }

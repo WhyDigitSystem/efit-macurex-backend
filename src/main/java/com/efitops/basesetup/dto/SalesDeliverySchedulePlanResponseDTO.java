@@ -9,22 +9,15 @@ public class SalesDeliverySchedulePlanResponseDTO {
 
     private Long id;
 
-    // Header
-    private Long salesDeliveryScheduleId;
-
-    // Schedule Details Grid
-    private Long salesDeliveryScheduleDetailsId;
-
     // Day Information
-    private Integer dayNo;
+    private int dayNo;
 
     private LocalDate deliveryDate;
 
-    private Integer weekNo;
+    private int weekNo;
 
     private String dayName;
 
     // Delivery Quantity
-    private Double deliveryQty;
-
+    private double deliveryQty;
 }

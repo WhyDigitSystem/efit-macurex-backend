@@ -1,5 +1,7 @@
 package com.efitops.basesetup.dto;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -14,5 +16,7 @@ public class SalesDeliveryScheduleDetailsDTO {
     private Long itemId;
 
     private Double actualPlannedQty;
+
+    private List<SalesDeliverySchedulePlanDTO> deliverySchedules;
 
 }

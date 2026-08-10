@@ -12,7 +12,7 @@ public interface SalesDeliveryScheduleRepo extends JpaRepository<SalesDeliverySc
 
     @Query(value = """
             SELECT *
-            FROM sales_delivery_schedule
+            FROM sdvbasic
             WHERE org_id = :orgId
               AND branch_id = :branchId
               AND cancel = false

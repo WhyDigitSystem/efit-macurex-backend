@@ -33,25 +33,6 @@ public interface DevelopService {
 	Map<String, Object> updateCreateEnquiry(EnquiryDTO enquiryDTO, MultipartFile[] files) throws ApplicationException;
 	
 
-	//salesdeliveryschedule
-	
-	Map<String, Object> createUpdateSalesDeliverySchedule(
-	        SalesDeliveryScheduleDTO salesDeliveryScheduleDTO)
-	        throws ApplicationException;
-
-	SalesDeliveryScheduleResponseDTO getSalesDeliveryScheduleById(Long id)
-	        throws ApplicationException;
-
-	List<SalesDeliveryScheduleResponseDTO> getAllSalesDeliverySchedule(
-	        Long orgId,
-	        Long branchId)
-	        throws ApplicationException;
-	
-	Map<String, Object> getContractNo()
-	        throws ApplicationException;
-
-	Map<String, Object> getItemDropdown(Long salesContractId)
-	        throws ApplicationException;
 	
 	//SALES RETURN
 
@@ -60,8 +41,8 @@ public interface DevelopService {
 	SalesReturnResponseDTO getSalesReturnById(Long id)  throws ApplicationException;
 
 
-	List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch) throws ApplicationException;
-
+	List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch)
+	        throws ApplicationException;
 	
 	
 	

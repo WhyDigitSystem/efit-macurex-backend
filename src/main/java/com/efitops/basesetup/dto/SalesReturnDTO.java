@@ -11,53 +11,51 @@ public class SalesReturnDTO {
 
     private Long id;
 
-    // Document
+   
     private String docNo;
     private LocalDate docDate;
 
-    // Plant
-    private Long branchId;
+   
+    private Long branch;
 
-    // Belongs To (LOV)
-    private Long belongsToId;
+   
+    private Long belongsTo;
 
-    // Invoice
+   
     private String invoiceNo;
     private LocalDate invoiceDate;
 
-    // Customer Invoice
+    
     private String customerInvoiceNo;
     private LocalDate customerInvoiceDate;
 
-    // Gate Pass
     private String gatePassNo;
 
-    // Customer
-    private Long customerId;
+   
+    private Long customer;
 
-    // Location
-    private Long locationId;
+   
+    private Long location;
 
-    // Return Type (LOV)
-    private Long returnTypeId;
+   
+    private Long returnType;
 
-    // Approved By Accounts
+   
     private String approvedByAccounts;
 
-    // Currency
+   
     private String currency;
 
-    // Exchange Rate
+    
     private BigDecimal exchangeRate;
 
-    // Reference
+    
     private String referenceNo;
     private LocalDate referenceDate;
 
-    // Invoice Reference Type (LOV)
     private Long invoiceReferenceTypeId;
 
-    // Common Fields
+   
     private Long orgId;
 
     private String financialYear;

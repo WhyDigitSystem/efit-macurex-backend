@@ -27,20 +27,26 @@ public class SalesDeliveryScheduleDetailsVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sdvdet_seq")
-    @SequenceGenerator(name = "sdvdet_seq",sequenceName = "sdvdet_seq", allocationSize = 1)
+    @SequenceGenerator(name = "sdvdet_seq",sequenceName = "sdvdet_seq", allocationSize = 1, initialValue = 1000000001)
     @Column(name = "sdvdet_id")
     private Long id;
 
     // Sales Contract Header
-    @ManyToOne
-    @JoinColumn(name = "sales_contract_id")
-    private SalesContractVO salesContract;
+//    @ManyToOne
+//    @JoinColumn(name = "sales_contract_id")
+//    private SalesContractVO salesContract;
 
     // Sales Contract Detail (Invoice Type comes from selected SO)
-    @ManyToOne
-    @JoinColumn(name = "sales_contract_details_id")
-    private SalesContractDetailsVO salesContractDetails;
+//    @ManyToOne
+//    @JoinColumn(name = "sales_contract_details_id")
+//    private SalesContractDetailsVO salesContractDetails;
 
+    @Column(name = "soNocontractno")
+    private String soNoContractNo;
+    
+    @Column(name = "invoicetype")
+    private String invoiceType;
+    
     // Item Master
     @ManyToOne
     @JoinColumn(name = "item_id")
@@ -56,8 +62,7 @@ public class SalesDeliveryScheduleDetailsVO {
     
     @OneToMany(
             mappedBy = "salesDeliveryScheduleDetails",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+            cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<SalesDeliverySchedulePlanVO> deliverySchedules = new ArrayList<>();
 }

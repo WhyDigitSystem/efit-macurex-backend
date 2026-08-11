@@ -1,8 +1,12 @@
 package com.efitops.basesetup.controller;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +25,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.OrderAcceptanceDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceDocIdResponseDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceItemDetailsResponseDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceItemDropdownResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceResponseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseResponseDTO;
+import com.efitops.basesetup.dto.ShortCloseItemResponseDTO;
 import com.efitops.basesetup.service.OrderAcceptanceService;
 
 @RestController
@@ -71,8 +79,7 @@ public class OrderAcceptanceContoller extends BaseController {
 	}
 
 	@GetMapping("/getOrderAcceptanceByOrgId")
-	public ResponseEntity<ResponseDTO> getOrderAcceptanceByOrgId(@RequestParam Long orgId,
-			@RequestParam Long branchId) {
+	public ResponseEntity<ResponseDTO> getOrderAcceptanceByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
 
 		String methodName = "getOrderAcceptanceByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -83,7 +90,7 @@ public class OrderAcceptanceContoller extends BaseController {
 		try {
 
 			List<OrderAcceptanceResponseDTO> orderAcceptanceResponseDTO = orderAcceptanceService
-					.getOrderAcceptanceByOrgId(orgId, branchId);
+					.getOrderAcceptanceByOrgId(orgId, branch);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order information retrieved successfully");
 
@@ -107,6 +114,7 @@ public class OrderAcceptanceContoller extends BaseController {
 	@PutMapping(value = "/createUpdateOrderAcceptance", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdateOrderAcceptance(
 			@RequestPart("orderAcceptance") OrderAcceptanceDTO orderAcceptanceDTO,
+//			@RequestBody OrderAcceptanceDTO orderAcceptanceDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -173,7 +181,7 @@ public class OrderAcceptanceContoller extends BaseController {
 
 	@GetMapping("/getSalesOrderShortCloseByOrgId")
 	public ResponseEntity<ResponseDTO> getSalesOrderShortCloseByOrgId(@RequestParam Long orgId,
-			@RequestParam Long branchId) {
+			@RequestParam Long branch) {
 
 		String methodName = "getSalesOrderShortCloseByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -184,7 +192,7 @@ public class OrderAcceptanceContoller extends BaseController {
 		try {
 
 			List<SalesOrderShortCloseResponseDTO> salesOrderShortCloseResponseDTO = orderAcceptanceService
-					.getSalesOrderShortCloseByOrgId(orgId, branchId);
+					.getSalesOrderShortCloseByOrgId(orgId, branch);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order information retrieved successfully");
 
@@ -205,11 +213,9 @@ public class OrderAcceptanceContoller extends BaseController {
 		return ResponseEntity.ok(responseDTO);
 	}
 
-	@PutMapping(value = "/createUpdateSalesOrderShort", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PutMapping(value = "/createUpdateSalesOrderShort")
 	public ResponseEntity<ResponseDTO> createUpdateSalesOrderShort(
-			@RequestPart("salesOrderShort") SalesOrderShortCloseDTO salesOrderShortCloseDTO,
-//			@RequestBody SalesOrderShortCloseDTO salesOrderShortCloseDTO,
-			@RequestPart(value = "files", required = false) MultipartFile[] files) {
+			@RequestBody SalesOrderShortCloseDTO salesOrderShortCloseDTO) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO;
@@ -217,7 +223,7 @@ public class OrderAcceptanceContoller extends BaseController {
 		try {
 
 			Map<String, Object> quotationMap = orderAcceptanceService
-					.createUpdateSalesOrderShort(salesOrderShortCloseDTO, files);
+					.createUpdateSalesOrderShort(salesOrderShortCloseDTO);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, quotationMap.get("message"));
 
@@ -236,4 +242,173 @@ public class OrderAcceptanceContoller extends BaseController {
 
 	}
 
+	@GetMapping("/viewFile/**")
+	public ResponseEntity<byte[]> viewFile(HttpServletRequest request) throws IOException {
+
+		return orderAcceptanceService.viewOrderAcceptanceFile(request);
+	}
+
+	@GetMapping("/getOrderAcceptanceItemDetails")
+	public ResponseEntity<ResponseDTO> getOrderAcceptanceItemDetails(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getOrderAcceptanceItemDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		List<OrderAcceptanceItemDropdownResponseDTO> itemList = new ArrayList<>();
+
+		try {
+
+			itemList = orderAcceptanceService.getOrderAcceptanceItemDetails(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (errorMsg == null || errorMsg.trim().isEmpty()) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order Items fetched successfully");
+			responseObjectsMap.put("items", itemList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Order fetch failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSalesOrderItemDetails")
+	public ResponseEntity<ResponseDTO> getSalesOrderItemDetails(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam(required = false) String docId) {
+
+		String methodName = "getSalesOrderItemDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		List<ShortCloseItemResponseDTO> itemList = new ArrayList<>();
+
+		try {
+
+			itemList = orderAcceptanceService.getSalesOrderItemDetails(orgId, branch, docId);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (errorMsg == null || errorMsg.trim().isEmpty()) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order Items fetched successfully");
+			responseObjectsMap.put("items", itemList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Order fetch failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getOrderAcceptanceDocIdDetails")
+	public ResponseEntity<ResponseDTO> getOrderAcceptanceDocIdDetails(@RequestParam(required = false) Long customer,
+			@RequestParam(required = false) String docId) {
+
+		String methodName = "getOrderAcceptanceDocIdDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		List<OrderAcceptanceDocIdResponseDTO> itemList = new ArrayList<>();
+
+		try {
+
+			itemList = orderAcceptanceService.getOrderAcceptanceDocIdDetails(customer, docId);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (errorMsg == null || errorMsg.trim().isEmpty()) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order docId fetched successfully");
+			responseObjectsMap.put("items", itemList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Order docId fetch failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getOrderAcceptanceItemDetailsDetails")
+	public ResponseEntity<ResponseDTO> getOrderAcceptanceItemDetailsDetails(
+			@RequestParam(required = false) String docId) {
+
+		String methodName = "getOrderAcceptanceItemDetailsDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		List<OrderAcceptanceItemDetailsResponseDTO> itemList = new ArrayList<>();
+
+		try {
+
+			itemList = orderAcceptanceService.getOrderAcceptanceItemDetailsDetails(docId);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (errorMsg == null || errorMsg.trim().isEmpty()) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order docId fetched successfully");
+			responseObjectsMap.put("items", itemList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Order docId fetch failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
 }

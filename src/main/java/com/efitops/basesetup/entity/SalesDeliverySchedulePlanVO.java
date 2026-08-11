@@ -15,7 +15,7 @@ public class SalesDeliverySchedulePlanVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "dlryschedule_seq")
-    @SequenceGenerator(name = "dlryschedule_seq",sequenceName = "dlryschedule_seq",allocationSize = 1)
+    @SequenceGenerator(name = "dlryschedule_seq",sequenceName = "dlryschedule_seq",allocationSize = 1, initialValue = 1000000001)
     @Column(name = "dlryschedule_id")
     private Long id;
 

@@ -19,16 +19,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "orderacceptancetaxdetails")
+@Table(name = "order_tax_details")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderAcceptanceTaxDetailsVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "orderacceptancetaxdetailsgen")
-	@SequenceGenerator(name = "orderacceptancetaxdetailsgen", sequenceName = "orderacceptancetaxdetailsseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "orderacceptancetaxdetails_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_tax_detailsgen")
+	@SequenceGenerator(name = "order_tax_detailsgen", sequenceName = "order_tax_detailsseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "order_tax_details_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "particulars")
@@ -42,7 +42,7 @@ public class OrderAcceptanceTaxDetailsVO {
 
 	@ManyToOne
 	@JsonBackReference
-	@JoinColumn(name = "orderacceptance_id")
+	@JoinColumn(name = "order_acceptance_basic_id")
 	OrderAcceptanceVO orderAcceptanceVO;
 
 }

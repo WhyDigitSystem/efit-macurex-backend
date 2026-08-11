@@ -34,7 +34,7 @@ public class SalesOrderShortCloseResponseDTO {
 
 	private String financialYear;
 
-	private BranchResponseDTO branchId;
+	private BranchResponseDTO branch;
 
 	private List<SalesOrderShortCloseDetailsResponseDTO> salesOrderShortCloseDetailsResponseDTO;
 	

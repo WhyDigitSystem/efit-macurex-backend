@@ -101,11 +101,22 @@ public class TransactionServiceImpl implements TransactionService {
 
 			salesDeliveryScheduleVO.setUpdatedBy(salesDeliveryScheduleDTO.getCreatedBy());
 
-			// Remove old Details.
-			// Because orphanRemoval=true, Delivery Plans are also removed automatically.
-			if (salesDeliveryScheduleVO.getDetails() != null) {
+			if (salesDeliveryScheduleDTO.getId() != null) {
+
+			    salesDeliveryScheduleVO = salesDeliveryScheduleRepo.findById(salesDeliveryScheduleDTO.getId())
+			            .orElseThrow(() -> new ApplicationException("Sales Delivery Schedule Not Found"));
+
+			    // Delete all plans first
+			    for (SalesDeliveryScheduleDetailsVO detail : salesDeliveryScheduleVO.getDetails()) {
+			        salesDeliverySchedulePlanRepo.deleteAll(detail.getDeliverySchedules());
+			    }
+
+			    // Delete all details
+			    salesDeliveryScheduleDetailsRepo.deleteAll(salesDeliveryScheduleVO.getDetails());
+
 			    salesDeliveryScheduleVO.getDetails().clear();
 			}
+			
 			message = "Sales Delivery Schedule Updated Successfully";
 		}
 
@@ -173,28 +184,28 @@ public class TransactionServiceImpl implements TransactionService {
 
 	        SalesDeliveryScheduleDetailsVO detail =
 	                new SalesDeliveryScheduleDetailsVO();
-
-	        if (dto.getSalesContractId() != null) {
-
-	            SalesContractVO salesContract =
-	                    salesContractRepo.findById(dto.getSalesContractId())
-	                    .orElseThrow(() ->
-	                            new ApplicationException("Sales Contract Not Found"));
-
-	            detail.setSalesContract(salesContract);
-	        }
-
-	        if (dto.getSalesContractDetailsId() != null) {
-
-	            SalesContractDetailsVO contractDetails =
-	                    salesContractDetailsRepo
-	                    .findById(dto.getSalesContractDetailsId())
-	                    .orElseThrow(() ->
-	                            new ApplicationException(
-	                                    "Sales Contract Detail Not Found"));
-
-	            detail.setSalesContractDetails(contractDetails);
-	        }
+//
+//	        if (dto.getSalesContractId() != null) {
+//
+//	            SalesContractVO salesContract =
+//	                    salesContractRepo.findById(dto.getSalesContractId())
+//	                    .orElseThrow(() ->
+//	                            new ApplicationException("Sales Contract Not Found"));
+//
+//	            detail.setSalesContract(salesContract);
+//	        }
+//
+//	        if (dto.getSalesContractDetailsId() != null) {
+//
+//	            SalesContractDetailsVO contractDetails =
+//	                    salesContractDetailsRepo
+//	                    .findById(dto.getSalesContractDetailsId())
+//	                    .orElseThrow(() ->
+//	                            new ApplicationException(
+//	                                    "Sales Contract Detail Not Found"));
+//
+//	            detail.setSalesContractDetails(contractDetails);
+//	        }
 
 	        if (dto.getItemId() != null) {
 
@@ -207,6 +218,8 @@ public class TransactionServiceImpl implements TransactionService {
 	        }
 
 	        detail.setActualPlannedQty(dto.getActualPlannedQty());
+	        detail.setSoNoContractNo(dto.getSoNoContractNo());
+	        detail.setInvoiceType(dto.getInvoiceType());
 
 	        detail.setSalesDeliverySchedule(header);
 
@@ -322,30 +335,34 @@ public class TransactionServiceImpl implements TransactionService {
 
 	            //================ Contract =================
 
-	            if (detailVO.getSalesContract() != null) {
+//	            if (detailVO.getSalesContract() != null) {
+//
+//	                detailResponse.setContractNo(
+//	                        detailVO.getSalesContract().getCustomerContractNo());
+//
+//	                detailResponse.setInvoiceType(
+//	                        detailVO.getSalesContract().getInvoiceType());
+//	            }
+//
+//	            //================ Qty =================
+//
+//	            if (detailVO.getSalesContractDetails() != null
+//	                    && detailVO.getSalesContractDetails().getQuantity() != null) {
+//
+//	                Double qty = detailVO.getSalesContractDetails()
+//	                        .getQuantity()
+//	                        .doubleValue();
+//
+//	                detailResponse.setOrderQty(qty);
+//
+//	                // Temporary
+//	                detailResponse.setPendingQty(qty);
+//	            }
 
-	                detailResponse.setContractNo(
-	                        detailVO.getSalesContract().getCustomerContractNo());
-
-	                detailResponse.setInvoiceType(
-	                        detailVO.getSalesContract().getInvoiceType());
-	            }
-
-	            //================ Qty =================
-
-	            if (detailVO.getSalesContractDetails() != null
-	                    && detailVO.getSalesContractDetails().getQuantity() != null) {
-
-	                Double qty = detailVO.getSalesContractDetails()
-	                        .getQuantity()
-	                        .doubleValue();
-
-	                detailResponse.setOrderQty(qty);
-
-	                // Temporary
-	                detailResponse.setPendingQty(qty);
-	            }
-
+	            detailResponse.setSoNocontractNo(detailVO.getSoNoContractNo());
+	            
+	            detailResponse.setInvoiceType(detailVO.getInvoiceType());
+	            
 	            detailResponse.setActualPlannedQty(
 	                    detailVO.getActualPlannedQty());
 

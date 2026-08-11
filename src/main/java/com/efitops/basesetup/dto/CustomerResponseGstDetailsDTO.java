@@ -12,6 +12,7 @@ public class CustomerResponseGstDetailsDTO {
 	private String customerName;
 	private String custometType;
 	private String customerGstNo;
-	private boolean isGstApproval;
+	private String CustomerType;
+	private String gstApproval;
 
 }

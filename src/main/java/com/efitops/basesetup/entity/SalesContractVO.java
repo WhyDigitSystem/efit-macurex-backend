@@ -42,6 +42,12 @@ public class SalesContractVO {
     private Long id;
 
 
+    @Column(name = "doc_id")
+	private String docId;
+	
+	@Column(name = "doc_date")
+	private LocalDate docDate;
+	
     @Column(name = "customer_contract_no")
     private String customerContractNo;
 

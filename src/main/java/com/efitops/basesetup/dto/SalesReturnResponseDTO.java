@@ -65,6 +65,13 @@ public class SalesReturnResponseDTO {
    
     private Long invoiceReferenceTypeId;
     private String invoiceReferenceType;
+    
+    
+    private BigDecimal netAmount;
+
+    private String amountInWords;
+
+    private String narration;
 
     
     private Long orgId;
@@ -85,6 +92,12 @@ public class SalesReturnResponseDTO {
 
     private String screenName;
 
+    
+    
+    private List<SalesReturnDetailsResponseDto> salesReturnDetails;
+    
+    
+    private List<SalesReturnTaxDetailsResponseDto> salesReturnTaxDetails;
    
 
 }

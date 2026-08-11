@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,10 +35,6 @@ public class SalesReturnDetailsVO {
 	@Column(name = "sales_return_detail_id")
 	private Long id;
 	
-	//header mapping
-	@ManyToOne
-	@JoinColumn(name = "sales_return_basic_id")
-	private SalesReturnVO salesReturn;
 	
     @ManyToOne
 	@JoinColumn(name = "item_id")
@@ -49,12 +46,13 @@ public class SalesReturnDetailsVO {
     @Column(name = "hsn_sac_code")
     private String hsnSacCode;
     
-    @ManyToOne
-    @JoinColumn(name = "tax_type")
-    private ListOfValuesDetailsVO taxType;
+    
+    @Column(name = "tax_type")
+    private String taxType;
 
-    @Column(name = "tax_percentage")
-    private BigDecimal taxPercentage;
+    @ManyToOne
+    @JoinColumn(name = "tax_percentage")
+    private GSTRateMasterVO taxPercentage;
     
     @ManyToOne
     @JoinColumn(name = "unit_id")
@@ -72,18 +70,50 @@ public class SalesReturnDetailsVO {
     @Column(name = "rate")
     private BigDecimal rate;
     
-    
-    
-    
-    
-    
+    @Column(name = "rate_selected_currency")
+    private BigDecimal rateInSelectedCurrency;
 
-	
-	
-	 
-	 
-	
-	
-	
+    @Column(name = "amount_selected_currency")
+    private BigDecimal amountInSelectedCurrency;
 
+    @Column(name = "amount")
+    private BigDecimal amount;
+
+    @Column(name = "sgst_rate")
+    private BigDecimal sgstRate;
+
+    @Column(name = "sgst_amount")
+    private BigDecimal sgstAmount;
+
+    @Column(name = "cgst_rate")
+    private BigDecimal cgstRate;
+
+    @Column(name = "cgst_amount")
+    private BigDecimal cgstAmount;
+
+    @Column(name = "igst_rate")
+    private BigDecimal igstRate;
+
+    @Column(name = "igst_amount")
+    private BigDecimal igstAmount;
+    
+  //header mapping
+  	@ManyToOne
+  	@JoinColumn(name = "sales_return_basic_id")
+  	private SalesReturnVO salesReturn;
+  	
 }
+    
+    
+    
+    
+
+	
+	
+	 
+	 
+	
+	
+	
+
+

@@ -25,23 +25,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "sale_contract_amendment_basic")
+@Table(name = "sales_contract_amendment_basic")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 
 public class SalesContractAmendmentVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "salecontractamendmentbasicgen")
-	@SequenceGenerator(name = "salecontractamendmentbasicgen", sequenceName = "salecontractamendmentbasicseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "sale_contract_amendment_basic_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_contract_amendment_basic_gen")
+	@SequenceGenerator(name = "sales_contract_amendment_basic_gen", sequenceName = "sales_contract_amendment_basic_seq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "sales_contract_amendment_basic_id")
 	private Long id;
 	
-	@Column(name = "contract_amd_no")
-	private String contractAmdNo;
+	@Column(name = "doc_id")
+	private String docId;
 	
-	@Column(name = "date")
-	private LocalDate date;
+	@Column(name = "doc_date")
+	private LocalDate docDate;
 	
 	@ManyToOne
 	@JoinColumn(name = "branch")
@@ -53,6 +53,12 @@ public class SalesContractAmendmentVO {
 	@Column(name = "contract_date")
 	private String contractDate;
 	
+	@Column(name = "party_po_amd_no")
+	private String partyPoAmdNo;
+	
+	@Column(name = "party_po_amd_date")
+	private String partyPoAmdDate;
+	
 	@Column(name = "cust_po_no")
 	private String custPoNo;
 	
@@ -61,9 +67,6 @@ public class SalesContractAmendmentVO {
 	
 	@Column(name = "revision_no")
 	private String revisionNo;
-	
-	
-	
 	
 	@Column(name = "remarks")
 	private String remarks;

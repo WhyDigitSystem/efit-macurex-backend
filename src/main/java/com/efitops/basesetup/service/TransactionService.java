@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
+import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -34,6 +36,21 @@ public interface TransactionService {
 
 
 		Map<String, Object> getAllCustomerDetails(Long orgId, Long branch) throws ApplicationException;
+
+//		Map<String, Object> getContractNo() throws ApplicationException;
+
+		List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+		SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id) throws ApplicationException;
+
+		Map<String, Object> updateCreateSalesContractAmendment(SalesContractAmendmentDTO salesContractAmendmentDTO) throws ApplicationException;
+
+		Map<String, Object> getSalesContractAmdContractNoDropdown(Long orgId, Long branch) throws ApplicationException;
+
+		Map<String, Object> getSalesContractAmdItemDropdown(String salesContractNo, Long orgId, Long branch) throws ApplicationException;
+
+		Map<String, Object> getSalesContractAmdRevisionNo(String salesContractNo, Long item, Long orgId, Long branch) throws ApplicationException;
+
 		
 
 }

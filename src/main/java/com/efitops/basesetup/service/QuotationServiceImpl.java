@@ -888,9 +888,6 @@ public class QuotationServiceImpl implements QuotationService {
 		
 		quotationVO.setKindAttention(quotationDTO.getKindAttention());
 
-// Common Fields
-		quotationVO.setCreatedBy(quotationDTO.getCreatedBy());
-		quotationVO.setUpdatedBy(quotationDTO.getUpdatedBy());
 		quotationVO.setCancelRemarks(quotationDTO.getCancelRemarks());
 		quotationVO.setScreenName(quotationDTO.getScreenName());
 		quotationVO.setScreenCode(quotationDTO.getScreenCode());

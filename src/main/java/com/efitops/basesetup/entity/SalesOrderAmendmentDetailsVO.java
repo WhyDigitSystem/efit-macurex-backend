@@ -1,10 +1,10 @@
 package com.efitops.basesetup.entity;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,7 +13,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AllArgsConstructor;
@@ -36,22 +35,24 @@ public class SalesOrderAmendmentDetailsVO {
 	private Long id;
 
 
-	 @ManyToOne
-	 @JoinColumn(name = "item")
-	 private ItemMasterVO item;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "item")
+	private ItemMasterVO item;
 
+//	@Column(name = "item_description")
+//	private String itemDescription;
 
 	@Column(name = "old_qty")
-	private Double oldQty;
+	private double oldQty;
 
 	@Column(name = "old_rate")
-	private Double oldRate;
+	private double oldRate;
 
 	@Column(name = "new_qty")
-	private Double newQty;
+	private double newQty;
 
 	@Column(name = "new_rate")
-	private Double newRate;
+	private double newRate;
 
 	@Column(name = "old_delivery_date")
 	private LocalDate oldDeliveryDate;

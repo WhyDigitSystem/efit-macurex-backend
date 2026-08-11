@@ -93,14 +93,31 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			""", nativeQuery = true)
 	List<Object[]> getQuotationItemDropdown(String quotationNo, Long orgId, Long branch);
 
+//	@Query(value = """
+//			SELECT *
+//			FROM sales_contract_basic
+//			WHERE cancel = 0
+//			  AND active = 1
+//			ORDER BY customer_contract_no
+//			""", nativeQuery = true)
+//	List<SalesContractVO> getContractNo();
+	
 	@Query(value = """
-			SELECT *
-			FROM sales_contract_basic
-			WHERE cancel = 0
-			  AND active = 1
-			ORDER BY customer_contract_no
-			""", nativeQuery = true)
-	List<SalesContractVO> getContractNo();
+		    SELECT
+		        salescontract_id AS id,
+		        doc_id AS contractNo,
+		        customer_purchase_order_no AS custPoNo,
+		        customer_purchase_order_date AS custPoDate,
+		        doc_date AS contractDate 
+		    FROM sales_contract_basic
+		    WHERE cancel = 0
+		      AND active = 1
+		      AND org_id = :orgId
+		      AND branch = :branch
+		    ORDER BY customer_contract_no
+		    """, nativeQuery = true)
+		List<Object[]> getSalesContractAmdContractNoDropdown(@Param("orgId") Long orgId,
+		                                        @Param("branch") Long branch);
 	
 	@Query(value = "SELECT customer_contract_no AS docId, invoice_type AS invoiceType " +
             "FROM sales_contract_basic " +
@@ -131,6 +148,52 @@ List<Map<String, Object>> getDocIdAndInvoiceType(
 			ORDER BY salescontract_id DESC
 			""", nativeQuery = true)
 	List<SalesContractVO> findByOrgIdAndBranch(@Param("orgId") Long orgId, @Param("branch") Long branch);
+
+
+	@Query(value = """
+		    SELECT
+		        i.item_id,
+		        i.item_code,
+		        i.item_description,
+		        scad.new_rate
+		    FROM sales_contract_basic scb
+		    INNER JOIN sales_contract_detail scd
+		        ON scb.salescontract_id = scd.salescontract_id
+		    INNER JOIN item i
+		        ON i.item_id = scd.item
+		    LEFT JOIN sales_contract_amendment_basic scab
+		        ON scab.contract_no = scb.customer_contract_no
+		    LEFT JOIN sales_contract_amendment_detail scad
+		        ON scad.sales_contract_amendment_basic_id = scab.sales_contract_amendment_basic_id
+		       AND scad.item = scd.item
+		    WHERE scb.doc_id = ?1
+		      AND scb.org_id = ?2
+		      AND scb.branch = ?3
+		      AND scb.active = 1
+		      AND scb.cancel = 0
+		    ORDER BY i.item_description
+		    """, nativeQuery = true)
+		List<Object[]> getSalesContractAmdItemDropdown(String salesContractNo,
+		                               Long orgId,
+		                               Long branch);
+
+		@Query(value = """
+			    SELECT COALESCE(MAX(CAST(scab.revision_no AS UNSIGNED)), 0) + 1
+			    FROM sales_contract_amendment_basic scab
+			    INNER JOIN sales_contract_amendment_detail scad
+			        ON scab.sales_contract_amendment_basic_id = scad.sales_contract_amendment_basic_id
+			    WHERE scab.contract_no = ?1
+			      AND scad.item = ?2
+			      AND scab.org_id = ?3
+			      AND scab.branch = ?4
+			      AND scab.active = 1
+			      AND scab.cancel = 0
+			    """, nativeQuery = true)
+			Integer getSalesContractAmdRevisionNo(String salesContractNo,
+			                      Long item,
+			                      Long orgId,
+			                      Long branch);
+
 	
 	
 	 @Query(value = """
@@ -152,4 +215,5 @@ List<Map<String, Object>> getDocIdAndInvoiceType(
 	    
 	    
 	    
+
 }

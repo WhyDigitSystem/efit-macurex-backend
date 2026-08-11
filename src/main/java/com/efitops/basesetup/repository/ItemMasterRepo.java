@@ -66,4 +66,11 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
 
 	@Query(value = "SELECT * FROM item WHERE item_id = ?1", nativeQuery = true)
 	ItemMasterVO getItemById(Long itemId);
+	
+	 @Query(value =
+			    "select im.item_description, im.hsn_sac_code " +
+			    "from itemmaster im " +
+			    "where im.itemmaster_id=:itemId",
+			    nativeQuery = true)
+			    Object getItemDetails(@Param("itemId") Long itemId);
 }

@@ -103,6 +103,17 @@ public class SalesReturnVO {
     @ManyToOne
     @JoinColumn(name = "invoice_reference_type")
     private ListOfValuesDetailsVO invoiceReferenceType;
+    
+    //summary charges
+    
+    @Column(name = "net_amount")
+    private BigDecimal netAmount;
+
+    @Column(name = "amount_in_words")
+    private String amountInWords;
+
+    @Column(name = "narration")
+    private String narration;
 
     @Column(name = "org_id")
     private Long orgId;
@@ -131,12 +142,36 @@ public class SalesReturnVO {
     @Column(name = "screen_name")
     private String screenName = "SALESRETURN";
     
+    @JsonGetter("active")
+	public String getActive() {
+		return active ? "Active" : "In-Active";
+	}
+
+	// Optionally, if you want to control serialization for 'cancel' field similarly
+	@JsonGetter("cancel")
+	public String getCancel() {
+		return cancel ? "T" : "F";
+	}
+    
   
 
     @Embedded
     private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
     
     
+    @OneToMany(
+            mappedBy = "salesReturn",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JsonManagedReference
+    private List<SalesReturnDetailsVO> salesReturnDetails = new ArrayList<>();
+    
+    
+    @OneToMany(mappedBy = "salesReturn",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JsonManagedReference
+    private List<SalesReturnTaxDetailsVO> salesReturnTaxDetails;
 
    
 }

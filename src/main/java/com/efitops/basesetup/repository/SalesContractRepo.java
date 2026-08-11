@@ -149,6 +149,7 @@ List<Map<String, Object>> getDocIdAndInvoiceType(
 			""", nativeQuery = true)
 	List<SalesContractVO> findByOrgIdAndBranch(@Param("orgId") Long orgId, @Param("branch") Long branch);
 
+
 	@Query(value = """
 		    SELECT
 		        i.item_id,
@@ -192,4 +193,27 @@ List<Map<String, Object>> getDocIdAndInvoiceType(
 			                      Long item,
 			                      Long orgId,
 			                      Long branch);
+
+	
+	
+	 @Query(value = """
+	            SELECT
+	                salescontract_id,
+	                customer_contract_no,
+	                contract_date,
+	                customer_purchase_order_no
+	            FROM sales_contract_basic
+	            WHERE active = true
+	              AND cancel = false
+	              AND org_id = :orgId
+	              AND branch = :branch
+	            ORDER BY customer_contract_no
+	            """, nativeQuery = true)
+	    List<Object[]> getSalesContractDropdown(
+	            @Param("orgId") Long orgId,
+	            @Param("branch") Long branch);
+	    
+	    
+	    
+
 }

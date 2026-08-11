@@ -54,6 +54,13 @@ public class SalesReturnDTO {
     private LocalDate referenceDate;
 
     private Long invoiceReferenceTypeId;
+    
+    
+    private BigDecimal netAmount;
+
+    private String amountInWords;
+
+    private String narration;
 
    
     private Long orgId;
@@ -73,6 +80,10 @@ public class SalesReturnDTO {
     private String screenCode;
 
     private String screenName;
+    
+    private List<SalesReturnDetailsDto> salesReturnDetails;
+    
+    private List<SalesReturnTaxDetailsDTO> salesReturnTaxDetails;
 
    
 }

@@ -13,7 +13,7 @@ public class SalesOrderAmendmentDetailsResponseDTO {
 
     private Long id;
 
-    private Integer slNo;
+    
 
     private String itemCode;
 

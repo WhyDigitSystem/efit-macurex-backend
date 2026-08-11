@@ -13,29 +13,26 @@ import lombok.NoArgsConstructor;
 public class SalesOrderAmendmentDTO {
 
     private Long id;
+
+   
     private Long branch;
-    private String soNumber;;
+    private String docId;
     private String salesOrderNumber;
-    private LocalDate amendmentDate;
+    private LocalDate docDate;
     private String partyPoAmendmentNo;
     private LocalDate salesOrderDate;
     private LocalDate partyPoAmendmentDate;
-    private LocalDate summary;
     private String poNo;
-    private Integer revisionNo;
+    private int revisionNo;
     private LocalDate poDate;
     private String remarks;
-    private Boolean approved;
     private Boolean active;
+    private Long orgId;
+    private String createdBy;
     private String updatedBy;
     private boolean cancel;
     private String cancelRemarks;
-    private String screenName;
-    private String screenCode;
-    private Long orgId;
-    private String createdBy;
-    
-    private List<SalesOrderAmendmentDetailsDTO> salesOrderAmendmentDetails;
-	 
 
+    
+    private List<SalesOrderAmendmentDetailsDTO> details;
 }

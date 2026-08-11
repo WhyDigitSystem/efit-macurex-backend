@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.efitops.basesetup.entity.BranchVO;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +21,7 @@ public class OrderAcceptanceResponseDTO {
 
 	private String orderNo;
 	
-	private String gstApproval;
+//	private String gstApproval;
 
 	private String belongsTo;
 
@@ -49,7 +47,7 @@ public class OrderAcceptanceResponseDTO {
 
 	private String createdBy;
 
-	private boolean active;
+	private boolean active=true;
 
 	private boolean cancel = false;
 
@@ -61,7 +59,7 @@ public class OrderAcceptanceResponseDTO {
 
 	private String financialYear;
 
-	private BranchVO branch;
+	private BranchResponseDTO branch;
 
 	private String destination;
 

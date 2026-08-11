@@ -19,7 +19,7 @@ public class SalesDeliveryScheduleVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sdvbasic_seq")
-    @SequenceGenerator(name = "sdvbasic_seq",sequenceName = "sdvbasic_seq",allocationSize = 1)
+    @SequenceGenerator(name = "sdvbasic_seq",sequenceName = "sdvbasic_seq",allocationSize = 1, initialValue = 1000000001)
     @Column(name = "sdvbasic_id")
     private Long id;
 
@@ -92,8 +92,7 @@ public class SalesDeliveryScheduleVO {
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
 	@OneToMany(mappedBy = "salesDeliverySchedule",
-	        cascade = CascadeType.ALL,
-	        orphanRemoval = true)
+	        cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<SalesDeliveryScheduleDetailsVO> details = new ArrayList<>();
 

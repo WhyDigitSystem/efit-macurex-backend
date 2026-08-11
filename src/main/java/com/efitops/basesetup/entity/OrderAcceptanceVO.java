@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,20 +27,31 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "orderacceptance")
+@Table(name = "order_acceptance_basic")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderAcceptanceVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "orderacceptancegen")
-	@SequenceGenerator(name = "orderacceptancegen", sequenceName = "orderacceptanceseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "orderacceptance_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_acceptance_basicgen")
+	@SequenceGenerator(name = "order_acceptance_basicgen", sequenceName = "order_acceptance_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "order_acceptance_basic_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "doc_id")
 	private String docId;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "tax_percentage")
+	private GSTRateMasterVO taxPercentage;
+
+	@Column(name = "tax_type")
+	private String taxType;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "unit")
+	private UnitMasterVO unit;
 
 	@Column(name = "doc_date")
 	private LocalDate docDate = LocalDate.now();
@@ -57,8 +69,8 @@ public class OrderAcceptanceVO {
 	private String withQuotation;
 
 	@ManyToOne
-	@JoinColumn(name = "customer_id")
-	private CustomerVO customerId;
+	@JoinColumn(name = "customer")
+	private CustomerVO customer;
 
 	@Column(name = "quotation_date")
 	private LocalDate quotationDate;
@@ -83,13 +95,13 @@ public class OrderAcceptanceVO {
 
 	@Column(name = "post_rate")
 	private String postRate;
-	
+
 	@Column(name = "customer_type")
 	private String customerType;
-	
+
 	@Column(name = "gst_no")
 	private String gstNo;
-	
+
 	@Column(name = "gst_approval")
 	private String gstApproval;
 
@@ -104,7 +116,7 @@ public class OrderAcceptanceVO {
 	@Column(name = "cancel")
 	private boolean cancel = false;
 
-	@Column(name = "updated_by")
+	@Column(name = "modified_by")
 	private String updatedBy;
 
 	@Column(name = "cancel_remarks")
@@ -143,10 +155,10 @@ public class OrderAcceptanceVO {
 
 	@Column(name = "taxable_amount", precision = 10, scale = 2)
 	private BigDecimal taxableAmount;
-	
+
 	@Column(name = "total_tax_amount", precision = 10, scale = 2)
 	private BigDecimal totalTaxAmount;
-	
+
 	@Column(name = "total_discount_amount", precision = 10, scale = 2)
 	private BigDecimal totalDiscountAmount;
 

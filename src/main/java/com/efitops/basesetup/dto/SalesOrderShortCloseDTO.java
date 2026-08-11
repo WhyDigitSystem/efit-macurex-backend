@@ -26,7 +26,7 @@ public class SalesOrderShortCloseDTO {
 	private Long orgId;
 
 	private String financialYear;
-
+	
 	private Long branch;
 
 	private boolean active;

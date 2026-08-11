@@ -10,15 +10,15 @@ import lombok.Data;
 public class SalesDeliveryScheduleDetailsResponseDTO {
 
     private Long id;
-    private String contractNo;
+    private String soNocontractNo;
     
     private String invoiceType;
 
     private ItemResponseDTO item;
 
-    private double orderQty;
-
-    private double pendingQty;
+//    private double orderQty;
+//
+//    private double pendingQty;
 
     private double actualPlannedQty;
 

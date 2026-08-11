@@ -35,7 +35,8 @@ public class SalesOrderAmendmentVO {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_order_amendment_basic_seq")
     @SequenceGenerator(name = "sales_order_amendment_basic_seq", sequenceName = "sales_order_amendment_basic_seq", allocationSize = 1)
-	@JoinColumn(name = "sales_order_amendment_id")
+	
+    @Column(name = "sales_order_amendment_id")
     private Long id;
 
     @ManyToOne
@@ -60,8 +61,6 @@ public class SalesOrderAmendmentVO {
     @Column(name = "party_po_amendment_date")
     private LocalDate partyPoAmendmentDate;
     
-    @Column(name = "summary")
-    private LocalDate summary;
     
     @Column(name = "po_no")
     private String poNo;
@@ -75,9 +74,7 @@ public class SalesOrderAmendmentVO {
     @Column(name = "remarks")
     private String remarks;
 
-    @Column(name = "approved")
-    private boolean approved;
-
+   
     @Column(name = "active")
     private boolean active;
     
@@ -97,14 +94,14 @@ public class SalesOrderAmendmentVO {
 	@Column(name = "screen_code")
 	private String screenCode = "SOA";
 
-	@JsonGetter("active")
-	public String getActive() {
-		return active ? "Active" : "In-Active";
+	@JsonGetter("activeStatus")
+	public String getActiveStatus() {
+	    return active ? "Active" : "In-Active";
 	}
 
-	@JsonGetter("cancel")
-	public String getCancel() {
-		return cancel ? "T" : "F";
+	@JsonGetter("cancelStatus")
+	public String getCancelStatus() {
+	    return cancel ? "T" : "F";
 	}
 	
 	@OneToMany(mappedBy = "salesOrderAmendmentVO",

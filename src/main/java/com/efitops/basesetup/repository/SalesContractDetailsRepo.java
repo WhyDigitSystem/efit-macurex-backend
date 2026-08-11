@@ -32,19 +32,29 @@ public interface SalesContractDetailsRepo extends JpaRepository<SalesContractDet
 //	        """, nativeQuery = true)
 //	    List<Object[]> getItemDropdown(Long salesContractId);
 
-	@Query(value = "SELECT " + "i.item_id, " + "i.item_code, " + "i.item_description, " + "u.description AS unit, "
-			+ "scd.quantity " + "FROM sales_contract_detail scd "
-			+ "INNER JOIN sales_contract_basic scb ON scd.salescontract_id = scb.salescontract_id "
-			+ "INNER JOIN item i ON scd.item = i.item_id " + "INNER JOIN unitmaster u ON scd.unit = u.unitmaster_id "
-			+ "WHERE scb.customer_contract_no = :docId " +
+	@Query(value = """
+			SELECT
+			    d.item,
+			    i.item_code,
+			    i.item_description
+			FROM sales_contract_details d
+			INNER JOIN item_master i
+			        ON i.item_id = d.item
+			INNER JOIN sales_contract_basic s
+			        ON s.salescontract_id = d.sales_contract
+			WHERE s.salescontract_id = :salesContractId
+			  AND s.org_id = :orgId
+			  AND s.branch = :branch
+			  AND s.cancel = false
+			  AND s.active = true
+			ORDER BY i.item_code
+			""", nativeQuery = true)
+			List<Object[]> getSalesContractItemDropdown(
+			        @Param("salesContractId") Long salesContractId,
+			        @Param("orgId") Long orgId,
+			        @Param("branch") Long branch);
 
-			"UNION ALL " +
+	
 
-			"SELECT " + "i.item_id, " + "i.item_code, " + "i.item_description, " + "u.description AS unit, "
-			+ "oad.quantity " + "FROM orderacceptance_detail oad "
-			+ "INNER JOIN orderacceptance oa ON oad.orderacceptance_id = oa.orderacceptance_id "
-			+ "INNER JOIN item i ON oad.item = i.item_id " + "INNER JOIN unitmaster u ON oad.unit = u.unitmaster_id "
-			+ "WHERE oa.doc_id = :docId " + "ORDER BY item_code", nativeQuery = true)
-	List<Object[]> getItemDropdown(@Param("docId") String docId);
-
+	
 }

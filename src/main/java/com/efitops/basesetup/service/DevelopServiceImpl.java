@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +27,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
 import com.efitops.basesetup.ResponseDTO.EnquiryCusContactResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
+import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractOrderAmendmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesReturnCustomerResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
@@ -46,6 +50,10 @@ import com.efitops.basesetup.dto.SalesDeliveryScheduleDetailsResponseDTO;
 import com.efitops.basesetup.dto.SalesDeliverySchedulePlanDTO;
 import com.efitops.basesetup.dto.SalesDeliverySchedulePlanResponseDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
+import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
+import com.efitops.basesetup.dto.SalesOrderAmendmentDetailsDTO;
+import com.efitops.basesetup.dto.SalesOrderAmendmentDetailsResponseDTO;
+import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.SalesReturnDTO;
 import com.efitops.basesetup.dto.SalesReturnDetailsDto;
 import com.efitops.basesetup.dto.SalesReturnDetailsResponseDto;
@@ -69,6 +77,8 @@ import com.efitops.basesetup.entity.SalesContractVO;
 import com.efitops.basesetup.entity.SalesDeliveryScheduleDetailsVO;
 import com.efitops.basesetup.entity.SalesDeliverySchedulePlanVO;
 import com.efitops.basesetup.entity.SalesDeliveryScheduleVO;
+import com.efitops.basesetup.entity.SalesOrderAmendmentDetailsVO;
+import com.efitops.basesetup.entity.SalesOrderAmendmentVO;
 import com.efitops.basesetup.entity.SalesReturnDetailsVO;
 import com.efitops.basesetup.entity.SalesReturnTaxDetailsVO;
 import com.efitops.basesetup.entity.SalesReturnVO;
@@ -92,6 +102,8 @@ import com.efitops.basesetup.repository.SalesContractRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleDetailsRepo;
 import com.efitops.basesetup.repository.SalesDeliverySchedulePlanRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
+import com.efitops.basesetup.repository.SalesOrderAmendmentDetailsRepo;
+import com.efitops.basesetup.repository.SalesOrderAmendmentRepo;
 import com.efitops.basesetup.repository.SalesReturnRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
@@ -160,6 +172,16 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	@Autowired
 	private UnitMasterRepo unitMasterRepo;
+	
+	
+	@Autowired
+	private SalesOrderAmendmentRepo salesOrderAmendmentRepo;
+	
+	
+	@Autowired
+	private SalesOrderAmendmentDetailsRepo salesOrderAmendmentDetailsRepo;
+	
+	
 	
 	
 	
@@ -535,7 +557,7 @@ public class DevelopServiceImpl implements DevelopService {
 	        CustomerVO customer = customerRepo.findById(enquiryDTO.getPartyId())
 	                .orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
-	        enquiryVO.setPartyid(customer);
+	        enquiryVO.setCustomer(customer);
 	    }
 
 	    // ================= Contact =================
@@ -725,12 +747,12 @@ public class DevelopServiceImpl implements DevelopService {
 
 	    // ================= Party =================
 
-	    if (enquiryVO.getPartyid() != null) {
+	    if (enquiryVO.getCustomer() != null) {
 
 	        responseDTO.setCustomerVO(
 	                new CustomerResonse1DTO(
-	                        enquiryVO.getPartyid().getId(),
-	                        enquiryVO.getPartyid().getCustomerName()));
+	                        enquiryVO.getCustomer().getId(),
+	                        enquiryVO.getCustomer().getCustomerName()));
 	    }
 
 	    // ================= Contact =================
@@ -1607,12 +1629,394 @@ public class DevelopServiceImpl implements DevelopService {
 			// TODO Auto-generated method stub
 			return null;
 		}
-	    
-	    
-	    
-	    
-	  
-	
+		
+		
+		//salesorderamendment
+		
+		
+		@Override
+		@Transactional
+		public Map<String, Object> createUpdateSalesOrderAmendment(
+		        SalesOrderAmendmentDTO salesOrderAmendmentDTO)
+		        throws ApplicationException {
+
+		    SalesOrderAmendmentVO salesOrderAmendmentVO =
+		            new SalesOrderAmendmentVO();
+
+		    String message;
+
+		    if (ObjectUtils.isNotEmpty(salesOrderAmendmentDTO.getId())) {
+
+		        salesOrderAmendmentVO =
+		                salesOrderAmendmentRepo.findById(
+		                        salesOrderAmendmentDTO.getId())
+		                .orElseThrow(() ->
+		                new ApplicationException(
+		                        "Sales Order Amendment Not Found"));
+
+		        createUpdateSalesOrderAmendmentVOByDTO(
+		                salesOrderAmendmentDTO,
+		                salesOrderAmendmentVO);
+
+		        message = "Sales Order Amendment Updated Successfully";
+
+		    } else {
+
+		        createUpdateSalesOrderAmendmentVOByDTO(
+		                salesOrderAmendmentDTO,
+		                salesOrderAmendmentVO);
+
+		        message = "Sales Order Amendment Created Successfully";
+		    }
+
+		    SalesOrderAmendmentVO savedSalesOrderAmendment =
+		            salesOrderAmendmentRepo.save(salesOrderAmendmentVO);
+
+		    if (ObjectUtils.isNotEmpty(salesOrderAmendmentDTO.getId())) {
+
+		        salesOrderAmendmentDetailsRepo
+		                .deleteBySalesOrderAmendmentVO(savedSalesOrderAmendment);
+		    }
+		    
+		    if (salesOrderAmendmentDTO.getDetails() != null) {
+
+		        for (SalesOrderAmendmentDetailsDTO detailDTO
+		                : salesOrderAmendmentDTO.getDetails()) {
+
+		            SalesOrderAmendmentDetailsVO detailVO =
+		                    new SalesOrderAmendmentDetailsVO();
+
+		            if (detailDTO.getItem() != null) {
+
+		                ItemMasterVO itemVO =
+		                        itemMasterRepo.findById(detailDTO.getItem())
+		                        .orElseThrow(() ->
+		                        new ApplicationException("Item Not Found"));
+
+		                detailVO.setItem(itemVO);
+		            }
+
+		            detailVO.setOldQty(detailDTO.getOldQty());
+		            detailVO.setOldRate(detailDTO.getOldRate());
+		            detailVO.setNewQty(detailDTO.getNewQty());
+		            detailVO.setNewRate(detailDTO.getNewRate());
+		            detailVO.setOldDeliveryDate(detailDTO.getOldDeliveryDate());
+		            detailVO.setNewDeliveryDate(detailDTO.getNewDeliveryDate());
+
+		            detailVO.setSalesOrderAmendmentVO(savedSalesOrderAmendment);
+
+		            salesOrderAmendmentDetailsRepo.save(detailVO);
+		        }
+		    }
+
+		    savedSalesOrderAmendment =
+		            salesOrderAmendmentRepo.findById(
+		                    savedSalesOrderAmendment.getId())
+		            .orElseThrow(() ->
+		            new ApplicationException(
+		                    "Sales Order Amendment Not Found"));
+
+		    Map<String, Object> response = new HashMap<>();
+
+		    response.put("message", message);
+		    response.put("salesOrderAmendmentVO",
+		            salesOrderAmendmentResponse(savedSalesOrderAmendment));
+
+		    return response;
+		    
+		    
+		    
+		}
+		
+		
+		private void createUpdateSalesOrderAmendmentVOByDTO(
+		        SalesOrderAmendmentDTO dto,
+		        SalesOrderAmendmentVO vo)
+		        throws ApplicationException {
+
+		    if (dto.getBranch() != null) {
+
+		        BranchVO branchVO = branchRepo.findById(dto.getBranch())
+		                .orElseThrow(() ->
+		                        new ApplicationException("Branch Not Found"));
+
+		        vo.setBranch(branchVO);
+		    }
+
+		    vo.setDocId(dto.getDocId());
+		    vo.setSalesOrderNumber(dto.getSalesOrderNumber());
+		    vo.setDocDate(dto.getDocDate());
+		    vo.setPartyPoAmendmentNo(dto.getPartyPoAmendmentNo());
+		    vo.setSalesOrderDate(dto.getSalesOrderDate());
+		    vo.setPartyPoAmendmentDate(dto.getPartyPoAmendmentDate());
+		    vo.setPoNo(dto.getPoNo());
+		    vo.setRevisionNo(dto.getRevisionNo());
+		    vo.setPoDate(dto.getPoDate());
+		    vo.setRemarks(dto.getRemarks());
+
+		    vo.setActive(dto.getActive());
+		    vo.setOrgId(dto.getOrgId());
+		    vo.setCreatedBy(dto.getCreatedBy());
+		    vo.setUpdatedBy(dto.getUpdatedBy());
+		    vo.setCancel(dto.isCancel());
+		    vo.setCancelRemarks(dto.getCancelRemarks());
+		}
+		
+		private SalesOrderAmendmentResponseDTO salesOrderAmendmentResponse(
+		        SalesOrderAmendmentVO salesOrderAmendmentVO) {
+
+		    SalesOrderAmendmentResponseDTO responseDTO =
+		            new SalesOrderAmendmentResponseDTO();
+
+		    responseDTO.setId(salesOrderAmendmentVO.getId());
+
+		    // ==========================
+		    // Branch
+		    // ==========================
+
+		    if (salesOrderAmendmentVO.getBranch() != null) {
+
+		        responseDTO.setBranchId(
+		                salesOrderAmendmentVO.getBranch().getId());
+
+		        responseDTO.setBranchName(
+		                salesOrderAmendmentVO.getBranch().getBranchName());
+		    }
+
+		    // ==========================
+		    // Header
+		    // ==========================
+
+		    responseDTO.setDocId(
+		            salesOrderAmendmentVO.getDocId());
+
+		    responseDTO.setDocDate(
+		            salesOrderAmendmentVO.getDocDate());
+
+		    responseDTO.setSalesOrderNumber(
+		            salesOrderAmendmentVO.getSalesOrderNumber());
+
+		    responseDTO.setPartyPoAmendmentNo(
+		            salesOrderAmendmentVO.getPartyPoAmendmentNo());
+
+		    responseDTO.setSalesOrderDate(
+		            salesOrderAmendmentVO.getSalesOrderDate());
+
+		    responseDTO.setPartyPoAmendmentDate(
+		            salesOrderAmendmentVO.getPartyPoAmendmentDate());
+
+		    responseDTO.setPoNo(
+		            salesOrderAmendmentVO.getPoNo());
+
+		    responseDTO.setRevisionNo(
+		            salesOrderAmendmentVO.getRevisionNo());
+
+		    responseDTO.setPoDate(
+		            salesOrderAmendmentVO.getPoDate());
+
+		    responseDTO.setRemarks(
+		            salesOrderAmendmentVO.getRemarks());
+
+		    responseDTO.setOrgId(
+		            salesOrderAmendmentVO.getOrgId());
+
+		    responseDTO.setCreatedBy(
+		            salesOrderAmendmentVO.getCreatedBy());
+
+		    responseDTO.setUpdatedBy(
+		            salesOrderAmendmentVO.getUpdatedBy());
+
+		    responseDTO.setActive(
+		            salesOrderAmendmentVO.isActive());
+
+		    responseDTO.setCancel(
+		            salesOrderAmendmentVO.isCancel());
+
+		    responseDTO.setCancelRemarks(
+		            salesOrderAmendmentVO.getCancelRemarks());
+
+		    responseDTO.setScreenName(
+		            salesOrderAmendmentVO.getScreenName());
+
+		    responseDTO.setScreenCode(
+		            salesOrderAmendmentVO.getScreenCode());
+
+		    // ==========================
+		    // Detail Grid
+		    // ==========================
+
+		    List<SalesOrderAmendmentDetailsResponseDTO> details =
+		            new ArrayList<>();
+
+		   
+
+		    for (SalesOrderAmendmentDetailsVO detailVO
+		            : salesOrderAmendmentVO.getDetails()) {
+
+		        SalesOrderAmendmentDetailsResponseDTO detailDTO =
+		                new SalesOrderAmendmentDetailsResponseDTO();
+
+		        detailDTO.setId(detailVO.getId());
+
+		       
+
+		        if (detailVO.getItem() != null) {
+
+		            detailDTO.setItemCode(
+		                    detailVO.getItem().getItemCode());
+
+		            detailDTO.setItemDescription(
+		                    detailVO.getItem().getItemDescription());
+		        }
+
+		        detailDTO.setOldQty(detailVO.getOldQty());
+
+		        detailDTO.setOldRate(detailVO.getOldRate());
+
+		        detailDTO.setNewQty(detailVO.getNewQty());
+
+		        detailDTO.setNewRate(detailVO.getNewRate());
+
+		        detailDTO.setOldDeliveryDate(
+		                detailVO.getOldDeliveryDate());
+
+		        detailDTO.setNewDeliveryDate(
+		                detailVO.getNewDeliveryDate());
+
+		        details.add(detailDTO);
+		    }
+
+		    responseDTO.setSalesOrderAmendmentDetails(details);
+
+		    return responseDTO;
+		}
+		
+		
+		@Override
+		public SalesOrderAmendmentResponseDTO getSalesOrderAmendmentById(Long id)
+		        throws ApplicationException {
+
+		    SalesOrderAmendmentVO salesOrderAmendmentVO =
+		            salesOrderAmendmentRepo.getSalesOrderAmendmentById(id);
+
+		    if (salesOrderAmendmentVO == null) {
+
+		        throw new ApplicationException(
+		                "Sales Order Amendment Not Found");
+		    }
+
+		    return salesOrderAmendmentResponse(salesOrderAmendmentVO);
+		}
+		
+		
+		@Override
+		public List<SalesOrderAmendmentResponseDTO> getSalesOrderAmendmentByOrgId(
+		        Long orgId,
+		        Long branch)
+		        throws ApplicationException {
+
+		    List<SalesOrderAmendmentVO> salesOrderAmendmentList =
+		            salesOrderAmendmentRepo.getSalesOrderAmendmentByOrgId(
+		                    orgId,
+		                    branch);
+
+		    if (salesOrderAmendmentList == null
+		            || salesOrderAmendmentList.isEmpty()) {
+
+		        throw new ApplicationException(
+		                "Sales Order Amendment Not Found");
+		    }
+
+		    List<SalesOrderAmendmentResponseDTO> responseList =
+		            new ArrayList<>();
+
+		    for (SalesOrderAmendmentVO salesOrderAmendmentVO
+		            : salesOrderAmendmentList) {
+
+		        responseList.add(
+		                salesOrderAmendmentResponse(
+		                        salesOrderAmendmentVO));
+		    }
+
+		    return responseList;
+		}
+		
+		@Override
+		public Map<String, Object> getSalesContractDropdown(
+		        Long orgId,
+		        Long branch)
+		        throws ApplicationException {
+
+		    Map<String, Object> responseMap = new HashMap<>();
+
+		    List<Object[]> salesContractList =
+		            salesContractRepo.getSalesContractDropdown(orgId, branch);
+
+		    List<SalesContractDropdownResponseDto> responseDTOList =
+		            new ArrayList<>();
+
+		    for (Object[] obj : salesContractList) {
+
+		        SalesContractDropdownResponseDto dto =
+		                new SalesContractDropdownResponseDto();
+
+		        dto.setId(((Number) obj[0]).longValue());
+
+		        dto.setCustomerContractNo((String) obj[1]);
+
+		        dto.setContractDate((LocalDate) obj[2]);
+
+		        dto.setCustomerPurchaseOrderNo((String) obj[3]);
+
+		        responseDTOList.add(dto);
+		    }
+
+		    responseMap.put("message", "Sales Contract List Fetched Successfully");
+		    responseMap.put("salesContractList", responseDTOList);
+
+		    return responseMap;
+		}
+		
+		
+		@Override
+		public Map<String, Object> getSalesContractItemDropdown(
+		        Long salesContractId,
+		        Long orgId,
+		        Long branch)
+		        throws ApplicationException {
+
+		    Map<String, Object> responseMap = new HashMap<>();
+
+		    List<Object[]> itemList =
+		            salesContractDetailsRepo.getSalesContractItemDropdown(
+		                    salesContractId,
+		                    orgId,
+		                    branch);
+
+		    List<SalesContractOrderAmendmentResponseDto> responseDTOList =
+		            new ArrayList<>();
+
+		    for (Object[] obj : itemList) {
+
+		    	SalesContractOrderAmendmentResponseDto dto =
+		                new SalesContractOrderAmendmentResponseDto();
+
+		        dto.setItemId(((Number)obj[0]).longValue());
+
+		        dto.setItemCode((String)obj[1]);
+
+		        dto.setItemDescription((String)obj[2]);
+
+		        responseDTOList.add(dto);
+		    }
+
+		    responseMap.put("message", "Item List Fetched Successfully");
+
+		    responseMap.put("itemList", responseDTOList);
+
+		    return responseMap;
+		}
+		
 }
-	 
-	
+
+

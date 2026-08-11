@@ -36,23 +36,22 @@ public class SalesOrderAmendmentDetailsVO {
 	private Long id;
 
 
-	@Column(name = "item")
-	private ItemMasterVO item;
+	 @ManyToOne
+	 @JoinColumn(name = "item")
+	 private ItemMasterVO item;
 
-//	@Column(name = "item_description")
-//	private String itemDescription;
 
 	@Column(name = "old_qty")
-	private double oldQty;
+	private Double oldQty;
 
 	@Column(name = "old_rate")
-	private double oldRate;
+	private Double oldRate;
 
 	@Column(name = "new_qty")
-	private double newQty;
+	private Double newQty;
 
 	@Column(name = "new_rate")
-	private double newRate;
+	private Double newRate;
 
 	@Column(name = "old_delivery_date")
 	private LocalDate oldDeliveryDate;

@@ -103,8 +103,48 @@ List<Object[]> getCustomerDetails(Long orgId, Long branch);
 			ORDER BY customer_code
 			""", nativeQuery = true)
 			List<Object[]> getCustomerDropdown(String ctype, Long orgId, Long branch);
-
+		
+			//getstocktransfercustomer
+			@Query(value =
+					"SELECT " +
+					"c.customer_id, " +
+					"c.customer_code, " +
+					"c.customer_name, " +
+					"c.account_name, " +
+					"g.gststatemaster_id, " +
+					"g.state_code, " +
+					"g.state_name, " +
+					"g.gst_state_id, " +
+					"c.is_gst_applicable, " +
+					"c.gst_no " +
+					"FROM customer_header c " +
+					"INNER JOIN gststatemaster g ON c.gst_state = g.gststatemaster_id " +
+					"WHERE c.cancel = false " +
+					"AND c.active = true " +
+					"AND LOWER(c.customer_type)='customer' " +
+					"ORDER BY c.customer_code",
+					nativeQuery = true)
+					List<Object[]> getStockTransferCustomer();
+					
+					// despatch customer
+					@Query(value = """
+						    SELECT
+						        customer_id,
+						        customer_code,
+						        customer_name,
+						        party_credit_limit
+						    FROM customer_header
+						    WHERE active = true
+						    AND branch = :branch
+						    AND org_id = :orgId
+						      AND cancel = false
+						    ORDER BY customer_name
+						    """, nativeQuery = true)
+						List<Object[]> getDespatchCustomer(  @Param("branch") Long branch,
+						        @Param("orgId") Long orgId);
 }
+
+
 
 
 

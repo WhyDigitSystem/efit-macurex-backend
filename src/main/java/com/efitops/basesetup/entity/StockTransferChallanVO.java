@@ -1,7 +1,11 @@
 package com.efitops.basesetup.entity;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -10,11 +14,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,7 +51,7 @@ public class StockTransferChallanVO {
 	
 	@ManyToOne
 	@JoinColumn(name = "listofvalues_id")
-	private ListOfValuesVO listOfValues;
+	private ListOfValuesVO types;
 	
 	@ManyToOne
 	@JoinColumn(name = "customer")
@@ -54,6 +60,9 @@ public class StockTransferChallanVO {
 	@ManyToOne
 	@JoinColumn(name = "location")
 	private LocationVO location;
+	
+	@Column(name = "time_of_transfer")
+	private LocalTime timeOfTranfer;
 	
 	@Column(name = "stock_posting")
 	private String stockPosting;
@@ -84,6 +93,28 @@ public class StockTransferChallanVO {
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 	
+	@Column(name = "total_insurance")
+	private Double totalInsurance;
+	@Column(name = "total_freight")
+	private Double totalFreight;
+	@Column(name = "total_ass_val")
+	private Double totalAssVal;
+	@Column(name = "mode_of_transport")
+	private String modeOfTransport;
+	@Column(name = "sales_tax")
+	private String salesTax;
+	@Column(name = "gross_amount")
+	private Double grossAmount;
+	@Column(name = "amount_in_words")
+	private String amountInWords;
+	@Column(name = "delivery_to")
+	private String deliverTo;
+	@Column(name = "payment_terms")
+	private String paymentTerms;
+	@Column(name = "narration")
+	private String narration;
+	
+	
 	@Column(name = "screen_code",length = 10)
 	private String screenCode ="STC";
 	@Column(name = "screen_name",length = 30)
@@ -97,5 +128,12 @@ public class StockTransferChallanVO {
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
- 
+	@OneToMany(mappedBy = "stockTransferChallanVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<StockTransferChallanDetailsVO> details = new ArrayList<>();
+
+//	@OneToMany(mappedBy = "stockTransferChallanVO", cascade = CascadeType.ALL)
+//	@JsonManagedReference
+//	private List<StockTransferChallanTaxDetailsVO> taxDetails = new ArrayList<>();
+// 
 }

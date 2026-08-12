@@ -13,16 +13,15 @@ public class SalesOrderAmendmentDetailsDTO {
 
     private Long id;
 
-    private Integer slNo;
+   
+    private Long item;
 
-    private String itemCode;
-
-    private String itemDescription;
-
+   
     private Double oldQty;
 
     private Double oldRate;
 
+   
     private Double newQty;
 
     private Double newRate;
@@ -30,5 +29,4 @@ public class SalesOrderAmendmentDetailsDTO {
     private LocalDate oldDeliveryDate;
 
     private LocalDate newDeliveryDate;
-
 }

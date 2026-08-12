@@ -81,4 +81,11 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
 	        ORDER BY item_id
 	        """, nativeQuery = true)
 	List<Object[]> getDespatchItems(@Param ("branch") Long branch ,@Param("orgId") Long orgId);
+
+         @Query(value =
+			    "select im.item_description, im.hsn_sac_code " +
+			    "from itemmaster im " +
+			    "where im.itemmaster_id=:itemId",
+			    nativeQuery = true)
+			    Object getItemDetails(@Param("itemId") Long itemId);
 }

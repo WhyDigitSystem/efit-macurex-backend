@@ -1,31 +1,26 @@
 package com.efitops.basesetup.dto;
 
+import java.util.List;
+
+import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
+
 import lombok.Data;
 
 @Data
 public class SalesDeliveryScheduleDetailsResponseDTO {
 
     private Long id;
-
-    // S.O No
-    private Long salesContractId;
-    private String salesContractNo;
-
-    // Invoice Type
-    private Long salesContractDetailsId;
+    private String soNocontractNo;
+    
     private String invoiceType;
 
-    // Item
-    private Long itemId;
-    private String itemCode;
-    private String itemDescription;
+    private ItemResponseDTO item;
 
-    // Unit
-    private String unit;
+//    private double orderQty;
+//
+//    private double pendingQty;
 
-    // Quantities
-    private Double orderQty;
-    private Double pendingQty;
-    private Double actualPlannedQty;
+    private double actualPlannedQty;
 
+    private List<SalesDeliverySchedulePlanResponseDTO> deliverySchedules;
 }

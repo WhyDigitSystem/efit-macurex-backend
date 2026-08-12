@@ -1,6 +1,7 @@
 package com.efitops.basesetup.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -142,6 +143,23 @@ List<Object[]> getCustomerDetails(Long orgId, Long branch);
 						    """, nativeQuery = true)
 						List<Object[]> getDespatchCustomer(  @Param("branch") Long branch,
 						        @Param("orgId") Long orgId);
+
+
+			@Query(value = """
+			        SELECT
+			            customer_id AS customerId,
+			            customer_name AS customerName,
+			            customer_code AS customerCode
+			        FROM customer_header
+			        WHERE org_id = ?1
+			          AND branch = ?2 and customer_type="CUSTOMER"
+			          AND active = 1
+			          AND cancel = 0
+			        ORDER BY customer_name
+			        """, nativeQuery = true)
+			List<Map<String, Object>> getAllCustomerDetails(
+			        @Param("orgId") Long orgId,
+			        @Param("branch") Long branch);
 }
 
 

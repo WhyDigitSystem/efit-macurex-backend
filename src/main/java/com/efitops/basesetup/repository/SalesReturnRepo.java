@@ -12,12 +12,12 @@ public interface SalesReturnRepo extends JpaRepository<SalesReturnVO, Long> {
 
     @Query(value = """
             SELECT *
-            FROM sales_return
+            FROM sales_return_basic
             WHERE org_id = :orgId
               AND branch_id = :branchId
               AND cancel = false
               AND active = true
-            ORDER BY sales_return_id DESC
+            ORDER BY sales_return_basicid DESC
             """, nativeQuery = true)
     List<SalesReturnVO> findByOrgIdAndBranch(
             @Param("orgId") Long orgId,

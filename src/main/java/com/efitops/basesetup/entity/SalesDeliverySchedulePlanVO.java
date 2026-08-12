@@ -4,28 +4,20 @@ import java.time.LocalDate;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.Data;
 
 @Entity
-@Table(name = "sales_delivery_schedule_plan")
+@Table(name = "dlryschedule")
 @Data
 public class SalesDeliverySchedulePlanVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sales_delivery_schedule_plan_seq")
-    @SequenceGenerator(name = "sales_delivery_schedule_plan_seq",sequenceName = "sales_delivery_schedule_plan_seq",allocationSize = 1)
-    @Column(name = "sales_delivery_schedule_plan_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "dlryschedule_seq")
+    @SequenceGenerator(name = "dlryschedule_seq",sequenceName = "dlryschedule_seq",allocationSize = 1, initialValue = 1000000001)
+    @Column(name = "dlryschedule_id")
     private Long id;
-
-    // Header
-    @ManyToOne
-    @JoinColumn(name = "sales_delivery_schedule_id")
-    private SalesDeliveryScheduleVO salesDeliverySchedule;
-
-    // Schedule Details Grid
-    @ManyToOne
-    @JoinColumn(name = "sales_delivery_schedule_details_id")
-    private SalesDeliveryScheduleDetailsVO salesDeliveryScheduleDetails;
 
     @Column(name = "day_no")
     private Integer dayNo;
@@ -41,4 +33,9 @@ public class SalesDeliverySchedulePlanVO {
 
     @Column(name = "delivery_qty")
     private Double deliveryQty;
+    
+    @ManyToOne
+    @JoinColumn(name = "sdvdet_id")
+    @JsonBackReference
+    private SalesDeliveryScheduleDetailsVO salesDeliveryScheduleDetails;
 }

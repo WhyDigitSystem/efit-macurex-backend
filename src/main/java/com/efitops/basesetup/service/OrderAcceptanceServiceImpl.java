@@ -1,9 +1,10 @@
 package com.efitops.basesetup.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,8 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -23,39 +24,46 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.efitops.basesetup.ResponseDTO.GSTRateResponseDTO;
+import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
-import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.CustomerResponseGstDetailsDTO;
-import com.efitops.basesetup.dto.ItemMasterResponseDTO;
-import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseGstDetailsDTO;
+import com.efitops.basesetup.dto.ItemMasterResponseTaxDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDetailsDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceDetailsResponseDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceDocIdResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceFileUploadDetailsDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceItemDetailsResponseDTO;
+import com.efitops.basesetup.dto.OrderAcceptanceItemDropdownResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceResponseDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceTaxDetailsDTO;
 import com.efitops.basesetup.dto.OrderAcceptanceTaxDetailsResponsDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDetailsDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseDetailsResponseDTO;
-import com.efitops.basesetup.dto.SalesOrderShortCloseFileDetailsResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderShortCloseResponseDTO;
-import com.efitops.basesetup.dto.UnitMasterResponseDTO;
+import com.efitops.basesetup.dto.ShortCloseItemResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
-import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.OrderAcceptanceDetailsVO;
 import com.efitops.basesetup.entity.OrderAcceptanceFileUploadDetailsVO;
 import com.efitops.basesetup.entity.OrderAcceptanceTaxDetailsVO;
 import com.efitops.basesetup.entity.OrderAcceptanceVO;
 import com.efitops.basesetup.entity.SalesOrderShortCloseDetailsVO;
-import com.efitops.basesetup.entity.SalesOrderShortCloseFileDetailsVO;
 import com.efitops.basesetup.entity.SalesOrderShortCloseVO;
+import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
@@ -138,6 +146,9 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	@Autowired
 	SalesOrderShortCloseFileDetailsRepo salesOrderShortCloseFileDetailsRepo;
 
+	@Autowired
+	GstRateMasterRepo gstRateRepo;
+
 	@Override
 	public OrderAcceptanceResponseDTO getOrderAcceptanceById(Long id) throws ApplicationException {
 
@@ -151,10 +162,10 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	}
 
 	@Override
-	public List<OrderAcceptanceResponseDTO> getOrderAcceptanceByOrgId(Long orgId, Long branchId)
+	public List<OrderAcceptanceResponseDTO> getOrderAcceptanceByOrgId(Long orgId, Long branch)
 			throws ApplicationException {
 
-		List<OrderAcceptanceVO> quotationList = orderAcceptanceRepo.getQuotationByOrgId(orgId, branchId);
+		List<OrderAcceptanceVO> quotationList = orderAcceptanceRepo.getQuotationByOrgId(orgId, branch);
 
 		if (quotationList == null || quotationList.isEmpty()) {
 			throw new ApplicationException("Quotation Not Found");
@@ -196,13 +207,10 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			message = "OrderAcceptance Created Successfully";
 		}
 
-		// Header + Child Mapping
 		createUpdateOrderAcceptanceVOByOrderAcceptanceDTO(orderAcceptanceDTO, orderAcceptanceVO);
 
-		// Save Header
 		orderAcceptanceVO = orderAcceptanceRepo.save(orderAcceptanceVO);
 
-		// Save Attachments
 		saveAttachments(files, orderAcceptanceVO);
 
 		// Response
@@ -220,12 +228,12 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		orderAcceptanceVO.setBelongsTo(orderAcceptanceDTO.getBelongsTo());
 
-		if (orderAcceptanceDTO.getCustomerId() != null && orderAcceptanceDTO.getCustomerId() > 0) {
+		if (orderAcceptanceDTO.getCustomer() != null && orderAcceptanceDTO.getCustomer() != 0) {
 
-			CustomerVO customer = customerRepo.findById(orderAcceptanceDTO.getBranchId())
+			CustomerVO customer = customerRepo.findById(orderAcceptanceDTO.getCustomer())
 					.orElseThrow(() -> new ApplicationException("Party Not Found"));
 
-			orderAcceptanceVO.setCustomerId(customer);
+			orderAcceptanceVO.setCustomer(customer);
 		}
 
 		orderAcceptanceVO.setWithQuotation(orderAcceptanceDTO.getWithQuotation());
@@ -248,8 +256,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		orderAcceptanceVO.setPostRate(orderAcceptanceDTO.getPostRate());
 
-		orderAcceptanceVO.setCreatedBy(orderAcceptanceDTO.getCreatedBy());
-		orderAcceptanceVO.setUpdatedBy(orderAcceptanceDTO.getUpdatedBy());
 		orderAcceptanceVO.setCancelRemarks(orderAcceptanceDTO.getCancelRemarks());
 
 		orderAcceptanceVO.setOrgId(orderAcceptanceDTO.getOrgId());
@@ -266,16 +272,17 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		orderAcceptanceVO.setSpecification(orderAcceptanceDTO.getSpecification());
 		orderAcceptanceVO.setNote(orderAcceptanceDTO.getNote());
 
-		orderAcceptanceVO.setCreatedBy(orderAcceptanceDTO.getCreatedBy());
-		orderAcceptanceVO.setUpdatedBy(orderAcceptanceDTO.getUpdatedBy());
+		orderAcceptanceVO.setOrgId(orderAcceptanceDTO.getOrgId());
+		orderAcceptanceVO.setActive(orderAcceptanceDTO.isActive());
+
 		orderAcceptanceVO.setOrgId(orderAcceptanceDTO.getOrgId());
 		orderAcceptanceVO.setFinancialYear(orderAcceptanceDTO.getFinancialYear());
-
 		orderAcceptanceVO.setGstApproval(orderAcceptanceDTO.getGstApproval());
+		orderAcceptanceVO.setDocId(orderAcceptanceDTO.getDocId());
 
-		if (orderAcceptanceDTO.getBranchId() != null && orderAcceptanceDTO.getBranchId() > 0) {
+		if (orderAcceptanceDTO.getBranch() != null && orderAcceptanceDTO.getBranch() > 0) {
 
-			BranchVO branch = branchRepo.findById(orderAcceptanceDTO.getBranchId())
+			BranchVO branch = branchRepo.findById(orderAcceptanceDTO.getBranch())
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 			orderAcceptanceVO.setBranch(branch);
@@ -316,16 +323,19 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 					detailsVO.setItem(itemCode);
 				}
 
-				if (dto.getCurrencyNameId() != null && dto.getCurrencyNameId() != 0) {
-					CurrencyVO currency = currencyRepo.findById(dto.getCurrencyNameId())
-							.orElseThrow(() -> new ApplicationException("Currency Not Found"));
+				UnitMasterVO unit = unitMasterRepo.findById(dto.getUnit())
+						.orElseThrow(() -> new ApplicationException("Unit Not Found"));
 
-					detailsVO.setCurrencyName(currency);
-				}
+				GSTRateMasterVO gstRateVO = gstRateRepo.findById(dto.getTaxPercentage())
+						.orElseThrow(() -> new ApplicationException("GST Rate Not Found"));
+
+				detailsVO.setTaxPercentage(gstRateVO);
 
 				detailsVO.setLastInvoiceDate(dto.getLastInvoiceDate());
 
 				detailsVO.setQuantity(dto.getQuantity());
+
+				detailsVO.setUnit(unit);
 
 				detailsVO.setQuantityRate(dto.getQuantityRate());
 
@@ -335,61 +345,55 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 				detailsVO.setOrderAmount(dto.getQuantity().multiply(dto.getOrderRate()));
 
-				BigDecimal discountAmount = detailsVO.getOrderAmount().multiply(dto.getDiscount())
-						.divide(BigDecimal.valueOf(100));
+				detailsVO.setTaxType(dto.getTaxType());
+
+				BigDecimal quantity = dto.getQuantity() == null ? BigDecimal.ZERO : dto.getQuantity();
+
+				BigDecimal orderRate = dto.getOrderRate() == null ? BigDecimal.ZERO : dto.getOrderRate();
+
+				BigDecimal discountPercentage = dto.getDiscount() == null ? BigDecimal.ZERO : dto.getDiscount();
+
+				BigDecimal orderAmount = quantity.multiply(orderRate);
+
+				BigDecimal discountAmount = orderAmount.multiply(discountPercentage).divide(BigDecimal.valueOf(100));
+
+				BigDecimal amount = orderAmount.subtract(discountAmount);
 
 				detailsVO.setDiscountAmount(discountAmount);
+				detailsVO.setAmount(amount);
 
-				totalDiscountAmount = totalDiscountAmount.add(discountAmount);
+				if ("YES".equalsIgnoreCase(orderAcceptanceVO.getGstApproval())) {
 
-				detailsVO.setAmount(detailsVO.getOrderAmount().subtract(discountAmount));
+					BigDecimal igstAmount = amount.multiply(gstRateVO.getIgst()).divide(BigDecimal.valueOf(100));
 
-				BigDecimal taxPercentage = dto.getTaxPercentage() == null ? BigDecimal.ZERO : dto.getTaxPercentage();
+					detailsVO.setIgstRate(gstRateVO.getIgst());
+					detailsVO.setCgstRate(BigDecimal.ZERO);
+					detailsVO.setSgstRate(BigDecimal.ZERO);
 
-				detailsVO.setTaxPercentage(taxPercentage);
-
-				if ("Yes".equalsIgnoreCase(orderAcceptanceDTO.getGstApproval())) {
-
-					BigDecimal igstAmount = detailsVO.getAmount().multiply(taxPercentage)
-							.divide(BigDecimal.valueOf(100));
-
-					detailsVO.setIgstRate(taxPercentage);
 					detailsVO.setIgstAmount(igstAmount);
-
-				} else if ("No".equalsIgnoreCase(orderAcceptanceDTO.getGstApproval())) {
-
-					BigDecimal halfTax = taxPercentage.divide(BigDecimal.valueOf(2));
-
-					BigDecimal cgstAmount = detailsVO.getAmount().multiply(halfTax).divide(BigDecimal.valueOf(100));
-
-					BigDecimal sgstAmount = detailsVO.getAmount().multiply(halfTax).divide(BigDecimal.valueOf(100));
-
-					detailsVO.setCgstRate(halfTax);
-					detailsVO.setCgstAmount(cgstAmount);
-
-					detailsVO.setSgstRate(halfTax);
-					detailsVO.setSgstAmount(sgstAmount);
+					detailsVO.setCgstAmount(BigDecimal.ZERO);
+					detailsVO.setSgstAmount(BigDecimal.ZERO);
 
 				} else {
+
+					BigDecimal cgstAmount = amount.multiply(gstRateVO.getCgst()).divide(BigDecimal.valueOf(100));
+
+					BigDecimal sgstAmount = amount.multiply(gstRateVO.getSgst()).divide(BigDecimal.valueOf(100));
+
+					detailsVO.setCgstRate(gstRateVO.getCgst());
+					detailsVO.setSgstRate(gstRateVO.getSgst());
 					detailsVO.setIgstRate(BigDecimal.ZERO);
+
+					detailsVO.setCgstAmount(cgstAmount);
+					detailsVO.setSgstAmount(sgstAmount);
 					detailsVO.setIgstAmount(BigDecimal.ZERO);
 
-					detailsVO.setCgstRate(BigDecimal.ZERO);
-					detailsVO.setCgstAmount(BigDecimal.ZERO);
-
-					detailsVO.setSgstRate(BigDecimal.ZERO);
-					detailsVO.setSgstAmount(BigDecimal.ZERO);
 				}
 
-				// Total Tax
-				BigDecimal totalItemTax = detailsVO.getIgstAmount().add(detailsVO.getCgstAmount())
-						.add(detailsVO.getSgstAmount());
+				detailsVO.setCurrencyName(dto.getCurrencyName());
+				detailsVO.setOrderAcceptanceVO(orderAcceptanceVO);
 
-				totalTaxAmount = totalTaxAmount.add(totalItemTax);
-				detailsVO.setTotalAmount(detailsVO.getAmount().add(totalItemTax));
-
-				totalAmount = totalAmount.add(detailsVO.getTotalAmount());
-
+				itemDetailsList.add(detailsVO);
 			}
 		}
 		orderAcceptanceVO.setOrderAcceptanceDetailsVO(itemDetailsList);
@@ -434,11 +438,9 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		try {
 
-			File folder = new File(uploadPath);
+			Path orderFolder = Paths.get(uploadPath, "orderAcceptance", orderAcceptanceVO.getId().toString());
 
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
+			createDirectory(orderFolder);
 
 			List<OrderAcceptanceFileUploadDetailsVO> attachmentList = new ArrayList<>();
 
@@ -448,43 +450,109 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 					continue;
 				}
 
-				String originalFileName = file.getOriginalFilename();
+				String originalName = file.getOriginalFilename();
 
-				String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
+				if (originalName == null) {
+					originalName = "file";
+				}
 
-				Path path = Paths.get(uploadPath, uniqueFileName);
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+					extension = originalName.substring(originalName.lastIndexOf("."));
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				String fileName = originalName + "_" + orderAcceptanceVO.getId() + extension;
+
+				Path filePath = orderFolder.resolve(fileName);
 
 				try (InputStream inputStream = file.getInputStream()) {
-
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
 				}
+
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/orderAcceptance/viewFile/").toUriString();
+
+				String relativePath = uploadPath.replace("\\", "/");
+
+				relativePath = filePath.toString().replace("\\", "/").replace(relativePath + "/", "");
+
+				String publicUrl = baseUrl + relativePath;
 
 				OrderAcceptanceFileUploadDetailsVO attachment = new OrderAcceptanceFileUploadDetailsVO();
 
 				attachment.setOrderAcceptanceVO(orderAcceptanceVO);
-
-				attachment.setName(originalFileName);
-
-				attachment.setFileName(uniqueFileName);
-
-				attachment.setFilePath(path.toString());
-
+				attachment.setName(file.getOriginalFilename());
+				attachment.setFileName(fileName);
+				attachment.setFilePath(publicUrl);
 				attachment.setFileSize(file.getSize());
-
+				attachment.setContentType(file.getContentType());
 				attachment.setUploadOn(LocalDateTime.now());
 
 				attachmentList.add(attachment);
 			}
 
-			List<OrderAcceptanceFileUploadDetailsVO> savedAttachments = orderAcceptanceFileUploadDetailsRepo
+			List<OrderAcceptanceFileUploadDetailsVO> saved = orderAcceptanceFileUploadDetailsRepo
 					.saveAll(attachmentList);
 
-			orderAcceptanceVO.setOrderAcceptanceFileUploadDetailsVO(savedAttachments);
+			orderAcceptanceVO.setOrderAcceptanceFileUploadDetailsVO(saved);
 
 		} catch (IOException e) {
-
 			throw new ApplicationException("File Upload Failed : " + e.getMessage());
 		}
+	}
+
+	private void createDirectory(Path path) throws IOException {
+
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
+	@Override
+	public ResponseEntity<byte[]> viewOrderAcceptanceFile(HttpServletRequest request) throws IOException {
+
+		return serveFile(request, "/api/orderAcceptance/viewFile/", uploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveFile(HttpServletRequest request, String apiPrefix, String uploadBasePath)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
 	}
 
 	private OrderAcceptanceResponseDTO buildOrderAcceptanceResponse(OrderAcceptanceVO orderAcceptanceVO) {
@@ -494,65 +562,61 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setId(orderAcceptanceVO.getId());
 		responseDTO.setDocId(orderAcceptanceVO.getDocId());
 		responseDTO.setDocDate(orderAcceptanceVO.getDocDate());
-
 		responseDTO.setOrderNo(orderAcceptanceVO.getOrderNo());
 		responseDTO.setBelongsTo(orderAcceptanceVO.getBelongsTo());
 		responseDTO.setSoType(orderAcceptanceVO.getSoType());
 		responseDTO.setWithQuotation(orderAcceptanceVO.getWithQuotation());
-
-		responseDTO.setQuotationNo(orderAcceptanceVO.getQuotationNo());
 		responseDTO.setQuotationDate(orderAcceptanceVO.getQuotationDate());
-
+		responseDTO.setQuotationNo(orderAcceptanceVO.getQuotationNo());
 		responseDTO.setEnquiryNo(orderAcceptanceVO.getEnquiryNo());
 		responseDTO.setEnquiryDate(orderAcceptanceVO.getEnquiryDate());
-
 		responseDTO.setCustomerPurchaseOrderNo(orderAcceptanceVO.getCustomerPurchaseOrderNo());
 		responseDTO.setCustomerPurchaseOrderDate(orderAcceptanceVO.getCustomerPurchaseOrderDate());
-
 		responseDTO.setPostRate(orderAcceptanceVO.getPostRate());
-
 		responseDTO.setCreatedBy(orderAcceptanceVO.getCreatedBy());
+//		responseDTO.setActive(orderAcceptanceVO.isActive());
+//		responseDTO.setCancel(orderAcceptanceVO.isCancel());
 		responseDTO.setUpdatedBy(orderAcceptanceVO.getUpdatedBy());
-
 		responseDTO.setCancelRemarks(orderAcceptanceVO.getCancelRemarks());
-
 		responseDTO.setOrgId(orderAcceptanceVO.getOrgId());
 		responseDTO.setFinancialYear(orderAcceptanceVO.getFinancialYear());
-
 		responseDTO.setDestination(orderAcceptanceVO.getDestination());
 		responseDTO.setModeOfTransport(orderAcceptanceVO.getModeOfTransport());
 		responseDTO.setGrossalue(orderAcceptanceVO.getGrossalue());
 		responseDTO.setFreight(orderAcceptanceVO.getFreight());
-
 		responseDTO.setDeliveryTerms(orderAcceptanceVO.getDeliveryTerms());
 		responseDTO.setPaymentTerms(orderAcceptanceVO.getPaymentTerms());
 		responseDTO.setSpecification(orderAcceptanceVO.getSpecification());
 		responseDTO.setNote(orderAcceptanceVO.getNote());
-		responseDTO.setGstApproval(orderAcceptanceVO.getGstApproval());
-
-		if (orderAcceptanceVO.getCustomerId() != null) {
-
-			CustomerResponseGstDetailsDTO customerDTO = new CustomerResponseGstDetailsDTO();
-
-			customerDTO.setId(orderAcceptanceVO.getCustomerId().getId());
-			customerDTO.setCustomerName(orderAcceptanceVO.getCustomerId().getCustomerName());
-			customerDTO.setCustomerGstNo(orderAcceptanceVO.getCustomerId().getGstNo());
-			customerDTO.setGstApproval(orderAcceptanceVO.getCustomerId().isRegistered());
-			responseDTO.setCustomerId(customerDTO);
-		}
 
 		if (orderAcceptanceVO.getBranch() != null) {
 
-			BranchVO branch = new BranchVO();
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
 
-			branch.setId(orderAcceptanceVO.getBranch().getId());
-			branch.setBranchCode(orderAcceptanceVO.getBranch().getBranchCode());
-			branch.setBranchName(orderAcceptanceVO.getBranch().getBranchName());
+			branchDTO.setId(orderAcceptanceVO.getBranch().getId());
+			branchDTO.setBranchCode(orderAcceptanceVO.getBranch().getBranchCode());
+			branchDTO.setBranchName(orderAcceptanceVO.getBranch().getBranchName());
 
-			responseDTO.setBranch(branch);
+			responseDTO.setBranch(branchDTO);
 		}
 
-		List<OrderAcceptanceDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+		if (orderAcceptanceVO.getCustomer() != null) {
+
+			CustomerResponseGstDetailsDTO customerDTO = new CustomerResponseGstDetailsDTO();
+
+			customerDTO.setId(orderAcceptanceVO.getCustomer().getId());
+			customerDTO.setCustomerName(orderAcceptanceVO.getCustomer().getCustomerName());
+			customerDTO.setCustomerType(orderAcceptanceVO.getCustomer().getCustomerType());
+			customerDTO.setCustomerGstNo(orderAcceptanceVO.getCustomer().getGstNo());
+
+			customerDTO.setGstApproval(orderAcceptanceVO.getCustomer().isGstApplicable() ? "Yes" : "No");
+
+			customerDTO.setCustomerGstNo(orderAcceptanceVO.getCustomer().getGstNo());
+
+			responseDTO.setCustomerId(customerDTO);
+		}
+
+		List<OrderAcceptanceDetailsResponseDTO> detailsList = new ArrayList<>();
 
 		if (orderAcceptanceVO.getOrderAcceptanceDetailsVO() != null) {
 
@@ -563,67 +627,52 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				detailsDTO.setId(detailsVO.getId());
 
 				if (detailsVO.getItem() != null) {
-
-					ItemMasterResponseDetailsDTO itemCodeDTO = new ItemMasterResponseDetailsDTO();
-
-					itemCodeDTO.setId(detailsVO.getItem().getId());
-					itemCodeDTO.setItemCode(detailsVO.getItem().getItemCode());
-					itemCodeDTO.setItemDescription(detailsVO.getItem().getItemDescription());
-
-					if (detailsVO.getItem().getPrimaryUnit() != null) {
-
-						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
-
-						unitDTO.setId(detailsVO.getItem().getPrimaryUnit().getId());
-						unitDTO.setUnitId(detailsVO.getItem().getPrimaryUnit().getUnitId());
-						unitDTO.setUnitDescription(detailsVO.getItem().getPrimaryUnit().getDescription());
-
-						itemCodeDTO.setUnit(unitDTO);
-					}
-
-					detailsDTO.setItems(itemCodeDTO);
+					detailsDTO.setItems(new ItemMasterResponseTaxDTO(detailsVO.getItem().getId(),
+							detailsVO.getItem().getItemCode(), detailsVO.getItem().getItemDescription(),
+							detailsVO.getItem().getHsnCode() != null ? detailsVO.getItem().getHsnCode().getHsn()
+									: null));
 				}
 
-				detailsDTO.setCustomerPartNo(detailsVO.getCustomerPartNo());
+//				detailsDTO.setCustomerPartNo(detailsVO.getCustomerPartNo());
+
+				if (detailsVO.getUnit() != null) {
+					detailsDTO
+							.setUnit(new UnitResponseDTO(detailsVO.getUnit().getId(), detailsVO.getUnit().getUnitId()));
+				}
+
+				if (detailsVO.getTaxPercentage() != null) {
+
+					GSTRateResponseDTO gstDTO = new GSTRateResponseDTO();
+					gstDTO.setId(detailsVO.getTaxPercentage().getId());
+					gstDTO.setTaxPercentage(detailsVO.getTaxPercentage().getRate());
+
+					detailsDTO.setTaxPercentage(gstDTO);
+				} else {
+					System.out.println("Tax Percentage is NULL");
+				}
 
 				detailsDTO.setLastInvoiceDate(detailsVO.getLastInvoiceDate());
-
 				detailsDTO.setQuantity(detailsVO.getQuantity());
 				detailsDTO.setQuantityRate(detailsVO.getQuantityRate());
 				detailsDTO.setOrderRate(detailsVO.getOrderRate());
-
 				detailsDTO.setDiscount(detailsVO.getDiscount());
-
 				detailsDTO.setAmount(detailsVO.getAmount());
-
 				detailsDTO.setSgstRate(detailsVO.getSgstRate());
 				detailsDTO.setSgstAmount(detailsVO.getSgstAmount());
-
 				detailsDTO.setCgstRate(detailsVO.getCgstRate());
 				detailsDTO.setCgstAmount(detailsVO.getCgstAmount());
-
 				detailsDTO.setIgstRate(detailsVO.getIgstRate());
 				detailsDTO.setIgstAmount(detailsVO.getIgstAmount());
+				detailsDTO.setCurrencyName(detailsVO.getCurrencyName());
+				detailsDTO.setTaxType(detailsVO.getTaxType());
 
-				if (detailsVO.getCurrencyName() != null) {
-
-					CurrencyResponseDTO currencyDTO = new CurrencyResponseDTO();
-
-					currencyDTO.setId(detailsVO.getCurrencyName().getId());
-					currencyDTO.setCurrencyName(detailsVO.getCurrencyName().getCurrency());
-
-					detailsDTO.setCurrencyName(currencyDTO);
-				}
-
-				detailsResponseList.add(detailsDTO);
+				detailsList.add(detailsDTO);
 			}
 		}
 
-		responseDTO.setOrderAcceptanceDetailsResponseDTO(detailsResponseList);
+		responseDTO.setOrderAcceptanceDetailsResponseDTO(detailsList);
 
-		// ================ Tax Details ===================
-
-		List<OrderAcceptanceTaxDetailsResponsDTO> taxResponseList = new ArrayList<>();
+		List<OrderAcceptanceTaxDetailsResponsDTO> taxList = new ArrayList<>();
 
 		if (orderAcceptanceVO.getOrderAcceptanceTaxDetailsVO() != null) {
 
@@ -636,15 +685,13 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				taxDTO.setAcceptedQtyAmount(taxVO.getAcceptedQtyAmount());
 				taxDTO.setRevisedAmount(taxVO.getRevisedAmount());
 
-				taxResponseList.add(taxDTO);
+				taxList.add(taxDTO);
 			}
 		}
 
-		responseDTO.setOrderAcceptanceTaxDetailsResponsVO(taxResponseList);
+		responseDTO.setOrderAcceptanceTaxDetailsResponsVO(taxList);
 
-		// ================ File Upload ===================
-
-		List<OrderAcceptanceFileUploadDetailsDTO> fileResponseList = new ArrayList<>();
+		List<OrderAcceptanceFileUploadDetailsDTO> fileList = new ArrayList<>();
 
 		if (orderAcceptanceVO.getOrderAcceptanceFileUploadDetailsVO() != null) {
 
@@ -660,11 +707,11 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				fileDTO.setFileSize(fileVO.getFileSize());
 				fileDTO.setUploadOn(fileVO.getUploadOn());
 
-				fileResponseList.add(fileDTO);
+				fileList.add(fileDTO);
 			}
 		}
 
-		responseDTO.setOrderAcceptanceFileUploadDetailsDTO(fileResponseList);
+		responseDTO.setOrderAcceptanceFileUploadDetailsDTO(fileList);
 
 		return responseDTO;
 	}
@@ -684,14 +731,14 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	}
 
 	@Override
-	public List<SalesOrderShortCloseResponseDTO> getSalesOrderShortCloseByOrgId(Long orgId, Long branchId)
+	public List<SalesOrderShortCloseResponseDTO> getSalesOrderShortCloseByOrgId(Long orgId, Long Branch)
 			throws ApplicationException {
 
 		List<SalesOrderShortCloseVO> quotationList = salesOrderShortCloseRepo.getSalesOrderShortCloseByOrgId(orgId,
-				branchId);
+				Branch);
 
 		if (quotationList == null || quotationList.isEmpty()) {
-			throw new ApplicationException("Quotation Not Found");
+			throw new ApplicationException("SalesOrderShortClose Not Found");
 		}
 
 		List<SalesOrderShortCloseResponseDTO> responseList = new ArrayList<>();
@@ -705,8 +752,8 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 	@Override
 	@Transactional
-	public Map<String, Object> createUpdateSalesOrderShort(SalesOrderShortCloseDTO salesOrderShortCloseDTO,
-			MultipartFile[] files) throws ApplicationException {
+	public Map<String, Object> createUpdateSalesOrderShort(SalesOrderShortCloseDTO salesOrderShortCloseDTO)
+			throws ApplicationException {
 
 		SalesOrderShortCloseVO salesOrderShortCloseVO;
 		String message;
@@ -735,9 +782,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		// Save Header
 		salesOrderShortCloseVO = salesOrderShortCloseRepo.save(salesOrderShortCloseVO);
 
-		// Save Attachments
-		saveAttachmentss(files, salesOrderShortCloseVO);
-
 		// Response
 		SalesOrderShortCloseResponseDTO responseDTO = buildSalesOrderShortCloseResponse(salesOrderShortCloseVO);
 
@@ -751,25 +795,33 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	private void createUpdateSalesOrderVOBySalesOrderDTO(SalesOrderShortCloseDTO salesOrderShortCloseDTO,
 			SalesOrderShortCloseVO salesOrderShortCloseVO) throws ApplicationException {
 
-		if (salesOrderShortCloseDTO.getCustomerId() != null && salesOrderShortCloseDTO.getCustomerId() > 0) {
+		if (salesOrderShortCloseDTO.getCustomer() != null && salesOrderShortCloseDTO.getCustomer() != 0) {
 
-			CustomerVO customer = customerRepo.findById(salesOrderShortCloseDTO.getCustomerId())
+			CustomerVO customer = customerRepo.findById(salesOrderShortCloseDTO.getCustomer())
 					.orElseThrow(() -> new ApplicationException("Party Not Found"));
 
-			salesOrderShortCloseVO.setCustomerId(customer);
+			salesOrderShortCloseVO.setCustomer(customer);
+		}
+
+		if (salesOrderShortCloseDTO.getSaleOrderNo() != null && salesOrderShortCloseDTO.getSaleOrderNo() > 0) {
+
+			OrderAcceptanceVO customer = orderAcceptanceRepo.findById(salesOrderShortCloseDTO.getSaleOrderNo())
+					.orElseThrow(() -> new ApplicationException("Party Not Found"));
+
+			salesOrderShortCloseVO.setSaleOrderNo(customer);
 		}
 
 		salesOrderShortCloseVO.setDocId(salesOrderShortCloseDTO.getDocId());
 
-		salesOrderShortCloseVO.setCreatedBy(salesOrderShortCloseDTO.getCreatedBy());
-		salesOrderShortCloseVO.setUpdatedBy(salesOrderShortCloseDTO.getCreatedBy());
 		salesOrderShortCloseVO.setCancelRemarks(salesOrderShortCloseDTO.getCancelRemarks());
 
 		salesOrderShortCloseVO.setOrgId(salesOrderShortCloseDTO.getOrgId());
 
-		if (salesOrderShortCloseDTO.getBranchId() != null && salesOrderShortCloseDTO.getBranchId() > 0) {
+		salesOrderShortCloseVO.setActive(salesOrderShortCloseDTO.isActive());
 
-			BranchVO branch = branchRepo.findById(salesOrderShortCloseDTO.getBranchId())
+		if (salesOrderShortCloseDTO.getBranch() != null && salesOrderShortCloseDTO.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(salesOrderShortCloseDTO.getBranch())
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 			salesOrderShortCloseVO.setBranch(branch);
@@ -780,9 +832,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 					.findBySalesOrderShortCloseVO(salesOrderShortCloseVO);
 			salesOrderShortCloseDetailsRepo.deleteAll(taxInvoiceDetailsVO1);
 
-			List<SalesOrderShortCloseFileDetailsVO> taxInvoiceDetailsVO3 = salesOrderShortCloseFileDetailsRepo
-					.findBySalesOrderShortCloseVO(salesOrderShortCloseVO);
-			salesOrderShortCloseFileDetailsRepo.deleteAll(taxInvoiceDetailsVO3);
 		}
 
 		List<SalesOrderShortCloseDetailsVO> itemDetailsList = new ArrayList<>();
@@ -795,9 +844,9 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 				detailsVO.setSalesOrderShortCloseVO(salesOrderShortCloseVO);
 
-				if (dto.getItemId() != null && dto.getItemId() != 0) {
+				if (dto.getItem() != null && dto.getItem() != 0) {
 
-					ItemMasterVO item = itemMasterRepo.findById(dto.getItemId())
+					ItemMasterVO item = itemMasterRepo.findById(dto.getItem())
 							.orElseThrow(() -> new ApplicationException("Item Not Found"));
 
 					detailsVO.setItem(item);
@@ -820,71 +869,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 	}
 
-	@Value("${short.upload.path}")
-	private String uploadPaths;
-
-	private void saveAttachmentss(MultipartFile[] files, SalesOrderShortCloseVO orderAcceptanceVO)
-			throws ApplicationException {
-
-		if (files == null || files.length == 0) {
-			return;
-		}
-
-		try {
-
-			File folder = new File(uploadPath);
-
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
-
-			List<SalesOrderShortCloseFileDetailsVO> attachmentList = new ArrayList<>();
-
-			for (MultipartFile file : files) {
-
-				if (file == null || file.isEmpty()) {
-					continue;
-				}
-
-				String originalFileName = file.getOriginalFilename();
-
-				String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
-
-				Path path = Paths.get(uploadPath, uniqueFileName);
-
-				try (InputStream inputStream = file.getInputStream()) {
-
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-				}
-
-				SalesOrderShortCloseFileDetailsVO attachment = new SalesOrderShortCloseFileDetailsVO();
-
-				attachment.setSalesOrderShortCloseVO(orderAcceptanceVO);
-
-				attachment.setName(originalFileName);
-
-				attachment.setFileName(uniqueFileName);
-
-				attachment.setFilePath(path.toString());
-
-				attachment.setFileSize(file.getSize());
-
-				attachment.setUploadOn(LocalDateTime.now());
-
-				attachmentList.add(attachment);
-			}
-
-			List<SalesOrderShortCloseFileDetailsVO> savedAttachments = salesOrderShortCloseFileDetailsRepo
-					.saveAll(attachmentList);
-
-			orderAcceptanceVO.setSalesOrderShortCloseFileDetailsVO(savedAttachments);
-
-		} catch (IOException e) {
-
-			throw new ApplicationException("File Upload Failed : " + e.getMessage());
-		}
-	}
-
 	private SalesOrderShortCloseResponseDTO buildSalesOrderShortCloseResponse(
 			SalesOrderShortCloseVO salesOrderShortCloseVO) {
 
@@ -902,13 +886,13 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setOrgId(salesOrderShortCloseVO.getOrgId());
 		responseDTO.setFinancialYear(salesOrderShortCloseVO.getFinancialYear());
 
-		if (salesOrderShortCloseVO.getCustomerId() != null) {
+		if (salesOrderShortCloseVO.getCustomer() != null) {
 
 			CustomerResponseDetailsDTO customerDTO = new CustomerResponseDetailsDTO();
 
-			customerDTO.setId(salesOrderShortCloseVO.getCustomerId().getId());
-			customerDTO.setCustomerName(salesOrderShortCloseVO.getCustomerId().getCustomerName());
-			customerDTO.setCustomerCode(salesOrderShortCloseVO.getCustomerId().getCustomerCode());
+			customerDTO.setId(salesOrderShortCloseVO.getCustomer().getId());
+			customerDTO.setCustomerName(salesOrderShortCloseVO.getCustomer().getCustomerName());
+			customerDTO.setCustomerCode(salesOrderShortCloseVO.getCustomer().getCustomerCode());
 			responseDTO.setCustomerId(customerDTO);
 		}
 
@@ -920,7 +904,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			branch.setBranchCode(salesOrderShortCloseVO.getBranch().getBranchCode());
 			branch.setBranchName(salesOrderShortCloseVO.getBranch().getBranchName());
 
-			responseDTO.setBranchId(branch);
+			responseDTO.setBranch(branch);
 		}
 
 		List<SalesOrderShortCloseDetailsResponseDTO> detailsResponseList = new ArrayList<>();
@@ -957,31 +941,128 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		responseDTO.setSalesOrderShortCloseDetailsResponseDTO(detailsResponseList);
 
-		List<SalesOrderShortCloseFileDetailsResponseDTO> fileResponseList = new ArrayList<>();
-
-		if (salesOrderShortCloseVO.getSalesOrderShortCloseFileDetailsVO() != null
-				&& !salesOrderShortCloseVO.getSalesOrderShortCloseFileDetailsVO().isEmpty()) {
-
-			for (SalesOrderShortCloseFileDetailsVO fileVO : salesOrderShortCloseVO
-					.getSalesOrderShortCloseFileDetailsVO()) {
-
-				SalesOrderShortCloseFileDetailsResponseDTO fileDTO = new SalesOrderShortCloseFileDetailsResponseDTO();
-
-				fileDTO.setId(fileVO.getId());
-				fileDTO.setName(fileVO.getName());
-				fileDTO.setFileName(fileVO.getFileName());
-				fileDTO.setFilePath(fileVO.getFilePath());
-				fileDTO.setFileSize(fileVO.getFileSize());
-				fileDTO.setUploadOn(fileVO.getUploadOn());
-
-				fileResponseList.add(fileDTO);
-			}
-		}
-
-		responseDTO.setSalesOrderShortCloseFileDetailsResponseDTO(fileResponseList);
-
 		return responseDTO;
 
+	}
+
+	@Override
+	public List<OrderAcceptanceItemDropdownResponseDTO> getOrderAcceptanceItemDetails(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> itemList = orderAcceptanceRepo.getOrderAcceptanceItemDetails(orgId, branch);
+
+		List<OrderAcceptanceItemDropdownResponseDTO> responseList = new ArrayList<>();
+
+		for (Object[] obj : itemList) {
+			responseList.add(mapToFinishedGoodsResponseDTO(obj));
+		}
+
+		return responseList;
+	}
+
+	private OrderAcceptanceItemDropdownResponseDTO mapToFinishedGoodsResponseDTO(Object[] obj) {
+
+		OrderAcceptanceItemDropdownResponseDTO dto = new OrderAcceptanceItemDropdownResponseDTO();
+
+		dto.setItemId(((Number) obj[0]).longValue());
+		dto.setItemCode((String) obj[1]);
+		dto.setItemDescription((String) obj[2]);
+		dto.setUnitId((String) obj[3]);
+		dto.setMinimumSellPrice((BigDecimal) obj[4]);
+		dto.setHsnCode((String) obj[5]);
+		dto.setRate((BigDecimal) obj[6]);
+		dto.setCgst((BigDecimal) obj[7]);
+		dto.setSgst((BigDecimal) obj[8]);
+		dto.setIgst((BigDecimal) obj[9]);
+		dto.setUnitMasterId(((Number) obj[10]).longValue());
+		dto.setGstRateMasterId(((Number) obj[11]).longValue());
+
+		return dto;
+	}
+
+	@Override
+	public List<ShortCloseItemResponseDTO> getSalesOrderItemDetails(Long orgId, Long branch, String docId)
+			throws ApplicationException {
+
+		List<Object[]> itemList = salesOrderShortCloseRepo.getSalesOrderItemDetails(orgId, branch, docId);
+
+		List<ShortCloseItemResponseDTO> responseList = new ArrayList<>();
+
+		for (Object[] obj : itemList) {
+			responseList.add(mapToFinishedGoodsResponseDTOs(obj));
+		}
+
+		return responseList;
+	}
+
+	private ShortCloseItemResponseDTO mapToFinishedGoodsResponseDTOs(Object[] obj) {
+
+		ShortCloseItemResponseDTO dto = new ShortCloseItemResponseDTO();
+
+		dto.setItemId(((Number) obj[0]).longValue());
+		dto.setItemCode((String) obj[1]);
+		dto.setItemDescription((String) obj[2]);
+
+		return dto;
+	}
+
+	@Override
+	public List<OrderAcceptanceDocIdResponseDTO> getOrderAcceptanceDocIdDetails(Long customer, String docId)
+			throws ApplicationException {
+
+		List<Object[]> itemList = salesOrderShortCloseRepo.getOrderAcceptanceDocIdDetails(customer, docId);
+
+		List<OrderAcceptanceDocIdResponseDTO> responseList = new ArrayList<>();
+
+		for (Object[] obj : itemList) {
+			responseList.add(mapToDocIdDTOs(obj));
+		}
+
+		return responseList;
+	}
+
+	private OrderAcceptanceDocIdResponseDTO mapToDocIdDTOs(Object[] obj) {
+
+		OrderAcceptanceDocIdResponseDTO dto = new OrderAcceptanceDocIdResponseDTO();
+
+		dto.setOrderAccptanceId(((Number) obj[0]).longValue());
+		dto.setDocId((String) obj[1]);
+
+		if (obj[2] != null) {
+			if (obj[2] instanceof java.sql.Date) {
+				dto.setDocDate(((java.sql.Date) obj[2]).toLocalDate());
+			} else if (obj[2] instanceof LocalDate) {
+				dto.setDocDate((LocalDate) obj[2]);
+			}
+		}
+		return dto;
+	}
+
+	@Override
+	public List<OrderAcceptanceItemDetailsResponseDTO> getOrderAcceptanceItemDetailsDetails(String docId)
+			throws ApplicationException {
+
+		List<Object[]> itemList = salesOrderShortCloseRepo.getOrderAcceptanceItemDetailsDetails(docId);
+
+		List<OrderAcceptanceItemDetailsResponseDTO> responseList = new ArrayList<>();
+
+		for (Object[] obj : itemList) {
+			responseList.add(mapToDocIdDTOss(obj));
+		}
+
+		return responseList;
+	}
+
+	private OrderAcceptanceItemDetailsResponseDTO mapToDocIdDTOss(Object[] obj) {
+
+		OrderAcceptanceItemDetailsResponseDTO dto = new OrderAcceptanceItemDetailsResponseDTO();
+
+		dto.setItemId(((Number) obj[0]).longValue());
+		dto.setItemCode((String) obj[1]);
+		dto.setItemDescitpion((String) obj[2]);
+		dto.setOrderId(((Number) obj[3]).longValue());
+		dto.setQuantity(((BigDecimal) obj[3]));
+		return dto;
 	}
 
 }

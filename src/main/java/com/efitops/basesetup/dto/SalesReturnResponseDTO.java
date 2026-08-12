@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesReturnCustomerResponseDTO;
+
 import lombok.Data;
 
 @Data
@@ -16,12 +19,12 @@ public class SalesReturnResponseDTO {
     private LocalDate docDate;
 
     // Plant
-    private Long branchId;
-    private String branchName;
+    private BranchResponseDTO branch;
+    
 
     // Belongs To
-    private Long belongsToId;
-    private String belongsTo;
+    private ListOfVlauesDetailsResponseDTO belongsTo;
+  
 
     // Invoice
     private String invoiceNo;
@@ -31,46 +34,46 @@ public class SalesReturnResponseDTO {
     private String customerInvoiceNo;
     private LocalDate customerInvoiceDate;
 
-    // Gate Pass
+    
     private String gatePassNo;
 
-    // Customer
-    private Long customerId;
-    private String customerCode;
-    private String customerName;
+  
+    private SalesReturnCustomerResponseDTO customer;
+   
 
-    // Auto Fill from Customer
-    private String partyGSTState;
-    private String gstNo;
-    private String isIgstApplicable;
+    
+    private LocationResponseDTO location;
 
-    // Location
-    private Long locationId;
-    private String locationCode;
-    private String locationName;
 
-    // Return Type
-    private Long returnTypeId;
-    private String returnType;
 
-    // Approved By Accounts
+    
+    private ListOfVlauesDetailsResponseDTO returnType;
+   
+   
     private String approvedByAccounts;
 
-    // Currency
+  
     private String currency;
 
-    // Exchange Rate
+   
     private BigDecimal exchangeRate;
 
-    // Reference
+   
     private String referenceNo;
     private LocalDate referenceDate;
 
-    // Invoice Reference Type
+   
     private Long invoiceReferenceTypeId;
     private String invoiceReferenceType;
+    
+    
+    private BigDecimal netAmount;
 
-    // Common Fields
+    private String amountInWords;
+
+    private String narration;
+
+    
     private Long orgId;
 
     private String financialYear;
@@ -81,14 +84,20 @@ public class SalesReturnResponseDTO {
 
     private String cancelRemarks;
 
-    private String active;
+    private boolean active;
 
-    private String cancel;
+    private boolean  cancel;
 
     private String screenCode;
 
     private String screenName;
 
+    
+    
+    private List<SalesReturnDetailsResponseDto> salesReturnDetails;
+    
+    
+    private List<SalesReturnTaxDetailsResponseDto> salesReturnTaxDetails;
    
 
 }

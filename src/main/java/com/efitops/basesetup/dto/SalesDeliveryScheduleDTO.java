@@ -10,11 +10,11 @@ public class SalesDeliveryScheduleDTO {
 
     private Long id;
 
-    private String dlvNo;
+//    private String dlvNo;
+//
+//    private LocalDate dlvDate;
 
-    private LocalDate dlvDate;
-
-    private Long branchId;
+    private Long branch;
 
     private String monthOfSchedule;
 
@@ -24,7 +24,7 @@ public class SalesDeliveryScheduleDTO {
     
     private String remarks;
 
-    private Long customerId;
+    private Long customer;
 
     private Long orgId;
 
@@ -32,19 +32,10 @@ public class SalesDeliveryScheduleDTO {
 
     private String createdBy;
 
-    private String updatedBy;
-
     private String cancelRemarks;
 
     private Boolean active;
-
-    private Boolean cancel;
-
-    private String screenCode;
-
-    private String screenName;
     
     private List<SalesDeliveryScheduleDetailsDTO> details;
     
-    private List<SalesDeliverySchedulePlanDTO> deliverySchedule;
 }

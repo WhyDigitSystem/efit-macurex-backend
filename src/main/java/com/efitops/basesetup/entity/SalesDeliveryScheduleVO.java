@@ -8,18 +8,19 @@ import javax.persistence.*;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.Data;
 
 @Entity
-@Table(name = "sales_delivery_schedule")
+@Table(name = "sdvbasic")
 @Data
 public class SalesDeliveryScheduleVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_delivery_schedule_seq")
-    @SequenceGenerator(name = "sales_delivery_schedule_seq",sequenceName = "sales_delivery_schedule_seq",allocationSize = 1)
-    @Column(name = "sales_delivery_schedule_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sdvbasic_seq")
+    @SequenceGenerator(name = "sdvbasic_seq",sequenceName = "sdvbasic_seq",allocationSize = 1, initialValue = 1000000001)
+    @Column(name = "sdvbasic_id")
     private Long id;
 
     @Column(name = "dlv_no")
@@ -91,14 +92,16 @@ public class SalesDeliveryScheduleVO {
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
 	@OneToMany(mappedBy = "salesDeliverySchedule",
-	        cascade = CascadeType.ALL,
-	        orphanRemoval = true)
-	private List<SalesDeliveryScheduleDetailsVO> details;
+	        cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<SalesDeliveryScheduleDetailsVO> details = new ArrayList<>();
+
 	
-	@OneToMany(mappedBy = "salesDeliverySchedule",
-	        cascade = CascadeType.ALL,
-	        orphanRemoval = true)
-	private List<SalesDeliverySchedulePlanVO> deliverySchedules = new ArrayList<>();
+	
+//	@OneToMany(mappedBy = "salesDeliverySchedule",
+//	        cascade = CascadeType.ALL,
+//	        orphanRemoval = true)
+//	private List<SalesDeliverySchedulePlanVO> deliverySchedules = new ArrayList<>();
 
 
 	

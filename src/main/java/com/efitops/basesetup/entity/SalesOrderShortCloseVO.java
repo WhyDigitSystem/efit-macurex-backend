@@ -25,16 +25,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "salesordershortclose")
+@Table(name = "sales_order_short_close_basic")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class SalesOrderShortCloseVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "salesordershortclosegen")
-	@SequenceGenerator(name = "salesordershortclosegen", sequenceName = "salesordershortcloseseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "salesordershortclose_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_order_short_close_basicgen")
+	@SequenceGenerator(name = "sales_order_short_close_basicgen", sequenceName = "sales_order_short_close_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "sales_order_short_close_basic_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "doc_id")
@@ -44,8 +44,13 @@ public class SalesOrderShortCloseVO {
 	private LocalDate docDate = LocalDate.now();
 
 	@ManyToOne
-	@JoinColumn(name = "customer_id")
-	private CustomerVO customerId;
+	@JoinColumn(name = "customer")
+	private CustomerVO customer;
+	
+	@ManyToOne
+	@JoinColumn(name = "sale_order_no")
+	private OrderAcceptanceVO saleOrderNo;
+
 
 	// Common Fields
 
@@ -53,12 +58,12 @@ public class SalesOrderShortCloseVO {
 	private String createdBy;
 
 	@Column(name = "active")
-	private boolean active=true;
+	private boolean active;
 
 	@Column(name = "cancel")
 	private boolean cancel = false;
 
-	@Column(name = "updated_by")
+	@Column(name = "modified_by")
 	private String updatedBy;
 
 	@Column(name = "cancel_remarks")
@@ -83,10 +88,6 @@ public class SalesOrderShortCloseVO {
 	@OneToMany(mappedBy = "salesOrderShortCloseVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<SalesOrderShortCloseDetailsVO> salesOrderShortCloseDetailsVO;
-	
-	@OneToMany(mappedBy = "salesOrderShortCloseVO", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	private List<SalesOrderShortCloseFileDetailsVO> salesOrderShortCloseFileDetailsVO;
 
 	@JsonGetter("active")
 	public String getActive() {

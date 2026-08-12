@@ -7,13 +7,7 @@ import lombok.Data;
 @Data
 public class SalesDeliverySchedulePlanDTO {
 
-    private Long id;
-
-    // Header
-    private Long salesDeliveryScheduleId;
-
-    // Schedule Details Grid
-    private Long salesDeliveryScheduleDetailsId;
+//    private Long id;
 
     // Delivery Schedule Grid
     private Integer dayNo;

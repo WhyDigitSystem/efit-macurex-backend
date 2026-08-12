@@ -3,7 +3,6 @@ package com.efitops.basesetup.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,8 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SalesContractAmendmentDTO {
 	private Long id;
-	private String contractAmdNo;
-	private LocalDate date;
+//	private String docId;
+//	private LocalDate docDate;
+	private String partyPoAmdNo;
+	private String partyPoAmdDate;
 	private Long branch;
 	private String contractNo;
 	private String contractDate;
@@ -24,10 +25,9 @@ public class SalesContractAmendmentDTO {
 	private String remarks;
 	private Long orgId;
 	private String createdBy;
-	private Boolean active;
+	private boolean active;
 	private String cancelRemarks;
-	
+
 	private List<SalesContractAmdDetailsDTO> salesContractAmdDetailsDTO;
-	
 
 }

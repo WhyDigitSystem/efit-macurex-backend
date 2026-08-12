@@ -45,8 +45,8 @@ public class EnquiryVO {
 	private BranchVO branch;
 
 	@ManyToOne
-	@JoinColumn(name = "party_id")
-	private CustomerVO partyid;
+	@JoinColumn(name = "customer")
+	private CustomerVO customer;
 
 	@ManyToOne
 	@JoinColumn(name = "contact_name")

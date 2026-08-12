@@ -8,11 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
+import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
+import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.SalesReturnDTO;
 import com.efitops.basesetup.dto.SalesReturnResponseDTO;
 import com.efitops.basesetup.entity.EnquiryVO;
@@ -33,25 +36,6 @@ public interface DevelopService {
 	Map<String, Object> updateCreateEnquiry(EnquiryDTO enquiryDTO, MultipartFile[] files) throws ApplicationException;
 	
 
-	//salesdeliveryschedule
-	
-	Map<String, Object> createUpdateSalesDeliverySchedule(
-	        SalesDeliveryScheduleDTO salesDeliveryScheduleDTO)
-	        throws ApplicationException;
-
-	SalesDeliveryScheduleResponseDTO getSalesDeliveryScheduleById(Long id)
-	        throws ApplicationException;
-
-	List<SalesDeliveryScheduleResponseDTO> getAllSalesDeliverySchedule(
-	        Long orgId,
-	        Long branchId)
-	        throws ApplicationException;
-	
-	Map<String, Object> getContractNo()
-	        throws ApplicationException;
-
-	Map<String, Object> getItemDropdown(Long salesContractId)
-	        throws ApplicationException;
 	
 	//SALES RETURN
 
@@ -60,9 +44,32 @@ public interface DevelopService {
 	SalesReturnResponseDTO getSalesReturnById(Long id)  throws ApplicationException;
 
 
-	List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch) throws ApplicationException;
+	List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch)
+	        throws ApplicationException;
+	
+	
+	//salesorderamendment
+	
+
+	Map<String, Object> createUpdateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
+			throws ApplicationException;
+
+	SalesOrderAmendmentResponseDTO getSalesOrderAmendmentById(Long id) throws ApplicationException;
+
+	List<SalesOrderAmendmentResponseDTO> getSalesOrderAmendmentByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
 
 	
+	Map<String, Object> getSalesContractDropdown(
+	        Long orgId,
+	        Long branch)
+	        throws ApplicationException;
+	
+	Map<String, Object> getSalesContractItemDropdown(
+	        Long salesContractId,
+	        Long orgId,
+	        Long branch)
+	        throws ApplicationException;
 	
 	
 	

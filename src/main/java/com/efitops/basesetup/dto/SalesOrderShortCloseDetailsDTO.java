@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SalesOrderShortCloseDetailsDTO {
 
-	private Long itemId;
+	private Long item;
 
 	private BigDecimal orderQty;
 

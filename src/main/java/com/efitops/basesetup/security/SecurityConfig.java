@@ -42,7 +42,7 @@ public class SecurityConfig {
 						"/api/inventory/**", "/api/grn/**", "/api/issuetosubcontractor/**", 
 						"/api/quality/**", "/api/purchase/**", "/api/dispatchcontroller/**", "/api/qualityapproval/**",
 						"/api/sales/**", "/api/productionPlan/**", "/api/toolmanagement/**","/api/salesVController/**","/api/processDone/**","/api/packingList/**","/api/assembly/**","/api/dailypatrolinspectioncontroller/**"
-						,"/api/jobOrder/**","/api/deletestock/**","/api/detailsSubmissionToBank/**","/api/exportpackinglist/**","/api/stockreconcilation/**","/api/NotificationDesignationController/**","/api/ticketcontroller/**","/api/toolmanagement/files/**","/api/screen/**","/api/notificationcontroller/**","/investmentfiles/**","/api/develop/**","/api/develop/**","/api/dev/**","/api/itemMaster/**","/api/partyMaster/**","/api/dhinesh/**","/api/quotationservice/**")
+						,"/api/jobOrder/**","/api/deletestock/**","/api/detailsSubmissionToBank/**","/api/exportpackinglist/**","/api/stockreconcilation/**","/api/NotificationDesignationController/**","/api/ticketcontroller/**","/api/toolmanagement/files/**","/api/screen/**","/api/notificationcontroller/**","/investmentfiles/**","/api/develop/**","/api/develop/**","/api/dev/**","/api/itemMaster/**","/api/partyMaster/**","/api/dhinesh/**","/api/quotationservice/**","/api/purchaseContract/**","/api/purchaseindent/**","/api/purchaseDeliverySchedule/**","/api/purchaseBill/**")
 				.permitAll().antMatchers("/api/**").hasAnyRole("USER", "GUEST_USER").anyRequest().authenticated();
 		http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 		return http.build();

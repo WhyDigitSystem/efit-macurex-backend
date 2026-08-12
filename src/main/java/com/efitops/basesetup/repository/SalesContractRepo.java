@@ -199,7 +199,7 @@ List<Map<String, Object>> getDocIdAndInvoiceType(
 	 @Query(value = """
 	            SELECT
 	                salescontract_id,
-	                customer_contract_no,
+	                doc_id,
 	                contract_date,
 	                customer_purchase_order_no
 	            FROM sales_contract_basic
@@ -207,7 +207,7 @@ List<Map<String, Object>> getDocIdAndInvoiceType(
 	              AND cancel = false
 	              AND org_id = :orgId
 	              AND branch = :branch
-	            ORDER BY customer_contract_no
+	            ORDER BY doc_id
 	            """, nativeQuery = true)
 	    List<Object[]> getSalesContractDropdown(
 	            @Param("orgId") Long orgId,

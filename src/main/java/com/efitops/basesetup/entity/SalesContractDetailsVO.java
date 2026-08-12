@@ -102,8 +102,8 @@ public class SalesContractDetailsVO {
     @Column(name = "igst_amount")
     private BigDecimal igstAmount;
     
-    @Column(name="final_amount")
-    private BigDecimal finalAmount;
+//    @Column(name="final_amount")
+//    private BigDecimal finalAmount;
 
     @Column(name = "currency")
     private String currency;

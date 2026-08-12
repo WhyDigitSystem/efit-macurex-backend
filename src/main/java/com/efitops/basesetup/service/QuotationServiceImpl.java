@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -25,16 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.QuotationIemFileUploadDetailsDTO;
-import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
@@ -43,7 +34,6 @@ import com.efitops.basesetup.dto.QuotationItemDetailsDTO;
 import com.efitops.basesetup.dto.QuotationItemDetailsResponseDTO;
 import com.efitops.basesetup.dto.QuotationItemTaxDetailsDTO;
 import com.efitops.basesetup.dto.QuotationResponseDTO;
-import com.efitops.basesetup.dto.TaxDefinitionResponseDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
@@ -53,8 +43,6 @@ import com.efitops.basesetup.entity.QuotationIemFileUploadDetailsVO;
 import com.efitops.basesetup.entity.QuotationItemDetailsVO;
 import com.efitops.basesetup.entity.QuotationItemTaxDetailsVO;
 import com.efitops.basesetup.entity.QuotationVO;
-import com.efitops.basesetup.entity.TaxDefinitionVO;
-import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
@@ -117,9 +105,15 @@ public class QuotationServiceImpl implements QuotationService {
 
 	@Autowired
 	CurrencyRepo currencyRepo;
+	
+	@Value("${server.base-url}")
+	private String serverBaseUrl;
+
+	
 
 	@Autowired
 	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
+	
 
 //	@Override
 //	public Map<String, Object> updateCreateQuotation(QuotationDTO quotationDTO) throws ApplicationException {
@@ -885,6 +879,7 @@ public class QuotationServiceImpl implements QuotationService {
 		quotationVO.setCustomerEnquiryNo(quotationDTO.getCustomerEnquiryNo());
 		quotationVO.setCustomerEnquiryDate(quotationDTO.getCustomerEnquiryDate());
 		quotationVO.setEnqBasicId(quotationDTO.getEnqBasicId());
+		quotationVO.setValidTill(quotationDTO.getValidTill());
 
 		quotationVO.setAmount(quotationDTO.getAmount());
 		quotationVO.setDate(quotationDTO.getDate());
@@ -893,14 +888,12 @@ public class QuotationServiceImpl implements QuotationService {
 		
 		quotationVO.setKindAttention(quotationDTO.getKindAttention());
 
-// Common Fields
-		quotationVO.setCreatedBy(quotationDTO.getCreatedBy());
-		quotationVO.setUpdatedBy(quotationDTO.getUpdatedBy());
 		quotationVO.setCancelRemarks(quotationDTO.getCancelRemarks());
 		quotationVO.setScreenName(quotationDTO.getScreenName());
 		quotationVO.setScreenCode(quotationDTO.getScreenCode());
 		quotationVO.setOrgId(quotationDTO.getOrgId());
 		quotationVO.setFinancialYear(quotationDTO.getFinancialYear());
+		quotationVO.setActive(quotationDTO.isActive());
 
 // Branch
 		if (quotationDTO.getBranchId() != null && quotationDTO.getBranchId() > 0) {
@@ -1229,9 +1222,13 @@ public class QuotationServiceImpl implements QuotationService {
 		        fileDTO.setName(fileVO.getName());
 
 		        fileDTO.setFileName(fileVO.getFileName());
+		        
+		        String urlPath = uploadPath
+		                .replace("C:/", "/")
+		                .replace("\\", "/");
 
-		        fileDTO.setFilePath(fileVO.getFilePath());
-
+		        fileDTO.setFilePath(serverBaseUrl + urlPath + fileVO.getFileName());
+		        
 		        fileDTO.setFileSize(fileVO.getFileSize());
 
 		        fileDTO.setUploadOn(fileVO.getUploadOn());
@@ -1245,4 +1242,7 @@ public class QuotationServiceImpl implements QuotationService {
 		return responseDTO;
 	}
 
+	
+	
+	
 }

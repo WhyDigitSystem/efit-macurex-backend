@@ -1,5 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,10 +12,10 @@ import lombok.NoArgsConstructor;
 public class SalesContractDetailResponseDTO {
 	private Long id;
 	private ItemResponse1DTO item;
-	private Double oldRate;
-	private Double newRate;
-	private String validFrom;
-	private String validTo;
-	private String newValidDate;
+	private double oldRate;
+	private double newRate;
+	private LocalDate validFrom;
+	private LocalDate validTo;
+	private LocalDate newValidDate;
 
 }

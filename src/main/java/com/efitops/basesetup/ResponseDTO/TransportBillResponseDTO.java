@@ -15,9 +15,9 @@ public class TransportBillResponseDTO {
 
     private Long id;
 
-    private BranchResponseDTO plant;
+    private BranchResponseDTO branch;
 
-    private DocumentTypeResponseDTO documentType;
+//    private DocumentTypeResponseDTO documentType;
     private String docNo;
     private LocalDate docDate;
 
@@ -29,8 +29,8 @@ public class TransportBillResponseDTO {
 
     private LocalDate billReceivedDate;
     private LocalDate accReceivedDate;
-    private String receivedBy;
-    private String accReceivedBy;
+    private EmployeeDropdownResponseDTO receivedBy;
+    private EmployeeDropdownResponseDTO accReceivedBy;
 
     private Long orgId;
     private Boolean active;
@@ -39,7 +39,7 @@ public class TransportBillResponseDTO {
     private Long updatedBy;
 
     private List<TransportBillPaymentDetailsResponseDTO> paymentDetails1;
-    private List<TransportBillPaymentDetails2ResponseDTO> paymentDetails2;
+//    private List<TransportBillPaymentDetails2ResponseDTO> paymentDetails2;
 
 
 }

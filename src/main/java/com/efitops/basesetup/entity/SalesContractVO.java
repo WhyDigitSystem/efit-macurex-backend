@@ -1,5 +1,6 @@
 package com.efitops.basesetup.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,12 @@ public class SalesContractVO {
     private Long id;
 
 
+    @Column(name = "doc_id")
+	private String docId;
+	
+	@Column(name = "doc_date")
+	private LocalDate docDate;
+	
     @Column(name = "customer_contract_no")
     private String customerContractNo;
 
@@ -112,6 +119,28 @@ public class SalesContractVO {
 
     @Column(name = "cancel")
     private boolean cancel = false;
+    
+    //summary
+    
+    @Column(name = "total_amount", precision = 10, scale = 2)
+	private BigDecimal totalAmount;
+
+	@Column(name = "amount_in_words", precision = 10, scale = 2)
+	private String amountInWords;
+
+	@Column(name = "payment_terms")
+	private String paymentTerms;
+
+	@Column(name = "price_terms", precision = 10, scale = 2)
+	private String priceTerms;
+
+	@Column(name = "terms")
+	private String terms;
+	
+
+	@Column(name = "notes")
+	private String notes;
+	
 
 	@Column(name = "screen_code", length = 30)
 	private String screenCode = "SAC";
@@ -119,19 +148,24 @@ public class SalesContractVO {
 	private String screenName = "SALESCONTRACT";
 	
 	
-	@OneToMany(mappedBy = "salesContract",
-	        cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "salesContract",cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<SalesContractDetailsVO> salesContractDetailsVO = new ArrayList<>();
 	
 	
 	@OneToMany(
 	        mappedBy = "salesContract",
-	        cascade = CascadeType.ALL,
-	        orphanRemoval = true)
+	        cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<SalesContractAttachVO> attachments = new ArrayList<>();
 	
+	
+	@OneToMany(
+	        mappedBy = "salesContract",
+	        cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<SalesContractTaxDetailsVO> salesContractTaxDetails =
+	        new ArrayList<>();
 	
     @Embedded
     private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();

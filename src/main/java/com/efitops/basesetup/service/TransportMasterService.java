@@ -3,21 +3,27 @@ package com.efitops.basesetup.service;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.DespatchInstructionResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
 import com.efitops.basesetup.dto.CustomerComplaintDTO;
 import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
-import com.efitops.basesetup.dto.DailyExchangeRateDTO;
+import com.efitops.basesetup.dto.DespatchInstructionDTO;
+import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
-import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
-import com.efitops.basesetup.entity.DailyExchangeRateVO;
+import com.efitops.basesetup.dto.StockTransferChallanDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 
 public interface TransportMasterService {
 
-	Map<String, Object> updateCreateCustomerComplaint(CustomerComplaintDTO customerComplaintDTO) throws ApplicationException;
+	Map<String, Object> updateCreateCustomerComplaint(
+	        CustomerComplaintDTO customerComplaintDTO,
+	        MultipartFile[] images)
+	        throws ApplicationException;
 
 	CustomerComplaintResponseDTO getCustomerComplaintById(Long id) throws ApplicationException;
 
@@ -25,38 +31,81 @@ public interface TransportMasterService {
 
 
 	// dropdown for preparedby
-	Map<String, Object> getPreparedBy(Long departmentId)
+	Map<String, Object> getPreparedBy(Long departmentId, Long branch, Long departmentId2)
 	        throws ApplicationException;
 
 	//dropdown for item	
-	Map<String, Object> getItem() throws ApplicationException;
+//	Map<String, Object> getItem() throws ApplicationException;
 
-	Map<String, Object> getItemDetails(Long itemId) throws ApplicationException;
+	Map<String, Object> getCustomerComplaintItemDetails(Long itemId, Long branch) throws ApplicationException;
    
 	//dropdown for branch
-	Map<String, Object> getBranch() throws ApplicationException;
-
-	Map<String, Object> getTypeDropdown() throws ApplicationException;
+	Map<String, Object> getAllBranch(Long orgId) throws ApplicationException;
 	
-	//department dropdown
-	Map<String, Object> getDepartment() throws ApplicationException;
-
 	//customer dropdown
-	Map<String, Object> getCustomerDetails(String customerId) throws ApplicationException;
+	Map<String, Object> getCustomerDetails(Long orgId , Long branch) throws ApplicationException;
 
-	Map<String, Object> getCustomer() throws ApplicationException;
 	
 	//SalesContractAmendment
-	Map<String, Object> updateCreateSalesContractAmendment(
-			SalesContractAmendmentDTO salesContractAmendmentDTO)
+//	Map<String, Object> updateCreateSalesContractAmendment(
+//			SalesContractAmendmentDTO salesContractAmendmentDTO)
+//			throws ApplicationException;
+//
+//	SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
+//			throws ApplicationException;
+//
+//	List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
+//			throws ApplicationException;
+//
+//	//dropdown for contrcatno
+//	Map<String, Object> getContractNo() throws ApplicationException;
+//	
+	//despatchinstruction
+
+
+
+	Map<String, Object> updateCreateDespatchInstruction(DespatchInstructionDTO despatchInstructionDTO)
 			throws ApplicationException;
 
-	SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
-			throws ApplicationException;
+	DespatchInstructionResponseDTO getDespatchInstructionById(Long id) throws ApplicationException;
 
-	List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
+	List<DespatchInstructionResponseDTO> getDespatchInstructionByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
 	
+	//Docket Invoice
+	Map<String, Object> updateCreateDocketInvoice(DocketInvoiceDTO docketInvoiceDTO) throws ApplicationException;
+
+	DocketInvoiceResponseDTO getDocketInvoiceById(Long id) throws ApplicationException;
+
+	List<DocketInvoiceResponseDTO> getDocketInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	//StockTransferChallan
+	Map<String, Object> updateCreateStockTransferChallan(StockTransferChallanDTO stockTransferChallanDTO) throws ApplicationException;
+
+	StockTransferChallanResponseDTO getStockTransferChallanById(Long id) throws ApplicationException;
+
+	List<StockTransferChallanResponseDTO> getStockTransferChallanByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	//stock transfercustomer
+	Map<String, Object> getStockTransferCustomer() throws ApplicationException;
+
+	
+
+	//despatch instruction schedule no dropdown
+	Map<String, Object> getDespatchScheduleNo(String scheduleNo,Long branch,Long orgId) throws ApplicationException;
+
+	Map<String, Object> getDespatchCustomer(Long branch, Long orgId) throws ApplicationException;
+
+
+	Map<String, Object> getDespatchSalesContract(Long customerId, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getDespatchItems(Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getDespatchScheduleMonth(Long itemId, Long branch, Long orgId) throws ApplicationException;
+
+
+
+
 	
 	 
 

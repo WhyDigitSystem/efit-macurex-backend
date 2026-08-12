@@ -1,7 +1,10 @@
 package com.efitops.basesetup.entity;
 
+import java.time.LocalDate;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,38 +20,38 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "sale_contract_details")
+@Table(name = "sales_contract_amendment_detail")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SalesContractAmdDetailsVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "salecontractdetailsgen")
-	@SequenceGenerator(name = "salecontractdetailsgen", sequenceName = "salecontractdetailsseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "sale_contract_details_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_contract_amendment_detailgen")
+	@SequenceGenerator(name = "sales_contract_amendment_detailgen", sequenceName = "sales_contract_amendment_detailseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "sales_contract_amendment_detail_id")
 	private Long id;
-	
-	@ManyToOne
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item")
 	private ItemMasterVO item;
-	
+
 	@Column(name = "old_rate")
-	private Double oldRate;
-	
+	private double oldRate;
+
 	@Column(name = "new_rate")
-	private Double newRate;
-	
+	private double newRate;
+
 	@Column(name = "valid_from")
-	private String validFrom;
-	
+	private LocalDate validFrom;
+
 	@Column(name = "valid_to")
-	private String validTo;
-	
+	private LocalDate validTo;
+
 	@Column(name = "new_validdate")
-	private String newValidDate;
-	
+	private LocalDate newValidDate;
+
 	@ManyToOne
-	@JoinColumn(name = "sale_contract_amendment_basic_id")
+	@JoinColumn(name = "sales_contract_amendment_basic_id")
 	@JsonBackReference
 	private SalesContractAmendmentVO salesContractAmendmentVO;
 }

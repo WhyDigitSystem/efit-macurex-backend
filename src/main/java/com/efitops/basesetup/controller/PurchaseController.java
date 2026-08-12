@@ -38,7 +38,7 @@ public class PurchaseController extends BaseController {
     // PURCHASE CONTRACT — original paths: /api/purchaseContract/**
     // ==================================================================
 
-    @PostMapping(value = "/api/purchaseContract/updateCreatePurchaseContract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/api/purchaseMaster/updateCreatePurchaseContract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDTO> updateCreatePurchaseContract(
             @RequestPart("purchaseContractDTO") String purchaseContractJson,
             @RequestPart(value = "files", required = false) MultipartFile[] files) {
@@ -58,7 +58,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/purchaseContract/getPurchaseContractById")
+    @GetMapping("/api/purchaseMaster/getPurchaseContractById")
     public ResponseEntity<ResponseDTO> getPurchaseContractById(@RequestParam Long id) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -73,7 +73,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/purchaseContract/getPurchaseContractByOrgId")
+    @GetMapping("/api/purchaseMaster/getPurchaseContractByOrgId")
     public ResponseEntity<ResponseDTO> getPurchaseContractByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -94,7 +94,7 @@ public class PurchaseController extends BaseController {
     // PURCHASE DELIVERY SCHEDULE — original paths: /api/purchaseDeliverySchedule/**
     // ==================================================================
 
-    @PostMapping("/api/purchaseDeliverySchedule/updateCreatePurchaseDeliverySchedule")
+    @PostMapping("/api/purchaseMaster/updateCreatePurchaseDeliverySchedule")
     public ResponseEntity<ResponseDTO> updateCreatePurchaseDeliverySchedule(@RequestBody PurchaseDeliveryScheduleDTO dto) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -109,7 +109,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/purchaseDeliverySchedule/getPurchaseDeliveryScheduleById")
+    @GetMapping("/api/purchaseMaster/getPurchaseDeliveryScheduleById")
     public ResponseEntity<ResponseDTO> getPurchaseDeliveryScheduleById(@RequestParam Long id) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -124,7 +124,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/purchaseDeliverySchedule/getPurchaseDeliveryScheduleByOrgId")
+    @GetMapping("/api/purchaseMaster/getPurchaseDeliveryScheduleByOrgId")
     public ResponseEntity<ResponseDTO> getPurchaseDeliveryScheduleByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -144,7 +144,7 @@ public class PurchaseController extends BaseController {
     // PURCHASE BILL — original paths: /api/purchaseBill/**
     // ==================================================================
 
-    @PostMapping("/api/purchaseBill/updateCreatePurchaseBill")
+    @PostMapping("/api/purchaseMaster/updateCreatePurchaseBill")
     public ResponseEntity<ResponseDTO> updateCreatePurchaseBill(@RequestBody PurchaseBillDTO dto) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -159,7 +159,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/purchaseBill/getPurchaseBillById")
+    @GetMapping("/api/purchaseMaster/getPurchaseBillById")
     public ResponseEntity<ResponseDTO> getPurchaseBillById(@RequestParam Long id) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -174,7 +174,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/purchaseBill/getPurchaseBillByOrgId")
+    @GetMapping("/api/purchaseMaster/getPurchaseBillByOrgId")
     public ResponseEntity<ResponseDTO> getPurchaseBillByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -195,7 +195,7 @@ public class PurchaseController extends BaseController {
     // PURCHASE INDENT — original paths: /api/purchaseindent/**
     // ==================================================================
 
-    @PostMapping(value = "/api/purchaseindent/createUpdatePurchaseIndent", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/api/purchaseMaster/createUpdatePurchaseIndent", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDTO> createUpdatePurchaseIndent(
             @RequestPart("purchaseIndent") String purchaseIndentJson,
             @RequestPart(value = "files", required = false) MultipartFile[] files) {
@@ -215,7 +215,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/purchaseindent/getPurchaseIndentById")
+    @GetMapping("/api/purchaseMaster/getPurchaseIndentById")
     public ResponseEntity<ResponseDTO> getPurchaseIndentById(@RequestParam Long id) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -230,7 +230,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/purchaseindent/getPurchaseIndentByOrgId")
+    @GetMapping("/api/purchaseMaster/getPurchaseIndentByOrgId")
     public ResponseEntity<ResponseDTO> getPurchaseIndentByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -249,7 +249,7 @@ public class PurchaseController extends BaseController {
     // PURCHASE SHORT CLOSE — /api/purchaseShortClose/**
     // ==================================================================
 
-    @PostMapping("/api/purchaseShortClose/updateCreatePurchaseShortClose")
+    @PostMapping("/api/purchaseMaster/updateCreatePurchaseShortClose")
     public ResponseEntity<ResponseDTO> updateCreatePurchaseShortClose(@RequestBody PurchaseShortCloseDTO dto) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -264,7 +264,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/purchaseShortClose/getPurchaseShortCloseById")
+    @GetMapping("/api/purchaseMaster/getPurchaseShortCloseById")
     public ResponseEntity<ResponseDTO> getPurchaseShortCloseById(@RequestParam Long id) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -279,7 +279,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/purchaseShortClose/getPurchaseShortCloseByOrgId")
+    @GetMapping("/api/purchaseMaster/getPurchaseShortCloseByOrgId")
     public ResponseEntity<ResponseDTO> getPurchaseShortCloseByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -297,7 +297,7 @@ public class PurchaseController extends BaseController {
     // LOCAL PURCHASE ORDER — /api/localPurchaseOrder/**
     // ==================================================================
 
-    @PostMapping(value = "/api/localPurchaseOrder/updateCreateLocalPurchaseOrder", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/api/purchaseMaster/updateCreateLocalPurchaseOrder", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDTO> updateCreateLocalPurchaseOrder(
             @RequestPart("localPurchaseOrderDTO") String localPurchaseOrderJson,
             @RequestPart(value = "files", required = false) MultipartFile[] files) {
@@ -317,7 +317,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/localPurchaseOrder/getLocalPurchaseOrderById")
+    @GetMapping("/api/purchaseMaster/getLocalPurchaseOrderById")
     public ResponseEntity<ResponseDTO> getLocalPurchaseOrderById(@RequestParam Long id) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
@@ -332,7 +332,7 @@ public class PurchaseController extends BaseController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/api/localPurchaseOrder/getLocalPurchaseOrderByOrgId")
+    @GetMapping("/api/purchaseMaster/getLocalPurchaseOrderByOrgId")
     public ResponseEntity<ResponseDTO> getLocalPurchaseOrderByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;

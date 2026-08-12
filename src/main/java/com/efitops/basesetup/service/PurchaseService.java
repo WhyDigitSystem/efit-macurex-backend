@@ -45,4 +45,6 @@ public interface PurchaseService {
     LocalPurchaseOrderResponseDTO getLocalPurchaseOrderById(Long id) throws ApplicationException;
     List<LocalPurchaseOrderResponseDTO> getLocalPurchaseOrderByOrgId(Long orgId, Long branchId) throws ApplicationException;
     String getLocalPurchaseOrderDocId(Long orgId, String finYear, Long branch);
+
+
 }

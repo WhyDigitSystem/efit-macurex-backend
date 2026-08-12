@@ -508,14 +508,13 @@ public class TransactionServiceImpl implements TransactionService {
 
 			Map<String, Object> map = new HashMap<>();
 
-			map.put("itemId", obj[0]);
-			map.put("itemCode", obj[1]);
-			map.put("itemDescription", obj[2]);
-			
-			map.put("unit", obj[3]);
-			map.put("orderQty", obj[4]);
-			map.put("itemId", obj[5]);
-			map.put("unitId", obj[6]);
+			map.put("itemId", obj[0] != null ? obj[0] : null);
+			map.put("itemCode", obj[1] != null ? obj[1] : null);
+			map.put("itemDescription", obj[2] != null ? obj[2] : null);
+			map.put("unit", obj[3] != null ? obj[3] : null);
+			map.put("orderQty", obj[4] != null ? obj[4] : null);
+			map.put("itemId", obj[5] != null ? obj[5] : null);
+			map.put("unitId", obj[6] != null ? obj[6] : null);
 
 			responseList.add(map);
 		}

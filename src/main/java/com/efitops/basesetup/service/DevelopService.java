@@ -60,16 +60,22 @@ public interface DevelopService {
 			throws ApplicationException;
 
 	
-	Map<String, Object> getSalesContractDropdown(
+	List<Map<String, Object>> getOrderAcceptanceBySalesOrderAmendment(
 	        Long orgId,
 	        Long branch)
 	        throws ApplicationException;
 	
-	Map<String, Object> getSalesContractItemDropdown(
-	        Long salesContractId,
-	        Long orgId,
-	        Long branch)
-	        throws ApplicationException;
+//	Map<String, Object> getItemDropdownBySalesOrderAmendment(
+//	        Long salesContractId,
+//	        Long orgId,
+//	        Long branch)
+//	        throws ApplicationException;
+
+	List<Map<String, Object>> getOrderAcceptanceItemsWithAmendment(String docId, Long orgId, Long branch) throws ApplicationException;
+
+	Integer getSalesOrderAmdRevisionNo(String salesOrderNo, Long item, Long orgId, Long branch) throws ApplicationException;
+
+
 	
 	
 	

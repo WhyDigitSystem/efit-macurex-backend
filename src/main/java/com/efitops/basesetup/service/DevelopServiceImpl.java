@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,12 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
-import com.efitops.basesetup.ResponseDTO.EnquiryCusContactResponseDTO;
-import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
-import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
-import com.efitops.basesetup.ResponseDTO.SalesContractOrderAmendmentResponseDto;
-import com.efitops.basesetup.ResponseDTO.SalesReturnCustomerResponseDTO;
-import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.EnquiryAttachmentResponseDTO;
@@ -41,26 +34,12 @@ import com.efitops.basesetup.dto.EnquiryDetailsReponseDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.EnquiryTermsandCondDTO;
 import com.efitops.basesetup.dto.EnquiryTermsandCondResponseDTO;
-import com.efitops.basesetup.dto.ItemMasterResponseDTO;
-import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
-import com.efitops.basesetup.dto.LocationResponseDTO;
-import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
-import com.efitops.basesetup.dto.SalesDeliveryScheduleDetailsDTO;
-import com.efitops.basesetup.dto.SalesDeliveryScheduleDetailsResponseDTO;
-import com.efitops.basesetup.dto.SalesDeliverySchedulePlanDTO;
-import com.efitops.basesetup.dto.SalesDeliverySchedulePlanResponseDTO;
-import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDetailsDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDetailsResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.SalesReturnDTO;
-import com.efitops.basesetup.dto.SalesReturnDetailsDto;
-import com.efitops.basesetup.dto.SalesReturnDetailsResponseDto;
 import com.efitops.basesetup.dto.SalesReturnResponseDTO;
-import com.efitops.basesetup.dto.SalesReturnTaxDetailsDTO;
-import com.efitops.basesetup.dto.SalesReturnTaxDetailsResponseDto;
-import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
@@ -68,21 +47,9 @@ import com.efitops.basesetup.entity.EnquiryAttachmentVO;
 import com.efitops.basesetup.entity.EnquiryDetailsVO;
 import com.efitops.basesetup.entity.EnquiryTermsandCondVO;
 import com.efitops.basesetup.entity.EnquiryVO;
-import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
-import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
-import com.efitops.basesetup.entity.LocationVO;
-import com.efitops.basesetup.entity.SalesContractDetailsVO;
-import com.efitops.basesetup.entity.SalesContractVO;
-import com.efitops.basesetup.entity.SalesDeliveryScheduleDetailsVO;
-import com.efitops.basesetup.entity.SalesDeliverySchedulePlanVO;
-import com.efitops.basesetup.entity.SalesDeliveryScheduleVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentDetailsVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentVO;
-import com.efitops.basesetup.entity.SalesReturnDetailsVO;
-import com.efitops.basesetup.entity.SalesReturnTaxDetailsVO;
-import com.efitops.basesetup.entity.SalesReturnVO;
-import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
@@ -97,6 +64,7 @@ import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesRepo;
 import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.OrderAcceptanceRepo;
 import com.efitops.basesetup.repository.SalesContractDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleDetailsRepo;
@@ -180,6 +148,9 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	@Autowired
 	private SalesOrderAmendmentDetailsRepo salesOrderAmendmentDetailsRepo;
+	
+	@Autowired
+	private OrderAcceptanceRepo orderAcceptanceRepo;
 	
 	
 	
@@ -1743,9 +1714,9 @@ public class DevelopServiceImpl implements DevelopService {
 		        vo.setBranch(branchVO);
 		    }
 
-		    vo.setDocId(dto.getDocId());
+//		    vo.setDocId(dto.getDocId());
 		    vo.setSalesOrderNumber(dto.getSalesOrderNumber());
-		    vo.setDocDate(dto.getDocDate());
+//		    vo.setDocDate(dto.getDocDate());
 		    vo.setPartyPoAmendmentNo(dto.getPartyPoAmendmentNo());
 		    vo.setSalesOrderDate(dto.getSalesOrderDate());
 		    vo.setPartyPoAmendmentDate(dto.getPartyPoAmendmentDate());
@@ -1757,8 +1728,8 @@ public class DevelopServiceImpl implements DevelopService {
 		    vo.setActive(dto.getActive());
 		    vo.setOrgId(dto.getOrgId());
 		    vo.setCreatedBy(dto.getCreatedBy());
-		    vo.setUpdatedBy(dto.getUpdatedBy());
-		    vo.setCancel(dto.isCancel());
+//		    vo.setUpdatedBy(dto.getUpdatedBy());
+//		    vo.setCancel(dto.isCancel());
 		    vo.setCancelRemarks(dto.getCancelRemarks());
 		}
 		
@@ -1770,12 +1741,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		    responseDTO.setId(salesOrderAmendmentVO.getId());
 
-		    // ==========================
-		    // Branch
-		    // ==========================
-
 		    if (salesOrderAmendmentVO.getBranch() != null) {
-
 		        responseDTO.setBranchId(
 		                salesOrderAmendmentVO.getBranch().getId());
 
@@ -1783,82 +1749,48 @@ public class DevelopServiceImpl implements DevelopService {
 		                salesOrderAmendmentVO.getBranch().getBranchName());
 		    }
 
-		    // ==========================
-		    // Header
-		    // ==========================
-
-		    responseDTO.setDocId(
-		            salesOrderAmendmentVO.getDocId());
-
-		    responseDTO.setDocDate(
-		            salesOrderAmendmentVO.getDocDate());
-
+		    responseDTO.setDocId(salesOrderAmendmentVO.getDocId());
+		    responseDTO.setDocDate(salesOrderAmendmentVO.getDocDate());
 		    responseDTO.setSalesOrderNumber(
 		            salesOrderAmendmentVO.getSalesOrderNumber());
-
 		    responseDTO.setPartyPoAmendmentNo(
 		            salesOrderAmendmentVO.getPartyPoAmendmentNo());
-
 		    responseDTO.setSalesOrderDate(
 		            salesOrderAmendmentVO.getSalesOrderDate());
-
 		    responseDTO.setPartyPoAmendmentDate(
 		            salesOrderAmendmentVO.getPartyPoAmendmentDate());
+		    responseDTO.setPoNo(salesOrderAmendmentVO.getPoNo());
+		    responseDTO.setRevisionNo(salesOrderAmendmentVO.getRevisionNo());
+		    responseDTO.setPoDate(salesOrderAmendmentVO.getPoDate());
+		    responseDTO.setRemarks(salesOrderAmendmentVO.getRemarks());
 
-		    responseDTO.setPoNo(
-		            salesOrderAmendmentVO.getPoNo());
-
-		    responseDTO.setRevisionNo(
-		            salesOrderAmendmentVO.getRevisionNo());
-
-		    responseDTO.setPoDate(
-		            salesOrderAmendmentVO.getPoDate());
-
-		    responseDTO.setRemarks(
-		            salesOrderAmendmentVO.getRemarks());
-
-		    responseDTO.setOrgId(
-		            salesOrderAmendmentVO.getOrgId());
-
-		    responseDTO.setCreatedBy(
-		            salesOrderAmendmentVO.getCreatedBy());
-
-		    responseDTO.setUpdatedBy(
-		            salesOrderAmendmentVO.getUpdatedBy());
-
-		    responseDTO.setActive(
-		            salesOrderAmendmentVO.isActive());
-
-		    responseDTO.setCancel(
-		            salesOrderAmendmentVO.isCancel());
-
+		    responseDTO.setOrgId(salesOrderAmendmentVO.getOrgId());
+		    responseDTO.setCreatedBy(salesOrderAmendmentVO.getCreatedBy());
+		    responseDTO.setUpdatedBy(salesOrderAmendmentVO.getUpdatedBy());
+		    responseDTO.setActive(salesOrderAmendmentVO.isActive());
+		    responseDTO.setCancel(salesOrderAmendmentVO.isCancel());
 		    responseDTO.setCancelRemarks(
 		            salesOrderAmendmentVO.getCancelRemarks());
-
 		    responseDTO.setScreenName(
 		            salesOrderAmendmentVO.getScreenName());
-
 		    responseDTO.setScreenCode(
 		            salesOrderAmendmentVO.getScreenCode());
 
-		    // ==========================
-		    // Detail Grid
-		    // ==========================
+		    // Fetch child table directly
+		    List<SalesOrderAmendmentDetailsVO> detailList =
+		            salesOrderAmendmentDetailsRepo
+		                    .findBySalesOrderAmendmentVO_Id(
+		                            salesOrderAmendmentVO.getId());
 
 		    List<SalesOrderAmendmentDetailsResponseDTO> details =
 		            new ArrayList<>();
 
-		   
-
-		    for (SalesOrderAmendmentDetailsVO detailVO
-		            : salesOrderAmendmentVO.getDetails()) {
+		    for (SalesOrderAmendmentDetailsVO detailVO : detailList) {
 
 		        SalesOrderAmendmentDetailsResponseDTO detailDTO =
 		                new SalesOrderAmendmentDetailsResponseDTO();
 
 		        detailDTO.setId(detailVO.getId());
-
-		       
 
 		        if (detailVO.getItem() != null) {
 
@@ -1870,11 +1802,8 @@ public class DevelopServiceImpl implements DevelopService {
 		        }
 
 		        detailDTO.setOldQty(detailVO.getOldQty());
-
 		        detailDTO.setOldRate(detailVO.getOldRate());
-
 		        detailDTO.setNewQty(detailVO.getNewQty());
-
 		        detailDTO.setNewRate(detailVO.getNewRate());
 
 		        detailDTO.setOldDeliveryDate(
@@ -1890,7 +1819,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		    return responseDTO;
 		}
-		
 		
 		@Override
 		public SalesOrderAmendmentResponseDTO getSalesOrderAmendmentById(Long id)
@@ -1942,79 +1870,125 @@ public class DevelopServiceImpl implements DevelopService {
 		}
 		
 		@Override
-		public Map<String, Object> getSalesContractDropdown(
-		        Long orgId,
-		        Long branch)
-		        throws ApplicationException {
+		public List<Map<String, Object>> getOrderAcceptanceBySalesOrderAmendment(
+		        Long orgId, Long branch) throws ApplicationException {
 
-		    Map<String, Object> responseMap = new HashMap<>();
+		    List<Object[]> orderAcceptanceList =
+		            salesContractRepo.getOrderAcceptanceBySalesOrderAmendment(orgId, branch);
 
-		    List<Object[]> salesContractList =
-		            salesContractRepo.getSalesContractDropdown(orgId, branch);
+		    List<Map<String, Object>> responseList = new ArrayList<>();
 
-		    List<SalesContractDropdownResponseDto> responseDTOList =
-		            new ArrayList<>();
+		    for (Object[] obj : orderAcceptanceList) {
 
-		    for (Object[] obj : salesContractList) {
+		        Map<String, Object> map = new HashMap<>();
 
-		        SalesContractDropdownResponseDto dto =
-		                new SalesContractDropdownResponseDto();
+		        map.put("id", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+		        map.put("docId", obj[1] != null ? obj[1].toString() : "");
+		        map.put("docDate", obj[2] != null ? obj[2] : null);
+		        map.put("customerPurchaseOrderNo",
+		                obj[3] != null ? obj[3].toString() : "");
+		        map.put("customerPurchaseOrderDate",
+		                obj[4] != null ? obj[4] : null);
 
-		        dto.setId(((Number) obj[0]).longValue());
-
-		        dto.setCustomerContractNo((String) obj[1]);
-
-		        dto.setContractDate((LocalDate) obj[2]);
-
-		        dto.setCustomerPurchaseOrderNo((String) obj[3]);
-
-		        responseDTOList.add(dto);
+		        responseList.add(map);
 		    }
 
-		    responseMap.put("message", "Sales Contract List Fetched Successfully");
-		    responseMap.put("salesContractList", responseDTOList);
-
-		    return responseMap;
+		    return responseList;
 		}
+		
+//		
+//		@Override
+//		public Map<String, Object> getItemDropdownBySalesOrderAmendment(
+//		        Long salesContractId,
+//		        Long orgId,
+//		        Long branch)
+//		        throws ApplicationException {
+//
+//		    Map<String, Object> responseMap = new HashMap<>();
+//
+//		    List<Object[]> itemList =
+//		            salesContractDetailsRepo.getItemDropdownBySalesOrderAmendment(
+//		                    salesContractId,
+//		                    orgId,
+//		                    branch);
+//
+//		    List<SalesContractOrderAmendmentResponseDto> responseDTOList =
+//		            new ArrayList<>();
+//
+//		    for (Object[] obj : itemList) {
+//
+//		    	SalesContractOrderAmendmentResponseDto dto =
+//		                new SalesContractOrderAmendmentResponseDto();
+//
+//		        dto.setItemId(((Number)obj[0]).longValue());
+//
+//		        dto.setItemCode((String)obj[1]);
+//
+//		        dto.setItemDescription((String)obj[2]);
+//
+//		        responseDTOList.add(dto);
+//		    }
+//
+//		    responseMap.put("message", "Item List Fetched Successfully");
+//
+//		    responseMap.put("itemList", responseDTOList);
+//
+//		    return responseMap;
+//		}
 		
 		
 		@Override
-		public Map<String, Object> getSalesContractItemDropdown(
-		        Long salesContractId,
+		public List<Map<String, Object>> getOrderAcceptanceItemsWithAmendment(
+		        String docId,
 		        Long orgId,
-		        Long branch)
-		        throws ApplicationException {
+		        Long branch) throws ApplicationException {
 
-		    Map<String, Object> responseMap = new HashMap<>();
-
-		    List<Object[]> itemList =
-		            salesContractDetailsRepo.getSalesContractItemDropdown(
-		                    salesContractId,
+		    List<Object[]> itemDetails =
+		    		orderAcceptanceRepo.getOrderAcceptanceItemsWithAmendment(
+		                    docId,
 		                    orgId,
 		                    branch);
 
-		    List<SalesContractOrderAmendmentResponseDto> responseDTOList =
-		            new ArrayList<>();
+		    return getOrderAcceptanceItemDetails(itemDetails);
+		}
 
-		    for (Object[] obj : itemList) {
+		private List<Map<String, Object>> getOrderAcceptanceItemDetails(
+		        List<Object[]> itemDetails) {
 
-		    	SalesContractOrderAmendmentResponseDto dto =
-		                new SalesContractOrderAmendmentResponseDto();
+		    List<Map<String, Object>> responseList = new ArrayList<>();
 
-		        dto.setItemId(((Number)obj[0]).longValue());
+		    for (Object[] obj : itemDetails) {
 
-		        dto.setItemCode((String)obj[1]);
+		        Map<String, Object> map = new HashMap<>();
 
-		        dto.setItemDescription((String)obj[2]);
+		        map.put("item", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+		        map.put("itemCode", obj[1] != null ? obj[1].toString() : "");
+		        map.put("itemDescription", obj[2] != null ? obj[2].toString() : "");
+		        map.put("oldQty", obj[3] != null ? obj[3] : null);
+		        map.put("oldDeliveryDate", obj[4] != null ? obj[4] : null);
+		        map.put("oldRate", obj[5] != null ? obj[5] : null);
 
-		        responseDTOList.add(dto);
+		        responseList.add(map);
 		    }
 
-		    responseMap.put("message", "Item List Fetched Successfully");
+		    return responseList;
+		}
+		
+		@Override
+		public Integer getSalesOrderAmdRevisionNo(
+		        String salesOrderNo,
+		        Long item,
+		        Long orgId,
+		        Long branch) throws ApplicationException {
 
-		    responseMap.put("itemList", responseDTOList);
+		    Integer revisionNo =
+		    		salesOrderAmendmentRepo.getSalesOrderAmdRevisionNo(
+		                    salesOrderNo,
+		                    item,
+		                    orgId,
+		                    branch);
 
-		    return responseMap;
+		    return revisionNo;
 		}
 		
 }

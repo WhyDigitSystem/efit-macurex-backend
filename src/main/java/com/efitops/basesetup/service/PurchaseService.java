@@ -45,4 +45,16 @@ public interface PurchaseService {
     LocalPurchaseOrderResponseDTO getLocalPurchaseOrderById(Long id) throws ApplicationException;
     List<LocalPurchaseOrderResponseDTO> getLocalPurchaseOrderByOrgId(Long orgId, Long branchId) throws ApplicationException;
     String getLocalPurchaseOrderDocId(Long orgId, String finYear, Long branch);
+
+
+// ======================DirectPurchase==============================================================
+
+    Map<String, Object> updateCreateDirectPurchase(DirectPurchaseDTO dto) throws ApplicationException;
+
+    DirectPurchaseResponseDTO getDirectPurchaseById(Long id) throws ApplicationException;
+
+    List<DirectPurchaseResponseDTO> getDirectPurchaseByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+    String getDirectPurchaseDocId(Long orgId, String finYear, Long branch);
+
 }

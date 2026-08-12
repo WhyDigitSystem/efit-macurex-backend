@@ -32,8 +32,8 @@ public class TransportBillDTO {
 
     private LocalDate billReceivedDate;
     private LocalDate accReceivedDate;
-    private String receivedBy;
-    private String accReceivedBy;
+    private Long receivedBy;
+    private Long accReceivedBy;
 
     private Long orgId;
     private boolean active;
@@ -41,7 +41,7 @@ public class TransportBillDTO {
     private Long createdBy;
 
     private List<TransportBillPaymentDetailsDTO> paymentDetails1;
-    private List<TransportBillPaymentDetails2DTO> paymentDetails2;
+//    private List<TransportBillPaymentDetails2DTO> paymentDetails2;
 
 
 }

@@ -43,9 +43,9 @@ public class TransportBillPaymentDetails2VO {
     @Column(name = "total_paid_amount")
     private BigDecimal totalPaidAmount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transport_bill_id", referencedColumnName = "transportbill_id")
-    private TransportBillVO transportBillVO;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "transport_bill_id", referencedColumnName = "transportbill_id")
+//    private TransportBillVO transportBillVO;
 
 
 }

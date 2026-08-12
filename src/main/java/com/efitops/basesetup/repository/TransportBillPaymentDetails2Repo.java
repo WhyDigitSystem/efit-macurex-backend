@@ -9,5 +9,5 @@ import com.efitops.basesetup.entity.TransportBillVO;
 
 public interface TransportBillPaymentDetails2Repo extends JpaRepository<TransportBillPaymentDetails2VO, Long> {
 
-    List<TransportBillPaymentDetails2VO> findByTransportBillVO(TransportBillVO transportBillVO);
+//    List<TransportBillPaymentDetails2VO> findByTransportBillVO(TransportBillVO transportBillVO);
 }

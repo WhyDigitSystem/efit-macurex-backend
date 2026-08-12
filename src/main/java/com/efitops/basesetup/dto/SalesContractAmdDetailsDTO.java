@@ -1,6 +1,6 @@
 package com.efitops.basesetup.dto;
 
-import com.efitops.basesetup.entity.ItemMasterVO;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SalesContractAmdDetailsDTO {
-	private Long id;
+//	private Long id;
 	private Long item;
-	private Double oldRate;
-	private Double newRate;
-	private String validFrom;
-	private String validTo;
-	private String newValidDate;
+	private double oldRate;
+	private double newRate;
+	private LocalDate validFrom;
+	private LocalDate validTo;
+	private LocalDate newValidDate;
 
 
 }

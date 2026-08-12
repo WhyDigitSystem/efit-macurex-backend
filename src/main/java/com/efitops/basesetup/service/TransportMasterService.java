@@ -86,8 +86,24 @@ public interface TransportMasterService {
 
 	List<StockTransferChallanResponseDTO> getStockTransferChallanByOrgId(Long orgId, Long branch) throws ApplicationException;
 
+	//stock transfercustomer
+	Map<String, Object> getStockTransferCustomer() throws ApplicationException;
 
 	
+
+	//despatch instruction schedule no dropdown
+	Map<String, Object> getDespatchScheduleNo(String scheduleNo,Long branch,Long orgId) throws ApplicationException;
+
+	Map<String, Object> getDespatchCustomer(Long branch, Long orgId) throws ApplicationException;
+
+
+	Map<String, Object> getDespatchSalesContract(Long customerId, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getDespatchItems(Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getDespatchScheduleMonth(Long itemId, Long branch, Long orgId) throws ApplicationException;
+
+
 
 
 	

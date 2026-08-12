@@ -261,8 +261,8 @@ public class TransactionServiceImpl implements TransactionService {
 	        SalesDeliverySchedulePlanVO plan =
 	                new SalesDeliverySchedulePlanVO();
 
-	        if (dto.getId() != null)
-	            plan.setId(dto.getId());
+//	        if (dto.getId() != null)
+//	            plan.setId(dto.getId());
 
 	        plan.setDayNo(dto.getDayNo());
 	        plan.setDeliveryDate(dto.getDeliveryDate());

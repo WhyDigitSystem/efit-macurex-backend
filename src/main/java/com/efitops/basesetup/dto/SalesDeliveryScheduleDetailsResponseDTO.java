@@ -16,9 +16,9 @@ public class SalesDeliveryScheduleDetailsResponseDTO {
 
     private ItemResponseDTO item;
 
-//    private double orderQty;
-//
-//    private double pendingQty;
+    private double orderQty;
+
+    private double pendingQty;
 
     private double actualPlannedQty;
 

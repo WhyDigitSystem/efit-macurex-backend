@@ -31,7 +31,7 @@ public interface TransactionService {
 		Map<String, Object> getContractNo(Long orgId, Long branch)
 		        throws ApplicationException;
 
-		Map<String, Object> getItemDropdown(String docId)
+		Map<String, Object> getSalesDeliveryScheduleByItemDropdown(String docId, Long orgId, Long branch)
 		        throws ApplicationException;
 
 

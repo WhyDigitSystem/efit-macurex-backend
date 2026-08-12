@@ -10,14 +10,14 @@ public class SalesDeliverySchedulePlanDTO {
 //    private Long id;
 
     // Delivery Schedule Grid
-    private Integer dayNo;
+    private int dayNo;
 
     private LocalDate deliveryDate;
 
-    private Integer weekNo;
+    private int weekNo;
 
     private String dayName;
 
-    private Double deliveryQty;
+    private double deliveryQty;
 
 }

@@ -34,10 +34,10 @@ import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.SalesContractAmdDetailsVO;
 import com.efitops.basesetup.entity.SalesContractAmendmentVO;
-import com.efitops.basesetup.entity.SalesContractVO;
 import com.efitops.basesetup.entity.SalesDeliveryScheduleDetailsVO;
 import com.efitops.basesetup.entity.SalesDeliverySchedulePlanVO;
 import com.efitops.basesetup.entity.SalesDeliveryScheduleVO;
+import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
@@ -49,6 +49,7 @@ import com.efitops.basesetup.repository.SalesContractRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleDetailsRepo;
 import com.efitops.basesetup.repository.SalesDeliverySchedulePlanRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
+import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -84,6 +85,9 @@ public class TransactionServiceImpl implements TransactionService {
 	
 	@Autowired
 	SalesContractAmdDetailsRepo salesContractAmdDetailsRepo;
+	
+	@Autowired
+    UnitMasterRepo 	unitMasterRepo;
 
 	// salesdeliveryschedule
 
@@ -221,16 +225,28 @@ public class TransactionServiceImpl implements TransactionService {
 //	            detail.setSalesContractDetails(contractDetails);
 //	        }
 
-	        if (dto.getItemId() != null) {
+	        if (dto.getItem() != null) {
 
 	            ItemMasterVO item =
-	                    itemMasterRepo.findById(dto.getItemId())
+	                    itemMasterRepo.findById(dto.getItem())
 	                    .orElseThrow(() ->
 	                            new ApplicationException("Item Not Found"));
 
 	            detail.setItem(item);
 	        }
+	        
+	        if (dto.getUnit() != null) {
 
+	            UnitMasterVO unit =
+	                    unitMasterRepo.findById(dto.getUnit())
+	                    .orElseThrow(() ->
+	                            new ApplicationException("Unit Not Found"));
+
+	            detail.setUnit(unit);
+	        }
+	       
+	        detail.setOrderQty(dto.getOrderQty());
+	        detail.setPendingQty(dto.getPendingQty());
 	        detail.setActualPlannedQty(dto.getActualPlannedQty());
 	        detail.setSoNoContractNo(dto.getSoNoContractNo());
 	        detail.setInvoiceType(dto.getInvoiceType());
@@ -376,7 +392,10 @@ public class TransactionServiceImpl implements TransactionService {
 	            detailResponse.setSoNocontractNo(detailVO.getSoNoContractNo());
 	            
 	            detailResponse.setInvoiceType(detailVO.getInvoiceType());
-	            
+	            detailResponse.setOrderQty(
+	                    detailVO.getOrderQty());
+	            detailResponse.setPendingQty(
+	                    detailVO.getPendingQty());
 	            detailResponse.setActualPlannedQty(
 	                    detailVO.getActualPlannedQty());
 
@@ -456,28 +475,32 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public List<SalesDeliveryScheduleResponseDTO> getAllSalesDeliverySchedule(Long orgId, Long branchId)
-			throws ApplicationException {
+	public List<SalesDeliveryScheduleResponseDTO> getAllSalesDeliverySchedule(
+	        Long orgId,
+	        Long branch) throws ApplicationException {
 
-		List<SalesDeliveryScheduleVO> scheduleList = salesDeliveryScheduleRepo.findByOrgIdAndBranch(orgId, branchId);
+	    List<SalesDeliveryScheduleVO> scheduleList =
+	            salesDeliveryScheduleRepo.findByOrgIdAndBranch(orgId, branch);
 
-		List<SalesDeliveryScheduleResponseDTO> responseList = new ArrayList<>();
+	    List<SalesDeliveryScheduleResponseDTO> responseList =
+	            new ArrayList<>();
 
-		for (SalesDeliveryScheduleVO scheduleVO : scheduleList) {
+	    for (SalesDeliveryScheduleVO scheduleVO : scheduleList) {
+	        responseList.add(
+	                buildSalesDeliveryScheduleResponse(scheduleVO)
+	        );
+	    }
 
-			responseList.add(buildSalesDeliveryScheduleResponse(scheduleVO));
-		}
-
-		return responseList;
+	    return responseList;
 	}
 
 	@Override
-	public Map<String, Object> getItemDropdown(String docId) throws ApplicationException {
+	public Map<String, Object> getSalesDeliveryScheduleByItemDropdown(String docId,Long orgId, Long branch) throws ApplicationException {
 
 		String methodName = "getItemDropdown";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		List<Object[]> list = salesContractDetailsRepo.getItemDropdown(docId);
+		List<Object[]> list = salesContractDetailsRepo.getSalesDeliveryScheduleByItemDropdown(docId , orgId , branch);
 
 		List<Map<String, Object>> responseList = new ArrayList<>();
 
@@ -490,6 +513,8 @@ public class TransactionServiceImpl implements TransactionService {
 			map.put("itemDescription", obj[2]);
 			map.put("unit", obj[3]);
 			map.put("orderQty", obj[4]);
+			map.put("itemId", obj[5]);
+			map.put("unitId", obj[6]);
 
 			responseList.add(map);
 		}

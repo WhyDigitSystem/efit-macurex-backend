@@ -15,22 +15,22 @@ public interface SalesContractDetailsRepo extends JpaRepository<SalesContractDet
 
 	List<SalesContractDetailsVO> findBySalesContract(SalesContractVO salesContractVO);
 
-//	@Query(value = """
-//	        SELECT
-//	            i.item_id,
-//	            i.item_code,
-//	            i.item_description,
-//	            u.description,
-//	            scd.quantity
-//	        FROM sales_contract_detail scd
-//	        INNER JOIN item i
-//	            ON scd.item = i.item_id
-//	        INNER JOIN unitmaster u
-//	            ON scd.unit = u.unitmaster_id
-//	        WHERE scd.salescontract_id = ?1
-//	        ORDER BY i.item_code
-//	        """, nativeQuery = true)
-//	    List<Object[]> getItemDropdown(Long salesContractId);
+	@Query(value = """
+	        SELECT
+	            i.item_id,
+	            i.item_code,
+	            i.item_description,
+	            u.description,
+	            scd.quantity
+	        FROM sales_contract_detail scd
+	        INNER JOIN item i
+	            ON scd.item = i.item_id
+	        INNER JOIN unitmaster u
+	            ON scd.unit = u.unitmaster_id
+	        WHERE scd.doc_id = ?1
+	        ORDER BY i.item_code
+	        """, nativeQuery = true)
+	    List<Object[]> getItemDropdown(String docId);
 
 	@Query(value = """
 			SELECT
@@ -53,6 +53,7 @@ public interface SalesContractDetailsRepo extends JpaRepository<SalesContractDet
 			        @Param("salesContractId") Long salesContractId,
 			        @Param("orgId") Long orgId,
 			        @Param("branch") Long branch);
+
 
 	
 

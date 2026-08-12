@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class SalesDeliveryScheduleDetailsDTO {
 
-	private Long id;
+//	private Long id;
 
 	private String soNoContractNo;
 

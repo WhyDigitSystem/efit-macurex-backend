@@ -47,19 +47,19 @@ public interface TransportMasterService {
 
 	
 	//SalesContractAmendment
-	Map<String, Object> updateCreateSalesContractAmendment(
-			SalesContractAmendmentDTO salesContractAmendmentDTO)
-			throws ApplicationException;
-
-	SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
-			throws ApplicationException;
-
-	List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
-			throws ApplicationException;
-
-	//dropdown for contrcatno
-	Map<String, Object> getContractNo() throws ApplicationException;
-	
+//	Map<String, Object> updateCreateSalesContractAmendment(
+//			SalesContractAmendmentDTO salesContractAmendmentDTO)
+//			throws ApplicationException;
+//
+//	SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
+//			throws ApplicationException;
+//
+//	List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
+//			throws ApplicationException;
+//
+//	//dropdown for contrcatno
+//	Map<String, Object> getContractNo() throws ApplicationException;
+//	
 	//despatchinstruction
 
 
@@ -86,8 +86,24 @@ public interface TransportMasterService {
 
 	List<StockTransferChallanResponseDTO> getStockTransferChallanByOrgId(Long orgId, Long branch) throws ApplicationException;
 
+	//stock transfercustomer
+	Map<String, Object> getStockTransferCustomer() throws ApplicationException;
 
 	
+
+	//despatch instruction schedule no dropdown
+	Map<String, Object> getDespatchScheduleNo(String scheduleNo,Long branch,Long orgId) throws ApplicationException;
+
+	Map<String, Object> getDespatchCustomer(Long branch, Long orgId) throws ApplicationException;
+
+
+	Map<String, Object> getDespatchSalesContract(Long customerId, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getDespatchItems(Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getDespatchScheduleMonth(Long itemId, Long branch, Long orgId) throws ApplicationException;
+
+
 
 
 	

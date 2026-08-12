@@ -3,10 +3,12 @@ package com.efitops.basesetup.service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,17 +28,25 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DespatchCustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchInstDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchInstructionResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DespatchInstructionScheduleResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DespatchSalesContractResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DespatchScheduleMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DocketInvoiceDetResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
+import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferCustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
+import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
@@ -46,7 +56,6 @@ import com.efitops.basesetup.dto.DespatchInstructionDTO;
 import com.efitops.basesetup.dto.DespatchInstructionDetailsDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDetailsDTO;
-import com.efitops.basesetup.dto.LocationResponseDTO;
 //github.com/WhyDigitSystem/efit-macurex-backend.git
 import com.efitops.basesetup.dto.SalesContractAmdDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
@@ -552,260 +561,260 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// Sales Contract amendment
 
-	@Override
-	@Transactional
-	public Map<String, Object> updateCreateSalesContractAmendment(
-			SalesContractAmendmentDTO salesContractAmendmentDTO) throws ApplicationException {
-
-		SalesContractAmendmentVO salesContractAmendmentVO = new SalesContractAmendmentVO();
-
-		String message;
-
-		if (salesContractAmendmentDTO.getId() != null) {
-
-			salesContractAmendmentVO = salesContractAmendmentRepo.findById(salesContractAmendmentDTO.getId())
-					.orElseThrow(() -> new ApplicationException("Invalid Sales Contract Amendment Details"));
-
-			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
-
-			message = "Sales Contract Amendment Updated Successfully";
-
-		} else {
-
-			salesContractAmendmentVO.setCreatedBy(salesContractAmendmentDTO.getCreatedBy());
-			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
-
-			message = "Sales Contract Amendment Created Successfully";
-		}
-		createUpdateSalesContractAmendmentVO(
-		        salesContractAmendmentDTO,
-		        salesContractAmendmentVO);
-
-		SalesContractAmendmentVO savedSalesContractAmendment =
-		        salesContractAmendmentRepo.save(salesContractAmendmentVO);
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("message", message);
-		response.put("salesContractAmendmentVO", salesContractResponseResponse(savedSalesContractAmendment));
-
-
-		return response;
-	}
-	private SalesContractAmdResponseDTO salesContractResponseResponse(
-			SalesContractAmendmentVO salesContractAmendmentVO) {
-
-		SalesContractAmdResponseDTO responseDTO = new SalesContractAmdResponseDTO();
-
-		responseDTO.setId(salesContractAmendmentVO.getId());
-		responseDTO.setContractAmdNo(salesContractAmendmentVO.getContractAmdNo());
-		responseDTO.setDate(salesContractAmendmentVO.getDate());
-		responseDTO.setContractNo(salesContractAmendmentVO.getContractNo());
-		responseDTO.setContractDate(salesContractAmendmentVO.getContractDate());
-		responseDTO.setCustPoNo(salesContractAmendmentVO.getCustPoNo());
-		responseDTO.setCustPoDate(salesContractAmendmentVO.getCustPoDate());
-		responseDTO.setRevisionNo(salesContractAmendmentVO.getRevisionNo());
-		responseDTO.setRemarks(salesContractAmendmentVO.getRemarks());
-
-		if (salesContractAmendmentVO.getBranch() != null) {
-
-			BranchResponseDTO branchDTO = new BranchResponseDTO();
-
-			branchDTO.setId(salesContractAmendmentVO.getBranch().getId());
-			branchDTO.setBranchName(salesContractAmendmentVO.getBranch().getBranchName());
-
-			responseDTO.setBranch(branchDTO);
-		}
-
-		responseDTO.setOrgId(salesContractAmendmentVO.getOrgId());
-		responseDTO.setCreatedBy(salesContractAmendmentVO.getCreatedBy());
-		responseDTO.setCancelRemarks(salesContractAmendmentVO.getCancelRemarks());
-
-		List<SalesContractDetailResponseDTO> detailResponseList = new ArrayList<>();
-
-		if (salesContractAmendmentVO.getSalesContractAmdDetailsVO() != null
-				&& !salesContractAmendmentVO.getSalesContractAmdDetailsVO().isEmpty()) {
-
-			for (SalesContractAmdDetailsVO detailVO : salesContractAmendmentVO.getSalesContractAmdDetailsVO()) {
-
-				SalesContractDetailResponseDTO detailDTO = new SalesContractDetailResponseDTO();
-
-				detailDTO.setId(detailVO.getId());
-
-				if (detailVO.getItem() != null) {
-
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
-
-					itemDTO.setId(detailVO.getItem().getId());
-					itemDTO.setItemCode(detailVO.getItem().getItemCode());
-
-					detailDTO.setItem(itemDTO);
-				}
-
-				detailDTO.setOldRate(detailVO.getOldRate());
-				detailDTO.setNewRate(detailVO.getNewRate());
-				detailDTO.setValidFrom(detailVO.getValidFrom());
-				detailDTO.setValidTo(detailVO.getValidTo());
-				detailDTO.setNewValidDate(detailVO.getNewValidDate());
-
-				detailResponseList.add(detailDTO);
-			}
-		}
-
-		responseDTO.setSalesContractDetailResponseDTO(detailResponseList);
-
-		return responseDTO;
-	}
-	private void createUpdateSalesContractAmendmentVO(
-			SalesContractAmendmentDTO dto,
-			SalesContractAmendmentVO salesContractAmendmentVO)
-			throws ApplicationException {
-
-		salesContractAmendmentVO.setContractAmdNo(dto.getContractAmdNo());
-		salesContractAmendmentVO.setDate(dto.getDate());
-		salesContractAmendmentVO.setContractNo(dto.getContractNo());
-		salesContractAmendmentVO.setContractDate(dto.getContractDate());
-		salesContractAmendmentVO.setCustPoNo(dto.getCustPoNo());
-		salesContractAmendmentVO.setCustPoDate(dto.getCustPoDate());
-		salesContractAmendmentVO.setRevisionNo(dto.getRevisionNo());
-		salesContractAmendmentVO.setRemarks(dto.getRemarks());
-
-		salesContractAmendmentVO.setOrgId(dto.getOrgId());
-		salesContractAmendmentVO.setActive(dto.getActive());
-		salesContractAmendmentVO.setCancelRemarks(dto.getCancelRemarks());
-
-		if (dto.getBranch() != null && dto.getBranch() != 0) {
-
-			BranchVO branch = branchRepo.findById(dto.getBranch())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-			salesContractAmendmentVO.setBranch(branch);
-		}
-
-		//----------------------------------------------------
-		// Delete old child records while updating
-		//----------------------------------------------------
-
-		if (dto.getId() != null) {
-
-			List<SalesContractAmdDetailsVO> oldList = salesContractAmdDetailsRepo
-					.findBySalesContractAmendmentVO(salesContractAmendmentVO);
-
-			salesContractAmdDetailsRepo.deleteAll(oldList);
-		}
-
-		List<SalesContractAmdDetailsVO> detailList = new ArrayList<>();
-
-		if (dto.getSalesContractAmdDetailsDTO() != null
-				&& !dto.getSalesContractAmdDetailsDTO().isEmpty()) {
-
-			for (SalesContractAmdDetailsDTO detailDTO : dto.getSalesContractAmdDetailsDTO()) {
-
-				SalesContractAmdDetailsVO detailVO = new SalesContractAmdDetailsVO();
-
-				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
-
-					ItemMasterVO item = itemMasterRepo.findById(detailDTO.getItem())
-							.orElseThrow(() -> new ApplicationException("Item Not Found"));
-
-					detailVO.setItem(item);
-				}
-
-				detailVO.setOldRate(detailDTO.getOldRate());
-				detailVO.setNewRate(detailDTO.getNewRate());
-				detailVO.setValidFrom(detailDTO.getValidFrom());
-				detailVO.setValidTo(detailDTO.getValidTo());
-				detailVO.setNewValidDate(detailDTO.getNewValidDate());
-
-				// Parent Mapping
-				detailVO.setSalesContractAmendmentVO(salesContractAmendmentVO);
-
-				detailList.add(detailVO);
-			}
-
-			// Set child list to parent
-			salesContractAmendmentVO.setSalesContractAmdDetailsVO(detailList);
-		}
-	}
+//	@Override
+//	@Transactional
+//	public Map<String, Object> updateCreateSalesContractAmendment(
+//			SalesContractAmendmentDTO salesContractAmendmentDTO) throws ApplicationException {
+//
+//		SalesContractAmendmentVO salesContractAmendmentVO = new SalesContractAmendmentVO();
+//
+//		String message;
+//
+//		if (salesContractAmendmentDTO.getId() != null) {
+//
+//			salesContractAmendmentVO = salesContractAmendmentRepo.findById(salesContractAmendmentDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("Invalid Sales Contract Amendment Details"));
+//
+//			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
+//
+//			message = "Sales Contract Amendment Updated Successfully";
+//
+//		} else {
+//
+//			salesContractAmendmentVO.setCreatedBy(salesContractAmendmentDTO.getCreatedBy());
+//			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
+//
+//			message = "Sales Contract Amendment Created Successfully";
+//		}
+//		createUpdateSalesContractAmendmentVO(
+//		        salesContractAmendmentDTO,
+//		        salesContractAmendmentVO);
+//
+//		SalesContractAmendmentVO savedSalesContractAmendment =
+//		        salesContractAmendmentRepo.save(salesContractAmendmentVO);
+//
+//		Map<String, Object> response = new HashMap<>();
+//		response.put("message", message);
+//		response.put("salesContractAmendmentVO", salesContractResponseResponse(savedSalesContractAmendment));
+//
+//
+//		return response;
+//	}
+//	private SalesContractAmdResponseDTO salesContractResponseResponse(
+//			SalesContractAmendmentVO salesContractAmendmentVO) {
+//
+//		SalesContractAmdResponseDTO responseDTO = new SalesContractAmdResponseDTO();
+//
+//		responseDTO.setId(salesContractAmendmentVO.getId());
+//		responseDTO.setContractAmdNo(salesContractAmendmentVO.getContractAmdNo());
+//		responseDTO.setDate(salesContractAmendmentVO.getDate());
+//		responseDTO.setContractNo(salesContractAmendmentVO.getContractNo());
+//		responseDTO.setContractDate(salesContractAmendmentVO.getContractDate());
+//		responseDTO.setCustPoNo(salesContractAmendmentVO.getCustPoNo());
+//		responseDTO.setCustPoDate(salesContractAmendmentVO.getCustPoDate());
+//		responseDTO.setRevisionNo(salesContractAmendmentVO.getRevisionNo());
+//		responseDTO.setRemarks(salesContractAmendmentVO.getRemarks());
+//
+//		if (salesContractAmendmentVO.getBranch() != null) {
+//
+//			BranchResponseDTO branchDTO = new BranchResponseDTO();
+//
+//			branchDTO.setId(salesContractAmendmentVO.getBranch().getId());
+//			branchDTO.setBranchName(salesContractAmendmentVO.getBranch().getBranchName());
+//
+//			responseDTO.setBranch(branchDTO);
+//		}
+//
+//		responseDTO.setOrgId(salesContractAmendmentVO.getOrgId());
+//		responseDTO.setCreatedBy(salesContractAmendmentVO.getCreatedBy());
+//		responseDTO.setCancelRemarks(salesContractAmendmentVO.getCancelRemarks());
+//
+//		List<SalesContractDetailResponseDTO> detailResponseList = new ArrayList<>();
+//
+//		if (salesContractAmendmentVO.getSalesContractAmdDetailsVO() != null
+//				&& !salesContractAmendmentVO.getSalesContractAmdDetailsVO().isEmpty()) {
+//
+//			for (SalesContractAmdDetailsVO detailVO : salesContractAmendmentVO.getSalesContractAmdDetailsVO()) {
+//
+//				SalesContractDetailResponseDTO detailDTO = new SalesContractDetailResponseDTO();
+//
+//				detailDTO.setId(detailVO.getId());
+//
+//				if (detailVO.getItem() != null) {
+//
+//					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+//
+//					itemDTO.setId(detailVO.getItem().getId());
+//					itemDTO.setItemCode(detailVO.getItem().getItemCode());
+//
+//					detailDTO.setItem(itemDTO);
+//				}
+//
+//				detailDTO.setOldRate(detailVO.getOldRate());
+//				detailDTO.setNewRate(detailVO.getNewRate());
+//				detailDTO.setValidFrom(detailVO.getValidFrom());
+//				detailDTO.setValidTo(detailVO.getValidTo());
+//				detailDTO.setNewValidDate(detailVO.getNewValidDate());
+//
+//				detailResponseList.add(detailDTO);
+//			}
+//		}
+//
+//		responseDTO.setSalesContractDetailResponseDTO(detailResponseList);
+//
+//		return responseDTO;
+//	}
+//	private void createUpdateSalesContractAmendmentVO(
+//			SalesContractAmendmentDTO dto,
+//			SalesContractAmendmentVO salesContractAmendmentVO)
+//			throws ApplicationException {
+//
+//		salesContractAmendmentVO.setContractAmdNo(dto.getContractAmdNo());
+//		salesContractAmendmentVO.setDate(dto.getDate());
+//		salesContractAmendmentVO.setContractNo(dto.getContractNo());
+//		salesContractAmendmentVO.setContractDate(dto.getContractDate());
+//		salesContractAmendmentVO.setCustPoNo(dto.getCustPoNo());
+//		salesContractAmendmentVO.setCustPoDate(dto.getCustPoDate());
+//		salesContractAmendmentVO.setRevisionNo(dto.getRevisionNo());
+//		salesContractAmendmentVO.setRemarks(dto.getRemarks());
+//
+//		salesContractAmendmentVO.setOrgId(dto.getOrgId());
+//		salesContractAmendmentVO.setActive(dto.getActive());
+//		salesContractAmendmentVO.setCancelRemarks(dto.getCancelRemarks());
+//
+//		if (dto.getBranch() != null && dto.getBranch() != 0) {
+//
+//			BranchVO branch = branchRepo.findById(dto.getBranch())
+//					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+//
+//			salesContractAmendmentVO.setBranch(branch);
+//		}
+//
+//		//----------------------------------------------------
+//		// Delete old child records while updating
+//		//----------------------------------------------------
+//
+//		if (dto.getId() != null) {
+//
+//			List<SalesContractAmdDetailsVO> oldList = salesContractAmdDetailsRepo
+//					.findBySalesContractAmendmentVO(salesContractAmendmentVO);
+//
+//			salesContractAmdDetailsRepo.deleteAll(oldList);
+//		}
+//
+//		List<SalesContractAmdDetailsVO> detailList = new ArrayList<>();
+//
+//		if (dto.getSalesContractAmdDetailsDTO() != null
+//				&& !dto.getSalesContractAmdDetailsDTO().isEmpty()) {
+//
+//			for (SalesContractAmdDetailsDTO detailDTO : dto.getSalesContractAmdDetailsDTO()) {
+//
+//				SalesContractAmdDetailsVO detailVO = new SalesContractAmdDetailsVO();
+//
+//				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
+//
+//					ItemMasterVO item = itemMasterRepo.findById(detailDTO.getItem())
+//							.orElseThrow(() -> new ApplicationException("Item Not Found"));
+//
+//					detailVO.setItem(item);
+//				}
+//
+//				detailVO.setOldRate(detailDTO.getOldRate());
+//				detailVO.setNewRate(detailDTO.getNewRate());
+//				detailVO.setValidFrom(detailDTO.getValidFrom());
+//				detailVO.setValidTo(detailDTO.getValidTo());
+//				detailVO.setNewValidDate(detailDTO.getNewValidDate());
+//
+//				// Parent Mapping
+//				detailVO.setSalesContractAmendmentVO(salesContractAmendmentVO);
+//
+//				detailList.add(detailVO);
+//			}
+//
+//			// Set child list to parent
+//			salesContractAmendmentVO.setSalesContractAmdDetailsVO(detailList);
+//		}
+//	}
+//	
+//	@Override
+//	public SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
+//			throws ApplicationException {
+//
+//		if (ObjectUtils.isEmpty(id)) {
+//			throw new ApplicationException("Invalid Id");
+//		}
+//
+//		SalesContractAmendmentVO salesContractAmendmentVO = salesContractAmendmentRepo.findById(id)
+//				.orElseThrow(() -> new ApplicationException("Sales Contract Amendment Not Found"));
+//
+//		return salesContractResponseResponse(salesContractAmendmentVO);
+//	}
+//	
+//	@Override
+//	public List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
+//	        throws ApplicationException {
+//
+//	    List<SalesContractAmendmentVO> salesContractAmendmentList =
+//	            salesContractAmendmentRepo.getSalesContractAmendmentByOrgId(orgId,branch);
+//
+//	    if (salesContractAmendmentList.isEmpty()) {
+//	        throw new ApplicationException("No Sales Contract Amendment Details Found");
+//	    }
+//
+//	    List<SalesContractAmdResponseDTO> responseList = new ArrayList<>();
+//
+//	    for (SalesContractAmendmentVO salesContractAmendmentVO : salesContractAmendmentList) {
+//
+//	        responseList.add(
+//	                salesContractResponseResponse(salesContractAmendmentVO));
+//	    }
+//
+//	    return responseList;
+//	}
 	
-	@Override
-	public SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
-			throws ApplicationException {
-
-		if (ObjectUtils.isEmpty(id)) {
-			throw new ApplicationException("Invalid Id");
-		}
-
-		SalesContractAmendmentVO salesContractAmendmentVO = salesContractAmendmentRepo.findById(id)
-				.orElseThrow(() -> new ApplicationException("Sales Contract Amendment Not Found"));
-
-		return salesContractResponseResponse(salesContractAmendmentVO);
-	}
-	
-	@Override
-	public List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
-	        throws ApplicationException {
-
-	    List<SalesContractAmendmentVO> salesContractAmendmentList =
-	            salesContractAmendmentRepo.getSalesContractAmendmentByOrgId(orgId,branch);
-
-	    if (salesContractAmendmentList.isEmpty()) {
-	        throw new ApplicationException("No Sales Contract Amendment Details Found");
-	    }
-
-	    List<SalesContractAmdResponseDTO> responseList = new ArrayList<>();
-
-	    for (SalesContractAmendmentVO salesContractAmendmentVO : salesContractAmendmentList) {
-
-	        responseList.add(
-	                salesContractResponseResponse(salesContractAmendmentVO));
-	    }
-
-	    return responseList;
-	}
-	
-	//dropdown for sales Contract Amendment
-	
-	@Override
-	public Map<String, Object> getContractNo() throws ApplicationException {
-
-	    String methodName = "getContractNo()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	    List<Map<String, Object>> responseList = new ArrayList<>();
-
-	    try {
-
-	        List<SalesContractVO> contractList = salesContractRepo.getContractNo();
-
-	        if (contractList != null && !contractList.isEmpty()) {
-
-	            for (SalesContractVO vo : contractList) {
-
-	                Map<String, Object> map = new HashMap<>();
-
-	                map.put("id", vo.getId());
-	                map.put("contractNo", vo.getCustomerContractNo());
-	                map.put("cust_po_no", vo.getCustomerPoNo());
-	                map.put("cust_po_date", vo.getCustomerPoDate());
-
-	                responseList.add(map);
-	            }
-	        }
-
-	    } catch (Exception e) {
-
-	        LOGGER.error("Error in getContractNoDropdown()", e);
-	        throw new ApplicationException(e.getMessage());
-	    }
-
-	    Map<String, Object> responseMap = new HashMap<>();
-	    responseMap.put("message", "Contract No Dropdown Loaded Successfully");
-	    responseMap.put("contractList", responseList);
-
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	    return responseMap;
-	}
+//	//dropdown for sales Contract Amendment
+//	
+//	@Override
+//	public Map<String, Object> getContractNo() throws ApplicationException {
+//
+//	    String methodName = "getContractNo()";
+//	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//	    List<Map<String, Object>> responseList = new ArrayList<>();
+//
+//	    try {
+//
+//	        List<SalesContractVO> contractList = salesContractRepo.getContractNo();
+//
+//	        if (contractList != null && !contractList.isEmpty()) {
+//
+//	            for (SalesContractVO vo : contractList) {
+//
+//	                Map<String, Object> map = new HashMap<>();
+//
+//	                map.put("id", vo.getId());
+//	                map.put("contractNo", vo.getCustomerContractNo());
+//	                map.put("cust_po_no", vo.getCustomerPoNo());
+//	                map.put("cust_po_date", vo.getCustomerPoDate());
+//
+//	                responseList.add(map);
+//	            }
+//	        }
+//
+//	    } catch (Exception e) {
+//
+//	        LOGGER.error("Error in getContractNoDropdown()", e);
+//	        throw new ApplicationException(e.getMessage());
+//	    }
+//
+//	    Map<String, Object> responseMap = new HashMap<>();
+//	    responseMap.put("message", "Contract No Dropdown Loaded Successfully");
+//	    responseMap.put("contractList", responseList);
+//
+//	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//	    return responseMap;
+//	}
 	
 	//Despatch Instruction 
 	@Override
@@ -1452,7 +1461,18 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    responseDTO.setOrgId(stockTransferChallanVO.getOrgId());
 	    responseDTO.setCreatedBy(stockTransferChallanVO.getCreatedBy());
 	    responseDTO.setCancelRemarks(stockTransferChallanVO.getCancelRemarks());
-
+	    responseDTO.setTimeOfTranfer(stockTransferChallanVO.getTimeOfTranfer());
+	    responseDTO.setTotalInsurance(stockTransferChallanVO.getTotalInsurance());
+	    responseDTO.setTotalFreight(stockTransferChallanVO.getTotalFreight());
+	    responseDTO.setTotalAssVal(stockTransferChallanVO.getTotalAssVal());
+	    responseDTO.setModeOfTransport(stockTransferChallanVO.getModeOfTransport());
+	    responseDTO.setSalesTax(stockTransferChallanVO.getSalesTax());
+	    responseDTO.setGrossAmount(stockTransferChallanVO.getGrossAmount());
+	    responseDTO.setAmountInWords(stockTransferChallanVO.getAmountInWords());
+	    responseDTO.setDeliverTo(stockTransferChallanVO.getDeliverTo());
+	    responseDTO.setPaymentTerms(stockTransferChallanVO.getPaymentTerms());
+	    responseDTO.setNarration(stockTransferChallanVO.getNarration());
+	    
 	    // =========================
 	    // Branch Response
 	    // =========================
@@ -1472,21 +1492,21 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    // List Of Values Response
 	    // =========================
 
-	    if (stockTransferChallanVO.getListOfValues() != null) {
+	    if (stockTransferChallanVO.getTypes() != null) {
 
 	        ListOfValuesResponseDTO listOfValuesResponseDTO =
 	                new ListOfValuesResponseDTO();
 
 	        listOfValuesResponseDTO.setId(
-	                stockTransferChallanVO.getListOfValues().getId());
+	                stockTransferChallanVO.getTypes().getId());
 
 	        listOfValuesResponseDTO.setListCode(
-	                stockTransferChallanVO.getListOfValues().getListCode());
+	                stockTransferChallanVO.getTypes().getListCode());
 
 	        listOfValuesResponseDTO.setListDescription(
-	                stockTransferChallanVO.getListOfValues().getListDescription());
+	                stockTransferChallanVO.getTypes().getListDescription());
 
-	        responseDTO.setListOfValues(listOfValuesResponseDTO);
+	        responseDTO.setTypes(listOfValuesResponseDTO);
 	    }
 
 	    // =========================
@@ -1513,8 +1533,8 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	    if (stockTransferChallanVO.getLocation() != null) {
 
-	        LocationResponseDTO locationResponseDTO =
-	                new LocationResponseDTO();
+	        LocationMasterResponseDTO locationResponseDTO =
+	                new LocationMasterResponseDTO();
 
 	        locationResponseDTO.setId(
 	                stockTransferChallanVO.getLocation().getId());
@@ -1542,6 +1562,17 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    stockTransferChallanVO.setActive(dto.isActive());
 	    stockTransferChallanVO.setOrgId(dto.getOrgId());
 	    stockTransferChallanVO.setCancelRemarks(dto.getCancelRemarks());
+	    stockTransferChallanVO.setTimeOfTranfer(dto.getTimeOfTranfer());
+	    stockTransferChallanVO.setTotalInsurance(dto.getTotalInsurance());
+	    stockTransferChallanVO.setTotalFreight(dto.getTotalFreight());
+	    stockTransferChallanVO.setTotalAssVal(dto.getTotalAssVal());
+	    stockTransferChallanVO.setModeOfTransport(dto.getModeOfTransport());
+	    stockTransferChallanVO.setSalesTax(dto.getSalesTax());
+	    stockTransferChallanVO.setGrossAmount(dto.getGrossAmount());
+	    stockTransferChallanVO.setAmountInWords(dto.getAmountInWords());
+	    stockTransferChallanVO.setDeliverTo(dto.getDeliverTo());
+	    stockTransferChallanVO.setPaymentTerms(dto.getPaymentTerms());
+	    stockTransferChallanVO.setNarration(dto.getNarration());	    
 	    
 	    //branch mapping
 	    if (dto.getBranch() != null && dto.getBranch() != 0) {
@@ -1559,14 +1590,14 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    // List Of Values Mapping
 	    // =========================
 
-	    if (dto.getListOfValues() != null && dto.getListOfValues() != 0) {
+	    if (dto.getTypes() != null && dto.getTypes() != 0) {
 
 	        ListOfValuesVO listOfValuesVO =
-	                listOfValuesRepo.findById(dto.getListOfValues())
+	                listOfValuesRepo.findById(dto.getTypes())
 	                .orElseThrow(() ->
 	                        new ApplicationException("List Of Values Not Found"));
 
-	        stockTransferChallanVO.setListOfValues(listOfValuesVO);
+	        stockTransferChallanVO.setTypes(listOfValuesVO);
 	    }
 
 	    // =========================
@@ -1639,4 +1670,216 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    return responseList;
 	}
 	
+	//drowdown for stocktransfercustomer
+	@Override
+	public Map<String, Object> getStockTransferCustomer() throws ApplicationException {
+
+	    List<Object[]> customerList = customerRepo.getStockTransferCustomer();
+
+	    if (customerList == null || customerList.isEmpty()) {
+	        throw new ApplicationException("No Customer Found");
+	    }
+
+	    List<StockTransferCustomerResponseDTO> responseList = new ArrayList<>();
+
+	    for (Object[] obj : customerList) {
+
+	    	StockTransferCustomerResponseDTO dto = new StockTransferCustomerResponseDTO();
+
+	    	dto.setId(((Number) obj[0]).longValue());
+	    	dto.setCustomerCode((String) obj[1]);
+	    	dto.setCustomerName((String) obj[2]);
+	    	dto.setAccountName((String) obj[3]);
+
+	    	GSTStateResponseDTO gstStateResponseDTO = new GSTStateResponseDTO();
+
+	    	gstStateResponseDTO.setId(((Number)obj[4]).longValue());
+	    	gstStateResponseDTO.setStateCode((String)obj[5]);
+	    	gstStateResponseDTO.setStateName((String)obj[6]);
+	    	gstStateResponseDTO.setGstStateId((String)obj[7]);
+
+	    	dto.setGstState(gstStateResponseDTO);
+
+	    	dto.setGstApplicable((Boolean)obj[8]);
+	    	dto.setGstNo((String)obj[9]);
+	    	
+	    	responseList.add(dto);
+	    }
+	    	
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("message", "Customer Dropdown Retrieved Successfully");
+	    response.put("customerList", responseList);
+
+	    return response;
+	    
+}
+	//despatch instruction sheduleno dropdown
+	@Override
+	public Map<String, Object> getDespatchScheduleNo(String scheduleNo,Long branch, Long orgId)
+	        throws ApplicationException {
+
+	    Map<String, Object> responseMap = new HashMap<>();
+
+	    List<Object[]> list =
+	            despatchInstructionRepo.getDespatchScheduleNo(scheduleNo,branch,orgId);
+
+	    List<DespatchInstructionScheduleResponseDTO> responseList = new ArrayList<>();
+
+	    for (Object[] obj : list) {
+
+	        DespatchInstructionScheduleResponseDTO dto =
+	                new DespatchInstructionScheduleResponseDTO();
+
+	        dto.setSalesDeliveryScheduleId(((Number) obj[0]).longValue());
+	        dto.setDlvNo((String) obj[1]);
+	        dto.setSalesDeliveryScheduleDetailsId(((Number) obj[2]).longValue());
+	        dto.setItemId(((Number) obj[3]).longValue());
+	        dto.setItemCode((String) obj[4]);
+	        dto.setItemDescription((String) obj[5]);
+	        dto.setActualPlannedQty(
+	                obj[6] != null ? ((Number) obj[6]).doubleValue() : 0.0);
+	        dto.setDispatchedQty(
+	                obj[7] != null ? (BigDecimal) obj[7] : BigDecimal.ZERO);
+	        dto.setBalanceQty(
+	                obj[8] != null ? (BigDecimal) obj[8] : BigDecimal.ZERO);
+
+	        responseList.add(dto);
+	    }
+
+	    responseMap.put("message", "Data Fetched Successfully");
+	    responseMap.put("scheduleBalanceList", responseList);
+
+	    return responseMap;
+	}
+	
+	// despatch customer dropdown
+	@Override
+	public Map<String, Object> getDespatchCustomer(Long branch,Long orgId) throws ApplicationException {
+
+	    Map<String, Object> responseMap = new HashMap<>();
+
+	    List<Object[]> customerList =
+	            customerRepo.getDespatchCustomer(branch,orgId);
+
+	    List<DespatchCustomerResponseDTO> responseDTOList = new ArrayList<>();
+
+	    for (Object[] obj : customerList) {
+
+	    	DespatchCustomerResponseDTO dto = new DespatchCustomerResponseDTO();
+
+	        dto.setId(((Number) obj[0]).longValue());
+
+	        dto.setCustomerCode((String) obj[1]);
+
+	        dto.setCustomerName((String) obj[2]);
+
+	        dto.setPartyCreditLimit(
+	                obj[3] != null ? (BigDecimal) obj[3] : BigDecimal.ZERO);
+
+	        responseDTOList.add(dto);
+	    }
+
+	    responseMap.put("message", "Customer List Fetched Successfully");
+	    responseMap.put("customerList", responseDTOList);
+
+	    return responseMap;
+	}
+	// despatch contract no dropdown
+	@Override
+	public Map<String, Object> getDespatchSalesContract(Long customerId,Long branch,Long orgId)
+	        throws ApplicationException {
+
+	    Map<String, Object> responseMap = new HashMap<>();
+
+	    List<Object[]> salesContractList =
+	    		despatchInstructionRepo.getDespatchSalesContract(customerId,branch,orgId);
+
+	    List<DespatchSalesContractResponseDTO> responseDTOList = new ArrayList<>();
+
+	    for (Object[] obj : salesContractList) {
+
+	    	DespatchSalesContractResponseDTO dto =
+	    	        new DespatchSalesContractResponseDTO();
+
+	    	dto.setCustomerContractNo((String) obj[0]);
+
+	    	dto.setContractDate((LocalDate) obj[1]);
+
+	    	dto.setSalesContractId(((Number)obj[2]).longValue());
+
+	    	dto.setInvoiceType((String)obj[3]);
+
+	        responseDTOList.add(dto);
+	    }
+
+	    responseMap.put("message", "Sales Contract List Fetched Successfully");
+	    responseMap.put("salesContractList", responseDTOList);
+
+	    return responseMap;
+	}
+	//Despacth Item dropdown 
+	@Override
+	public Map<String, Object> getDespatchItems(Long branch ,Long orgId)
+	        throws ApplicationException {
+
+	    Map<String, Object> responseMap = new HashMap<>();
+
+	    List<Object[]> itemList = itemMasterRepo.getDespatchItems(branch,orgId);
+
+	    List<ItemResponseDTO> responseDTOList = new ArrayList<>();
+
+	    for (Object[] obj : itemList) {
+
+	        ItemResponseDTO dto = new ItemResponseDTO();
+
+	        dto.setId(((Number) obj[0]).longValue());
+
+	        dto.setItemCode((String) obj[1]);
+
+	        dto.setItemDescription((String) obj[2]);
+	        
+	        UnitResponseDTO unitDTO = new UnitResponseDTO();
+	        unitDTO.setId(((Number) obj[3]).longValue());
+	        
+	        
+
+	        responseDTOList.add(dto);
+	    }
+
+	    responseMap.put("message", "Finished Goods Item List Fetched Successfully");
+	    responseMap.put("itemList", responseDTOList);
+
+	    return responseMap;
+	}
+	
+	// Despatch Schedulemonth
+	@Override
+	public Map<String, Object> getDespatchScheduleMonth(
+	        Long itemId,
+	        Long branch,
+	        Long orgId) throws ApplicationException {
+
+	    Map<String, Object> responseMap = new HashMap<>();
+
+	    List<Object[]> scheduleMonthList =
+	            despatchInstructionRepo.getDespatchScheduleMonth(itemId, branch, orgId);
+
+	    List<DespatchScheduleMonthResponseDTO> responseDTOList = new ArrayList<>();
+
+	    for (Object[] obj : scheduleMonthList) {
+
+	    	DespatchScheduleMonthResponseDTO dto = new DespatchScheduleMonthResponseDTO();
+
+	        dto.setId(((Number) obj[0]).longValue());
+
+	        dto.setMonthOfSchedule((String) obj[1]);
+
+	        responseDTOList.add(dto);
+	    }
+
+	    responseMap.put("message", "Schedule Month Fetched Successfully");
+	    responseMap.put("scheduleMonthList", responseDTOList);
+
+	    return responseMap;
+	}
 }

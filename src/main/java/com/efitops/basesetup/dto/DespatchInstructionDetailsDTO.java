@@ -1,5 +1,7 @@
 package com.efitops.basesetup.dto;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 
 import lombok.AllArgsConstructor;
@@ -18,10 +20,10 @@ public class DespatchInstructionDetailsDTO {
 	private String pdi;
 	private String pdiDate;
 	private  String schduleMonth;
-	private String plannedQty;
-	private String pendingQty;
-	private String availableQty;
-	private String descQty;
+	private BigDecimal plannedQty;
+	private BigDecimal pendingQty;
+	private BigDecimal availableQty;
+	private BigDecimal descQty;
 	private String noOfPackage;
 	private String packageType;
 	

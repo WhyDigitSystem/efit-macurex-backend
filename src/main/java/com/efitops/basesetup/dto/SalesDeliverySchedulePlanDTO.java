@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class SalesDeliverySchedulePlanDTO {
 
-    private Long id;
+//    private Long id;
 
     // Delivery Schedule Grid
     private Integer dayNo;

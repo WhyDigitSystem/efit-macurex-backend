@@ -49,9 +49,9 @@ public class CustomerComplaintEntryVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 	
-	@ManyToOne
-	@JoinColumn(name = "customer_name")
-	private CustomerVO customerName;
+//	@ManyToOne
+//	@JoinColumn(name = "customer_name")
+//	private CustomerVO customerName;
 	
 	@Column(name = "buyer_name")
 	private String buyerName;
@@ -93,8 +93,8 @@ public class CustomerComplaintEntryVO {
 	
 
 	@ManyToOne
-	@JoinColumn(name = "customer_id")
-	private CustomerVO customerId;
+	@JoinColumn(name = "customer")
+	private CustomerVO customer;
 	
 	@Column(name = "active")
 	private boolean active;

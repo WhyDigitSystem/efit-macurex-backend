@@ -21,7 +21,7 @@ public class CustomerComplaintDTO {
 //	private MultipartFile[] images;
 	private String remarks;
 	private Long branch;
-	private Long  customerName;
+//	private Long  customerName;
 	private String buyerName;
 	private Long department;
 	private Long item;
@@ -35,7 +35,7 @@ public class CustomerComplaintDTO {
 	private LocalDate complaintDate;
 	private String complaintType;
 	private String customerRefNo;
-	private Long customerId;
+	private Long customer;
 	private boolean active;
 	private Long orgId;
 	private String createdBy;

@@ -738,7 +738,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				Branch);
 
 		if (quotationList == null || quotationList.isEmpty()) {
-			throw new ApplicationException("Quotation Not Found");
+			throw new ApplicationException("SalesOrderShortClose Not Found");
 		}
 
 		List<SalesOrderShortCloseResponseDTO> responseList = new ArrayList<>();
@@ -816,6 +816,8 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		salesOrderShortCloseVO.setCancelRemarks(salesOrderShortCloseDTO.getCancelRemarks());
 
 		salesOrderShortCloseVO.setOrgId(salesOrderShortCloseDTO.getOrgId());
+
+		salesOrderShortCloseVO.setActive(salesOrderShortCloseDTO.isActive());
 
 		if (salesOrderShortCloseDTO.getBranch() != null && salesOrderShortCloseDTO.getBranch() != 0) {
 

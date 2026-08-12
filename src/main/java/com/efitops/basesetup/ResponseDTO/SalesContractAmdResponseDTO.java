@@ -19,6 +19,8 @@ public class SalesContractAmdResponseDTO {
 	private BranchResponseDTO branch;
 	private String contractNo;
 	private String contractDate;
+	private String partyPoAmdNo;
+	private String partyPoAmdDate;
 	private String custPoNo;
 	private String custPoDate;
 	private String revisionNo;

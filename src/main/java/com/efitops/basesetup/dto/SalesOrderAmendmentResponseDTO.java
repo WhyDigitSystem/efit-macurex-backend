@@ -1,57 +1,49 @@
 package com.efitops.basesetup.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class SalesOrderAmendmentResponseDTO {
 
     private Long id;
 
+    // Branch
     private Long branchId;
     private String branchName;
 
-    private String soAmendmentNo;
+    // Document
+    private String docId;
+    private LocalDate docDate;
 
-    private String soNumber;
+    // Sales Order
+    private String salesOrderNumber;
 
-    private LocalDate amendmentDate;
-
+    // Amendment Details
     private String partyPoAmendmentNo;
-
     private LocalDate salesOrderDate;
-
     private LocalDate partyPoAmendmentDate;
 
+    // PO Details
     private String poNo;
-
     private Integer revisionNo;
-
     private LocalDate poDate;
 
+    // Remarks
     private String remarks;
 
-    private Boolean approved;
-
-    private Boolean active;
-
+    // Common Details
     private Long orgId;
-
     private String createdBy;
-
     private String updatedBy;
-
+    private Boolean active;
     private Boolean cancel;
-
     private String cancelRemarks;
-
     private String screenName;
-
     private String screenCode;
 
+    // Grid
+    private List<SalesOrderAmendmentDetailsResponseDTO> salesOrderAmendmentDetails;
 }

@@ -1,5 +1,6 @@
 package com.efitops.basesetup.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -51,16 +52,16 @@ public class DespatchInstructionDetailsVO {
 	private  String schduleMonth;
 	
 	@Column(name = "planned_qty")
-	private String plannedQty;
+	private BigDecimal plannedQty;
 	
 	@Column(name = "pending_qty")
-	private String pendingQty;
+	private BigDecimal pendingQty;
 	
 	@Column(name = "available_qty")
-	private String availableQty;
+	private BigDecimal availableQty;
 	
 	@Column(name = "descQty")
-	private String descQty;
+	private BigDecimal descQty;
 	
 	@Column(name = "no_of_package")
 	private String noOfPackage;

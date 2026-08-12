@@ -105,6 +105,11 @@ public class QuotationServiceImpl implements QuotationService {
 
 	@Autowired
 	CurrencyRepo currencyRepo;
+	
+	@Value("${server.base-url}")
+	private String serverBaseUrl;
+
+	
 
 	@Autowired
 	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
@@ -883,9 +888,6 @@ public class QuotationServiceImpl implements QuotationService {
 		
 		quotationVO.setKindAttention(quotationDTO.getKindAttention());
 
-// Common Fields
-		quotationVO.setCreatedBy(quotationDTO.getCreatedBy());
-		quotationVO.setUpdatedBy(quotationDTO.getUpdatedBy());
 		quotationVO.setCancelRemarks(quotationDTO.getCancelRemarks());
 		quotationVO.setScreenName(quotationDTO.getScreenName());
 		quotationVO.setScreenCode(quotationDTO.getScreenCode());
@@ -1220,9 +1222,13 @@ public class QuotationServiceImpl implements QuotationService {
 		        fileDTO.setName(fileVO.getName());
 
 		        fileDTO.setFileName(fileVO.getFileName());
+		        
+		        String urlPath = uploadPath
+		                .replace("C:/", "/")
+		                .replace("\\", "/");
 
-		        fileDTO.setFilePath(fileVO.getFilePath());
-
+		        fileDTO.setFilePath(serverBaseUrl + urlPath + fileVO.getFileName());
+		        
 		        fileDTO.setFileSize(fileVO.getFileSize());
 
 		        fileDTO.setUploadOn(fileVO.getUploadOn());

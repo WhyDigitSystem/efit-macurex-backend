@@ -47,19 +47,19 @@ public interface TransportMasterService {
 
 	
 	//SalesContractAmendment
-	Map<String, Object> updateCreateSalesContractAmendment(
-			SalesContractAmendmentDTO salesContractAmendmentDTO)
-			throws ApplicationException;
-
-	SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
-			throws ApplicationException;
-
-	List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
-			throws ApplicationException;
-
-	//dropdown for contrcatno
-	Map<String, Object> getContractNo() throws ApplicationException;
-	
+//	Map<String, Object> updateCreateSalesContractAmendment(
+//			SalesContractAmendmentDTO salesContractAmendmentDTO)
+//			throws ApplicationException;
+//
+//	SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
+//			throws ApplicationException;
+//
+//	List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
+//			throws ApplicationException;
+//
+//	//dropdown for contrcatno
+//	Map<String, Object> getContractNo() throws ApplicationException;
+//	
 	//despatchinstruction
 
 

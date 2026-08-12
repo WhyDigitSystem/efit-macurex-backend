@@ -561,260 +561,260 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// Sales Contract amendment
 
-	@Override
-	@Transactional
-	public Map<String, Object> updateCreateSalesContractAmendment(
-			SalesContractAmendmentDTO salesContractAmendmentDTO) throws ApplicationException {
-
-		SalesContractAmendmentVO salesContractAmendmentVO = new SalesContractAmendmentVO();
-
-		String message;
-
-		if (salesContractAmendmentDTO.getId() != null) {
-
-			salesContractAmendmentVO = salesContractAmendmentRepo.findById(salesContractAmendmentDTO.getId())
-					.orElseThrow(() -> new ApplicationException("Invalid Sales Contract Amendment Details"));
-
-			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
-
-			message = "Sales Contract Amendment Updated Successfully";
-
-		} else {
-
-			salesContractAmendmentVO.setCreatedBy(salesContractAmendmentDTO.getCreatedBy());
-			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
-
-			message = "Sales Contract Amendment Created Successfully";
-		}
-		createUpdateSalesContractAmendmentVO(
-		        salesContractAmendmentDTO,
-		        salesContractAmendmentVO);
-
-		SalesContractAmendmentVO savedSalesContractAmendment =
-		        salesContractAmendmentRepo.save(salesContractAmendmentVO);
-
-		Map<String, Object> response = new HashMap<>();
-		response.put("message", message);
-		response.put("salesContractAmendmentVO", salesContractResponseResponse(savedSalesContractAmendment));
-
-
-		return response;
-	}
-	private SalesContractAmdResponseDTO salesContractResponseResponse(
-			SalesContractAmendmentVO salesContractAmendmentVO) {
-
-		SalesContractAmdResponseDTO responseDTO = new SalesContractAmdResponseDTO();
-
-		responseDTO.setId(salesContractAmendmentVO.getId());
-		responseDTO.setContractAmdNo(salesContractAmendmentVO.getContractAmdNo());
-		responseDTO.setDate(salesContractAmendmentVO.getDate());
-		responseDTO.setContractNo(salesContractAmendmentVO.getContractNo());
-		responseDTO.setContractDate(salesContractAmendmentVO.getContractDate());
-		responseDTO.setCustPoNo(salesContractAmendmentVO.getCustPoNo());
-		responseDTO.setCustPoDate(salesContractAmendmentVO.getCustPoDate());
-		responseDTO.setRevisionNo(salesContractAmendmentVO.getRevisionNo());
-		responseDTO.setRemarks(salesContractAmendmentVO.getRemarks());
-
-		if (salesContractAmendmentVO.getBranch() != null) {
-
-			BranchResponseDTO branchDTO = new BranchResponseDTO();
-
-			branchDTO.setId(salesContractAmendmentVO.getBranch().getId());
-			branchDTO.setBranchName(salesContractAmendmentVO.getBranch().getBranchName());
-
-			responseDTO.setBranch(branchDTO);
-		}
-
-		responseDTO.setOrgId(salesContractAmendmentVO.getOrgId());
-		responseDTO.setCreatedBy(salesContractAmendmentVO.getCreatedBy());
-		responseDTO.setCancelRemarks(salesContractAmendmentVO.getCancelRemarks());
-
-		List<SalesContractDetailResponseDTO> detailResponseList = new ArrayList<>();
-
-		if (salesContractAmendmentVO.getSalesContractAmdDetailsVO() != null
-				&& !salesContractAmendmentVO.getSalesContractAmdDetailsVO().isEmpty()) {
-
-			for (SalesContractAmdDetailsVO detailVO : salesContractAmendmentVO.getSalesContractAmdDetailsVO()) {
-
-				SalesContractDetailResponseDTO detailDTO = new SalesContractDetailResponseDTO();
-
-				detailDTO.setId(detailVO.getId());
-
-				if (detailVO.getItem() != null) {
-
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
-
-					itemDTO.setId(detailVO.getItem().getId());
-					itemDTO.setItemCode(detailVO.getItem().getItemCode());
-
-					detailDTO.setItem(itemDTO);
-				}
-
-				detailDTO.setOldRate(detailVO.getOldRate());
-				detailDTO.setNewRate(detailVO.getNewRate());
-				detailDTO.setValidFrom(detailVO.getValidFrom());
-				detailDTO.setValidTo(detailVO.getValidTo());
-				detailDTO.setNewValidDate(detailVO.getNewValidDate());
-
-				detailResponseList.add(detailDTO);
-			}
-		}
-
-		responseDTO.setSalesContractDetailResponseDTO(detailResponseList);
-
-		return responseDTO;
-	}
-	private void createUpdateSalesContractAmendmentVO(
-			SalesContractAmendmentDTO dto,
-			SalesContractAmendmentVO salesContractAmendmentVO)
-			throws ApplicationException {
-
-		salesContractAmendmentVO.setContractAmdNo(dto.getContractAmdNo());
-		salesContractAmendmentVO.setDate(dto.getDate());
-		salesContractAmendmentVO.setContractNo(dto.getContractNo());
-		salesContractAmendmentVO.setContractDate(dto.getContractDate());
-		salesContractAmendmentVO.setCustPoNo(dto.getCustPoNo());
-		salesContractAmendmentVO.setCustPoDate(dto.getCustPoDate());
-		salesContractAmendmentVO.setRevisionNo(dto.getRevisionNo());
-		salesContractAmendmentVO.setRemarks(dto.getRemarks());
-
-		salesContractAmendmentVO.setOrgId(dto.getOrgId());
-		salesContractAmendmentVO.setActive(dto.getActive());
-		salesContractAmendmentVO.setCancelRemarks(dto.getCancelRemarks());
-
-		if (dto.getBranch() != null && dto.getBranch() != 0) {
-
-			BranchVO branch = branchRepo.findById(dto.getBranch())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-			salesContractAmendmentVO.setBranch(branch);
-		}
-
-		//----------------------------------------------------
-		// Delete old child records while updating
-		//----------------------------------------------------
-
-		if (dto.getId() != null) {
-
-			List<SalesContractAmdDetailsVO> oldList = salesContractAmdDetailsRepo
-					.findBySalesContractAmendmentVO(salesContractAmendmentVO);
-
-			salesContractAmdDetailsRepo.deleteAll(oldList);
-		}
-
-		List<SalesContractAmdDetailsVO> detailList = new ArrayList<>();
-
-		if (dto.getSalesContractAmdDetailsDTO() != null
-				&& !dto.getSalesContractAmdDetailsDTO().isEmpty()) {
-
-			for (SalesContractAmdDetailsDTO detailDTO : dto.getSalesContractAmdDetailsDTO()) {
-
-				SalesContractAmdDetailsVO detailVO = new SalesContractAmdDetailsVO();
-
-				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
-
-					ItemMasterVO item = itemMasterRepo.findById(detailDTO.getItem())
-							.orElseThrow(() -> new ApplicationException("Item Not Found"));
-
-					detailVO.setItem(item);
-				}
-
-				detailVO.setOldRate(detailDTO.getOldRate());
-				detailVO.setNewRate(detailDTO.getNewRate());
-				detailVO.setValidFrom(detailDTO.getValidFrom());
-				detailVO.setValidTo(detailDTO.getValidTo());
-				detailVO.setNewValidDate(detailDTO.getNewValidDate());
-
-				// Parent Mapping
-				detailVO.setSalesContractAmendmentVO(salesContractAmendmentVO);
-
-				detailList.add(detailVO);
-			}
-
-			// Set child list to parent
-			salesContractAmendmentVO.setSalesContractAmdDetailsVO(detailList);
-		}
-	}
+//	@Override
+//	@Transactional
+//	public Map<String, Object> updateCreateSalesContractAmendment(
+//			SalesContractAmendmentDTO salesContractAmendmentDTO) throws ApplicationException {
+//
+//		SalesContractAmendmentVO salesContractAmendmentVO = new SalesContractAmendmentVO();
+//
+//		String message;
+//
+//		if (salesContractAmendmentDTO.getId() != null) {
+//
+//			salesContractAmendmentVO = salesContractAmendmentRepo.findById(salesContractAmendmentDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("Invalid Sales Contract Amendment Details"));
+//
+//			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
+//
+//			message = "Sales Contract Amendment Updated Successfully";
+//
+//		} else {
+//
+//			salesContractAmendmentVO.setCreatedBy(salesContractAmendmentDTO.getCreatedBy());
+//			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
+//
+//			message = "Sales Contract Amendment Created Successfully";
+//		}
+//		createUpdateSalesContractAmendmentVO(
+//		        salesContractAmendmentDTO,
+//		        salesContractAmendmentVO);
+//
+//		SalesContractAmendmentVO savedSalesContractAmendment =
+//		        salesContractAmendmentRepo.save(salesContractAmendmentVO);
+//
+//		Map<String, Object> response = new HashMap<>();
+//		response.put("message", message);
+//		response.put("salesContractAmendmentVO", salesContractResponseResponse(savedSalesContractAmendment));
+//
+//
+//		return response;
+//	}
+//	private SalesContractAmdResponseDTO salesContractResponseResponse(
+//			SalesContractAmendmentVO salesContractAmendmentVO) {
+//
+//		SalesContractAmdResponseDTO responseDTO = new SalesContractAmdResponseDTO();
+//
+//		responseDTO.setId(salesContractAmendmentVO.getId());
+//		responseDTO.setContractAmdNo(salesContractAmendmentVO.getContractAmdNo());
+//		responseDTO.setDate(salesContractAmendmentVO.getDate());
+//		responseDTO.setContractNo(salesContractAmendmentVO.getContractNo());
+//		responseDTO.setContractDate(salesContractAmendmentVO.getContractDate());
+//		responseDTO.setCustPoNo(salesContractAmendmentVO.getCustPoNo());
+//		responseDTO.setCustPoDate(salesContractAmendmentVO.getCustPoDate());
+//		responseDTO.setRevisionNo(salesContractAmendmentVO.getRevisionNo());
+//		responseDTO.setRemarks(salesContractAmendmentVO.getRemarks());
+//
+//		if (salesContractAmendmentVO.getBranch() != null) {
+//
+//			BranchResponseDTO branchDTO = new BranchResponseDTO();
+//
+//			branchDTO.setId(salesContractAmendmentVO.getBranch().getId());
+//			branchDTO.setBranchName(salesContractAmendmentVO.getBranch().getBranchName());
+//
+//			responseDTO.setBranch(branchDTO);
+//		}
+//
+//		responseDTO.setOrgId(salesContractAmendmentVO.getOrgId());
+//		responseDTO.setCreatedBy(salesContractAmendmentVO.getCreatedBy());
+//		responseDTO.setCancelRemarks(salesContractAmendmentVO.getCancelRemarks());
+//
+//		List<SalesContractDetailResponseDTO> detailResponseList = new ArrayList<>();
+//
+//		if (salesContractAmendmentVO.getSalesContractAmdDetailsVO() != null
+//				&& !salesContractAmendmentVO.getSalesContractAmdDetailsVO().isEmpty()) {
+//
+//			for (SalesContractAmdDetailsVO detailVO : salesContractAmendmentVO.getSalesContractAmdDetailsVO()) {
+//
+//				SalesContractDetailResponseDTO detailDTO = new SalesContractDetailResponseDTO();
+//
+//				detailDTO.setId(detailVO.getId());
+//
+//				if (detailVO.getItem() != null) {
+//
+//					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+//
+//					itemDTO.setId(detailVO.getItem().getId());
+//					itemDTO.setItemCode(detailVO.getItem().getItemCode());
+//
+//					detailDTO.setItem(itemDTO);
+//				}
+//
+//				detailDTO.setOldRate(detailVO.getOldRate());
+//				detailDTO.setNewRate(detailVO.getNewRate());
+//				detailDTO.setValidFrom(detailVO.getValidFrom());
+//				detailDTO.setValidTo(detailVO.getValidTo());
+//				detailDTO.setNewValidDate(detailVO.getNewValidDate());
+//
+//				detailResponseList.add(detailDTO);
+//			}
+//		}
+//
+//		responseDTO.setSalesContractDetailResponseDTO(detailResponseList);
+//
+//		return responseDTO;
+//	}
+//	private void createUpdateSalesContractAmendmentVO(
+//			SalesContractAmendmentDTO dto,
+//			SalesContractAmendmentVO salesContractAmendmentVO)
+//			throws ApplicationException {
+//
+//		salesContractAmendmentVO.setContractAmdNo(dto.getContractAmdNo());
+//		salesContractAmendmentVO.setDate(dto.getDate());
+//		salesContractAmendmentVO.setContractNo(dto.getContractNo());
+//		salesContractAmendmentVO.setContractDate(dto.getContractDate());
+//		salesContractAmendmentVO.setCustPoNo(dto.getCustPoNo());
+//		salesContractAmendmentVO.setCustPoDate(dto.getCustPoDate());
+//		salesContractAmendmentVO.setRevisionNo(dto.getRevisionNo());
+//		salesContractAmendmentVO.setRemarks(dto.getRemarks());
+//
+//		salesContractAmendmentVO.setOrgId(dto.getOrgId());
+//		salesContractAmendmentVO.setActive(dto.getActive());
+//		salesContractAmendmentVO.setCancelRemarks(dto.getCancelRemarks());
+//
+//		if (dto.getBranch() != null && dto.getBranch() != 0) {
+//
+//			BranchVO branch = branchRepo.findById(dto.getBranch())
+//					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+//
+//			salesContractAmendmentVO.setBranch(branch);
+//		}
+//
+//		//----------------------------------------------------
+//		// Delete old child records while updating
+//		//----------------------------------------------------
+//
+//		if (dto.getId() != null) {
+//
+//			List<SalesContractAmdDetailsVO> oldList = salesContractAmdDetailsRepo
+//					.findBySalesContractAmendmentVO(salesContractAmendmentVO);
+//
+//			salesContractAmdDetailsRepo.deleteAll(oldList);
+//		}
+//
+//		List<SalesContractAmdDetailsVO> detailList = new ArrayList<>();
+//
+//		if (dto.getSalesContractAmdDetailsDTO() != null
+//				&& !dto.getSalesContractAmdDetailsDTO().isEmpty()) {
+//
+//			for (SalesContractAmdDetailsDTO detailDTO : dto.getSalesContractAmdDetailsDTO()) {
+//
+//				SalesContractAmdDetailsVO detailVO = new SalesContractAmdDetailsVO();
+//
+//				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
+//
+//					ItemMasterVO item = itemMasterRepo.findById(detailDTO.getItem())
+//							.orElseThrow(() -> new ApplicationException("Item Not Found"));
+//
+//					detailVO.setItem(item);
+//				}
+//
+//				detailVO.setOldRate(detailDTO.getOldRate());
+//				detailVO.setNewRate(detailDTO.getNewRate());
+//				detailVO.setValidFrom(detailDTO.getValidFrom());
+//				detailVO.setValidTo(detailDTO.getValidTo());
+//				detailVO.setNewValidDate(detailDTO.getNewValidDate());
+//
+//				// Parent Mapping
+//				detailVO.setSalesContractAmendmentVO(salesContractAmendmentVO);
+//
+//				detailList.add(detailVO);
+//			}
+//
+//			// Set child list to parent
+//			salesContractAmendmentVO.setSalesContractAmdDetailsVO(detailList);
+//		}
+//	}
+//	
+//	@Override
+//	public SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
+//			throws ApplicationException {
+//
+//		if (ObjectUtils.isEmpty(id)) {
+//			throw new ApplicationException("Invalid Id");
+//		}
+//
+//		SalesContractAmendmentVO salesContractAmendmentVO = salesContractAmendmentRepo.findById(id)
+//				.orElseThrow(() -> new ApplicationException("Sales Contract Amendment Not Found"));
+//
+//		return salesContractResponseResponse(salesContractAmendmentVO);
+//	}
+//	
+//	@Override
+//	public List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
+//	        throws ApplicationException {
+//
+//	    List<SalesContractAmendmentVO> salesContractAmendmentList =
+//	            salesContractAmendmentRepo.getSalesContractAmendmentByOrgId(orgId,branch);
+//
+//	    if (salesContractAmendmentList.isEmpty()) {
+//	        throw new ApplicationException("No Sales Contract Amendment Details Found");
+//	    }
+//
+//	    List<SalesContractAmdResponseDTO> responseList = new ArrayList<>();
+//
+//	    for (SalesContractAmendmentVO salesContractAmendmentVO : salesContractAmendmentList) {
+//
+//	        responseList.add(
+//	                salesContractResponseResponse(salesContractAmendmentVO));
+//	    }
+//
+//	    return responseList;
+//	}
 	
-	@Override
-	public SalesContractAmdResponseDTO getSalesContractAmendmentById(Long id)
-			throws ApplicationException {
-
-		if (ObjectUtils.isEmpty(id)) {
-			throw new ApplicationException("Invalid Id");
-		}
-
-		SalesContractAmendmentVO salesContractAmendmentVO = salesContractAmendmentRepo.findById(id)
-				.orElseThrow(() -> new ApplicationException("Sales Contract Amendment Not Found"));
-
-		return salesContractResponseResponse(salesContractAmendmentVO);
-	}
-	
-	@Override
-	public List<SalesContractAmdResponseDTO> getSalesContractAmendmentByOrgId(Long orgId,Long branch)
-	        throws ApplicationException {
-
-	    List<SalesContractAmendmentVO> salesContractAmendmentList =
-	            salesContractAmendmentRepo.getSalesContractAmendmentByOrgId(orgId,branch);
-
-	    if (salesContractAmendmentList.isEmpty()) {
-	        throw new ApplicationException("No Sales Contract Amendment Details Found");
-	    }
-
-	    List<SalesContractAmdResponseDTO> responseList = new ArrayList<>();
-
-	    for (SalesContractAmendmentVO salesContractAmendmentVO : salesContractAmendmentList) {
-
-	        responseList.add(
-	                salesContractResponseResponse(salesContractAmendmentVO));
-	    }
-
-	    return responseList;
-	}
-	
-	//dropdown for sales Contract Amendment
-	
-	@Override
-	public Map<String, Object> getContractNo() throws ApplicationException {
-
-	    String methodName = "getContractNo()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	    List<Map<String, Object>> responseList = new ArrayList<>();
-
-	    try {
-
-	        List<SalesContractVO> contractList = salesContractRepo.getContractNo();
-
-	        if (contractList != null && !contractList.isEmpty()) {
-
-	            for (SalesContractVO vo : contractList) {
-
-	                Map<String, Object> map = new HashMap<>();
-
-	                map.put("id", vo.getId());
-	                map.put("contractNo", vo.getCustomerContractNo());
-	                map.put("cust_po_no", vo.getCustomerPoNo());
-	                map.put("cust_po_date", vo.getCustomerPoDate());
-
-	                responseList.add(map);
-	            }
-	        }
-
-	    } catch (Exception e) {
-
-	        LOGGER.error("Error in getContractNoDropdown()", e);
-	        throw new ApplicationException(e.getMessage());
-	    }
-
-	    Map<String, Object> responseMap = new HashMap<>();
-	    responseMap.put("message", "Contract No Dropdown Loaded Successfully");
-	    responseMap.put("contractList", responseList);
-
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	    return responseMap;
-	}
+//	//dropdown for sales Contract Amendment
+//	
+//	@Override
+//	public Map<String, Object> getContractNo() throws ApplicationException {
+//
+//	    String methodName = "getContractNo()";
+//	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//	    List<Map<String, Object>> responseList = new ArrayList<>();
+//
+//	    try {
+//
+//	        List<SalesContractVO> contractList = salesContractRepo.getContractNo();
+//
+//	        if (contractList != null && !contractList.isEmpty()) {
+//
+//	            for (SalesContractVO vo : contractList) {
+//
+//	                Map<String, Object> map = new HashMap<>();
+//
+//	                map.put("id", vo.getId());
+//	                map.put("contractNo", vo.getCustomerContractNo());
+//	                map.put("cust_po_no", vo.getCustomerPoNo());
+//	                map.put("cust_po_date", vo.getCustomerPoDate());
+//
+//	                responseList.add(map);
+//	            }
+//	        }
+//
+//	    } catch (Exception e) {
+//
+//	        LOGGER.error("Error in getContractNoDropdown()", e);
+//	        throw new ApplicationException(e.getMessage());
+//	    }
+//
+//	    Map<String, Object> responseMap = new HashMap<>();
+//	    responseMap.put("message", "Contract No Dropdown Loaded Successfully");
+//	    responseMap.put("contractList", responseList);
+//
+//	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//	    return responseMap;
+//	}
 	
 	//Despatch Instruction 
 	@Override

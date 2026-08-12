@@ -1,5 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,10 +17,10 @@ public class DespatchInstDetailsResponseDTO {
 	private String pdi;
 	private String pdiDate;
 	private  String schduleMonth;
-	private String plannedQty;
-	private String pendingQty;
-	private String availableQty;
-	private String descQty;
+	private BigDecimal plannedQty;
+	private BigDecimal pendingQty;
+	private BigDecimal availableQty;
+	private BigDecimal descQty;
 	private String noOfPackage;
 	private String packageType;
 }

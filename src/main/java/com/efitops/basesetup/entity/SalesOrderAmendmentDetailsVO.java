@@ -30,7 +30,7 @@ public class SalesOrderAmendmentDetailsVO {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sales_order_amendment_detail_seq")
-	@SequenceGenerator(name = "sales_order_amendment_detail_seq",sequenceName = "sales_order_amendment_detail_seq",allocationSize = 1)
+	@SequenceGenerator(name = "sales_order_amendment_detail_seq",sequenceName = "sales_order_amendment_detail_seq", initialValue = 1000000001,allocationSize = 1)
 	@Column(name = "sales_order_amendment_detail_id")
 	private Long id;
 

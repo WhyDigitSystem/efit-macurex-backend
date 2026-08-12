@@ -511,6 +511,7 @@ public class TransactionServiceImpl implements TransactionService {
 			map.put("itemId", obj[0]);
 			map.put("itemCode", obj[1]);
 			map.put("itemDescription", obj[2]);
+			
 			map.put("unit", obj[3]);
 			map.put("orderQty", obj[4]);
 			map.put("itemId", obj[5]);

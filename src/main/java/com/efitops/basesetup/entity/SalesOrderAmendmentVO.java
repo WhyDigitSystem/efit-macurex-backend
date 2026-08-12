@@ -49,7 +49,7 @@ public class SalesOrderAmendmentVO {
     @Column(name = "salesorder_no")
     private String salesOrderNumber;
 
-    @Column(name = "docdate")
+    @Column(name = "doc_date")
     private LocalDate docDate;
 
     @Column(name = "party_po_amendment_no")

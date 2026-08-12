@@ -19,13 +19,13 @@ public class SalesOrderAmendmentDetailsResponseDTO {
 
     private String itemDescription;
 
-    private Double oldQty;
+    private double oldQty;
 
-    private Double oldRate;
+    private double oldRate;
 
-    private Double newQty;
+    private double newQty;
 
-    private Double newRate;
+    private double newRate;
 
     private LocalDate oldDeliveryDate;
 

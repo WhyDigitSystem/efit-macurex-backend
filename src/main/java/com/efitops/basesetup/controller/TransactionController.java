@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,7 +26,6 @@ import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
-import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.service.TransactionService;
 
 @CrossOrigin
@@ -39,7 +38,7 @@ public class TransactionController extends BaseController  {
 	@Autowired
 	TransactionService transactionService;
 	
-	@PostMapping("/createUpdateSalesDeliverySchedule")
+	@PutMapping("/createUpdateSalesDeliverySchedule")
 	public ResponseEntity<ResponseDTO> createUpdateSalesDeliverySchedule(
 	        @RequestBody SalesDeliveryScheduleDTO salesDeliveryScheduleDTO) {
 
@@ -147,29 +146,12 @@ public class TransactionController extends BaseController  {
 
 	    String errorMsg = null;
 	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO = null;
-
-	    List<SalesDeliveryScheduleResponseDTO> salesDeliveryScheduleList =
-	            new ArrayList<>();
+	    ResponseDTO responseDTO;
 
 	    try {
 
-	        salesDeliveryScheduleList =
-	        		transactionService.getAllSalesDeliverySchedule(
-	                        orgId,
-	                        branch);
-
-	    } catch (Exception e) {
-
-	        errorMsg = e.getMessage();
-
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-	    }
-
-	    if (StringUtils.isBlank(errorMsg)) {
+	        List<SalesDeliveryScheduleResponseDTO> salesDeliveryScheduleList =
+	                transactionService.getAllSalesDeliverySchedule(orgId, branch);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
@@ -181,7 +163,14 @@ public class TransactionController extends BaseController  {
 
 	        responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } else {
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
 
 	        responseDTO = createServiceResponseError(
 	                responseObjectsMap,
@@ -241,11 +230,11 @@ public class TransactionController extends BaseController  {
 
 	//item dropdown
 
-	@GetMapping("/getItemDropdown")
+	@GetMapping("/getItemDropdownBySalesDeliverySchedule")
 	public ResponseEntity<ResponseDTO> getItemDropdown(
-	        @RequestParam String docId) {
+	        @RequestParam String docId,@RequestParam Long orgId, @RequestParam Long branch) {
 
-	    String methodName = "getItemDropdown";
+	    String methodName = "getSalesDeliveryScheduleByItemDropdown";
 
 	    Map<String, Object> responseObjectsMap = new HashMap<>();
 	    ResponseDTO responseDTO;
@@ -253,7 +242,7 @@ public class TransactionController extends BaseController  {
 	    try {
 
 	        Map<String, Object> responseMap =
-	        		transactionService.getItemDropdown(docId);
+	        		transactionService.getSalesDeliveryScheduleByItemDropdown(docId,orgId,branch);
 
 	        responseObjectsMap.put("message", responseMap.get("message"));
 	        responseObjectsMap.put("itemList", responseMap.get("itemList"));

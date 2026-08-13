@@ -28,7 +28,7 @@ public class SalesOrderAmendmentResponseDTO {
 
     // PO Details
     private String poNo;
-    private Integer revisionNo;
+    private int revisionNo;
     private LocalDate poDate;
 
     // Remarks
@@ -38,8 +38,8 @@ public class SalesOrderAmendmentResponseDTO {
     private Long orgId;
     private String createdBy;
     private String updatedBy;
-    private Boolean active;
-    private Boolean cancel;
+    private boolean active;
+    private boolean cancel;
     private String cancelRemarks;
     private String screenName;
     private String screenCode;

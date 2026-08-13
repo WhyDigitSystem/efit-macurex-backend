@@ -78,7 +78,7 @@ public class DhineshController extends BaseController{
 	    return ResponseEntity.ok(responseDTO);
 	}
 	
-	@GetMapping("/getFinishedGoodsItems")
+	@GetMapping("/getFinishedGoodsItemsbySalesContract")
 	public ResponseEntity<ResponseDTO> getFinishedGoodsItems(
 	        @RequestParam Long orgId,
 	        @RequestParam Long branch) {
@@ -125,7 +125,7 @@ public class DhineshController extends BaseController{
 	}
 	
 	
-	@GetMapping("/getQuotationDropdown")
+	@GetMapping("/getQuotationDropdownbySalesContract")
 	public ResponseEntity<ResponseDTO> getQuotationDropdown(
 	        @RequestParam String customerCode,
 	        @RequestParam String ctype,
@@ -183,7 +183,7 @@ public class DhineshController extends BaseController{
 	    return ResponseEntity.ok().body(responseDTO);
 	}
 	
-	@GetMapping("/getCustomerDropdown")
+	@GetMapping("/getCustomerDropdownbySalesContract")
     public ResponseEntity<ResponseDTO> getCustomerDropdown(
             @RequestParam String ctype,
             @RequestParam Long orgId,
@@ -231,7 +231,7 @@ public class DhineshController extends BaseController{
         return ResponseEntity.ok().body(responseDTO);
     }
 	
-	@GetMapping("/getQuotationItemDropdown")
+	@GetMapping("/getQuotationItemDropdownbySalesContract")
 	public ResponseEntity<ResponseDTO> getQuotationItemDropdown(
 	        @RequestParam String quotationNo,
 	        @RequestParam Long orgId,

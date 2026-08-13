@@ -119,7 +119,7 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 		List<Object[]> getSalesContractAmdContractNoDropdown(@Param("orgId") Long orgId,
 		                                        @Param("branch") Long branch);
 	
-	@Query(value = "SELECT customer_contract_no AS docId, invoice_type AS invoiceType " +
+	@Query(value = "SELECT doc_id AS docId, invoice_type AS invoiceType " +
             "FROM sales_contract_basic " +
             "WHERE cancel = 0 " +
             "AND active = 1 " +
@@ -127,7 +127,7 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
             "AND branch = :branch " +
             "UNION ALL " +
             "SELECT doc_id AS docId, so_type AS invoiceType " +
-            "FROM orderacceptance " +
+            "FROM order_acceptance_basic " +
             "WHERE cancel = 0 " +
             "AND active = 1 " +
             "AND org_id = :orgId " +
@@ -198,18 +198,19 @@ List<Map<String, Object>> getDocIdAndInvoiceType(
 	
 	 @Query(value = """
 	            SELECT
-	                salescontract_id,
-	                customer_contract_no,
-	                contract_date,
-	                customer_purchase_order_no
-	            FROM sales_contract_basic
-	            WHERE active = true
-	              AND cancel = false
-	              AND org_id = :orgId
-	              AND branch = :branch
-	            ORDER BY customer_contract_no
+				order_acceptance_basic_id,
+				doc_id,
+				doc_date,
+				customer_purchase_order_no,
+				customer_purchase_order_date
+			FROM order_acceptance_basic
+			WHERE active = true
+			  AND cancel = false
+			  AND org_id = ?1
+			  AND branch = ?2
+			ORDER BY doc_id
 	            """, nativeQuery = true)
-	    List<Object[]> getSalesContractDropdown(
+	    List<Object[]> getOrderAcceptanceBySalesOrderAmendment(
 	            @Param("orgId") Long orgId,
 	            @Param("branch") Long branch);
 	    

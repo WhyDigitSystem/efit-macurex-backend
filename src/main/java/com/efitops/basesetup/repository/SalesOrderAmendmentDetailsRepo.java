@@ -16,4 +16,6 @@ extends JpaRepository<SalesOrderAmendmentDetailsVO, Long> {
     void deleteBySalesOrderAmendmentVO(
             SalesOrderAmendmentVO salesOrderAmendmentVO);
 
+	List<SalesOrderAmendmentDetailsVO> findBySalesOrderAmendmentVO_Id(Long id);
+
 }

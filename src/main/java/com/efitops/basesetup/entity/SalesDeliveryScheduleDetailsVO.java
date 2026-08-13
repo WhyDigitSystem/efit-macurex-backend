@@ -41,7 +41,7 @@ public class SalesDeliveryScheduleDetailsVO {
 //    @JoinColumn(name = "sales_contract_details_id")
 //    private SalesContractDetailsVO salesContractDetails;
 
-    @Column(name = "soNocontractno")
+    @Column(name = "so_no_contractno")
     private String soNoContractNo;
     
     @Column(name = "invoicetype")
@@ -52,8 +52,16 @@ public class SalesDeliveryScheduleDetailsVO {
     @JoinColumn(name = "item_id")
     private ItemMasterVO item;
 
+    @ManyToOne
+    @JoinColumn(name = "unit")
+    private UnitMasterVO unit;
+    
+    @Column(name = "order_qty")
+    private double orderQty;
+    @Column(name = "pending_qty")
+    private double pendingQty;
     @Column(name = "actual_planned_qty")
-    private Double actualPlannedQty;
+    private double actualPlannedQty;
     
     @ManyToOne
     @JoinColumn(name = "sdvbasic_id")

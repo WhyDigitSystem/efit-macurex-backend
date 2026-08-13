@@ -20,19 +20,19 @@ public class SalesDeliverySchedulePlanVO {
     private Long id;
 
     @Column(name = "day_no")
-    private Integer dayNo;
+    private int dayNo;
 
     @Column(name = "delivery_date")
     private LocalDate deliveryDate;
 
     @Column(name = "week_no")
-    private Integer weekNo;
+    private int weekNo;
 
     @Column(name = "day_name")
     private String dayName;
 
     @Column(name = "delivery_qty")
-    private Double deliveryQty;
+    private double deliveryQty;
     
     @ManyToOne
     @JoinColumn(name = "sdvdet_id")

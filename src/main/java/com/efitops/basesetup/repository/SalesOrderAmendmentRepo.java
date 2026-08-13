@@ -39,7 +39,25 @@ public interface SalesOrderAmendmentRepo extends JpaRepository<SalesOrderAmendme
         """, nativeQuery = true)
     Integer findMaxRevisionNo(
             @Param("soNumber") String soNumber);
-    
+
+    @Query(value = """
+            SELECT COALESCE(MAX(soa.revision_no), 0) + 1
+            FROM sales_order_amendment_basic soa
+            INNER JOIN sales_order_amendment_detail soad
+                ON soa.sales_order_amendment_id =
+                   soad.sales_order_amendment_id
+            WHERE soa.salesorder_no = ?1
+              AND soad.item = ?2
+              AND soa.org_id = ?3
+              AND soa.branch = ?4
+              AND soa.active = 1
+              AND soa.cancel = 0
+            """, nativeQuery = true)
+    Integer getSalesOrderAmdRevisionNo(
+            String salesOrderNo,
+            Long item,
+            Long orgId,
+            Long branch);    
     
     
    

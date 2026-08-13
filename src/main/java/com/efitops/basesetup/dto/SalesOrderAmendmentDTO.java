@@ -16,9 +16,9 @@ public class SalesOrderAmendmentDTO {
 
    
     private Long branch;
-    private String docId;
+//    private String docId;
     private String salesOrderNumber;
-    private LocalDate docDate;
+//    private LocalDate docDate;
     private String partyPoAmendmentNo;
     private LocalDate salesOrderDate;
     private LocalDate partyPoAmendmentDate;
@@ -29,8 +29,8 @@ public class SalesOrderAmendmentDTO {
     private Boolean active;
     private Long orgId;
     private String createdBy;
-    private String updatedBy;
-    private boolean cancel;
+//    private String updatedBy;
+//    private boolean cancel;
     private String cancelRemarks;
 
     

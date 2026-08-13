@@ -25,6 +25,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentCustomerResponceDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentDetailsItemResponseDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentDetailsResponseDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
+import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.EnquiryAttachmentResponseDTO;
@@ -35,6 +43,8 @@ import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.EnquiryTermsandCondDTO;
 import com.efitops.basesetup.dto.EnquiryTermsandCondResponseDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
+import com.efitops.basesetup.dto.PurchaseContractAmendmentDetailsDto;
+import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDetailsDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDetailsResponseDTO;
@@ -49,8 +59,11 @@ import com.efitops.basesetup.entity.EnquiryDetailsVO;
 import com.efitops.basesetup.entity.EnquiryTermsandCondVO;
 import com.efitops.basesetup.entity.EnquiryVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.PurchaseContractAmendmentDetailsVO;
+import com.efitops.basesetup.entity.PurchaseContractAmendmentVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentDetailsVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentVO;
+import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
@@ -68,6 +81,7 @@ import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.OrderAcceptanceRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentRepo;
+import com.efitops.basesetup.repository.PurchaseContractRepo;
 import com.efitops.basesetup.repository.SalesContractDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleDetailsRepo;
@@ -161,6 +175,11 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	@Autowired
 	private PurchaseContractAmendmentDetailsRepo purchaseContractAmendmentDetailsRepo;
+	
+	
+	@Autowired
+	private PurchaseContractRepo purchaseContractRepo;
+	
 	
 	
 
@@ -2037,415 +2056,486 @@ public class DevelopServiceImpl implements DevelopService {
 
 		    return revisionNo;
 		}
+		
+		//PurchaseContractAmendment
+		
 				
 		
-//		@Override
-//		public Map<String, Object> createUpdatePurchaseContractAmendment(
-//		        PurchaseContractAmendmentDto purchaseContractAmendmentDto)
-//		        throws ApplicationException {
-//
-//		    Map<String, Object> responseMap = new HashMap<>();
-//
-//		    PurchaseContractAmendmentVO purchaseContractAmendmentVO = null;
-//
-//		    // =========================
-//		    // Create / Update
-//		    // =========================
-//
-//		    if (purchaseContractAmendmentDto.getId() != null) {
-//
-//		        purchaseContractAmendmentVO = purchaseContractAmendmentRepo
-//		                .findById(purchaseContractAmendmentDto.getId())
-//		                .orElseThrow(() ->
-//		                        new ApplicationException("Purchase Contract Amendment not found"));
-//
-//		    } else {
-//
-//		        purchaseContractAmendmentVO = new PurchaseContractAmendmentVO();
-//		    }
-//
-//		    // =========================
-//		    // Branch
-//		    // =========================
-//
-//		    if (purchaseContractAmendmentDto.getBranch() != null) {
-//
-//		        BranchVO branchVO = branchRepo
-//		                .findById(purchaseContractAmendmentDto.getBranch())
-//		                .orElseThrow(() ->
-//		                        new ApplicationException("Branch Not Found"));
-//
-//		        purchaseContractAmendmentVO.setBranch(branchVO);
-//		    }
-//
-//		    // =========================
-//		    // Party
-//		    // =========================
-//
-//		    if (purchaseContractAmendmentDto.getParty() != null) {
-//
-//		        CustomerVO customerVO = customerRepo
-//		                .findById(purchaseContractAmendmentDto.getParty())
-//		                .orElseThrow(() ->
-//		                        new ApplicationException("Customer Not Found"));
-//
-//		        purchaseContractAmendmentVO.setParty(customerVO);
-//		    }
-//
-//		    // =========================
-//		    // Basic Details
-//		    // =========================
-//
-//		    purchaseContractAmendmentVO.setBelongsTo(
-//		            purchaseContractAmendmentDto.getBelongsTo());
-//
-//		    purchaseContractAmendmentVO.setDocId(
-//		            purchaseContractAmendmentDto.getDocId());
-//
-//		    purchaseContractAmendmentVO.setDocDate(
-//		            purchaseContractAmendmentDto.getDocDate());
-//
-//		    purchaseContractAmendmentVO.setPartyName(
-//		            purchaseContractAmendmentDto.getPartyName());
-//
-//		    purchaseContractAmendmentVO.setContractNo(
-//		            purchaseContractAmendmentDto.getContractNo());
-//
-//		    purchaseContractAmendmentVO.setContractDate(
-//		            purchaseContractAmendmentDto.getContractDate());
-//
-//		    purchaseContractAmendmentVO.setRevisionNo(
-//		            purchaseContractAmendmentDto.getRevisionNo());
-//
-//		    purchaseContractAmendmentVO.setRefNo(
-//		            purchaseContractAmendmentDto.getRefNo());
-//
-//		    purchaseContractAmendmentVO.setRefDate(
-//		            purchaseContractAmendmentDto.getRefDate());
-//
-//		    // =========================
-//		    // Summary
-//		    // =========================
-//
-//		    purchaseContractAmendmentVO.setFreightType(
-//		            purchaseContractAmendmentDto.getFreightType());
-//
-//		    purchaseContractAmendmentVO.setPackingType(
-//		            purchaseContractAmendmentDto.getPackingType());
-//
-//		    purchaseContractAmendmentVO.setModeOfDespatch(
-//		            purchaseContractAmendmentDto.getModeOfDespatch());
-//
-//		    purchaseContractAmendmentVO.setTaxDescription(
-//		            purchaseContractAmendmentDto.getTaxDescription());
-//
-//		    purchaseContractAmendmentVO.setPreparedBy(
-//		            purchaseContractAmendmentDto.getPreparedBy());
-//
-//		    purchaseContractAmendmentVO.setAuthorisedBy(
-//		            purchaseContractAmendmentDto.getAuthorisedBy());
-//
-//		    purchaseContractAmendmentVO.setRemarks(
-//		            purchaseContractAmendmentDto.getRemarks());
-//
-//		    // =========================
-//		    // Common Fields
-//		    // =========================
-//
-//		    purchaseContractAmendmentVO.setOrgId(
-//		            purchaseContractAmendmentDto.getOrgId());
-//
-//		    purchaseContractAmendmentVO.setCreatedBy(
-//		            purchaseContractAmendmentDto.getCreatedBy());
-//
-//		    purchaseContractAmendmentVO.setUpdatedBy(
-//		            purchaseContractAmendmentDto.getUpdatedBy());
-//
-//		    purchaseContractAmendmentVO.setActive(
-//		            purchaseContractAmendmentDto.isActive());
-//
-//		    purchaseContractAmendmentVO.setCancel(
-//		            purchaseContractAmendmentDto.isCancel());
-//
-//		    purchaseContractAmendmentVO.setCancelRemarks(
-//		            purchaseContractAmendmentDto.getCancelRemarks());
-//
-//		    // =========================
-//		    // Save Parent
-//		    // =========================
-//
-//		    purchaseContractAmendmentVO =
-//		            purchaseContractAmendmentRepo.save(
-//		                    purchaseContractAmendmentVO);
-//
-//		    // =========================
-//		    // Save Details
-//		    // =========================
-//
-//		    if (purchaseContractAmendmentDto.getDetails() != null
-//		            && !purchaseContractAmendmentDto.getDetails().isEmpty()) {
-//
-//		        List<PurchaseContractAmendmentDetailsVO> detailsList =
-//		                new ArrayList<>();
-//
-//		        for (PurchaseContractAmendmentDetailsDto detailDto
-//		                : purchaseContractAmendmentDto.getDetails()) {
-//
-//		            PurchaseContractAmendmentDetailsVO detailVO =
-//		                    new PurchaseContractAmendmentDetailsVO();
-//
-//		            detailVO.setPurchaseContractAmendment(
-//		                    purchaseContractAmendmentVO);
-//
-//		            // Item
-//
-//		            if (detailDto.getItem() != null) {
-//
-//		                ItemMasterVO itemVO = itemMasterRepo
-//		                        .findById(detailDto.getItem())
-//		                        .orElseThrow(() ->
-//		                                new ApplicationException("Item Not Found"));
-//
-//		                detailVO.setItem(itemVO);
-//		            }
-//
-//		            // Unit
-//
-//		            if (detailDto.getUnit() != null) {
-//
-//		                UnitMasterVO unitVO = unitMasterRepo
-//		                        .findById(detailDto.getUnit())
-//		                        .orElseThrow(() ->
-//		                                new ApplicationException("Unit Not Found"));
-//
-//		                detailVO.setUnit(unitVO);
-//		            }
-//
-//		            detailVO.setOldRate(detailDto.getOldRate());
-//		            detailVO.setNewRate(detailDto.getNewRate());
-//
-//		            detailVO.setValidFrom(detailDto.getValidFrom());
-//		            detailVO.setValidTo(detailDto.getValidTo());
-//		            detailVO.setNewValidFrom(detailDto.getNewValidFrom());
-//		            detailVO.setNewValidTo(detailDto.getNewValidTo());
-//
-//		            detailsList.add(detailVO);
-//		        }
-//
-//		        purchaseContractAmendmentDetailsRepo.saveAll(detailsList);
-//		    }
-//
-//		    // =========================
-//		    // Response
-//		    // =========================
-//
-//		    responseMap.put(CommonConstant.MESSAGE,
-//		            "Purchase Contract Amendment Saved Successfully");
-//
-//		    responseMap.put(CommonConstant.STATUS,
-//		            CommonConstant.SUCCESS);
-//
-//		    responseMap.put(CommonConstant.DATA,
-//		            purchaseContractAmendmentVO.getId());
-//
-//		    return responseMap;
-//		}
-//		
-//		private PurchaseContractAmendmentResponseDto purchaseContractAmendmentResponse(
-//		        PurchaseContractAmendmentVO purchaseContractAmendmentVO) {
-//
-//		    PurchaseContractAmendmentResponseDto responseDto =
-//		            new PurchaseContractAmendmentResponseDto();
-//
-//		    responseDto.setId(purchaseContractAmendmentVO.getId());
-//
-//		    // =========================
-//		    // Branch
-//		    // =========================
-//
-//		    if (purchaseContractAmendmentVO.getBranch() != null) {
-//
-//		        BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
-//
-//		        branchResponseDTO.setId(
-//		                purchaseContractAmendmentVO.getBranch().getId());
-//
-//		        branchResponseDTO.setBranchName(
-//		                purchaseContractAmendmentVO.getBranch().getBranchName());
-//
-//		        responseDto.setBranch(branchResponseDTO);
-//		    }
-//
-//		    // =========================
-//		    // Party
-//		    // =========================
-//
-//		    if (purchaseContractAmendmentVO.getParty() != null) {
-//
-//		        PurchaseContractAmendmentCustomerResponceDto customerResponse =
-//		                new PurchaseContractAmendmentCustomerResponceDto();
-//
-//		        customerResponse.setPartyId(
-//		                purchaseContractAmendmentVO.getParty().getId());
-//
-//		        customerResponse.setPartyName(
-//		                purchaseContractAmendmentVO.getParty().getCustomerName());
-//
-//		        responseDto.setParty(customerResponse);
-//		    }
-//
-//		    // =========================
-//		    // Basic Details
-//		    // =========================
-//
-//		    responseDto.setBelongsTo(
-//		            purchaseContractAmendmentVO.getBelongsTo());
-//
-//		    responseDto.setDocId(
-//		            purchaseContractAmendmentVO.getDocId());
-//
-//		    responseDto.setDocDate(
-//		            purchaseContractAmendmentVO.getDocDate());
-//
-//		    responseDto.setContractNo(
-//		            purchaseContractAmendmentVO.getContractNo());
-//
-//		    responseDto.setContractDate(
-//		            purchaseContractAmendmentVO.getContractDate());
-//
-//		    responseDto.setRevisionNo(
-//		            purchaseContractAmendmentVO.getRevisionNo());
-//
-//		    responseDto.setRefNo(
-//		            purchaseContractAmendmentVO.getRefNo());
-//
-//		    responseDto.setRefDate(
-//		            purchaseContractAmendmentVO.getRefDate());
-//
-//		    // =========================
-//		    // Summary
-//		    // =========================
-//
-//		    responseDto.setFreightType(
-//		            purchaseContractAmendmentVO.getFreightType());
-//
-//		    responseDto.setPackingType(
-//		            purchaseContractAmendmentVO.getPackingType());
-//
-//		    responseDto.setModeOfDespatch(
-//		            purchaseContractAmendmentVO.getModeOfDespatch());
-//
-//		    responseDto.setTaxDescription(
-//		            purchaseContractAmendmentVO.getTaxDescription());
-//
-//		    responseDto.setPreparedBy(
-//		            purchaseContractAmendmentVO.getPreparedBy());
-//
-//		    responseDto.setAuthorisedBy(
-//		            purchaseContractAmendmentVO.getAuthorisedBy());
-//
-//		    responseDto.setRemarks(
-//		            purchaseContractAmendmentVO.getRemarks());
-//
-//		    // =========================
-//		    // Common Fields
-//		    // =========================
-//
-//		    responseDto.setOrgId(
-//		            purchaseContractAmendmentVO.getOrgId());
-//
-//		    responseDto.setCreatedBy(
-//		            purchaseContractAmendmentVO.getCreatedBy());
-//
-//		    responseDto.setUpdatedBy(
-//		            purchaseContractAmendmentVO.getUpdatedBy());
-//
-//		    responseDto.setCancelRemarks(
-//		            purchaseContractAmendmentVO.getCancelRemarks());
-//
-//		    responseDto.setActive(
-//		            purchaseContractAmendmentVO.isActive());
-//
-//		    responseDto.setCancel(
-//		            purchaseContractAmendmentVO.isCancel());
-//
-//		    responseDto.setScreenName(
-//		            purchaseContractAmendmentVO.getScreenName());
-//
-//		    responseDto.setScreenCode(
-//		            purchaseContractAmendmentVO.getScreenCode());
-//
-//		    return responseDto;
-//		}
-//		
-//		@Override
-//		public PurchaseContractAmendmentResponseDto getPurchaseContractAmendmentById(Long id)
-//		        throws ApplicationException {
-//
-//		    PurchaseContractAmendmentVO purchaseContractAmendmentVO =
-//		            purchaseContractAmendmentRepo.findById(id)
-//		            .orElseThrow(() ->
-//		                    new ApplicationException("Purchase Contract Amendment Not Found"));
-//
-//		    return purchaseContractAmendmentResponse(purchaseContractAmendmentVO);
-//		}
-//		
-//		@Override
-//		public List<PurchaseContractAmendmentResponseDto> getPurchaseContractAmendmentByOrgId(
-//		        Long orgId, Long branch) throws ApplicationException {
-//
-//		    List<PurchaseContractAmendmentVO> voList =
-//		            purchaseContractAmendmentRepo.findByOrgId(orgId, branch);
-//
-//		    List<PurchaseContractAmendmentResponseDto> responseList =
-//		            new ArrayList<>();
-//
-//		    for (PurchaseContractAmendmentVO vo : voList) {
-//
-//		        responseList.add(
-//		                purchaseContractAmendmentResponse(vo));
-//		    }
-//
-//		    return responseList;
-//		}
+		@Override
+		@Transactional
+		public Map<String, Object> createUpdatePurchaseContractAmendment(
+		        PurchaseContractAmendmentDto purchaseContractAmendmentDto)
+		        throws ApplicationException {
+
+		    PurchaseContractAmendmentVO purchaseContractAmendmentVO;
+
+		    String message;
+
+		    // =========================
+		    // Create / Update
+		    // =========================
+
+		    if (ObjectUtils.isNotEmpty(purchaseContractAmendmentDto.getId())) {
+
+		        purchaseContractAmendmentVO =
+		                purchaseContractAmendmentRepo
+		                .findById(purchaseContractAmendmentDto.getId())
+		                .orElseThrow(() ->
+		                        new ApplicationException(
+		                                "Purchase Contract Amendment Not Found"));
+
+		        purchaseContractAmendmentVO.setUpdatedBy(
+		                purchaseContractAmendmentDto.getCreatedBy());
+
+		        message = "Purchase Contract Amendment Updated Successfully";
+
+		    } else {
+
+		        purchaseContractAmendmentVO =
+		                new PurchaseContractAmendmentVO();
+
+		        purchaseContractAmendmentVO.setCreatedBy(
+		                purchaseContractAmendmentDto.getCreatedBy());
+
+		        purchaseContractAmendmentVO.setUpdatedBy(
+		                purchaseContractAmendmentDto.getCreatedBy());
+
+		        message = "Purchase Contract Amendment Created Successfully";
+		    }
+
+		    // =========================
+		    // Header + Child Mapping
+		    // =========================
+
+		    createUpdatePurchaseContractAmendmentVOByDTO(
+		            purchaseContractAmendmentDto,
+		            purchaseContractAmendmentVO);
+
+		    // =========================
+		    // Save Header
+		    // =========================
+
+		    purchaseContractAmendmentVO =
+		            purchaseContractAmendmentRepo.save(
+		                    purchaseContractAmendmentVO);
+
+		    // =========================
+		    // Response
+		    // =========================
+
+		    PurchaseContractAmendmentResponseDto responseDTO =
+		            purchaseContractAmendmentResponse(
+		                    purchaseContractAmendmentVO);
+
+		    Map<String, Object> response =
+		            new HashMap<>();
+
+		    response.put("message", message);
+
+		    response.put(
+		            "purchaseContractAmendmentVO",
+		            responseDTO);
+
+		    return response;
+		}
 		
-		//PurchaseContractAmendmentContractNoDropdown
 		
-//		@Override
-//		public Map<String, Object> getPurchaseContractAmendmentContractNoDropdown(
-//		        Long orgId,
-//		        Long branch)
-//		        throws ApplicationException {
-//
-//		    Map<String, Object> responseMap = new HashMap<>();
-//
-//		    List<Object[]> objectList =
-//		            purchaseContractAmendmentRepo.getPurchaseContractDropdown(
-//		                    orgId, branch);
-//
-//		    List<PurchaseContractAmendmentContractDropdownResponseDto> responseList =
-//		            new ArrayList<>();
-//
-//		    for (Object[] obj : objectList) {
-//
-//		        PurchaseContractAmendmentContractDropdownResponseDto dto =
-//		                new PurchaseContractAmendmentContractDropdownResponseDto();
-//
-//		        dto.setId(((Number) obj[0]).longValue());
-//		        dto.setContractNo((String) obj[1]);
-//
-//		        responseList.add(dto);
-//		    }
-//
-//		    responseMap.put(CommonConstant.MESSAGE,
-//		            "Purchase Contract Dropdown Loaded Successfully");
-//
-//		    responseMap.put(CommonConstant.STATUS,
-//		            CommonConstant.SUCCESS);
-//
-//		    responseMap.put(CommonConstant.DATA,
-//		            responseList);
-//
-//		    return responseMap;
-//		}
+		private void createUpdatePurchaseContractAmendmentVOByDTO(
+		        PurchaseContractAmendmentDto dto,
+		        PurchaseContractAmendmentVO vo)
+		        throws ApplicationException {
+
+		    // =========================
+		    // Branch
+		    // =========================
+
+		    if (dto.getBranch() != null) {
+
+		        BranchVO branchVO = branchRepo
+		                .findById(dto.getBranch())
+		                .orElseThrow(() ->
+		                        new ApplicationException("Branch Not Found"));
+
+		        vo.setBranch(branchVO);
+		    }
+
+		    // =========================
+		    // CUSTOMER
+		    // =========================
+
+		    if (dto.getCustomer() != null) {
+
+		        CustomerVO customerVO = customerRepo
+		                .findById(dto.getCustomer())
+		                .orElseThrow(() -> new ApplicationException("Customer Not Found"));
+
+		        vo.setCustomer(customerVO);
+		    }
+
+		    // =========================
+		    // Header
+		    // =========================
+
+		    vo.setBelongsTo(dto.getBelongsTo());
+//		    vo.setDocId(dto.getDocId());
+//		    vo.setDocDate(dto.getDocDate());
+
+		   
+		    vo.setContractNo(dto.getContractNo());
+		    vo.setContractDate(dto.getContractDate());
+
+		    vo.setRevisionNo(dto.getRevisionNo());
+
+		    vo.setRefNo(dto.getRefNo());
+		    vo.setRefDate(dto.getRefDate());
+
+		    // =========================
+		    // Summary
+		    // =========================
+
+		    vo.setFreightType(dto.getFreightType());
+		    vo.setPackingType(dto.getPackingType());
+		    vo.setInsuranceAmount(dto.getInsuranceAmount());
+		    vo.setModeOfDespatch(dto.getModeOfDespatch());
+		    vo.setTaxDescription(dto.getTaxDescription());
+		    vo.setPreparedBy(dto.getPreparedBy());
+		    vo.setAuthorisedBy(dto.getAuthorisedBy());
+		    vo.setRemarks(dto.getRemarks());
+
+		    // =========================
+		    // Common
+		    // =========================
+
+		    vo.setOrgId(dto.getOrgId());
+		    vo.setActive(dto.isActive());
+		    vo.setCancelRemarks(dto.getCancelRemarks());
+
+		    // =========================
+		    // Delete Old Details (Update)
+		    // =========================
+
+		    if (vo.getId() != null) {
+
+		        purchaseContractAmendmentDetailsRepo
+		                .deleteByPurchaseContractAmendment(vo);
+		    }
+
+		    // =========================
+		    // Save Grid
+		    // =========================
+
+		    List<PurchaseContractAmendmentDetailsVO> detailsList =
+		            new ArrayList<>();
+
+		    if (dto.getDetails() != null
+		            && !dto.getDetails().isEmpty()) {
+
+		        for (PurchaseContractAmendmentDetailsDto detailDto
+		                : dto.getDetails()) {
+
+		            PurchaseContractAmendmentDetailsVO detailVO =
+		                    new PurchaseContractAmendmentDetailsVO();
+
+		            detailVO.setPurchaseContractAmendment(vo);
+
+		            // Item
+
+		            if (detailDto.getItem() != null) {
+
+		                ItemMasterVO itemVO =
+		                        itemMasterRepo.findById(detailDto.getItem())
+		                        .orElseThrow(() ->
+		                                new ApplicationException("Item Not Found"));
+
+		                detailVO.setItem(itemVO);
+		            }
+
+		            // Unit
+
+		            if (detailDto.getUnit() != null) {
+
+		                UnitMasterVO unitVO =
+		                        unitMasterRepo.findById(detailDto.getUnit())
+		                        .orElseThrow(() ->
+		                                new ApplicationException("Unit Not Found"));
+
+		                detailVO.setUnit(unitVO);
+		            }
+
+		            detailVO.setOldRate(detailDto.getOldRate());
+		            detailVO.setNewRate(detailDto.getNewRate());
+
+		            detailVO.setValidFrom(detailDto.getValidFrom());
+		            detailVO.setValidTo(detailDto.getValidTo());
+
+		            detailVO.setNewValidFrom(detailDto.getNewValidFrom());
+		            detailVO.setNewValidTo(detailDto.getNewValidTo());
+
+		            detailsList.add(detailVO);
+		        }
+		    }
+
+		    purchaseContractAmendmentDetailsRepo.saveAll(detailsList);
+		}
+		
+		private PurchaseContractAmendmentResponseDto purchaseContractAmendmentResponse(
+		        PurchaseContractAmendmentVO vo) {
+
+		    PurchaseContractAmendmentResponseDto responseDto =
+		            new PurchaseContractAmendmentResponseDto();
+
+		    responseDto.setId(vo.getId());
+
+		    // =========================
+		    // Branch
+		    // =========================
+
+		    if (vo.getBranch() != null) {
+
+		        BranchResponseDTO branchResponseDTO =
+		                new BranchResponseDTO();
+
+		        branchResponseDTO.setId(
+		                vo.getBranch().getId());
+
+		        branchResponseDTO.setBranchName(
+		                vo.getBranch().getBranchName());
+
+		        responseDto.setBranch(branchResponseDTO);
+		    }
+
+		    // =========================
+		    // Party
+		    // =========================
+
+		    if (vo.getCustomer() != null) {
+
+		        PurchaseContractAmendmentCustomerResponceDto customerResponseDTO =
+		                new PurchaseContractAmendmentCustomerResponceDto();
+
+		        customerResponseDTO.setId(vo.getCustomer().getId());
+		        customerResponseDTO.setCustomerName(vo.getCustomer().getCustomerName());
+
+		        responseDto.setCustomer(customerResponseDTO);
+		    }
+		    
+		       
+		    // =========================
+		    // Header
+		    // =========================
+
+		    responseDto.setBelongsTo(vo.getBelongsTo());
+		    responseDto.setDocId(vo.getDocId());
+		    responseDto.setDocDate(vo.getDocDate());
+
+		    
+
+		    responseDto.setContractNo(vo.getContractNo());
+		    responseDto.setContractDate(vo.getContractDate());
+
+		    responseDto.setRevisionNo(vo.getRevisionNo());
+
+		    responseDto.setRefNo(vo.getRefNo());
+		    responseDto.setRefDate(vo.getRefDate());
+
+		    // =========================
+		    // Summary
+		    // =========================
+
+		    responseDto.setFreightType(vo.getFreightType());
+		    responseDto.setPackingType(vo.getPackingType());
+		    responseDto.setModeOfDespatch(vo.getModeOfDespatch());
+		    responseDto.setTaxDescription(vo.getTaxDescription());
+		    responseDto.setPreparedBy(vo.getPreparedBy());
+		    responseDto.setAuthorisedBy(vo.getAuthorisedBy());
+		    responseDto.setRemarks(vo.getRemarks());
+
+		    // =========================
+		    // Common
+		    // =========================
+
+		    responseDto.setOrgId(vo.getOrgId());
+		    responseDto.setCreatedBy(vo.getCreatedBy());
+		    responseDto.setUpdatedBy(vo.getUpdatedBy());
+		    responseDto.setCancel(vo.isCancel());
+		    responseDto.setCancelRemarks(vo.getCancelRemarks());
+		    responseDto.setActive(vo.isActive());
+
+		    // =========================
+		    // Details
+		    // =========================
+
+		    List<PurchaseContractAmendmentDetailsResponseDto> detailResponseList =
+		            new ArrayList<>();
+
+		    List<PurchaseContractAmendmentDetailsVO> detailVOList =
+		            purchaseContractAmendmentDetailsRepo
+		            .findByPurchaseContractAmendment(vo);
+
+		    for (PurchaseContractAmendmentDetailsVO detailVO : detailVOList) {
+
+		        PurchaseContractAmendmentDetailsResponseDto detailResponse =
+		                new PurchaseContractAmendmentDetailsResponseDto();
+
+		        detailResponse.setId(detailVO.getId());
+
+		        if (detailVO.getItem() != null) {
+
+		            PurchaseContractAmendmentDetailsItemResponseDto itemResponse =
+		                    new PurchaseContractAmendmentDetailsItemResponseDto();
+
+		            itemResponse.setItemCode(
+		                    detailVO.getItem().getItemCode());
+
+		            itemResponse.setItemDescription(
+		                    detailVO.getItem().getItemDescription());
+
+		            detailResponse.setItem(itemResponse);
+		        }
+
+		        if (detailVO.getUnit() != null) {
+
+		            UnitResponseDTO unitResponse = new UnitResponseDTO();
+
+		            unitResponse.setId(detailVO.getUnit().getId());
+		            unitResponse.setUnitId(detailVO.getUnit().getUnitId());
+		            
+
+		            detailResponse.setUnit(unitResponse);
+		        }
+		        detailResponse.setOldRate(detailVO.getOldRate());
+		        detailResponse.setNewRate(detailVO.getNewRate());
+
+		        detailResponse.setValidFrom(detailVO.getValidFrom());
+		        detailResponse.setValidTo(detailVO.getValidTo());
+
+		        detailResponse.setNewValidFrom(detailVO.getNewValidFrom());
+		        detailResponse.setNewValidTo(detailVO.getNewValidTo());
+
+		        detailResponseList.add(detailResponse);
+		    }
+
+		    responseDto.setDetails(detailResponseList);
+
+		    return responseDto;
+		}
+		
+		
+		@Override
+		public PurchaseContractAmendmentResponseDto getPurchaseContractAmendmentById(
+		        Long id) throws ApplicationException {
+
+		    PurchaseContractAmendmentVO purchaseContractAmendmentVO =
+		            purchaseContractAmendmentRepo.findById(id)
+		            .orElseThrow(() ->
+		                    new ApplicationException(
+		                            "Purchase Contract Amendment Not Found"));
+
+		    return purchaseContractAmendmentResponse(
+		            purchaseContractAmendmentVO);
+		}
+		
+		
+		
+		@Override
+		public List<PurchaseContractAmendmentResponseDto>
+		        getPurchaseContractAmendmentByOrgId(
+		                Long orgId,
+		                Long branch)
+		        throws ApplicationException {
+
+		    List<PurchaseContractAmendmentVO> voList =
+		            purchaseContractAmendmentRepo.findByOrgId(
+		                    orgId,
+		                    branch);
+
+		    List<PurchaseContractAmendmentResponseDto> responseList =
+		            new ArrayList<>();
+
+		    for (PurchaseContractAmendmentVO vo : voList) {
+
+		        responseList.add(
+		                purchaseContractAmendmentResponse(vo));
+		    }
+
+		    return responseList;
+		}
+		
+		@Override
+		public List<PurchaseContractAmendmentContractDropdownResponseDto> getContractNoDropdownforPurchaseContractAmendment(
+		        Long orgId,
+		        Long branch) throws ApplicationException {
+
+		    List<PurchaseContractAmendmentVO> voList =
+		            purchaseContractAmendmentRepo.findContractNoDropdown(orgId, branch);
+
+		    List<PurchaseContractAmendmentContractDropdownResponseDto> responseList =
+		            new ArrayList<>();
+
+		    for (PurchaseContractAmendmentVO vo : voList) {
+
+		        PurchaseContractAmendmentContractDropdownResponseDto dto =
+		                new PurchaseContractAmendmentContractDropdownResponseDto();
+
+		        dto.setId(vo.getId());
+		        dto.setContractNo(vo.getContractNo());
+
+		        responseList.add(dto);
+		    }
+
+		    return responseList;
+		}
+		
+		
+		@Override
+		public List<PurchaseContractAmendmentItemDropdownResponseDto>
+		        getItemDropdownForPurchaseContractAmendment(
+		                Long contractId)
+		        throws ApplicationException {
+
+		    List<Object[]> objectList =
+		            purchaseContractRepo.getItemsByContractId(contractId);
+
+		    List<PurchaseContractAmendmentItemDropdownResponseDto> responseList =
+		            new ArrayList<>();
+
+		    for (Object[] obj : objectList) {
+
+		        PurchaseContractAmendmentItemDropdownResponseDto responseDto =
+		                new PurchaseContractAmendmentItemDropdownResponseDto();
+
+		        responseDto.setId(
+		                ((Number) obj[0]).longValue());
+
+		        responseDto.setItemCode(
+		                (String) obj[1]);
+
+		        responseDto.setItemDescription(
+		                (String) obj[2]);
+
+		        responseList.add(responseDto);
+		    }
+
+		    return responseList;
+		}
+		
+		
+		@Override
+		public Integer getPurchaseContractAmdRevisionNo(
+		        String contractNo,
+		        Long orgId,
+		        Long branch)
+		        throws ApplicationException {
+
+		    Integer revisionNo =
+		            purchaseContractAmendmentRepo.getPurchaseContractAmdRevisionNo(
+		                    contractNo,
+		                    orgId,
+		                    branch);
+
+		    return revisionNo;
+		}
+		
+		
+		
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+
 import com.efitops.basesetup.entity.PurchaseContractAmendmentVO;
 
 public interface PurchaseContractAmendmentRepo
@@ -28,25 +29,23 @@ public interface PurchaseContractAmendmentRepo
             SELECT COALESCE(MAX(revision_no),0)
             FROM pcamdbasic
             WHERE contract_no = :contractNo
-              AND cancel = false
-            """, nativeQuery = true)
-    Integer findMaxRevisionNo(
-            @Param("contractNo") String contractNo);
-    
-    
-    @Query(value = """
-            SELECT
-                purchasecontract_id,
-                contract_no
-            FROM purchase_contract
-            WHERE org_id = :orgId
+              AND org_id = :orgId
               AND branch = :branch
-              AND active = true
               AND cancel = false
-            ORDER BY contract_no
             """, nativeQuery = true)
-    List<Object[]> getPurchaseContractDropdown(
+    Integer getPurchaseContractAmdRevisionNo(
+            @Param("contractNo") String contractNo,
             @Param("orgId") Long orgId,
             @Param("branch") Long branch);
+    
+    
+    @Query("SELECT p FROM PurchaseContractAmendmentVO p " +
+    	       "WHERE p.orgId = :orgId " +
+    	       "AND p.branch.id = :branch " +
+    	       "AND p.cancel = false " +
+    	       "ORDER BY p.contractNo")
+    	List<PurchaseContractAmendmentVO> findContractNoDropdown(
+    	        @Param("orgId") Long orgId,
+    	        @Param("branch") Long branch);
 
 }

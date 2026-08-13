@@ -4,28 +4,47 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "purchase_short_close")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PurchaseShortCloseVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchaseshortclosegen")
-    @SequenceGenerator(name = "purchaseshortclosegen", sequenceName = "purchaseshortcloseseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchaseshortclose_id")
+    @SequenceGenerator(
+            name = "purchaseshortclosegen",
+            sequenceName = "purchaseshortcloseseq",
+            initialValue = 1000000001,
+            allocationSize = 1
+    )
+    @Column(name = "purchaseshortclose_id", columnDefinition = "BIGINT DEFAULT 0")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "branch")
     private BranchVO branch;
 
@@ -41,12 +60,11 @@ public class PurchaseShortCloseVO {
     @Column(name = "type")
     private String type;
 
-    // Supplier Code / Supplier Name both resolve from the same Party/Customer master record
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "supplier_id")
     private CustomerVO supplier;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "local_purchase_order_id")
     private LocalPurchaseOrderVO localPurchaseOrder;
 
@@ -56,9 +74,10 @@ public class PurchaseShortCloseVO {
     @Column(name = "po_date")
     private LocalDate poDate;
 
-
     @Column(name = "reference_for_short_close", length = 1000)
     private String referenceForShortClose;
+
+    // ---------------- Audit / Organization ----------------
 
     @Column(name = "org_id")
     private Long orgId;
@@ -81,8 +100,17 @@ public class PurchaseShortCloseVO {
     @Column(name = "modified_by")
     private Long updatedBy;
 
-    @OneToMany(mappedBy = "purchaseShortCloseVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<PurchaseShortCloseDetailsVO> purchaseShortCloseDetailsVO = new ArrayList<>();
+    // ---------------- Children ----------------
+
+    @OneToMany(
+            mappedBy = "purchaseShortCloseVO",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    @Builder.Default
+    private List<PurchaseShortCloseDetailsVO> purchaseShortCloseDetailsVO =
+            new ArrayList<>();
 
     public Boolean getActive() {
         return active;
@@ -93,5 +121,6 @@ public class PurchaseShortCloseVO {
     }
 
     @Embedded
+    @Builder.Default
     private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 }

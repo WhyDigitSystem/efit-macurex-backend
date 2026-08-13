@@ -346,4 +346,67 @@ public class PurchaseController extends BaseController {
         }
         return ResponseEntity.ok(responseDTO);
     }
+    // ==================================================================
+    // DIRECT PURCHASE — /api/directPurchase/**
+    // ==================================================================
+
+    @PostMapping("/api/purchaseMaster/updateCreateDirectPurchase")
+    public ResponseEntity<ResponseDTO> updateCreateDirectPurchase(@RequestBody DirectPurchaseDTO dto) {
+        Map<String, Object> responseObjectsMap = new HashMap<>();
+        ResponseDTO responseDTO;
+        try {
+            Map<String, Object> result = purchaseService.updateCreateDirectPurchase(dto);
+            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, result.get("message"));
+            responseObjectsMap.put("directPurchaseVO", result.get("directPurchaseVO"));
+            responseDTO = createServiceResponse(responseObjectsMap);
+        } catch (Exception e) {
+            responseDTO = createServiceResponseError(responseObjectsMap, "Direct Purchase Save Failed", e.getMessage());
+        }
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @GetMapping("/api/purchaseMaster/getDirectPurchaseById")
+    public ResponseEntity<ResponseDTO> getDirectPurchaseById(@RequestParam Long id) {
+        Map<String, Object> responseObjectsMap = new HashMap<>();
+        ResponseDTO responseDTO;
+        try {
+            DirectPurchaseResponseDTO result = purchaseService.getDirectPurchaseById(id);
+            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Direct Purchase information retrieved successfully");
+            responseObjectsMap.put("directPurchaseVO", result);
+            responseDTO = createServiceResponse(responseObjectsMap);
+        } catch (Exception e) {
+            responseDTO = createServiceResponseError(responseObjectsMap, "Direct Purchase information retrieval failed", e.getMessage());
+        }
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @GetMapping("/api/purchaseMaster/getDirectPurchaseByOrgId")
+    public ResponseEntity<ResponseDTO> getDirectPurchaseByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
+        Map<String, Object> responseObjectsMap = new HashMap<>();
+        ResponseDTO responseDTO;
+        try {
+            List<DirectPurchaseResponseDTO> result = purchaseService.getDirectPurchaseByOrgId(orgId, branchId);
+            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Direct Purchase information retrieved successfully");
+            responseObjectsMap.put("directPurchaseVO", result);
+            responseDTO = createServiceResponse(responseObjectsMap);
+        } catch (Exception e) {
+            responseDTO = createServiceResponseError(responseObjectsMap, "Direct Purchase information retrieval failed", e.getMessage());
+        }
+        return ResponseEntity.ok(responseDTO);
+    }
+//
+//    @GetMapping("/api/purchaseMaster/getDirectPurchaseDocId")
+//    public ResponseEntity<ResponseDTO> getDirectPurchaseDocId(@RequestParam Long orgId, @RequestParam String finYear, @RequestParam Long branch) {
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//        ResponseDTO responseDTO;
+//        try {
+//            String docId = purchaseService.getDirectPurchaseDocId(orgId, finYear, branch);
+//            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Bill No generated successfully");
+//            responseObjectsMap.put("billNo", docId);
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//        } catch (Exception e) {
+//            responseDTO = createServiceResponseError(responseObjectsMap, "Bill No generation failed", e.getMessage());
+//        }
+//        return ResponseEntity.ok(responseDTO);
+//    }
 }

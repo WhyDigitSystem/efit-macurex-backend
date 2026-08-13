@@ -9,7 +9,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,44 +19,47 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "purchase_contract")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PurchaseContractVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasecontractgen")
-    @SequenceGenerator(name = "purchasecontractgen", sequenceName = "purchasecontractseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasecontract_id")
+    @SequenceGenerator(
+            name = "purchasecontractgen",
+            sequenceName = "purchasecontractseq",
+            initialValue = 1000000001,
+            allocationSize = 1
+    )
+    @Column(name = "purchasecontract_id", columnDefinition = "BIGINT DEFAULT 0")
     private Long id;
 
-    // Plant ID (Belongs To) -> linked to Branch (same pattern as Quotation/TransportBill "plant")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "branch")
     private BranchVO branch;
 
-    // Contract No -> auto generated (prefix + running number) via DocumentTypeMappingDetails,
-    // exactly like Department/Designation/Employee docId generation (screenCode = "PC")
     @Column(name = "contract_no")
     private String contractNo;
 
     @Column(name = "contract_date")
     private LocalDate contractDate;
 
-    // Department -> linked to ListOfValuesDetails (List Of Values master, "DEPARTMENT" category)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "department_id")
     private ListOfValuesDetailsVO department;
 
-    // Supplier Code / Supplier Name -> both come from the same Party/Customer master record (Supplier)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "supplier_id")
     private CustomerVO supplier;
 
@@ -67,9 +69,7 @@ public class PurchaseContractVO {
     @Column(name = "ref_date")
     private LocalDate refDate;
 
-    // GST State -> auto-populated from Supplier's GST State (party master) at save time,
-    // stored against GSTStateMaster so it can also be independently viewed/edited
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "gst_state_id")
     private GSTStateMasterVO gstState;
 
@@ -79,15 +79,14 @@ public class PurchaseContractVO {
     @Column(name = "valid_to")
     private LocalDate validTo;
 
-    // Derived at save-time: true when supplier's GST State country = India, else false (import)
     @Column(name = "is_igst_appl")
     private Boolean isIgstAppl;
 
-    // Derived at save-time from Supplier's Country (party master): "LOCAL" if India else "IMPORT"
     @Column(name = "po_type")
     private String poType;
 
-    // ---------------- 3. Charges Summary (single set of entry fields per contract) ----------------
+    // ---------------- Charges Summary ----------------
+
     @Column(name = "mode_of_despatch")
     private String modeOfDespatch;
 
@@ -103,7 +102,7 @@ public class PurchaseContractVO {
     @Column(name = "packing_type")
     private String packingType;
 
-    @Column(name = "insurance_amount")
+    @Column(name = "insurance_amount", precision = 10, scale = 2)
     private BigDecimal insuranceAmount;
 
     @Column(name = "bank")
@@ -133,7 +132,8 @@ public class PurchaseContractVO {
     @Column(name = "terms_conditions")
     private String termsConditions;
 
-    // ---------------- audit / org fields ----------------
+    // ---------------- Audit / Organization ----------------
+
     @Column(name = "org_id")
     private Long orgId;
 
@@ -155,14 +155,33 @@ public class PurchaseContractVO {
     @Column(name = "modified_by")
     private Long updatedBy;
 
-    // ---------------- children ----------------
-    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    // ---------------- Children ----------------
+
+    @OneToMany(
+            mappedBy = "purchaseContractVO",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    @Builder.Default
     private List<PurchaseContractDetailsVO> purchaseContractDetailsVO = new ArrayList<>();
 
-    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "purchaseContractVO",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    @Builder.Default
     private List<PurchaseContractTaxDetailsVO> purchaseContractTaxDetailsVO = new ArrayList<>();
 
-    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "purchaseContractVO",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    @Builder.Default
     private List<PurchaseContractAttachmentVO> purchaseContractAttachmentVO = new ArrayList<>();
 
     public Boolean getActive() {
@@ -174,5 +193,6 @@ public class PurchaseContractVO {
     }
 
     @Embedded
+    @Builder.Default
     private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 }

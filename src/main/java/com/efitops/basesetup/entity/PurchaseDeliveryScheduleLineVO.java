@@ -3,38 +3,53 @@ package com.efitops.basesetup.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "purchase_delivery_schedule_line")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PurchaseDeliveryScheduleLineVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasedeliveryschedulelinegen")
-    @SequenceGenerator(name = "purchasedeliveryschedulelinegen", sequenceName = "purchasedeliveryschedulelineseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasedeliveryschedulelinegen_id")
+    @SequenceGenerator(
+            name = "purchasedeliveryschedulelinegen",
+            sequenceName = "purchasedeliveryschedulelineseq",
+            initialValue = 1000000001,
+            allocationSize = 1
+    )
+    @Column(name = "purchasedeliveryschedulelinegen_id", columnDefinition = "BIGINT DEFAULT 0")
     private Long id;
 
-    // entered by user
     @Column(name = "plan_date")
     private LocalDate planDate;
 
-    // entered by user - assumed numeric; change to String if shown as "W1", "W2" etc.
     @Column(name = "week_no")
     private Integer weekNo;
 
-    // entered by user
-    @Column(name = "schedule_qty")
+    @Column(name = "schedule_qty", precision = 10, scale = 2)
     private BigDecimal scheduleQty;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "purchasedeliveryschedule_id")
     private PurchaseDeliveryScheduleVO purchaseDeliveryScheduleVO;
 }

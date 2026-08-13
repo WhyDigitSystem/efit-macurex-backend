@@ -8,7 +8,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,46 +31,53 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PurchaseIndentVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchaseindentgen")
-    @SequenceGenerator(name = "purchaseindentgen", sequenceName = "purchaseindentseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchaseindent_id")
+    @SequenceGenerator(
+            name = "purchaseindentgen",
+            sequenceName = "purchaseindentseq",
+            initialValue = 1000000001,
+            allocationSize = 1
+    )
+    @Column(name = "purchaseindent_id", columnDefinition = "BIGINT DEFAULT 0")
     private Long id;
 
     @Column(name = "indent_no", length = 30)
     private String indentNo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "branch")
     private BranchVO branch;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "belongs_to")
     private ListOfValuesDetailsVO belongsTo;
 
     @Column(name = "indent_date")
     private LocalDate indentDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "department")
     private DepartmentVO department;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "prepared_by")
     private EmployeeMasterVO preparedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "by_whom")
     private EmployeeMasterVO byWhom;
 
     @Column(name = "approved")
     private boolean approved;
 
-    // Indent Summary - kept directly on parent, no child table
     @Column(name = "remarks", length = 1000)
     private String remarks;
+
+    // ---------------- Audit / Organization ----------------
 
     @Column(name = "org_id")
     private Long orgId;
@@ -91,17 +98,31 @@ public class PurchaseIndentVO {
     private String cancelRemarks;
 
     @Column(name = "screen_code", length = 10)
+    @Builder.Default
     private String screenCode = "PI";
 
     @Column(name = "screen_name", length = 30)
+    @Builder.Default
     private String screenName = "PURCHASEINDENT";
 
-    @OneToMany(mappedBy = "purchaseIndentVO", cascade = CascadeType.ALL, orphanRemoval = true)
+    // ---------------- Children ----------------
+
+    @OneToMany(
+            mappedBy = "purchaseIndentVO",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @JsonManagedReference
+    @Builder.Default
     private List<PurchaseIndentDetailsVO> details = new ArrayList<>();
 
-    @OneToMany(mappedBy = "purchaseIndentVO", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "purchaseIndentVO",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @JsonManagedReference
+    @Builder.Default
     private List<PurchaseIndentAttachmentVO> attachments = new ArrayList<>();
 
     @JsonGetter("active")
@@ -115,5 +136,6 @@ public class PurchaseIndentVO {
     }
 
     @Embedded
+    @Builder.Default
     private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 }

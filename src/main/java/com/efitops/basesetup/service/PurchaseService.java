@@ -26,7 +26,7 @@ public interface PurchaseService {
     // ---------- Purchase Bill ----------
     Map<String, Object> updateCreatePurchaseBill(PurchaseBillDTO dto) throws ApplicationException;
     PurchaseBillResponseDTO getPurchaseBillById(Long id) throws ApplicationException;
-    List<PurchaseBillResponseDTO> getPurchaseBillByOrgId(Long orgId, Long branchId) throws ApplicationException;
+    List<PurchaseBillResponseDTO> getPurchaseBillByOrgId(Long orgId, Long branch) throws ApplicationException;
     String getPurchaseBillDocId(Long orgId, String finYear, Long branch);
 
     // ---------- Purchase Indent ----------
@@ -37,14 +37,18 @@ public interface PurchaseService {
     // ---------- Purchase Short Close ----------
     Map<String, Object> updateCreatePurchaseShortClose(PurchaseShortCloseDTO dto) throws ApplicationException;
     PurchaseShortCloseResponseDTO getPurchaseShortCloseById(Long id) throws ApplicationException;
-    List<PurchaseShortCloseResponseDTO> getPurchaseShortCloseByOrgId(Long orgId, Long branchId) throws ApplicationException;
+    List<PurchaseShortCloseResponseDTO> getPurchaseShortCloseByOrgId(Long orgId, Long branch) throws ApplicationException;
     String getPurchaseShortCloseDocId(Long orgId, String finYear, Long branch);
 
     // ---------- Local Purchase Order ----------
     Map<String, Object> updateCreateLocalPurchaseOrder(LocalPurchaseOrderDTO dto, MultipartFile[] files) throws ApplicationException;
     LocalPurchaseOrderResponseDTO getLocalPurchaseOrderById(Long id) throws ApplicationException;
-    List<LocalPurchaseOrderResponseDTO> getLocalPurchaseOrderByOrgId(Long orgId, Long branchId) throws ApplicationException;
+    List<LocalPurchaseOrderResponseDTO> getLocalPurchaseOrderByOrgId(Long orgId, Long branch) throws ApplicationException;
     String getLocalPurchaseOrderDocId(Long orgId, String finYear, Long branch);
 
-
+    // add to the interface
+    Map<String, Object> updateCreateDirectPurchase(DirectPurchaseDTO dto) throws ApplicationException;
+    DirectPurchaseResponseDTO getDirectPurchaseById(Long id) throws ApplicationException;
+    List<DirectPurchaseResponseDTO> getDirectPurchaseByOrgId(Long orgId, Long branch) throws ApplicationException;
+    String getDirectPurchaseDocId(Long orgId, String finYear, Long branch);
 }

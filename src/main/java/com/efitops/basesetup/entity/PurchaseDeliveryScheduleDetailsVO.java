@@ -2,60 +2,74 @@ package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "purchase_delivery_schedule_details")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PurchaseDeliveryScheduleDetailsVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasedeliveryscheduledetailsgen")
-    @SequenceGenerator(name = "purchasedeliveryscheduledetailsgen", sequenceName = "purchasedeliveryscheduledetailsseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasedeliveryscheduledetails_id")
+    @SequenceGenerator(
+            name = "purchasedeliveryscheduledetailsgen",
+            sequenceName = "purchasedeliveryscheduledetailsseq",
+            initialValue = 1000000001,
+            allocationSize = 1
+    )
+    @Column(name = "purchasedeliveryscheduledetails_id", columnDefinition = "BIGINT DEFAULT 0")
     private Long id;
 
-    // Item Code -> ItemMaster; the 5 fields below are all snapshotted from THIS item at save time
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "item_id")
     private ItemMasterVO item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "primary_unit_id")
     private UnitMasterVO primaryUnit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "purchase_unit_id")
     private UnitMasterVO purchaseUnit;
 
-    @Column(name = "demand_qty")
+    @Column(name = "demand_qty", precision = 10, scale = 2)
     private BigDecimal demandQty;
 
-    @Column(name = "available_stock")
+    @Column(name = "available_stock", precision = 10, scale = 2)
     private BigDecimal availableStock;
 
-    @Column(name = "qty")
+    @Column(name = "qty", precision = 10, scale = 2)
     private BigDecimal qty;
 
-    // entered by user
-    @Column(name = "tentative_qty")
+    @Column(name = "tentative_qty", precision = 10, scale = 2)
     private BigDecimal tentativeQty;
 
-    // entered by user
-    @Column(name = "tentative_qty_next_month")
+    @Column(name = "tentative_qty_next_month", precision = 10, scale = 2)
     private BigDecimal tentativeQtyNextMonth;
 
-    // entered by user
-    @Column(name = "rate")
+    @Column(name = "rate", precision = 10, scale = 2)
     private BigDecimal rate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "purchasedeliveryschedule_id")
     private PurchaseDeliveryScheduleVO purchaseDeliveryScheduleVO;
 }

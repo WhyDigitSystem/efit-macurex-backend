@@ -5,7 +5,6 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +16,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -25,27 +25,31 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PurchaseIndentDetailsVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchaseindentdetailsgen")
-    @SequenceGenerator(name = "purchaseindentdetailsgen", sequenceName = "purchaseindentdetailsseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchaseindentdetails_id")
+    @SequenceGenerator(
+            name = "purchaseindentdetailsgen",
+            sequenceName = "purchaseindentdetailsseq",
+            initialValue = 1000000001,
+            allocationSize = 1
+    )
+    @Column(name = "purchaseindentdetails_id", columnDefinition = "BIGINT DEFAULT 0")
     private Long id;
 
-    // Item is a full reference to ItemMasterVO - itemCode / itemDescription /
-    // primaryUnit / purchaseUnit are all pulled from here, never stored again.
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "item")
     private ItemMasterVO item;
 
-    @Column(name = "qty_in_primary_unit")
+    @Column(name = "qty_in_primary_unit", precision = 10, scale = 2)
     private BigDecimal qtyInPrimaryUnit;
 
-    @Column(name = "conversion_factor")
+    @Column(name = "conversion_factor", precision = 10, scale = 2)
     private BigDecimal conversionFactor;
 
-    @Column(name = "qty_in_purchase_unit")
+    @Column(name = "qty_in_purchase_unit", precision = 10, scale = 2)
     private BigDecimal qtyInPurchaseUnit;
 
     @Column(name = "required_date")
@@ -55,7 +59,7 @@ public class PurchaseIndentDetailsVO {
     private String purpose;
 
     @ManyToOne
-    @JoinColumn(name = "purchaseindent_id")
     @JsonBackReference
+    @JoinColumn(name = "purchaseindent_id")
     private PurchaseIndentVO purchaseIndentVO;
 }

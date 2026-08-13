@@ -15,8 +15,8 @@ public interface LocalPurchaseOrderRepo extends JpaRepository<LocalPurchaseOrder
     @Query(nativeQuery = true, value = "select * from local_purchase_order where localpurchaseorder_id=?1")
     LocalPurchaseOrderVO getLocalPurchaseOrderById(Long id);
 
-    @Query(nativeQuery = true, value = "select * from local_purchase_order where org_id=?1 and branch_id=?2 and active=1 and cancel=0")
-    List<LocalPurchaseOrderVO> getLocalPurchaseOrderByOrgId(Long orgId, Long branchId);
+    @Query(nativeQuery = true, value = "select * from local_purchase_order where org_id=?1 and branch=?2 and active=1 and cancel=0")
+    List<LocalPurchaseOrderVO> getLocalPurchaseOrderByOrgId(Long orgId, Long branch);
 
     @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,'0')) AS docid "
             + "from documenttypemapping_details where org_id=?1 and screen_code=?2")

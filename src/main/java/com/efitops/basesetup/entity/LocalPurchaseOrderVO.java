@@ -5,30 +5,48 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "local_purchase_order")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class LocalPurchaseOrderVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "localpurchaseordergen")
-    @SequenceGenerator(name = "localpurchaseordergen", sequenceName = "localpurchaseorderseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "localpurchaseorder_id")
+    @SequenceGenerator(
+            name = "localpurchaseordergen",
+            sequenceName = "localpurchaseorderseq",
+            initialValue = 1000000001,
+            allocationSize = 1
+    )
+    @Column(name = "localpurchaseorder_id", columnDefinition = "BIGINT DEFAULT 0")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id")
-    private BranchVO plant;
+    @ManyToOne
+    @JoinColumn(name = "branch")
+    private BranchVO branch;
 
     @Column(name = "po_no")
     private String poNo;
@@ -39,15 +57,15 @@ public class LocalPurchaseOrderVO {
     @Column(name = "po_date")
     private LocalDate poDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "department_id")
     private ListOfValuesDetailsVO department;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "supplier_id")
     private CustomerVO supplier;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "gst_state_id")
     private GSTStateMasterVO gstState;
 
@@ -66,7 +84,7 @@ public class LocalPurchaseOrderVO {
     @Column(name = "gstn_no")
     private String gstnNo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "tax_code_id")
     private ListOfValuesDetailsVO taxCode;
 
@@ -74,29 +92,30 @@ public class LocalPurchaseOrderVO {
     private Boolean isReverseChrg;
 
     @Column(name = "item_type")
-    private String itemType; // "Regular" / "Consumables"
+    private String itemType;
 
     @Column(name = "indent_required")
     private Boolean indentRequired;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "dealer_type_id")
     private ListOfValuesDetailsVO dealerType;
 
-    // ---------------- 4. Terms And Conditions ----------------
+    // ---------------- Terms And Conditions ----------------
+
     @Column(name = "freight_type")
     private String freightType;
 
     @Column(name = "packing_type")
     private String packingType;
 
-    @Column(name = "insurance")
+    @Column(name = "insurance", precision = 10, scale = 2)
     private BigDecimal insurance;
 
-    @Column(name = "freight")
+    @Column(name = "freight", precision = 10, scale = 2)
     private BigDecimal freight;
 
-    @Column(name = "total_amount")
+    @Column(name = "total_amount", precision = 10, scale = 2)
     private BigDecimal totalAmount;
 
     @Column(name = "mode_of_despatch")
@@ -117,19 +136,20 @@ public class LocalPurchaseOrderVO {
     @Column(name = "notes", length = 1000)
     private String notes;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "prepared_by")
     private EmployeeMasterVO preparedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "checked_by")
     private EmployeeMasterVO checkedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "authorised_by")
     private EmployeeMasterVO authorisedBy;
 
-    // ---------------- audit / org ----------------
+    // ---------------- Audit / Organization ----------------
+
     @Column(name = "org_id")
     private Long orgId;
 
@@ -151,14 +171,33 @@ public class LocalPurchaseOrderVO {
     @Column(name = "modified_by")
     private Long updatedBy;
 
-    // ---------------- children ----------------
-    @OneToMany(mappedBy = "localPurchaseOrderVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    // ---------------- Children ----------------
+
+    @OneToMany(
+            mappedBy = "localPurchaseOrderVO",
+            cascade = javax.persistence.CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    @Builder.Default
     private List<LocalPurchaseOrderDetailsVO> localPurchaseOrderDetailsVO = new ArrayList<>();
 
-    @OneToMany(mappedBy = "localPurchaseOrderVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "localPurchaseOrderVO",
+            cascade = javax.persistence.CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    @Builder.Default
     private List<LocalPurchaseOrderTaxDetailsVO> localPurchaseOrderTaxDetailsVO = new ArrayList<>();
 
-    @OneToMany(mappedBy = "localPurchaseOrderVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "localPurchaseOrderVO",
+            cascade = javax.persistence.CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    @Builder.Default
     private List<LocalPurchaseOrderAttachmentVO> localPurchaseOrderAttachmentVO = new ArrayList<>();
 
     public Boolean getActive() {

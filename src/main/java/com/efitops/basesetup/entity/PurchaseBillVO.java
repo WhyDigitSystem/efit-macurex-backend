@@ -5,32 +5,49 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "purchase_bill")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PurchaseBillVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasebillgen")
-    @SequenceGenerator(name = "purchasebillgen", sequenceName = "purchasebillseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasebill_id")
+    @SequenceGenerator(
+            name = "purchasebillgen",
+            sequenceName = "purchasebillseq",
+            initialValue = 1000000001,
+            allocationSize = 1
+    )
+    @Column(name = "purchasebill_id", columnDefinition = "BIGINT DEFAULT 0")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "branch")
     private BranchVO branch;
 
-    // PB No -> auto generated (prefix + running number), same pattern as Contract No / Doc No
     @Column(name = "pb_no")
     private String pbNo;
 
@@ -40,66 +57,57 @@ public class PurchaseBillVO {
     @Column(name = "pb_date")
     private LocalDate pbDate;
 
-    // Supplier Code / Supplier Name / Supplier ID -> all come from the same Party/Customer master record
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "supplier_id")
     private CustomerVO supplier;
 
-    // GST State -> auto pulled from Supplier's GST State, same as Purchase Contract
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "gst_state_id")
     private GSTStateMasterVO gstState;
 
-    // TODO: GRN module doesn't exist yet - once it does, replace these two plain
-    // fields with a @ManyToOne to the real GRN entity (see PurchaseContract's
-    // poType/poId pattern in PurchaseDeliveryScheduleVO for how to wire it in).
     @Column(name = "grn_no")
     private String grnNo;
 
     @Column(name = "grn_date")
     private LocalDate grnDate;
 
-    // Derived at save-time from supplier's country, same as Purchase Contract
     @Column(name = "is_igst_appl")
     private Boolean isIgstAppl;
 
     @Column(name = "excisable")
     private Boolean excisable;
 
-    // Currency -> List Of Values dropdown, same pattern as Dealer Type/Tax Code/etc below
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "currency_id")
     private ListOfValuesDetailsVO currency;
 
-    // GSTN No -> auto pulled from supplier's GSTN field
     @Column(name = "gstn_no")
     private String gstnNo;
 
     @Column(name = "vendor_dc_no")
     private String vendorDcNo;
 
-    @Column(name = "exchange_rate")
+    @Column(name = "exchange_rate", precision = 10, scale = 2)
     private BigDecimal exchangeRate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "dealer_type_id")
     private ListOfValuesDetailsVO dealerType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "tax_code_id")
     private ListOfValuesDetailsVO taxCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "local_purchase_order_id")
     private LocalPurchaseOrderVO localPurchaseOrder;
 
     @Column(name = "po_type")
-    private String poType;   // "PURCHASE_CONTRACT" for now (LOCAL_PURCHASE_ORDER later)
+    private String poType;
 
     @Column(name = "po_id")
     private Long poId;
 
-    // snapshot of the PO's number/date at selection time
     @Column(name = "po_no")
     private String poNo;
 
@@ -115,17 +123,17 @@ public class PurchaseBillVO {
     @Column(name = "bill_date")
     private LocalDate date;
 
-    @Column(name = "duty_per_unit")
+    @Column(name = "duty_per_unit", precision = 10, scale = 2)
     private BigDecimal dutyPerUnit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "posting_category_id")
     private ListOfValuesDetailsVO postingCategory;
 
     @Column(name = "modvat_copy_received")
     private Boolean modvatCopyReceived;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "ecc_type_id")
     private ListOfValuesDetailsVO eccType;
 
@@ -135,17 +143,18 @@ public class PurchaseBillVO {
     @Column(name = "supplier_dc_inv_date")
     private LocalDate supplierDcInvDate;
 
-    // ---------------- 3. Charges Summary ----------------
-    @Column(name = "total_freight")
+    // ---------------- Charges Summary ----------------
+
+    @Column(name = "total_freight", precision = 10, scale = 2)
     private BigDecimal totalFreight;
 
-    @Column(name = "total_qty")
+    @Column(name = "total_qty", precision = 10, scale = 2)
     private BigDecimal totalQty;
 
-    @Column(name = "basic_value")
+    @Column(name = "basic_value", precision = 10, scale = 2)
     private BigDecimal basicValue;
 
-    @Column(name = "total_amount")
+    @Column(name = "total_amount", precision = 10, scale = 2)
     private BigDecimal totalAmount;
 
     @Column(name = "amount_in_words")
@@ -160,7 +169,8 @@ public class PurchaseBillVO {
     @Column(name = "payment_terms")
     private String paymentTerms;
 
-    // ---------------- audit / org ----------------
+    // ---------------- Audit / Organization ----------------
+
     @Column(name = "org_id")
     private Long orgId;
 
@@ -182,11 +192,24 @@ public class PurchaseBillVO {
     @Column(name = "modified_by")
     private Long updatedBy;
 
-    // ---------------- children ----------------
-    @OneToMany(mappedBy = "purchaseBillVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    // ---------------- Children ----------------
+
+    @OneToMany(
+            mappedBy = "purchaseBillVO",
+            cascade = javax.persistence.CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    @Builder.Default
     private List<PurchaseBillDetailsVO> purchaseBillDetailsVO = new ArrayList<>();
 
-    @OneToMany(mappedBy = "purchaseBillVO", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "purchaseBillVO",
+            cascade = javax.persistence.CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    @Builder.Default
     private List<PurchaseBillTaxGridVO> purchaseBillTaxGridVO = new ArrayList<>();
 
     public Boolean getActive() {
@@ -198,5 +221,6 @@ public class PurchaseBillVO {
     }
 
     @Embedded
+    @Builder.Default
     private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 }

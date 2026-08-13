@@ -20,35 +20,36 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "purchase_contract_tax_details")
+@Table(name = "direct_purchase_tax_details")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PurchaseContractTaxDetailsVO {
+public class DirectPurchaseTaxDetailsVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasecontracttaxgen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "directpurchasetaxgen")
     @SequenceGenerator(
-            name = "purchasecontracttaxgen",
-            sequenceName = "purchasecontracttaxseq",
+            name = "directpurchasetaxgen",
+            sequenceName = "directpurchasetaxseq",
             initialValue = 1000000001,
             allocationSize = 1
     )
-    @Column(name = "purchasecontracttax_id", columnDefinition = "BIGINT DEFAULT 0")
+    @Column(name = "directpurchasetax_id", columnDefinition = "BIGINT DEFAULT 0")
     private Long id;
 
     @Column(name = "particulars")
     private String particulars;
 
-    @Column(name = "tax_percent", precision = 10, scale = 2)
-    private BigDecimal taxPercent;
-
     @Column(name = "amount", precision = 10, scale = 2)
     private BigDecimal amount;
 
     @ManyToOne
+    @JoinColumn(name = "ledger_account_id")
+    private ListOfValuesDetailsVO ledgerAccount;
+
+    @ManyToOne
     @JsonBackReference
-    @JoinColumn(name = "purchasecontract_id")
-    private PurchaseContractVO purchaseContractVO;
+    @JoinColumn(name = "directpurchase_id")
+    private DirectPurchaseVO directPurchaseVO;
 }

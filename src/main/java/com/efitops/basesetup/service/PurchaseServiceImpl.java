@@ -241,6 +241,12 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Autowired UnitMasterRepo unitMasterRepo;
     @Autowired ListOfValuesDetailsRepo listOfValuesDetailsRepo;
 
+
+    @Autowired DirectPurchaseRepo directPurchaseRepo;
+    @Autowired DirectPurchaseDetailsRepo directPurchaseDetailsRepo;
+    @Autowired DirectPurchaseTaxDetailsRepo directPurchaseTaxDetailsRepo;
+    @Autowired PurchaseIndentRepo purchaseIndentRepoForDirectPurchase; // reuse existing purchaseIndentRepo field instead if already present in the class
+
     @Value("${purchasecontract.upload.path}")
     private String purchaseContractUploadPath;
 
@@ -1846,7 +1852,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void createUpdateLocalPurchaseOrderVOFromDTO(LocalPurchaseOrderDTO dto, LocalPurchaseOrderVO vo) throws ApplicationException {
 
         if (dto.getBranch() != null && dto.getBranch() != 0) {
-            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
+            vo.setBranch(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
         }
         vo.setBelongsTo(dto.getBelongsTo());
         vo.setPoDate(dto.getPoDate());
@@ -2106,12 +2112,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         LocalPurchaseOrderResponseDTO dto = new LocalPurchaseOrderResponseDTO();
         dto.setId(vo.getId());
 
-        if (vo.getPlant() != null) {
+        if (vo.getBranch() != null) {
             BranchResponseDTO plantDTO = new BranchResponseDTO();
-            plantDTO.setId(vo.getPlant().getId());
-            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
-            plantDTO.setBranchName(vo.getPlant().getBranchName());
-            dto.setPlant(plantDTO);
+            plantDTO.setId(vo.getBranch().getId());
+            plantDTO.setBranchCode(vo.getBranch().getBranchCode());
+            plantDTO.setBranchName(vo.getBranch().getBranchName());
+            dto.setBranch(plantDTO);
         }
 
         dto.setPoNo(vo.getPoNo());
@@ -2263,6 +2269,312 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
         }
         dto.setAttachments(attachmentList);
+
+        return dto;
+    }
+    // ==================================================================
+    // ============================ DIRECT PURCHASE =====================
+    // Same structure as Purchase Bill (branch/dept/supplier resolution, tax grid,
+    // delete-then-recreate children). Item list for "Purchase Detail" is sourced
+    // from the selected Purchase Indent's item lines, same linkage pattern used
+    // for Local Purchase Order's Indent Qty / Pending Indent Qty.
+    // ==================================================================
+
+    private static final String SCREEN_CODE_DP = "DP";
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> updateCreateDirectPurchase(DirectPurchaseDTO dto) throws ApplicationException {
+
+        DirectPurchaseVO vo;
+        String message;
+        boolean isUpdate = ObjectUtils.isNotEmpty(dto.getId());
+
+        if (isUpdate) {
+            vo = directPurchaseRepo.findById(dto.getId())
+                    .orElseThrow(() -> new ApplicationException("Direct Purchase Not Found"));
+            vo.setUpdatedBy(dto.getCreatedBy());
+            message = "Direct Purchase Updated Successfully";
+        } else {
+            vo = new DirectPurchaseVO();
+            vo.setCreatedBy(dto.getCreatedBy());
+            vo.setUpdatedBy(dto.getCreatedBy());
+            vo.setBillNo(directPurchaseRepo.getDirectPurchaseDocId(dto.getOrgId(), SCREEN_CODE_DP));
+            message = "Direct Purchase Created Successfully";
+        }
+
+        createUpdateDirectPurchaseVOFromDTO(dto, vo);
+
+        if (isUpdate) {
+            directPurchaseRepo.flush();
+        } else {
+            vo = directPurchaseRepo.save(vo);
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", message);
+        response.put("directPurchaseVO", buildDirectPurchaseResponse(vo));
+        return response;
+    }
+
+    private void createUpdateDirectPurchaseVOFromDTO(DirectPurchaseDTO dto, DirectPurchaseVO vo) throws ApplicationException {
+
+        if (dto.getBranch() != null && dto.getBranch() != 0) {
+            vo.setBranch(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
+        }
+        vo.setBelongsTo(dto.getBelongsTo());
+        vo.setBillDate(dto.getBillDate());
+
+        if (dto.getDepartment() != null && dto.getDepartment() != 0) {
+            vo.setDepartment(resolveLov(dto.getDepartment()));
+        }
+
+        if (dto.getSupplier() != null && dto.getSupplier() != 0) {
+            CustomerVO supplier = customerRepo.findById(dto.getSupplier())
+                    .orElseThrow(() -> new ApplicationException("Supplier Not Found"));
+            vo.setSupplier(supplier);
+
+            // Currency -> BLOCKED real source unconfirmed; same placeholder as
+            // PurchaseDropdownService.getSupplierById
+            boolean isIndia = supplier.getCountry() != null && supplier.getCountry().getCountryName() != null
+                    && supplier.getCountry().getCountryName().toUpperCase().contains(INDIA);
+            vo.setCurrency(isIndia ? "INR" : null);
+        }
+
+        // Purchase Indent No. / Indent Date -> snapshotted server-side from the selected Indent
+        if (dto.getPurchaseIndentId() != null) {
+            PurchaseIndentVO indent = purchaseIndentRepo.findById(dto.getPurchaseIndentId())
+                    .orElseThrow(() -> new ApplicationException("Purchase Indent Not Found"));
+            vo.setPurchaseIndent(indent);
+            vo.setIndentNo(indent.getIndentNo());
+            vo.setIndentDate(indent.getIndentDate());
+        } else {
+            vo.setPurchaseIndent(null);
+            vo.setIndentNo(null);
+            vo.setIndentDate(null);
+        }
+
+        // BLOCKED - gateinverseentry api doesn't exist yet, taken as plain entry for now
+        vo.setGatePassNo(dto.getGatePassNo());
+        vo.setSupplierInvNo(dto.getSupplierInvNo());
+
+        vo.setExcisable(dto.getExcisable());
+        vo.setDate(dto.getDate());
+        vo.setLocation(dto.getLocation());
+
+        if (dto.getTaxCode() != null && dto.getTaxCode() != 0) {
+            vo.setTaxCode(taxDefinitionRepo.findById(dto.getTaxCode())
+                    .orElseThrow(() -> new ApplicationException("Tax Definition Not Found")));
+        }
+
+        vo.setAmountInWords(dto.getAmountInWords());
+        vo.setPaymentTerms(dto.getPaymentTerms());
+        vo.setDeliveryTerms(dto.getDeliveryTerms());
+        vo.setNarration(dto.getNarration());
+        vo.setApproved(dto.getApproved());
+        vo.setNotes(dto.getNotes());
+        vo.setFreight(dto.getFreight());
+
+        vo.setOrgId(dto.getOrgId());
+        vo.setFinancialYear(dto.getFinancialYear());
+        vo.setActive(dto.isActive());
+        vo.setCancelRemarks(dto.getCancelRemarks());
+
+        buildDirectPurchaseDetailsList(dto, vo);
+        buildDirectPurchaseTaxDetailsList(dto, vo);
+
+        // Total Amount -> [CALCULATED] sum of all detail lines' totalAmount + freight - tax grid
+        // is NOT auto-summed into this (tax lines can post to different ledger accounts, so
+        // they're informational, not automatically additive here). If you want tax lines folded
+        // into Total Amount too, tell me the rule and I'll add it.
+        BigDecimal detailsTotal = BigDecimal.ZERO;
+        for (DirectPurchaseDetailsVO d : vo.getDirectPurchaseDetailsVO()) {
+            if (d.getTotalAmount() != null) detailsTotal = detailsTotal.add(d.getTotalAmount());
+        }
+        BigDecimal freight = dto.getFreight() != null ? dto.getFreight() : BigDecimal.ZERO;
+        vo.setTotalAmount(detailsTotal.add(freight));
+    }
+
+    // "Purchase Detail" grid - with calculation
+    private void buildDirectPurchaseDetailsList(DirectPurchaseDTO dto, DirectPurchaseVO vo) throws ApplicationException {
+
+        if (vo.getId() != null && vo.getDirectPurchaseDetailsVO() != null && !vo.getDirectPurchaseDetailsVO().isEmpty()) {
+            directPurchaseDetailsRepo.deleteAll(new ArrayList<>(vo.getDirectPurchaseDetailsVO()));
+            directPurchaseDetailsRepo.flush();
+        }
+        vo.getDirectPurchaseDetailsVO().clear();
+        if (dto.getPurchaseDetails() == null) return;
+
+        for (DirectPurchaseDetailsDTO line : dto.getPurchaseDetails()) {
+
+            DirectPurchaseDetailsVO detailVO = new DirectPurchaseDetailsVO();
+
+            if (line.getItemId() != null && line.getItemId() != 0) {
+                ItemMasterVO item = itemMasterRepo.findById(line.getItemId()).orElseThrow(() -> new ApplicationException("Item Not Found"));
+                detailVO.setItem(item);
+                if (item.getPrimaryUnit() != null) detailVO.setUnit(item.getPrimaryUnit());
+            }
+
+            detailVO.setRateDifference(line.getRateDifference());
+
+            BigDecimal qty = line.getQty() != null ? line.getQty() : BigDecimal.ZERO;
+            BigDecimal rate = line.getRate() != null ? line.getRate() : BigDecimal.ZERO;
+            detailVO.setQty(qty);
+            detailVO.setRate(rate);
+
+            // Amount = Qty * Rate
+            BigDecimal amount = qty.multiply(rate);
+            detailVO.setAmount(amount);
+
+            BigDecimal discount = line.getDiscount() != null ? line.getDiscount() : BigDecimal.ZERO;
+            detailVO.setDiscount(discount);
+
+            // Total Amount = Amount - Discount
+            detailVO.setTotalAmount(amount.subtract(discount));
+
+            detailVO.setDirectPurchaseVO(vo);
+            vo.getDirectPurchaseDetailsVO().add(detailVO);
+        }
+    }
+
+    private void buildDirectPurchaseTaxDetailsList(DirectPurchaseDTO dto, DirectPurchaseVO vo) throws ApplicationException {
+
+        if (vo.getId() != null && vo.getDirectPurchaseTaxDetailsVO() != null && !vo.getDirectPurchaseTaxDetailsVO().isEmpty()) {
+            directPurchaseTaxDetailsRepo.deleteAll(new ArrayList<>(vo.getDirectPurchaseTaxDetailsVO()));
+            directPurchaseTaxDetailsRepo.flush();
+        }
+        vo.getDirectPurchaseTaxDetailsVO().clear();
+        if (dto.getTaxDetails() == null) return;
+
+        for (DirectPurchaseTaxDetailsDTO taxDTO : dto.getTaxDetails()) {
+            DirectPurchaseTaxDetailsVO taxVO = new DirectPurchaseTaxDetailsVO();
+            taxVO.setParticulars(taxDTO.getParticulars());
+            taxVO.setAmount(taxDTO.getAmount());
+            taxVO.setLedgerAccount(resolveLov(taxDTO.getLedgerAccount()));
+            taxVO.setDirectPurchaseVO(vo);
+            vo.getDirectPurchaseTaxDetailsVO().add(taxVO);
+        }
+    }
+
+    @Override
+    public DirectPurchaseResponseDTO getDirectPurchaseById(Long id) throws ApplicationException {
+        DirectPurchaseVO vo = directPurchaseRepo.getDirectPurchaseById(id);
+        if (vo == null) throw new ApplicationException("Direct Purchase Not Found");
+        return buildDirectPurchaseResponse(vo);
+    }
+
+    @Override
+    public List<DirectPurchaseResponseDTO> getDirectPurchaseByOrgId(Long orgId, Long branchId) throws ApplicationException {
+        List<DirectPurchaseVO> list = directPurchaseRepo.getDirectPurchaseByOrgId(orgId, branchId);
+        if (list == null || list.isEmpty()) throw new ApplicationException("Direct Purchase Not Found");
+        List<DirectPurchaseResponseDTO> responseList = new ArrayList<>();
+        for (DirectPurchaseVO vo : list) responseList.add(buildDirectPurchaseResponse(vo));
+        return responseList;
+    }
+
+    @Override
+    public String getDirectPurchaseDocId(Long orgId, String finYear, Long branch) {
+        return directPurchaseRepo.getDirectPurchaseDocId(orgId, SCREEN_CODE_DP);
+    }
+
+    private DirectPurchaseResponseDTO buildDirectPurchaseResponse(DirectPurchaseVO vo) {
+
+        DirectPurchaseResponseDTO dto = new DirectPurchaseResponseDTO();
+        dto.setId(vo.getId());
+
+        if (vo.getBranch() != null) {
+            BranchResponseDTO plantDTO = new BranchResponseDTO();
+            plantDTO.setId(vo.getBranch().getId());
+            plantDTO.setBranchCode(vo.getBranch().getBranchCode());
+            plantDTO.setBranchName(vo.getBranch().getBranchName());
+            dto.setBranch(plantDTO);
+        }
+
+        dto.setBillNo(vo.getBillNo());
+        dto.setBelongsTo(vo.getBelongsTo());
+        dto.setBillDate(vo.getBillDate());
+        dto.setDepartment(toLovDTO(vo.getDepartment()));
+
+        if (vo.getSupplier() != null) {
+            CustomerResponseDetailsDTO supplierDTO = new CustomerResponseDetailsDTO();
+            supplierDTO.setId(vo.getSupplier().getId());
+            supplierDTO.setCustomerName(vo.getSupplier().getCustomerName());
+            dto.setSupplier(supplierDTO);
+        }
+
+        dto.setPurchaseIndentId(vo.getPurchaseIndent() != null ? vo.getPurchaseIndent().getId() : null);
+        dto.setIndentNo(vo.getIndentNo());
+        dto.setIndentDate(vo.getIndentDate());
+
+        dto.setGatePassNo(vo.getGatePassNo());
+        dto.setSupplierInvNo(vo.getSupplierInvNo());
+        dto.setExcisable(vo.getExcisable());
+        dto.setDate(vo.getDate());
+        dto.setLocation(vo.getLocation());
+        dto.setCurrency(vo.getCurrency());
+        dto.setTaxCode(vo.getTaxCode() != null ? vo.getTaxCode().getTaxDescription() : null);
+
+        dto.setTotalAmount(vo.getTotalAmount());
+        dto.setAmountInWords(vo.getAmountInWords());
+        dto.setPaymentTerms(vo.getPaymentTerms());
+        dto.setDeliveryTerms(vo.getDeliveryTerms());
+        dto.setNarration(vo.getNarration());
+        dto.setApproved(vo.getApproved());
+        dto.setNotes(vo.getNotes());
+        dto.setFreight(vo.getFreight());
+
+        dto.setOrgId(vo.getOrgId());
+        dto.setFinancialYear(vo.getFinancialYear());
+        dto.setActive(vo.getActive());
+        dto.setCancelRemarks(vo.getCancelRemarks());
+        dto.setCreatedBy(vo.getCreatedBy());
+        dto.setUpdatedBy(vo.getUpdatedBy());
+
+        List<DirectPurchaseDetailsResponseDTO> detailsList = new ArrayList<>();
+        if (vo.getDirectPurchaseDetailsVO() != null) {
+            for (DirectPurchaseDetailsVO d : vo.getDirectPurchaseDetailsVO()) {
+
+                DirectPurchaseDetailsResponseDTO line = new DirectPurchaseDetailsResponseDTO();
+                line.setId(d.getId());
+
+                if (d.getItem() != null) {
+                    ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
+                    itemDTO.setId(d.getItem().getId());
+                    itemDTO.setItemCode(d.getItem().getItemCode());
+                    itemDTO.setItemDescription(d.getItem().getItemDescription());
+                    line.setItemCode(itemDTO);
+                }
+                if (d.getUnit() != null) {
+                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
+                    unitDTO.setId(d.getUnit().getId());
+                    unitDTO.setPrimaryUnit(d.getUnit().getUnitId());
+                    line.setUnit(unitDTO);
+                }
+
+                line.setRateDifference(d.getRateDifference());
+                line.setQty(d.getQty());
+                line.setRate(d.getRate());
+                line.setAmount(d.getAmount());
+                line.setDiscount(d.getDiscount());
+                line.setTotalAmount(d.getTotalAmount());
+
+                detailsList.add(line);
+            }
+        }
+        dto.setPurchaseDetails(detailsList);
+
+        List<DirectPurchaseTaxDetailsResponseDTO> taxList = new ArrayList<>();
+        if (vo.getDirectPurchaseTaxDetailsVO() != null) {
+            for (DirectPurchaseTaxDetailsVO t : vo.getDirectPurchaseTaxDetailsVO()) {
+                DirectPurchaseTaxDetailsResponseDTO taxDTO = new DirectPurchaseTaxDetailsResponseDTO();
+                taxDTO.setId(t.getId());
+                taxDTO.setParticulars(t.getParticulars());
+                taxDTO.setAmount(t.getAmount());
+                taxDTO.setLedgerAccount(toLovDTO(t.getLedgerAccount()));
+                taxList.add(taxDTO);
+            }
+        }
+        dto.setTaxDetails(taxList);
 
         return dto;
     }

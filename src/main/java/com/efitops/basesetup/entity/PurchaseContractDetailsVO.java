@@ -5,7 +5,6 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,88 +13,84 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "purchase_contract_details")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PurchaseContractDetailsVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasecontractdetailsgen")
-    @SequenceGenerator(name = "purchasecontractdetailsgen", sequenceName = "purchasecontractdetailsseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasecontractdetails_id")
+    @SequenceGenerator(
+            name = "purchasecontractdetailsgen",
+            sequenceName = "purchasecontractdetailsseq",
+            initialValue = 1000000001,
+            allocationSize = 1
+    )
+    @Column(name = "purchasecontractdetails_id", columnDefinition = "BIGINT DEFAULT 0")
     private Long id;
 
-    // Item Code / Item Description -> both resolved from the same ItemMaster record (like Quotation item lines)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "item_id")
     private ItemMasterVO item;
 
-    // HSN/SAC Code -> auto-pulled from the selected Item's hsnCode, stored here for history/audit
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "hsn_id")
     private HsnVO hsnCode;
 
-    // Tax Type -> List Of Values (e.g. SGST/CGST/IGST/EXEMPT) master
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "tax_type_id")
     private ListOfValuesDetailsVO taxType;
 
-    // Tax (%) -> auto-pulled from TaxDefinition master for the selected Tax Type, editable
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "tax_definition_id")
     private TaxDefinitionVO taxDefinition;
 
-    @Column(name = "tax_percent")
+    @Column(name = "tax_percent", precision = 10, scale = 2)
     private BigDecimal taxPercent;
 
-    // Unit -> auto-pulled from Item's primary unit, but can be overridden
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "unit_id")
     private UnitMasterVO unit;
 
-    // entered by user
-    @Column(name = "rate_in_currency")
+    @Column(name = "rate_in_currency", precision = 10, scale = 2)
     private BigDecimal rateInCurrency;
 
-    // entered by user
-    @Column(name = "sgst_rate")
+    @Column(name = "sgst_rate", precision = 10, scale = 2)
     private BigDecimal sgstRate;
 
-    // calculated = rateInCurrency * sgstRate / 100
-    @Column(name = "sgst_amount")
+    @Column(name = "sgst_amount", precision = 10, scale = 2)
     private BigDecimal sgstAmount;
 
-    // entered by user
-    @Column(name = "cgst_rate")
+    @Column(name = "cgst_rate", precision = 10, scale = 2)
     private BigDecimal cgstRate;
 
-    // calculated = rateInCurrency * cgstRate / 100
-    @Column(name = "cgst_amount")
+    @Column(name = "cgst_amount", precision = 10, scale = 2)
     private BigDecimal cgstAmount;
 
-    // entered by user
-    @Column(name = "igst_rate")
+    @Column(name = "igst_rate", precision = 10, scale = 2)
     private BigDecimal igstRate;
 
-    // calculated = rateInCurrency * igstRate / 100
-    @Column(name = "igst_amount")
+    @Column(name = "igst_amount", precision = 10, scale = 2)
     private BigDecimal igstAmount;
 
-    // entered by user, defaults to header Valid From if blank
     @Column(name = "valid_from")
     private LocalDate validFrom;
 
-    // entered by user, defaults to header Valid To if blank
     @Column(name = "valid_to")
     private LocalDate validTo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "purchasecontract_id")
     private PurchaseContractVO purchaseContractVO;
 }

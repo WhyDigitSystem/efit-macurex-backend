@@ -14,12 +14,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PurchaseContractAmendmentDetailsResponseDto {
+	
+	
+	private Long id;
 
     // Item Master
     private PurchaseContractAmendmentDetailsItemResponseDto item;
 
     // Unit Master
-    private UnitMasterResponseDTO unit;
+    private UnitResponseDTO unit;
 
     // Rates
     private BigDecimal oldRate;

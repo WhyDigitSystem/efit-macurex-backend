@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -12,11 +13,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,12 +55,10 @@ public class PurchaseContractAmendmentVO {
 	 private LocalDate docDate;
 	 
 	 @ManyToOne
-	 @JoinColumn(name = "party")
-	 private CustomerVO party;
+	 @JoinColumn(name = "customer")
+	 private CustomerVO customer;
 	 
-	 @Column(name = "party_name")
-	 private String partyName;
-	 
+	
 	 
 	 @Column(name = "contract_no")
 	 private String contractNo;
@@ -85,6 +87,9 @@ public class PurchaseContractAmendmentVO {
 	 @Column(name = "packing_type")
 	 private String packingType;
 
+	 @Column(name = "insurance_amount")
+	 private BigDecimal insuranceAmount;
+	 
 	 @Column(name = "mode_of_despatch")
 	 private String modeOfDespatch;
 
@@ -130,8 +135,15 @@ public class PurchaseContractAmendmentVO {
 
         @Embedded
         private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
+        
+        @OneToMany
+        @JsonManagedReference
+        private  PurchaseContractAmendmentDetailsVO purchaseContractAmendmentDetails;
    
-
+        @OneToMany
+    	@JsonManagedReference
+    	private List<PurchaseContractAmendmentAttachmentVO> purchaseContractAmendmentAttachment;
+        
 
 	    
 	    

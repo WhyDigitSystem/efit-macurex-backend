@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,9 +37,10 @@ public class PurchaseContractAmendmentDetailsVO {
 
     // Parent
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "pcamdbasic_id")
-    private PurchaseContractAmendmentVO purchaseContractAmendment;
 
+    private PurchaseContractAmendmentVO purchaseContractAmendment;
     // Item Code (Normalized with Item Master)
     @ManyToOne
     @JoinColumn(name = "item")

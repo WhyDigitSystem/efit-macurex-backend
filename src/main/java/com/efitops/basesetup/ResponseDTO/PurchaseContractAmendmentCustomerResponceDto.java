@@ -5,7 +5,9 @@ import lombok.Data;
 @Data
 public class PurchaseContractAmendmentCustomerResponceDto {
 	
-	private Long partyId;
-	private String partyName;
+	
+	
+	 private Long id;
+	private String customerName;
 
 }

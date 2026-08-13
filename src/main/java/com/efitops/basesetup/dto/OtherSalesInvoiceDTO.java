@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RejectionInvoiceDTO {
+public class OtherSalesInvoiceDTO {
 
 	private Long id;
 
@@ -76,11 +76,11 @@ public class RejectionInvoiceDTO {
 	private String financialYear;
 
 	private Long branch;
-
+	
 	private String isIgstApplicable;
 
-	private List<RejectionInvoiceDetailsDTO> rejectionInvoiceDetailsDTO;
+	private List<OtherSalesInvoiceDetailsDTO> otherSalesInvoiceDetailsDTO;
 
-	private List<RejectionInvoiceTaxDetailsDTO> rejectionInvoiceTaxDetailsDTO;
+	private List<OtherSalesInvoiceTaxDetailsDTO> otherSalesInvoiceTaxDetailsDTO;
 
 }

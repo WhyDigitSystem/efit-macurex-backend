@@ -20,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
+import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
@@ -363,240 +365,440 @@ public ResponseEntity<ResponseDTO> getSalesReturnByOrgId(
 
 @PutMapping("/createUpdateSalesOrderAmendment")
 public ResponseEntity<ResponseDTO> createUpdateSalesOrderAmendment(
-        @RequestBody SalesOrderAmendmentDTO salesOrderAmendmentDTO) {
+      @RequestBody SalesOrderAmendmentDTO salesOrderAmendmentDTO) {
 
-    String methodName = "createUpdateSalesOrderAmendment";
-    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+  String methodName = "createUpdateSalesOrderAmendment";
+  LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-    Map<String, Object> responseObjectsMap = new HashMap<>();
-    ResponseDTO responseDTO;
+  Map<String, Object> responseObjectsMap = new HashMap<>();
+  ResponseDTO responseDTO;
 
-    try {
+  try {
 
-        Map<String, Object> responseMap =
-                developService.createUpdateSalesOrderAmendment(
-                        salesOrderAmendmentDTO);
+      Map<String, Object> responseMap =
+              developService.createUpdateSalesOrderAmendment(
+                      salesOrderAmendmentDTO);
 
-        responseObjectsMap.put(
-                CommonConstant.STRING_MESSAGE,
-                responseMap.get("message"));
+      responseObjectsMap.put(
+              CommonConstant.STRING_MESSAGE,
+              responseMap.get("message"));
 
-        responseObjectsMap.put(
-                "salesOrderAmendment",
-                responseMap.get("salesOrderAmendmentVO"));
+      responseObjectsMap.put(
+              "salesOrderAmendment",
+              responseMap.get("salesOrderAmendmentVO"));
 
-        responseDTO = createServiceResponse(responseObjectsMap);
+      responseDTO = createServiceResponse(responseObjectsMap);
 
-    } catch (Exception e) {
+  } catch (Exception e) {
 
-        LOGGER.error(
-                UserConstants.ERROR_MSG_METHOD_NAME,
-                methodName,
-                e.getMessage(),
-                e);
+      LOGGER.error(
+              UserConstants.ERROR_MSG_METHOD_NAME,
+              methodName,
+              e.getMessage(),
+              e);
 
-        responseDTO = createServiceResponseError(
-                responseObjectsMap,
-                e.getMessage(),
-                e.getMessage());
-    }
+      responseDTO = createServiceResponseError(
+              responseObjectsMap,
+              e.getMessage(),
+              e.getMessage());
+  }
 
-    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+  LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-    return ResponseEntity.ok(responseDTO);
+  return ResponseEntity.ok(responseDTO);
 }
 
 
 @GetMapping("/getSalesOrderAmendmentById")
 public ResponseEntity<ResponseDTO> getSalesOrderAmendmentById(
-        @RequestParam Long id) {
+      @RequestParam Long id) {
 
-    String methodName = "getSalesOrderAmendmentById()";
-    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+  String methodName = "getSalesOrderAmendmentById()";
+  LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-    String errorMsg = null;
-    Map<String, Object> responseObjectsMap = new HashMap<>();
-    ResponseDTO responseDTO = null;
+  String errorMsg = null;
+  Map<String, Object> responseObjectsMap = new HashMap<>();
+  ResponseDTO responseDTO = null;
 
-    SalesOrderAmendmentResponseDTO salesOrderAmendment = null;
+  SalesOrderAmendmentResponseDTO salesOrderAmendment = null;
 
-    try {
+  try {
 
-        salesOrderAmendment =
-                developService.getSalesOrderAmendmentById(id);
+      salesOrderAmendment =
+              developService.getSalesOrderAmendmentById(id);
 
-    } catch (Exception e) {
+  } catch (Exception e) {
 
-        errorMsg = e.getMessage();
+      errorMsg = e.getMessage();
 
-        LOGGER.error(
-                UserConstants.ERROR_MSG_METHOD_NAME,
-                methodName,
-                errorMsg);
-    }
+      LOGGER.error(
+              UserConstants.ERROR_MSG_METHOD_NAME,
+              methodName,
+              errorMsg);
+  }
 
-    if (StringUtils.isBlank(errorMsg)) {
+  if (StringUtils.isBlank(errorMsg)) {
 
-        responseObjectsMap.put(
-                CommonConstant.STRING_MESSAGE,
-                "Sales Order Amendment information retrieved successfully");
+      responseObjectsMap.put(
+              CommonConstant.STRING_MESSAGE,
+              "Sales Order Amendment information retrieved successfully");
 
-        responseObjectsMap.put(
-                "salesOrderAmendment",
-                salesOrderAmendment);
+      responseObjectsMap.put(
+              "salesOrderAmendment",
+              salesOrderAmendment);
 
-        responseDTO = createServiceResponse(responseObjectsMap);
+      responseDTO = createServiceResponse(responseObjectsMap);
 
-    } else {
+  } else {
 
-        responseDTO = createServiceResponseError(
-                responseObjectsMap,
-                "Sales Order Amendment information retrieval failed",
-                errorMsg);
-    }
+      responseDTO = createServiceResponseError(
+              responseObjectsMap,
+              "Sales Order Amendment information retrieval failed",
+              errorMsg);
+  }
 
-    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+  LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-    return ResponseEntity.ok().body(responseDTO);
+  return ResponseEntity.ok().body(responseDTO);
 }
 
 
 @GetMapping("/getSalesOrderAmendmentByOrgId")
 public ResponseEntity<ResponseDTO> getSalesOrderAmendmentByOrgId(
-        @RequestParam Long orgId,
-        @RequestParam Long branch) {
+      @RequestParam Long orgId,
+      @RequestParam Long branch) {
 
-    String methodName = "getSalesOrderAmendmentByOrgId()";
-    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+  String methodName = "getSalesOrderAmendmentByOrgId()";
+  LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-    String errorMsg = null;
-    Map<String, Object> responseObjectsMap = new HashMap<>();
-    ResponseDTO responseDTO = null;
+  String errorMsg = null;
+  Map<String, Object> responseObjectsMap = new HashMap<>();
+  ResponseDTO responseDTO = null;
 
-    List<SalesOrderAmendmentResponseDTO> salesOrderAmendmentList =
-            new ArrayList<>();
+  List<SalesOrderAmendmentResponseDTO> salesOrderAmendmentList =
+          new ArrayList<>();
 
-    try {
+  try {
 
-        salesOrderAmendmentList =
-                developService.getSalesOrderAmendmentByOrgId(
-                        orgId,
-                        branch);
+      salesOrderAmendmentList =
+              developService.getSalesOrderAmendmentByOrgId(
+                      orgId,
+                      branch);
 
-    } catch (Exception e) {
+  } catch (Exception e) {
 
-        errorMsg = e.getMessage();
+      errorMsg = e.getMessage();
 
-        LOGGER.error(
-                UserConstants.ERROR_MSG_METHOD_NAME,
-                methodName,
-                errorMsg);
-    }
+      LOGGER.error(
+              UserConstants.ERROR_MSG_METHOD_NAME,
+              methodName,
+              errorMsg);
+  }
 
-    if (StringUtils.isBlank(errorMsg)) {
+  if (StringUtils.isBlank(errorMsg)) {
 
-        responseObjectsMap.put(
-                CommonConstant.STRING_MESSAGE,
-                "Sales Order Amendment information retrieved successfully");
+      responseObjectsMap.put(
+              CommonConstant.STRING_MESSAGE,
+              "Sales Order Amendment information retrieved successfully");
 
-        responseObjectsMap.put(
-                "salesOrderAmendmentList",
-                salesOrderAmendmentList);
+      responseObjectsMap.put(
+              "salesOrderAmendmentList",
+              salesOrderAmendmentList);
 
-        responseDTO = createServiceResponse(responseObjectsMap);
+      responseDTO = createServiceResponse(responseObjectsMap);
 
-    } else {
+  } else {
 
-        responseDTO = createServiceResponseError(
-                responseObjectsMap,
-                "Sales Order Amendment information retrieval failed",
-                errorMsg);
-    }
+      responseDTO = createServiceResponseError(
+              responseObjectsMap,
+              "Sales Order Amendment information retrieval failed",
+              errorMsg);
+  }
 
-    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+  LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-    return ResponseEntity.ok().body(responseDTO);
+  return ResponseEntity.ok().body(responseDTO);
 }
 
 
 @GetMapping("/getOrderAcceptanceBySalesOrderAmendment")
 public ResponseEntity<ResponseDTO> getOrderAcceptanceBySalesOrderAmendment(
-        @RequestParam Long orgId,
-        @RequestParam Long branch) {
+      @RequestParam Long orgId,
+      @RequestParam Long branch) {
 
-    String methodName = "getOrderAcceptanceBySalesOrderAmendment()";
-    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+  String methodName = "getOrderAcceptanceBySalesOrderAmendment()";
+  LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-    String errorMsg = null;
-    Map<String, Object> responseObjectsMap = new HashMap<>();
-    ResponseDTO responseDTO;
+  String errorMsg = null;
+  Map<String, Object> responseObjectsMap = new HashMap<>();
+  ResponseDTO responseDTO;
 
-    try {
+  try {
 
-        List<Map<String, Object>> responseList =
-        		developService.getOrderAcceptanceBySalesOrderAmendment(
-                        orgId, branch);
+      List<Map<String, Object>> responseList =
+      		developService.getOrderAcceptanceBySalesOrderAmendment(
+                      orgId, branch);
 
-        responseObjectsMap.put(
-                CommonConstant.STRING_MESSAGE,
-                "Order Acceptance List Fetched Successfully");
+      responseObjectsMap.put(
+              CommonConstant.STRING_MESSAGE,
+              "Order Acceptance List Fetched Successfully");
 
-        responseObjectsMap.put(
-                "orderAcceptanceList",
-                responseList);
+      responseObjectsMap.put(
+              "orderAcceptanceList",
+              responseList);
 
-        responseDTO = createServiceResponse(responseObjectsMap);
+      responseDTO = createServiceResponse(responseObjectsMap);
 
-    } catch (Exception e) {
+  } catch (Exception e) {
 
-        errorMsg = e.getMessage();
+      errorMsg = e.getMessage();
 
-        LOGGER.error(
-                UserConstants.ERROR_MSG_METHOD_NAME,
-                methodName,
-                errorMsg);
+      LOGGER.error(
+              UserConstants.ERROR_MSG_METHOD_NAME,
+              methodName,
+              errorMsg);
 
-        responseDTO = createServiceResponseError(
-                responseObjectsMap,
-                "Order Acceptance List Fetch Failed",
-                errorMsg);
-    }
+      responseDTO = createServiceResponseError(
+              responseObjectsMap,
+              "Order Acceptance List Fetch Failed",
+              errorMsg);
+  }
 
-    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+  LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-    return ResponseEntity.ok().body(responseDTO);
+  return ResponseEntity.ok().body(responseDTO);
 }
 
 
 //@GetMapping("/getItemDropdownBySalesOrderAmendment")
 //public ResponseEntity<ResponseDTO> getItemDropdownBySalesOrderAmendment(
-//        @RequestParam Long salesContractId,
-//        @RequestParam Long orgId,
-//        @RequestParam Long branch) {
+//      @RequestParam Long salesContractId,
+//      @RequestParam Long orgId,
+//      @RequestParam Long branch) {
 //
-//    String methodName = "getItemDropdownBySalesOrderAmendment";
+//  String methodName = "getItemDropdownBySalesOrderAmendment";
 //
-//    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//  LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//  Map<String, Object> responseObjectsMap = new HashMap<>();
+//
+//  ResponseDTO responseDTO;
+//
+//  try {
+//
+//      Map<String, Object> responseMap =
+//      		developService.getItemDropdownBySalesOrderAmendment(
+//      		        salesContractId,
+//      		        orgId,
+//      		        branch);
+//
+//      responseObjectsMap.put(
+//              CommonConstant.STRING_MESSAGE,
+//              responseMap.get("message"));
+//
+//      responseObjectsMap.put(
+//              "itemList",
+//              responseMap.get("itemList"));
+//
+//      responseDTO = createServiceResponse(responseObjectsMap);
+//
+//  } catch (Exception e) {
+//
+//      LOGGER.error(
+//              UserConstants.ERROR_MSG_METHOD_NAME,
+//              methodName,
+//              e.getMessage(),
+//              e);
+//
+//      responseDTO = createServiceResponseError(
+//              responseObjectsMap,
+//              e.getMessage(),
+//              e.getMessage());
+//  }
+//
+//  LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//  return ResponseEntity.ok(responseDTO);
+//}
+
+@GetMapping("/getItemsDetailsbySalesOrderAmendment")
+public ResponseEntity<ResponseDTO> getItemsDetailsbySalesOrderAmendment(
+      @RequestParam String docId,
+      @RequestParam Long orgId,
+      @RequestParam Long branch) {
+
+  String methodName = "getOrderAcceptanceItemsWithAmendment()";
+  LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+  String errorMsg = null;
+  Map<String, Object> responseObjectsMap = new HashMap<>();
+  ResponseDTO responseDTO = null;
+
+  try {
+
+      List<Map<String, Object>> itemDetails =
+      		developService.getOrderAcceptanceItemsWithAmendment(
+                      docId,
+                      orgId,
+                      branch);
+
+      responseObjectsMap.put(
+              CommonConstant.STRING_MESSAGE,
+              "Order Acceptance Item Details Fetched Successfully");
+
+      responseObjectsMap.put(
+              "itemDetails",
+              itemDetails);
+
+      responseDTO = createServiceResponse(responseObjectsMap);
+
+  } catch (Exception e) {
+
+      errorMsg = e.getMessage();
+
+      LOGGER.error(
+              UserConstants.ERROR_MSG_METHOD_NAME,
+              methodName,
+              errorMsg);
+  }
+
+  if (StringUtils.isBlank(errorMsg)) {
+
+      responseDTO = createServiceResponse(responseObjectsMap);
+
+  } else {
+
+      responseDTO = createServiceResponseError(
+              responseObjectsMap,
+              "Order Acceptance Item Details Fetch Failed",
+              errorMsg);
+  }
+
+  LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+  return ResponseEntity.ok().body(responseDTO);
+}
+
+@GetMapping("/getSalesOrderAmdRevisionNo")
+public ResponseEntity<ResponseDTO> getSalesOrderAmdRevisionNo(
+      @RequestParam String salesOrderNo,
+      @RequestParam Long item,
+      @RequestParam Long orgId,
+      @RequestParam Long branch) {
+
+  String methodName = "getSalesOrderAmdRevisionNo()";
+  LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+  String errorMsg = null;
+  Map<String, Object> responseObjectsMap = new HashMap<>();
+  ResponseDTO responseDTO = null;
+
+  try {
+
+      Integer revisionNo =
+      		developService.getSalesOrderAmdRevisionNo(
+                      salesOrderNo,
+                      item,
+                      orgId,
+                      branch);
+
+      responseObjectsMap.put(
+              CommonConstant.STRING_MESSAGE,
+              "Revision No Loaded Successfully");
+
+      responseObjectsMap.put(
+              "revisionNo",
+              revisionNo);
+
+  } catch (Exception e) {
+
+      errorMsg = e.getMessage();
+
+      LOGGER.error(
+              UserConstants.ERROR_MSG_METHOD_NAME,
+              methodName,
+              errorMsg);
+  }
+
+  if (StringUtils.isBlank(errorMsg)) {
+
+      responseDTO = createServiceResponse(responseObjectsMap);
+
+  } else {
+
+      responseDTO = createServiceResponseError(
+              responseObjectsMap,
+              "Revision No Loading Failed",
+              errorMsg);
+  }
+
+  LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+  return ResponseEntity.ok().body(responseDTO);
+}
+
+//Purchase contract amendment
+
+
+//@PostMapping("/createUpdatePurchaseContractAmendment")
+//public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
+//        @RequestBody PurchaseContractAmendmentDto purchaseContractAmendmentDto) {
 //
 //    Map<String, Object> responseObjectsMap = new HashMap<>();
-//
 //    ResponseDTO responseDTO;
 //
 //    try {
 //
-//        Map<String, Object> responseMap =
-//        		developService.getItemDropdownBySalesOrderAmendment(
-//        		        salesContractId,
-//        		        orgId,
-//        		        branch);
+//        Map<String, Object> purchaseContractAmendmentMap =
+//                developService.createUpdatePurchaseContractAmendment(
+//                        purchaseContractAmendmentDto);
 //
 //        responseObjectsMap.put(
 //                CommonConstant.STRING_MESSAGE,
-//                responseMap.get("message"));
+//                purchaseContractAmendmentMap.get(CommonConstant.MESSAGE));
 //
 //        responseObjectsMap.put(
-//                "itemList",
-//                responseMap.get("itemList"));
+//                "purchaseContractAmendmentVO",
+//                purchaseContractAmendmentMap.get(CommonConstant.DATA));
+//
+//        responseDTO = createServiceResponse(responseObjectsMap);
+//
+//    } catch (Exception e) {
+//
+//        e.printStackTrace();
+//
+//        responseDTO = createServiceResponseError(
+//                responseObjectsMap,
+//                e.getMessage(),
+//                e.getMessage());
+//    }
+//
+//    return ResponseEntity.ok(responseDTO);
+//}
+//
+//
+//@GetMapping("/getPurchaseContractAmendmentById")
+//public ResponseEntity<ResponseDTO> getPurchaseContractAmendmentById(
+//        @RequestParam Long id) {
+//
+//    String methodName = "getPurchaseContractAmendmentById()";
+//    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//    Map<String, Object> responseObjectsMap = new HashMap<>();
+//    ResponseDTO responseDTO;
+//
+//    try {
+//
+//        PurchaseContractAmendmentResponseDto response =
+//                developService.getPurchaseContractAmendmentById(id);
+//
+//        responseObjectsMap.put(
+//                CommonConstant.STRING_MESSAGE,
+//                "Purchase Contract Amendment information retrieved successfully");
+//
+//        responseObjectsMap.put(
+//                "purchaseContractAmendmentResponseVO",
+//                response);
 //
 //        responseDTO = createServiceResponse(responseObjectsMap);
 //
@@ -605,12 +807,11 @@ public ResponseEntity<ResponseDTO> getOrderAcceptanceBySalesOrderAmendment(
 //        LOGGER.error(
 //                UserConstants.ERROR_MSG_METHOD_NAME,
 //                methodName,
-//                e.getMessage(),
-//                e);
+//                e.getMessage());
 //
 //        responseDTO = createServiceResponseError(
 //                responseObjectsMap,
-//                e.getMessage(),
+//                "Purchase Contract Amendment information retrieval failed",
 //                e.getMessage());
 //    }
 //
@@ -619,119 +820,58 @@ public ResponseEntity<ResponseDTO> getOrderAcceptanceBySalesOrderAmendment(
 //    return ResponseEntity.ok(responseDTO);
 //}
 
-@GetMapping("/getItemsDetailsbySalesOrderAmendment")
-public ResponseEntity<ResponseDTO> getItemsDetailsbySalesOrderAmendment(
-        @RequestParam String docId,
-        @RequestParam Long orgId,
-        @RequestParam Long branch) {
+// =========================
+// Get By Org Id
+// =========================
 
-    String methodName = "getOrderAcceptanceItemsWithAmendment()";
-    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//@GetMapping("/getPurchaseContractAmendmentByOrgId")
+//public ResponseEntity<ResponseDTO> getPurchaseContractAmendmentByOrgId(
+//        @RequestParam Long orgId,
+//        @RequestParam Long branch) {
+//
+//    String methodName = "getPurchaseContractAmendmentByOrgId()";
+//    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//    Map<String, Object> responseObjectsMap = new HashMap<>();
+//    ResponseDTO responseDTO;
+//
+//    try {
+//
+//        List<PurchaseContractAmendmentResponseDto> response =
+//                developService.getPurchaseContractAmendmentByOrgId(
+//                        orgId, branch);
+//
+//        responseObjectsMap.put(
+//                CommonConstant.STRING_MESSAGE,
+//                "Purchase Contract Amendment information retrieved successfully");
+//
+//        responseObjectsMap.put(
+//                "purchaseContractAmendmentResponseVO",
+//                response);
+//
+//        responseDTO = createServiceResponse(responseObjectsMap);
+//
+//    } catch (Exception e) {
+//
+//        LOGGER.error(
+//                UserConstants.ERROR_MSG_METHOD_NAME,
+//                methodName,
+//                e.getMessage());
+//
+//        responseDTO = createServiceResponseError(
+//                responseObjectsMap,
+//                "Purchase Contract Amendment information retrieval failed",
+//                e.getMessage());
+//    }
+//
+//    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//    return ResponseEntity.ok(responseDTO);
+//}
 
-    String errorMsg = null;
-    Map<String, Object> responseObjectsMap = new HashMap<>();
-    ResponseDTO responseDTO = null;
+//PurchaseContractAmendmentContractNoDropdown
 
-    try {
 
-        List<Map<String, Object>> itemDetails =
-        		developService.getOrderAcceptanceItemsWithAmendment(
-                        docId,
-                        orgId,
-                        branch);
 
-        responseObjectsMap.put(
-                CommonConstant.STRING_MESSAGE,
-                "Order Acceptance Item Details Fetched Successfully");
 
-        responseObjectsMap.put(
-                "itemDetails",
-                itemDetails);
-
-        responseDTO = createServiceResponse(responseObjectsMap);
-
-    } catch (Exception e) {
-
-        errorMsg = e.getMessage();
-
-        LOGGER.error(
-                UserConstants.ERROR_MSG_METHOD_NAME,
-                methodName,
-                errorMsg);
-    }
-
-    if (StringUtils.isBlank(errorMsg)) {
-
-        responseDTO = createServiceResponse(responseObjectsMap);
-
-    } else {
-
-        responseDTO = createServiceResponseError(
-                responseObjectsMap,
-                "Order Acceptance Item Details Fetch Failed",
-                errorMsg);
-    }
-
-    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-    return ResponseEntity.ok().body(responseDTO);
-}
-
-@GetMapping("/getSalesOrderAmdRevisionNo")
-public ResponseEntity<ResponseDTO> getSalesOrderAmdRevisionNo(
-        @RequestParam String salesOrderNo,
-        @RequestParam Long item,
-        @RequestParam Long orgId,
-        @RequestParam Long branch) {
-
-    String methodName = "getSalesOrderAmdRevisionNo()";
-    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-    String errorMsg = null;
-    Map<String, Object> responseObjectsMap = new HashMap<>();
-    ResponseDTO responseDTO = null;
-
-    try {
-
-        Integer revisionNo =
-        		developService.getSalesOrderAmdRevisionNo(
-                        salesOrderNo,
-                        item,
-                        orgId,
-                        branch);
-
-        responseObjectsMap.put(
-                CommonConstant.STRING_MESSAGE,
-                "Revision No Loaded Successfully");
-
-        responseObjectsMap.put(
-                "revisionNo",
-                revisionNo);
-
-    } catch (Exception e) {
-
-        errorMsg = e.getMessage();
-
-        LOGGER.error(
-                UserConstants.ERROR_MSG_METHOD_NAME,
-                methodName,
-                errorMsg);
-    }
-
-    if (StringUtils.isBlank(errorMsg)) {
-
-        responseDTO = createServiceResponse(responseObjectsMap);
-
-    } else {
-
-        responseDTO = createServiceResponseError(
-                responseObjectsMap,
-                "Revision No Loading Failed",
-                errorMsg);
-    }
-
-    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-    return ResponseEntity.ok().body(responseDTO);
-}
 }

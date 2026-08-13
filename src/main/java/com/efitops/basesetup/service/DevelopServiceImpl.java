@@ -34,6 +34,7 @@ import com.efitops.basesetup.dto.EnquiryDetailsReponseDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.EnquiryTermsandCondDTO;
 import com.efitops.basesetup.dto.EnquiryTermsandCondResponseDTO;
+import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDetailsDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDetailsResponseDTO;
@@ -65,6 +66,8 @@ import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.OrderAcceptanceRepo;
+import com.efitops.basesetup.repository.PurchaseContractAmendmentDetailsRepo;
+import com.efitops.basesetup.repository.PurchaseContractAmendmentRepo;
 import com.efitops.basesetup.repository.SalesContractDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleDetailsRepo;
@@ -151,6 +154,16 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	@Autowired
 	private OrderAcceptanceRepo orderAcceptanceRepo;
+	
+	@Autowired
+	private PurchaseContractAmendmentRepo purchaseContractAmendmentRepo;
+	
+	
+	@Autowired
+	private PurchaseContractAmendmentDetailsRepo purchaseContractAmendmentDetailsRepo;
+	
+	
+
 	
 	
 	
@@ -1602,7 +1615,7 @@ public class DevelopServiceImpl implements DevelopService {
 		}
 		
 		
-		//salesorderamendment
+	//salesorderamendment
 		
 		
 		@Override
@@ -1792,13 +1805,47 @@ public class DevelopServiceImpl implements DevelopService {
 
 		        detailDTO.setId(detailVO.getId());
 
+//		        if (detailVO.getItem() != null) {
+//		        	detailDTO.setId(
+//		                    detailVO.getItem().getId());
+//		            detailDTO.setItemCode(
+//		                    detailVO.getItem().getItemCode());
+//
+//		            detailDTO.setItemDescription(
+//		                    detailVO.getItem().getItemDescription());
+//		        }
+		        
+		        
 		        if (detailVO.getItem() != null) {
 
-		            detailDTO.setItemCode(
+		            ItemMasterResponseDetailsDTO itemDTO =
+		                    new ItemMasterResponseDetailsDTO();
+
+		            itemDTO.setId(
+		                    detailVO.getItem().getId());
+
+		            itemDTO.setItemCode(
 		                    detailVO.getItem().getItemCode());
 
-		            detailDTO.setItemDescription(
+		            itemDTO.setItemDescription(
 		                    detailVO.getItem().getItemDescription());
+
+		            // If you need unit
+//		            if (detailVO.getItem().getUnit() != null) {
+//
+//		                UnitMasterResponseDTO unitDTO =
+//		                        new UnitMasterResponseDTO();
+//
+//		                unitDTO.setId(
+//		                        detailVO.getItem().getUnit().getId());
+//
+//		                unitDTO.setDescription(
+//		                        detailVO.getItem().getUnit().getDescription());
+//
+//		                itemDTO.setUnit(unitDTO);
+//		            }
+
+		            detailDTO.setItem(itemDTO);
 		        }
 
 		        detailDTO.setOldQty(detailVO.getOldQty());
@@ -1990,7 +2037,415 @@ public class DevelopServiceImpl implements DevelopService {
 
 		    return revisionNo;
 		}
+				
 		
+//		@Override
+//		public Map<String, Object> createUpdatePurchaseContractAmendment(
+//		        PurchaseContractAmendmentDto purchaseContractAmendmentDto)
+//		        throws ApplicationException {
+//
+//		    Map<String, Object> responseMap = new HashMap<>();
+//
+//		    PurchaseContractAmendmentVO purchaseContractAmendmentVO = null;
+//
+//		    // =========================
+//		    // Create / Update
+//		    // =========================
+//
+//		    if (purchaseContractAmendmentDto.getId() != null) {
+//
+//		        purchaseContractAmendmentVO = purchaseContractAmendmentRepo
+//		                .findById(purchaseContractAmendmentDto.getId())
+//		                .orElseThrow(() ->
+//		                        new ApplicationException("Purchase Contract Amendment not found"));
+//
+//		    } else {
+//
+//		        purchaseContractAmendmentVO = new PurchaseContractAmendmentVO();
+//		    }
+//
+//		    // =========================
+//		    // Branch
+//		    // =========================
+//
+//		    if (purchaseContractAmendmentDto.getBranch() != null) {
+//
+//		        BranchVO branchVO = branchRepo
+//		                .findById(purchaseContractAmendmentDto.getBranch())
+//		                .orElseThrow(() ->
+//		                        new ApplicationException("Branch Not Found"));
+//
+//		        purchaseContractAmendmentVO.setBranch(branchVO);
+//		    }
+//
+//		    // =========================
+//		    // Party
+//		    // =========================
+//
+//		    if (purchaseContractAmendmentDto.getParty() != null) {
+//
+//		        CustomerVO customerVO = customerRepo
+//		                .findById(purchaseContractAmendmentDto.getParty())
+//		                .orElseThrow(() ->
+//		                        new ApplicationException("Customer Not Found"));
+//
+//		        purchaseContractAmendmentVO.setParty(customerVO);
+//		    }
+//
+//		    // =========================
+//		    // Basic Details
+//		    // =========================
+//
+//		    purchaseContractAmendmentVO.setBelongsTo(
+//		            purchaseContractAmendmentDto.getBelongsTo());
+//
+//		    purchaseContractAmendmentVO.setDocId(
+//		            purchaseContractAmendmentDto.getDocId());
+//
+//		    purchaseContractAmendmentVO.setDocDate(
+//		            purchaseContractAmendmentDto.getDocDate());
+//
+//		    purchaseContractAmendmentVO.setPartyName(
+//		            purchaseContractAmendmentDto.getPartyName());
+//
+//		    purchaseContractAmendmentVO.setContractNo(
+//		            purchaseContractAmendmentDto.getContractNo());
+//
+//		    purchaseContractAmendmentVO.setContractDate(
+//		            purchaseContractAmendmentDto.getContractDate());
+//
+//		    purchaseContractAmendmentVO.setRevisionNo(
+//		            purchaseContractAmendmentDto.getRevisionNo());
+//
+//		    purchaseContractAmendmentVO.setRefNo(
+//		            purchaseContractAmendmentDto.getRefNo());
+//
+//		    purchaseContractAmendmentVO.setRefDate(
+//		            purchaseContractAmendmentDto.getRefDate());
+//
+//		    // =========================
+//		    // Summary
+//		    // =========================
+//
+//		    purchaseContractAmendmentVO.setFreightType(
+//		            purchaseContractAmendmentDto.getFreightType());
+//
+//		    purchaseContractAmendmentVO.setPackingType(
+//		            purchaseContractAmendmentDto.getPackingType());
+//
+//		    purchaseContractAmendmentVO.setModeOfDespatch(
+//		            purchaseContractAmendmentDto.getModeOfDespatch());
+//
+//		    purchaseContractAmendmentVO.setTaxDescription(
+//		            purchaseContractAmendmentDto.getTaxDescription());
+//
+//		    purchaseContractAmendmentVO.setPreparedBy(
+//		            purchaseContractAmendmentDto.getPreparedBy());
+//
+//		    purchaseContractAmendmentVO.setAuthorisedBy(
+//		            purchaseContractAmendmentDto.getAuthorisedBy());
+//
+//		    purchaseContractAmendmentVO.setRemarks(
+//		            purchaseContractAmendmentDto.getRemarks());
+//
+//		    // =========================
+//		    // Common Fields
+//		    // =========================
+//
+//		    purchaseContractAmendmentVO.setOrgId(
+//		            purchaseContractAmendmentDto.getOrgId());
+//
+//		    purchaseContractAmendmentVO.setCreatedBy(
+//		            purchaseContractAmendmentDto.getCreatedBy());
+//
+//		    purchaseContractAmendmentVO.setUpdatedBy(
+//		            purchaseContractAmendmentDto.getUpdatedBy());
+//
+//		    purchaseContractAmendmentVO.setActive(
+//		            purchaseContractAmendmentDto.isActive());
+//
+//		    purchaseContractAmendmentVO.setCancel(
+//		            purchaseContractAmendmentDto.isCancel());
+//
+//		    purchaseContractAmendmentVO.setCancelRemarks(
+//		            purchaseContractAmendmentDto.getCancelRemarks());
+//
+//		    // =========================
+//		    // Save Parent
+//		    // =========================
+//
+//		    purchaseContractAmendmentVO =
+//		            purchaseContractAmendmentRepo.save(
+//		                    purchaseContractAmendmentVO);
+//
+//		    // =========================
+//		    // Save Details
+//		    // =========================
+//
+//		    if (purchaseContractAmendmentDto.getDetails() != null
+//		            && !purchaseContractAmendmentDto.getDetails().isEmpty()) {
+//
+//		        List<PurchaseContractAmendmentDetailsVO> detailsList =
+//		                new ArrayList<>();
+//
+//		        for (PurchaseContractAmendmentDetailsDto detailDto
+//		                : purchaseContractAmendmentDto.getDetails()) {
+//
+//		            PurchaseContractAmendmentDetailsVO detailVO =
+//		                    new PurchaseContractAmendmentDetailsVO();
+//
+//		            detailVO.setPurchaseContractAmendment(
+//		                    purchaseContractAmendmentVO);
+//
+//		            // Item
+//
+//		            if (detailDto.getItem() != null) {
+//
+//		                ItemMasterVO itemVO = itemMasterRepo
+//		                        .findById(detailDto.getItem())
+//		                        .orElseThrow(() ->
+//		                                new ApplicationException("Item Not Found"));
+//
+//		                detailVO.setItem(itemVO);
+//		            }
+//
+//		            // Unit
+//
+//		            if (detailDto.getUnit() != null) {
+//
+//		                UnitMasterVO unitVO = unitMasterRepo
+//		                        .findById(detailDto.getUnit())
+//		                        .orElseThrow(() ->
+//		                                new ApplicationException("Unit Not Found"));
+//
+//		                detailVO.setUnit(unitVO);
+//		            }
+//
+//		            detailVO.setOldRate(detailDto.getOldRate());
+//		            detailVO.setNewRate(detailDto.getNewRate());
+//
+//		            detailVO.setValidFrom(detailDto.getValidFrom());
+//		            detailVO.setValidTo(detailDto.getValidTo());
+//		            detailVO.setNewValidFrom(detailDto.getNewValidFrom());
+//		            detailVO.setNewValidTo(detailDto.getNewValidTo());
+//
+//		            detailsList.add(detailVO);
+//		        }
+//
+//		        purchaseContractAmendmentDetailsRepo.saveAll(detailsList);
+//		    }
+//
+//		    // =========================
+//		    // Response
+//		    // =========================
+//
+//		    responseMap.put(CommonConstant.MESSAGE,
+//		            "Purchase Contract Amendment Saved Successfully");
+//
+//		    responseMap.put(CommonConstant.STATUS,
+//		            CommonConstant.SUCCESS);
+//
+//		    responseMap.put(CommonConstant.DATA,
+//		            purchaseContractAmendmentVO.getId());
+//
+//		    return responseMap;
+//		}
+//		
+//		private PurchaseContractAmendmentResponseDto purchaseContractAmendmentResponse(
+//		        PurchaseContractAmendmentVO purchaseContractAmendmentVO) {
+//
+//		    PurchaseContractAmendmentResponseDto responseDto =
+//		            new PurchaseContractAmendmentResponseDto();
+//
+//		    responseDto.setId(purchaseContractAmendmentVO.getId());
+//
+//		    // =========================
+//		    // Branch
+//		    // =========================
+//
+//		    if (purchaseContractAmendmentVO.getBranch() != null) {
+//
+//		        BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+//
+//		        branchResponseDTO.setId(
+//		                purchaseContractAmendmentVO.getBranch().getId());
+//
+//		        branchResponseDTO.setBranchName(
+//		                purchaseContractAmendmentVO.getBranch().getBranchName());
+//
+//		        responseDto.setBranch(branchResponseDTO);
+//		    }
+//
+//		    // =========================
+//		    // Party
+//		    // =========================
+//
+//		    if (purchaseContractAmendmentVO.getParty() != null) {
+//
+//		        PurchaseContractAmendmentCustomerResponceDto customerResponse =
+//		                new PurchaseContractAmendmentCustomerResponceDto();
+//
+//		        customerResponse.setPartyId(
+//		                purchaseContractAmendmentVO.getParty().getId());
+//
+//		        customerResponse.setPartyName(
+//		                purchaseContractAmendmentVO.getParty().getCustomerName());
+//
+//		        responseDto.setParty(customerResponse);
+//		    }
+//
+//		    // =========================
+//		    // Basic Details
+//		    // =========================
+//
+//		    responseDto.setBelongsTo(
+//		            purchaseContractAmendmentVO.getBelongsTo());
+//
+//		    responseDto.setDocId(
+//		            purchaseContractAmendmentVO.getDocId());
+//
+//		    responseDto.setDocDate(
+//		            purchaseContractAmendmentVO.getDocDate());
+//
+//		    responseDto.setContractNo(
+//		            purchaseContractAmendmentVO.getContractNo());
+//
+//		    responseDto.setContractDate(
+//		            purchaseContractAmendmentVO.getContractDate());
+//
+//		    responseDto.setRevisionNo(
+//		            purchaseContractAmendmentVO.getRevisionNo());
+//
+//		    responseDto.setRefNo(
+//		            purchaseContractAmendmentVO.getRefNo());
+//
+//		    responseDto.setRefDate(
+//		            purchaseContractAmendmentVO.getRefDate());
+//
+//		    // =========================
+//		    // Summary
+//		    // =========================
+//
+//		    responseDto.setFreightType(
+//		            purchaseContractAmendmentVO.getFreightType());
+//
+//		    responseDto.setPackingType(
+//		            purchaseContractAmendmentVO.getPackingType());
+//
+//		    responseDto.setModeOfDespatch(
+//		            purchaseContractAmendmentVO.getModeOfDespatch());
+//
+//		    responseDto.setTaxDescription(
+//		            purchaseContractAmendmentVO.getTaxDescription());
+//
+//		    responseDto.setPreparedBy(
+//		            purchaseContractAmendmentVO.getPreparedBy());
+//
+//		    responseDto.setAuthorisedBy(
+//		            purchaseContractAmendmentVO.getAuthorisedBy());
+//
+//		    responseDto.setRemarks(
+//		            purchaseContractAmendmentVO.getRemarks());
+//
+//		    // =========================
+//		    // Common Fields
+//		    // =========================
+//
+//		    responseDto.setOrgId(
+//		            purchaseContractAmendmentVO.getOrgId());
+//
+//		    responseDto.setCreatedBy(
+//		            purchaseContractAmendmentVO.getCreatedBy());
+//
+//		    responseDto.setUpdatedBy(
+//		            purchaseContractAmendmentVO.getUpdatedBy());
+//
+//		    responseDto.setCancelRemarks(
+//		            purchaseContractAmendmentVO.getCancelRemarks());
+//
+//		    responseDto.setActive(
+//		            purchaseContractAmendmentVO.isActive());
+//
+//		    responseDto.setCancel(
+//		            purchaseContractAmendmentVO.isCancel());
+//
+//		    responseDto.setScreenName(
+//		            purchaseContractAmendmentVO.getScreenName());
+//
+//		    responseDto.setScreenCode(
+//		            purchaseContractAmendmentVO.getScreenCode());
+//
+//		    return responseDto;
+//		}
+//		
+//		@Override
+//		public PurchaseContractAmendmentResponseDto getPurchaseContractAmendmentById(Long id)
+//		        throws ApplicationException {
+//
+//		    PurchaseContractAmendmentVO purchaseContractAmendmentVO =
+//		            purchaseContractAmendmentRepo.findById(id)
+//		            .orElseThrow(() ->
+//		                    new ApplicationException("Purchase Contract Amendment Not Found"));
+//
+//		    return purchaseContractAmendmentResponse(purchaseContractAmendmentVO);
+//		}
+//		
+//		@Override
+//		public List<PurchaseContractAmendmentResponseDto> getPurchaseContractAmendmentByOrgId(
+//		        Long orgId, Long branch) throws ApplicationException {
+//
+//		    List<PurchaseContractAmendmentVO> voList =
+//		            purchaseContractAmendmentRepo.findByOrgId(orgId, branch);
+//
+//		    List<PurchaseContractAmendmentResponseDto> responseList =
+//		            new ArrayList<>();
+//
+//		    for (PurchaseContractAmendmentVO vo : voList) {
+//
+//		        responseList.add(
+//		                purchaseContractAmendmentResponse(vo));
+//		    }
+//
+//		    return responseList;
+//		}
+		
+		//PurchaseContractAmendmentContractNoDropdown
+		
+//		@Override
+//		public Map<String, Object> getPurchaseContractAmendmentContractNoDropdown(
+//		        Long orgId,
+//		        Long branch)
+//		        throws ApplicationException {
+//
+//		    Map<String, Object> responseMap = new HashMap<>();
+//
+//		    List<Object[]> objectList =
+//		            purchaseContractAmendmentRepo.getPurchaseContractDropdown(
+//		                    orgId, branch);
+//
+//		    List<PurchaseContractAmendmentContractDropdownResponseDto> responseList =
+//		            new ArrayList<>();
+//
+//		    for (Object[] obj : objectList) {
+//
+//		        PurchaseContractAmendmentContractDropdownResponseDto dto =
+//		                new PurchaseContractAmendmentContractDropdownResponseDto();
+//
+//		        dto.setId(((Number) obj[0]).longValue());
+//		        dto.setContractNo((String) obj[1]);
+//
+//		        responseList.add(dto);
+//		    }
+//
+//		    responseMap.put(CommonConstant.MESSAGE,
+//		            "Purchase Contract Dropdown Loaded Successfully");
+//
+//		    responseMap.put(CommonConstant.STATUS,
+//		            CommonConstant.SUCCESS);
+//
+//		    responseMap.put(CommonConstant.DATA,
+//		            responseList);
+//
+//		    return responseMap;
+//		}
 }
-
-

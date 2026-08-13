@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
@@ -562,6 +564,170 @@ public class TransactionController extends BaseController  {
 	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	// Docket Invoice 
+	@PostMapping("/updateCreateDocketInvoice")
+	public ResponseEntity<ResponseDTO> updateCreateDocketInvoice(
+	        @RequestBody DocketInvoiceDTO docketInvoiceDTO) {
+
+	    String methodName = "updateCreateDocketInvoice()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    String errorMsg = null;
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        Map<String, Object> responseMap =
+	        		transactionService.updateCreateDocketInvoice(docketInvoiceDTO);
+
+	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+	                responseMap.get("message"));
+
+	        responseObjectsMap.put("docketInvoiceVO",
+	                responseMap.get("docketInvoiceVO"));
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                errorMsg,
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getDocketInvoiceById")
+	public ResponseEntity<ResponseDTO> getDocketInvoiceById(
+	        @RequestParam Long id) {
+
+	    String methodName = "getDocketInvoiceById()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    DocketInvoiceResponseDTO docketInvoiceResponseDTO = null;
+
+	    try {
+
+	        docketInvoiceResponseDTO =
+	        		transactionService.getDocketInvoiceById(id);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Docket Invoice retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "docketInvoiceResponseDTO",
+	                docketInvoiceResponseDTO);
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Docket Invoice retrieval failed",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+
+	}
+	
+	
+	@GetMapping("/getDocketInvoiceByOrgId")
+	public ResponseEntity<ResponseDTO> getDocketInvoiceByOrgId(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getDocketInvoiceByOrgId()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    List<DocketInvoiceResponseDTO> docketInvoiceResponseDTO =
+	            new ArrayList<>();
+
+	    try {
+
+	        docketInvoiceResponseDTO =
+	        		transactionService.getDocketInvoiceByOrgId(
+	                        orgId,
+	                        branch);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Docket Invoice retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "docketInvoiceResponseDTO",
+	                docketInvoiceResponseDTO);
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Docket Invoice retrieval failed",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+
 	}
 	
 }

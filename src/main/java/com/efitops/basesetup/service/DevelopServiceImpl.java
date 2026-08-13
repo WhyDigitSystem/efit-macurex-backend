@@ -33,6 +33,7 @@ import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentDetailsRespons
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.EnquiryAttachmentResponseDTO;
@@ -753,7 +754,7 @@ public class DevelopServiceImpl implements DevelopService {
 	    if (enquiryVO.getCustomer() != null) {
 
 	        responseDTO.setCustomerVO(
-	                new CustomerResonse1DTO(
+	                new CustomerResponse1DTO(
 	                        enquiryVO.getCustomer().getId(),
 	                        enquiryVO.getCustomer().getCustomerName()));
 	    }

@@ -1,6 +1,7 @@
 package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import javax.persistence.Entity;
 
@@ -12,13 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DespatchInstructionDetailsDTO {
-	private Long id;
+//	private Long id;
 	private String ordAccpContrNo;
-	private String date;
+	private LocalDate date;
 	private Long item;
 	private Long unit;
 	private String pdi;
-	private String pdiDate;
+	private LocalDate pdiDate;
 	private  String schduleMonth;
 	private BigDecimal plannedQty;
 	private BigDecimal pendingQty;

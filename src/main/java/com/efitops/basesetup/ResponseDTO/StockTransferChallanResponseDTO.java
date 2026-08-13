@@ -19,10 +19,10 @@ import lombok.NoArgsConstructor;
 public class StockTransferChallanResponseDTO {
 	private Long id;
 	private String docID;
-	private LocalDate transferDate;
+	private LocalDate docDate;
 	private BranchResponseDTO branch;
 	private ListOfValuesResponseDTO types;
-	private CustomerResonse1DTO customer;
+	private CustomerResponse1DTO customer;
 	private LocationMasterResponseDTO location;
 	private LocalTime timeOfTranfer;
 	private String stockPosting;
@@ -30,7 +30,7 @@ public class StockTransferChallanResponseDTO {
 	private int noOfPackages;
 	private int otherPackages;
 	private String importLocal;
-	private boolean active;
+	private String active;
 	private Long orgId;
 	private String createdBy;
 	private String cancelRemarks;

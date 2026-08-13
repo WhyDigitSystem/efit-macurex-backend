@@ -3,7 +3,7 @@ package com.efitops.basesetup.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.EnquiryCusContactResponseDTO;
 
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ public class EnquiryResponseDTO {
 	 private Long id;
 	 private String enquiryNo;
 	 private BranchResponseDTO branch;
-	 private CustomerResonse1DTO customerVO;
+	 private CustomerResponse1DTO customerVO;
 	 private EmployeeResponseDTO contactName;
 	 private String enquiryType;
 	 private LocalDate enquiryDate;

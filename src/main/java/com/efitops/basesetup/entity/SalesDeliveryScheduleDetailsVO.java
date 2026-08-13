@@ -41,7 +41,7 @@ public class SalesDeliveryScheduleDetailsVO {
 //    @JoinColumn(name = "sales_contract_details_id")
 //    private SalesContractDetailsVO salesContractDetails;
 
-    @Column(name = "soNocontractno")
+    @Column(name = "so_no_contractno")
     private String soNoContractNo;
     
     @Column(name = "invoicetype")

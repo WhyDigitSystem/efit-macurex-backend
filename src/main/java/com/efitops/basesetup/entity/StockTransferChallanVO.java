@@ -33,16 +33,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StockTransferChallanVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stocktransferchellanbasicgen")
-	@SequenceGenerator(name = "stocktransferchellanbasicgen", sequenceName = "stocktransferchellanbasicseq", initialValue = 1000000001, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stock_transfer_chellan_basicgen")
+	@SequenceGenerator(name = "stock_transfer_chellan_basicgen", sequenceName = "stock_transfer_chellan_basicseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "stock_transfer_chellan_basic_id")
     private Long id;
 	
 	@Column(name = "doc_id")
 	private String docID;
 	
-	@Column(name = "transfer_date")
-	private LocalDate transferDate;
+	@Column(name = "doc_date")
+	private LocalDate docDate;
 	
 	@ManyToOne
 	@JoinColumn(name = "branch")
@@ -120,6 +120,11 @@ public class StockTransferChallanVO {
 	@Column(name = "screen_name",length = 30)
 	private String screenName="Stock Tranfer Challan";
 	
+	
+	@JsonGetter("active")
+	public String getActive() {
+		return active ? "Active" : "In-Active";
+	}
 	
 	@JsonGetter("cancel")
 	public String getCancel() {

@@ -3,7 +3,7 @@ package com.efitops.basesetup.dto;
 import java.time.LocalDate;
 
 
-import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 
@@ -34,7 +34,7 @@ public class CustomerComplaintResponseDTO {
 	private LocalDate complaintDate;
 	private String complaintType;
 	private String customerRefNo;
-	private CustomerResonse1DTO customer;
+	private CustomerResponse1DTO customer;
 	private boolean active;
 	private Long orgId;
 	private String createdBy;

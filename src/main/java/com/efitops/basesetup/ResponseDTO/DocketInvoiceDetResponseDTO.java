@@ -16,7 +16,7 @@ public class DocketInvoiceDetResponseDTO {
 	private int noOfQty;
 	private double weight;
 	private double totalValue;
-	private Double cumulativeValue;
+	private double cumulativeValue;
 	private String mode;
 
 }

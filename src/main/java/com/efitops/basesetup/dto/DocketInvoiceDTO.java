@@ -13,19 +13,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DocketInvoiceDTO {
 	 private Long id;
-	 private String docNo;
+//	 private String docNo;
 	 private Long branch;
 	 private Long transport;
-     private LocalDate docDate;
+//     private LocalDate docDate;
      private String billNo;
      private LocalDate billDate;
  	 private int totalAmount;
  	 private Long orgId;
- 	 private Boolean active;
+ 	 private boolean active;
  	 private String createdBy;
  	 private String cancelRemarks;
  	 private List<DocketInvoiceDetailsDTO> docketInvoiceDetailsDTO;
-	 public String Active;
 		
 	 }
  	 

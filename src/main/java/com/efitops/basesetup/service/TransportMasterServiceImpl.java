@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchCustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchInstDetailsResponseDTO;
@@ -41,6 +42,7 @@ import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PendingQtyResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
@@ -98,15 +100,13 @@ import com.efitops.basesetup.repository.StockTransferChallanRepo;
 import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.security.TokenProvider;
 
-@Service 
+@Service
 public class TransportMasterServiceImpl implements TransportMasterService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransportMasterServiceImpl.class);
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(TransportMasterServiceImpl.class);
 
 	private final TokenProvider tokenProvider;
 	@Autowired
 	CustomerComplaintRepo customerComplaintRepo;
-
 
 	@Autowired
 	CustomerRepo customerRepo;
@@ -114,10 +114,9 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	@Autowired
 	DepartmentRepo departmentRepo;
 
-	
 	@Autowired
 	EmployeeMasterRepo employeeMasterRepo;
-	
+
 	@Autowired
 	private SalesContractAmdRepo salesContractAmendmentRepo;
 
@@ -129,37 +128,37 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	@Autowired
 	private ItemMasterRepo itemMasterRepo;
-	
+
 	@Autowired
 	private SalesContractRepo salesContractRepo;
-	
+
 	@Autowired
 	private DespatchInstructionRepo despatchInstructionRepo;
-	
+
 	@Autowired
 	private DespatchInstructionDetailsRepo despatchInstructionDetailsRepo;
-	
+
 	@Autowired
 	private CurrencyRepo CurrencyRepo;
-	
+
 	@Autowired
 	private LocationRepo locationRepo;
-	
+
 	@Autowired
 	private DocketInvoiceRepo docketInvoiceRepo;
-	
+
 	@Autowired
 	private DocketInvoiceDetRepo docketInvoiceDetRepo;
-	
+
 	@Autowired
 	private TransportRepo transportRepo;
 
 	@Autowired
 	private StockTransferChallanRepo stockTransferChallanRepo;
-	
+
 	@Autowired
 	private ListOfValuesRepo listOfValuesRepo;
-	
+
 	TransportMasterServiceImpl(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
 	}
@@ -168,10 +167,8 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateCustomerComplaint(
-	        CustomerComplaintDTO customerComplaintDTO,
-	        MultipartFile[] images)
-	        throws ApplicationException {
+	public Map<String, Object> updateCreateCustomerComplaint(CustomerComplaintDTO customerComplaintDTO,
+			MultipartFile[] images) throws ApplicationException {
 		CustomerComplaintEntryVO customerComplaintEntryVO = new CustomerComplaintEntryVO();
 		String message;
 
@@ -197,13 +194,13 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		}
 
 		CustomerComplaintEntryVO savedCustomerComplaint = customerComplaintRepo.save(customerComplaintEntryVO);
-		
+
 		// Save Images
 		saveImages(images, savedCustomerComplaint);
 
 		// Reload latest data
 		savedCustomerComplaint = customerComplaintRepo.findById(savedCustomerComplaint.getId())
-		        .orElseThrow(() -> new ApplicationException("Customer Complaint Not Found"));
+				.orElseThrow(() -> new ApplicationException("Customer Complaint Not Found"));
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("message", message);
@@ -268,21 +265,21 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 //		}
 		if (customerComplaintEntryVO.getCustomer() != null) {
 
-		    CustomerResonse1DTO customerDTO = new CustomerResonse1DTO();
+			CustomerResponse1DTO customerDTO = new CustomerResponse1DTO();
 
-		    customerDTO.setId(customerComplaintEntryVO.getCustomer().getId());
-		    customerDTO.setCustomerName(customerComplaintEntryVO.getCustomer().getCustomerName());
+			customerDTO.setId(customerComplaintEntryVO.getCustomer().getId());
+			customerDTO.setCustomerName(customerComplaintEntryVO.getCustomer().getCustomerName());
 
-		    responseDTO.setCustomer(customerDTO);
+			responseDTO.setCustomer(customerDTO);
 		}
 		if (customerComplaintEntryVO.getItem() != null) {
 
-		    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+			ItemResponse1DTO itemDTO = new ItemResponse1DTO();
 
-		    itemDTO.setId(customerComplaintEntryVO.getItem().getId());
-		    itemDTO.setItemCode(customerComplaintEntryVO.getItem().getItemCode());
+			itemDTO.setId(customerComplaintEntryVO.getItem().getId());
+			itemDTO.setItemCode(customerComplaintEntryVO.getItem().getItemCode());
 
-		    responseDTO.setItem(itemDTO);
+			responseDTO.setItem(itemDTO);
 		}
 
 		responseDTO.setOrgId(customerComplaintEntryVO.getOrgId());
@@ -357,53 +354,54 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			customerComplaintEntryVO.setItem(item);
 		}
 	}
-		// ================= IMAGE UPLOAD =================
+
+	// ================= IMAGE UPLOAD =================
 	@Value("${customer.complaint.upload.path}")
 	private String uploadPath;
-	private void saveImages(MultipartFile[] images,
-	        CustomerComplaintEntryVO customerComplaintEntryVO)
-	        throws ApplicationException {
 
-	    if (images == null || images.length == 0) {
-	        return;
-	    }
+	private void saveImages(MultipartFile[] images, CustomerComplaintEntryVO customerComplaintEntryVO)
+			throws ApplicationException {
 
-	    try {
+		if (images == null || images.length == 0) {
+			return;
+		}
 
-	        File folder = new File(uploadPath);
+		try {
 
-	        if (!folder.exists()) {
-	            folder.mkdirs();
-	        }
+			File folder = new File(uploadPath);
 
-	        List<String> imageNames = new ArrayList<>();
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
 
-	        for (MultipartFile image : images) {
+			List<String> imageNames = new ArrayList<>();
 
-	            if (image == null || image.isEmpty()) {
-	                continue;
-	            }
+			for (MultipartFile image : images) {
 
-	            String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
+				if (image == null || image.isEmpty()) {
+					continue;
+				}
 
-	            Path path = Paths.get(uploadPath, fileName);
+				String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
 
-	            try (InputStream inputStream = image.getInputStream()) {
-	                Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-	            }
+				Path path = Paths.get(uploadPath, fileName);
 
-	            imageNames.add(fileName);
-	        }
+				try (InputStream inputStream = image.getInputStream()) {
+					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+				}
 
-	        // Save all image names as comma-separated values
-	        customerComplaintEntryVO.setImage(String.join(",", imageNames));
+				imageNames.add(fileName);
+			}
 
-	        customerComplaintRepo.save(customerComplaintEntryVO);
+			// Save all image names as comma-separated values
+			customerComplaintEntryVO.setImage(String.join(",", imageNames));
 
-	    } catch (IOException e) {
+			customerComplaintRepo.save(customerComplaintEntryVO);
 
-	        throw new ApplicationException("Image Upload Failed : " + e.getMessage());
-	    }
+		} catch (IOException e) {
+
+			throw new ApplicationException("Image Upload Failed : " + e.getMessage());
+		}
 	}
 
 	@Override
@@ -457,11 +455,11 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	// dropdown api
 	@Override
 
-	public Map<String, Object> getPreparedBy(Long orgId, Long branch ,Long departmentId) throws ApplicationException {
+	public Map<String, Object> getPreparedBy(Long orgId, Long branch, Long departmentId) throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> employeeList = employeeMasterRepo.getPreparedBy(orgId , branch , departmentId);
+		List<Object[]> employeeList = employeeMasterRepo.getPreparedBy(orgId, branch, departmentId);
 
 		List<Map<String, Object>> preparedByList = new ArrayList<>();
 
@@ -484,29 +482,28 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	// dropdown for item
 
 	@Override
-	public Map<String, Object> getCustomerComplaintItemDetails(Long orgId, Long branch)
-	        throws ApplicationException {
+	public Map<String, Object> getCustomerComplaintItemDetails(Long orgId, Long branch) throws ApplicationException {
 
-	    List<Object[]> list = itemMasterRepo.getCustomerComplaintItemDetails(orgId, branch);
+		List<Object[]> list = itemMasterRepo.getCustomerComplaintItemDetails(orgId, branch);
 
-	    List<Map<String, Object>> itemList = new ArrayList<>();
+		List<Map<String, Object>> itemList = new ArrayList<>();
 
-	    for (Object[] obj : list) {
+		for (Object[] obj : list) {
 
-	        Map<String, Object> itemMap = new HashMap<>();
+			Map<String, Object> itemMap = new HashMap<>();
 
-	        itemMap.put("id", obj[0]);
-	        itemMap.put("itemCode", obj[1]);
-	        itemMap.put("itemDescription", obj[2]);
-	        itemMap.put("customerPartNo", obj[3]);
+			itemMap.put("id", obj[0]);
+			itemMap.put("itemCode", obj[1]);
+			itemMap.put("itemDescription", obj[2]);
+			itemMap.put("customerPartNo", obj[3]);
 
-	        itemList.add(itemMap);
-	    }
+			itemList.add(itemMap);
+		}
 
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("itemDetails", itemList);
+		Map<String, Object> response = new HashMap<>();
+		response.put("itemDetails", itemList);
 
-	    return response;
+		return response;
 	}
 
 	// dropdown for branch
@@ -514,32 +511,31 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	@Override
 	public Map<String, Object> getAllBranch(Long orgId) throws ApplicationException {
 
-	    List<Object[]> list = branchRepo.getAllBranch(orgId);
+		List<Object[]> list = branchRepo.getAllBranch(orgId);
 
-	    List<Map<String, Object>> responseList = new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : list) {
+		for (Object[] obj : list) {
 
-	        Map<String, Object> map = new HashMap<>();
+			Map<String, Object> map = new HashMap<>();
 
-	        map.put("id", obj[0]);
-	        map.put("branchCode", obj[1]);
-	        map.put("branchName", obj[2]);
+			map.put("id", obj[0]);
+			map.put("branchCode", obj[1]);
+			map.put("branchName", obj[2]);
 
-	        responseList.add(map);
-	    }
+			responseList.add(map);
+		}
 
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("branchList", responseList);
+		Map<String, Object> response = new HashMap<>();
+		response.put("branchList", responseList);
 
-	    return response;
+		return response;
 	}
 
-	
 	@Override
-	public Map<String, Object> getCustomerDetails(Long orgId , Long branch) throws ApplicationException {
+	public Map<String, Object> getCustomerDetails(Long orgId, Long branch) throws ApplicationException {
 
-		List<Object[]> list = customerRepo.getCustomerDetails(orgId,branch);
+		List<Object[]> list = customerRepo.getCustomerDetails(orgId, branch);
 
 		if (list.isEmpty()) {
 			throw new ApplicationException("Customer Not Found");
@@ -557,7 +553,6 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 		return response;
 	}
-
 
 	// Sales Contract amendment
 
@@ -771,7 +766,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 //
 //	    return responseList;
 //	}
-	
+
 //	//dropdown for sales Contract Amendment
 //	
 //	@Override
@@ -815,1071 +810,808 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 //
 //	    return responseMap;
 //	}
-	
-	//Despatch Instruction 
+
+	// Despatch Instruction
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateDespatchInstruction(
-	        DespatchInstructionDTO despatchInstructionDTO)
-	        throws ApplicationException {
+	public Map<String, Object> updateCreateDespatchInstruction(DespatchInstructionDTO despatchInstructionDTO)
+			throws ApplicationException {
 
-	    DespatchInstructionVO despatchInstructionVO = new DespatchInstructionVO();
+		DespatchInstructionVO despatchInstructionVO = new DespatchInstructionVO();
 
-	    String message;
+		String message;
 
-	    if (ObjectUtils.isNotEmpty(despatchInstructionDTO.getId())) {
+		if (ObjectUtils.isNotEmpty(despatchInstructionDTO.getId())) {
 
-	        despatchInstructionVO = despatchInstructionRepo
-	                .findById(despatchInstructionDTO.getId())
-	                .orElseThrow(() ->
-	                        new ApplicationException("Invalid Despatch Instruction Details"));
+			despatchInstructionVO = despatchInstructionRepo.findById(despatchInstructionDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Despatch Instruction Details"));
 
-	        despatchInstructionVO.setUpdated_By(
-	                despatchInstructionDTO.getCreatedBy());
+			despatchInstructionVO.setUpdated_By(despatchInstructionDTO.getCreatedBy());
 
-	        message = "Despatch Instruction Updated Successfully";
+			message = "Despatch Instruction Updated Successfully";
 
-	    } else {
+		} else {
 
-	        despatchInstructionVO.setCreatedBy(
-	                despatchInstructionDTO.getCreatedBy());
+			despatchInstructionVO.setCreatedBy(despatchInstructionDTO.getCreatedBy());
 
-	        despatchInstructionVO.setUpdated_By(
-	                despatchInstructionDTO.getCreatedBy());
+			despatchInstructionVO.setUpdated_By(despatchInstructionDTO.getCreatedBy());
 
-	        message = "Despatch Instruction Created Successfully";
-	    }
+			message = "Despatch Instruction Created Successfully";
+		}
 
-	    createUpdateDespatchInstructionVO(
-	            despatchInstructionDTO,
-	            despatchInstructionVO);
+		createUpdateDespatchInstructionVO(despatchInstructionDTO, despatchInstructionVO);
 
-	    DespatchInstructionVO savedDespatchInstruction =
-	            despatchInstructionRepo.save(despatchInstructionVO);
+		DespatchInstructionVO savedDespatchInstruction = despatchInstructionRepo.save(despatchInstructionVO);
 
-	    Map<String, Object> response = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 
-	    response.put("message", message);
+		response.put("message", message);
 
-	    response.put(
-	            "despatchInstructionVO",
-	            despatchInstructionResponse(savedDespatchInstruction));
+		response.put("despatchInstructionVO", despatchInstructionResponse(savedDespatchInstruction));
 
-	    return response;   
+		return response;
 	}
-	private DespatchInstructionResponseDTO despatchInstructionResponse(
-	        DespatchInstructionVO despatchInstructionVO) {
 
-	    DespatchInstructionResponseDTO responseDTO = new DespatchInstructionResponseDTO();
+	private DespatchInstructionResponseDTO despatchInstructionResponse(DespatchInstructionVO despatchInstructionVO) {
 
-	    responseDTO.setId(despatchInstructionVO.getId());
-	    responseDTO.setDiNo(despatchInstructionVO.getDiNo());
-	    responseDTO.setSchduleNo(despatchInstructionVO.getSchduleNo());
-	    responseDTO.setInvoiceType(despatchInstructionVO.getInvoiceType());
-	    responseDTO.setSchduleDate(despatchInstructionVO.getSchduleDate());
-	    responseDTO.setPaymentTerms(despatchInstructionVO.getPaymentTerms());
-	    responseDTO.setModeOfTransport(despatchInstructionVO.getModeOfTransport());
-	    responseDTO.setNetWeight(despatchInstructionVO.getNetWeight());
-	    responseDTO.setGrossWeight(despatchInstructionVO.getGrossWeight());
-	    responseDTO.setDeliveryInstructions(despatchInstructionVO.getDeliveryInstructions());
-	    responseDTO.setConsignee(despatchInstructionVO.getConsignee());
+		DespatchInstructionResponseDTO responseDTO = new DespatchInstructionResponseDTO();
 
-	    responseDTO.setOrgId(despatchInstructionVO.getOrgId());
-	    responseDTO.setCreatedBy(despatchInstructionVO.getCreatedBy());
-	    responseDTO.setCancelRemarks(despatchInstructionVO.getCancelRemarks());
-	    
-	    if (despatchInstructionVO.getBranch() != null) {
+		responseDTO.setId(despatchInstructionVO.getId());
+		responseDTO.setDocId(despatchInstructionVO.getDocId());
+		responseDTO.setDocDate(despatchInstructionVO.getDocDate());
+		responseDTO.setSchduleNo(despatchInstructionVO.getSchduleNo());
+		responseDTO.setInvoiceType(despatchInstructionVO.getInvoiceType());
+		responseDTO.setSchduleDate(despatchInstructionVO.getSchduleDate());
+		responseDTO.setPaymentTerms(despatchInstructionVO.getPaymentTerms());
+		responseDTO.setModeOfTransport(despatchInstructionVO.getModeOfTransport());
+		responseDTO.setNetWeight(despatchInstructionVO.getNetWeight());
+		responseDTO.setGrossWeight(despatchInstructionVO.getGrossWeight());
+		responseDTO.setDeliveryInstructions(despatchInstructionVO.getDeliveryInstructions());
+		responseDTO.setConsignee(despatchInstructionVO.getConsignee());
 
-	        BranchResponseDTO branchDTO = new BranchResponseDTO();
+		responseDTO.setOrgId(despatchInstructionVO.getOrgId());
+		responseDTO.setCreatedBy(despatchInstructionVO.getCreatedBy());
+		responseDTO.setCancelRemarks(despatchInstructionVO.getCancelRemarks());
 
-	        branchDTO.setId(despatchInstructionVO.getBranch().getId());
-	        branchDTO.setBranchName(despatchInstructionVO.getBranch().getBranchName());
+		if (despatchInstructionVO.getBranch() != null) {
 
-	        responseDTO.setBranch(branchDTO);
-	    }
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
 
-	    if (despatchInstructionVO.getCustomer() != null) {
+			branchDTO.setId(despatchInstructionVO.getBranch().getId());
+			branchDTO.setBranchName(despatchInstructionVO.getBranch().getBranchName());
 
-	        CurrencyResponseDTO customerDTO = new CurrencyResponseDTO();
+			responseDTO.setBranch(branchDTO);
+		}
 
-	        customerDTO.setId(despatchInstructionVO.getCustomer().getId());
-	        customerDTO.setCurrencyName(despatchInstructionVO.getCustomer().getCurrency());
+		if (despatchInstructionVO.getCustomer() != null) {
 
-	        responseDTO.setCurrency(customerDTO);
-	    }
+			CustomerResponse1DTO customerDTO = new CustomerResponse1DTO();
 
-	    if (despatchInstructionVO.getLocation() != null) {
+			customerDTO.setId(despatchInstructionVO.getCustomer().getId());
+			customerDTO.setCustomerName(despatchInstructionVO.getCustomer().getCustomerName());
 
-	        LocationMasterResponseDTO locationDTO = new LocationMasterResponseDTO();
+			responseDTO.setCustomer(customerDTO);
+		}
 
-	        locationDTO.setId(despatchInstructionVO.getLocation().getId());
-	        locationDTO.setLocationName(despatchInstructionVO.getLocation().getLocationName());
+		if (despatchInstructionVO.getLocation() != null) {
 
-	        responseDTO.setLocation(locationDTO);
-	    }
+			LocationMasterResponseDTO locationDTO = new LocationMasterResponseDTO();
 
-	    List<DespatchInstDetailsResponseDTO> detailResponseList = new ArrayList<>();
+			locationDTO.setId(despatchInstructionVO.getLocation().getId());
+			locationDTO.setLocationName(despatchInstructionVO.getLocation().getLocationName());
 
-	    if (despatchInstructionVO.getDetails() != null
-	            && !despatchInstructionVO.getDetails().isEmpty()) {
+			responseDTO.setLocation(locationDTO);
+		}
 
-	        for (DespatchInstructionDetailsVO detailVO : despatchInstructionVO.getDetails()) {
+		List<DespatchInstDetailsResponseDTO> detailResponseList = new ArrayList<>();
 
-	            DespatchInstDetailsResponseDTO detailDTO =
-	                    new DespatchInstDetailsResponseDTO();
+		if (despatchInstructionVO.getDetails() != null && !despatchInstructionVO.getDetails().isEmpty()) {
 
-	            detailDTO.setOrdAccpContrNo(detailVO.getOrdAccpContrNo());
-	            detailDTO.setDate(detailVO.getDate());
+			for (DespatchInstructionDetailsVO detailVO : despatchInstructionVO.getDetails()) {
 
-	            if (detailVO.getItem() != null) {
+				DespatchInstDetailsResponseDTO detailDTO = new DespatchInstDetailsResponseDTO();
 
-	                ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+				detailDTO.setOrdAccpContrNo(detailVO.getOrdAccpContrNo());
+				detailDTO.setDate(detailVO.getDate());
 
-	                itemDTO.setId(detailVO.getItem().getId());
-	                itemDTO.setItemCode(detailVO.getItem().getItemCode());
-	                
+				if (detailVO.getItem() != null) {
 
-	                detailDTO.setItem(itemDTO);
-	            }
+					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
 
-	            
+					itemDTO.setId(detailVO.getItem().getId());
+					itemDTO.setItemCode(detailVO.getItem().getItemCode());
 
-	            detailDTO.setPdi(detailVO.getPdi());
-	            detailDTO.setPdiDate(detailVO.getPdiDate());
-	            detailDTO.setSchduleMonth(detailVO.getSchduleMonth());
-	            detailDTO.setPlannedQty(detailVO.getPlannedQty());
-	            detailDTO.setPendingQty(detailVO.getPendingQty());
-	            detailDTO.setAvailableQty(detailVO.getAvailableQty());
-	            detailDTO.setDescQty(detailVO.getDescQty());
-	            detailDTO.setNoOfPackage(detailVO.getNoOfPackage());
-	            detailDTO.setPackageType(detailVO.getPackageType());
+					detailDTO.setItem(itemDTO);
+				}
 
-	            detailResponseList.add(detailDTO);
-	        }
-	    }
+				detailDTO.setPdi(detailVO.getPdi());
+				detailDTO.setPdiDate(detailVO.getPdiDate());
+				detailDTO.setSchduleMonth(detailVO.getSchduleMonth());
+				detailDTO.setPlannedQty(detailVO.getPlannedQty());
+				detailDTO.setPendingQty(detailVO.getPendingQty());
+				detailDTO.setAvailableQty(detailVO.getAvailableQty());
+				detailDTO.setDescQty(detailVO.getDescQty());
+				detailDTO.setNoOfPackage(detailVO.getNoOfPackage());
+				detailDTO.setPackageType(detailVO.getPackageType());
 
-	    responseDTO.setDespatchInstDetailsResponseDTO(detailResponseList);
+				detailResponseList.add(detailDTO);
+			}
+		}
 
-	    return responseDTO;
+		responseDTO.setDespatchInstDetailsResponseDTO(detailResponseList);
+
+		return responseDTO;
 	}
-	
-	private void createUpdateDespatchInstructionVO(
-	        DespatchInstructionDTO dto,
-	        DespatchInstructionVO despatchInstructionVO)
-	        throws ApplicationException {
 
-	    despatchInstructionVO.setDiNo(dto.getDiNo());
-	    despatchInstructionVO.setSchduleNo(dto.getSchduleNo());
-	    despatchInstructionVO.setInvoiceType(dto.getInvoiceType());
-	    despatchInstructionVO.setSchduleDate(dto.getSchduleDate());
-	    despatchInstructionVO.setPaymentTerms(dto.getPaymentTerms());
-	    despatchInstructionVO.setModeOfTransport(dto.getModeOfTransport());
-	    despatchInstructionVO.setNetWeight(dto.getNetWeight());
-	    despatchInstructionVO.setGrossWeight(dto.getGrossWeight());
-	    despatchInstructionVO.setDeliveryInstructions(dto.getDeliveryInstructions());
-	    despatchInstructionVO.setConsignee(dto.getConsignee());
+	private void createUpdateDespatchInstructionVO(DespatchInstructionDTO dto,
+			DespatchInstructionVO despatchInstructionVO) throws ApplicationException {
 
-	    despatchInstructionVO.setOrgId(dto.getOrgId());
-	    despatchInstructionVO.setActive(dto.getActive());
-	    despatchInstructionVO.setCancelRemarks(dto.getCancelRemarks());
+		despatchInstructionVO.setDocId(dto.getDocId());
+		despatchInstructionVO.setDocDate(dto.getDocDate());
+		despatchInstructionVO.setSchduleNo(dto.getSchduleNo());
+		despatchInstructionVO.setInvoiceType(dto.getInvoiceType());
+		despatchInstructionVO.setSchduleDate(dto.getSchduleDate());
+		despatchInstructionVO.setPaymentTerms(dto.getPaymentTerms());
+		despatchInstructionVO.setModeOfTransport(dto.getModeOfTransport());
+		despatchInstructionVO.setNetWeight(dto.getNetWeight());
+		despatchInstructionVO.setGrossWeight(dto.getGrossWeight());
+		despatchInstructionVO.setDeliveryInstructions(dto.getDeliveryInstructions());
+		despatchInstructionVO.setConsignee(dto.getConsignee());
 
-	    // =========================
-	    // Branch Mapping
-	    // =========================
+		despatchInstructionVO.setOrgId(dto.getOrgId());
+		despatchInstructionVO.setActive(dto.getActive());
+		despatchInstructionVO.setCancelRemarks(dto.getCancelRemarks());
 
-	    if (dto.getBranch() != null && dto.getBranch() != 0) {
+		// =========================
+		// Branch Mapping
+		// =========================
 
-	        BranchVO branch = branchRepo.findById(dto.getBranch())
-	                .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
-	        despatchInstructionVO.setBranch(branch);
-	    }
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
-	    // =========================
-	    // Customer Mapping
-	    // =========================
+			despatchInstructionVO.setBranch(branch);
+		}
 
-	    if (dto.getCustomer() != null && dto.getCustomer() != 0) {
+		// =========================
+		// Customer Mapping
+		// =========================
 
-	        CurrencyVO customer = CurrencyRepo.findById(dto.getCustomer())
-	                .orElseThrow(() -> new ApplicationException("Customer Not Found"));
+		if (dto.getCustomer() != null) {
 
-	        despatchInstructionVO.setCustomer(customer);
-	    }
+			CustomerVO customerVO = customerRepo.findById(dto.getCustomer())
+					.orElseThrow(() -> new ApplicationException("Customer not found"));
 
-	    // =========================
-	    // Location Mapping
-	    // =========================
+			despatchInstructionVO.setCustomer(customerVO);
+		}
+		// =========================
+		// Location Mapping
+		// =========================
 
-	    if (dto.getLocation() != null && dto.getLocation() != 0) {
+		if (dto.getLocation() != null && dto.getLocation() != 0) {
 
-	        LocationVO location = locationRepo.findById(dto.getLocation())
-	                .orElseThrow(() -> new ApplicationException("Location Not Found"));
+			LocationVO location = locationRepo.findById(dto.getLocation())
+					.orElseThrow(() -> new ApplicationException("Location Not Found"));
 
-	        despatchInstructionVO.setLocation(location);
-	    }
+			despatchInstructionVO.setLocation(location);
+		}
 
-	    // ======================================
-	    // Delete Existing Child During Update
-	    // ======================================
+		// ======================================
+		// Delete Existing Child During Update
+		// ======================================
 
-	    if (dto.getId() != null) {
+		if (dto.getId() != null) {
 
-	        List<DespatchInstructionDetailsVO> oldList =
-	                despatchInstructionDetailsRepo
-	                        .findByDespatchInstructionVO(despatchInstructionVO);
+			List<DespatchInstructionDetailsVO> oldList = despatchInstructionDetailsRepo
+					.findByDespatchInstructionVO(despatchInstructionVO);
 
-	        despatchInstructionDetailsRepo.deleteAll(oldList);
-	    }
+			despatchInstructionDetailsRepo.deleteAll(oldList);
+		}
 
-	    // ======================================
-	    // Child Save
-	    // ======================================
+		// ======================================
+		// Child Save
+		// ======================================
 
-	    List<DespatchInstructionDetailsVO> detailList =
-	            new ArrayList<>();
+		List<DespatchInstructionDetailsVO> detailList = new ArrayList<>();
 
-	    if (dto.getDespatchInstructionDetailsDTO() != null
-	            && !dto.getDespatchInstructionDetailsDTO().isEmpty()) {
+		if (dto.getDespatchInstructionDetailsDTO() != null && !dto.getDespatchInstructionDetailsDTO().isEmpty()) {
 
-	        for (DespatchInstructionDetailsDTO detailDTO :
-	                dto.getDespatchInstructionDetailsDTO()) {
+			for (DespatchInstructionDetailsDTO detailDTO : dto.getDespatchInstructionDetailsDTO()) {
 
-	            DespatchInstructionDetailsVO detailVO =
-	                    new DespatchInstructionDetailsVO();
+				DespatchInstructionDetailsVO detailVO = new DespatchInstructionDetailsVO();
 
-	            detailVO.setOrdAccpContrNo(detailDTO.getOrdAccpContrNo());
-	            detailVO.setDate(detailDTO.getDate());
+				detailVO.setOrdAccpContrNo(detailDTO.getOrdAccpContrNo());
+				detailVO.setDate(detailDTO.getDate());
 
-	            if (detailDTO.getItem() != null
-	                    && detailDTO.getItem() != 0) {
+				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
 
-	                ItemMasterVO item =
-	                        itemMasterRepo.findById(detailDTO.getItem())
-	                                .orElseThrow(() ->
-	                                        new ApplicationException("Item Not Found"));
+					ItemMasterVO item = itemMasterRepo.findById(detailDTO.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Not Found"));
 
-	                detailVO.setItem(item);
-	            }
+					detailVO.setItem(item);
+				}
 
-	            
-	            detailVO.setPdi(detailDTO.getPdi());
-	            detailVO.setPdiDate(detailDTO.getPdiDate());
-	            detailVO.setSchduleMonth(detailDTO.getSchduleMonth());
-	            detailVO.setPlannedQty(detailDTO.getPlannedQty());
-	            detailVO.setPendingQty(detailDTO.getPendingQty());
-	            detailVO.setAvailableQty(detailDTO.getAvailableQty());
-	            detailVO.setDescQty(detailDTO.getDescQty());
-	            detailVO.setNoOfPackage(detailDTO.getNoOfPackage());
-	            detailVO.setPackageType(detailDTO.getPackageType());
+				detailVO.setPdi(detailDTO.getPdi());
+				detailVO.setPdiDate(detailDTO.getPdiDate());
+				detailVO.setSchduleMonth(detailDTO.getSchduleMonth());
+				detailVO.setPlannedQty(detailDTO.getPlannedQty());
+				detailVO.setPendingQty(detailDTO.getPendingQty());
+				detailVO.setAvailableQty(detailDTO.getAvailableQty());
+				detailVO.setDescQty(detailDTO.getDescQty());
+				detailVO.setNoOfPackage(detailDTO.getNoOfPackage());
+				detailVO.setPackageType(detailDTO.getPackageType());
 
-	            // Parent Mapping
-	            detailVO.setDespatchInstructionVO(despatchInstructionVO);
+				// Parent Mapping
+				detailVO.setDespatchInstructionVO(despatchInstructionVO);
 
-	            detailList.add(detailVO);
-	        }
+				detailList.add(detailVO);
+			}
 
-	        despatchInstructionVO.setDetails(detailList);
-	    }
+			despatchInstructionVO.setDetails(detailList);
+		}
 	}
+
 	@Override
-	public DespatchInstructionResponseDTO getDespatchInstructionById(Long id)
-	        throws ApplicationException {
+	public DespatchInstructionResponseDTO getDespatchInstructionById(Long id) throws ApplicationException {
 
-	    if (ObjectUtils.isEmpty(id)) {
-	        throw new ApplicationException("Invalid Id");
-	    }
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ApplicationException("Invalid Id");
+		}
 
-	    DespatchInstructionVO despatchInstructionVO = despatchInstructionRepo
-	            .findById(id)
-	            .orElseThrow(() ->
-	                    new ApplicationException("Despatch Instruction Not Found"));
+		DespatchInstructionVO despatchInstructionVO = despatchInstructionRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Despatch Instruction Not Found"));
 
-	    return despatchInstructionResponse(despatchInstructionVO);
+		return despatchInstructionResponse(despatchInstructionVO);
 	}
-	
-	
+
 	@Override
-	public List<DespatchInstructionResponseDTO> getDespatchInstructionByOrgId(
-	        Long orgId,
-	        Long branch)
-	        throws ApplicationException {
+	public List<DespatchInstructionResponseDTO> getDespatchInstructionByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
 
-	    List<DespatchInstructionVO> despatchInstructionList =
-	            despatchInstructionRepo.getDespatchInstructionByOrgId(orgId, branch);
+		List<DespatchInstructionVO> despatchInstructionList = despatchInstructionRepo
+				.getDespatchInstructionByOrgId(orgId, branch);
 
-	    if (despatchInstructionList.isEmpty()) {
-	        throw new ApplicationException("No Despatch Instruction Details Found");
-	    }
+		if (despatchInstructionList.isEmpty()) {
+			throw new ApplicationException("No Despatch Instruction Details Found");
+		}
 
-	    List<DespatchInstructionResponseDTO> responseList = new ArrayList<>();
+		List<DespatchInstructionResponseDTO> responseList = new ArrayList<>();
 
-	    for (DespatchInstructionVO despatchInstructionVO : despatchInstructionList) {
+		for (DespatchInstructionVO despatchInstructionVO : despatchInstructionList) {
 
-	        responseList.add(
-	                despatchInstructionResponse(despatchInstructionVO));
-	    }
+			responseList.add(despatchInstructionResponse(despatchInstructionVO));
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	//Docket Invoice
-	
-	@Override
-	@Transactional
-	public Map<String, Object> updateCreateDocketInvoice(
-	        DocketInvoiceDTO docketInvoiceDTO)
-	        throws ApplicationException {
 
-	    DocketInvoiceVO docketInvoiceVO = new DocketInvoiceVO();
 
-	    String message;
-
-	    if (ObjectUtils.isNotEmpty(docketInvoiceDTO.getId())) {
-
-	        docketInvoiceVO = docketInvoiceRepo
-	                .findById(docketInvoiceDTO.getId())
-	                .orElseThrow(() ->
-	                        new ApplicationException("Invalid Docket Invoice Details"));
-
-	        docketInvoiceVO.setUpdatedBy(
-	                docketInvoiceDTO.getCreatedBy());
-
-	        message = "Docket Invoice Updated Successfully";
-
-	    } else {
-
-	        docketInvoiceVO.setCreatedBy(
-	                docketInvoiceDTO.getCreatedBy());
-
-	        docketInvoiceVO.setUpdatedBy(
-	                docketInvoiceDTO.getCreatedBy());
-
-	        message = "Docket Invoice Created Successfully";
-	    }
-
-	    createUpdateDocketInvoiceVO(
-	            docketInvoiceDTO,
-	            docketInvoiceVO);
-
-	    DocketInvoiceVO savedDocketInvoice =
-	            docketInvoiceRepo.save(docketInvoiceVO);
-
-	    Map<String, Object> response = new HashMap<>();
-
-	    response.put("message", message);
-
-	    response.put(
-	            "docketInvoiceVO",
-	            docketInvoiceResponse(savedDocketInvoice));
-
-	    return response;
-	}
-	
-	private DocketInvoiceResponseDTO docketInvoiceResponse(
-	        DocketInvoiceVO docketInvoiceVO) {
-
-	    DocketInvoiceResponseDTO responseDTO =
-	            new DocketInvoiceResponseDTO();
-
-	    responseDTO.setId(docketInvoiceVO.getId());
-	    responseDTO.setDocNo(docketInvoiceVO.getDocNo());
-	    responseDTO.setDocDate(docketInvoiceVO.getDocDate());
-	    responseDTO.setBillNo(docketInvoiceVO.getBillNo());
-	    responseDTO.setBillDate(docketInvoiceVO.getBillDate());
-	    responseDTO.setTotalAmount(docketInvoiceVO.getTotalAmount());
-	    responseDTO.setOrgId(docketInvoiceVO.getOrgId());
-	    responseDTO.setActive(docketInvoiceVO.isActive());
-	    responseDTO.setCreatedBy(docketInvoiceVO.getCreatedBy());
-	    responseDTO.setCancelRemarks(docketInvoiceVO.getCancelRemarks());
-
-	    // =========================
-	    // Branch Response
-	    // =========================
-
-	    if (docketInvoiceVO.getBranch() != null) {
-
-	        BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
-
-	        branchResponseDTO.setId(docketInvoiceVO.getBranch().getId());
-	        branchResponseDTO.setBranchName(docketInvoiceVO.getBranch().getBranchName());
-
-	        responseDTO.setBranch(branchResponseDTO);
-	    }
-
-	    // =========================
-	    // Transport Response
-	    // =========================
-
-	    if (docketInvoiceVO.getTransport() != null) {
-
-	        TransportResponseDTO transportResponseDTO = new TransportResponseDTO();
-
-	        transportResponseDTO.setId(docketInvoiceVO.getTransport().getId());
-	        transportResponseDTO.setTransportName(docketInvoiceVO.getTransport().getTransportName());
-
-	        responseDTO.setTransport(transportResponseDTO);
-	    }
-
-	    // =========================
-	    // Child Response
-	    // =========================
-
-	    List<DocketInvoiceDetResponseDTO> detailResponseList =
-	            new ArrayList<>();
-
-	    if (docketInvoiceVO.getDetails() != null
-	            && !docketInvoiceVO.getDetails().isEmpty()) {
-
-	        for (DocketInvoiceDetailsVO detailVO
-	                : docketInvoiceVO.getDetails()) {
-
-	            DocketInvoiceDetResponseDTO detailDTO =
-	                    new DocketInvoiceDetResponseDTO();
-
-	            detailDTO.setDocketNo(detailVO.getDocketNo());
-	            detailDTO.setDocketDate(detailVO.getDocketDate());
-	            detailDTO.setInvoiceNo(detailVO.getInvoiceNo());
-	            detailDTO.setNoOfQty(detailVO.getNoOfQty());
-	            detailDTO.setWeight(detailVO.getWeight());
-	            detailDTO.setTotalValue(detailVO.getTotalValue());
-	            detailDTO.setCumulativeValue(detailVO.getCumulativeValue());
-	            detailDTO.setMode(detailVO.getMode());
-
-	            detailResponseList.add(detailDTO);
-	        }
-	    }
-
-	    responseDTO.setDocketInvoiceDetResponseDTO(
-	            detailResponseList);
-
-	    return responseDTO;
-	}
-	
-	private void createUpdateDocketInvoiceVO(
-	        DocketInvoiceDTO dto,
-	        DocketInvoiceVO docketInvoiceVO)
-	        throws ApplicationException {
-
-	    docketInvoiceVO.setDocNo(dto.getDocNo());
-	    docketInvoiceVO.setDocDate(dto.getDocDate());
-	    docketInvoiceVO.setBillNo(dto.getBillNo());
-	    docketInvoiceVO.setBillDate(dto.getBillDate());
-	    docketInvoiceVO.setTotalAmount(dto.getTotalAmount());
-
-	    docketInvoiceVO.setOrgId(dto.getOrgId());
-	    docketInvoiceVO.setActive(dto.getActive());
-	    docketInvoiceVO.setCancelRemarks(dto.getCancelRemarks());
-
-	    // =========================
-	    // Branch Mapping
-	    // =========================
-
-	    if (dto.getBranch() != null && dto.getBranch() != 0) {
-
-	        BranchVO branch = branchRepo.findById(dto.getBranch())
-	                .orElseThrow(() ->
-	                        new ApplicationException("Branch Not Found"));
-
-	        docketInvoiceVO.setBranch(branch);
-	    }
-
-	    // =========================
-	    // Transport Mapping
-	    // =========================
-
-	    if (dto.getTransport() != null && dto.getTransport() != 0) {
-
-	        TransportMasterVO transport = transportRepo
-	                .findById(dto.getTransport())
-	                .orElseThrow(() ->
-	                        new ApplicationException("Transport Not Found"));
-
-	        docketInvoiceVO.setTransport(transport);
-	    }
-
-	    // ======================================
-	    // Delete Existing Child During Update
-	    // ======================================
-
-	    if (dto.getId() != null) {
-
-	        List<DocketInvoiceDetailsVO> oldList =
-	        		docketInvoiceDetRepo
-	                        .findByDocketInvoiceVO(docketInvoiceVO);
-
-	        docketInvoiceDetRepo.deleteAll(oldList);
-	    }
-
-	    // ======================================
-	    // Child Save
-	    // ======================================
-
-	    List<DocketInvoiceDetailsVO> detailList =
-	            new ArrayList<>();
-
-	    if (dto.getDocketInvoiceDetailsDTO() != null
-	            && !dto.getDocketInvoiceDetailsDTO().isEmpty()) {
-
-	        for (DocketInvoiceDetailsDTO detailDTO
-	                : dto.getDocketInvoiceDetailsDTO()) {
-
-	            DocketInvoiceDetailsVO detailVO =
-	                    new DocketInvoiceDetailsVO();
-
-	            detailVO.setDocketNo(detailDTO.getDocketNo());
-	            detailVO.setDocketDate(detailDTO.getDocketDate());
-	            detailVO.setInvoiceNo(detailDTO.getInvoiceNo());
-	            detailVO.setNoOfQty(detailDTO.getNoOfQty());
-	            detailVO.setWeight(detailDTO.getWeight());
-	            detailVO.setTotalValue(detailDTO.getTotalValue());
-	            detailVO.setCumulativeValue(detailDTO.getCumulativeValue());
-	            detailVO.setMode(detailDTO.getMode());
-
-	            // Parent Mapping
-	            detailVO.setDocketInvoiceVO(docketInvoiceVO);
-
-	            detailList.add(detailVO);
-	        }
-
-	        docketInvoiceVO.setDetails(detailList);
-	    }
-	    
-	}
-	@Override
-	public DocketInvoiceResponseDTO getDocketInvoiceById(Long id)
-	        throws ApplicationException {
-
-	    if (ObjectUtils.isEmpty(id)) {
-	        throw new ApplicationException("Invalid Id");
-	    }
-
-	    DocketInvoiceVO docketInvoiceVO = docketInvoiceRepo
-	            .findById(id)
-	            .orElseThrow(() ->
-	                    new ApplicationException("Docket Invoice Not Found"));
-
-	    return docketInvoiceResponse(docketInvoiceVO);
-	}
-	
-	@Override
-	public List<DocketInvoiceResponseDTO> getDocketInvoiceByOrgId(
-	        Long orgId,
-	        Long branch)
-	        throws ApplicationException {
-
-	    List<DocketInvoiceVO> docketInvoiceList =
-	            docketInvoiceRepo.getDocketInvoiceByOrgId(orgId, branch);
-
-	    if (docketInvoiceList.isEmpty()) {
-	        throw new ApplicationException("No Docket Invoice Details Found");
-	    }
-
-	    List<DocketInvoiceResponseDTO> responseList =
-	            new ArrayList<>();
-
-	    for (DocketInvoiceVO docketInvoiceVO : docketInvoiceList) {
-
-	        responseList.add(
-	                docketInvoiceResponse(docketInvoiceVO));
-	    }
-
-	    return responseList;
-	}
-	
 	// Stock Transfer Challan
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateStockTransferChallan(
-	        StockTransferChallanDTO stockTransferChallanDTO)
-	        throws ApplicationException {
+	public Map<String, Object> updateCreateStockTransferChallan(StockTransferChallanDTO stockTransferChallanDTO)
+			throws ApplicationException {
 
-	    StockTransferChallanVO stockTransferChallanVO =
-	            new StockTransferChallanVO();
+		StockTransferChallanVO stockTransferChallanVO = new StockTransferChallanVO();
 
-	    String message;
+		String message;
 
-	    if (ObjectUtils.isNotEmpty(stockTransferChallanDTO.getId())) {
+		if (ObjectUtils.isNotEmpty(stockTransferChallanDTO.getId())) {
 
-	        stockTransferChallanVO = stockTransferChallanRepo
-	                .findById(stockTransferChallanDTO.getId())
-	                .orElseThrow(() ->
-	                        new ApplicationException("Invalid Stock Transfer Challan Details"));
+			stockTransferChallanVO = stockTransferChallanRepo.findById(stockTransferChallanDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Stock Transfer Challan Details"));
 
-	        stockTransferChallanVO.setUpdated_By(
-	                stockTransferChallanDTO.getCreatedBy());
+			stockTransferChallanVO.setUpdated_By(stockTransferChallanDTO.getCreatedBy());
 
-	        message = "Stock Transfer Challan Updated Successfully";
+			message = "Stock Transfer Challan Updated Successfully";
 
-	    } else {
+		} else {
 
-	        stockTransferChallanVO.setCreatedBy(
-	                stockTransferChallanDTO.getCreatedBy());
+			stockTransferChallanVO.setCreatedBy(stockTransferChallanDTO.getCreatedBy());
 
-	        stockTransferChallanVO.setUpdated_By(
-	                stockTransferChallanDTO.getCreatedBy());
+			stockTransferChallanVO.setUpdated_By(stockTransferChallanDTO.getCreatedBy());
 
-	        message = "Stock Transfer Challan Created Successfully";
-	    }
+			message = "Stock Transfer Challan Created Successfully";
+		}
 
-	    createUpdateStockTransferChallanVO(
-	            stockTransferChallanDTO,
-	            stockTransferChallanVO);
+		createUpdateStockTransferChallanVO(stockTransferChallanDTO, stockTransferChallanVO);
 
-	    StockTransferChallanVO savedStockTransferChallan =
-	            stockTransferChallanRepo.save(stockTransferChallanVO);
+		StockTransferChallanVO savedStockTransferChallan = stockTransferChallanRepo.save(stockTransferChallanVO);
 
-	    Map<String, Object> response = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 
-	    response.put("message", message);
+		response.put("message", message);
 
-	    response.put(
-	            "stockTransferChallanVO",
-	            stockTransferChallanResponse(savedStockTransferChallan));
+		response.put("stockTransferChallanVO", stockTransferChallanResponse(savedStockTransferChallan));
 
-	    return response;
+		return response;
 	}
+
 	private StockTransferChallanResponseDTO stockTransferChallanResponse(
-	        StockTransferChallanVO stockTransferChallanVO) {
+			StockTransferChallanVO stockTransferChallanVO) {
 
-	    StockTransferChallanResponseDTO responseDTO =
-	            new StockTransferChallanResponseDTO();
+		StockTransferChallanResponseDTO responseDTO = new StockTransferChallanResponseDTO();
 
-	    // =========================
-	    // Basic Details
-	    // =========================
+		// =========================
+		// Basic Details
+		// =========================
 
-	    responseDTO.setId(stockTransferChallanVO.getId());
-	    responseDTO.setDocID(stockTransferChallanVO.getDocID());
-	    responseDTO.setTransferDate(stockTransferChallanVO.getTransferDate());
-	    responseDTO.setStockPosting(stockTransferChallanVO.getStockPosting());
-	    responseDTO.setDate(stockTransferChallanVO.getDate());
-	    responseDTO.setNoOfPackages(stockTransferChallanVO.getNoOfPackages());
-	    responseDTO.setOtherPackages(stockTransferChallanVO.getOtherPackages());
-	    responseDTO.setImportLocal(stockTransferChallanVO.getImportLocal());
-	    responseDTO.setActive(stockTransferChallanVO.isActive());
-	    responseDTO.setOrgId(stockTransferChallanVO.getOrgId());
-	    responseDTO.setCreatedBy(stockTransferChallanVO.getCreatedBy());
-	    responseDTO.setCancelRemarks(stockTransferChallanVO.getCancelRemarks());
-	    responseDTO.setTimeOfTranfer(stockTransferChallanVO.getTimeOfTranfer());
-	    responseDTO.setTotalInsurance(stockTransferChallanVO.getTotalInsurance());
-	    responseDTO.setTotalFreight(stockTransferChallanVO.getTotalFreight());
-	    responseDTO.setTotalAssVal(stockTransferChallanVO.getTotalAssVal());
-	    responseDTO.setModeOfTransport(stockTransferChallanVO.getModeOfTransport());
-	    responseDTO.setSalesTax(stockTransferChallanVO.getSalesTax());
-	    responseDTO.setGrossAmount(stockTransferChallanVO.getGrossAmount());
-	    responseDTO.setAmountInWords(stockTransferChallanVO.getAmountInWords());
-	    responseDTO.setDeliverTo(stockTransferChallanVO.getDeliverTo());
-	    responseDTO.setPaymentTerms(stockTransferChallanVO.getPaymentTerms());
-	    responseDTO.setNarration(stockTransferChallanVO.getNarration());
-	    
-	    // =========================
-	    // Branch Response
-	    // =========================
+		responseDTO.setId(stockTransferChallanVO.getId());
+		responseDTO.setDocID(stockTransferChallanVO.getDocID());
+		responseDTO.setDocDate(stockTransferChallanVO.getDocDate());
+		responseDTO.setStockPosting(stockTransferChallanVO.getStockPosting());
+		responseDTO.setDate(stockTransferChallanVO.getDate());
+		responseDTO.setNoOfPackages(stockTransferChallanVO.getNoOfPackages());
+		responseDTO.setOtherPackages(stockTransferChallanVO.getOtherPackages());
+		responseDTO.setImportLocal(stockTransferChallanVO.getImportLocal());
+		responseDTO.setActive(stockTransferChallanVO.getActive());
+		responseDTO.setOrgId(stockTransferChallanVO.getOrgId());
+		responseDTO.setCreatedBy(stockTransferChallanVO.getCreatedBy());
+		responseDTO.setCancelRemarks(stockTransferChallanVO.getCancelRemarks());
+		responseDTO.setTimeOfTranfer(stockTransferChallanVO.getTimeOfTranfer());
+		responseDTO.setTotalInsurance(stockTransferChallanVO.getTotalInsurance());
+		responseDTO.setTotalFreight(stockTransferChallanVO.getTotalFreight());
+		responseDTO.setTotalAssVal(stockTransferChallanVO.getTotalAssVal());
+		responseDTO.setModeOfTransport(stockTransferChallanVO.getModeOfTransport());
+		responseDTO.setSalesTax(stockTransferChallanVO.getSalesTax());
+		responseDTO.setGrossAmount(stockTransferChallanVO.getGrossAmount());
+		responseDTO.setAmountInWords(stockTransferChallanVO.getAmountInWords());
+		responseDTO.setDeliverTo(stockTransferChallanVO.getDeliverTo());
+		responseDTO.setPaymentTerms(stockTransferChallanVO.getPaymentTerms());
+		responseDTO.setNarration(stockTransferChallanVO.getNarration());
 
-	    if (stockTransferChallanVO.getBranch() != null) {
+		// =========================
+		// Branch Response
+		// =========================
 
-	        BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+		if (stockTransferChallanVO.getBranch() != null) {
 
-	        branchResponseDTO.setId(stockTransferChallanVO.getBranch().getId());
-	        branchResponseDTO.setBranchName(
-	                stockTransferChallanVO.getBranch().getBranchName());
+			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
 
-	        responseDTO.setBranch(branchResponseDTO);
-	    }
+			branchResponseDTO.setId(stockTransferChallanVO.getBranch().getId());
+			branchResponseDTO.setBranchName(stockTransferChallanVO.getBranch().getBranchName());
 
-	    // =========================
-	    // List Of Values Response
-	    // =========================
+			responseDTO.setBranch(branchResponseDTO);
+		}
 
-	    if (stockTransferChallanVO.getTypes() != null) {
+		// =========================
+		// List Of Values Response
+		// =========================
 
-	        ListOfValuesResponseDTO listOfValuesResponseDTO =
-	                new ListOfValuesResponseDTO();
+		if (stockTransferChallanVO.getTypes() != null) {
 
-	        listOfValuesResponseDTO.setId(
-	                stockTransferChallanVO.getTypes().getId());
+			ListOfValuesResponseDTO listOfValuesResponseDTO = new ListOfValuesResponseDTO();
 
-	        listOfValuesResponseDTO.setListCode(
-	                stockTransferChallanVO.getTypes().getListCode());
+			listOfValuesResponseDTO.setId(stockTransferChallanVO.getTypes().getId());
 
-	        listOfValuesResponseDTO.setListDescription(
-	                stockTransferChallanVO.getTypes().getListDescription());
+			listOfValuesResponseDTO.setListCode(stockTransferChallanVO.getTypes().getListCode());
 
-	        responseDTO.setTypes(listOfValuesResponseDTO);
-	    }
+			listOfValuesResponseDTO.setListDescription(stockTransferChallanVO.getTypes().getListDescription());
 
-	    // =========================
-	    // Customer Response
-	    // =========================
+			responseDTO.setTypes(listOfValuesResponseDTO);
+		}
 
-	    if (stockTransferChallanVO.getCustomer() != null) {
+		// =========================
+		// Customer Response
+		// =========================
 
-	        CustomerResonse1DTO customerResponseDTO =
-	                new CustomerResonse1DTO();
+		if (stockTransferChallanVO.getCustomer() != null) {
 
-	        customerResponseDTO.setId(
-	                stockTransferChallanVO.getCustomer().getId());
+			CustomerResponse1DTO customerResponseDTO = new CustomerResponse1DTO();
 
-	        customerResponseDTO.setCustomerName(
-	                stockTransferChallanVO.getCustomer().getCustomerName());
+			customerResponseDTO.setId(stockTransferChallanVO.getCustomer().getId());
 
-	        responseDTO.setCustomer(customerResponseDTO);
-	    }
+			customerResponseDTO.setCustomerName(stockTransferChallanVO.getCustomer().getCustomerName());
 
-	    // =========================
-	    // Location Response
-	    // =========================
+			responseDTO.setCustomer(customerResponseDTO);
+		}
 
-	    if (stockTransferChallanVO.getLocation() != null) {
+		// =========================
+		// Location Response
+		// =========================
 
-	        LocationMasterResponseDTO locationResponseDTO =
-	                new LocationMasterResponseDTO();
+		if (stockTransferChallanVO.getLocation() != null) {
 
-	        locationResponseDTO.setId(
-	                stockTransferChallanVO.getLocation().getId());
+			LocationMasterResponseDTO locationResponseDTO = new LocationMasterResponseDTO();
 
-	        locationResponseDTO.setLocationName(
-	                stockTransferChallanVO.getLocation().getLocationName());
+			locationResponseDTO.setId(stockTransferChallanVO.getLocation().getId());
 
-	        responseDTO.setLocation(locationResponseDTO);
-	    }
+			locationResponseDTO.setLocationName(stockTransferChallanVO.getLocation().getLocationName());
 
-	    return responseDTO;
+			responseDTO.setLocation(locationResponseDTO);
+		}
+
+		return responseDTO;
 	}
-	private void createUpdateStockTransferChallanVO(
-	        StockTransferChallanDTO dto,
-	        StockTransferChallanVO stockTransferChallanVO)
-	        throws ApplicationException {
 
-	    stockTransferChallanVO.setDocID(dto.getDocID());
-	    stockTransferChallanVO.setTransferDate(dto.getTransferDate());
-	    stockTransferChallanVO.setStockPosting(dto.getStockPosting());
-	    stockTransferChallanVO.setDate(dto.getDate());
-	    stockTransferChallanVO.setNoOfPackages(dto.getNoOfPackages());
-	    stockTransferChallanVO.setOtherPackages(dto.getOtherPackages());
-	    stockTransferChallanVO.setImportLocal(dto.getImportLocal());
-	    stockTransferChallanVO.setActive(dto.isActive());
-	    stockTransferChallanVO.setOrgId(dto.getOrgId());
-	    stockTransferChallanVO.setCancelRemarks(dto.getCancelRemarks());
-	    stockTransferChallanVO.setTimeOfTranfer(dto.getTimeOfTranfer());
-	    stockTransferChallanVO.setTotalInsurance(dto.getTotalInsurance());
-	    stockTransferChallanVO.setTotalFreight(dto.getTotalFreight());
-	    stockTransferChallanVO.setTotalAssVal(dto.getTotalAssVal());
-	    stockTransferChallanVO.setModeOfTransport(dto.getModeOfTransport());
-	    stockTransferChallanVO.setSalesTax(dto.getSalesTax());
-	    stockTransferChallanVO.setGrossAmount(dto.getGrossAmount());
-	    stockTransferChallanVO.setAmountInWords(dto.getAmountInWords());
-	    stockTransferChallanVO.setDeliverTo(dto.getDeliverTo());
-	    stockTransferChallanVO.setPaymentTerms(dto.getPaymentTerms());
-	    stockTransferChallanVO.setNarration(dto.getNarration());	    
-	    
-	    //branch mapping
-	    if (dto.getBranch() != null && dto.getBranch() != 0) {
+	private void createUpdateStockTransferChallanVO(StockTransferChallanDTO dto,
+			StockTransferChallanVO stockTransferChallanVO) throws ApplicationException {
 
-	        BranchVO branchVO =
-	                branchRepo.findById(dto.getBranch())
-	                .orElseThrow(() ->
-	                        new ApplicationException("branch Not Found"));
+		stockTransferChallanVO.setDocID(dto.getDocID());
+		stockTransferChallanVO.setDocDate(dto.getDocDate());
+		stockTransferChallanVO.setStockPosting(dto.getStockPosting());
+		stockTransferChallanVO.setDate(dto.getDate());
+		stockTransferChallanVO.setNoOfPackages(dto.getNoOfPackages());
+		stockTransferChallanVO.setOtherPackages(dto.getOtherPackages());
+		stockTransferChallanVO.setImportLocal(dto.getImportLocal());
+		stockTransferChallanVO.setActive(dto.isActive());
+		stockTransferChallanVO.setOrgId(dto.getOrgId());
+		stockTransferChallanVO.setCancelRemarks(dto.getCancelRemarks());
+		stockTransferChallanVO.setTimeOfTranfer(dto.getTimeOfTranfer());
+		stockTransferChallanVO.setTotalInsurance(dto.getTotalInsurance());
+		stockTransferChallanVO.setTotalFreight(dto.getTotalFreight());
+		stockTransferChallanVO.setTotalAssVal(dto.getTotalAssVal());
+		stockTransferChallanVO.setModeOfTransport(dto.getModeOfTransport());
+		stockTransferChallanVO.setSalesTax(dto.getSalesTax());
+		stockTransferChallanVO.setGrossAmount(dto.getGrossAmount());
+		stockTransferChallanVO.setAmountInWords(dto.getAmountInWords());
+		stockTransferChallanVO.setDeliverTo(dto.getDeliverTo());
+		stockTransferChallanVO.setPaymentTerms(dto.getPaymentTerms());
+		stockTransferChallanVO.setNarration(dto.getNarration());
 
-	        stockTransferChallanVO.setBranch(branchVO);
-	    }
+		// branch mapping
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("branch Not Found"));
 
-	    // =========================
-	    // List Of Values Mapping
-	    // =========================
+			stockTransferChallanVO.setBranch(branchVO);
+		}
 
-	    if (dto.getTypes() != null && dto.getTypes() != 0) {
+		// =========================
+		// List Of Values Mapping
+		// =========================
 
-	        ListOfValuesVO listOfValuesVO =
-	                listOfValuesRepo.findById(dto.getTypes())
-	                .orElseThrow(() ->
-	                        new ApplicationException("List Of Values Not Found"));
+		if (dto.getTypes() != null && dto.getTypes() != 0) {
 
-	        stockTransferChallanVO.setTypes(listOfValuesVO);
-	    }
+			ListOfValuesVO listOfValuesVO = listOfValuesRepo.findById(dto.getTypes())
+					.orElseThrow(() -> new ApplicationException("List Of Values Not Found"));
 
-	    // =========================
-	    // Customer Mapping
-	    // =========================
+			stockTransferChallanVO.setTypes(listOfValuesVO);
+		}
 
-	    if (dto.getCustomer() != null && dto.getCustomer() != 0) {
+		// =========================
+		// Customer Mapping
+		// =========================
 
-	        CustomerVO customerVO =
-	                customerRepo.findById(dto.getCustomer())
-	                .orElseThrow(() ->
-	                        new ApplicationException("Customer Not Found"));
+		if (dto.getCustomer() != null && dto.getCustomer() != 0) {
 
-	        stockTransferChallanVO.setCustomer(customerVO);
-	    }
+			CustomerVO customerVO = customerRepo.findById(dto.getCustomer())
+					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
-	    // =========================
-	    // Location Mapping
-	    // =========================
+			stockTransferChallanVO.setCustomer(customerVO);
+		}
 
-	    if (dto.getLocation() != null && dto.getLocation() != 0) {
+		// =========================
+		// Location Mapping
+		// =========================
 
-	        LocationVO locationVO =
-	                locationRepo.findById(dto.getLocation())
-	                .orElseThrow(() ->
-	                        new ApplicationException("Location Not Found"));
+		if (dto.getLocation() != null && dto.getLocation() != 0) {
 
-	        stockTransferChallanVO.setLocation(locationVO);
-	    }
+			LocationVO locationVO = locationRepo.findById(dto.getLocation())
+					.orElseThrow(() -> new ApplicationException("Location Not Found"));
+
+			stockTransferChallanVO.setLocation(locationVO);
+		}
 	}
-	
+
 	@Override
-	public StockTransferChallanResponseDTO getStockTransferChallanById(
-	        Long id)
-	        throws ApplicationException {
+	public StockTransferChallanResponseDTO getStockTransferChallanById(Long id) throws ApplicationException {
 
-	    if (ObjectUtils.isEmpty(id)) {
-	        throw new ApplicationException("Invalid Id");
-	    }
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ApplicationException("Invalid Id");
+		}
 
-	    StockTransferChallanVO stockTransferChallanVO =
-	            stockTransferChallanRepo.findById(id)
-	            .orElseThrow(() ->
-	                    new ApplicationException("Stock Transfer Challan Not Found"));
+		StockTransferChallanVO stockTransferChallanVO = stockTransferChallanRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Stock Transfer Challan Not Found"));
 
-	    return stockTransferChallanResponse(stockTransferChallanVO);
+		return stockTransferChallanResponse(stockTransferChallanVO);
 	}
+
 	@Override
-	public List<StockTransferChallanResponseDTO> getStockTransferChallanByOrgId(
-	        Long orgId,
-	        Long branch)
-	        throws ApplicationException {
+	public List<StockTransferChallanResponseDTO> getStockTransferChallanByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
 
-	    List<StockTransferChallanVO> stockTransferChallanList =
-	            stockTransferChallanRepo.getStockTransferChallanByOrgId(orgId, branch);
+		List<StockTransferChallanVO> stockTransferChallanList = stockTransferChallanRepo
+				.getStockTransferChallanByOrgId(orgId, branch);
 
-	    if (stockTransferChallanList.isEmpty()) {
-	        throw new ApplicationException("No Stock Transfer Challan Details Found");
-	    }
+		if (stockTransferChallanList.isEmpty()) {
+			throw new ApplicationException("No Stock Transfer Challan Details Found");
+		}
 
-	    List<StockTransferChallanResponseDTO> responseList =
-	            new ArrayList<>();
+		List<StockTransferChallanResponseDTO> responseList = new ArrayList<>();
 
-	    for (StockTransferChallanVO stockTransferChallanVO : stockTransferChallanList) {
+		for (StockTransferChallanVO stockTransferChallanVO : stockTransferChallanList) {
 
-	        responseList.add(
-	                stockTransferChallanResponse(stockTransferChallanVO));
-	    }
+			responseList.add(stockTransferChallanResponse(stockTransferChallanVO));
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	//drowdown for stocktransfercustomer
+
+	// drowdown for stocktransfercustomer
 	@Override
 	public Map<String, Object> getStockTransferCustomer() throws ApplicationException {
 
-	    List<Object[]> customerList = customerRepo.getStockTransferCustomer();
+		List<Object[]> customerList = customerRepo.getStockTransferCustomer();
 
-	    if (customerList == null || customerList.isEmpty()) {
-	        throw new ApplicationException("No Customer Found");
-	    }
+		if (customerList == null || customerList.isEmpty()) {
+			throw new ApplicationException("No Customer Found");
+		}
 
-	    List<StockTransferCustomerResponseDTO> responseList = new ArrayList<>();
+		List<StockTransferCustomerResponseDTO> responseList = new ArrayList<>();
 
-	    for (Object[] obj : customerList) {
+		for (Object[] obj : customerList) {
 
-	    	StockTransferCustomerResponseDTO dto = new StockTransferCustomerResponseDTO();
+			StockTransferCustomerResponseDTO dto = new StockTransferCustomerResponseDTO();
 
-	    	dto.setId(((Number) obj[0]).longValue());
-	    	dto.setCustomerCode((String) obj[1]);
-	    	dto.setCustomerName((String) obj[2]);
-	    	dto.setAccountName((String) obj[3]);
+			dto.setId(((Number) obj[0]).longValue());
+			dto.setCustomerCode((String) obj[1]);
+			dto.setCustomerName((String) obj[2]);
+			dto.setAccountName((String) obj[3]);
 
-	    	GSTStateResponseDTO gstStateResponseDTO = new GSTStateResponseDTO();
+			GSTStateResponseDTO gstStateResponseDTO = new GSTStateResponseDTO();
 
-	    	gstStateResponseDTO.setId(((Number)obj[4]).longValue());
-	    	gstStateResponseDTO.setStateCode((String)obj[5]);
-	    	gstStateResponseDTO.setStateName((String)obj[6]);
-	    	gstStateResponseDTO.setGstStateId((String)obj[7]);
+			gstStateResponseDTO.setId(((Number) obj[4]).longValue());
+			gstStateResponseDTO.setStateCode((String) obj[5]);
+			gstStateResponseDTO.setStateName((String) obj[6]);
+			gstStateResponseDTO.setGstStateId((String) obj[7]);
 
-	    	dto.setGstState(gstStateResponseDTO);
+			dto.setGstState(gstStateResponseDTO);
 
-	    	dto.setGstApplicable((Boolean)obj[8]);
-	    	dto.setGstNo((String)obj[9]);
-	    	
-	    	responseList.add(dto);
-	    }
-	    	
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("message", "Customer Dropdown Retrieved Successfully");
-	    response.put("customerList", responseList);
+			dto.setGstApplicable((Boolean) obj[8]);
+			dto.setGstNo((String) obj[9]);
 
-	    return response;
-	    
-}
-	//despatch instruction sheduleno dropdown
-	@Override
-	public Map<String, Object> getDespatchScheduleNo(String scheduleNo,Long branch, Long orgId)
-	        throws ApplicationException {
+			responseList.add(dto);
+		}
 
-	    Map<String, Object> responseMap = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", "Customer Dropdown Retrieved Successfully");
+		response.put("customerList", responseList);
 
-	    List<Object[]> list =
-	            despatchInstructionRepo.getDespatchScheduleNo(scheduleNo,branch,orgId);
+		return response;
 
-	    List<DespatchInstructionScheduleResponseDTO> responseList = new ArrayList<>();
-
-	    for (Object[] obj : list) {
-
-	        DespatchInstructionScheduleResponseDTO dto =
-	                new DespatchInstructionScheduleResponseDTO();
-
-	        dto.setSalesDeliveryScheduleId(((Number) obj[0]).longValue());
-	        dto.setDlvNo((String) obj[1]);
-	        dto.setSalesDeliveryScheduleDetailsId(((Number) obj[2]).longValue());
-	        dto.setItemId(((Number) obj[3]).longValue());
-	        dto.setItemCode((String) obj[4]);
-	        dto.setItemDescription((String) obj[5]);
-	        dto.setActualPlannedQty(
-	                obj[6] != null ? ((Number) obj[6]).doubleValue() : 0.0);
-	        dto.setDispatchedQty(
-	                obj[7] != null ? (BigDecimal) obj[7] : BigDecimal.ZERO);
-	        dto.setBalanceQty(
-	                obj[8] != null ? (BigDecimal) obj[8] : BigDecimal.ZERO);
-
-	        responseList.add(dto);
-	    }
-
-	    responseMap.put("message", "Data Fetched Successfully");
-	    responseMap.put("scheduleBalanceList", responseList);
-
-	    return responseMap;
 	}
-	
+
+	// despatch instruction sheduleno dropdown
+	@Override
+	public Map<String, Object> getScheduleNoDropdownForDespatchInstruction(Long customer, String monthYear, Long branch, Long orgId)
+			throws ApplicationException {
+
+		Map<String, Object> responseMap = new HashMap<>();
+
+		List<Object[]> scheduleList = despatchInstructionRepo.getScheduleNoDropdownForDespatchInstruction(customer, monthYear, branch, orgId);
+
+		List<DespatchInstructionScheduleResponseDTO> responseDTOList = new ArrayList<>();
+
+		for (Object[] obj : scheduleList) {
+
+			DespatchInstructionScheduleResponseDTO dto = new DespatchInstructionScheduleResponseDTO();
+
+			 dto.setSalesDeliveryScheduleId(
+		                obj[0] != null ? ((Number) obj[0]).longValue() : null);
+
+		        dto.setDlvNo(
+		                obj[1] != null ? (String) obj[1] : null);
+
+		        dto.setDlvdate(
+		                obj[2] != null ? ((java.sql.Date) obj[2]).toLocalDate() : null);
+
+		        dto.setInvoiceType(
+		                obj[4] != null ? (String) obj[4] : null);
+
+		        dto.setMonthOfSchedule(
+		                obj[3] != null
+		                        ? Month.valueOf(((String) obj[3]).toUpperCase())
+		                        : null);
+
+			responseDTOList.add(dto);
+		}
+
+		responseMap.put("message", "Data Fetched Successfully");
+
+		responseMap.put("scheduleBalanceList", responseDTOList);
+
+		return responseMap;
+	}
+
 	// despatch customer dropdown
 	@Override
-	public Map<String, Object> getDespatchCustomer(Long branch,Long orgId) throws ApplicationException {
+	public Map<String, Object> getDespatchCustomer(Long branch, Long orgId) throws ApplicationException {
 
-	    Map<String, Object> responseMap = new HashMap<>();
+		Map<String, Object> responseMap = new HashMap<>();
 
-	    List<Object[]> customerList =
-	            customerRepo.getDespatchCustomer(branch,orgId);
+		List<Object[]> customerList = customerRepo.getDespatchCustomer(branch, orgId);
 
-	    List<DespatchCustomerResponseDTO> responseDTOList = new ArrayList<>();
+		List<DespatchCustomerResponseDTO> responseDTOList = new ArrayList<>();
 
-	    for (Object[] obj : customerList) {
+		for (Object[] obj : customerList) {
 
-	    	DespatchCustomerResponseDTO dto = new DespatchCustomerResponseDTO();
+			DespatchCustomerResponseDTO dto = new DespatchCustomerResponseDTO();
 
-	        dto.setId(((Number) obj[0]).longValue());
+			dto.setId(obj[0] != null ? ((Number) obj[0]).longValue() : 0L);
 
-	        dto.setCustomerCode((String) obj[1]);
+			dto.setCustomerCode(obj[1] != null ? (String) obj[1] : "");
 
-	        dto.setCustomerName((String) obj[2]);
+			dto.setCustomerName(obj[2] != null ? (String) obj[2] : "");
 
-	        dto.setPartyCreditLimit(
-	                obj[3] != null ? (BigDecimal) obj[3] : BigDecimal.ZERO);
+			dto.setPartyCreditLimit(
+					obj[3] != null ? BigDecimal.valueOf(((Number) obj[3]).doubleValue()) : BigDecimal.ZERO);
 
-	        responseDTOList.add(dto);
-	    }
+			responseDTOList.add(dto);
+		}
 
-	    responseMap.put("message", "Customer List Fetched Successfully");
-	    responseMap.put("customerList", responseDTOList);
+		responseMap.put("message", "Customer List Fetched Successfully");
 
-	    return responseMap;
+		responseMap.put("customerList", responseDTOList);
+
+		return responseMap;
 	}
+
 	// despatch contract no dropdown
 	@Override
-	public Map<String, Object> getDespatchSalesContract(Long customerId,Long branch,Long orgId)
-	        throws ApplicationException {
+	public Map<String, Object> getDespatchSalesContract(Long customerId, Long branch, Long orgId)
+			throws ApplicationException {
 
-	    Map<String, Object> responseMap = new HashMap<>();
+		Map<String, Object> responseMap = new HashMap<>();
 
-	    List<Object[]> salesContractList =
-	    		despatchInstructionRepo.getDespatchSalesContract(customerId,branch,orgId);
+		List<Object[]> salesContractList = despatchInstructionRepo.getDespatchSalesContract(customerId, branch, orgId);
 
-	    List<DespatchSalesContractResponseDTO> responseDTOList = new ArrayList<>();
+		List<DespatchSalesContractResponseDTO> responseDTOList = new ArrayList<>();
 
-	    for (Object[] obj : salesContractList) {
+		for (Object[] obj : salesContractList) {
 
-	    	DespatchSalesContractResponseDTO dto =
-	    	        new DespatchSalesContractResponseDTO();
+			DespatchSalesContractResponseDTO dto = new DespatchSalesContractResponseDTO();
 
-	    	dto.setCustomerContractNo((String) obj[0]);
+			dto.setCustomerContractNo(obj[0] != null ? (String) obj[0] : "");
 
-	    	dto.setContractDate((LocalDate) obj[1]);
+			dto.setContractDate(obj[1] != null ? ((java.sql.Date) obj[1]).toLocalDate() : null);
 
-	    	dto.setSalesContractId(((Number)obj[2]).longValue());
+			dto.setSalesContractId(obj[2] != null ? ((Number) obj[2]).longValue() : 0L);
 
-	    	dto.setInvoiceType((String)obj[3]);
+			dto.setInvoiceType(obj[3] != null ? (String) obj[3] : "");
 
-	        responseDTOList.add(dto);
-	    }
+			responseDTOList.add(dto);
+		}
 
-	    responseMap.put("message", "Sales Contract List Fetched Successfully");
-	    responseMap.put("salesContractList", responseDTOList);
+		responseMap.put("message", "Sales Contract List Fetched Successfully");
 
-	    return responseMap;
+		responseMap.put("salesContractList", responseDTOList);
+
+		return responseMap;
 	}
-	//Despacth Item dropdown 
+
+	// Despacth Item dropdown
 	@Override
-	public Map<String, Object> getDespatchItems(Long branch ,Long orgId)
-	        throws ApplicationException {
+	public Map<String, Object> getDespatchItems(Long branch, Long orgId) throws ApplicationException {
 
-	    Map<String, Object> responseMap = new HashMap<>();
+		Map<String, Object> responseMap = new HashMap<>();
 
-	    List<Object[]> itemList = itemMasterRepo.getDespatchItems(branch,orgId);
+		List<Object[]> itemList = itemMasterRepo.getDespatchItems(branch, orgId);
 
-	    List<ItemResponseDTO> responseDTOList = new ArrayList<>();
+		List<ItemResponseDTO> responseDTOList = new ArrayList<>();
 
-	    for (Object[] obj : itemList) {
+		for (Object[] obj : itemList) {
 
-	        ItemResponseDTO dto = new ItemResponseDTO();
+			ItemResponseDTO dto = new ItemResponseDTO();
 
-	        dto.setId(((Number) obj[0]).longValue());
+			dto.setId(obj[0] != null ? ((Number) obj[0]).longValue() : 0L);
 
-	        dto.setItemCode((String) obj[1]);
+			dto.setItemCode(obj[1] != null ? (String) obj[1] : "");
 
-	        dto.setItemDescription((String) obj[2]);
-	        
-	        UnitResponseDTO unitDTO = new UnitResponseDTO();
-	        unitDTO.setId(((Number) obj[3]).longValue());
-	        
-	        
+			dto.setItemDescription(obj[2] != null ? (String) obj[2] : "");
 
-	        responseDTOList.add(dto);
-	    }
+			UnitResponseDTO unitDTO = new UnitResponseDTO();
 
-	    responseMap.put("message", "Finished Goods Item List Fetched Successfully");
-	    responseMap.put("itemList", responseDTOList);
+			unitDTO.setId(obj[3] != null ? ((Number) obj[3]).longValue() : 0L);
 
-	    return responseMap;
+			dto.setUnit(unitDTO);
+
+			responseDTOList.add(dto);
+		}
+
+		responseMap.put("message", "Finished Goods Item List Fetched Successfully");
+
+		responseMap.put("itemList", responseDTOList);
+
+		return responseMap;
 	}
-	
+
 	// Despatch Schedulemonth
 	@Override
-	public Map<String, Object> getDespatchScheduleMonth(
-	        Long itemId,
-	        Long branch,
-	        Long orgId) throws ApplicationException {
+	public Map<String, Object> getDespatchScheduleMonth(Long itemId, Long branch, Long orgId)
+			throws ApplicationException {
 
-	    Map<String, Object> responseMap = new HashMap<>();
+		Map<String, Object> responseMap = new HashMap<>();
 
-	    List<Object[]> scheduleMonthList =
-	            despatchInstructionRepo.getDespatchScheduleMonth(itemId, branch, orgId);
+		List<Object[]> scheduleMonthList = despatchInstructionRepo.getDespatchScheduleMonth(itemId, branch, orgId);
 
-	    List<DespatchScheduleMonthResponseDTO> responseDTOList = new ArrayList<>();
+		List<DespatchScheduleMonthResponseDTO> responseDTOList = new ArrayList<>();
 
-	    for (Object[] obj : scheduleMonthList) {
+		for (Object[] obj : scheduleMonthList) {
 
-	    	DespatchScheduleMonthResponseDTO dto = new DespatchScheduleMonthResponseDTO();
+			DespatchScheduleMonthResponseDTO dto = new DespatchScheduleMonthResponseDTO();
 
-	        dto.setId(((Number) obj[0]).longValue());
+			dto.setId(obj[0] != null ? ((Number) obj[0]).longValue() : 0L);
 
-	        dto.setMonthOfSchedule((String) obj[1]);
+			dto.setMonthOfSchedule(obj[1] != null ? (String) obj[1] : "");
 
-	        responseDTOList.add(dto);
-	    }
+			responseDTOList.add(dto);
+		}
 
-	    responseMap.put("message", "Schedule Month Fetched Successfully");
-	    responseMap.put("scheduleMonthList", responseDTOList);
+		responseMap.put("message", "Schedule Month Fetched Successfully");
 
-	    return responseMap;
+		responseMap.put("scheduleMonthList", responseDTOList);
+
+		return responseMap;
 	}
+	// despatch planned qty
+
+	@Override
+	public Map<String, Object> getDespatchPlannedQty(Long itemId, Long branch, Long orgId) throws ApplicationException {
+
+		Map<String, Object> responseMap = new HashMap<>();
+
+		BigDecimal plannedQty = despatchInstructionRepo.getDespatchPlannedQty(itemId, branch, orgId);
+
+		if (plannedQty == null) {
+			plannedQty = BigDecimal.ZERO;
+		}
+
+		responseMap.put("message", "Planned Quantity Fetched Successfully");
+
+		responseMap.put("plannedQty", plannedQty);
+
+		return responseMap;
+	}
+	// pending qty
+//	@Override
+//	public Map<String, Object> getDespatchPendingQty(Long itemId,
+//	                                         String month,
+//	                                          Long branch,
+//	                                         Long orgId,
+//	                                         Long customerId)
+//	        throws ApplicationException {
+//
+//	    Map<String, Object> responseMap = new HashMap<>();
+//
+//	    List<Object[]> pendingQtyList =
+//	            despatchInstructionRepo.getDespatchPendingQty(
+//	                    itemId,
+//	                    month,
+//	                    branch,
+//	                    orgId,
+//	                    customerId);
+//
+//	    List<PendingQtyResponseDTO> responseDTOList = new ArrayList<>();
+//
+//	    for (Object[] obj : pendingQtyList) {
+//
+//	        PendingQtyResponseDTO dto = new PendingQtyResponseDTO();
+//
+//	        dto.setPendingQty(
+//	                obj[0] != null
+//	                        ? ((Number) obj[0]).intValue()
+//	                        : 0);
+//
+//	        dto.setSno(
+//	                obj[1] != null
+//	                        ? ((Number) obj[1]).intValue()
+//	                        : 0);
+//
+//	        responseDTOList.add(dto);
+//	    }
+//
+//	    responseMap.put(
+//	            "message",
+//	            "Pending Quantity Fetched Successfully");
+//
+//	    responseMap.put(
+//	            "pendingQtyList",
+//	            responseDTOList);
+//
+//	    return responseMap;
+//	}
+
 }

@@ -72,12 +72,7 @@ public interface TransportMasterService {
 	List<DespatchInstructionResponseDTO> getDespatchInstructionByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
 	
-	//Docket Invoice
-	Map<String, Object> updateCreateDocketInvoice(DocketInvoiceDTO docketInvoiceDTO) throws ApplicationException;
-
-	DocketInvoiceResponseDTO getDocketInvoiceById(Long id) throws ApplicationException;
-
-	List<DocketInvoiceResponseDTO> getDocketInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException;
+	
 
 	//StockTransferChallan
 	Map<String, Object> updateCreateStockTransferChallan(StockTransferChallanDTO stockTransferChallanDTO) throws ApplicationException;
@@ -92,7 +87,6 @@ public interface TransportMasterService {
 	
 
 	//despatch instruction schedule no dropdown
-	Map<String, Object> getDespatchScheduleNo(String scheduleNo,Long branch,Long orgId) throws ApplicationException;
 
 	Map<String, Object> getDespatchCustomer(Long branch, Long orgId) throws ApplicationException;
 
@@ -102,6 +96,15 @@ public interface TransportMasterService {
 	Map<String, Object> getDespatchItems(Long branch, Long orgId) throws ApplicationException;
 
 	Map<String, Object> getDespatchScheduleMonth(Long itemId, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getDespatchPlannedQty(Long itemId, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getScheduleNoDropdownForDespatchInstruction(Long customer, String monthYear,Long branch, Long orgId)
+			throws ApplicationException;
+
+
+//	Map<String, Object> getDespatchPendingQty(Long itemId, String month, Long branch, Long orgId, Long customerId)
+//			throws ApplicationException;
 
 
 

@@ -1,5 +1,6 @@
 package com.efitops.basesetup.entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +31,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DespatchInstructionVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "despatchbasicgen")
-	@SequenceGenerator(name = "despatchbasicgen", sequenceName = "despatchbasicseq", initialValue = 1000000001, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "despatch_basicgen")
+	@SequenceGenerator(name = "despatch_basicgen", sequenceName = "despatch_basicseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "despatch_basic_id")
 	private Long id;
 	
@@ -39,12 +40,15 @@ public class DespatchInstructionVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 	
-	@Column(name = "di_no")
-	private String diNo;
+	@Column(name = "doc_id")
+	private String docId;
+	
+	@Column(name = "doc_date")
+	private LocalDate docDate;
 	
 	@ManyToOne
 	@JoinColumn(name = "custumer")
-	private CurrencyVO customer;
+	private CustomerVO customer;
 	
 	@Column(name = "schdule_no")
 	private String schduleNo;

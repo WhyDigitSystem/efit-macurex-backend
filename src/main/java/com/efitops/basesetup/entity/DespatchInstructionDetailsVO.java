@@ -1,6 +1,7 @@
 package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -36,7 +37,7 @@ public class DespatchInstructionDetailsVO {
 	private String ordAccpContrNo;
 	
 	@Column(name = "date")
-	private String date;
+	private LocalDate date;
 	
 	@ManyToOne
 	@JoinColumn(name = "item_id")
@@ -46,7 +47,7 @@ public class DespatchInstructionDetailsVO {
 	private String pdi;
 	
 	@Column(name = "pdi_date")
-	private String pdiDate;
+	private LocalDate pdiDate;
 	
 	@Column(name = "schdule_month")
 	private  String schduleMonth;
@@ -60,7 +61,7 @@ public class DespatchInstructionDetailsVO {
 	@Column(name = "available_qty")
 	private BigDecimal availableQty;
 	
-	@Column(name = "descQty")
+	@Column(name = "desc_Qty")
 	private BigDecimal descQty;
 	
 	@Column(name = "no_of_package")

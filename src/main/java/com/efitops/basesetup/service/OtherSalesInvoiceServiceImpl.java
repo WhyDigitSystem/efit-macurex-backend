@@ -528,7 +528,7 @@ public class OtherSalesInvoiceServiceImpl implements OtherSalesInvoiceService {
 			DespatchInstructionResponseDocIdDTO customerDTO = new DespatchInstructionResponseDocIdDTO();
 
 			customerDTO.setId(otherSalesInvoiceVO.getDiNo().getId());
-			customerDTO.setDocId(otherSalesInvoiceVO.getDiNo().getDiNo());
+			customerDTO.setDocId(otherSalesInvoiceVO.getDiNo().getDocId());
 
 			responseDTO.setDiNo(customerDTO);
 		}

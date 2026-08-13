@@ -1,5 +1,6 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
@@ -16,8 +17,9 @@ import lombok.NoArgsConstructor;
 public class DespatchInstructionResponseDTO {
 	private Long id;
 	private BranchResponseDTO branch;
-	private String diNo;
-	private CurrencyResponseDTO currency;
+	private String docId;
+	private LocalDate docDate;
+	private CustomerResponse1DTO customer;
 	private String schduleNo;
 	private String invoiceType;
 	private String schduleDate;

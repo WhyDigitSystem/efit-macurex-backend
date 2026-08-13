@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchCustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchInstDetailsResponseDTO;
@@ -41,6 +41,7 @@ import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PendingQtyResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
@@ -268,7 +269,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 //		}
 		if (customerComplaintEntryVO.getCustomer() != null) {
 
-		    CustomerResonse1DTO customerDTO = new CustomerResonse1DTO();
+			CustomerResponse1DTO customerDTO = new CustomerResponse1DTO();
 
 		    customerDTO.setId(customerComplaintEntryVO.getCustomer().getId());
 		    customerDTO.setCustomerName(customerComplaintEntryVO.getCustomer().getCustomerName());
@@ -873,7 +874,8 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    DespatchInstructionResponseDTO responseDTO = new DespatchInstructionResponseDTO();
 
 	    responseDTO.setId(despatchInstructionVO.getId());
-	    responseDTO.setDiNo(despatchInstructionVO.getDiNo());
+	    responseDTO.setDocId(despatchInstructionVO.getDocId());
+	    responseDTO.setDocDate(despatchInstructionVO.getDocDate());
 	    responseDTO.setSchduleNo(despatchInstructionVO.getSchduleNo());
 	    responseDTO.setInvoiceType(despatchInstructionVO.getInvoiceType());
 	    responseDTO.setSchduleDate(despatchInstructionVO.getSchduleDate());
@@ -900,12 +902,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	    if (despatchInstructionVO.getCustomer() != null) {
 
-	        CurrencyResponseDTO customerDTO = new CurrencyResponseDTO();
+	    	CustomerResponse1DTO customerDTO = new CustomerResponse1DTO();
 
 	        customerDTO.setId(despatchInstructionVO.getCustomer().getId());
-	        customerDTO.setCurrencyName(despatchInstructionVO.getCustomer().getCurrency());
+	        customerDTO.setCustomerName(despatchInstructionVO.getCustomer().getCustomerName());
 
-	        responseDTO.setCurrency(customerDTO);
+	        responseDTO.setCustomer(customerDTO);
 	    }
 
 	    if (despatchInstructionVO.getLocation() != null) {
@@ -930,7 +932,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	            detailDTO.setOrdAccpContrNo(detailVO.getOrdAccpContrNo());
 	            detailDTO.setDate(detailVO.getDate());
-
+	        
 	            if (detailVO.getItem() != null) {
 
 	                ItemResponse1DTO itemDTO = new ItemResponse1DTO();
@@ -942,8 +944,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	                detailDTO.setItem(itemDTO);
 	            }
 
-	            
-
+	   
 	            detailDTO.setPdi(detailVO.getPdi());
 	            detailDTO.setPdiDate(detailVO.getPdiDate());
 	            detailDTO.setSchduleMonth(detailVO.getSchduleMonth());
@@ -959,7 +960,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    }
 
 	    responseDTO.setDespatchInstDetailsResponseDTO(detailResponseList);
-
+	
 	    return responseDTO;
 	}
 	
@@ -968,7 +969,8 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	        DespatchInstructionVO despatchInstructionVO)
 	        throws ApplicationException {
 
-	    despatchInstructionVO.setDiNo(dto.getDiNo());
+	    despatchInstructionVO.setDocId(dto.getDocId());
+	    despatchInstructionVO.setDocDate(dto.getDocDate());
 	    despatchInstructionVO.setSchduleNo(dto.getSchduleNo());
 	    despatchInstructionVO.setInvoiceType(dto.getInvoiceType());
 	    despatchInstructionVO.setSchduleDate(dto.getSchduleDate());
@@ -999,14 +1001,14 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    // Customer Mapping
 	    // =========================
 
-	    if (dto.getCustomer() != null && dto.getCustomer() != 0) {
+	    if (dto.getCustomer() != null) {
 
-	        CurrencyVO customer = CurrencyRepo.findById(dto.getCustomer())
-	                .orElseThrow(() -> new ApplicationException("Customer Not Found"));
+	        CustomerVO customerVO =
+	                customerRepo.findById(dto.getCustomer())
+	                .orElseThrow(() -> new ApplicationException("Customer not found"));
 
-	        despatchInstructionVO.setCustomer(customer);
+	        despatchInstructionVO.setCustomer(customerVO);
 	    }
-
 	    // =========================
 	    // Location Mapping
 	    // =========================
@@ -1062,6 +1064,8 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	                detailVO.setItem(item);
 	            }
 
+	            
+	            
 	            
 	            detailVO.setPdi(detailDTO.getPdi());
 	            detailVO.setPdiDate(detailDTO.getPdiDate());
@@ -1515,8 +1519,8 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	    if (stockTransferChallanVO.getCustomer() != null) {
 
-	        CustomerResonse1DTO customerResponseDTO =
-	                new CustomerResonse1DTO();
+	    	CustomerResponse1DTO customerResponseDTO =
+	                new CustomerResponse1DTO();
 
 	        customerResponseDTO.setId(
 	                stockTransferChallanVO.getCustomer().getId());
@@ -1715,171 +1719,348 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 }
 	//despatch instruction sheduleno dropdown
 	@Override
-	public Map<String, Object> getDespatchScheduleNo(String scheduleNo,Long branch, Long orgId)
+	public Map<String, Object> getDespatchScheduleNo(String scheduleNo,
+	                                                 Long branch,
+	                                                 Long orgId)
 	        throws ApplicationException {
 
 	    Map<String, Object> responseMap = new HashMap<>();
 
-	    List<Object[]> list =
-	            despatchInstructionRepo.getDespatchScheduleNo(scheduleNo,branch,orgId);
+	    List<Object[]> scheduleList =
+	            despatchInstructionRepo.getDespatchScheduleNo(
+	                    scheduleNo,
+	                    branch,
+	                    orgId);
 
-	    List<DespatchInstructionScheduleResponseDTO> responseList = new ArrayList<>();
+	    List<DespatchInstructionScheduleResponseDTO> responseDTOList =
+	            new ArrayList<>();
 
-	    for (Object[] obj : list) {
+	    for (Object[] obj : scheduleList) {
 
 	        DespatchInstructionScheduleResponseDTO dto =
 	                new DespatchInstructionScheduleResponseDTO();
 
-	        dto.setSalesDeliveryScheduleId(((Number) obj[0]).longValue());
-	        dto.setDlvNo((String) obj[1]);
-	        dto.setSalesDeliveryScheduleDetailsId(((Number) obj[2]).longValue());
-	        dto.setItemId(((Number) obj[3]).longValue());
-	        dto.setItemCode((String) obj[4]);
-	        dto.setItemDescription((String) obj[5]);
-	        dto.setActualPlannedQty(
-	                obj[6] != null ? ((Number) obj[6]).doubleValue() : 0.0);
-	        dto.setDispatchedQty(
-	                obj[7] != null ? (BigDecimal) obj[7] : BigDecimal.ZERO);
-	        dto.setBalanceQty(
-	                obj[8] != null ? (BigDecimal) obj[8] : BigDecimal.ZERO);
+	        dto.setSalesDeliveryScheduleId(
+	                ((Number) obj[0]).longValue());
 
-	        responseList.add(dto);
+	        dto.setDlvNo(
+	                (String) obj[1]);
+
+	        dto.setDlvdate(
+	                obj[2] != null ? ((java.sql.Date) obj[2]).toLocalDate() : null);
+
+	        dto.setInvoiceType(
+	                (String) obj[3]);
+
+	        dto.setDispatchedQty(
+	                obj[4] != null
+	                        ? BigDecimal.valueOf(((Number) obj[4]).doubleValue())
+	                        : BigDecimal.ZERO);
+
+	        dto.setBalanceQty(
+	                obj[5] != null
+	                        ? BigDecimal.valueOf(((Number) obj[5]).doubleValue())
+	                        : BigDecimal.ZERO);
+
+	        responseDTOList.add(dto);
 	    }
 
-	    responseMap.put("message", "Data Fetched Successfully");
-	    responseMap.put("scheduleBalanceList", responseList);
+	    responseMap.put(
+	            "message",
+	            "Data Fetched Successfully");
+
+	    responseMap.put(
+	            "scheduleBalanceList",
+	            responseDTOList);
 
 	    return responseMap;
 	}
 	
 	// despatch customer dropdown
 	@Override
-	public Map<String, Object> getDespatchCustomer(Long branch,Long orgId) throws ApplicationException {
+	public Map<String, Object> getDespatchCustomer(Long branch, Long orgId)
+	        throws ApplicationException {
 
 	    Map<String, Object> responseMap = new HashMap<>();
 
 	    List<Object[]> customerList =
-	            customerRepo.getDespatchCustomer(branch,orgId);
+	            customerRepo.getDespatchCustomer(branch, orgId);
 
 	    List<DespatchCustomerResponseDTO> responseDTOList = new ArrayList<>();
 
 	    for (Object[] obj : customerList) {
 
-	    	DespatchCustomerResponseDTO dto = new DespatchCustomerResponseDTO();
+	        DespatchCustomerResponseDTO dto =
+	                new DespatchCustomerResponseDTO();
 
-	        dto.setId(((Number) obj[0]).longValue());
+	        dto.setId(
+	                obj[0] != null
+	                        ? ((Number) obj[0]).longValue()
+	                        : 0L);
 
-	        dto.setCustomerCode((String) obj[1]);
+	        dto.setCustomerCode(
+	                obj[1] != null
+	                        ? (String) obj[1]
+	                        : "");
 
-	        dto.setCustomerName((String) obj[2]);
+	        dto.setCustomerName(
+	                obj[2] != null
+	                        ? (String) obj[2]
+	                        : "");
 
 	        dto.setPartyCreditLimit(
-	                obj[3] != null ? (BigDecimal) obj[3] : BigDecimal.ZERO);
+	                obj[3] != null
+	                        ? BigDecimal.valueOf(((Number) obj[3]).doubleValue())
+	                        : BigDecimal.ZERO);
 
 	        responseDTOList.add(dto);
 	    }
 
-	    responseMap.put("message", "Customer List Fetched Successfully");
-	    responseMap.put("customerList", responseDTOList);
+	    responseMap.put(
+	            "message",
+	            "Customer List Fetched Successfully");
+
+	    responseMap.put(
+	            "customerList",
+	            responseDTOList);
 
 	    return responseMap;
 	}
 	// despatch contract no dropdown
 	@Override
-	public Map<String, Object> getDespatchSalesContract(Long customerId,Long branch,Long orgId)
+	public Map<String, Object> getDespatchSalesContract(Long customerId,
+	                                                    Long branch,
+	                                                    Long orgId)
 	        throws ApplicationException {
 
 	    Map<String, Object> responseMap = new HashMap<>();
 
 	    List<Object[]> salesContractList =
-	    		despatchInstructionRepo.getDespatchSalesContract(customerId,branch,orgId);
+	            despatchInstructionRepo.getDespatchSalesContract(
+	                    customerId,
+	                    branch,
+	                    orgId);
 
-	    List<DespatchSalesContractResponseDTO> responseDTOList = new ArrayList<>();
+	    List<DespatchSalesContractResponseDTO> responseDTOList =
+	            new ArrayList<>();
 
 	    for (Object[] obj : salesContractList) {
 
-	    	DespatchSalesContractResponseDTO dto =
-	    	        new DespatchSalesContractResponseDTO();
+	        DespatchSalesContractResponseDTO dto =
+	                new DespatchSalesContractResponseDTO();
 
-	    	dto.setCustomerContractNo((String) obj[0]);
+	        dto.setCustomerContractNo(
+	                obj[0] != null
+	                        ? (String) obj[0]
+	                        : "");
 
-	    	dto.setContractDate((LocalDate) obj[1]);
+	        dto.setContractDate(
+	                obj[1] != null
+	                        ? ((java.sql.Date) obj[1]).toLocalDate()
+	                        : null);
 
-	    	dto.setSalesContractId(((Number)obj[2]).longValue());
+	        dto.setSalesContractId(
+	                obj[2] != null
+	                        ? ((Number) obj[2]).longValue()
+	                        : 0L);
 
-	    	dto.setInvoiceType((String)obj[3]);
+	        dto.setInvoiceType(
+	                obj[3] != null
+	                        ? (String) obj[3]
+	                        : "");
 
 	        responseDTOList.add(dto);
 	    }
 
-	    responseMap.put("message", "Sales Contract List Fetched Successfully");
-	    responseMap.put("salesContractList", responseDTOList);
+	    responseMap.put(
+	            "message",
+	            "Sales Contract List Fetched Successfully");
+
+	    responseMap.put(
+	            "salesContractList",
+	            responseDTOList);
 
 	    return responseMap;
 	}
 	//Despacth Item dropdown 
 	@Override
-	public Map<String, Object> getDespatchItems(Long branch ,Long orgId)
+	public Map<String, Object> getDespatchItems(Long branch, Long orgId)
 	        throws ApplicationException {
 
 	    Map<String, Object> responseMap = new HashMap<>();
 
-	    List<Object[]> itemList = itemMasterRepo.getDespatchItems(branch,orgId);
+	    List<Object[]> itemList =
+	            itemMasterRepo.getDespatchItems(branch, orgId);
 
 	    List<ItemResponseDTO> responseDTOList = new ArrayList<>();
 
 	    for (Object[] obj : itemList) {
 
-	        ItemResponseDTO dto = new ItemResponseDTO();
+	        ItemResponseDTO dto =
+	                new ItemResponseDTO();
 
-	        dto.setId(((Number) obj[0]).longValue());
+	        dto.setId(
+	                obj[0] != null
+	                        ? ((Number) obj[0]).longValue()
+	                        : 0L);
 
-	        dto.setItemCode((String) obj[1]);
+	        dto.setItemCode(
+	                obj[1] != null
+	                        ? (String) obj[1]
+	                        : "");
 
-	        dto.setItemDescription((String) obj[2]);
-	        
-	        UnitResponseDTO unitDTO = new UnitResponseDTO();
-	        unitDTO.setId(((Number) obj[3]).longValue());
-	        
-	        
+	        dto.setItemDescription(
+	                obj[2] != null
+	                        ? (String) obj[2]
+	                        : "");
+
+	        UnitResponseDTO unitDTO =
+	                new UnitResponseDTO();
+
+	        unitDTO.setId(
+	                obj[3] != null
+	                        ? ((Number) obj[3]).longValue()
+	                        : 0L);
+
+	        dto.setUnit(unitDTO);
 
 	        responseDTOList.add(dto);
 	    }
 
-	    responseMap.put("message", "Finished Goods Item List Fetched Successfully");
-	    responseMap.put("itemList", responseDTOList);
+	    responseMap.put(
+	            "message",
+	            "Finished Goods Item List Fetched Successfully");
+
+	    responseMap.put(
+	            "itemList",
+	            responseDTOList);
 
 	    return responseMap;
 	}
-	
 	// Despatch Schedulemonth
 	@Override
 	public Map<String, Object> getDespatchScheduleMonth(
 	        Long itemId,
 	        Long branch,
-	        Long orgId) throws ApplicationException {
+	        Long orgId)
+	        throws ApplicationException {
 
 	    Map<String, Object> responseMap = new HashMap<>();
 
 	    List<Object[]> scheduleMonthList =
-	            despatchInstructionRepo.getDespatchScheduleMonth(itemId, branch, orgId);
+	            despatchInstructionRepo.getDespatchScheduleMonth(
+	                    itemId,
+	                    branch,
+	                    orgId);
 
-	    List<DespatchScheduleMonthResponseDTO> responseDTOList = new ArrayList<>();
+	    List<DespatchScheduleMonthResponseDTO> responseDTOList =
+	            new ArrayList<>();
 
 	    for (Object[] obj : scheduleMonthList) {
 
-	    	DespatchScheduleMonthResponseDTO dto = new DespatchScheduleMonthResponseDTO();
+	        DespatchScheduleMonthResponseDTO dto =
+	                new DespatchScheduleMonthResponseDTO();
 
-	        dto.setId(((Number) obj[0]).longValue());
+	        dto.setId(
+	                obj[0] != null
+	                        ? ((Number) obj[0]).longValue()
+	                        : 0L);
 
-	        dto.setMonthOfSchedule((String) obj[1]);
+	        dto.setMonthOfSchedule(
+	                obj[1] != null
+	                        ? (String) obj[1]
+	                        : "");
 
 	        responseDTOList.add(dto);
 	    }
 
-	    responseMap.put("message", "Schedule Month Fetched Successfully");
-	    responseMap.put("scheduleMonthList", responseDTOList);
+	    responseMap.put(
+	            "message",
+	            "Schedule Month Fetched Successfully");
+
+	    responseMap.put(
+	            "scheduleMonthList",
+	            responseDTOList);
 
 	    return responseMap;
 	}
+	//despatch planned qty
+	
+	@Override
+	public Map<String, Object> getDespatchPlannedQty(Long itemId,
+	                                                 Long branch,
+	                                                 Long orgId)
+	        throws ApplicationException {
+
+	    Map<String, Object> responseMap = new HashMap<>();
+
+	    BigDecimal plannedQty =
+	            despatchInstructionRepo.getDespatchPlannedQty(
+	                    itemId,
+	                    branch,
+	                    orgId);
+
+	    if (plannedQty == null) {
+	        plannedQty = BigDecimal.ZERO;
+	    }
+
+	    responseMap.put(
+	            "message",
+	            "Planned Quantity Fetched Successfully");
+
+	    responseMap.put(
+	            "plannedQty",
+	            plannedQty);
+
+	    return responseMap;
+	}
+	// pending qty
+//	@Override
+//	public Map<String, Object> getDespatchPendingQty(Long itemId,
+//	                                         String month,
+//	                                          Long branch,
+//	                                         Long orgId,
+//	                                         Long customerId)
+//	        throws ApplicationException {
+//
+//	    Map<String, Object> responseMap = new HashMap<>();
+//
+//	    List<Object[]> pendingQtyList =
+//	            despatchInstructionRepo.getDespatchPendingQty(
+//	                    itemId,
+//	                    month,
+//	                    branch,
+//	                    orgId,
+//	                    customerId);
+//
+//	    List<PendingQtyResponseDTO> responseDTOList = new ArrayList<>();
+//
+//	    for (Object[] obj : pendingQtyList) {
+//
+//	        PendingQtyResponseDTO dto = new PendingQtyResponseDTO();
+//
+//	        dto.setPendingQty(
+//	                obj[0] != null
+//	                        ? ((Number) obj[0]).intValue()
+//	                        : 0);
+//
+//	        dto.setSno(
+//	                obj[1] != null
+//	                        ? ((Number) obj[1]).intValue()
+//	                        : 0);
+//
+//	        responseDTOList.add(dto);
+//	    }
+//
+//	    responseMap.put(
+//	            "message",
+//	            "Pending Quantity Fetched Successfully");
+//
+//	    responseMap.put(
+//	            "pendingQtyList",
+//	            responseDTOList);
+//
+//	    return responseMap;
+//	}
+	
 }

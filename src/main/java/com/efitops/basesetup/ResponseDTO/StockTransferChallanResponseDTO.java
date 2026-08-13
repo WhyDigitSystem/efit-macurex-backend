@@ -22,7 +22,7 @@ public class StockTransferChallanResponseDTO {
 	private LocalDate transferDate;
 	private BranchResponseDTO branch;
 	private ListOfValuesResponseDTO types;
-	private CustomerResonse1DTO customer;
+	private CustomerResponse1DTO customer;
 	private LocationMasterResponseDTO location;
 	private LocalTime timeOfTranfer;
 	private String stockPosting;

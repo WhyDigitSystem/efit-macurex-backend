@@ -103,6 +103,11 @@ public interface TransportMasterService {
 
 	Map<String, Object> getDespatchScheduleMonth(Long itemId, Long branch, Long orgId) throws ApplicationException;
 
+	Map<String, Object> getDespatchPlannedQty(Long itemId, Long branch, Long orgId) throws ApplicationException;
+
+//	Map<String, Object> getDespatchPendingQty(Long itemId, String month, Long branch, Long orgId, Long customerId)
+//			throws ApplicationException;
+
 
 
 

@@ -26,8 +26,8 @@ public class PurchaseShortCloseVO {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id")
-    private BranchVO plant;
+    @JoinColumn(name = "branch")
+    private BranchVO branch;
 
     @Column(name = "short_close_no")
     private String shortCloseNo;

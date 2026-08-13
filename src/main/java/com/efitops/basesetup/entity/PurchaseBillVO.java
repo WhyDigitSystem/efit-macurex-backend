@@ -27,8 +27,8 @@ public class PurchaseBillVO {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id")
-    private BranchVO plant;
+    @JoinColumn(name = "branch")
+    private BranchVO branch;
 
     // PB No -> auto generated (prefix + running number), same pattern as Contract No / Doc No
     @Column(name = "pb_no")

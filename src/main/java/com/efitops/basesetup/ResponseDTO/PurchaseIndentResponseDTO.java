@@ -19,7 +19,7 @@ public class PurchaseIndentResponseDTO {
 
     private Long id;
     private String indentNo;
-    private BranchResponseDTO plant;
+    private BranchResponseDTO branch;
     private ListOfVlauesDetailsResponseDTO belongsTo;
     private LocalDate indentDate;
     private DepartmentResponseDTO department;

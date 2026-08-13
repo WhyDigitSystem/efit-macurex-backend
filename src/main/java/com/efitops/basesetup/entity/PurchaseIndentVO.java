@@ -43,8 +43,8 @@ public class PurchaseIndentVO {
     private String indentNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plant")
-    private BranchVO plant;
+    @JoinColumn(name = "branch")
+    private BranchVO branch;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "belongs_to")

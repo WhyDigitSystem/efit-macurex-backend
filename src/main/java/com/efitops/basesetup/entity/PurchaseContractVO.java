@@ -40,8 +40,8 @@ public class PurchaseContractVO {
 
     // Plant ID (Belongs To) -> linked to Branch (same pattern as Quotation/TransportBill "plant")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id")
-    private BranchVO plant;
+    @JoinColumn(name = "branch")
+    private BranchVO branch;
 
     // Contract No -> auto generated (prefix + running number) via DocumentTypeMappingDetails,
     // exactly like Department/Designation/Employee docId generation (screenCode = "PC")

@@ -14,7 +14,7 @@ public interface PurchaseDeliveryScheduleRepo extends JpaRepository<PurchaseDeli
     @Query(nativeQuery = true, value = "select * from purchase_delivery_schedule where purchasedeliveryschedule_id=?1")
     PurchaseDeliveryScheduleVO getPurchaseDeliveryScheduleById(Long id);
 
-    @Query(nativeQuery = true, value = "select * from purchase_delivery_schedule where org_id=?1 and branch_id=?2 and active=1 and cancel=0")
+    @Query(nativeQuery = true, value = "select * from purchase_delivery_schedule where org_id=?1 and branch=?2 and active=1 and cancel=0")
     List<PurchaseDeliveryScheduleVO> getPurchaseDeliveryScheduleByOrgId(Long orgId, Long branchId);
 
     @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,'0')) AS docid "

@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class PurchaseDeliveryScheduleResponseDTO {
 
     private Long id;
-    private BranchResponseDTO plant;
+    private BranchResponseDTO branch;
     private String belongsTo;
     private String docNo;
     private LocalDate docDate;

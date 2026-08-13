@@ -14,7 +14,7 @@ public interface PurchaseContractRepo extends JpaRepository<PurchaseContractVO, 
     @Query(nativeQuery = true, value = "select * from purchase_contract where purchasecontract_id=?1")
     PurchaseContractVO getPurchaseContractById(Long id);
 
-    @Query(nativeQuery = true, value = "select * from purchase_contract where org_id=?1 and branch_id=?2 and active=1 and cancel=0")
+    @Query(nativeQuery = true, value = "select * from purchase_contract where org_id=?1 and branch=?2 and active=1 and cancel=0")
     List<PurchaseContractVO> getPurchaseContractByOrgId(Long orgId, Long branchId);
 
     boolean existsByContractNoAndOrgId(String contractNo, Long orgId);

@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class PurchaseShortCloseResponseDTO {
 
     private Long id;
-    private BranchResponseDTO plant;
+    private BranchResponseDTO branch;
     private String shortCloseNo;
     private String belongsTo;
     private LocalDate shortCloseDate;

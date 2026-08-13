@@ -320,7 +320,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void createUpdatePurchaseContractVOFromDTO(PurchaseContractDTO dto, PurchaseContractVO vo) throws ApplicationException {
 
         if (dto.getBranch() != null && dto.getBranch() != 0) {
-            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
+            vo.setBranch(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
         }
         vo.setContractDate(dto.getContractDate());
 
@@ -523,12 +523,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         PurchaseContractResponseDTO dto = new PurchaseContractResponseDTO();
         dto.setId(vo.getId());
 
-        if (vo.getPlant() != null) {
+        if (vo.getBranch() != null) {
             BranchResponseDTO plantDTO = new BranchResponseDTO();
-            plantDTO.setId(vo.getPlant().getId());
-            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
-            plantDTO.setBranchName(vo.getPlant().getBranchName());
-            dto.setPlant(plantDTO);
+            plantDTO.setId(vo.getBranch().getId());
+            plantDTO.setBranchCode(vo.getBranch().getBranchCode());
+            plantDTO.setBranchName(vo.getBranch().getBranchName());
+            dto.setBranch(plantDTO);
         }
 
         dto.setContractNo(vo.getContractNo());
@@ -706,7 +706,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void createUpdatePurchaseDeliveryScheduleVOFromDTO(PurchaseDeliveryScheduleDTO dto, PurchaseDeliveryScheduleVO vo) throws ApplicationException {
 
         if (dto.getBranch() != null && dto.getBranch() != 0) {
-            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
+            vo.setBranch(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
         }
         vo.setBelongsTo(dto.getBelongsTo());
         vo.setDocDate(dto.getDocDate());
@@ -832,12 +832,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         PurchaseDeliveryScheduleResponseDTO dto = new PurchaseDeliveryScheduleResponseDTO();
         dto.setId(vo.getId());
 
-        if (vo.getPlant() != null) {
-            BranchResponseDTO plantDTO = new BranchResponseDTO();
-            plantDTO.setId(vo.getPlant().getId());
-            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
-            plantDTO.setBranchName(vo.getPlant().getBranchName());
-            dto.setPlant(plantDTO);
+        if (vo.getBranch() != null) {
+            BranchResponseDTO branchDTO = new BranchResponseDTO();
+            branchDTO.setId(vo.getBranch().getId());
+            branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+            branchDTO.setBranchName(vo.getBranch().getBranchName());
+            dto.setBranch(branchDTO);
         }
 
         dto.setBelongsTo(vo.getBelongsTo());
@@ -962,7 +962,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void createUpdatePurchaseBillVOFromDTO(PurchaseBillDTO dto, PurchaseBillVO vo) throws ApplicationException {
 
         if (dto.getBranch() != null && dto.getBranch() != 0) {
-            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
+            vo.setBranch(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
         }
         vo.setBelongsTo(dto.getBelongsTo());
         vo.setPbDate(dto.getPbDate());
@@ -1165,12 +1165,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         PurchaseBillResponseDTO dto = new PurchaseBillResponseDTO();
         dto.setId(vo.getId());
 
-        if (vo.getPlant() != null) {
+        if (vo.getBranch() != null) {
             BranchResponseDTO plantDTO = new BranchResponseDTO();
-            plantDTO.setId(vo.getPlant().getId());
-            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
-            plantDTO.setBranchName(vo.getPlant().getBranchName());
-            dto.setPlant(plantDTO);
+            plantDTO.setId(vo.getBranch().getId());
+            plantDTO.setBranchCode(vo.getBranch().getBranchCode());
+            plantDTO.setBranchName(vo.getBranch().getBranchName());
+            dto.setBranch(plantDTO);
         }
 
         dto.setPbNo(vo.getPbNo());
@@ -1391,7 +1391,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchaseIndentVO.setCancelRemarks(dto.getCancelRemarks());
 
         if (dto.getPlant() != null && dto.getPlant() != 0) {
-            purchaseIndentVO.setPlant(branchRepo.findById(dto.getPlant()).orElseThrow(() -> new ApplicationException("Plant (Branch) Not Found")));
+            purchaseIndentVO.setBranch(branchRepo.findById(dto.getPlant()).orElseThrow(() -> new ApplicationException("Plant (Branch) Not Found")));
         }
 
         if (dto.getBelongsTo() != null && dto.getBelongsTo() != 0) {
@@ -1493,8 +1493,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         dto.setActive(vo.getActiveStr());
         dto.setCancelRemarks(vo.getCancelRemarks());
 
-        if (vo.getPlant() != null) {
-            dto.setPlant(new BranchResponseDTO(vo.getPlant().getId(), vo.getPlant().getBranchCode(), vo.getPlant().getBranchName()));
+        if (vo.getBranch() != null) {
+            dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(), vo.getBranch().getBranchName()));
         }
         if (vo.getBelongsTo() != null) {
             dto.setBelongsTo(new ListOfVlauesDetailsResponseDTO(vo.getBelongsTo().getId(),
@@ -1567,7 +1567,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     public List<PurchaseIndentResponseDTO> getPurchaseIndentByOrgId(Long orgId, Long branch) throws ApplicationException {
-        List<PurchaseIndentVO> voList = purchaseIndentRepo.findByOrgIdAndPlant_Id(orgId, branch);
+        List<PurchaseIndentVO> voList = purchaseIndentRepo.findByOrgIdAndBranch(orgId, branch);
         if (voList.isEmpty()) throw new ApplicationException("No Purchase Indent Details Found");
         List<PurchaseIndentResponseDTO> responseList = new ArrayList<>();
         for (PurchaseIndentVO vo : voList) responseList.add(buildPurchaseIndentResponse(vo));
@@ -1620,7 +1620,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void createUpdatePurchaseShortCloseVOFromDTO(PurchaseShortCloseDTO dto, PurchaseShortCloseVO vo) throws ApplicationException {
 
         if (dto.getBranch() != null && dto.getBranch() != 0) {
-            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
+            vo.setBranch(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
         }
         vo.setBelongsTo(dto.getBelongsTo());
         vo.setShortCloseDate(dto.getShortCloseDate());
@@ -1727,12 +1727,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         PurchaseShortCloseResponseDTO dto = new PurchaseShortCloseResponseDTO();
         dto.setId(vo.getId());
 
-        if (vo.getPlant() != null) {
+        if (vo.getBranch() != null) {
             BranchResponseDTO plantDTO = new BranchResponseDTO();
-            plantDTO.setId(vo.getPlant().getId());
-            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
-            plantDTO.setBranchName(vo.getPlant().getBranchName());
-            dto.setPlant(plantDTO);
+            plantDTO.setId(vo.getBranch().getId());
+            plantDTO.setBranchCode(vo.getBranch().getBranchCode());
+            plantDTO.setBranchName(vo.getBranch().getBranchName());
+            dto.setBranch(plantDTO);
         }
 
         dto.setShortCloseNo(vo.getShortCloseNo());

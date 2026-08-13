@@ -27,8 +27,8 @@ public class PurchaseDeliveryScheduleVO {
 
     // Plant ID -> Branch (same pattern as Purchase Contract's "plant")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id")
-    private BranchVO plant;
+    @JoinColumn(name = "branch")
+    private BranchVO branch;
 
     // Belongs To -> plain text, independent of the Plant/Branch FK above
     @Column(name = "belongs_to")

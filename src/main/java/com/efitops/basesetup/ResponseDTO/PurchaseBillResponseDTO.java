@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class PurchaseBillResponseDTO {
 
     private Long id;
-    private BranchResponseDTO plant;
+    private BranchResponseDTO branch;
     private String pbNo;
     private String belongsTo;
     private LocalDate pbDate;

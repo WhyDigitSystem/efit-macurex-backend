@@ -15,7 +15,7 @@ public interface PurchaseBillRepo extends JpaRepository<PurchaseBillVO, Long> {
     @Query(nativeQuery = true, value = "select * from purchase_bill where purchasebill_id=?1")
     PurchaseBillVO getPurchaseBillById(Long id);
 
-    @Query(nativeQuery = true, value = "select * from purchase_bill where org_id=?1 and branch_id=?2 and active=1 and cancel=0")
+    @Query(nativeQuery = true, value = "select * from purchase_bill where org_id=?1 and branch=?2 and active=1 and cancel=0")
     List<PurchaseBillVO> getPurchaseBillByOrgId(Long orgId, Long branchId);
 
     @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,'0')) AS docid "

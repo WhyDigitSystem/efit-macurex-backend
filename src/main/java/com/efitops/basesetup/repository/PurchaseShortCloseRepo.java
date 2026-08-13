@@ -15,7 +15,7 @@ public interface PurchaseShortCloseRepo extends JpaRepository<PurchaseShortClose
     @Query(nativeQuery = true, value = "select * from purchase_short_close where purchaseshortclose_id=?1")
     PurchaseShortCloseVO getPurchaseShortCloseById(Long id);
 
-    @Query(nativeQuery = true, value = "select * from purchase_short_close where org_id=?1 and branch_id=?2 and active=1 and cancel=0")
+    @Query(nativeQuery = true, value = "select * from purchase_short_close where org_id=?1 and branch=?2 and active=1 and cancel=0")
     List<PurchaseShortCloseVO> getPurchaseShortCloseByOrgId(Long orgId, Long branchId);
 
     @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,'0')) AS docid "

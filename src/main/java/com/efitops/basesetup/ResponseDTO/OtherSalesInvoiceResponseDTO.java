@@ -1,6 +1,5 @@
 package com.efitops.basesetup.ResponseDTO;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,93 +17,96 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OtherSalesInvoiceResponseDTO {
 
-    private Long id;
+	private Long id;
 
-    private String docId;
+	private String docId;
+	private String diNo;
 
-    private LocalDate docDate;
+	private LocalDate diDate;
 
-    private String monthYear;
+	private LocalDate docDate;
 
-    private String belongsTo;
+	private String monthYear;
 
-    private String docType;
+	private String belongsTo;
 
-    private CustomerOtherSalesResponseDTO  customer;
+	private String docType;
 
-    private DespatchInstructionResponseDocIdDTO diNo;
+	private CustomerOtherSalesResponseDTO customer;
 
-    private String stockPosting;
+//    private DespatchInstructionResponseDocIdDTO diNo;
 
-    private String excisable;
+	private String stockPosting;
 
-    private LocationMasterResponseDTO location;
+	private String excisable;
 
-    private String vehicle;
+	private LocationMasterResponseDTO location;
 
-    private LocalTime timeOfIssue;
+	private String vehicle;
 
-    private LocalDate timeOfIssueDate;
+	private LocalTime timeOfIssue;
 
-    private CurrencyResponseDTO currency;
+	private LocalDate timeOfIssueDate;
 
-    private LocalTime timeOfRemoval;
+	private CurrencyResponseDTO currency;
 
-    private LocalDate timeOfRemovalDate;
+	private LocalTime timeOfRemoval;
 
-    private String kanbanCardNo;
+	private LocalDate timeOfRemovalDate;
 
-    private String invoiceType;
+	private String kanbanCardNo;
 
-    private String schNo;
+	private String invoiceType;
 
-    private LocalDate schDate;
+	private String schNo;
 
-    private BigDecimal exchangeRate;
+	private LocalDate schDate;
 
-    private BigDecimal totalInsurance;
+	private BigDecimal exchangeRate;
 
-    private BigDecimal totalFreight;
+	private BigDecimal totalInsurance;
 
-    private BigDecimal totalAssVal;
+	private BigDecimal totalFreight;
 
-    private String modeOfTransport;
+	private BigDecimal totalAssVal;
 
-    private BigDecimal netAmount;
+	private String modeOfTransport;
 
-    private String amountInWords;
+	private BigDecimal netAmount;
 
-    private String deliveryTo;
+	private String amountInWords;
 
-    private String paymentTerms;
+	private String deliveryTo;
 
-    private String purchaseOrder;
+	private String paymentTerms;
 
-    private String purchaseOrderDate;
+	private String purchaseOrder;
 
-    private String createdBy;
+	private String purchaseOrderDate;
 
-    private String isIgstApplicable;
+	private String createdBy;
 
-    private String active;
+	private String isIgstApplicable;
 
-    private String cancel;
+	private String active;
 
-    private String updatedBy;
+	private String cancel;
 
-    private String cancelRemarks;
+	private String updatedBy;
 
-    private String screenName;
+	private String cancelRemarks;
 
-    private String screenCode;
+	private String screenName;
 
-    private Long orgId;
+	private String screenCode;
 
-    private String financialYear;
+	private Long orgId;
 
-    private BranchResponseDTO  branch;
+	private String financialYear;
 
-    private List<OtherSalesInvoiceDetailsResponseDTO> otherSalesInvoiceDetailsResponseDTO;
+	private BranchResponseDTO branch;
 
-    private List<OtherSalesInvoiceTaxDetailsResponseDTO> otherSalesInvoiceTaxDetailsResponseDTO;
+	private List<OtherSalesInvoiceDetailsResponseDTO> otherSalesInvoiceDetailsResponseDTO;
+
+	private List<OtherSalesInvoiceTaxDetailsResponseDTO> otherSalesInvoiceTaxDetailsResponseDTO;
 }

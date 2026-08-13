@@ -213,7 +213,7 @@ public class OtherSalesInvoiceController extends BaseController {
 
 	@GetMapping("/getItemDetailsBasedDesPatch")
 	public ResponseEntity<ResponseDTO> getItemDetailsBasedDesPatch(@RequestParam Long orgId, @RequestParam Long branch,
-			@RequestParam(required = false) Long despatch) {
+			@RequestParam(required = false) String despatch) {
 		String methodName = "getItemDetailsBasedDesPatch()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -239,8 +239,7 @@ public class OtherSalesInvoiceController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
+
 	@GetMapping("/getSalesOrderNo")
 	public ResponseEntity<ResponseDTO> getSalesOrderNo(@RequestParam Long customer) {
 		String methodName = "getSalesOrderNo()";
@@ -269,9 +268,8 @@ public class OtherSalesInvoiceController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	
 	@GetMapping("/getOrderAmount")
-	public ResponseEntity<ResponseDTO> getOrderAmount(@RequestParam Long id,@RequestParam Long item) {
+	public ResponseEntity<ResponseDTO> getOrderAmount(@RequestParam Long id, @RequestParam Long item) {
 		String methodName = "getOrderAmount()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -280,7 +278,7 @@ public class OtherSalesInvoiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = otherSalesInvoiceService.getOrderAmount(id,item);
+			mapp = otherSalesInvoiceService.getOrderAmount(id, item);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -292,6 +290,64 @@ public class OtherSalesInvoiceController extends BaseController {
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
 			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve  Sales", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getCustometDetailsFromParty")
+	public ResponseEntity<ResponseDTO> getCustometDetailsFromParty(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam String customerCode) {
+		String methodName = "getCustometDetailsFromParty()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = otherSalesInvoiceService.getCustometDetailsFromParty(orgId, branch, customerCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Customer retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve  Customer", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getCustometDetailsFromDespatch")
+	public ResponseEntity<ResponseDTO> getCustometDetailsFromDespatch(@RequestParam Long orgId,
+			@RequestParam Long customer) {
+		String methodName = "getCustometDetailsFromDespatch()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = otherSalesInvoiceService.getCustometDetailsFromDespatch(orgId, customer);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Despatch retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve  Despatch", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

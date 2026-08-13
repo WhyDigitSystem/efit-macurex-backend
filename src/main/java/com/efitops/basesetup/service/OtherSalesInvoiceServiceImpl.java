@@ -231,6 +231,10 @@ public class OtherSalesInvoiceServiceImpl implements OtherSalesInvoiceService {
 
 		otherSalesInvoiceVO.setIsIgstApplicable(otherSalesInvoiceDTO.getIsIgstApplicable());
 
+		otherSalesInvoiceVO.setDiNo(otherSalesInvoiceDTO.getDiNo());
+
+		otherSalesInvoiceVO.setDiDate(otherSalesInvoiceDTO.getDiDate());
+
 		if (otherSalesInvoiceDTO.getBranch() != null && otherSalesInvoiceDTO.getBranch() > 0) {
 
 			BranchVO branch = branchRepo.findById(otherSalesInvoiceDTO.getBranch())
@@ -239,13 +243,13 @@ public class OtherSalesInvoiceServiceImpl implements OtherSalesInvoiceService {
 			otherSalesInvoiceVO.setBranch(branch);
 		}
 
-		if (otherSalesInvoiceDTO.getDiNo() != null && otherSalesInvoiceDTO.getDiNo() > 0) {
-
-			DespatchInstructionVO branch = despatchInstructionRepo.findById(otherSalesInvoiceDTO.getDiNo())
-					.orElseThrow(() -> new ApplicationException("Despatch Not Found"));
-
-			otherSalesInvoiceVO.setDiNo(branch);
-		}
+//		if (otherSalesInvoiceDTO.getDiNo() != null && otherSalesInvoiceDTO.getDiNo() > 0) {
+//
+//			DespatchInstructionVO branch = despatchInstructionRepo.findById(otherSalesInvoiceDTO.getDiNo())
+//					.orElseThrow(() -> new ApplicationException("Despatch Not Found"));
+//
+//			otherSalesInvoiceVO.setDiNo(branch);
+//		}
 
 		if (otherSalesInvoiceDTO.getLocation() != null && otherSalesInvoiceDTO.getLocation() > 0) {
 
@@ -498,6 +502,10 @@ public class OtherSalesInvoiceServiceImpl implements OtherSalesInvoiceService {
 
 		responseDTO.setScreenCode(otherSalesInvoiceVO.getScreenCode());
 
+		responseDTO.setDiNo(otherSalesInvoiceVO.getDiNo());
+
+		responseDTO.setDiDate(otherSalesInvoiceVO.getDiDate());
+
 		if (otherSalesInvoiceVO.getBranch() != null) {
 
 			BranchResponseDTO branchDTO = new BranchResponseDTO();
@@ -523,15 +531,15 @@ public class OtherSalesInvoiceServiceImpl implements OtherSalesInvoiceService {
 			responseDTO.setCustomer(customerDTO);
 		}
 
-		if (otherSalesInvoiceVO.getDiNo() != null) {
-
-			DespatchInstructionResponseDocIdDTO customerDTO = new DespatchInstructionResponseDocIdDTO();
-
-			customerDTO.setId(otherSalesInvoiceVO.getDiNo().getId());
-			customerDTO.setDocId(otherSalesInvoiceVO.getDiNo().getDocId());
-
-			responseDTO.setDiNo(customerDTO);
-		}
+//		if (otherSalesInvoiceVO.getDiNo() != null) {
+//
+//			DespatchInstructionResponseDocIdDTO customerDTO = new DespatchInstructionResponseDocIdDTO();
+//
+//			customerDTO.setId(otherSalesInvoiceVO.getDiNo().getId());
+//			customerDTO.setDocId(otherSalesInvoiceVO.getDiNo().getDocId());
+//
+//			responseDTO.setDiNo(customerDTO);
+//		}
 
 		if (otherSalesInvoiceVO.getLocation() != null) {
 
@@ -711,7 +719,7 @@ public class OtherSalesInvoiceServiceImpl implements OtherSalesInvoiceService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getItemDetailsBasedDesPatch(Long orgId, Long branch, Long despatch) {
+	public List<Map<String, Object>> getItemDetailsBasedDesPatch(Long orgId, Long branch, String despatch) {
 		Set<Object[]> chType = otherSalesInvoiceRepo.getItemDetailsBasedDesPatch(orgId, branch, despatch);
 		return getItemDetailsBasedDesPatch(chType);
 	}
@@ -776,6 +784,61 @@ public class OtherSalesInvoiceServiceImpl implements OtherSalesInvoiceService {
 			Map<String, Object> map = new HashMap<>();
 
 			map.put("rate", ch[1] != null ? new BigDecimal(ch[1].toString()) : BigDecimal.ZERO);
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getCustometDetailsFromParty(Long orgId, Long branch, String customerCode) {
+		Set<Object[]> chType = otherSalesInvoiceRepo.getCustometDetailsFromParty(orgId, branch, customerCode);
+		return getCustometDetailsFromParty(chType);
+	}
+
+	private List<Map<String, Object>> getCustometDetailsFromParty(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("customerId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("customerName", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("customerCode", ch[2] != null ? ch[2].toString() : "");
+
+			map.put("isRegistered", ch[3] != null && ((Number) ch[3]).intValue() == 1 ? "Yes" : "No");
+
+			map.put("gstNo", ch[4] != null ? ch[4].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getCustometDetailsFromDespatch(Long orgId, Long customer) {
+		Set<Object[]> chType = otherSalesInvoiceRepo.getCustometDetailsFromDespatch(orgId, customer);
+		return getCustometDetailsFromDespatch(chType);
+	}
+
+	private List<Map<String, Object>> getCustometDetailsFromDespatch(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("despatchId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("docId", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("docDate", ch[2] != null ? ((java.sql.Date) ch[2]).toLocalDate() : null);
 
 			list.add(map);
 		}

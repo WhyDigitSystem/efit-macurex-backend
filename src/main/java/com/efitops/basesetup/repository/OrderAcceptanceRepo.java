@@ -40,16 +40,16 @@ public interface OrderAcceptanceRepo extends JpaRepository<OrderAcceptanceVO, Lo
 	            d.item,
 	            i.item_code,
 	            i.item_description,
-	            soa.old_qty,
-	            soa.old_delivery_date,
-	            soa.old_rate
+	            soa.new_qty,
+	            soa.new_delivery_date,
+	            soa.new_rate
 	        FROM order_acceptance_detail d
 	        INNER JOIN item i
 	            ON i.item_id = d.item
 	        INNER JOIN order_acceptance_basic o
 	            ON o.order_acceptance_basic_id = d.order_acceptance_basic_id
 	        LEFT JOIN sales_order_amendment_basic soab
-	            ON soab.doc_id = o.doc_id
+					ON soab.salesorder_no = o.doc_id
 	           AND soab.org_id = o.org_id
 	           AND soab.branch = o.branch
 	           AND soab.active = true

@@ -954,7 +954,7 @@ public class TransactionServiceImpl implements TransactionService {
 			responseDTO.setBillDate(docketInvoiceVO.getBillDate());
 			responseDTO.setTotalAmount(docketInvoiceVO.getTotalAmount());
 			responseDTO.setOrgId(docketInvoiceVO.getOrgId());
-			responseDTO.setActive(docketInvoiceVO.isActive());
+			responseDTO.setActive(docketInvoiceVO.getActive());
 			responseDTO.setCreatedBy(docketInvoiceVO.getCreatedBy());
 			responseDTO.setCancelRemarks(docketInvoiceVO.getCancelRemarks());
 
@@ -1019,14 +1019,13 @@ public class TransactionServiceImpl implements TransactionService {
 		private void createUpdateDocketInvoiceVO(DocketInvoiceDTO dto, DocketInvoiceVO docketInvoiceVO)
 				throws ApplicationException {
 
-			docketInvoiceVO.setDocNo(dto.getDocNo());
-			docketInvoiceVO.setDocDate(dto.getDocDate());
+	
 			docketInvoiceVO.setBillNo(dto.getBillNo());
 			docketInvoiceVO.setBillDate(dto.getBillDate());
 			docketInvoiceVO.setTotalAmount(dto.getTotalAmount());
 
 			docketInvoiceVO.setOrgId(dto.getOrgId());
-			docketInvoiceVO.setActive(dto.getActive());
+			docketInvoiceVO.setActive(dto.isActive());
 			docketInvoiceVO.setCancelRemarks(dto.getCancelRemarks());
 
 			// =========================

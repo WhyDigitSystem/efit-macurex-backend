@@ -18,7 +18,8 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			    q.quotation_id,
 			    q.doc_id AS quotation_no,
 			    q.doc_date,
-			    e.enquiry_no
+			    e.enquiry_no,
+			    e.enquiry_date
 			FROM quotation_header q
 			INNER JOIN customer_header c
 			    ON c.customer_id = q.customer inner join enquiry e on e.enquiry_id=q.enquiry_no 
@@ -45,7 +46,8 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			    q.quotation_id,
 			    q.doc_id AS quotation_no,
 			    q.doc_date,
-			    e.enquiry_no
+			    e.enquiry_no,
+			    e.enquiry_date
 			FROM quotation_header q inner join enquiry e on e.enquiry_id=q.enquiry_no
 			WHERE q.cancel = 0
 			  AND q.doc_id = ?5

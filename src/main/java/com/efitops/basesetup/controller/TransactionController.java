@@ -568,7 +568,7 @@ public class TransactionController extends BaseController  {
 	
 	
 	// Docket Invoice 
-	@PostMapping("/updateCreateDocketInvoice")
+	@PutMapping("/updateCreateDocketInvoice")
 	public ResponseEntity<ResponseDTO> updateCreateDocketInvoice(
 	        @RequestBody DocketInvoiceDTO docketInvoiceDTO) {
 

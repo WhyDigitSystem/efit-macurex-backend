@@ -15,5 +15,6 @@ public class QuotationDropdownResponseDTO {
     private String quotationNo;
     private LocalDate quotationDate;
     private String enquiryNo;
+    private LocalDate enquiryDate;
 
 }

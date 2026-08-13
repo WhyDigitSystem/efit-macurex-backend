@@ -30,8 +30,8 @@ public class DespatchInstructionResponseDTO {
 	private String cancelRemarks;
 	private String paymentTerms;
 	private String modeOfTransport;
-	private int netWeight;
-	private int grossWeight;
+	private double netWeight;
+	private double grossWeight;
 	private String deliveryInstructions;
 	private String Consignee;
 	private List<DespatchInstDetailsResponseDTO> despatchInstDetailsResponseDTO;

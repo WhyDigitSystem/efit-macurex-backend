@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
+import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
@@ -51,6 +53,13 @@ public interface TransactionService {
 
 		Map<String, Object> getSalesContractAmdRevisionNo(String salesContractNo, Long item, Long orgId, Long branch) throws ApplicationException;
 
+		
+		//Docket Invoice
+		Map<String, Object> updateCreateDocketInvoice(DocketInvoiceDTO docketInvoiceDTO) throws ApplicationException;
+
+		DocketInvoiceResponseDTO getDocketInvoiceById(Long id) throws ApplicationException;
+
+		List<DocketInvoiceResponseDTO> getDocketInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException;
 		
 
 }

@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class StockTransferChallanDTO {
 	private Long id;
 	private String docID;
-	private LocalDate transferDate;
+	private LocalDate docDate;
 	private Long branch;
 	private Long types;
 	private Long customer;

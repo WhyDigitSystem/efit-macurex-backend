@@ -1,5 +1,6 @@
 package com.efitops.basesetup.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,52 +26,50 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 	        @Param("orgId") Long orgId,
 	        @Param("branch") Long branch);
 	
-	//schedule no dropdown
-	
-	    @Query(value = """
-	        SELECT
-	            sds.sales_delivery_schedule_id,
-	            sds.dlv_no,
-	            sdsd.sales_delivery_schedule_details_id,
-	            i.item_id,
-	            i.item_code,
-	            i.item_description,
-	            sdsd.actual_planned_qty,
-	            COALESCE(SUM(dd.descQty), 0) AS dispatched_qty,
-	            (sdsd.actual_planned_qty - COALESCE(SUM(dd.descQty), 0)) AS balance_qty
+	//despatch schedule no dropdown
+	@Query(value = """
+		    SELECT
+		        sds.sdvbasic_id,
+		        sds.dlv_no,
+		        sds.dlv_date,
+		        sdsd.invoicetype,
+		        COALESCE(SUM(dd.desc_qty), 0) AS dispatched_qty,
+		        (sdsd.actual_planned_qty - COALESCE(SUM(dd.desc_qty), 0)) AS balance_qty
 
-	        FROM sales_delivery_schedule_details sdsd
+		    FROM sdvdet sdsd
 
-	        INNER JOIN sales_delivery_schedule sds
-	            ON sds.sales_delivery_schedule_id = sdsd.sales_delivery_schedule_id
+		    INNER JOIN sdvbasic sds
+		        ON sds.sdvbasic_id = sdsd.sdvbasic_id
 
-	        INNER JOIN item i
-	            ON i.item_id = sdsd.item_id
+		    INNER JOIN item i
+		        ON i.item_id = sdsd.item_id
 
-	        LEFT JOIN despatch_basic db
-	            ON db.schdule_no = sds.dlv_no
+		    LEFT JOIN despatch_basic db
+		        ON db.schdule_no = sds.dlv_no
 
-	        LEFT JOIN despatch_detail dd
-	            ON dd.despatch_basic_id = db.despatch_basic_id
-	           AND dd.item_id = sdsd.item_id
+		    LEFT JOIN despatch_detail dd
+		        ON dd.despatch_basic_id = db.despatch_basic_id
+		       AND dd.item_id = sdsd.item_id
 
-	        WHERE sds.dlv_no = :scheduleNo
-	          AND sds.branch_id = :branch
-	          AND sds.org_id = :orgId
+		    WHERE sds.dlv_no = :scheduleNo
+		      AND sds.branch_id = :branch
+		      AND sds.org_id = :orgId
 
-	        GROUP BY
-	            sds.sales_delivery_schedule_id,
-	            sds.dlv_no,
-	            sdsd.sales_delivery_schedule_details_id,
-	            i.item_id,
-	            i.item_code,
-	            i.item_description,
-	            sdsd.actual_planned_qty
+		    GROUP BY
+		        sds.sdvbasic_id,
+		        sds.dlv_no,
+		        sds.dlv_date,
+		        sdsd.invoicetype,
+		        dd.desc_qty,
+		        sdsd.actual_planned_qty
 
-	        HAVING
-	            (sdsd.actual_planned_qty - COALESCE(SUM(dd.descQty),0)) > 0
-	        """, nativeQuery = true)
-	    List<Object[]> getDespatchScheduleNo(@Param("scheduleNo") String scheduleNo,@Param("branch") Long branch,@Param("orgId") Long orgId);
+		    HAVING
+		        (sdsd.actual_planned_qty - COALESCE(SUM(dd.desc_qty), 0)) > 0
+		    """, nativeQuery = true)
+		List<Object[]> getDespatchScheduleNo(
+		        @Param("scheduleNo") String scheduleNo,
+		        @Param("branch") Long branch,
+		        @Param("orgId") Long orgId);
 	   
 	    
 	    //despatch despatch salessontract no
@@ -97,11 +96,11 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 	    	//Despatch Schedule month dropdown
 	    	@Query(value = """
 	    	        SELECT
-	    	            a.sales_delivery_schedule_id,
+	    	            a.sdvbasic_id,
 	    	            a.month_of_schedule
-	    	        FROM sales_delivery_schedule a
-	    	        INNER JOIN sales_delivery_schedule_details d
-	    	            ON a.sales_delivery_schedule_id = d.sales_delivery_schedule_id
+	    	        FROM sdvbasic a
+	    	        INNER JOIN sdvdet d
+	    	            ON a.sdvbasic_id = d.sdvbasic_id
 	    	        INNER JOIN item i
 	    	            ON d.item_id = i.item_id
 	    	        WHERE a.cancel = false
@@ -114,5 +113,137 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 	    	        @Param("itemId") Long itemId,
 	    	        @Param("branch") Long branch,
 	    	        @Param("orgId") Long orgId);
+	    	
+	    	//planned qty
+	    	@Query(value = """
+	    		    SELECT
+	    		        SUM(sdsd.actual_planned_qty) - COALESCE(SUM(dd.desc_qty), 0) AS plannedQty
+
+	    		    FROM sdvbasic sds
+
+	    		    INNER JOIN sdvdet sdsd
+	    		        ON sds.sdvbasic_id = sdsd.sdvbasic_id
+
+	    		    INNER JOIN item i
+	    		        ON i.item_id = sdsd.item_id
+
+	    		    LEFT JOIN despatch_basic db
+	    		        ON db.schdule_no = sds.dlv_no
+
+	    		    LEFT JOIN despatch_detail dd
+	    		        ON dd.despatch_basic_id = db.despatch_basic_id
+	    		       AND dd.item_id = sdsd.item_id
+
+	    		    WHERE sds.cancel = FALSE
+	    		      AND i.item_id = :itemId
+	    		      AND sds.branch_id = :branch
+	    		      AND sds.org_id = :orgId
+	    		    """, nativeQuery = true)
+	    		BigDecimal getDespatchPlannedQty(
+	    		        @Param("itemId") Long itemId,
+	    		        @Param("branch") Long branch,
+	    		        @Param("orgId") Long orgId);
+	    	
+			// Pending qty
+	    	
+//	    	@Query(value = """
+//
+//	    			SELECT
+//	    			    sdsd.actual_planned_qty AS pendingQty,
+//	    			    1 AS sno
+//	    			FROM sales_delivery_schedule sds
+//
+//	    			INNER JOIN customer_header ch
+//	    			    ON ch.customer_id = sds.customer_id
+//
+//	    			INNER JOIN sales_delivery_schedule_details sdsd
+//	    			    ON sds.sales_delivery_schedule_id = sdsd.sales_delivery_schedule_id
+//
+//	    			INNER JOIN item i
+//	    			    ON i.item_id = sdsd.item_id
+//
+//	    			WHERE sds.cancel = FALSE
+//	    			  AND sdsd.actual_planned_qty > 0
+//	    			  AND i.item_id = :itemId
+//	    			  AND sds.month_of_schedule = :month
+//	    			  AND sds.branch_id = :branch
+//	    			  AND sds.org_id = :orgId
+//	    			  AND ch.customer_id = :customerId
+//	    			  AND NOT EXISTS
+//	    			  (
+//	    			      SELECT 1
+//	    			      FROM despatch_basic db
+//	    			      INNER JOIN despatch_detail dd
+//	    			          ON db.despatch_basic_id = dd.despatch_basic_id
+//	    			      WHERE db.cancel = FALSE
+//	    			        AND db.schdule_no = sds.dlv_no
+//	    			        AND dd.item_id = i.item_id
+//	    			  )
+//
+//	    			UNION
+//
+//	    			SELECT
+//	    			    (sdsd.actual_planned_qty - SUM(dd.desc_qty)) AS pendingQty,
+//	    			    2 AS sno
+//	    			FROM sales_delivery_schedule sds
+//
+//	    			INNER JOIN customer_header ch
+//	    			    ON ch.customer_id = sds.customer_id
+//
+//	    			INNER JOIN sales_delivery_schedule_details sdsd
+//	    			    ON sds.sales_delivery_schedule_id = sdsd.sales_delivery_schedule_id
+//
+//	    			INNER JOIN item i
+//	    			    ON i.item_id = sdsd.item_id
+//
+//	    			INNER JOIN despatch_basic db
+//	    			    ON db.schdule_no = sds.dlv_no
+//
+//	    			INNER JOIN despatch_detail dd
+//	    			    ON dd.despatch_basic_id = db.despatch_basic_id
+//	    			   AND dd.item_id = i.item_id
+//
+//	    			WHERE sds.cancel = FALSE
+//	    			  AND i.item_id = :itemId
+//	    			  AND sds.month_of_schedule = :month
+//	    			  AND sds.branch_id = :branch
+//	    			  AND sds.org_id = :orgId
+//	    			  AND ch.customer_id = :customerId
+//
+//	    			GROUP BY
+//	    			    sdsd.actual_planned_qty
+//
+//	    			HAVING
+//	    			    (sdsd.actual_planned_qty - SUM(dd.desc_qty)) > 0
+//
+//	    			UNION
+//
+//	    			SELECT
+//	    			    sdsd.actual_planned_qty AS pendingQty,
+//	    			    3 AS sno
+//	    			FROM sales_delivery_schedule sds
+//
+//	    			INNER JOIN customer_header ch
+//	    			    ON ch.customer_id = sds.customer_id
+//
+//	    			INNER JOIN sales_delivery_schedule_details sdsd
+//	    			    ON sds.sales_delivery_schedule_id = sdsd.sales_delivery_schedule_id
+//
+//	    			INNER JOIN item i
+//	    			    ON i.item_id = sdsd.item_id
+//
+//	    			WHERE sds.cancel = FALSE
+//	    			  AND i.item_id = :itemId
+//	    			  AND sds.month_of_schedule = :month
+//	    			  AND sds.org_id = :orgId
+//	    			  AND ch.customer_id = :customerId
+//
+//	    			""", nativeQuery = true)
+//	    			List<Object[]> getDespatchPendingQty(
+//	    			        @Param("itemId") Long itemId,
+//	    			        @Param("month") String month,
+//	    			        @Param("branch") Long branch,
+//	    			        @Param("orgId") Long orgId,
+//	    			        @Param("customerId") Long customerId);
 	}
 

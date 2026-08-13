@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.EnquiryCusContactResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
@@ -750,7 +750,7 @@ public class DevelopServiceImpl implements DevelopService {
 	    if (enquiryVO.getCustomer() != null) {
 
 	        responseDTO.setCustomerVO(
-	                new CustomerResonse1DTO(
+	                new CustomerResponse1DTO(
 	                        enquiryVO.getCustomer().getId(),
 	                        enquiryVO.getCustomer().getCustomerName()));
 	    }

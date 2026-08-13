@@ -1,6 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,11 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DespatchInstDetailsResponseDTO {
 	private String ordAccpContrNo;
-	private String date;
+	private LocalDate date;
 	private ItemResponse1DTO item;
-	private ItemResponse1DTO unit;
 	private String pdi;
-	private String pdiDate;
+	private LocalDate pdiDate;
 	private  String schduleMonth;
 	private BigDecimal plannedQty;
 	private BigDecimal pendingQty;

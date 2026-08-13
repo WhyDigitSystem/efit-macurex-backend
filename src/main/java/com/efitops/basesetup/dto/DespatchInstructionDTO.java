@@ -2,6 +2,7 @@ package com.efitops.basesetup.dto;
 
 
 
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -14,7 +15,8 @@ import lombok.NoArgsConstructor;
 public class DespatchInstructionDTO {
 	private Long id;
 	private Long branch;
-	private String diNo;
+	private String docId;
+	private LocalDate docDate;
 	private Long customer;
 	private String schduleNo;
 	private String invoiceType;

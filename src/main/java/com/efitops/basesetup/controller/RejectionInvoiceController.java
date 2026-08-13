@@ -17,26 +17,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.efitops.basesetup.ResponseDTO.OtherSalesInvoiceResponseDTO;
+import com.efitops.basesetup.ResponseDTO.RejectionInvoiceResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
-import com.efitops.basesetup.dto.OtherSalesInvoiceDTO;
+import com.efitops.basesetup.dto.RejectionInvoiceDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
-import com.efitops.basesetup.service.OtherSalesInvoiceService;
+import com.efitops.basesetup.service.RejectionInvoiceService;
 
 @RestController
-@RequestMapping("/api/otherSalesInvoice")
-public class OtherSalesInvoiceController extends BaseController {
+@RequestMapping("/api/rejectionInvoice")
+public class RejectionInvoiceController extends BaseController {
 
-	public static final Logger LOGGER = LoggerFactory.getLogger(OtherSalesInvoiceController.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(RejectionInvoiceController.class);
 
 	@Autowired
-	OtherSalesInvoiceService otherSalesInvoiceService;
+	RejectionInvoiceService rejectionInvoiceService;
 
-	@GetMapping("/getOtherSalesInvoiceById")
-	public ResponseEntity<ResponseDTO> getOtherSalesInvoiceById(@RequestParam Long id) {
+	@GetMapping("/getRejectionInvoiceById")
+	public ResponseEntity<ResponseDTO> getRejectionInvoiceById(@RequestParam Long id) {
 
-		String methodName = "getOtherSalesInvoiceById()";
+		String methodName = "getRejectionInvoiceById()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		String errorMsg = null;
@@ -45,12 +45,13 @@ public class OtherSalesInvoiceController extends BaseController {
 
 		try {
 
-			OtherSalesInvoiceResponseDTO otherSalesInvoiceResponseDTO = otherSalesInvoiceService
-					.getOtherSalesInvoiceById(id);
+			RejectionInvoiceResponseDTO rejectionInvoiceResponseDTO = rejectionInvoiceService
+					.getRejectionInvoiceById(id);
 
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Invoice information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Rejection Invoice information retrieved successfully");
 
-			responseObjectsMap.put("otherSalesInvoiceResponseVO", otherSalesInvoiceResponseDTO);
+			responseObjectsMap.put("rejectionInvoiceResponseVO", rejectionInvoiceResponseDTO);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 
@@ -59,8 +60,8 @@ public class OtherSalesInvoiceController extends BaseController {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-			responseDTO = createServiceResponseError(responseObjectsMap, "Quotation information retrieval failed",
-					errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Rejection Invoice information retrieval failed", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
@@ -68,11 +69,10 @@ public class OtherSalesInvoiceController extends BaseController {
 		return ResponseEntity.ok(responseDTO);
 	}
 
-	@GetMapping("/getOtherSalesInvoiceByOrgId")
-	public ResponseEntity<ResponseDTO> getOtherSalesInvoiceByOrgId(@RequestParam Long orgId,
-			@RequestParam Long branch) {
+	@GetMapping("/getRejectionInvoiceByOrgId")
+	public ResponseEntity<ResponseDTO> getRejectionInvoiceByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
 
-		String methodName = "getOtherSalesInvoiceByOrgId()";
+		String methodName = "getRejectionInvoiceByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -80,12 +80,13 @@ public class OtherSalesInvoiceController extends BaseController {
 
 		try {
 
-			List<OtherSalesInvoiceResponseDTO> otherSalesInvoiceResponseDTO = otherSalesInvoiceService
-					.getOtherSalesInvoiceByOrgId(orgId, branch);
+			List<RejectionInvoiceResponseDTO> rejectionInvoiceResponseDTO = rejectionInvoiceService
+					.getRejectionInvoiceByOrgId(orgId, branch);
 
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Rejection Invoice information retrieved successfully");
 
-			responseObjectsMap.put("otherSalesInvoiceResponseVO", otherSalesInvoiceResponseDTO);
+			responseObjectsMap.put("rejectionInvoiceResponseVO", rejectionInvoiceResponseDTO);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 
@@ -93,8 +94,8 @@ public class OtherSalesInvoiceController extends BaseController {
 
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-			responseDTO = createServiceResponseError(responseObjectsMap, "Order information retrieval failed",
-					e.getMessage());
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Rejection Invoice information retrieval failed", e.getMessage());
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
@@ -102,19 +103,19 @@ public class OtherSalesInvoiceController extends BaseController {
 		return ResponseEntity.ok(responseDTO);
 	}
 
-	@PutMapping("/createUpdateOtherSalesInvoice")
-	public ResponseEntity<ResponseDTO> createUpdateOtherSalesInvoice(
-			@RequestBody OtherSalesInvoiceDTO otherSalesInvoiceDTO) {
-		String methodName = "createUpdateOtherSalesInvoice()";
+	@PutMapping("/createUpdateRejectionInvoice")
+	public ResponseEntity<ResponseDTO> createUpdateRejectionInvoice(
+			@RequestBody RejectionInvoiceDTO rejectionInvoiceDTO) {
+		String methodName = "createUpdateRejectionInvoice()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO = null;
 		try {
-			Map<String, Object> otherSalesInvoiceVO = otherSalesInvoiceService
-					.createUpdateOtherSalesInvoice(otherSalesInvoiceDTO);
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, otherSalesInvoiceVO.get("message"));
-			responseObjectsMap.put("otherSalesInvoiceVO", otherSalesInvoiceVO.get("otherSalesInvoiceVO"));
+			Map<String, Object> rejectionInvoiceVO = rejectionInvoiceService
+					.createUpdateRejectionInvoice(rejectionInvoiceDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, rejectionInvoiceVO.get("message"));
+			responseObjectsMap.put("rejectionInvoiceVO", rejectionInvoiceVO.get("rejectionInvoiceVO"));
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
@@ -125,11 +126,11 @@ public class OtherSalesInvoiceController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	@GetMapping("/getOtherSalesInvoiceDocId")
-	public ResponseEntity<ResponseDTO> getOtherSalesInvoiceDocId(@RequestParam Long orgId,
+	@GetMapping("/getRejectionInvoiceDocId")
+	public ResponseEntity<ResponseDTO> getRejectionInvoiceDocId(@RequestParam Long orgId,
 			@RequestParam String screenCode) {
 
-		String methodName = "getOtherSalesInvoiceDocId()";
+		String methodName = "getRejectionInvoiceDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -137,18 +138,20 @@ public class OtherSalesInvoiceController extends BaseController {
 		String mapp = "";
 
 		try {
-			mapp = otherSalesInvoiceService.getOtherSalesInvoiceDocId(orgId, screenCode);
+			mapp = rejectionInvoiceService.getRejectionInvoiceDocId(orgId, screenCode);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 
 		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "InvoiceDocId information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Rejection Invoice DocId information retrieved successfully");
 			responseObjectsMap.put("invoiceDocId", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve InvoiceDocId", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Rejection Invoice DocId",
+					errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
@@ -165,18 +168,18 @@ public class OtherSalesInvoiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = otherSalesInvoiceService.getExchangeRate(orgId, currency);
+			mapp = rejectionInvoiceService.getExchangeRate(orgId, currency);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 
 		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "ExChange Report retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Exchange Rate retrieved successfully");
 			responseObjectsMap.put("mapp", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve  ExChange", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Exchange Rate", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
@@ -193,18 +196,18 @@ public class OtherSalesInvoiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = otherSalesInvoiceService.getTaxPercentage(orgId, hsn);
+			mapp = rejectionInvoiceService.getTaxPercentage(orgId, hsn);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 
 		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Tax Report retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Tax Percentage retrieved successfully");
 			responseObjectsMap.put("mapp", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve  Tax", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Tax Percentage", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
@@ -222,25 +225,24 @@ public class OtherSalesInvoiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = otherSalesInvoiceService.getItemDetailsBasedDesPatch(orgId, branch, despatch);
+			mapp = rejectionInvoiceService.getItemDetailsBasedDesPatch(orgId, branch, despatch);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 
 		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item details retrieved successfully");
 			responseObjectsMap.put("mapp", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve  Item", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Item details", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
+
 	@GetMapping("/getSalesOrderNo")
 	public ResponseEntity<ResponseDTO> getSalesOrderNo(@RequestParam Long customer) {
 		String methodName = "getSalesOrderNo()";
@@ -251,27 +253,26 @@ public class OtherSalesInvoiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = otherSalesInvoiceService.getSalesOrderNo(customer);
+			mapp = rejectionInvoiceService.getSalesOrderNo(customer);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 
 		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales Order retrieved successfully");
 			responseObjectsMap.put("mapp", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve  Sales", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Sales Order", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	
 	@GetMapping("/getOrderAmount")
-	public ResponseEntity<ResponseDTO> getOrderAmount(@RequestParam Long id,@RequestParam Long item) {
+	public ResponseEntity<ResponseDTO> getOrderAmount(@RequestParam Long id, @RequestParam Long item) {
 		String methodName = "getOrderAmount()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -280,18 +281,18 @@ public class OtherSalesInvoiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = otherSalesInvoiceService.getOrderAmount(id,item);
+			mapp = rejectionInvoiceService.getOrderAmount(id, item);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 
 		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order Amount retrieved successfully");
 			responseObjectsMap.put("mapp", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve  Sales", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Order Amount", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

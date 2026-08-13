@@ -14,5 +14,6 @@ public class QuotationDropdownResponseDTO {
     private Long quotationId;
     private String quotationNo;
     private LocalDate quotationDate;
+    private String enquiryNo;
 
 }

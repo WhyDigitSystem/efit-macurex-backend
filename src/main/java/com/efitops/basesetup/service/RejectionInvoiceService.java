@@ -5,21 +5,21 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.efitops.basesetup.ResponseDTO.OtherSalesInvoiceResponseDTO;
-import com.efitops.basesetup.dto.OtherSalesInvoiceDTO;
+import com.efitops.basesetup.ResponseDTO.RejectionInvoiceResponseDTO;
+import com.efitops.basesetup.dto.RejectionInvoiceDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
-public interface OtherSalesInvoiceService {
+public interface RejectionInvoiceService {
 
-	OtherSalesInvoiceResponseDTO getOtherSalesInvoiceById(Long id) throws ApplicationException;
+	RejectionInvoiceResponseDTO getRejectionInvoiceById(Long id) throws ApplicationException;
 
-	List<OtherSalesInvoiceResponseDTO> getOtherSalesInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException;
+	List<RejectionInvoiceResponseDTO> getRejectionInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-	Map<String, Object> createUpdateOtherSalesInvoice(OtherSalesInvoiceDTO otherSalesInvoiceDTO)
+	Map<String, Object> createUpdateRejectionInvoice(RejectionInvoiceDTO rejectionInvoiceDTO)
 			throws ApplicationException;
 
-	String getOtherSalesInvoiceDocId(Long orgId, String screenCode);
+	String getRejectionInvoiceDocId(Long orgId, String screenCode);
 
 	List<Map<String, Object>> getExchangeRate(Long orgId, Long currency);
 

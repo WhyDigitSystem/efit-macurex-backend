@@ -33,8 +33,8 @@ import lombok.NoArgsConstructor;
 public class SalesOrderAmendmentVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_order_amendment_basic_seq")
-    @SequenceGenerator(name = "sales_order_amendment_basic_seq", sequenceName = "sales_order_amendment_basic_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_order_amendment_basicgen")
+    @SequenceGenerator(name = "sales_order_amendment_basicgen", sequenceName = "sales_order_amendment_basicseq",initialValue = 1000000001, allocationSize = 1)
 	
     @Column(name = "sales_order_amendment_id")
     private Long id;
@@ -49,7 +49,7 @@ public class SalesOrderAmendmentVO {
     @Column(name = "salesorder_no")
     private String salesOrderNumber;
 
-    @Column(name = "docdate")
+    @Column(name = "doc_date")
     private LocalDate docDate;
 
     @Column(name = "party_po_amendment_no")

@@ -13,9 +13,12 @@ public class SalesDeliveryScheduleDetailsDTO {
 
 	private String invoiceType;
 
-	private Long itemId;
+	private Long item;
+    private Long unit;
 
-	private Double actualPlannedQty;
+    private double orderQty;
+    private double pendingQty;
+	private double actualPlannedQty;
 
 	private List<SalesDeliverySchedulePlanDTO> deliverySchedules;
 

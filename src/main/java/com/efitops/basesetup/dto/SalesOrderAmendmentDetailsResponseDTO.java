@@ -13,19 +13,19 @@ public class SalesOrderAmendmentDetailsResponseDTO {
 
     private Long id;
 
-    
+    private ItemMasterResponseDetailsDTO item;
 
-    private String itemCode;
+//    private String itemCode;
+//
+//    private String itemDescription;
 
-    private String itemDescription;
+    private double oldQty;
 
-    private Double oldQty;
+    private double oldRate;
 
-    private Double oldRate;
+    private double newQty;
 
-    private Double newQty;
-
-    private Double newRate;
+    private double newRate;
 
     private LocalDate oldDeliveryDate;
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.efitops.basesetup.entity.OrderAcceptanceVO;
@@ -33,4 +34,38 @@ public interface OrderAcceptanceRepo extends JpaRepository<OrderAcceptanceVO, Lo
 			+ "		ORDER BY i.item_code", nativeQuery = true)
 	List<Object[]> getOrderAcceptanceItemDetails(Long orgId, Long branch);
 
+
+	@Query(value = """
+	        SELECT
+	            d.item,
+	            i.item_code,
+	            i.item_description,
+	            soa.new_qty,
+	            soa.new_delivery_date,
+	            soa.new_rate
+	        FROM order_acceptance_detail d
+	        INNER JOIN item i
+	            ON i.item_id = d.item
+	        INNER JOIN order_acceptance_basic o
+	            ON o.order_acceptance_basic_id = d.order_acceptance_basic_id
+	        LEFT JOIN sales_order_amendment_basic soab
+					ON soab.salesorder_no = o.doc_id
+	           AND soab.org_id = o.org_id
+	           AND soab.branch = o.branch
+	           AND soab.active = true
+	           AND soab.cancel = false
+	        LEFT JOIN sales_order_amendment_detail soa
+	            ON soa.sales_order_amendment_id = soab.sales_order_amendment_id
+	           AND soa.item = d.item
+	        WHERE o.doc_id = :docId
+	          AND o.org_id = :orgId
+	          AND o.branch = :branch
+	          AND o.cancel = false
+	          AND o.active = true
+	        ORDER BY i.item_code
+	        """, nativeQuery = true)
+	List<Object[]> getOrderAcceptanceItemsWithAmendment(
+	        @Param("docId") String docId,
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch);
 }

@@ -263,11 +263,12 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		orderAcceptanceVO.setDestination(orderAcceptanceDTO.getDestination());
 		orderAcceptanceVO.setModeOfTransport(orderAcceptanceDTO.getModeOfTransport());
 
-		orderAcceptanceVO.setGrossalue(orderAcceptanceDTO.getGrossalue());
 		orderAcceptanceVO.setFreight(orderAcceptanceDTO.getFreight());
 
 		orderAcceptanceVO.setDeliveryTerms(orderAcceptanceDTO.getDeliveryTerms());
 		orderAcceptanceVO.setPaymentTerms(orderAcceptanceDTO.getPaymentTerms());
+
+		orderAcceptanceVO.setInvoiceType(orderAcceptanceDTO.getInvoiceType());
 
 		orderAcceptanceVO.setSpecification(orderAcceptanceDTO.getSpecification());
 		orderAcceptanceVO.setNote(orderAcceptanceDTO.getNote());
@@ -391,6 +392,10 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				}
 
 				detailsVO.setCurrencyName(dto.getCurrencyName());
+				BigDecimal totalDiscount = detailsVO.getCgstAmount().add(detailsVO.getSgstAmount())
+						.add(detailsVO.getIgstAmount());
+
+				totalAmount = totalAmount.add(amount.add(totalDiscount));
 				detailsVO.setOrderAcceptanceVO(orderAcceptanceVO);
 
 				itemDetailsList.add(detailsVO);
@@ -416,7 +421,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			}
 		}
 
-		orderAcceptanceVO.setTaxableAmount(totalAmount);
+		orderAcceptanceVO.setGrossValue(totalAmount);
 
 		orderAcceptanceVO.setTotalTaxAmount(totalTaxAmount);
 
@@ -574,6 +579,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setCustomerPurchaseOrderDate(orderAcceptanceVO.getCustomerPurchaseOrderDate());
 		responseDTO.setPostRate(orderAcceptanceVO.getPostRate());
 		responseDTO.setCreatedBy(orderAcceptanceVO.getCreatedBy());
+		responseDTO.setInvoiceType(orderAcceptanceVO.getInvoiceType());
 //		responseDTO.setActive(orderAcceptanceVO.isActive());
 //		responseDTO.setCancel(orderAcceptanceVO.isCancel());
 		responseDTO.setUpdatedBy(orderAcceptanceVO.getUpdatedBy());
@@ -582,7 +588,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setFinancialYear(orderAcceptanceVO.getFinancialYear());
 		responseDTO.setDestination(orderAcceptanceVO.getDestination());
 		responseDTO.setModeOfTransport(orderAcceptanceVO.getModeOfTransport());
-		responseDTO.setGrossalue(orderAcceptanceVO.getGrossalue());
+		responseDTO.setGrossValue(orderAcceptanceVO.getGrossValue());
 		responseDTO.setFreight(orderAcceptanceVO.getFreight());
 		responseDTO.setDeliveryTerms(orderAcceptanceVO.getDeliveryTerms());
 		responseDTO.setPaymentTerms(orderAcceptanceVO.getPaymentTerms());
@@ -629,11 +635,9 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				if (detailsVO.getItem() != null) {
 					detailsDTO.setItems(new ItemMasterResponseTaxDTO(detailsVO.getItem().getId(),
 							detailsVO.getItem().getItemCode(), detailsVO.getItem().getItemDescription(),
-							detailsVO.getItem().getHsnCode() != null ? detailsVO.getItem().getHsnCode().getHsn()
-									: null));
+							detailsVO.getItem().getHsnCode() != null ? detailsVO.getItem().getHsnCode().getHsn() : null,
+							detailsVO.getItem().getCustomerPartNo()));
 				}
-
-//				detailsDTO.setCustomerPartNo(detailsVO.getCustomerPartNo());
 
 				if (detailsVO.getUnit() != null) {
 					detailsDTO

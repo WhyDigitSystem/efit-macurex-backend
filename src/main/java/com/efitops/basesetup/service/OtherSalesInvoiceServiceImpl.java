@@ -230,7 +230,6 @@ public class OtherSalesInvoiceServiceImpl implements OtherSalesInvoiceService {
 		otherSalesInvoiceVO.setFinancialYear(otherSalesInvoiceDTO.getFinancialYear());
 
 		otherSalesInvoiceVO.setIsIgstApplicable(otherSalesInvoiceDTO.getIsIgstApplicable());
-		
 
 		if (otherSalesInvoiceDTO.getBranch() != null && otherSalesInvoiceDTO.getBranch() > 0) {
 
@@ -756,6 +755,28 @@ public class OtherSalesInvoiceServiceImpl implements OtherSalesInvoiceService {
 			map.put("docId", ch[0] != null ? ch[0].toString() : "");
 			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
 			map.put("id", ch[2] != null ? ch[2].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getOrderAmount(Long id, Long item) {
+		Set<Object[]> chType = otherSalesInvoiceRepo.getOrderAmount(id, item);
+		return getOrderAmount(chType);
+	}
+
+	private List<Map<String, Object>> getOrderAmount(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("rate", ch[1] != null ? new BigDecimal(ch[1].toString()) : BigDecimal.ZERO);
+
 			list.add(map);
 		}
 

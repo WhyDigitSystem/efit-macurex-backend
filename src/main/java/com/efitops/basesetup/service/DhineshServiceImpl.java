@@ -666,6 +666,9 @@ public class DhineshServiceImpl implements DhineshService {
 			dto.setQuotationNo(obj[1] != null ? obj[1].toString() : null);
 
 			dto.setQuotationDate(obj[2] != null ? ((java.sql.Date) obj[2]).toLocalDate() : null);
+			
+			dto.setEnquiryNo(obj[3] != null ? obj[3].toString() : null);
+
 
 			responseList.add(dto);
 		}

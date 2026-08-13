@@ -86,5 +86,20 @@ public interface OtherSalesInvoiceRepo extends JpaRepository<OtherSalesInvoiceVO
 			+ "where p.customer_id =?1 and ob.cancel='F'\r\n"
 			+ "order by  2")
 	Set<Object[]> getSalesOrderNo(Long customer);
+	
+	@Query(nativeQuery = true, value = "select (od.order_amount/od.quantity) rate from order_acceptance_detail od,item i,\r\n"
+			+ "order_acceptance_basic ob\r\n"
+			+ "where OB.CANCEL=0  AND i.item_id = od.item\r\n"
+			+ "and ob.order_acceptance_basic_id =?1\r\n"
+			+ "and i.item_id =?2\r\n"
+			+ "and ob.order_acceptance_basic_id not in (Select order_acceptance_basic_id from order_acceptance_basic)\r\n"
+			+ "union\r\n"
+			+ "select od.order_rate rate from sales_contract_detail od,item i,\r\n"
+			+ "sales_contract_basic ob\r\n"
+			+ "where OB.CANCEL=0  AND i.item_id = od.item\r\n"
+			+ "and ob.salescontract_id = ?1\r\n"
+			+ "and i.item_id =?2\r\n"
+			+ "and ob.salescontract_id not in (Select contract_no from sales_contract_amendment_basic)")
+	Set<Object[]> getOrderAmount(Long id,Long item);
 
 }

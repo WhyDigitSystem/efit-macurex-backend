@@ -172,11 +172,11 @@ public class RejectionInvoiceVO {
 
 	@OneToMany(mappedBy = "rejectionInvoiceVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<OtherSalesInvoiceDetailsVO> otherSalesInvoiceDetailsVO;
+	private List<RejectionInvoiceDetailsVO> rejectionInvoiceDetailsVO;
 
-	@OneToMany(mappedBy = "RejectionInvoiceVO", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "rejectionInvoiceVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<OtherSalesInvoiceTaxDetailsVO> otherSalesInvoiceTaxDetailsVO;
+	private List<RejectionInvoiceTaxDetailsVO> rejectionInvoiceTaxDetailsVO;
 
 	@JsonGetter("active")
 	public String getActive() {

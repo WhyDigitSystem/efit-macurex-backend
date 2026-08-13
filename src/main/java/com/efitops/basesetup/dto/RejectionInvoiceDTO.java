@@ -79,8 +79,8 @@ public class RejectionInvoiceDTO {
 
 	private String isIgstApplicable;
 
-	private List<OtherSalesInvoiceDetailsDTO> otherSalesInvoiceDetailsDTO;
+	private List<RejectionInvoiceDetailsDTO> rejectionInvoiceDetailsDTO;
 
-	private List<OtherSalesInvoiceTaxDetailsDTO> otherSalesInvoiceTaxDetailsDTO;
+	private List<RejectionInvoiceTaxDetailsDTO> rejectionInvoiceTaxDetailsDTO;
 
 }

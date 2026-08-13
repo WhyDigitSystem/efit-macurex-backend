@@ -98,7 +98,7 @@ public interface OtherSalesInvoiceRepo extends JpaRepository<OtherSalesInvoiceVO
 			+ "sales_contract_basic ob\r\n"
 			+ "where OB.CANCEL=0  AND i.item_id = od.item\r\n"
 			+ "and ob.salescontract_id = ?1\r\n"
-			+ "and i.item_id =1000000006\r\n"
+			+ "and i.item_id =?2\r\n"
 			+ "and ob.salescontract_id not in (Select contract_no from sales_contract_amendment_basic)")
 	Set<Object[]> getOrderAmount(Long id,Long item);
 

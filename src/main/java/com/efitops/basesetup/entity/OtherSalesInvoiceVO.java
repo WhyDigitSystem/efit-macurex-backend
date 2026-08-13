@@ -1,6 +1,7 @@
 package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -28,15 +29,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "rejection_invoice_basic")
+@Table(name = "other_sales_inv_basic")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class RejectionInvoiceVO {
+@AllArgsConstructor
+public class OtherSalesInvoiceVO {
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rejection_invoice_basicgen")
-	@SequenceGenerator(name = "rejection_invoice_basicgen", sequenceName = "rejection_invoice_basicgen", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "rejection_invoice_basic_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "other_sales_inv_basicgen")
+	@SequenceGenerator(name = "other_sales_inv_basicgen", sequenceName = "other_sales_inv_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "other_sales_inv_basic_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "doc_id")
@@ -170,13 +172,13 @@ public class RejectionInvoiceVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 
-	@OneToMany(mappedBy = "rejectionInvoiceVO", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "otherSalesInvoiceVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<RejectionInvoiceDetailsVO> rejectionInvoiceDetailsVO;
+	private List<OtherSalesInvoiceDetailsVO> otherSalesInvoiceDetailsVO;
 
-	@OneToMany(mappedBy = "rejectionInvoiceVO", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "otherSalesInvoiceVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<RejectionInvoiceTaxDetailsVO> rejectionInvoiceTaxDetailsVO;
+	private List<OtherSalesInvoiceTaxDetailsVO> otherSalesInvoiceTaxDetailsVO;
 
 	@JsonGetter("active")
 	public String getActive() {

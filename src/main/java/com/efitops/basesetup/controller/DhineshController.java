@@ -231,7 +231,7 @@ public class DhineshController extends BaseController{
         return ResponseEntity.ok().body(responseDTO);
     }
 	
-	@GetMapping("/getQuotationItemDropdown")
+	@GetMapping("/getQuotationItemDropdownbySalesContract")
 	public ResponseEntity<ResponseDTO> getQuotationItemDropdown(
 	        @RequestParam String quotationNo,
 	        @RequestParam Long orgId,

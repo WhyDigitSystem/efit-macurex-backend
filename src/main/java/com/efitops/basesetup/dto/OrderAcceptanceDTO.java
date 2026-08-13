@@ -44,7 +44,7 @@ public class OrderAcceptanceDTO {
 
 	private String createdBy;
 
-	private String updatedBy;
+//	private String updatedBy;
 
 	private String cancelRemarks;
 

@@ -544,7 +544,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
             DespatchInstructionResponseDocIdDTO customerDTO = new DespatchInstructionResponseDocIdDTO();
 
             customerDTO.setId(rejectionInvoiceVO.getDiNo().getId());
-            customerDTO.setDocId(rejectionInvoiceVO.getDiNo().getDiNo());
+            customerDTO.setDocId(rejectionInvoiceVO.getDiNo().getDocId());
 
             responseDTO.setDiNo(customerDTO);
         }

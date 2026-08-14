@@ -14,13 +14,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocketInvoiceDetResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
+import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.DocketInvoiceDTO;
+import com.efitops.basesetup.dto.DocketInvoiceDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractAmdDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
@@ -31,16 +36,21 @@ import com.efitops.basesetup.dto.SalesDeliverySchedulePlanResponseDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.DocketInvoiceDetailsVO;
+import com.efitops.basesetup.entity.DocketInvoiceVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.SalesContractAmdDetailsVO;
 import com.efitops.basesetup.entity.SalesContractAmendmentVO;
 import com.efitops.basesetup.entity.SalesDeliveryScheduleDetailsVO;
 import com.efitops.basesetup.entity.SalesDeliverySchedulePlanVO;
 import com.efitops.basesetup.entity.SalesDeliveryScheduleVO;
+import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
+import com.efitops.basesetup.repository.DocketInvoiceDetRepo;
+import com.efitops.basesetup.repository.DocketInvoiceRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.SalesContractAmdDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractAmdRepo;
@@ -49,6 +59,7 @@ import com.efitops.basesetup.repository.SalesContractRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleDetailsRepo;
 import com.efitops.basesetup.repository.SalesDeliverySchedulePlanRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
+import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
@@ -88,6 +99,16 @@ public class TransactionServiceImpl implements TransactionService {
 	
 	@Autowired
     UnitMasterRepo 	unitMasterRepo;
+	
+	@Autowired
+	private DocketInvoiceRepo docketInvoiceRepo;
+
+	@Autowired
+	private DocketInvoiceDetRepo docketInvoiceDetRepo;
+	
+	@Autowired
+	TransportRepo transportRepo;
+
 
 	// salesdeliveryschedule
 
@@ -880,5 +901,230 @@ public class TransactionServiceImpl implements TransactionService {
 
 		    return responseMap;
 		}
-		
+		// Docket Invoice
+
+		@Override
+		@Transactional
+		public Map<String, Object> updateCreateDocketInvoice(DocketInvoiceDTO docketInvoiceDTO)
+				throws ApplicationException {
+
+			DocketInvoiceVO docketInvoiceVO = new DocketInvoiceVO();
+
+			String message;
+
+			if (ObjectUtils.isNotEmpty(docketInvoiceDTO.getId())) {
+
+				docketInvoiceVO = docketInvoiceRepo.findById(docketInvoiceDTO.getId())
+						.orElseThrow(() -> new ApplicationException("Invalid Docket Invoice Details"));
+
+				docketInvoiceVO.setUpdatedBy(docketInvoiceDTO.getCreatedBy());
+
+				message = "Docket Invoice Updated Successfully";
+
+			} else {
+
+				docketInvoiceVO.setCreatedBy(docketInvoiceDTO.getCreatedBy());
+
+				docketInvoiceVO.setUpdatedBy(docketInvoiceDTO.getCreatedBy());
+
+				message = "Docket Invoice Created Successfully";
+			}
+
+			createUpdateDocketInvoiceVO(docketInvoiceDTO, docketInvoiceVO);
+
+			DocketInvoiceVO savedDocketInvoice = docketInvoiceRepo.save(docketInvoiceVO);
+
+			Map<String, Object> response = new HashMap<>();
+
+			response.put("message", message);
+
+			response.put("docketInvoiceVO", docketInvoiceResponse(savedDocketInvoice));
+
+			return response;
+		}
+
+		private DocketInvoiceResponseDTO docketInvoiceResponse(DocketInvoiceVO docketInvoiceVO) {
+
+			DocketInvoiceResponseDTO responseDTO = new DocketInvoiceResponseDTO();
+
+			responseDTO.setId(docketInvoiceVO.getId());
+			responseDTO.setDocNo(docketInvoiceVO.getDocNo());
+			responseDTO.setDocDate(docketInvoiceVO.getDocDate());
+			responseDTO.setBillNo(docketInvoiceVO.getBillNo());
+			responseDTO.setBillDate(docketInvoiceVO.getBillDate());
+			responseDTO.setTotalAmount(docketInvoiceVO.getTotalAmount());
+			responseDTO.setOrgId(docketInvoiceVO.getOrgId());
+			responseDTO.setActive(docketInvoiceVO.getActive());
+			responseDTO.setCreatedBy(docketInvoiceVO.getCreatedBy());
+			responseDTO.setCancelRemarks(docketInvoiceVO.getCancelRemarks());
+
+			// =========================
+			// Branch Response
+			// =========================
+
+			if (docketInvoiceVO.getBranch() != null) {
+
+				BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+
+				branchResponseDTO.setId(docketInvoiceVO.getBranch().getId());
+				branchResponseDTO.setBranchName(docketInvoiceVO.getBranch().getBranchName());
+
+				responseDTO.setBranch(branchResponseDTO);
+			}
+
+			// =========================
+			// Transport Response
+			// =========================
+
+			if (docketInvoiceVO.getTransport() != null) {
+
+				TransportResponseDTO transportResponseDTO = new TransportResponseDTO();
+
+				transportResponseDTO.setId(docketInvoiceVO.getTransport().getId());
+				transportResponseDTO.setTransportName(docketInvoiceVO.getTransport().getTransportName());
+
+				responseDTO.setTransport(transportResponseDTO);
+			}
+
+			// =========================
+			// Child Response
+			// =========================
+
+			List<DocketInvoiceDetResponseDTO> detailResponseList = new ArrayList<>();
+
+			if (docketInvoiceVO.getDetails() != null && !docketInvoiceVO.getDetails().isEmpty()) {
+
+				for (DocketInvoiceDetailsVO detailVO : docketInvoiceVO.getDetails()) {
+
+					DocketInvoiceDetResponseDTO detailDTO = new DocketInvoiceDetResponseDTO();
+
+					detailDTO.setDocketNo(detailVO.getDocketNo());
+					detailDTO.setDocketDate(detailVO.getDocketDate());
+					detailDTO.setInvoiceNo(detailVO.getInvoiceNo());
+					detailDTO.setNoOfQty(detailVO.getNoOfQty());
+					detailDTO.setWeight(detailVO.getWeight());
+					detailDTO.setTotalValue(detailVO.getTotalValue());
+					detailDTO.setCumulativeValue(detailVO.getCumulativeValue());
+					detailDTO.setMode(detailVO.getMode());
+
+					detailResponseList.add(detailDTO);
+				}
+			}
+
+			responseDTO.setDocketInvoiceDetResponseDTO(detailResponseList);
+
+			return responseDTO;
+		}
+
+		private void createUpdateDocketInvoiceVO(DocketInvoiceDTO dto, DocketInvoiceVO docketInvoiceVO)
+				throws ApplicationException {
+
+	
+			docketInvoiceVO.setBillNo(dto.getBillNo());
+			docketInvoiceVO.setBillDate(dto.getBillDate());
+			docketInvoiceVO.setTotalAmount(dto.getTotalAmount());
+
+			docketInvoiceVO.setOrgId(dto.getOrgId());
+			docketInvoiceVO.setActive(dto.isActive());
+			docketInvoiceVO.setCancelRemarks(dto.getCancelRemarks());
+
+			// =========================
+			// Branch Mapping
+			// =========================
+
+			if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+				BranchVO branch = branchRepo.findById(dto.getBranch())
+						.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+				docketInvoiceVO.setBranch(branch);
+			}
+
+			// =========================
+			// Transport Mapping
+			// =========================
+
+			if (dto.getTransport() != null && dto.getTransport() != 0) {
+
+				TransportMasterVO transport = transportRepo.findById(dto.getTransport())
+						.orElseThrow(() -> new ApplicationException("Transport Not Found"));
+
+				docketInvoiceVO.setTransport(transport);
+			}
+
+			// ======================================
+			// Delete Existing Child During Update
+			// ======================================
+
+			if (dto.getId() != null) {
+
+				List<DocketInvoiceDetailsVO> oldList = docketInvoiceDetRepo.findByDocketInvoiceVO(docketInvoiceVO);
+
+				docketInvoiceDetRepo.deleteAll(oldList);
+			}
+
+			// ======================================
+			// Child Save
+			// ======================================
+
+			List<DocketInvoiceDetailsVO> detailList = new ArrayList<>();
+
+			if (dto.getDocketInvoiceDetailsDTO() != null && !dto.getDocketInvoiceDetailsDTO().isEmpty()) {
+
+				for (DocketInvoiceDetailsDTO detailDTO : dto.getDocketInvoiceDetailsDTO()) {
+
+					DocketInvoiceDetailsVO detailVO = new DocketInvoiceDetailsVO();
+
+					detailVO.setDocketNo(detailDTO.getDocketNo());
+					detailVO.setDocketDate(detailDTO.getDocketDate());
+					detailVO.setInvoiceNo(detailDTO.getInvoiceNo());
+					detailVO.setNoOfQty(detailDTO.getNoOfQty());
+					detailVO.setWeight(detailDTO.getWeight());
+					detailVO.setTotalValue(detailDTO.getTotalValue());
+					detailVO.setCumulativeValue(detailDTO.getCumulativeValue());
+					detailVO.setMode(detailDTO.getMode());
+
+					// Parent Mapping
+					detailVO.setDocketInvoiceVO(docketInvoiceVO);
+
+					detailList.add(detailVO);
+				}
+
+				docketInvoiceVO.setDetails(detailList);
+			}
+
+		}
+
+		@Override
+		public DocketInvoiceResponseDTO getDocketInvoiceById(Long id) throws ApplicationException {
+
+			if (ObjectUtils.isEmpty(id)) {
+				throw new ApplicationException("Invalid Id");
+			}
+
+			DocketInvoiceVO docketInvoiceVO = docketInvoiceRepo.findById(id)
+					.orElseThrow(() -> new ApplicationException("Docket Invoice Not Found"));
+
+			return docketInvoiceResponse(docketInvoiceVO);
+		}
+
+		@Override
+		public List<DocketInvoiceResponseDTO> getDocketInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException {
+
+			List<DocketInvoiceVO> docketInvoiceList = docketInvoiceRepo.getDocketInvoiceByOrgId(orgId, branch);
+
+			if (docketInvoiceList.isEmpty()) {
+				throw new ApplicationException("No Docket Invoice Details Found");
+			}
+
+			List<DocketInvoiceResponseDTO> responseList = new ArrayList<>();
+
+			for (DocketInvoiceVO docketInvoiceVO : docketInvoiceList) {
+
+				responseList.add(docketInvoiceResponse(docketInvoiceVO));
+			}
+
+			return responseList;
+		}
+
 }

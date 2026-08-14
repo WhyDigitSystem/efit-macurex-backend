@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DespatchInstructionDetailsDTO {
-	private Long id;
+//	private Long id;
 	private String ordAccpContrNo;
 	private LocalDate date;
 	private Long item;

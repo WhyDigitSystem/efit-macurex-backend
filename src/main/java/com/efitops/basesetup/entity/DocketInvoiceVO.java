@@ -19,6 +19,7 @@ import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,8 +32,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DocketInvoiceVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "docketinvoicebasicgen")
-	@SequenceGenerator(name = "docketinvoicebasicgen", sequenceName = "docketinvoicebasicseq", initialValue = 1000000001, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "docket_invoice_basicgen")
+	@SequenceGenerator(name = "docket_invoice_basicgen", sequenceName = "docket_invoice_basicseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "docket_invoice_basic_id")
     private Long id;
 	
@@ -85,13 +86,18 @@ public class DocketInvoiceVO {
 		return cancel ? "T" : "F";
 	}
 	
+	@JsonGetter("active")
+	public String getActive() {
+		return active ? "Active" : "In-Active";
+	}
+	
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
 	 @OneToMany(
 	            mappedBy = "docketInvoiceVO",
-	            cascade = CascadeType.ALL,
-	            orphanRemoval = true)
+	            cascade = CascadeType.ALL)
+	 @JsonManagedReference
 	    private List<DocketInvoiceDetailsVO> details =
 	            new ArrayList<>();
 

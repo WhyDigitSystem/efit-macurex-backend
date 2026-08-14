@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,8 +26,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DocketInvoiceDetailsVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "docketinvoicedetailgen")
-	@SequenceGenerator(name = "docketinvoicedetailgen", sequenceName = "docketinvoicedetailseq", initialValue = 1000000001, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "docket_invoice_detailgen")
+	@SequenceGenerator(name = "docket_invoice_detailgen", sequenceName = "docket_invoice_detailseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "docket_invoice_detail_id")
     private Long id;
 	
@@ -48,12 +50,13 @@ public class DocketInvoiceDetailsVO {
 	private double totalValue;
 	
 	@Column(name = "cumulative_value")
-	private Double cumulativeValue;
+	private double cumulativeValue;
 	
 	@Column(name = "mode")
 	private String mode;
 	
 	 @ManyToOne(fetch = FetchType.LAZY)
+	 @JsonBackReference
 	    @JoinColumn(name="docket_invoice_basic_id")
 	    private DocketInvoiceVO docketInvoiceVO;
 	

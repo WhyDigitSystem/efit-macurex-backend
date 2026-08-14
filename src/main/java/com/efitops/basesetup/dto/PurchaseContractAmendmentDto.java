@@ -1,6 +1,7 @@
 package com.efitops.basesetup.dto;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -25,12 +26,12 @@ public class PurchaseContractAmendmentDto {
 	    private String belongsTo;
 
 	    // Amendment
-	    private String docId;
-	    private LocalDate docDate;
+//	    private String docId;
+//	    private LocalDate docDate;
 
 	    // Party
-	    private Long party;
-	    private String partyName;
+	    private Long customer;
+	    
 
 	    // Purchase Contract
 	    private String contractNo;
@@ -60,7 +61,7 @@ public class PurchaseContractAmendmentDto {
 
 	    private String packingType;
 
-	    private String insuranceAmount;
+	    private BigDecimal insuranceAmount;
 
 	    private String modeOfDespatch;
 

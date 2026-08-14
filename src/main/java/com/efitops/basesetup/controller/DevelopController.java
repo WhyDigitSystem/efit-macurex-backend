@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
@@ -740,138 +742,294 @@ public ResponseEntity<ResponseDTO> getSalesOrderAmdRevisionNo(
 //Purchase contract amendment
 
 
-//@PostMapping("/createUpdatePurchaseContractAmendment")
-//public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
-//        @RequestBody PurchaseContractAmendmentDto purchaseContractAmendmentDto) {
-//
-//    Map<String, Object> responseObjectsMap = new HashMap<>();
-//    ResponseDTO responseDTO;
-//
-//    try {
-//
-//        Map<String, Object> purchaseContractAmendmentMap =
-//                developService.createUpdatePurchaseContractAmendment(
-//                        purchaseContractAmendmentDto);
-//
-//        responseObjectsMap.put(
-//                CommonConstant.STRING_MESSAGE,
-//                purchaseContractAmendmentMap.get(CommonConstant.MESSAGE));
-//
-//        responseObjectsMap.put(
-//                "purchaseContractAmendmentVO",
-//                purchaseContractAmendmentMap.get(CommonConstant.DATA));
-//
-//        responseDTO = createServiceResponse(responseObjectsMap);
-//
-//    } catch (Exception e) {
-//
-//        e.printStackTrace();
-//
-//        responseDTO = createServiceResponseError(
-//                responseObjectsMap,
-//                e.getMessage(),
-//                e.getMessage());
-//    }
-//
-//    return ResponseEntity.ok(responseDTO);
-//}
-//
-//
-//@GetMapping("/getPurchaseContractAmendmentById")
-//public ResponseEntity<ResponseDTO> getPurchaseContractAmendmentById(
-//        @RequestParam Long id) {
-//
-//    String methodName = "getPurchaseContractAmendmentById()";
-//    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-//
-//    Map<String, Object> responseObjectsMap = new HashMap<>();
-//    ResponseDTO responseDTO;
-//
-//    try {
-//
-//        PurchaseContractAmendmentResponseDto response =
-//                developService.getPurchaseContractAmendmentById(id);
-//
-//        responseObjectsMap.put(
-//                CommonConstant.STRING_MESSAGE,
-//                "Purchase Contract Amendment information retrieved successfully");
-//
-//        responseObjectsMap.put(
-//                "purchaseContractAmendmentResponseVO",
-//                response);
-//
-//        responseDTO = createServiceResponse(responseObjectsMap);
-//
-//    } catch (Exception e) {
-//
-//        LOGGER.error(
-//                UserConstants.ERROR_MSG_METHOD_NAME,
-//                methodName,
-//                e.getMessage());
-//
-//        responseDTO = createServiceResponseError(
-//                responseObjectsMap,
-//                "Purchase Contract Amendment information retrieval failed",
-//                e.getMessage());
-//    }
-//
-//    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-//
-//    return ResponseEntity.ok(responseDTO);
-//}
+@PutMapping(
+        value = "/createUpdatePurchaseContractAmendment",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+)
+public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
+        @RequestPart("purchaseContractAmendment")
+        PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+
+        @RequestPart(value = "files", required = false)
+        MultipartFile[] files) {
+
+    Map<String, Object> responseObjectsMap = new HashMap<>();
+    ResponseDTO responseDTO;
+
+    try {
+
+        Map<String, Object> purchaseContractAmendmentMap =
+                developService.createUpdatePurchaseContractAmendment(
+                        purchaseContractAmendmentDto,
+                        files);
+
+        responseObjectsMap.put(
+                CommonConstant.STRING_MESSAGE,
+                purchaseContractAmendmentMap.get("message"));
+
+        responseObjectsMap.put(
+                "purchaseContractAmendmentVO",
+                purchaseContractAmendmentMap.get(
+                        "purchaseContractAmendmentVO"));
+
+        responseDTO =
+                createServiceResponse(responseObjectsMap);
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+
+        responseDTO = createServiceResponseError(
+                responseObjectsMap,
+                e.getMessage(),
+                e.getMessage());
+    }
+
+    return ResponseEntity.ok(responseDTO);
+}
+// =========================
+// Get By Id
+// =========================
+
+@GetMapping("/getPurchaseContractAmendmentById")
+public ResponseEntity<ResponseDTO> getPurchaseContractAmendmentById(
+        @RequestParam Long id) {
+
+    String methodName = "getPurchaseContractAmendmentById()";
+    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+    Map<String, Object> responseObjectsMap = new HashMap<>();
+    ResponseDTO responseDTO;
+
+    try {
+
+        PurchaseContractAmendmentResponseDto response =
+                developService.getPurchaseContractAmendmentById(id);
+
+        responseObjectsMap.put(
+                CommonConstant.STRING_MESSAGE,
+                "Purchase Contract Amendment information retrieved successfully");
+
+        responseObjectsMap.put(
+                "purchaseContractAmendmentResponseVO",
+                response);
+
+        responseDTO = createServiceResponse(responseObjectsMap);
+
+    } catch (Exception e) {
+
+        LOGGER.error(
+                UserConstants.ERROR_MSG_METHOD_NAME,
+                methodName,
+                e.getMessage());
+
+        responseDTO = createServiceResponseError(
+                responseObjectsMap,
+                "Purchase Contract Amendment information retrieval failed",
+                e.getMessage());
+    }
+
+    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+    return ResponseEntity.ok(responseDTO);
+}
 
 // =========================
 // Get By Org Id
 // =========================
 
-//@GetMapping("/getPurchaseContractAmendmentByOrgId")
-//public ResponseEntity<ResponseDTO> getPurchaseContractAmendmentByOrgId(
-//        @RequestParam Long orgId,
-//        @RequestParam Long branch) {
-//
-//    String methodName = "getPurchaseContractAmendmentByOrgId()";
-//    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-//
-//    Map<String, Object> responseObjectsMap = new HashMap<>();
-//    ResponseDTO responseDTO;
-//
-//    try {
-//
-//        List<PurchaseContractAmendmentResponseDto> response =
-//                developService.getPurchaseContractAmendmentByOrgId(
-//                        orgId, branch);
-//
-//        responseObjectsMap.put(
-//                CommonConstant.STRING_MESSAGE,
-//                "Purchase Contract Amendment information retrieved successfully");
-//
-//        responseObjectsMap.put(
-//                "purchaseContractAmendmentResponseVO",
-//                response);
-//
-//        responseDTO = createServiceResponse(responseObjectsMap);
-//
-//    } catch (Exception e) {
-//
-//        LOGGER.error(
-//                UserConstants.ERROR_MSG_METHOD_NAME,
-//                methodName,
-//                e.getMessage());
-//
-//        responseDTO = createServiceResponseError(
-//                responseObjectsMap,
-//                "Purchase Contract Amendment information retrieval failed",
-//                e.getMessage());
-//    }
-//
-//    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-//
-//    return ResponseEntity.ok(responseDTO);
-//}
+@GetMapping("/getPurchaseContractAmendmentByOrgId")
+public ResponseEntity<ResponseDTO> getPurchaseContractAmendmentByOrgId(
+        @RequestParam Long orgId,
+        @RequestParam Long branch) {
 
-//PurchaseContractAmendmentContractNoDropdown
+    String methodName = "getPurchaseContractAmendmentByOrgId()";
+    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+    Map<String, Object> responseObjectsMap = new HashMap<>();
+    ResponseDTO responseDTO;
+
+    try {
+
+        List<PurchaseContractAmendmentResponseDto> response =
+                developService.getPurchaseContractAmendmentByOrgId(
+                        orgId,
+                        branch);
+
+        responseObjectsMap.put(
+                CommonConstant.STRING_MESSAGE,
+                "Purchase Contract Amendment information retrieved successfully");
+
+        responseObjectsMap.put(
+                "purchaseContractAmendmentResponseVO",
+                response);
+
+        responseDTO = createServiceResponse(responseObjectsMap);
+
+    } catch (Exception e) {
+
+        LOGGER.error(
+                UserConstants.ERROR_MSG_METHOD_NAME,
+                methodName,
+                e.getMessage());
+
+        responseDTO = createServiceResponseError(
+                responseObjectsMap,
+                "Purchase Contract Amendment information retrieval failed",
+                e.getMessage());
+    }
+
+    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+    return ResponseEntity.ok(responseDTO);
+}
+
+// =========================
+// Contract No Dropdown
+// =========================
+
+@GetMapping("/getContractNoDropdownforPurchaseContractAmendment")
+public ResponseEntity<ResponseDTO>
+getContractNoDropdownforPurchaseContractAmendment(
+        @RequestParam Long orgId,
+        @RequestParam Long branch) {
+
+    String methodName =
+            "getContractNoDropdownforPurchaseContractAmendment()";
+
+    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+    Map<String, Object> responseObjectsMap = new HashMap<>();
+    ResponseDTO responseDTO;
+
+    try {
+
+        List<PurchaseContractAmendmentContractDropdownResponseDto> response =
+                developService
+                .getContractNoDropdownforPurchaseContractAmendment(
+                        orgId,
+                        branch);
+
+        responseObjectsMap.put(
+                CommonConstant.STRING_MESSAGE,
+                "Purchase Contract dropdown retrieved successfully");
+
+        responseObjectsMap.put(
+                "purchaseContractDropdownResponseVO",
+                response);
+
+        responseDTO = createServiceResponse(responseObjectsMap);
+
+    } catch (Exception e) {
+
+        LOGGER.error(
+                UserConstants.ERROR_MSG_METHOD_NAME,
+                methodName,
+                e.getMessage());
+
+        responseDTO = createServiceResponseError(
+                responseObjectsMap,
+                "Purchase Contract dropdown retrieval failed",
+                e.getMessage());
+    }
+
+    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+    return ResponseEntity.ok(responseDTO);
+}
 
 
+//=========================
+//Item Dropdown
+//=========================
+
+@GetMapping("/getItemDropdownForPurchaseContractAmendment")
+public ResponseEntity<ResponseDTO> getItemDropdownForPurchaseContractAmendment(
+     @RequestParam Long contractId) {
+
+ String methodName = "getItemDropdownForPurchaseContractAmendment()";
+ LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+ Map<String, Object> responseObjectsMap = new HashMap<>();
+ ResponseDTO responseDTO;
+
+ try {
+
+     List<PurchaseContractAmendmentItemDropdownResponseDto> response =
+             developService.getItemDropdownForPurchaseContractAmendment(
+                     contractId);
+
+     responseObjectsMap.put(
+             CommonConstant.STRING_MESSAGE,
+             "Item dropdown retrieved successfully");
+
+     responseObjectsMap.put(
+             "purchaseContractAmendmentItemDropdownResponseVO",
+             response);
+
+     responseDTO = createServiceResponse(responseObjectsMap);
+
+ } catch (Exception e) {
+
+     LOGGER.error(
+             UserConstants.ERROR_MSG_METHOD_NAME,
+             methodName,
+             e.getMessage());
+
+     responseDTO = createServiceResponseError(
+             responseObjectsMap,
+             "Item dropdown retrieval failed",
+             e.getMessage());
+ }
+
+ LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+ return ResponseEntity.ok(responseDTO);
+}
 
 
+@GetMapping("/getPurchaseContractAmdRevisionNo")
+public ResponseEntity<ResponseDTO> getPurchaseContractAmdRevisionNo(
+        @RequestParam String contractNo,
+        @RequestParam Long orgId,
+        @RequestParam Long branch) {
+
+    String methodName = "getPurchaseContractAmdRevisionNo()";
+    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+    Map<String, Object> responseObjectsMap = new HashMap<>();
+    ResponseDTO responseDTO;
+
+    try {
+
+        Integer revisionNo = developService.getPurchaseContractAmdRevisionNo(
+                contractNo,
+                orgId,
+                branch);
+
+        responseObjectsMap.put(
+                CommonConstant.STRING_MESSAGE,
+                "Revision No retrieved successfully");
+
+        responseObjectsMap.put("revisionNo", revisionNo);
+
+        responseDTO = createServiceResponse(responseObjectsMap);
+
+    } catch (Exception e) {
+
+        LOGGER.error(
+                UserConstants.ERROR_MSG_METHOD_NAME,
+                methodName,
+                e.getMessage());
+
+        responseDTO = createServiceResponseError(
+                responseObjectsMap,
+                "Revision No retrieval failed",
+                e.getMessage());
+    }
+
+    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+    return ResponseEntity.ok(responseDTO);
+}
 }

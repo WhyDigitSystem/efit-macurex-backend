@@ -22,7 +22,7 @@ public class DocketInvoiceResponseDTO {
      private LocalDate billDate;
 	 private int totalAmount;
 	 private Long orgId;
-	 private Boolean active;
+	 private String active;
 	 private String createdBy;
 	 private String cancelRemarks;
 	 private List<DocketInvoiceDetResponseDTO>docketInvoiceDetResponseDTO;

@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,16 +30,16 @@ public class PurchaseContractAmendmentDetailsVO {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "pcamddetail_seq")
     @SequenceGenerator(name = "pcamddetail_seq",
-            sequenceName = "pcamddetail_seq",
+            sequenceName = "pcamddetail_seq",initialValue = 1000000001,
             allocationSize = 1)
     @Column(name = "pcamddetail_id")
     private Long id;
 
     // Parent
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "pcamdbasic_id")
-    private PurchaseContractAmendmentVO purchaseContractAmendment;
-
+    private PurchaseContractAmendmentVO purchaseContractAmendmentVO;
     // Item Code (Normalized with Item Master)
     @ManyToOne
     @JoinColumn(name = "item")

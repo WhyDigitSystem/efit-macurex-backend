@@ -30,8 +30,8 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			    sb.dlv_no,
 			    sb.dlv_date,
 			    sb.month_of_schedule,
-			    sd.invoicetype,
-			    3 AS SN
+			    sd.invoicetype
+
 			FROM sdvbasic sb
 			INNER JOIN sdvdet sd
 			    ON sb.sdvbasic_id = sd.sdvbasic_id
@@ -63,8 +63,8 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			    sb.dlv_no,
 			    sb.dlv_date,
 			    sb.month_of_schedule,
-			    sd.invoicetype,
-			    6 AS SN
+			    sd.invoicetype
+
 			FROM sdvbasic sb
 			INNER JOIN sdvdet sd
 			    ON sb.sdvbasic_id = sd.sdvbasic_id
@@ -91,10 +91,9 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 
 			ORDER BY dlv_no
 			""", nativeQuery = true)
-	List<Object[]> getScheduleNoDropdownForDespatchInstruction(@Param("customer") Long customer, @Param("monthYear") String monthYear,
-			@Param("branch") Long branch, @Param("orgId") Long orgId);
+	List<Object[]> getScheduleNoDropdownForDespatchInstruction(@Param("customer") Long customer,
+			@Param("monthYear") String monthYear, @Param("branch") Long branch, @Param("orgId") Long orgId);
 
-	// despatch despatch orderacceptanceandsalescontract no
 	@Query(value = """
 			SELECT
 			    ob.doc_id,
@@ -109,7 +108,7 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			  AND ob.branch = :branch
 			  AND ob.org_id = :orgId
 
-			UNION 
+			UNION
 
 			SELECT
 			    sc.doc_id,
@@ -126,8 +125,9 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 
 			ORDER BY doc_date
 			""", nativeQuery = true)
-			List<Object[]> getOrderAndSalesContractDropdownFromDespatchInstruction(@Param("customer") Long customerId,@Param("branch") Long branch,@Param("orgId")  Long orgId);
-	
+	List<Object[]> getOrderAndSalesContractDropdownFromDespatchInstruction(@Param("customer") Long customerId,
+			@Param("branch") Long branch, @Param("orgId") Long orgId);
+
 	// Despatch Schedule month dropdown
 	@Query(value = """
 			SELECT
@@ -136,17 +136,17 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			FROM sdvbasic a
 			INNER JOIN sdvdet d
 			    ON a.sdvbasic_id = d.sdvbasic_id
-			INNER JOIN item i
-			    ON d.item_id = i.item_id
-			WHERE a.cancel = false
-			  AND i.item_id = :item
-			  And a.dlv_no = :dlvno
+			WHERE a.cancel = FALSE
+			  AND d.item_id = :item
+			  AND a.dlv_no = :dlvNo
 			  AND a.branch_id = :branch
 			  AND a.org_id = :orgId
-			ORDER BY a.month_of_schedule
+			GROUP BY
+			    a.sdvbasic_id,
+			    a.month_of_schedule
 			""", nativeQuery = true)
-	List<Object[]> getScheduleMonthForDespatchInstruction(@Param("item") Long itemId,@Param("dlvno") String dlvno, @Param("branch") Long branch,
-			@Param("orgId") Long orgId);
+	List<Object[]> getScheduleMonthForDespatchInstruction(@Param("item") Long item, @Param("dlvNo") String dlvNo,
+			@Param("branch") Long branch, @Param("orgId") Long orgId);
 
 	// planned qty
 	@Query(value = """
@@ -166,7 +166,7 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 
 			LEFT JOIN despatch_detail dd
 			    ON dd.despatch_basic_id = db.despatch_basic_id
-			   AND dd.item_id = sdsd.item_id
+			   AND dd.item = sdsd.item_id
 
 			WHERE sds.cancel = FALSE
 			  AND i.item_id = :item
@@ -277,4 +277,47 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 //	    			        @Param("branch") Long branch,
 //	    			        @Param("orgId") Long orgId,
 //	    			        @Param("customerId") Long customerId);
+
+	// despatch fill grid api
+	@Query(value = """
+			SELECT
+			    i.item_id,
+			    '' AS mark,
+			    i.item_code,
+			    i.item_description,
+			    u.unitmaster_id,
+			   
+			    sb.sdvbasic_id,
+			    sd.so_no_contractno,
+			    2 AS SN,
+			     u.unit_id
+			FROM sdvbasic sb
+			INNER JOIN sdvdet sd
+			    ON sb.sdvbasic_id = sd.sdvbasic_id
+			INNER JOIN item i
+			    ON sd.item_id = i.item_id
+			INNER JOIN unitmaster u
+			    ON i.primary_unit = u.unitmaster_id
+			INNER JOIN customer_header ch
+			    ON sb.customer_id = ch.customer_id
+			WHERE sb.cancel = FALSE
+			  AND i.cancel = FALSE
+			  AND ch.customer_id = :customerId
+			  AND sb.sdvbasic_id = :sdvBasicId
+			  AND sb.branch_id = :branch
+			  AND sb.org_id = :orgId
+			  AND NOT EXISTS (
+			        SELECT 1
+			        FROM despatch_basic db
+			        INNER JOIN despatch_detail dd
+			            ON db.despatch_basic_id = dd.despatch_basic_id
+			        WHERE db.cancel = FALSE
+			          AND db.schdule_no = sb.dlv_no
+			          AND dd.item = sd.item_id
+			  )
+			ORDER BY i.item_code
+			""", nativeQuery = true)
+	List<Object[]> getFillGridItemsForDespatchInstruction(@Param("customerId") Long customerId,
+			@Param("sdvBasicId") Long sdvBasicId, @Param("branch") Long branch, @Param("orgId") Long orgId);
+
 }

@@ -113,7 +113,7 @@ public class DespatchInstructionVO {
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 
-	@OneToMany(mappedBy = "despatchInstructionVO", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "despatchInstructionVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<DespatchInstructionDetailsVO> details = new ArrayList<>();
 

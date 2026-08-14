@@ -42,7 +42,7 @@ public class StockTransferChallanVO {
 	private String docID;
 	
 	@Column(name = "doc_date")
-	private LocalDate docDate;
+	private LocalDate docDate=LocalDate.now();
 	
 	@ManyToOne
 	@JoinColumn(name = "branch")

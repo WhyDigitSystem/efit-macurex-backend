@@ -39,15 +39,13 @@ public class ProformaInvoiceDetailsVO {
 	private BigDecimal taxPercentage;
 
 	@Column(name = "despatch_qty", precision = 10, scale = 2)
-	private BigDecimal despatchQty;	
+	private BigDecimal despatchQty;
 
 	@Column(name = "amount", precision = 10, scale = 2)
 	private BigDecimal amount;
 
-
 	@Column(name = "order_rate", precision = 10, scale = 2)
 	private BigDecimal orderRate;
-
 
 	@Column(name = "sgst_rate", precision = 10, scale = 2)
 	private BigDecimal sgstRate;
@@ -69,7 +67,10 @@ public class ProformaInvoiceDetailsVO {
 
 	@Column(name = "hsn_code")
 	private String hsnCode;
-	
+
+	@Column(name = "tax_type")
+	private String taxType;
+
 	@ManyToOne
 	@JsonBackReference
 	@JoinColumn(name = "proforma_invoice_basic_id")

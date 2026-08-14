@@ -6,17 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
 import com.efitops.basesetup.dto.BranchResponseDTO;
-import com.efitops.basesetup.dto.CurrencyResponseDTO;
-import com.efitops.basesetup.entity.BankDetailsVO;
-import com.efitops.basesetup.entity.BranchVO;
-import com.efitops.basesetup.entity.CustomerVO;
-import com.efitops.basesetup.entity.LocationVO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

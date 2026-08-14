@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 public class ProformaInvoiceVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "proforma_invoice_basicgen")
-	@SequenceGenerator(name = "proforma_invoice_basicgen", sequenceName = "proforma_invoice_basicgen", initialValue = 1000000001, allocationSize = 1)
+	@SequenceGenerator(name = "proforma_invoice_basicgen", sequenceName = "proforma_invoice_basicseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "proforma_invoice_basic_id")
 	private Long id;
 

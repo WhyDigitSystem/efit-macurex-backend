@@ -23,5 +23,7 @@ public class ProformaInvoiceDetailsDTO {
 	private BigDecimal orderRate;
 
 	private String hsnCode;
+	
+	private String taxType;
 
 }

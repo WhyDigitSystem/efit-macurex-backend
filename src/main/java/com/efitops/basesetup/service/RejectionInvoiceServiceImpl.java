@@ -69,8 +69,6 @@ import com.efitops.basesetup.repository.SalesOrderShortCloseRepo;
 @Service
 public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 
-	private final BankDetailsRepo bankDetailsRepo;
-
 	public static final Logger LOGGER = LoggerFactory.getLogger(RejectionInvoiceServiceImpl.class);
 
 	@Autowired
@@ -118,9 +116,8 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 	@Autowired
 	ProformaInvoiceDetailsRepo proformaInvoiceDetailsRepo;
 
-	RejectionInvoiceServiceImpl(BankDetailsRepo bankDetailsRepo) {
-		this.bankDetailsRepo = bankDetailsRepo;
-	}
+	@Autowired
+	BankDetailsRepo bankDetailsRepo;
 
 	@Override
 	public RejectionInvoiceResponseDTO getRejectionInvoiceById(Long id) throws ApplicationException {
@@ -847,6 +844,17 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 
 		proformaInvoiceVO.setFinancialYear(proformaInvoiceDTO.getFinancialYear());
 
+		proformaInvoiceVO.setKindAttention(proformaInvoiceDTO.getKindAttention());
+		proformaInvoiceVO.setDesignation(proformaInvoiceDTO.getDesignation());
+		proformaInvoiceVO.setNoOfPkg(proformaInvoiceDTO.getNoOfPkg());
+		proformaInvoiceVO.setPkgType(proformaInvoiceDTO.getPkgType());
+		proformaInvoiceVO.setRateOfDuty(proformaInvoiceDTO.getRateOfDuty());
+		proformaInvoiceVO.setTariffNo(proformaInvoiceDTO.getTariffNo());
+
+		proformaInvoiceVO.setNarration(proformaInvoiceDTO.getNarration());
+		
+		proformaInvoiceVO.setPaymentPercentage(proformaInvoiceDTO.getPaymentPercentage());
+
 		if (proformaInvoiceDTO.getBranch() != null && proformaInvoiceDTO.getBranch() != 0) {
 
 			BranchVO branch = branchRepo.findById(proformaInvoiceDTO.getBranch())
@@ -904,6 +912,8 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 				}
 
 				detailsVO.setDespatchQty(dto.getDespatchQty());
+				
+				detailsVO.setTaxType(dto.getTaxType());
 
 				detailsVO.setHsnCode(dto.getHsnCode());
 
@@ -997,13 +1007,13 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 			}
 		}
 
+		proformaInvoiceVO.setProformaInvoiceTaxDetailsVO(taxList);
+
 		proformaInvoiceVO.setBasicValue(assTotal);
 
 		proformaInvoiceVO.setGrossAmount(finalAmount);
 
 		proformaInvoiceVO.setAmountInWords(amountInWordsConverterService.convert(proformaInvoiceVO.getGrossAmount()));
-
-		proformaInvoiceVO.setProformaInvoiceTaxDetailsVO(taxList);
 
 	}
 
@@ -1038,11 +1048,25 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 		responseDTO.setPaymentPercentage(proformaInvoiceVO.getPaymentPercentage());
 		responseDTO.setNarration(proformaInvoiceVO.getNarration());
 		responseDTO.setCreatedBy(proformaInvoiceVO.getCreatedBy());
+		responseDTO.setCreatedBy(proformaInvoiceVO.getCreatedBy());
 		responseDTO.setActive(proformaInvoiceVO.getActive());
 		responseDTO.setCancel(proformaInvoiceVO.getCancel());
 		responseDTO.setUpdatedBy(proformaInvoiceVO.getUpdatedBy());
 		responseDTO.setCancelRemarks(proformaInvoiceVO.getCancelRemarks());
 		responseDTO.setOrgId(proformaInvoiceVO.getOrgId());
+		responseDTO.setKindAttention(proformaInvoiceVO.getKindAttention());
+		responseDTO.setDesignation(proformaInvoiceVO.getDesignation());
+		responseDTO.setNoOfPkg(proformaInvoiceVO.getNoOfPkg());
+		responseDTO.setPkgType(proformaInvoiceVO.getPkgType());
+		responseDTO.setRateOfDuty(proformaInvoiceVO.getRateOfDuty());
+		responseDTO.setTariffNo(proformaInvoiceVO.getTariffNo());
+
+		responseDTO.setNarration(proformaInvoiceVO.getNarration());
+		responseDTO.setScreenName(proformaInvoiceVO.getScreenName());
+		responseDTO.setScreenCode(proformaInvoiceVO.getScreenCode());
+		responseDTO.setFinancialYear(proformaInvoiceVO.getFinancialYear());
+		responseDTO.setPaymentPercentage(proformaInvoiceVO.getPaymentPercentage());
+		responseDTO.setUpdatedBy(proformaInvoiceVO.getUpdatedBy());
 
 		if (proformaInvoiceVO.getBranch() != null) {
 
@@ -1129,6 +1153,8 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 
 				detailsDTO.setTaxPercentage(detailsVO.getTaxPercentage());
 
+				detailsDTO.setTaxType(detailsVO.getTaxType());
+
 				detailsDTO.setHsnCode(detailsVO.getHsnCode());
 
 				detailsDTO.setDespatchQty(detailsVO.getDespatchQty());
@@ -1157,16 +1183,15 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 
 		List<ProformaInvoiceTaxDetailsResponseDTO> taxList = new ArrayList<>();
 
-		if (proformaInvoiceVO.getProformaInvoiceTaxDetailsVO() != null) {
+		if (proformaInvoiceVO.getProformaInvoiceTaxDetailsVO() != null
+				&& !proformaInvoiceVO.getProformaInvoiceTaxDetailsVO().isEmpty()) {
 
 			for (ProformaInvoiceTaxDetailsVO taxVO : proformaInvoiceVO.getProformaInvoiceTaxDetailsVO()) {
 
 				ProformaInvoiceTaxDetailsResponseDTO taxDTO = new ProformaInvoiceTaxDetailsResponseDTO();
 
 				taxDTO.setId(taxVO.getId());
-
 				taxDTO.setParticulars(taxVO.getParticulars());
-
 				taxDTO.setAmount(taxVO.getAmount());
 
 				taxList.add(taxDTO);

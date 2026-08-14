@@ -51,7 +51,7 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			        WHERE db.cancel = FALSE
 			          AND db.schdule_no = sb.dlv_no
 			          AND db.custumer = c.customer_id
-			          AND dd.item_id = sd.item_id
+			          AND dd.item = sd.item_id
 			  )
 			)
 
@@ -85,7 +85,7 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			        WHERE x.cancel = FALSE
 			          AND x.schdule_no = ob.doc_id
 			          AND x.custumer = ch.customer_id
-			          AND y.item_id = sd.item_id
+			          AND y.item = sd.item_id
 			  )
 			)
 

@@ -40,6 +40,7 @@ import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PendingQtyResponseDTO;
@@ -72,6 +73,7 @@ import com.efitops.basesetup.entity.DespatchInstructionVO;
 import com.efitops.basesetup.entity.DocketInvoiceDetailsVO;
 import com.efitops.basesetup.entity.DocketInvoiceVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.SalesContractAmdDetailsVO;
@@ -91,6 +93,7 @@ import com.efitops.basesetup.repository.DocketInvoiceDetRepo;
 import com.efitops.basesetup.repository.DocketInvoiceRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.SalesContractAmdDetailsRepo;
@@ -158,6 +161,9 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	@Autowired
 	private ListOfValuesRepo listOfValuesRepo;
+	
+	@Autowired
+	ListOfValuesDetailsRepo listOfValuesDetailsRepo;
 
 	TransportMasterServiceImpl(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
@@ -1138,8 +1144,6 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		// =========================
 
 		responseDTO.setId(stockTransferChallanVO.getId());
-		responseDTO.setDocID(stockTransferChallanVO.getDocID());
-		responseDTO.setDocDate(stockTransferChallanVO.getDocDate());
 		responseDTO.setStockPosting(stockTransferChallanVO.getStockPosting());
 		responseDTO.setDate(stockTransferChallanVO.getDate());
 		responseDTO.setNoOfPackages(stockTransferChallanVO.getNoOfPackages());
@@ -1179,18 +1183,18 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		// List Of Values Response
 		// =========================
 
-		if (stockTransferChallanVO.getTypes() != null) {
-
-			ListOfValuesResponseDTO listOfValuesResponseDTO = new ListOfValuesResponseDTO();
-
-			listOfValuesResponseDTO.setId(stockTransferChallanVO.getTypes().getId());
-
-			listOfValuesResponseDTO.setListCode(stockTransferChallanVO.getTypes().getListCode());
-
-			listOfValuesResponseDTO.setListDescription(stockTransferChallanVO.getTypes().getListDescription());
-
-			responseDTO.setTypes(listOfValuesResponseDTO);
-		}
+//		if (stockTransferChallanVO.getTypes() != null) {
+//
+//			ListOfValuesDetailsResponseDTO listOfValuesDetailsResponseDTO = new ListOfValuesDetailsResponseDTO();
+//
+//			listOfValuesDetailsResponseDTO.setId(stockTransferChallanVO.getTypes().getId());
+//
+//			listOfValuesDetailsResponseDTO.setListCode(stockTransferChallanVO.getTypes().getValueCode());
+//
+//			listOfValuesDetailsResponseDTO.setListDescription(stockTransferChallanVO.getTypes().getListDescription());
+//
+//			responseDTO.setTypes(listOfValuesDetailsResponseDTO);
+//		}
 
 		// =========================
 		// Customer Response
@@ -1203,6 +1207,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			customerResponseDTO.setId(stockTransferChallanVO.getCustomer().getId());
 
 			customerResponseDTO.setCustomerName(stockTransferChallanVO.getCustomer().getCustomerName());
+			
 
 			responseDTO.setCustomer(customerResponseDTO);
 		}
@@ -1228,8 +1233,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	private void createUpdateStockTransferChallanVO(StockTransferChallanDTO dto,
 			StockTransferChallanVO stockTransferChallanVO) throws ApplicationException {
 
-		stockTransferChallanVO.setDocID(dto.getDocID());
-		stockTransferChallanVO.setDocDate(dto.getDocDate());
+		
 		stockTransferChallanVO.setStockPosting(dto.getStockPosting());
 		stockTransferChallanVO.setDate(dto.getDate());
 		stockTransferChallanVO.setNoOfPackages(dto.getNoOfPackages());
@@ -1265,7 +1269,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 		if (dto.getTypes() != null && dto.getTypes() != 0) {
 
-			ListOfValuesVO listOfValuesVO = listOfValuesRepo.findById(dto.getTypes())
+			ListOfValuesDetailsVO listOfValuesVO = listOfValuesDetailsRepo.findById(dto.getTypes())
 					.orElseThrow(() -> new ApplicationException("List Of Values Not Found"));
 
 			stockTransferChallanVO.setTypes(listOfValuesVO);

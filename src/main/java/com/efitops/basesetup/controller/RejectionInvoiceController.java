@@ -160,9 +160,9 @@ public class RejectionInvoiceController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	@GetMapping("/getTaxPercentage")
-	public ResponseEntity<ResponseDTO> getTaxPercentage(@RequestParam Long orgId, @RequestParam Long hsn) {
-		String methodName = "getTaxPercentage()";
+	@GetMapping("/getTaxValue")
+	public ResponseEntity<ResponseDTO> getTaxValue(@RequestParam Long orgId, @RequestParam Long hsn) {
+		String methodName = "getTaxValue()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -170,7 +170,7 @@ public class RejectionInvoiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = rejectionInvoiceService.getTaxPercentage(orgId, hsn);
+			mapp = rejectionInvoiceService.getTaxValue(orgId, hsn);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -188,10 +188,9 @@ public class RejectionInvoiceController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	@GetMapping("/getItemDetailsBasedDesPatch")
-	public ResponseEntity<ResponseDTO> getItemDetailsBasedDesPatch(@RequestParam Long orgId, @RequestParam Long branch,
-			@RequestParam(required = false) Long despatch) {
-		String methodName = "getItemDetailsBasedDesPatch()";
+	@GetMapping("/getItemDetailsResponse")
+	public ResponseEntity<ResponseDTO> getItemDetailsResponse(@RequestParam Long orgId, @RequestParam Long branch) {
+		String methodName = "getItemDetailsResponse()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -199,7 +198,7 @@ public class RejectionInvoiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = rejectionInvoiceService.getItemDetailsBasedDesPatch(orgId, branch, despatch);
+			mapp = rejectionInvoiceService.getItemDetailsResponse(orgId, branch);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);

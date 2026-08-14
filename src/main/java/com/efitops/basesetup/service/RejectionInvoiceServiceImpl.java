@@ -852,7 +852,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 		proformaInvoiceVO.setTariffNo(proformaInvoiceDTO.getTariffNo());
 
 		proformaInvoiceVO.setNarration(proformaInvoiceDTO.getNarration());
-		
+
 		proformaInvoiceVO.setPaymentPercentage(proformaInvoiceDTO.getPaymentPercentage());
 
 		if (proformaInvoiceDTO.getBranch() != null && proformaInvoiceDTO.getBranch() != 0) {
@@ -912,7 +912,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 				}
 
 				detailsVO.setDespatchQty(dto.getDespatchQty());
-				
+
 				detailsVO.setTaxType(dto.getTaxType());
 
 				detailsVO.setHsnCode(dto.getHsnCode());
@@ -1090,6 +1090,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 			customerDTO.setCustomerCode(proformaInvoiceVO.getCustomer().getCustomerCode());
 			customerDTO.setCustomerGstNo(proformaInvoiceVO.getCustomer().getGstNo());
 			customerDTO.setGstApproval(proformaInvoiceVO.getCustomer().isGstApplicable() ? "Yes" : "No");
+			customerDTO.setState(proformaInvoiceVO.getCustomer().getGstState().getStateName());
 			responseDTO.setCustomer(customerDTO);
 		}
 
@@ -1136,7 +1137,8 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 					itemMasterDetailsResponseDTO.setCustomerPoNo(detailsVO.getItem().getCustomerPartNo());
 
 					itemMasterDetailsResponseDTO.setHsnCode(detailsVO.getItem().getHsnCode().getHsn());
-
+					
+	
 					if (detailsVO.getItem().getPricingUnit() != null) {
 
 						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
@@ -1229,6 +1231,28 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 			map.put("unitId", ch[3] != null ? ch[3].toString() : "");
 			map.put("hsn", ch[4] != null ? ch[4].toString() : "");
 			map.put("customerPartNo", ch[5] != null ? ch[5].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getGstState(Long orgId, Long customer) {
+		Set<Object[]> chType = proformaInvoiceRepo.getGstState(orgId, customer);
+		return getGstState(chType);
+	}
+
+	private List<Map<String, Object>> getGstState(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("stateName", ch[0] != null ? ch[0].toString() : "");
+			map.put("stateCode", ch[1] != null ? ch[1].toString() : "");
 
 			list.add(map);
 		}

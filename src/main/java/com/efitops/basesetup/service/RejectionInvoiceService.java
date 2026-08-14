@@ -38,4 +38,6 @@ public interface RejectionInvoiceService {
 
 	List<Map<String, Object>> getItemDetailsResponse(Long orgId, Long branch);
 
+	List<Map<String, Object>> getGstState(Long orgId, Long customer);
+
 }

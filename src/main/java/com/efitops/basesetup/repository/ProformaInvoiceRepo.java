@@ -47,4 +47,8 @@ public interface ProformaInvoiceRepo extends JpaRepository<ProformaInvoiceVO, Lo
     		+ "                i.customer_part_no order by i.item_id")
 	Set<Object[]> getItemDetailsResponse(Long orgId, Long branch);
 
+    @Query(nativeQuery = true, value = "select g.state_name,g.state_code from  customer_header c join gststatemaster g on g.gststatemaster_id=c.gst_state and c.org_id=?1 \r\n"
+    		+ "and c.customer_id=?2 and c.active=1 and c.cancel=0")
+	Set<Object[]> getGstState(Long orgId, Long customer);
+
 }

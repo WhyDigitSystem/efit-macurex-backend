@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.efitops.basesetup.ResponseDTO.CustomerResonse1DTO;
-import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentAttachmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentCustomerResponceDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentDetailsItemResponseDto;
@@ -33,7 +33,6 @@ import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentDetailsRespons
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
-import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.EnquiryAttachmentResponseDTO;
@@ -60,6 +59,7 @@ import com.efitops.basesetup.entity.EnquiryDetailsVO;
 import com.efitops.basesetup.entity.EnquiryTermsandCondVO;
 import com.efitops.basesetup.entity.EnquiryVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.PurchaseContractAmendmentAttachmentVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentDetailsVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentDetailsVO;
@@ -80,6 +80,7 @@ import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.OrderAcceptanceRepo;
+import com.efitops.basesetup.repository.PurchaseContractAmendmentAttachmentRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentRepo;
 import com.efitops.basesetup.repository.PurchaseContractRepo;
@@ -183,7 +184,15 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	
 	
+	@Value("${purchase.contract.amendment.upload.path}")
+	private String uploadPath1;
 
+	@Value("${server.base-url}")
+	private String serverBaseUrl;
+
+	
+	@Autowired
+	PurchaseContractAmendmentAttachmentRepo purchaseContractAmendmentAttachmentRepo;
 	
 	
 	
@@ -2065,30 +2074,29 @@ public class DevelopServiceImpl implements DevelopService {
 		@Override
 		@Transactional
 		public Map<String, Object> createUpdatePurchaseContractAmendment(
-		        PurchaseContractAmendmentDto purchaseContractAmendmentDto)
+		        PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+		        MultipartFile[] files)
 		        throws ApplicationException {
 
 		    PurchaseContractAmendmentVO purchaseContractAmendmentVO;
-
 		    String message;
 
-		    // =========================
-		    // Create / Update
-		    // =========================
-
-		    if (ObjectUtils.isNotEmpty(purchaseContractAmendmentDto.getId())) {
+		    if (ObjectUtils.isNotEmpty(
+		            purchaseContractAmendmentDto.getId())) {
 
 		        purchaseContractAmendmentVO =
 		                purchaseContractAmendmentRepo
-		                .findById(purchaseContractAmendmentDto.getId())
-		                .orElseThrow(() ->
-		                        new ApplicationException(
-		                                "Purchase Contract Amendment Not Found"));
+		                        .findById(
+		                                purchaseContractAmendmentDto.getId())
+		                        .orElseThrow(() ->
+		                                new ApplicationException(
+		                                        "Purchase Contract Amendment Not Found"));
 
 		        purchaseContractAmendmentVO.setUpdatedBy(
 		                purchaseContractAmendmentDto.getCreatedBy());
 
-		        message = "Purchase Contract Amendment Updated Successfully";
+		        message =
+		                "Purchase Contract Amendment Updated Successfully";
 
 		    } else {
 
@@ -2101,29 +2109,26 @@ public class DevelopServiceImpl implements DevelopService {
 		        purchaseContractAmendmentVO.setUpdatedBy(
 		                purchaseContractAmendmentDto.getCreatedBy());
 
-		        message = "Purchase Contract Amendment Created Successfully";
+		        message =
+		                "Purchase Contract Amendment Created Successfully";
 		    }
 
-		    // =========================
 		    // Header + Child Mapping
-		    // =========================
-
 		    createUpdatePurchaseContractAmendmentVOByDTO(
 		            purchaseContractAmendmentDto,
 		            purchaseContractAmendmentVO);
 
-		    // =========================
 		    // Save Header
-		    // =========================
-
 		    purchaseContractAmendmentVO =
 		            purchaseContractAmendmentRepo.save(
 		                    purchaseContractAmendmentVO);
 
-		    // =========================
-		    // Response
-		    // =========================
+		    // Save Attachments
+		    saveAttachments(
+		            files,
+		            purchaseContractAmendmentVO);
 
+		    // Response
 		    PurchaseContractAmendmentResponseDto responseDTO =
 		            purchaseContractAmendmentResponse(
 		                    purchaseContractAmendmentVO);
@@ -2131,7 +2136,9 @@ public class DevelopServiceImpl implements DevelopService {
 		    Map<String, Object> response =
 		            new HashMap<>();
 
-		    response.put("message", message);
+		    response.put(
+		            "message",
+		            message);
 
 		    response.put(
 		            "purchaseContractAmendmentVO",
@@ -2139,7 +2146,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		    return response;
 		}
-		
 		
 		private void createUpdatePurchaseContractAmendmentVOByDTO(
 		        PurchaseContractAmendmentDto dto,
@@ -2152,23 +2158,26 @@ public class DevelopServiceImpl implements DevelopService {
 
 		    if (dto.getBranch() != null) {
 
-		        BranchVO branchVO = branchRepo
-		                .findById(dto.getBranch())
-		                .orElseThrow(() ->
-		                        new ApplicationException("Branch Not Found"));
+		        BranchVO branchVO =
+		                branchRepo.findById(dto.getBranch())
+		                        .orElseThrow(() ->
+		                                new ApplicationException(
+		                                        "Branch Not Found"));
 
 		        vo.setBranch(branchVO);
 		    }
 
 		    // =========================
-		    // CUSTOMER
+		    // Customer
 		    // =========================
 
 		    if (dto.getCustomer() != null) {
 
-		        CustomerVO customerVO = customerRepo
-		                .findById(dto.getCustomer())
-		                .orElseThrow(() -> new ApplicationException("Customer Not Found"));
+		        CustomerVO customerVO =
+		                customerRepo.findById(dto.getCustomer())
+		                        .orElseThrow(() ->
+		                                new ApplicationException(
+		                                        "Customer Not Found"));
 
 		        vo.setCustomer(customerVO);
 		    }
@@ -2178,10 +2187,10 @@ public class DevelopServiceImpl implements DevelopService {
 		    // =========================
 
 		    vo.setBelongsTo(dto.getBelongsTo());
-//		    vo.setDocId(dto.getDocId());
-//		    vo.setDocDate(dto.getDocDate());
 
-		   
+		    // vo.setDocId(dto.getDocId());
+		    // vo.setDocDate(dto.getDocDate());
+
 		    vo.setContractNo(dto.getContractNo());
 		    vo.setContractDate(dto.getContractDate());
 
@@ -2212,21 +2221,21 @@ public class DevelopServiceImpl implements DevelopService {
 		    vo.setCancelRemarks(dto.getCancelRemarks());
 
 		    // =========================
-		    // Delete Old Details (Update)
+		    // Delete Old Details
 		    // =========================
 
 		    if (vo.getId() != null) {
 
 		        purchaseContractAmendmentDetailsRepo
-		                .deleteByPurchaseContractAmendment(vo);
+		                .deleteByPurchaseContractAmendmentVO(vo);
 		    }
 
 		    // =========================
 		    // Save Grid
 		    // =========================
 
-		    List<PurchaseContractAmendmentDetailsVO> detailsList =
-		            new ArrayList<>();
+		    List<PurchaseContractAmendmentDetailsVO>
+		            detailsList = new ArrayList<>();
 
 		    if (dto.getDetails() != null
 		            && !dto.getDetails().isEmpty()) {
@@ -2237,46 +2246,64 @@ public class DevelopServiceImpl implements DevelopService {
 		            PurchaseContractAmendmentDetailsVO detailVO =
 		                    new PurchaseContractAmendmentDetailsVO();
 
-		            detailVO.setPurchaseContractAmendment(vo);
+		            detailVO.setPurchaseContractAmendmentVO(vo);
 
+		            // =========================
 		            // Item
+		            // =========================
 
 		            if (detailDto.getItem() != null) {
 
 		                ItemMasterVO itemVO =
-		                        itemMasterRepo.findById(detailDto.getItem())
-		                        .orElseThrow(() ->
-		                                new ApplicationException("Item Not Found"));
+		                        itemMasterRepo.findById(
+		                                detailDto.getItem())
+		                                .orElseThrow(() ->
+		                                        new ApplicationException(
+		                                                "Item Not Found"));
 
 		                detailVO.setItem(itemVO);
 		            }
 
+		            // =========================
 		            // Unit
+		            // =========================
 
 		            if (detailDto.getUnit() != null) {
 
 		                UnitMasterVO unitVO =
-		                        unitMasterRepo.findById(detailDto.getUnit())
-		                        .orElseThrow(() ->
-		                                new ApplicationException("Unit Not Found"));
+		                        unitMasterRepo.findById(
+		                                detailDto.getUnit())
+		                                .orElseThrow(() ->
+		                                        new ApplicationException(
+		                                                "Unit Not Found"));
 
 		                detailVO.setUnit(unitVO);
 		            }
 
-		            detailVO.setOldRate(detailDto.getOldRate());
-		            detailVO.setNewRate(detailDto.getNewRate());
+		            detailVO.setOldRate(
+		                    detailDto.getOldRate());
 
-		            detailVO.setValidFrom(detailDto.getValidFrom());
-		            detailVO.setValidTo(detailDto.getValidTo());
+		            detailVO.setNewRate(
+		                    detailDto.getNewRate());
 
-		            detailVO.setNewValidFrom(detailDto.getNewValidFrom());
-		            detailVO.setNewValidTo(detailDto.getNewValidTo());
+		            detailVO.setValidFrom(
+		                    detailDto.getValidFrom());
+
+		            detailVO.setValidTo(
+		                    detailDto.getValidTo());
+
+		            detailVO.setNewValidFrom(
+		                    detailDto.getNewValidFrom());
+
+		            detailVO.setNewValidTo(
+		                    detailDto.getNewValidTo());
 
 		            detailsList.add(detailVO);
 		        }
 		    }
 
-		    purchaseContractAmendmentDetailsRepo.saveAll(detailsList);
+		    purchaseContractAmendmentDetailsRepo
+		            .saveAll(detailsList);
 		}
 		
 		private PurchaseContractAmendmentResponseDto purchaseContractAmendmentResponse(
@@ -2371,7 +2398,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		    List<PurchaseContractAmendmentDetailsVO> detailVOList =
 		            purchaseContractAmendmentDetailsRepo
-		            .findByPurchaseContractAmendment(vo);
+		            .findByPurchaseContractAmendmentVO(vo);
 
 		    for (PurchaseContractAmendmentDetailsVO detailVO : detailVOList) {
 
@@ -2418,9 +2445,195 @@ public class DevelopServiceImpl implements DevelopService {
 
 		    responseDto.setDetails(detailResponseList);
 
-		    return responseDto;
+		 // =========================
+		 // Attachments
+		 // =========================
+
+		 List<PurchaseContractAmendmentAttachmentResponseDto>
+		         attachmentResponseList = new ArrayList<>();
+
+		 List<PurchaseContractAmendmentAttachmentVO>
+		         attachmentVOList =
+		         purchaseContractAmendmentAttachmentRepo
+		                 .findByPurchaseContractAmendmentVO(vo);
+
+		 if (attachmentVOList != null) {
+
+		     for (PurchaseContractAmendmentAttachmentVO fileVO
+		             : attachmentVOList) {
+
+		         PurchaseContractAmendmentAttachmentResponseDto fileDTO =
+		                 new PurchaseContractAmendmentAttachmentResponseDto();
+
+		         fileDTO.setId(
+		                 fileVO.getId());
+
+		         fileDTO.setName(
+		                 fileVO.getName());
+
+		         fileDTO.setFileName(
+		                 fileVO.getFileName());
+
+		         String urlPath = uploadPath
+		                 .replace("C:/", "/")
+		                 .replace("\\", "/");
+
+		         fileDTO.setFilePath(
+		                 serverBaseUrl
+		                 + urlPath
+		                 + fileVO.getFileName());
+
+		         fileDTO.setFileSize(
+		                 fileVO.getFileSize());
+
+		         fileDTO.setContentType(
+		                 fileVO.getContentType());
+
+		         fileDTO.setUploadOn(
+		                 fileVO.getUploadOn());
+
+		         attachmentResponseList.add(
+		                 fileDTO);
+		     }
+		 }
+
+		 responseDto.setAttachments(
+		         attachmentResponseList);
+
+		 return responseDto;
+		 
 		}
 		
+		
+		private void saveAttachments(
+		        MultipartFile[] files,
+		        PurchaseContractAmendmentVO purchaseContractAmendmentVO)
+		        throws ApplicationException {
+
+		    // If no new files are uploaded, keep existing files
+		    if (files == null || files.length == 0) {
+		        return;
+		    }
+
+		    try {
+
+		        File folder = new File(uploadPath1);
+
+		        if (!folder.exists()) {
+		            folder.mkdirs();
+		        }
+
+		        // ==========================================
+		        // Delete Existing Attachments
+		        // ==========================================
+
+		        List<PurchaseContractAmendmentAttachmentVO> oldAttachments =
+		                purchaseContractAmendmentAttachmentRepo
+		                        .findByPurchaseContractAmendmentVO(
+		                                purchaseContractAmendmentVO);
+
+		        for (PurchaseContractAmendmentAttachmentVO oldAttachment
+		                : oldAttachments) {
+
+		            // Delete physical file
+		            if (oldAttachment.getFilePath() != null) {
+
+		                File oldFile =
+		                        new File(oldAttachment.getFilePath());
+
+		                if (oldFile.exists()) {
+		                    oldFile.delete();
+		                }
+		            }
+		        }
+
+		        // Delete old attachment records from DB
+		        if (!oldAttachments.isEmpty()) {
+
+		            purchaseContractAmendmentAttachmentRepo
+		                    .deleteByPurchaseContractAmendmentVO(
+		                            purchaseContractAmendmentVO);
+		        }
+
+		        // ==========================================
+		        // Save New Attachments
+		        // ==========================================
+
+		        List<PurchaseContractAmendmentAttachmentVO>
+		                attachmentList = new ArrayList<>();
+
+		        for (MultipartFile file : files) {
+
+		            if (file == null || file.isEmpty()) {
+		                continue;
+		            }
+
+		            String originalFileName =
+		                    file.getOriginalFilename();
+
+		            String uniqueFileName =
+		                    UUID.randomUUID()
+		                    + "_"
+		                    + originalFileName;
+
+		            Path path =
+		                    Paths.get(
+		                            uploadPath1,
+		                            uniqueFileName);
+
+		            try (InputStream inputStream =
+		                         file.getInputStream()) {
+
+		                Files.copy(
+		                        inputStream,
+		                        path,
+		                        StandardCopyOption.REPLACE_EXISTING);
+		            }
+
+		            PurchaseContractAmendmentAttachmentVO attachment =
+		                    new PurchaseContractAmendmentAttachmentVO();
+
+		            attachment.setPurchaseContractAmendmentVO(
+		                    purchaseContractAmendmentVO);
+
+		            attachment.setName(
+		                    originalFileName);
+
+		            attachment.setFileName(
+		                    uniqueFileName);
+
+		            attachment.setFilePath(
+		                    path.toString());
+
+		            attachment.setFileSize(
+		                    file.getSize());
+
+		            attachment.setContentType(
+		                    file.getContentType());
+
+		            attachment.setUploadOn(
+		                    LocalDateTime.now());
+
+		            attachmentList.add(attachment);
+		        }
+
+		        // Save new attachment records
+		        List<PurchaseContractAmendmentAttachmentVO>
+		                savedAttachments =
+		                purchaseContractAmendmentAttachmentRepo
+		                        .saveAll(attachmentList);
+
+		        purchaseContractAmendmentVO
+		                .setPurchaseContractAmendmentAttachment(
+		                        savedAttachments);
+
+		    } catch (IOException e) {
+
+		        throw new ApplicationException(
+		                "File Upload Failed : "
+		                + e.getMessage());
+		    }
+		}
 		
 		@Override
 		public PurchaseContractAmendmentResponseDto getPurchaseContractAmendmentById(

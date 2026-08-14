@@ -742,9 +742,16 @@ public ResponseEntity<ResponseDTO> getSalesOrderAmdRevisionNo(
 //Purchase contract amendment
 
 
-@PostMapping("/createUpdatePurchaseContractAmendment")
+@PutMapping(
+        value = "/createUpdatePurchaseContractAmendment",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+)
 public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
-        @RequestBody PurchaseContractAmendmentDto purchaseContractAmendmentDto) {
+        @RequestPart("purchaseContractAmendment")
+        PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+
+        @RequestPart(value = "files", required = false)
+        MultipartFile[] files) {
 
     Map<String, Object> responseObjectsMap = new HashMap<>();
     ResponseDTO responseDTO;
@@ -753,7 +760,8 @@ public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
 
         Map<String, Object> purchaseContractAmendmentMap =
                 developService.createUpdatePurchaseContractAmendment(
-                        purchaseContractAmendmentDto);
+                        purchaseContractAmendmentDto,
+                        files);
 
         responseObjectsMap.put(
                 CommonConstant.STRING_MESSAGE,
@@ -764,7 +772,8 @@ public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
                 purchaseContractAmendmentMap.get(
                         "purchaseContractAmendmentVO"));
 
-        responseDTO = createServiceResponse(responseObjectsMap);
+        responseDTO =
+                createServiceResponse(responseObjectsMap);
 
     } catch (Exception e) {
 
@@ -778,7 +787,6 @@ public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
 
     return ResponseEntity.ok(responseDTO);
 }
-
 // =========================
 // Get By Id
 // =========================

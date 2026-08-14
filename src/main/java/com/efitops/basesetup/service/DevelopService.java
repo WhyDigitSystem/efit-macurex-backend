@@ -85,7 +85,7 @@ public interface DevelopService {
 	
 	
 	Map<String, Object> createUpdatePurchaseContractAmendment(
-	        PurchaseContractAmendmentDto purchaseContractAmendmentDto)
+	        PurchaseContractAmendmentDto purchaseContractAmendmentDto, MultipartFile[] files)
 	        throws ApplicationException;
 
 	PurchaseContractAmendmentResponseDto getPurchaseContractAmendmentById(Long id) throws ApplicationException;

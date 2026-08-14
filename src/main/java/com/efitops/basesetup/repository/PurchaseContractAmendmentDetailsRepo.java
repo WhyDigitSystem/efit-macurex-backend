@@ -9,12 +9,11 @@ import com.efitops.basesetup.entity.PurchaseContractAmendmentVO;
 
 public interface PurchaseContractAmendmentDetailsRepo
         extends JpaRepository<PurchaseContractAmendmentDetailsVO, Long> {
-	
-	 List<PurchaseContractAmendmentDetailsVO> findByPurchaseContractAmendment(
-	            PurchaseContractAmendmentVO purchaseContractAmendment);
 
-	    void deleteByPurchaseContractAmendment(
-	            PurchaseContractAmendmentVO purchaseContractAmendment);
+	void deleteByPurchaseContractAmendmentVO(PurchaseContractAmendmentVO vo);
+
+	List<PurchaseContractAmendmentDetailsVO> findByPurchaseContractAmendmentVO(PurchaseContractAmendmentVO vo);
+	
 
     
 }

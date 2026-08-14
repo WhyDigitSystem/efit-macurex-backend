@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.efitops.basesetup.ResponseDTO.ProformaInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.RejectionInvoiceResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.ProformaInvoiceDTO;
 import com.efitops.basesetup.dto.RejectionInvoiceDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.service.RejectionInvoiceService;
@@ -158,34 +160,6 @@ public class RejectionInvoiceController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	@GetMapping("/getExchangeRate")
-	public ResponseEntity<ResponseDTO> getExchangeRate(@RequestParam Long orgId, @RequestParam Long currency) {
-		String methodName = "getExchangeRate()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-		String errorMsg = null;
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO = null;
-		List<Map<String, Object>> mapp = new ArrayList<>();
-
-		try {
-			mapp = rejectionInvoiceService.getExchangeRate(orgId, currency);
-		} catch (Exception e) {
-			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-		}
-
-		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Exchange Rate retrieved successfully");
-			responseObjectsMap.put("mapp", mapp);
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Exchange Rate", errorMsg);
-		}
-
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-		return ResponseEntity.ok().body(responseDTO);
-	}
-
 	@GetMapping("/getTaxPercentage")
 	public ResponseEntity<ResponseDTO> getTaxPercentage(@RequestParam Long orgId, @RequestParam Long hsn) {
 		String methodName = "getTaxPercentage()";
@@ -243,59 +217,129 @@ public class RejectionInvoiceController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	@GetMapping("/getSalesOrderNo")
-	public ResponseEntity<ResponseDTO> getSalesOrderNo(@RequestParam Long customer) {
-		String methodName = "getSalesOrderNo()";
+	// Proforma
+
+	@GetMapping("/getProformaInvoiceById")
+	public ResponseEntity<ResponseDTO> getProformaInvoiceById(@RequestParam Long id) {
+
+		String methodName = "getProformaInvoiceById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ProformaInvoiceResponseDTO proformaInvoiceResponseDTO = rejectionInvoiceService.getProformaInvoiceById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Proforma Invoice information retrieved successfully");
+
+			responseObjectsMap.put("proformaInvoiceResponseVO", proformaInvoiceResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Proforma Invoice information retrieval failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getProformaInvoiceByOrgId")
+	public ResponseEntity<ResponseDTO> getProformaInvoiceByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getProformaInvoiceByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<ProformaInvoiceResponseDTO> proformaInvoiceResponseDTO = rejectionInvoiceService
+					.getProformaInvoiceByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Proforma Invoice information retrieved successfully");
+
+			responseObjectsMap.put("proformaInvoiceResponseVO", proformaInvoiceResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Proforma Invoice information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@PutMapping("/createUpdateProformaInvoice")
+	public ResponseEntity<ResponseDTO> createUpdateProformaInvoice(@RequestBody ProformaInvoiceDTO proformaInvoiceDTO) {
+		String methodName = "createUpdateProformaInvoice()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO = null;
-		List<Map<String, Object>> mapp = new ArrayList<>();
+		try {
+			Map<String, Object> proformaInvoiceVO = rejectionInvoiceService
+					.createUpdateProformaInvoice(proformaInvoiceDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, proformaInvoiceVO.get("message"));
+			responseObjectsMap.put("proformaInvoiceVO", proformaInvoiceVO.get("proformaInvoiceVO"));
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getProformaInvoiceDocId")
+	public ResponseEntity<ResponseDTO> getProformaInvoiceDocId(@RequestParam Long orgId,
+			@RequestParam String screenCode) {
+
+		String methodName = "getProformaInvoiceDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
 
 		try {
-			mapp = rejectionInvoiceService.getSalesOrderNo(customer);
+			mapp = rejectionInvoiceService.getProformaInvoiceDocId(orgId, screenCode);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 
 		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales Order retrieved successfully");
-			responseObjectsMap.put("mapp", mapp);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Proforma Invoice DocId information retrieved successfully");
+			responseObjectsMap.put("invoiceDocId", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Sales Order", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Proforma Invoice DocId",
+					errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	@GetMapping("/getOrderAmount")
-	public ResponseEntity<ResponseDTO> getOrderAmount(@RequestParam Long id, @RequestParam Long item) {
-		String methodName = "getOrderAmount()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-		String errorMsg = null;
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO = null;
-		List<Map<String, Object>> mapp = new ArrayList<>();
-
-		try {
-			mapp = rejectionInvoiceService.getOrderAmount(id, item);
-		} catch (Exception e) {
-			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-		}
-
-		if (StringUtils.isBlank(errorMsg)) {
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Order Amount retrieved successfully");
-			responseObjectsMap.put("mapp", mapp);
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Order Amount", errorMsg);
-		}
-
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-		return ResponseEntity.ok().body(responseDTO);
-	}
 }

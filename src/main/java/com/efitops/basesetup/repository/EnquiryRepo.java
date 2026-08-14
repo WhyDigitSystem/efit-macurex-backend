@@ -10,21 +10,22 @@ import com.efitops.basesetup.entity.EnquiryVO;
 
 public interface EnquiryRepo extends JpaRepository<EnquiryVO, Long> {
 
-    @Query(value = """
-            SELECT *
-            FROM enquiry
-            WHERE org_id = :orgId
-              AND branch = :branch
-              AND cancel = false
-              AND active = true
-            ORDER BY enquiry_id
-            """, nativeQuery = true)
-    List<EnquiryVO> findByOrgIdAndBranch(
-            @Param("orgId") Long orgId,
-            @Param("branch") Long branch);
+	@Query(value = """
+			SELECT *
+			FROM enquiry
+			WHERE org_id = :orgId
+			  AND branch = :branch
+			  AND cancel = false
+			  AND active = true
+			ORDER BY enquiry_id
+			""", nativeQuery = true)
+	List<EnquiryVO> findByOrgIdAndBranch(@Param("orgId") Long orgId, @Param("branch") Long branch);
 
-    boolean existsByEnquiryNoAndOrgId(
-            String enquiryNo,
-            Long orgId);
+	 @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
+	String getEnquiryDocId(Long orgId, String financialYear, String screenCode);
+
+//    boolean existsByEnquiryNoAndOrgId(
+//            String enquiryNo,
+//            Long orgId);
 
 }

@@ -12,9 +12,9 @@ public class SalesDeliveryScheduleResponseDTO {
 
     private Long id;
 
-    private String dlvNo;
+    private String docId;
 
-    private LocalDate dlvDate;
+    private LocalDate docDate;
 
     private BranchResponseDTO branch;
 

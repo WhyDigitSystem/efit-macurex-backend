@@ -779,7 +779,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 			proformaInvoiceVO.setDocId(docId);
 
 			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdSAndFinYearAndScreenCode(proformaInvoiceDTO.getOrgId(),
+					.findByOrgIdAndFinYearAndScreenCode(proformaInvoiceDTO.getOrgId(),
 							proformaInvoiceDTO.getFinancialYear(), screenCode);
 			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
 			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);

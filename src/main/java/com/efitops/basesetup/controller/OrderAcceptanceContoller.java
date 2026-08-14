@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -409,6 +410,71 @@ public class OrderAcceptanceContoller extends BaseController {
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getSalesOrderShortCloseDocId")
+	public ResponseEntity<ResponseDTO> getSalesOrderShortCloseDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear, @RequestParam String screenCode) {
+
+		String methodName = "getSalesOrderShortCloseDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+			mapp = orderAcceptanceService.getSalesOrderShortCloseDocId(orgId, financialYear, screenCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"DocId information retrieved successfully");
+			responseObjectsMap.put("invoiceDocId", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve  DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+	@GetMapping("/getOrderAcceptanceDocId")
+	public ResponseEntity<ResponseDTO> getOrderAcceptanceDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear, @RequestParam String screenCode) {
+
+		String methodName = "getOrderAcceptanceDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+			mapp = orderAcceptanceService.getOrderAcceptanceDocId(orgId, financialYear, screenCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}	
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"DocId information retrieved successfully");
+			responseObjectsMap.put("invoiceDocId", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve  DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
 }

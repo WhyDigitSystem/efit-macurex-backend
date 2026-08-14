@@ -60,6 +60,10 @@ public interface TransactionService {
 		DocketInvoiceResponseDTO getDocketInvoiceById(Long id) throws ApplicationException;
 
 		List<DocketInvoiceResponseDTO> getDocketInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+		String getSalesDeliveryScheduleDocId(Long orgId, String financialYear, String screenCode);
+
+		String getDocketInvoiceDocId(Long orgId, String financialYear, String screenCode);
 		
 
 }

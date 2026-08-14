@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,309 +35,288 @@ import com.efitops.basesetup.service.DhineshService;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/dhinesh")
-public class DhineshController extends BaseController{
-
+public class DhineshController extends BaseController {
 
 	@Autowired
 	DhineshService dhineshService;
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(DhineshController.class);
 
-	
 	@PostMapping(value = "/createUpdateSalesContract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdateSalesContract(
-	        @RequestPart("salesContract") SalesContractDTO salesContractDTO,
+			@RequestPart("salesContract") SalesContractDTO salesContractDTO,
 //	        @RequestBody SalesContractDTO salesContractDTO,
-	        @RequestPart(value = "files", required = false) MultipartFile[] files) {
+			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
-	    String methodName = "createUpdateSalesContract()";
+		String methodName = "createUpdateSalesContract()";
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> createdSalesContractVO =
-	                dhineshService.createUpdateSalesContract(salesContractDTO, files);
+			Map<String, Object> createdSalesContractVO = dhineshService.createUpdateSalesContract(salesContractDTO,
+					files);
 
-	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                createdSalesContractVO.get("message"));
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, createdSalesContractVO.get("message"));
 
-	        responseObjectsMap.put("salesContractVO",
-	                createdSalesContractVO.get("salesContract"));
+			responseObjectsMap.put("salesContractVO", createdSalesContractVO.get("salesContract"));
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	@GetMapping("/getFinishedGoodsItemsbySalesContract")
-	public ResponseEntity<ResponseDTO> getFinishedGoodsItems(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getFinishedGoodsItems(@RequestParam Long orgId, @RequestParam Long branch) {
 
-	    String methodName = "getFinishedGoodsItems()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getFinishedGoodsItems()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    String errorMsg = null;
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO = null;
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
 
-	    List<SalesContractItemDropdownResponseDTO> itemList = new ArrayList<>();
+		List<SalesContractItemDropdownResponseDTO> itemList = new ArrayList<>();
 
-	    try {
+		try {
 
-	        itemList = dhineshService.getFinishedGoodsItems(orgId, branch);
+			itemList = dhineshService.getFinishedGoodsItems(orgId, branch);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
-	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-	    }
+		}
 
-	    if (errorMsg == null || errorMsg.trim().isEmpty()) {
+		if (errorMsg == null || errorMsg.trim().isEmpty()) {
 
-	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                "Finished Goods Items fetched successfully");
-	        responseObjectsMap.put("items", itemList);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Finished Goods Items fetched successfully");
+			responseObjectsMap.put("items", itemList);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } else {
+		} else {
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Finished Goods Items fetch failed",
-	                errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Finished Goods Items fetch failed", errorMsg);
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
+
 	@GetMapping("/getQuotationDropdownbySalesContract")
-	public ResponseEntity<ResponseDTO> getQuotationDropdown(
-	        @RequestParam String customerCode,
-	        @RequestParam String ctype,
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch,
-	        @RequestParam(required = false, defaultValue = "") String oldQuotationNo,
-	        @RequestParam(required = false, defaultValue = "0") Long recId) {
+	public ResponseEntity<ResponseDTO> getQuotationDropdown(@RequestParam String customerCode,
+			@RequestParam String ctype, @RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam(required = false, defaultValue = "") String oldQuotationNo,
+			@RequestParam(required = false, defaultValue = "0") Long recId) {
 
-	    String methodName = "getQuotationDropdown()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getQuotationDropdown()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    String errorMsg = null;
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO = null;
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
 
-	    List<QuotationDropdownResponseDTO> quotationList = new ArrayList<>();
+		List<QuotationDropdownResponseDTO> quotationList = new ArrayList<>();
 
-	    try {
+		try {
 
-	        quotationList = dhineshService.getQuotationDropdown(
-	                customerCode,
-	                ctype,
-	                orgId,
-	                branch,
-	                oldQuotationNo,
-	                recId);
+			quotationList = dhineshService.getQuotationDropdown(customerCode, ctype, orgId, branch, oldQuotationNo,
+					recId);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
-	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-	    }
+		}
 
-	    if (errorMsg == null || errorMsg.trim().isEmpty()) {
+		if (errorMsg == null || errorMsg.trim().isEmpty()) {
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Quotation details fetched successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Quotation details fetched successfully");
 
-	        responseObjectsMap.put("quotations", quotationList);
+			responseObjectsMap.put("quotations", quotationList);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } else {
+		} else {
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Quotation details fetch failed",
-	                errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Quotation details fetch failed", errorMsg);
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
 	@GetMapping("/getCustomerDropdownbySalesContract")
-    public ResponseEntity<ResponseDTO> getCustomerDropdown(
-            @RequestParam String ctype,
-            @RequestParam Long orgId,
-            @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getCustomerDropdown(@RequestParam String ctype, @RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-        String methodName = "getCustomerDropdown()";
-        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getCustomerDropdown()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-        String errorMsg = null;
-        Map<String, Object> responseObjectsMap = new HashMap<>();
-        ResponseDTO responseDTO = null;
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
 
-        List<CustomerDropdownResponseDTO> customerList = new ArrayList<>();
+		List<CustomerDropdownResponseDTO> customerList = new ArrayList<>();
 
-        try {
+		try {
 
-            customerList = dhineshService.getCustomerDropdown(ctype, orgId, branch);
+			customerList = dhineshService.getCustomerDropdown(ctype, orgId, branch);
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 
-            errorMsg = e.getMessage();
-            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-        }
+		}
 
-        if (errorMsg == null || errorMsg.trim().isEmpty()) {
+		if (errorMsg == null || errorMsg.trim().isEmpty()) {
 
-            responseObjectsMap.put(
-                    CommonConstant.STRING_MESSAGE,
-                    "Customer Details fetched successfully");
-            responseObjectsMap.put("customers", customerList);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Customer Details fetched successfully");
+			responseObjectsMap.put("customers", customerList);
 
-            responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-        } else {
+		} else {
 
-            responseDTO = createServiceResponseError(
-                    responseObjectsMap,
-                    "Customer Details fetch failed",
-                    errorMsg);
-        }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Customer Details fetch failed", errorMsg);
+		}
 
-        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-        return ResponseEntity.ok().body(responseDTO);
-    }
-	
-	@GetMapping("/getQuotationItemDropdownbySalesContract")
-	public ResponseEntity<ResponseDTO> getQuotationItemDropdown(
-	        @RequestParam String quotationNo,
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
-
-	    String methodName = "getQuotationItemDropdown()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	    String errorMsg = null;
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO = null;
-
-	    List<QuotationItemDropdownResponseDTO> itemList = new ArrayList<>();
-
-	    try {
-
-	        itemList = dhineshService.getQuotationItemDropdown(
-	                quotationNo,
-	                orgId,
-	                branch);
-
-	    } catch (Exception e) {
-
-	        errorMsg = e.getMessage();
-	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-	    }
-
-	    if (errorMsg == null || errorMsg.trim().isEmpty()) {
-
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Quotation Item Details fetched successfully");
-
-	        responseObjectsMap.put("items", itemList);
-
-	        responseDTO = createServiceResponse(responseObjectsMap);
-
-	    } else {
-
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Quotation Item Details fetch failed",
-	                errorMsg);
-	    }
-
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
+	@GetMapping("/getQuotationItemDropdownbySalesContract")
+	public ResponseEntity<ResponseDTO> getQuotationItemDropdown(@RequestParam String quotationNo,
+			@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getQuotationItemDropdown()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		List<QuotationItemDropdownResponseDTO> itemList = new ArrayList<>();
+
+		try {
+
+			itemList = dhineshService.getQuotationItemDropdown(quotationNo, orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (errorMsg == null || errorMsg.trim().isEmpty()) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Quotation Item Details fetched successfully");
+
+			responseObjectsMap.put("items", itemList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Quotation Item Details fetch failed",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
 	@GetMapping("/getSalesContractById")
 	public ResponseEntity<ResponseDTO> getSalesContractById(@RequestParam Long id) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        SalesContractResponseDTO salesContract =
-	                dhineshService.getSalesContractById(id);
+			SalesContractResponseDTO salesContract = dhineshService.getSalesContractById(id);
 
-	        responseObjectsMap.put("salesContract", salesContract);
-	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                "Sales Contract fetched successfully");
+			responseObjectsMap.put("salesContract", salesContract);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales Contract fetched successfully");
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getSalesContractByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getSalesContractByOrgIdAndBranch(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<SalesContractResponseDTO> salesContracts = dhineshService.getSalesContractByOrgIdAndBranch(orgId,
+					branch);
+
+			responseObjectsMap.put("salesContract", salesContracts);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales Contract List fetched successfully");
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
 	}
 	
-	@GetMapping("/getSalesContractByOrgIdAndBranch")
-	public ResponseEntity<ResponseDTO> getSalesContractByOrgIdAndBranch(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	@GetMapping("/getSalesContractDocId")
+	public ResponseEntity<ResponseDTO> getSalesContractDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear, @RequestParam String screenCode) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		String methodName = "getQuotationDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
 
-	    try {
+		try {
+			mapp = dhineshService.getSalesContractDocId(orgId, financialYear, screenCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
 
-	        List<SalesContractResponseDTO> salesContracts =
-	                dhineshService.getSalesContractByOrgIdAndBranch(orgId, branch);
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"SalesContract DocId information retrieved successfully");
+			responseObjectsMap.put("invoiceDocId", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Proforma SalesContract	 DocId",
+					errorMsg);
+		}
 
-	        responseObjectsMap.put("salesContract", salesContracts);
-	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                "Sales Contract List fetched successfully");
-
-	        responseDTO = createServiceResponse(responseObjectsMap);
-
-	    } catch (Exception e) {
-
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
-
-	    return ResponseEntity.ok(responseDTO);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
 	}
 }

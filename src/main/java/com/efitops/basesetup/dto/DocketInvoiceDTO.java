@@ -24,6 +24,7 @@ public class DocketInvoiceDTO {
  	 private boolean active;
  	 private String createdBy;
  	 private String cancelRemarks;
+ 	 private String  financialYear;
  	 private List<DocketInvoiceDetailsDTO> docketInvoiceDetailsDTO;
 		
 	 }

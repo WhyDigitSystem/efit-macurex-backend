@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.efitops.basesetup.ResponseDTO.DocumentTypeResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransportBillPaymentDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransportBillResponseDTO;
@@ -22,12 +21,14 @@ import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.TransportBillDTO;
 import com.efitops.basesetup.dto.TransportBillPaymentDetailsDTO;
 import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.TransportBillPaymentDetailsVO;
 import com.efitops.basesetup.entity.TransportBillVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.DocumentTypeMasterRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.TransportBillPaymentDetails2Repo;
@@ -60,13 +61,18 @@ public class TransportBillServiceImpl implements TransportBillService {
     
     @Autowired
     EmployeeMasterRepo employeeMasterRepo;
+    
+    @Autowired
+    DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
 
     // ================== Transport Bill ==================
 
     @Override
     @Transactional
     public Map<String, Object> updateCreateTransportBill(TransportBillDTO dto) throws ApplicationException {
-
+ 
+    	String screenCode = "TB";
+    	
         TransportBillVO transportBillVO;
         String message;
 
@@ -101,6 +107,18 @@ public class TransportBillServiceImpl implements TransportBillService {
             }
 
             transportBillVO = new TransportBillVO();
+            
+			String docId = transportBillRepo.getTransportBillDocId(dto.getOrgId(),
+					dto.getFinancialYear(), screenCode);
+
+			transportBillVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(),
+							dto.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+            
             transportBillVO.setCreatedBy(dto.getCreatedBy());
             transportBillVO.setUpdatedBy(dto.getCreatedBy());
 
@@ -146,7 +164,6 @@ public class TransportBillServiceImpl implements TransportBillService {
     private void createUpdateTransportBillVO(TransportBillDTO dto, TransportBillVO transportBillVO)
             throws ApplicationException {
 
-        transportBillVO.setDocNo(dto.getDocNo());
         transportBillVO.setDocDate(dto.getDocDate());
         transportBillVO.setBillNo(dto.getBillNo());
         transportBillVO.setBillDate(dto.getBillDate());
@@ -240,7 +257,7 @@ public class TransportBillServiceImpl implements TransportBillService {
 
         TransportBillResponseDTO dto = new TransportBillResponseDTO();
         dto.setId(vo.getId());
-        dto.setDocNo(vo.getDocNo());
+        dto.setDocId(vo.getDocId());
         dto.setDocDate(vo.getDocDate());
         dto.setBillNo(vo.getBillNo());
         dto.setBillDate(vo.getBillDate());
@@ -333,4 +350,11 @@ public class TransportBillServiceImpl implements TransportBillService {
 
         return responseList;
     }
+    
+    @Override
+	public String getTransportBillDocId(Long orgId, String financialYear, String screenCode) {
+		String screenCode1 = "TB";
+		String result = transportBillRepo.getTransportBillDocId(orgId, financialYear, screenCode1);
+		return result;
+	}
 }

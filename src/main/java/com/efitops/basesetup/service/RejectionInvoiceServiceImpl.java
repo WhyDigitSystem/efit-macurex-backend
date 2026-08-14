@@ -773,12 +773,14 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 
 		} else {
 
-			String docId = proformaInvoiceRepo.getProformaInvoiceDocId(proformaInvoiceDTO.getOrgId(), screenCode);
+			String docId = proformaInvoiceRepo.getProformaInvoiceDocId(proformaInvoiceDTO.getOrgId(),
+					proformaInvoiceDTO.getFinancialYear(), screenCode);
 
 			proformaInvoiceVO.setDocId(docId);
 
 			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdScreenCode(proformaInvoiceDTO.getOrgId(), screenCode);
+					.findByOrgIdSAndFinYearAndScreenCode(proformaInvoiceDTO.getOrgId(),
+							proformaInvoiceDTO.getFinancialYear(), screenCode);
 			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
 			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
@@ -1137,8 +1139,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 					itemMasterDetailsResponseDTO.setCustomerPoNo(detailsVO.getItem().getCustomerPartNo());
 
 					itemMasterDetailsResponseDTO.setHsnCode(detailsVO.getItem().getHsnCode().getHsn());
-					
-	
+
 					if (detailsVO.getItem().getPricingUnit() != null) {
 
 						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
@@ -1206,9 +1207,9 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 	}
 
 	@Override
-	public String getProformaInvoiceDocId(Long orgId, String screenCode) {
+	public String getProformaInvoiceDocId(Long orgId, String financialYear, String screenCode) {
 		String screenCode1 = "PI";
-		String result = proformaInvoiceRepo.getProformaInvoiceDocId(orgId, screenCode1);
+		String result = proformaInvoiceRepo.getProformaInvoiceDocId(orgId, financialYear, screenCode1);
 		return result;
 	}
 

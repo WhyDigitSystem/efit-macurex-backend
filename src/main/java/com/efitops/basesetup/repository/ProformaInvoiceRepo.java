@@ -18,8 +18,8 @@ public interface ProformaInvoiceRepo extends JpaRepository<ProformaInvoiceVO, Lo
     @Query(nativeQuery = true, value = "select * from proforma_invoice_basic where org_id=?1 and branch=?2 and active=1 and cancel=0")
     List<ProformaInvoiceVO> getProformaInvoiceByOrgId(Long orgId, Long branch);
 
-    @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,4,0)) AS docid from documenttypemapping_details where org_id=?1 and screen_code=?2")
-    String getProformaInvoiceDocId(Long orgId, String screenCode);
+    @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,4,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
+    String getProformaInvoiceDocId(Long orgId,String financialYear, String screenCode);
 
     @Query(nativeQuery = true, value = "select a.rate,a.igst,a.sgst,a.cgst from gstratemaster a join hsn h on h.hsn_id=a.hsn_sac_code\r\n"
     		+ " where a.cancel=0 and h.hsn=?2 and a.org_id=?1")
@@ -46,6 +46,7 @@ public interface ProformaInvoiceRepo extends JpaRepository<ProformaInvoiceVO, Lo
     		+ "                h.hsn,\r\n"
     		+ "                i.customer_part_no order by i.item_id")
 	Set<Object[]> getItemDetailsResponse(Long orgId, Long branch);
+
 
 //    @Query(nativeQuery = true, value = "select g.state_name,g.state_code from  customer_header c join gststatemaster g on g.gststatemaster_id=c.gst_state and c.org_id=?1 \r\n"
 //    		+ "and c.customer_id=?2 and c.active=1 and c.cancel=0")

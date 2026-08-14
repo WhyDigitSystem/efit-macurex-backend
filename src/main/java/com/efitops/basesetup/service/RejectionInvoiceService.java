@@ -32,11 +32,11 @@ public interface RejectionInvoiceService {
 
 	Map<String, Object> createUpdateProformaInvoice(ProformaInvoiceDTO proformaInvoiceDTO) throws ApplicationException;
 
-	String getProformaInvoiceDocId(Long orgId, String screenCode);
-
 	List<Map<String, Object>> getTaxValue(Long orgId, Long hsn);
 
 	List<Map<String, Object>> getItemDetailsResponse(Long orgId, Long branch);
+
+	String getProformaInvoiceDocId(Long orgId, String financialYear, String screenCode);
 
 //	List<Map<String, Object>> getGstState(Long orgId, Long customer);
 

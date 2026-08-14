@@ -88,16 +88,16 @@ public interface TransportMasterService {
 
 	//despatch instruction schedule no dropdown
 
-	Map<String, Object> getDespatchCustomer(Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getCustomerDropdownForDespatchInstructions(Long branch, Long orgId) throws ApplicationException;
 
 
-	Map<String, Object> getDespatchSalesContract(Long customerId, Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getOrderAndSalesContractDropdownFromDespatchInstruction(Long customerId, Long branch, Long orgId) throws ApplicationException;
 
-	Map<String, Object> getDespatchItems(Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getItemsFromDespatchInstruction(Long item_type,Long branch, Long orgId) throws ApplicationException;
 
-	Map<String, Object> getDespatchScheduleMonth(Long itemId, Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getScheduleMonthForDespatchInstruction(Long item,String dlvno, Long branch, Long orgId) throws ApplicationException;
 
-	Map<String, Object> getDespatchPlannedQty(Long itemId, Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getPlannedQtyForDespatchInstruction(Long item, Long branch, Long orgId) throws ApplicationException;
 
 	Map<String, Object> getScheduleNoDropdownForDespatchInstruction(Long customer, String monthYear,Long branch, Long orgId)
 			throws ApplicationException;

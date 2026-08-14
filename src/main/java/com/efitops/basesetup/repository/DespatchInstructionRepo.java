@@ -18,7 +18,7 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			  AND branch = :branch
 			  AND cancel = false
 			  AND active = 1
-			ORDER BY di_no
+			ORDER BY despatch_basic_id
 			""", nativeQuery = true)
 	List<DespatchInstructionVO> getDespatchInstructionByOrgId(@Param("orgId") Long orgId, @Param("branch") Long branch);
 
@@ -94,25 +94,40 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 	List<Object[]> getScheduleNoDropdownForDespatchInstruction(@Param("customer") Long customer, @Param("monthYear") String monthYear,
 			@Param("branch") Long branch, @Param("orgId") Long orgId);
 
-	// despatch despatch salessontract no
+	// despatch despatch orderacceptanceandsalescontract no
 	@Query(value = """
 			SELECT
-			    sc.customer_contract_no,
-			    sc.contract_date,
-			    sc.salescontract_id,
-			    sc.invoice_type
+			    ob.doc_id,
+			    ob.doc_date,
+			    ob.order_acceptance_basic_id AS id,
+			    NULL AS type
+			FROM order_acceptance_basic ob
+			INNER JOIN customer_header ch
+			    ON ch.customer_id = ob.customer
+			WHERE ob.cancel = FALSE
+			  AND ch.customer_id = :customer
+			  AND ob.branch = :branch
+			  AND ob.org_id = :orgId
+
+			UNION 
+
+			SELECT
+			    sc.doc_id,
+			    sc.doc_date,
+			    sc.salescontract_id AS id,
+			    sc.invoice_type AS type
 			FROM sales_contract_basic sc
 			INNER JOIN customer_header ch
 			    ON ch.customer_id = sc.customer
-			WHERE sc.cancel = false
-			  AND ch.customer_id = :customerId
+			WHERE sc.cancel = FALSE
+			  AND ch.customer_id = :customer
 			  AND sc.branch = :branch
 			  AND sc.org_id = :orgId
-			ORDER BY sc.contract_date
-			""", nativeQuery = true)
-	List<Object[]> getDespatchSalesContract(@Param("customerId") Long customerId, @Param("branch") Long branch,
-			@Param("orgId") Long orgId);
 
+			ORDER BY doc_date
+			""", nativeQuery = true)
+			List<Object[]> getOrderAndSalesContractDropdownFromDespatchInstruction(@Param("customer") Long customerId,@Param("branch") Long branch,@Param("orgId")  Long orgId);
+	
 	// Despatch Schedule month dropdown
 	@Query(value = """
 			SELECT
@@ -124,12 +139,13 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			INNER JOIN item i
 			    ON d.item_id = i.item_id
 			WHERE a.cancel = false
-			  AND i.item_id = :itemId
+			  AND i.item_id = :item
+			  And a.dlv_no = :dlvno
 			  AND a.branch_id = :branch
 			  AND a.org_id = :orgId
 			ORDER BY a.month_of_schedule
 			""", nativeQuery = true)
-	List<Object[]> getDespatchScheduleMonth(@Param("itemId") Long itemId, @Param("branch") Long branch,
+	List<Object[]> getScheduleMonthForDespatchInstruction(@Param("item") Long itemId,@Param("dlvno") String dlvno, @Param("branch") Long branch,
 			@Param("orgId") Long orgId);
 
 	// planned qty
@@ -153,11 +169,11 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			   AND dd.item_id = sdsd.item_id
 
 			WHERE sds.cancel = FALSE
-			  AND i.item_id = :itemId
+			  AND i.item_id = :item
 			  AND sds.branch_id = :branch
 			  AND sds.org_id = :orgId
 			""", nativeQuery = true)
-	BigDecimal getDespatchPlannedQty(@Param("itemId") Long itemId, @Param("branch") Long branch,
+	BigDecimal getPlannedQtyForDespatchInstruction(@Param("item") Long item, @Param("branch") Long branch,
 			@Param("orgId") Long orgId);
 
 	// Pending qty

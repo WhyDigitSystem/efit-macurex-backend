@@ -75,12 +75,12 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
 	             primary_unit
 	        FROM item
 	        WHERE cancel = false
-	          AND item_type = 'FG'
+	          AND item_type = :item_type
 	          AND branch = :branch
 	          AND org_Id = :orgId
 	        ORDER BY item_id
 	        """, nativeQuery = true)
-	List<Object[]> getDespatchItems(@Param ("branch") Long branch ,@Param("orgId") Long orgId);
+	List<Object[]> getItemsFromDespatchInstruction(@Param("item_type") Long item_type ,@Param ("branch") Long branch ,@Param("orgId") Long orgId);
 
          @Query(value =
 			    "select im.item_description, im.hsn_sac_code " +

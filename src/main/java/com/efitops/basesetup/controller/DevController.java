@@ -666,13 +666,13 @@ public class DevController extends BaseController{
 
 		    return ResponseEntity.ok(responseDTO);
 		}
-		//dropdown for customer
-		@GetMapping("/getDespatchCustomer")
-		public ResponseEntity<ResponseDTO> getDespatchCustomer(
+		//despatch dropdown for customer
+		@GetMapping("/getCustomerDropdownForDespatchInstructions")
+		public ResponseEntity<ResponseDTO> getCustomerDropdownForDespatchInstructions(
 				@RequestParam Long branch,
 				 @RequestParam Long orgId) {
 
-		    String methodName = "getDespatchCustomer()";
+		    String methodName = "getCustomerDropdownForDespatchInstructions()";
 		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		    Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -681,7 +681,7 @@ public class DevController extends BaseController{
 		    try {
 
 		        Map<String, Object> responseMap =
-		                transportMasterService.getDespatchCustomer(branch,orgId);
+		                transportMasterService.getCustomerDropdownForDespatchInstructions(branch,orgId);
 
 		        responseObjectsMap.put(
 		                CommonConstant.STRING_MESSAGE,
@@ -711,12 +711,12 @@ public class DevController extends BaseController{
 
 		    return ResponseEntity.ok(responseDTO);
 		}
-		//Despatch sales Contract Dropdown
-		@GetMapping("/getDespatchSalesContract")
-		public ResponseEntity<ResponseDTO> getDespatchSalesContract(
+		//Despatch orderacceptanceandsalesContract Dropdown
+		@GetMapping("/getOrderAndSalesContractDropdownFromDespatchInstruction")
+		public ResponseEntity<ResponseDTO> getOrderAndSalesContractDropdownFromDespatchInstruction(
 		        @RequestParam Long customerId,@RequestParam Long branch,@RequestParam Long orgId) {
 
-		    String methodName = "getDespatchSalesContract()";
+		    String methodName = "getOrderAndSalesContractDropdownFromDespatchInstruction()";
 		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		    Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -725,7 +725,7 @@ public class DevController extends BaseController{
 		    try {
 
 		        Map<String, Object> responseMap =
-		                transportMasterService.getDespatchSalesContract(customerId,branch,orgId);
+		                transportMasterService.getOrderAndSalesContractDropdownFromDespatchInstruction(customerId,branch,orgId);
 
 		        responseObjectsMap.put(
 		                CommonConstant.STRING_MESSAGE,
@@ -756,10 +756,10 @@ public class DevController extends BaseController{
 		    return ResponseEntity.ok(responseDTO);
 		}
 		//despatch instruction items
-		@GetMapping("/getDespatchItems")
-		public ResponseEntity<ResponseDTO> getDespatchItems(@RequestParam Long branch,@RequestParam Long orgId) {
+		@GetMapping("/getItemsFromDespatchInstruction")
+		public ResponseEntity<ResponseDTO> getItemsFromDespatchInstruction(@RequestParam Long item_type,@RequestParam Long branch,@RequestParam Long orgId) {
 
-		    String methodName = "getDespatchItems()";
+		    String methodName = "getItemsFromDespatchInstruction()";
 		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		    Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -768,7 +768,7 @@ public class DevController extends BaseController{
 		    try {
 
 		        Map<String, Object> responseMap =
-		                transportMasterService.getDespatchItems(branch,orgId);
+		                transportMasterService.getItemsFromDespatchInstruction(item_type,branch,orgId);
 
 		        responseObjectsMap.put(
 		                CommonConstant.STRING_MESSAGE,
@@ -800,13 +800,14 @@ public class DevController extends BaseController{
 		}
 		
 		//Despatch schedule month 
-		@GetMapping("/getDespatchScheduleMonth")
-		public ResponseEntity<ResponseDTO> getDespatchScheduleMonth(
-		        @RequestParam Long itemId,
+		@GetMapping("/getScheduleMonthForDespatchInstruction")
+		public ResponseEntity<ResponseDTO> getScheduleMonthForDespatchInstruction(
+		        @RequestParam Long item,
+		        @RequestParam String dlvno,
 		        @RequestParam Long branch,
 		        @RequestParam Long orgId) {
 
-		    String methodName = "getDespatchScheduleMonth()";
+		    String methodName = "getScheduleMonthForDespatchInstruction()";
 		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		    Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -815,7 +816,7 @@ public class DevController extends BaseController{
 		    try {
 
 		        Map<String, Object> responseMap =
-		                transportMasterService.getDespatchScheduleMonth(itemId, branch, orgId);
+		                transportMasterService.getScheduleMonthForDespatchInstruction(item,dlvno, branch, orgId);
 
 		        responseObjectsMap.put(
 		                CommonConstant.STRING_MESSAGE,
@@ -847,13 +848,13 @@ public class DevController extends BaseController{
 		}
 		
 		//despatch instruction planned qty
-		@GetMapping("/getDespatchPlannedQty")
-		public ResponseEntity<ResponseDTO> getDespatchPlannedQty(
-		        @RequestParam Long itemId,
+		@GetMapping("/getPlannedQtyForDespatchInstruction")
+		public ResponseEntity<ResponseDTO> getPlannedQtyForDespatchInstruction(
+		        @RequestParam Long item,
 		        @RequestParam Long branch,
 		        @RequestParam Long orgId) {
 
-		    String methodName = "getDespatchPlannedQty()";
+		    String methodName = "getPlannedQtyForDespatchInstruction()";
 		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		    Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -862,8 +863,8 @@ public class DevController extends BaseController{
 		    try {
 
 		        Map<String, Object> responseMap =
-		                transportMasterService.getDespatchPlannedQty(
-		                        itemId,
+		                transportMasterService.getPlannedQtyForDespatchInstruction(
+		                        item,
 		                        branch,
 		                        orgId);
 

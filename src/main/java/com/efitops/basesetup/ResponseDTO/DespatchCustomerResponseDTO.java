@@ -16,6 +16,6 @@ public class DespatchCustomerResponseDTO {
 
 	    private String customerName;
 
-	    private BigDecimal partyCreditLimit;
+	    private  String accountName;
 
 }

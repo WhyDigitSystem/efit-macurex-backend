@@ -946,8 +946,8 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	private void createUpdateDespatchInstructionVO(DespatchInstructionDTO dto,
 			DespatchInstructionVO despatchInstructionVO) throws ApplicationException {
 
-		despatchInstructionVO.setDocId(dto.getDocId());
-		despatchInstructionVO.setDocDate(dto.getDocDate());
+//		despatchInstructionVO.setDocId(dto.getDocId());
+//		despatchInstructionVO.setDocDate(dto.getDocDate());
 		despatchInstructionVO.setSchduleNo(dto.getSchduleNo());
 		despatchInstructionVO.setInvoiceType(dto.getInvoiceType());
 		despatchInstructionVO.setSchduleDate(dto.getSchduleDate());
@@ -959,7 +959,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		despatchInstructionVO.setConsignee(dto.getConsignee());
 
 		despatchInstructionVO.setOrgId(dto.getOrgId());
-		despatchInstructionVO.setActive(dto.getActive());
+		despatchInstructionVO.setActive(dto.isActive());
 		despatchInstructionVO.setCancelRemarks(dto.getCancelRemarks());
 
 		// =========================
@@ -1418,11 +1418,11 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// despatch customer dropdown
 	@Override
-	public Map<String, Object> getDespatchCustomer(Long branch, Long orgId) throws ApplicationException {
+	public Map<String, Object> getCustomerDropdownForDespatchInstructions(Long branch, Long orgId) throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> customerList = customerRepo.getDespatchCustomer(branch, orgId);
+		List<Object[]> customerList = customerRepo.getCustomerDropdownForDespatchInstructions(branch, orgId);
 
 		List<DespatchCustomerResponseDTO> responseDTOList = new ArrayList<>();
 
@@ -1436,8 +1436,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			dto.setCustomerName(obj[2] != null ? (String) obj[2] : "");
 
-			dto.setPartyCreditLimit(
-					obj[3] != null ? BigDecimal.valueOf(((Number) obj[3]).doubleValue()) : BigDecimal.ZERO);
+			dto.setAccountName(obj[2] != null ? (String) obj[3] : "");
 
 			responseDTOList.add(dto);
 		}
@@ -1451,12 +1450,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// despatch contract no dropdown
 	@Override
-	public Map<String, Object> getDespatchSalesContract(Long customerId, Long branch, Long orgId)
+	public Map<String, Object> getOrderAndSalesContractDropdownFromDespatchInstruction(Long customerId, Long branch, Long orgId)
 			throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> salesContractList = despatchInstructionRepo.getDespatchSalesContract(customerId, branch, orgId);
+		List<Object[]> salesContractList = despatchInstructionRepo.getOrderAndSalesContractDropdownFromDespatchInstruction(customerId, branch, orgId);
 
 		List<DespatchSalesContractResponseDTO> responseDTOList = new ArrayList<>();
 
@@ -1464,14 +1463,9 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			DespatchSalesContractResponseDTO dto = new DespatchSalesContractResponseDTO();
 
-			dto.setCustomerContractNo(obj[0] != null ? (String) obj[0] : "");
+			dto.setOrderAccepCustomerContractNo(obj[0] != null ? (String) obj[0] : "");
 
-			dto.setContractDate(obj[1] != null ? ((java.sql.Date) obj[1]).toLocalDate() : null);
-
-			dto.setSalesContractId(obj[2] != null ? ((Number) obj[2]).longValue() : 0L);
-
-			dto.setInvoiceType(obj[3] != null ? (String) obj[3] : "");
-
+			
 			responseDTOList.add(dto);
 		}
 
@@ -1484,11 +1478,11 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// Despacth Item dropdown
 	@Override
-	public Map<String, Object> getDespatchItems(Long branch, Long orgId) throws ApplicationException {
+	public Map<String, Object> getItemsFromDespatchInstruction(Long item_type,Long branch, Long orgId) throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> itemList = itemMasterRepo.getDespatchItems(branch, orgId);
+		List<Object[]> itemList = itemMasterRepo.getItemsFromDespatchInstruction(item_type,branch, orgId);
 
 		List<ItemResponseDTO> responseDTOList = new ArrayList<>();
 
@@ -1497,21 +1491,18 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			ItemResponseDTO dto = new ItemResponseDTO();
 
 			dto.setId(obj[0] != null ? ((Number) obj[0]).longValue() : 0L);
+		    dto.setItemCode(obj[1] != null ? obj[1].toString() : "");
+		    dto.setItemDescription(obj[2] != null ? obj[2].toString() : "");
+		    if (obj[3] != null) {
+		        UnitResponseDTO unit = new UnitResponseDTO();
+		        unit.setId(((Number) obj[3]).longValue());
+		        dto.setUnit(unit);
+		    }
 
-			dto.setItemCode(obj[1] != null ? (String) obj[1] : "");
-
-			dto.setItemDescription(obj[2] != null ? (String) obj[2] : "");
-
-			UnitResponseDTO unitDTO = new UnitResponseDTO();
-
-			unitDTO.setId(obj[3] != null ? ((Number) obj[3]).longValue() : 0L);
-
-			dto.setUnit(unitDTO);
 
 			responseDTOList.add(dto);
 		}
 
-		responseMap.put("message", "Finished Goods Item List Fetched Successfully");
 
 		responseMap.put("itemList", responseDTOList);
 
@@ -1520,12 +1511,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// Despatch Schedulemonth
 	@Override
-	public Map<String, Object> getDespatchScheduleMonth(Long itemId, Long branch, Long orgId)
+	public Map<String, Object> getScheduleMonthForDespatchInstruction(Long item,String dlvno, Long branch, Long orgId)
 			throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> scheduleMonthList = despatchInstructionRepo.getDespatchScheduleMonth(itemId, branch, orgId);
+		List<Object[]> scheduleMonthList = despatchInstructionRepo.getScheduleMonthForDespatchInstruction(item,dlvno, branch, orgId);
 
 		List<DespatchScheduleMonthResponseDTO> responseDTOList = new ArrayList<>();
 
@@ -1549,11 +1540,11 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	// despatch planned qty
 
 	@Override
-	public Map<String, Object> getDespatchPlannedQty(Long itemId, Long branch, Long orgId) throws ApplicationException {
+	public Map<String, Object> getPlannedQtyForDespatchInstruction(Long item, Long branch, Long orgId) throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		BigDecimal plannedQty = despatchInstructionRepo.getDespatchPlannedQty(itemId, branch, orgId);
+		BigDecimal plannedQty = despatchInstructionRepo.getPlannedQtyForDespatchInstruction(item, branch, orgId);
 
 		if (plannedQty == null) {
 			plannedQty = BigDecimal.ZERO;

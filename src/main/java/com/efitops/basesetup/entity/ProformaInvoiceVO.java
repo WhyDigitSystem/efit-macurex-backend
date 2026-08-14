@@ -174,7 +174,7 @@ public class ProformaInvoiceVO {
 	public String getCancel() {
 		return cancel ? "T" : "F";
 	}
-
+ 
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 

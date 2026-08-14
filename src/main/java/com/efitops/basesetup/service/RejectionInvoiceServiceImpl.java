@@ -804,7 +804,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 	private void createUpdateProformaInvoiceVOByProformaInvoiceDTO(ProformaInvoiceDTO proformaInvoiceDTO,
 			ProformaInvoiceVO proformaInvoiceVO) throws ApplicationException {
 
-		proformaInvoiceVO.setBelongsTo(proformaInvoiceDTO.getBelongsTo());
+//		proformaInvoiceVO.setBelongsTo(proformaInvoiceDTO.getBelongsTo());
 
 		if (proformaInvoiceDTO.getCustomer() != null && proformaInvoiceDTO.getCustomer() != 0) {
 
@@ -814,7 +814,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 			proformaInvoiceVO.setCustomer(customer);
 		}
 
-		proformaInvoiceVO.setId(proformaInvoiceDTO.getId());
+//		proformaInvoiceVO.setId(proformaInvoiceDTO.getId());
 
 		proformaInvoiceVO.setBelongsTo(proformaInvoiceDTO.getBelongsTo());
 
@@ -1238,26 +1238,26 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 		return list;
 	}
 
-	@Override
-	public List<Map<String, Object>> getGstState(Long orgId, Long customer) {
-		Set<Object[]> chType = proformaInvoiceRepo.getGstState(orgId, customer);
-		return getGstState(chType);
-	}
-
-	private List<Map<String, Object>> getGstState(Set<Object[]> chType) {
-
-		List<Map<String, Object>> list = new ArrayList<>();
-
-		for (Object[] ch : chType) {
-
-			Map<String, Object> map = new HashMap<>();
-			map.put("stateName", ch[0] != null ? ch[0].toString() : "");
-			map.put("stateCode", ch[1] != null ? ch[1].toString() : "");
-
-			list.add(map);
-		}
-
-		return list;
-	}
+//	@Override
+//	public List<Map<String, Object>> getGstState(Long orgId, Long customer) {
+//		Set<Object[]> chType = proformaInvoiceRepo.getGstState(orgId, customer);
+//		return getGstState(chType);
+//	}
+//
+//	private List<Map<String, Object>> getGstState(Set<Object[]> chType) {
+//
+//		List<Map<String, Object>> list = new ArrayList<>();
+//
+//		for (Object[] ch : chType) {
+//
+//			Map<String, Object> map = new HashMap<>();
+//			map.put("stateName", ch[0] != null ? ch[0].toString() : "");
+//			map.put("stateCode", ch[1] != null ? ch[1].toString() : "");
+//
+//			list.add(map);
+//		}
+//
+//		return list;
+//	}
 
 }

@@ -98,7 +98,6 @@ public class AmountInWordsConverterServiceImpl implements AmountInWordsConverter
 
 		int paiseInt = paise.intValue();
 
-		// Add paise
 		if (paiseInt > 0) {
 
 			String paiseInWords = convertBelowThousand(paiseInt);

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProformaInvoiceDetailsDTO {
 
-	private Long id;
+//	private Long id;
 
 	private Long item;
 

@@ -37,7 +37,7 @@ public interface ProformaInvoiceRepo extends JpaRepository<ProformaInvoiceVO, Lo
     		+ "                ON u.unitmaster_id = i.primary_unit\r\n"
     		+ "            INNER JOIN hsn h\r\n"
     		+ "                ON h.hsn_id = i.hsn_code\r\n"
-    		+ "            WHERE i.cancel = 0\r\n"
+    		+ "            WHERE i.cancel = 0\r\n"	
     		+ "              AND i.org_id = ?1\r\n"
     		+ "              AND i.branch = ?2 group by  i.item_id,\r\n"
     		+ "                i.item_code,\r\n"
@@ -47,8 +47,8 @@ public interface ProformaInvoiceRepo extends JpaRepository<ProformaInvoiceVO, Lo
     		+ "                i.customer_part_no order by i.item_id")
 	Set<Object[]> getItemDetailsResponse(Long orgId, Long branch);
 
-    @Query(nativeQuery = true, value = "select g.state_name,g.state_code from  customer_header c join gststatemaster g on g.gststatemaster_id=c.gst_state and c.org_id=?1 \r\n"
-    		+ "and c.customer_id=?2 and c.active=1 and c.cancel=0")
-	Set<Object[]> getGstState(Long orgId, Long customer);
+//    @Query(nativeQuery = true, value = "select g.state_name,g.state_code from  customer_header c join gststatemaster g on g.gststatemaster_id=c.gst_state and c.org_id=?1 \r\n"
+//    		+ "and c.customer_id=?2 and c.active=1 and c.cancel=0")
+//	Set<Object[]> getGstState(Long orgId, Long customer);
 
 }

@@ -27,15 +27,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "stock_transfer_chellan_basic")
+@Table(name = "stock_transfer_challan_basic")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class StockTransferChallanVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stock_transfer_chellan_basicgen")
-	@SequenceGenerator(name = "stock_transfer_chellan_basicgen", sequenceName = "stock_transfer_chellan_basicseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "stock_transfer_chellan_basic_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stock_transfer_challan_basicgen")
+	@SequenceGenerator(name = "stock_transfer_challan_basicgen", sequenceName = "stock_transfer_challan_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "stock_transfer_challan_basic_id")
     private Long id;
 	
 	@Column(name = "doc_id")
@@ -62,7 +62,7 @@ public class StockTransferChallanVO {
 	private LocationVO location;
 	
 	@Column(name = "time_of_transfer")
-	private LocalTime timeOfTranfer;
+	private String timeOfTranfer;
 	
 	@Column(name = "stock_posting")
 	private String stockPosting;
@@ -79,6 +79,8 @@ public class StockTransferChallanVO {
 	@Column(name = "import_local")
 	private String importLocal;
 	
+	 @Column(name = "is_igst_applicable")
+	    private String isIgstApplicable;
 	
 	@Column(name = "active")
 	private boolean active;
@@ -137,8 +139,8 @@ public class StockTransferChallanVO {
 	@JsonManagedReference
 	private List<StockTransferChallanDetailsVO> details = new ArrayList<>();
 
-//	@OneToMany(mappedBy = "stockTransferChallanVO", cascade = CascadeType.ALL)
-//	@JsonManagedReference
-//	private List<StockTransferChallanTaxDetailsVO> taxDetails = new ArrayList<>();
+	@OneToMany(mappedBy = "stockTransferChallanVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<StockTransferChallanTaxDetailsVO> taxDetails = new ArrayList<>();
 // 
 }

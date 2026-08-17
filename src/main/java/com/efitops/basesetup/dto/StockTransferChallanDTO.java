@@ -19,7 +19,7 @@ public class StockTransferChallanDTO {
 	private Long location;
 	private String stockPosting;
 	private LocalDate date;
-	private LocalTime timeOfTranfer;
+	private String timeOfTranfer;
 	private int noOfPackages;
 	private int otherPackages;
 	private String importLocal;

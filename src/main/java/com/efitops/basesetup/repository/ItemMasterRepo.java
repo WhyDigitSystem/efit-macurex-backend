@@ -91,64 +91,85 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
          
 //        Items for Stock transfer challan
          @Query(value = """
-        		 SELECT
-        		     i.item_id,
-        		     i.item_code,
-        		     i.item_description,
-        		     i.customer_part_no,
-        		     dd.desc_qty AS recqty,
-        		     0 AS freight,
-        		     0 AS insur,
-        		     i.excise_tariff_no,
-        		     gm.hsn_sac_code
-        		 FROM despatch_detail dd
-        		 INNER JOIN item i
-        		     ON dd.item = i.item_id
-        		 INNER JOIN despatch_basic db
-        		     ON db.despatch_basic_id = dd.despatch_basic_id
-        		 LEFT JOIN gstratemaster gm
-        		     ON i.hsn_code = gm.hsn_sac_code
-        		 WHERE i.cancel = FALSE
-        		   AND db.cancel = FALSE
-        		   AND db.despatch_basic_id = :despatchNo
-        		   AND db.branch = :branch
-        		   AND db.org_id = :orgId
+        		    SELECT
+        		        i.item_id,
+        		        i.item_code,
+        		        i.item_description,
+        		        h.hsn,
+        		        i.customer_part_no,
+        		        gr.rate,
+        		        gr.cgst,
+        		        gr.sgst,
+        		        gr.igst,
+        		        u.unitmaster_id,
+        		        u.unit_id,
+        		        gr.gstratemaster_id
+        		    FROM despatch_detail dd
+        		    INNER JOIN item i
+        		        ON dd.item = i.item_id
+        		    INNER JOIN despatch_basic db
+        		        ON db.despatch_basic_id = dd.despatch_basic_id
+        		    INNER JOIN unitmaster u
+        		        ON u.unitmaster_id = i.primary_unit
+        		    INNER JOIN hsn h
+        		        ON h.hsn_id = i.hsn_code
+        		    LEFT JOIN gstratemaster gr
+        		        ON gr.hsn_sac_code = h.hsn_id
+        		        AND gr.active = 1
+        		        AND gr.cancel = 0
+        		        AND gr.org_id = :orgId
+        		        AND gr.branch = :branch
+        		    WHERE i.cancel = FALSE
+        		      AND db.cancel = FALSE
+        		      AND db.branch = :branch
+        		      AND db.org_id = :orgId
 
-        		 UNION
+        		    UNION
 
-        		 SELECT
-        		     i.item_id,
-        		     i.item_code,
-        		     i.item_description,
-        		     i.customer_part_no,
-        		     0 AS recqty,
-        		     0 AS freight,
-        		     0 AS insur,
-        		     i.excise_tariff_no,
-        		     gm.hsn_sac_code
-        		 FROM item i
-        		 INNER JOIN listofvaluesdetails l
-        		     ON i.item_type = l.listofvaluesdetails_id
-        		 LEFT JOIN gstratemaster gm
-        		     ON i.hsn_code = gm.hsn_sac_code
-        		 WHERE i.cancel = FALSE
-        		   AND i.branch = :branch
-        		   AND i.org_id = :orgId
-        		   AND l.value_code IN (
-        		       'RM',
-        		       'SFG',
-        		       'FG',
-        		       'Consumables',
-        		       'Scrap',
-        		       'Machines',
-        		       'Tool',
-        		       'Instruments',
-        		       'Others'
-        		   )
+        		    SELECT
+        		        i.item_id,
+        		        i.item_code,
+        		        i.item_description,
+        		        h.hsn,
+        		        i.customer_part_no,
+        		        gr.rate,
+        		        gr.cgst,
+        		        gr.sgst,
+        		        gr.igst,
+        		        u.unitmaster_id,
+        		        u.unit_id,
+        		        gr.gstratemaster_id
+        		    FROM item i
+        		    INNER JOIN listofvaluesdetails l
+        		        ON i.item_type = l.listofvaluesdetails_id
+        		    INNER JOIN unitmaster u
+        		        ON u.unitmaster_id = i.primary_unit
+        		    INNER JOIN hsn h
+        		        ON h.hsn_id = i.hsn_code
+        		    LEFT JOIN gstratemaster gr
+        		        ON gr.hsn_sac_code = h.hsn_id
+        		        AND gr.active = 1
+        		        AND gr.cancel = 0
+        		        AND gr.org_id = :orgId
+        		        AND gr.branch = :branch
+        		    WHERE i.cancel = FALSE
+        		      AND i.branch = :branch
+        		      AND i.org_id = :orgId
+        		      AND l.value_code IN (
+        		          'RM',
+        		          'SFG',
+        		          'FG',
+        		          'Consumables',
+        		          'Scrap',
+        		          'Machines',
+        		          'Tool',
+        		          'Instruments',
+        		          'Others'
+        		      )
 
-        		 ORDER BY item_code
-        		 """, nativeQuery = true)
-        		 List<Object[]> getItemsForStockTransferChallan(@Param("despatchNo") String despatchNo,
-        		                                 @Param("branch") Long branch,
-        		                                 @Param("orgId") Long orgId);
+        		    ORDER BY item_code
+        		    """, nativeQuery = true)
+        		List<Object[]> getItemsForStockTransferChallan(
+        		        @Param("branch") Long branch,
+        		        @Param("orgId") Long orgId);
 }

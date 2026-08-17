@@ -15,6 +15,6 @@ public class CustomerDropdownResponseDTO {
     private String address;
     private String gstState;
     private String gstNo;
-    private Boolean igstApplicable;
+    private boolean igstApplicable;
     private String gstType;
 }

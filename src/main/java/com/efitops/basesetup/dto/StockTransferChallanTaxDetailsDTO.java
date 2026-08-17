@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StockTransferChallanTaxDetailsDTO {
-	private Long id;
+//	private Long id;
+	private Long particularsId;
 	private Long particulars;
 	 private BigDecimal acceptQtyAmount;
 	 private BigDecimal revisedAmoount;

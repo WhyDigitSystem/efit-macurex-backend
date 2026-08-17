@@ -1009,7 +1009,6 @@ public class DevController extends BaseController{
 		//item drop down for stocktransfer challan
 		@GetMapping("/getItemsForStockTransferChallan")
 		public ResponseEntity<ResponseDTO> getItemsForStockTransferChallan(
-		        @RequestParam String despatchNo,
 		        @RequestParam Long branch,
 		        @RequestParam Long orgId) {
 
@@ -1023,7 +1022,6 @@ public class DevController extends BaseController{
 
 		        Map<String, Object> responseMap =
 		                transportMasterService.getItemsForStockTransferChallan(
-		                        despatchNo,
 		                        branch,
 		                        orgId);
 

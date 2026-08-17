@@ -668,257 +668,257 @@ public class PurchaseServiceImpl implements PurchaseService {
     // purchaseContractId field, per the earlier decision to drop the PO-type flag.
     // ==================================================================
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> updateCreatePurchaseDeliverySchedule(PurchaseDeliveryScheduleDTO dto) throws ApplicationException {
-
-        PurchaseDeliveryScheduleVO vo;
-        String message;
-        boolean isUpdate = ObjectUtils.isNotEmpty(dto.getId());
-
-        if (isUpdate) {
-            vo = purchaseDeliveryScheduleRepo.findById(dto.getId())
-                    .orElseThrow(() -> new ApplicationException("Purchase Delivery Schedule Not Found"));
-            vo.setUpdatedBy(dto.getCreatedBy());
-            message = "Purchase Delivery Schedule Updated Successfully";
-        } else {
-            vo = new PurchaseDeliveryScheduleVO();
-            vo.setCreatedBy(dto.getCreatedBy());
-            vo.setUpdatedBy(dto.getCreatedBy());
-            vo.setDocNo(purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleDocId(dto.getOrgId(), SCREEN_CODE_PDS));
-            message = "Purchase Delivery Schedule Created Successfully";
-        }
-
-        createUpdatePurchaseDeliveryScheduleVOFromDTO(dto, vo);
-
-        if (isUpdate) {
-            purchaseDeliveryScheduleRepo.flush();
-        } else {
-            vo = purchaseDeliveryScheduleRepo.save(vo);
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", message);
-        response.put("purchaseDeliveryScheduleVO", buildPurchaseDeliveryScheduleResponse(vo));
-        return response;
-    }
-
-    private void createUpdatePurchaseDeliveryScheduleVOFromDTO(PurchaseDeliveryScheduleDTO dto, PurchaseDeliveryScheduleVO vo) throws ApplicationException {
-
-        if (dto.getBranch() != null && dto.getBranch() != 0) {
-            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
-        }
-        vo.setBelongsTo(dto.getBelongsTo());
-        vo.setDocDate(dto.getDocDate());
-        vo.setSchStartDate(dto.getSchStartDate());
-        vo.setSchEndDate(dto.getSchEndDate());
-
-        // PO No. -> resolved from whichever source table poType points to.
-        // Snapshotted here so this record doesn't silently change if the source PO is edited later.
-        if (dto.getPoType() != null && dto.getPoId() != null) {
-
-            switch (dto.getPoType()) {
-
-                case "LOCAL_PURCHASE_ORDER":
-                    LocalPurchaseOrderVO lpo = localPurchaseOrderRepo.findById(dto.getPoId())
-                            .orElseThrow(() -> new ApplicationException("Local Purchase Order Not Found"));
-                    vo.setPoType(dto.getPoType());
-                    vo.setPoId(lpo.getId());
-                    vo.setPoNo(lpo.getPoNo());
-                    vo.setPoDate(lpo.getPoDate());
-                    break;
-
-                case "PURCHASE_CONTRACT":
-                    PurchaseContractVO contract = purchaseContractRepo.findById(dto.getPoId())
-                            .orElseThrow(() -> new ApplicationException("Purchase Contract Not Found"));
-                    vo.setPoType(dto.getPoType());
-                    vo.setPoId(contract.getId());
-                    vo.setPoNo(contract.getContractNo());
-                    vo.setPoDate(contract.getContractDate());
-                    break;
-
-                default:
-                    throw new ApplicationException("Unsupported PO Type: " + dto.getPoType());
-            }
-
-        } else {
-            vo.setPoType(null);
-            vo.setPoId(null);
-            vo.setPoNo(null);
-            vo.setPoDate(null);
-        }
-
-        vo.setPreparedBy(dto.getPreparedBy());
-        vo.setNote(dto.getNote());
-        vo.setOrgId(dto.getOrgId());
-        vo.setFinancialYear(dto.getFinancialYear());
-        vo.setActive(dto.isActive());
-        vo.setCancelRemarks(dto.getCancelRemarks());
-
-        buildScheduleDetailsList(dto, vo);
-        buildScheduleList(dto, vo);
-    }
-
-    private void buildScheduleDetailsList(PurchaseDeliveryScheduleDTO dto, PurchaseDeliveryScheduleVO vo) throws ApplicationException {
-
-        if (vo.getId() != null && vo.getPurchaseDeliveryScheduleDetailsVO() != null && !vo.getPurchaseDeliveryScheduleDetailsVO().isEmpty()) {
-            purchaseDeliveryScheduleDetailsRepo.deleteAll(new ArrayList<>(vo.getPurchaseDeliveryScheduleDetailsVO()));
-            purchaseDeliveryScheduleDetailsRepo.flush();
-        }
-        vo.getPurchaseDeliveryScheduleDetailsVO().clear();
-        if (dto.getScheduleDetails() == null) return;
-
-        for (PurchaseDeliveryScheduleDetailsDTO line : dto.getScheduleDetails()) {
-
-            PurchaseDeliveryScheduleDetailsVO detailVO = new PurchaseDeliveryScheduleDetailsVO();
-
-            if (line.getItemId() != null && line.getItemId() != 0) {
-                ItemMasterVO item = itemMasterRepo.findById(line.getItemId()).orElseThrow(() -> new ApplicationException("Item Not Found"));
-                detailVO.setItem(item);
-                if (item.getPrimaryUnit() != null) detailVO.setPrimaryUnit(item.getPrimaryUnit());
-                // purchaseUnit/demandQty/availableStock/qty still pending confirmed ItemMasterVO getter names
-            }
-
-            detailVO.setTentativeQty(line.getTentativeQty());
-            detailVO.setTentativeQtyNextMonth(line.getTentativeQtyNextMonth());
-            detailVO.setRate(line.getRate());
-            detailVO.setPurchaseDeliveryScheduleVO(vo);
-            vo.getPurchaseDeliveryScheduleDetailsVO().add(detailVO);
-        }
-    }
-
-    private void buildScheduleList(PurchaseDeliveryScheduleDTO dto, PurchaseDeliveryScheduleVO vo) {
-
-        if (vo.getId() != null && vo.getPurchaseDeliveryScheduleLineVO() != null && !vo.getPurchaseDeliveryScheduleLineVO().isEmpty()) {
-            purchaseDeliveryScheduleLineRepo.deleteAll(new ArrayList<>(vo.getPurchaseDeliveryScheduleLineVO()));
-            purchaseDeliveryScheduleLineRepo.flush();
-        }
-        vo.getPurchaseDeliveryScheduleLineVO().clear();
-        if (dto.getSchedule() == null) return;
-
-        for (PurchaseDeliveryScheduleLineDTO line : dto.getSchedule()) {
-            PurchaseDeliveryScheduleLineVO lineVO = new PurchaseDeliveryScheduleLineVO();
-            lineVO.setPlanDate(line.getPlanDate());
-            lineVO.setWeekNo(line.getWeekNo());
-            lineVO.setScheduleQty(line.getScheduleQty());
-            lineVO.setPurchaseDeliveryScheduleVO(vo);
-            vo.getPurchaseDeliveryScheduleLineVO().add(lineVO);
-        }
-    }
-
-    @Override
-    public PurchaseDeliveryScheduleResponseDTO getPurchaseDeliveryScheduleById(Long id) throws ApplicationException {
-        PurchaseDeliveryScheduleVO vo = purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleById(id);
-        if (vo == null) throw new ApplicationException("Purchase Delivery Schedule Not Found");
-        return buildPurchaseDeliveryScheduleResponse(vo);
-    }
-
-    @Override
-    public List<PurchaseDeliveryScheduleResponseDTO> getPurchaseDeliveryScheduleByOrgId(Long orgId, Long branchId) throws ApplicationException {
-        List<PurchaseDeliveryScheduleVO> list = purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleByOrgId(orgId, branchId);
-        if (list == null || list.isEmpty()) throw new ApplicationException("Purchase Delivery Schedule Not Found");
-        List<PurchaseDeliveryScheduleResponseDTO> responseList = new ArrayList<>();
-        for (PurchaseDeliveryScheduleVO vo : list) responseList.add(buildPurchaseDeliveryScheduleResponse(vo));
-        return responseList;
-    }
-
-    @Override
-    public String getPurchaseDeliveryScheduleDocId(Long orgId, String finYear, Long branch) {
-        return purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleDocId(orgId, SCREEN_CODE_PDS);
-    }
-
-    private PurchaseDeliveryScheduleResponseDTO buildPurchaseDeliveryScheduleResponse(PurchaseDeliveryScheduleVO vo) {
-
-        PurchaseDeliveryScheduleResponseDTO dto = new PurchaseDeliveryScheduleResponseDTO();
-        dto.setId(vo.getId());
-
-        if (vo.getPlant() != null) {
-            BranchResponseDTO plantDTO = new BranchResponseDTO();
-            plantDTO.setId(vo.getPlant().getId());
-            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
-            plantDTO.setBranchName(vo.getPlant().getBranchName());
-            dto.setPlant(plantDTO);
-        }
-
-        dto.setBelongsTo(vo.getBelongsTo());
-        dto.setDocNo(vo.getDocNo());
-        dto.setDocDate(vo.getDocDate());
-        dto.setSchStartDate(vo.getSchStartDate());
-        dto.setSchEndDate(vo.getSchEndDate());
-
-        if (vo.getSupplier() != null) {
-            CustomerResponseDetailsDTO supplierDTO = new CustomerResponseDetailsDTO();
-            supplierDTO.setId(vo.getSupplier().getId());
-            supplierDTO.setCustomerName(vo.getSupplier().getCustomerName());
-            dto.setSupplier(supplierDTO);
-        }
-
-        dto.setLocalPurchaseOrderId(vo.getLocalPurchaseOrder() != null ? vo.getLocalPurchaseOrder().getId() : null);
-        dto.setPoNo(vo.getPoNo());
-        dto.setPoDate(vo.getPoDate());
-
-        dto.setPreparedBy(vo.getPreparedBy());
-        dto.setNote(vo.getNote());
-        dto.setOrgId(vo.getOrgId());
-        dto.setFinancialYear(vo.getFinancialYear());
-        dto.setActive(vo.getActive());
-        dto.setCancelRemarks(vo.getCancelRemarks());
-        dto.setCreatedBy(vo.getCreatedBy());
-        dto.setUpdatedBy(vo.getUpdatedBy());
-
-        List<PurchaseDeliveryScheduleDetailsResponseDTO> detailsList = new ArrayList<>();
-        if (vo.getPurchaseDeliveryScheduleDetailsVO() != null) {
-            for (PurchaseDeliveryScheduleDetailsVO d : vo.getPurchaseDeliveryScheduleDetailsVO()) {
-
-                PurchaseDeliveryScheduleDetailsResponseDTO line = new PurchaseDeliveryScheduleDetailsResponseDTO();
-                line.setId(d.getId());
-
-                if (d.getItem() != null) {
-                    ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
-                    itemDTO.setId(d.getItem().getId());
-                    itemDTO.setItemCode(d.getItem().getItemCode());
-                    itemDTO.setItemDescription(d.getItem().getItemDescription());
-                    line.setItemCode(itemDTO);
-                }
-                if (d.getPrimaryUnit() != null) {
-                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
-                    unitDTO.setId(d.getPrimaryUnit().getId());
-                    unitDTO.setPrimaryUnit(d.getPrimaryUnit().getUnitId());
-                    line.setPrimaryUnit(unitDTO);
-                }
-                if (d.getPurchaseUnit() != null) {
-                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
-                    unitDTO.setId(d.getPurchaseUnit().getId());
-                    unitDTO.setPrimaryUnit(d.getPurchaseUnit().getUnitId());
-                    line.setPurchaseUnit(unitDTO);
-                }
-                line.setDemandQty(d.getDemandQty());
-                line.setAvailableStock(d.getAvailableStock());
-                line.setQty(d.getQty());
-                line.setTentativeQty(d.getTentativeQty());
-                line.setTentativeQtyNextMonth(d.getTentativeQtyNextMonth());
-                line.setRate(d.getRate());
-
-                detailsList.add(line);
-            }
-        }
-        dto.setScheduleDetails(detailsList);
-
-        List<PurchaseDeliveryScheduleLineResponseDTO> scheduleList = new ArrayList<>();
-        if (vo.getPurchaseDeliveryScheduleLineVO() != null) {
-            for (PurchaseDeliveryScheduleLineVO l : vo.getPurchaseDeliveryScheduleLineVO()) {
-                PurchaseDeliveryScheduleLineResponseDTO line = new PurchaseDeliveryScheduleLineResponseDTO();
-                line.setId(l.getId());
-                line.setPlanDate(l.getPlanDate());
-                line.setWeekNo(l.getWeekNo());
-                line.setScheduleQty(l.getScheduleQty());
-                scheduleList.add(line);
-            }
-        }
-        dto.setSchedule(scheduleList);
-
-        return dto;
-    }
+//    @Override
+//    @Transactional(rollbackFor = Exception.class)
+//    public Map<String, Object> updateCreatePurchaseDeliverySchedule(PurchaseDeliveryScheduleDTO dto) throws ApplicationException {
+//
+//        PurchaseDeliveryScheduleVO vo;
+//        String message;
+//        boolean isUpdate = ObjectUtils.isNotEmpty(dto.getId());
+//
+//        if (isUpdate) {
+//            vo = purchaseDeliveryScheduleRepo.findById(dto.getId())
+//                    .orElseThrow(() -> new ApplicationException("Purchase Delivery Schedule Not Found"));
+//            vo.setUpdatedBy(dto.getCreatedBy());
+//            message = "Purchase Delivery Schedule Updated Successfully";
+//        } else {
+//            vo = new PurchaseDeliveryScheduleVO();
+//            vo.setCreatedBy(dto.getCreatedBy());
+//            vo.setUpdatedBy(dto.getCreatedBy());
+//            vo.setDocNo(purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleDocId(dto.getOrgId(), SCREEN_CODE_PDS));
+//            message = "Purchase Delivery Schedule Created Successfully";
+//        }
+//
+//        createUpdatePurchaseDeliveryScheduleVOFromDTO(dto, vo);
+//
+//        if (isUpdate) {
+//            purchaseDeliveryScheduleRepo.flush();
+//        } else {
+//            vo = purchaseDeliveryScheduleRepo.save(vo);
+//        }
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("message", message);
+//        response.put("purchaseDeliveryScheduleVO", buildPurchaseDeliveryScheduleResponse(vo));
+//        return response;
+//    }
+//
+//    private void createUpdatePurchaseDeliveryScheduleVOFromDTO(PurchaseDeliveryScheduleDTO dto, PurchaseDeliveryScheduleVO vo) throws ApplicationException {
+//
+//        if (dto.getBranch() != null && dto.getBranch() != 0) {
+//            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
+//        }
+//        vo.setBelongsTo(dto.getBelongsTo());
+//        vo.setDocDate(dto.getDocDate());
+//        vo.setSchStartDate(dto.getSchStartDate());
+//        vo.setSchEndDate(dto.getSchEndDate());
+//
+//        // PO No. -> resolved from whichever source table poType points to.
+//        // Snapshotted here so this record doesn't silently change if the source PO is edited later.
+//        if (dto.getPoType() != null && dto.getPoId() != null) {
+//
+//            switch (dto.getPoType()) {
+//
+//                case "LOCAL_PURCHASE_ORDER":
+//                    LocalPurchaseOrderVO lpo = localPurchaseOrderRepo.findById(dto.getPoId())
+//                            .orElseThrow(() -> new ApplicationException("Local Purchase Order Not Found"));
+//                    vo.setPoType(dto.getPoType());
+//                    vo.setPoId(lpo.getId());
+//                    vo.setPoNo(lpo.getPoNo());
+//                    vo.setPoDate(lpo.getPoDate());
+//                    break;
+//
+//                case "PURCHASE_CONTRACT":
+//                    PurchaseContractVO contract = purchaseContractRepo.findById(dto.getPoId())
+//                            .orElseThrow(() -> new ApplicationException("Purchase Contract Not Found"));
+//                    vo.setPoType(dto.getPoType());
+//                    vo.setPoId(contract.getId());
+//                    vo.setPoNo(contract.getContractNo());
+//                    vo.setPoDate(contract.getContractDate());
+//                    break;
+//
+//                default:
+//                    throw new ApplicationException("Unsupported PO Type: " + dto.getPoType());
+//            }
+//
+//        } else {
+//            vo.setPoType(null);
+//            vo.setPoId(null);
+//            vo.setPoNo(null);
+//            vo.setPoDate(null);
+//        }
+//
+//        vo.setPreparedBy(dto.getPreparedBy());
+//        vo.setNote(dto.getNote());
+//        vo.setOrgId(dto.getOrgId());
+//        vo.setFinancialYear(dto.getFinancialYear());
+//        vo.setActive(dto.isActive());
+//        vo.setCancelRemarks(dto.getCancelRemarks());
+//
+//        buildScheduleDetailsList(dto, vo);
+//        buildScheduleList(dto, vo);
+//    }
+//
+//    private void buildScheduleDetailsList(PurchaseDeliveryScheduleDTO dto, PurchaseDeliveryScheduleVO vo) throws ApplicationException {
+//
+//        if (vo.getId() != null && vo.getPurchaseDeliveryScheduleDetailsVO() != null && !vo.getPurchaseDeliveryScheduleDetailsVO().isEmpty()) {
+//            purchaseDeliveryScheduleDetailsRepo.deleteAll(new ArrayList<>(vo.getPurchaseDeliveryScheduleDetailsVO()));
+//            purchaseDeliveryScheduleDetailsRepo.flush();
+//        }
+//        vo.getPurchaseDeliveryScheduleDetailsVO().clear();
+//        if (dto.getScheduleDetails() == null) return;
+//
+//        for (PurchaseDeliveryScheduleDetailsDTO line : dto.getScheduleDetails()) {
+//
+//            PurchaseDeliveryScheduleDetailsVO detailVO = new PurchaseDeliveryScheduleDetailsVO();
+//
+//            if (line.getItemId() != null && line.getItemId() != 0) {
+//                ItemMasterVO item = itemMasterRepo.findById(line.getItemId()).orElseThrow(() -> new ApplicationException("Item Not Found"));
+//                detailVO.setItem(item);
+//                if (item.getPrimaryUnit() != null) detailVO.setPrimaryUnit(item.getPrimaryUnit());
+//                // purchaseUnit/demandQty/availableStock/qty still pending confirmed ItemMasterVO getter names
+//            }
+//
+//            detailVO.setTentativeQty(line.getTentativeQty());
+//            detailVO.setTentativeQtyNextMonth(line.getTentativeQtyNextMonth());
+//            detailVO.setRate(line.getRate());
+//            detailVO.setPurchaseDeliveryScheduleVO(vo);
+//            vo.getPurchaseDeliveryScheduleDetailsVO().add(detailVO);
+//        }
+//    }
+//
+//    private void buildScheduleList(PurchaseDeliveryScheduleDTO dto, PurchaseDeliveryScheduleVO vo) {
+//
+//        if (vo.getId() != null && vo.getPurchaseDeliveryScheduleLineVO() != null && !vo.getPurchaseDeliveryScheduleLineVO().isEmpty()) {
+//            purchaseDeliveryScheduleLineRepo.deleteAll(new ArrayList<>(vo.getPurchaseDeliveryScheduleLineVO()));
+//            purchaseDeliveryScheduleLineRepo.flush();
+//        }
+//        vo.getPurchaseDeliveryScheduleLineVO().clear();
+//        if (dto.getSchedule() == null) return;
+//
+//        for (PurchaseDeliveryScheduleLineDTO line : dto.getSchedule()) {
+//            PurchaseDeliveryScheduleLineVO lineVO = new PurchaseDeliveryScheduleLineVO();
+//            lineVO.setPlanDate(line.getPlanDate());
+//            lineVO.setWeekNo(line.getWeekNo());
+//            lineVO.setScheduleQty(line.getScheduleQty());
+//            lineVO.setPurchaseDeliveryScheduleVO(vo);
+//            vo.getPurchaseDeliveryScheduleLineVO().add(lineVO);
+//        }
+//    }
+//
+//    @Override
+//    public PurchaseDeliveryScheduleResponseDTO getPurchaseDeliveryScheduleById(Long id) throws ApplicationException {
+//        PurchaseDeliveryScheduleVO vo = purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleById(id);
+//        if (vo == null) throw new ApplicationException("Purchase Delivery Schedule Not Found");
+//        return buildPurchaseDeliveryScheduleResponse(vo);
+//    }
+//
+//    @Override
+//    public List<PurchaseDeliveryScheduleResponseDTO> getPurchaseDeliveryScheduleByOrgId(Long orgId, Long branchId) throws ApplicationException {
+//        List<PurchaseDeliveryScheduleVO> list = purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleByOrgId(orgId, branchId);
+//        if (list == null || list.isEmpty()) throw new ApplicationException("Purchase Delivery Schedule Not Found");
+//        List<PurchaseDeliveryScheduleResponseDTO> responseList = new ArrayList<>();
+//        for (PurchaseDeliveryScheduleVO vo : list) responseList.add(buildPurchaseDeliveryScheduleResponse(vo));
+//        return responseList;
+//    }
+//
+//    @Override
+//    public String getPurchaseDeliveryScheduleDocId(Long orgId, String finYear, Long branch) {
+//        return purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleDocId(orgId, SCREEN_CODE_PDS);
+//    }
+//
+//    private PurchaseDeliveryScheduleResponseDTO buildPurchaseDeliveryScheduleResponse(PurchaseDeliveryScheduleVO vo) {
+//
+//        PurchaseDeliveryScheduleResponseDTO dto = new PurchaseDeliveryScheduleResponseDTO();
+//        dto.setId(vo.getId());
+//
+//        if (vo.getPlant() != null) {
+//            BranchResponseDTO plantDTO = new BranchResponseDTO();
+//            plantDTO.setId(vo.getPlant().getId());
+//            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
+//            plantDTO.setBranchName(vo.getPlant().getBranchName());
+//            dto.setPlant(plantDTO);
+//        }
+//
+//        dto.setBelongsTo(vo.getBelongsTo());
+//        dto.setDocNo(vo.getDocNo());
+//        dto.setDocDate(vo.getDocDate());
+//        dto.setSchStartDate(vo.getSchStartDate());
+//        dto.setSchEndDate(vo.getSchEndDate());
+//
+//        if (vo.getSupplier() != null) {
+//            CustomerResponseDetailsDTO supplierDTO = new CustomerResponseDetailsDTO();
+//            supplierDTO.setId(vo.getSupplier().getId());
+//            supplierDTO.setCustomerName(vo.getSupplier().getCustomerName());
+//            dto.setSupplier(supplierDTO);
+//        }
+//
+//        dto.setLocalPurchaseOrderId(vo.getLocalPurchaseOrder() != null ? vo.getLocalPurchaseOrder().getId() : null);
+//        dto.setPoNo(vo.getPoNo());
+//        dto.setPoDate(vo.getPoDate());
+//
+//        dto.setPreparedBy(vo.getPreparedBy());
+//        dto.setNote(vo.getNote());
+//        dto.setOrgId(vo.getOrgId());
+//        dto.setFinancialYear(vo.getFinancialYear());
+//        dto.setActive(vo.getActive());
+//        dto.setCancelRemarks(vo.getCancelRemarks());
+//        dto.setCreatedBy(vo.getCreatedBy());
+//        dto.setUpdatedBy(vo.getUpdatedBy());
+//
+//        List<PurchaseDeliveryScheduleDetailsResponseDTO> detailsList = new ArrayList<>();
+//        if (vo.getPurchaseDeliveryScheduleDetailsVO() != null) {
+//            for (PurchaseDeliveryScheduleDetailsVO d : vo.getPurchaseDeliveryScheduleDetailsVO()) {
+//
+//                PurchaseDeliveryScheduleDetailsResponseDTO line = new PurchaseDeliveryScheduleDetailsResponseDTO();
+//                line.setId(d.getId());
+//
+//                if (d.getItem() != null) {
+//                    ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
+//                    itemDTO.setId(d.getItem().getId());
+//                    itemDTO.setItemCode(d.getItem().getItemCode());
+//                    itemDTO.setItemDescription(d.getItem().getItemDescription());
+//                    line.setItemCode(itemDTO);
+//                }
+//                if (d.getPrimaryUnit() != null) {
+//                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
+//                    unitDTO.setId(d.getPrimaryUnit().getId());
+//                    unitDTO.setPrimaryUnit(d.getPrimaryUnit().getUnitId());
+//                    line.setPrimaryUnit(unitDTO);
+//                }
+//                if (d.getPurchaseUnit() != null) {
+//                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
+//                    unitDTO.setId(d.getPurchaseUnit().getId());
+//                    unitDTO.setPrimaryUnit(d.getPurchaseUnit().getUnitId());
+//                    line.setPurchaseUnit(unitDTO);
+//                }
+//                line.setDemandQty(d.getDemandQty());
+//                line.setAvailableStock(d.getAvailableStock());
+//                line.setQty(d.getQty());
+//                line.setTentativeQty(d.getTentativeQty());
+//                line.setTentativeQtyNextMonth(d.getTentativeQtyNextMonth());
+//                line.setRate(d.getRate());
+//
+//                detailsList.add(line);
+//            }
+//        }
+//        dto.setScheduleDetails(detailsList);
+//
+//        List<PurchaseDeliveryScheduleLineResponseDTO> scheduleList = new ArrayList<>();
+//        if (vo.getPurchaseDeliveryScheduleLineVO() != null) {
+//            for (PurchaseDeliveryScheduleLineVO l : vo.getPurchaseDeliveryScheduleLineVO()) {
+//                PurchaseDeliveryScheduleLineResponseDTO line = new PurchaseDeliveryScheduleLineResponseDTO();
+//                line.setId(l.getId());
+//                line.setPlanDate(l.getPlanDate());
+//                line.setWeekNo(l.getWeekNo());
+//                line.setScheduleQty(l.getScheduleQty());
+//                scheduleList.add(line);
+//            }
+//        }
+//        dto.setSchedule(scheduleList);
+//
+//        return dto;
+//    }
 
     // ==================================================================
     // ============================ PURCHASE BILL =======================

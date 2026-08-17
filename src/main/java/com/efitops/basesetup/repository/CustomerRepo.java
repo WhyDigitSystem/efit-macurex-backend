@@ -177,6 +177,41 @@ List<Object[]> getCustomerDetails(Long orgId, Long branch);
 			List<Map<String, Object>> getAllCustomerDetails(
 			        @Param("orgId") Long orgId,
 			        @Param("branch") Long branch);
+			
+			
+//		Customerdropdown for the purchasedelivaryschedule 
+			
+			@Query(value = """
+			        SELECT
+			            c.customer_id,
+			            c.customer_code,
+			            c.customer_name
+			           
+			        FROM customer_header c
+
+			        LEFT JOIN listofvaluesdetails a
+			            ON c.customer_category = a.listofvaluesdetails_id
+
+			        LEFT JOIN listofvaluesdetails b
+			            ON c.customer_category1 = b.listofvaluesdetails_id
+
+			        LEFT JOIN listofvaluesdetails cc
+			            ON c.customer_category2 = cc.listofvaluesdetails_id
+
+			        WHERE c.cancel = FALSE
+			          AND c.active = TRUE
+			          AND c.branch = :branch
+			          AND c.org_id = :orgId
+			          AND (
+			                a.value_code = 'SUPPLIER'
+			             OR b.value_code = 'SUPPLIER'
+			             OR cc.value_code = 'SUPPLIER'
+			          )
+
+			        ORDER BY c.customer_code
+			        """, nativeQuery = true)
+			List<Object[]> getSupplierDropdownForPurchaseDeliverySchedule(@Param("branch") Long branch,
+			                                   @Param("orgId") Long orgId);
 }
 
 

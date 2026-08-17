@@ -1,6 +1,8 @@
 package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -16,23 +18,19 @@ import lombok.NoArgsConstructor;
 public class PurchaseDeliveryScheduleDetailsVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasedeliveryscheduledetailsgen")
-    @SequenceGenerator(name = "purchasedeliveryscheduledetailsgen", sequenceName = "purchasedeliveryscheduledetailsseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasedeliveryscheduledetails_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchase_delivery_schedule_detailsgen")
+    @SequenceGenerator(name = "purchase_delivery_schedule_detailsgen", sequenceName = "purchase_delivery_schedule_detailsseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "purchase_delivery_schedule_details_id")
     private Long id;
 
-    // Item Code -> ItemMaster; the 5 fields below are all snapshotted from THIS item at save time
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    
+    @ManyToOne
+    @JoinColumn(name = "item")
     private ItemMasterVO item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "primary_unit_id")
+    @ManyToOne
+    @JoinColumn(name = "primary_unit")
     private UnitMasterVO primaryUnit;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchase_unit_id")
-    private UnitMasterVO purchaseUnit;
 
     @Column(name = "demand_qty")
     private BigDecimal demandQty;
@@ -43,19 +41,23 @@ public class PurchaseDeliveryScheduleDetailsVO {
     @Column(name = "qty")
     private BigDecimal qty;
 
-    // entered by user
     @Column(name = "tentative_qty")
     private BigDecimal tentativeQty;
 
-    // entered by user
+  
     @Column(name = "tentative_qty_next_month")
     private BigDecimal tentativeQtyNextMonth;
 
-    // entered by user
+  
     @Column(name = "rate")
     private BigDecimal rate;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchasedeliveryschedule_id")
+    
+    @ManyToOne
+    @JoinColumn(name = "purchase_delivery_schedule_basic_id")
     private PurchaseDeliveryScheduleVO purchaseDeliveryScheduleVO;
+
+    @OneToMany(mappedBy = "purchaseDeliveryScheduleDetailsVO",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    private List<PurchaseDeliveryScheduleLineVO> purchaseDeliveryScheduleLineVO = new ArrayList<>();
 }

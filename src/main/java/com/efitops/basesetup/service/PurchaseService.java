@@ -18,10 +18,10 @@ public interface PurchaseService {
     String getPurchaseContractDocId(Long orgId, String finYear, Long branch);
 
     // ---------- Purchase Delivery Schedule ----------
-    Map<String, Object> updateCreatePurchaseDeliverySchedule(PurchaseDeliveryScheduleDTO dto) throws ApplicationException;
-    PurchaseDeliveryScheduleResponseDTO getPurchaseDeliveryScheduleById(Long id) throws ApplicationException;
-    List<PurchaseDeliveryScheduleResponseDTO> getPurchaseDeliveryScheduleByOrgId(Long orgId, Long branchId) throws ApplicationException;
-    String getPurchaseDeliveryScheduleDocId(Long orgId, String finYear, Long branch);
+//    Map<String, Object> updateCreatePurchaseDeliverySchedule(PurchaseDeliveryScheduleDTO dto) throws ApplicationException;
+//    PurchaseDeliveryScheduleResponseDTO getPurchaseDeliveryScheduleById(Long id) throws ApplicationException;
+//    List<PurchaseDeliveryScheduleResponseDTO> getPurchaseDeliveryScheduleByOrgId(Long orgId, Long branchId) throws ApplicationException;
+//    String getPurchaseDeliveryScheduleDocId(Long orgId, String finYear, Long branch);
 
     // ---------- Purchase Bill ----------
     Map<String, Object> updateCreatePurchaseBill(PurchaseBillDTO dto) throws ApplicationException;

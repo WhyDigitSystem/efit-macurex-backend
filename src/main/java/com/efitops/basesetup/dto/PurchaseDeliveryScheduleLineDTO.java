@@ -12,14 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PurchaseDeliveryScheduleLineDTO {
 
-    private Long id;
+	private LocalDate planDate;
 
-    // [USER ENTER]
-    private LocalDate planDate;
+	private int weekNo;
 
-    // [USER ENTER] - assumed numeric; change to String if shown as "W1", "W2" etc.
-    private Integer weekNo;
-
-    // [USER ENTER]
-    private BigDecimal scheduleQty;
+	private BigDecimal scheduleQty;
 }

@@ -94,50 +94,50 @@ public class PurchaseController extends BaseController {
     // PURCHASE DELIVERY SCHEDULE — original paths: /api/purchaseDeliverySchedule/**
     // ==================================================================
 
-    @PostMapping("/api/purchaseMaster/updateCreatePurchaseDeliverySchedule")
-    public ResponseEntity<ResponseDTO> updateCreatePurchaseDeliverySchedule(@RequestBody PurchaseDeliveryScheduleDTO dto) {
-        Map<String, Object> responseObjectsMap = new HashMap<>();
-        ResponseDTO responseDTO;
-        try {
-            Map<String, Object> result = purchaseService.updateCreatePurchaseDeliverySchedule(dto);
-            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, result.get("message"));
-            responseObjectsMap.put("purchaseDeliveryScheduleVO", result.get("purchaseDeliveryScheduleVO"));
-            responseDTO = createServiceResponse(responseObjectsMap);
-        } catch (Exception e) {
-            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Delivery Schedule Save Failed", e.getMessage());
-        }
-        return ResponseEntity.ok(responseDTO);
-    }
-
-    @GetMapping("/api/purchaseMaster/getPurchaseDeliveryScheduleById")
-    public ResponseEntity<ResponseDTO> getPurchaseDeliveryScheduleById(@RequestParam Long id) {
-        Map<String, Object> responseObjectsMap = new HashMap<>();
-        ResponseDTO responseDTO;
-        try {
-            PurchaseDeliveryScheduleResponseDTO result = purchaseService.getPurchaseDeliveryScheduleById(id);
-            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Delivery Schedule information retrieved successfully");
-            responseObjectsMap.put("purchaseDeliveryScheduleVO", result);
-            responseDTO = createServiceResponse(responseObjectsMap);
-        } catch (Exception e) {
-            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Delivery Schedule information retrieval failed", e.getMessage());
-        }
-        return ResponseEntity.ok(responseDTO);
-    }
-
-    @GetMapping("/api/purchaseMaster/getPurchaseDeliveryScheduleByOrgId")
-    public ResponseEntity<ResponseDTO> getPurchaseDeliveryScheduleByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
-        Map<String, Object> responseObjectsMap = new HashMap<>();
-        ResponseDTO responseDTO;
-        try {
-            List<PurchaseDeliveryScheduleResponseDTO> result = purchaseService.getPurchaseDeliveryScheduleByOrgId(orgId, branchId);
-            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Delivery Schedule information retrieved successfully");
-            responseObjectsMap.put("purchaseDeliveryScheduleVO", result);
-            responseDTO = createServiceResponse(responseObjectsMap);
-        } catch (Exception e) {
-            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Delivery Schedule information retrieval failed", e.getMessage());
-        }
-        return ResponseEntity.ok(responseDTO);
-    }
+//    @PostMapping("/api/purchaseMaster/updateCreatePurchaseDeliverySchedule")
+//    public ResponseEntity<ResponseDTO> updateCreatePurchaseDeliverySchedule(@RequestBody PurchaseDeliveryScheduleDTO dto) {
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//        ResponseDTO responseDTO;
+//        try {
+//            Map<String, Object> result = purchaseService.updateCreatePurchaseDeliverySchedule(dto);
+//            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, result.get("message"));
+//            responseObjectsMap.put("purchaseDeliveryScheduleVO", result.get("purchaseDeliveryScheduleVO"));
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//        } catch (Exception e) {
+//            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Delivery Schedule Save Failed", e.getMessage());
+//        }
+//        return ResponseEntity.ok(responseDTO);
+//    }
+//
+//    @GetMapping("/api/purchaseMaster/getPurchaseDeliveryScheduleById")
+//    public ResponseEntity<ResponseDTO> getPurchaseDeliveryScheduleById(@RequestParam Long id) {
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//        ResponseDTO responseDTO;
+//        try {
+//            PurchaseDeliveryScheduleResponseDTO result = purchaseService.getPurchaseDeliveryScheduleById(id);
+//            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Delivery Schedule information retrieved successfully");
+//            responseObjectsMap.put("purchaseDeliveryScheduleVO", result);
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//        } catch (Exception e) {
+//            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Delivery Schedule information retrieval failed", e.getMessage());
+//        }
+//        return ResponseEntity.ok(responseDTO);
+//    }
+//
+//    @GetMapping("/api/purchaseMaster/getPurchaseDeliveryScheduleByOrgId")
+//    public ResponseEntity<ResponseDTO> getPurchaseDeliveryScheduleByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//        ResponseDTO responseDTO;
+//        try {
+//            List<PurchaseDeliveryScheduleResponseDTO> result = purchaseService.getPurchaseDeliveryScheduleByOrgId(orgId, branchId);
+//            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Delivery Schedule information retrieved successfully");
+//            responseObjectsMap.put("purchaseDeliveryScheduleVO", result);
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//        } catch (Exception e) {
+//            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Delivery Schedule information retrieval failed", e.getMessage());
+//        }
+//        return ResponseEntity.ok(responseDTO);
+//    }
 
 
     // ==================================================================

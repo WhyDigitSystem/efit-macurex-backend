@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.efitops.basesetup.entity.PurchaseDeliveryScheduleVO;
@@ -20,4 +21,20 @@ public interface PurchaseDeliveryScheduleRepo extends JpaRepository<PurchaseDeli
     @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,'0')) AS docid "
             + "from documenttypemapping_details where org_id=?1 and screen_code=?2")
     String getPurchaseDeliveryScheduleDocId(Long orgId, String screenCode);
+    
+    
+    @Query(value = """
+            SELECT
+                u.unitmaster_id,
+                u.unit_id
+            FROM unitmaster u
+            INNER JOIN item i
+                ON u.unitmaster_id = i.purchase_unit
+            WHERE u.cancel = FALSE
+              AND i.item_id = :item
+              AND i.branch = :branch
+              AND i.org_id = :orgId
+            ORDER BY u.unit_id
+            """, nativeQuery = true)
+    List<Object[]> getPurchaseUnitForPurchaseDeliverySchedule(@Param("item") Long itemId,@Param("branch") Long branch,@Param("orgId") Long orgId);
 }

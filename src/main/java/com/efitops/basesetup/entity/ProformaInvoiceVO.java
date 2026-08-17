@@ -1,7 +1,6 @@
 package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -29,16 +28,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "other_sales_inv_basic")
+@Table(name = "proforma_invoice_basic")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class OtherSalesInvoiceVO {
-
+@NoArgsConstructor
+public class ProformaInvoiceVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "other_sales_inv_basicgen")
-	@SequenceGenerator(name = "other_sales_inv_basicgen", sequenceName = "other_sales_inv_basicseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "other_sales_inv_basic_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "proforma_invoice_basicgen")
+	@SequenceGenerator(name = "proforma_invoice_basicgen", sequenceName = "proforma_invoice_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "proforma_invoice_basic_id")
 	private Long id;
 
 	@Column(name = "doc_id")
@@ -47,38 +45,34 @@ public class OtherSalesInvoiceVO {
 	@Column(name = "doc_date")
 	private LocalDate docDate = LocalDate.now();
 
-	@Column(name = "month_year")
-	private String monthYear;
-
 	@Column(name = "belongs_to")
 	private String belongsTo;
-
-	@Column(name = "doc_type")
-	private String docType;
 
 	@ManyToOne
 	@JoinColumn(name = "customer")
 	private CustomerVO customer;
 
-	
-	@Column(name = "di_no")
-	private String diNo;
-	
-	@Column(name = "di_date")
-	private LocalDate diDate;
+	@Column(name = "purchase_order_no")
+	private String purchaseOrderNo;
 
-	@Column(name = "stock_posting")
-	private String stockPosting;
+	@Column(name = "purchase_order_date")
+	private LocalDate purchaseOrderDate;
 
-	@Column(name = "excisable")
-	private String excisable;
+	@Column(name = "ref_no")
+	private String refNo;
+
+	@Column(name = "ref_date")
+	private LocalDate refDate;
+
+	@Column(name = "kind_attention")
+	private String kindAttention;
+
+	@Column(name = "designation")
+	private String designation;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "location")
 	private LocationVO location;
-
-	@Column(name = "vehicle")
-	private String vehicle;
 
 	@Column(name = "time_of_issue")
 	private LocalTime timeOfIssue = LocalTime.now();
@@ -87,44 +81,35 @@ public class OtherSalesInvoiceVO {
 	private LocalDate timeOfIssueDate = LocalDate.now();
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "currency")
-	private CurrencyVO currency;
+	@JoinColumn(name = "bank_name")
+	private BankDetailsVO bankName;
 
-	@Column(name = "time_of_removal")
-	private LocalTime timeOfRemoval = LocalTime.now();;
+	@Column(name = "insurance", precision = 10, scale = 2)
+	private BigDecimal insurance;
 
-	@Column(name = "time_of_removal_date")
-	private LocalDate timeOfRemovalDate = LocalDate.now();;
+	@Column(name = "freight", precision = 10, scale = 2)
+	private BigDecimal freight;
 
-	@Column(name = "kanban_card_no")
-	private String kanbanCardNo;
+	@Column(name = "no_of_pkg", precision = 10, scale = 2)
+	private BigDecimal noOfPkg;
 
-	@Column(name = "invoice_type")
-	private String invoiceType;
+	@Column(name = "pkg_type")
+	private String pkgType;
 
-	@Column(name = "sch_no")
-	private String schNo;
+	@Column(name = "rate_of_duty", precision = 10, scale = 2)
+	private BigDecimal rateOfDuty;
 
-	@Column(name = "sch_date")
-	private LocalDate schDate;
+	@Column(name = "tariff_no")
+	private String tariffNo;
 
-	@Column(name = "exchange_rate")
-	private BigDecimal exchangeRate;
+	@Column(name = "basic_value", precision = 10, scale = 2)
+	private BigDecimal basicValue;
 
-	@Column(name = "total_insurance")
-	private BigDecimal totalInsurance;
-
-	@Column(name = "total_freight", precision = 10, scale = 2)
-	private BigDecimal totalFreight;
-
-	@Column(name = "total_ass_val", precision = 10, scale = 2)
-	private BigDecimal totalAssVal;
+	@Column(name = "gross_amount", precision = 10, scale = 2)
+	private BigDecimal grossAmount;
 
 	@Column(name = "mode_of_transport")
 	private String modeOfTransport;
-
-	@Column(name = "net_amount")
-	private BigDecimal netAmount;
 
 	@Column(name = "amount_in_words")
 	private String amountInWords;
@@ -135,17 +120,14 @@ public class OtherSalesInvoiceVO {
 	@Column(name = "payment_terms")
 	private String paymentTerms;
 
-	@Column(name = "purchase_order")
-	private String purchaseOrder;
-
-	@Column(name = "purchase_order_date")
-	private String purchaseOrderDate;
+	@Column(name = "payment_percentage")
+	private String paymentPercentage;
 
 	@Column(name = "created_by")
 	private String createdBy;
 
-	@Column(name = "is_igst_applicable")
-	private String isIgstApplicable;
+	@Column(name = "narration")
+	private String narration;
 
 	@Column(name = "active")
 	private boolean active;
@@ -160,10 +142,10 @@ public class OtherSalesInvoiceVO {
 	private String cancelRemarks;
 
 	@Column(name = "screen_name")
-	private String screenName = "OTHER SALES INVOICE";
+	private String screenName = "PROFORMAINVOICE";
 
 	@Column(name = "screen_code")
-	private String screenCode = "OSI";
+	private String screenCode = "PI";
 
 	@Column(name = "org_id")
 	private Long orgId;
@@ -175,13 +157,13 @@ public class OtherSalesInvoiceVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 
-	@OneToMany(mappedBy = "otherSalesInvoiceVO", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "proformaInvoiceVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<OtherSalesInvoiceDetailsVO> otherSalesInvoiceDetailsVO;
+	private List<ProformaInvoiceDetailsVO> proformaInvoiceDetailsVO;
 
-	@OneToMany(mappedBy = "otherSalesInvoiceVO", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "proformaInvoiceVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<OtherSalesInvoiceTaxDetailsVO> otherSalesInvoiceTaxDetailsVO;
+	private List<ProformaInvoiceTaxDetailsVO> proformaInvoiceTaxDetailsVO;
 
 	@JsonGetter("active")
 	public String getActive() {
@@ -192,7 +174,7 @@ public class OtherSalesInvoiceVO {
 	public String getCancel() {
 		return cancel ? "T" : "F";
 	}
-
+ 
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 

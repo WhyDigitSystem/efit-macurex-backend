@@ -53,11 +53,11 @@ public class TransportBillVO {
     @JoinColumn(name = "document_type_id")
     private DocumentTypeMasterVO documentType;
 
-    @Column(name = "doc_no")
-    private String docNo;
+    @Column(name = "doc_id")
+    private String docId;
 
     @Column(name = "doc_date")
-    private LocalDate docDate;
+    private LocalDate docDate=LocalDate.now();
 
     // Transport Name is linked to Transport Master
     @ManyToOne(fetch = FetchType.LAZY)

@@ -25,10 +25,14 @@ public interface OtherSalesInvoiceService {
 
 	List<Map<String, Object>> getTaxPercentage(Long orgId, Long hsn);
 
-	List<Map<String, Object>> getItemDetailsBasedDesPatch(Long orgId, Long branch, Long despatch);
-
 	List<Map<String, Object>> getSalesOrderNo(Long customer);
 
 	List<Map<String, Object>> getOrderAmount(Long id, Long item);
+
+	List<Map<String, Object>> getCustometDetailsFromParty(Long orgId, Long branch, String customerCode);
+
+	List<Map<String, Object>> getCustometDetailsFromDespatch(Long orgId, Long customer);
+
+	List<Map<String, Object>> getItemDetailsBasedDesPatch(Long orgId, Long branch, String despatch);
 
 }

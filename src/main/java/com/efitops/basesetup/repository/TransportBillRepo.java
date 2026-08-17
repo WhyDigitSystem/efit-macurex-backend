@@ -24,4 +24,7 @@ public interface TransportBillRepo extends JpaRepository<TransportBillVO, Long> 
     	List<TransportBillVO> findByOrgIdAndBranch(@Param("orgId") Long orgId,
     	                                           @Param("branch") Long branch);
 //    List<TransportBillVO> findByOrgIdAndPlant_Id(Long orgId, Long plantId);
+
+    @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
+	String getTransportBillDocId(Long orgId, String financialYear, String screenCode);
 }

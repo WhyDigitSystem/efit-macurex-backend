@@ -18,10 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StockTransferChallanResponseDTO {
 	private Long id;
-	private String docID;
-	private LocalDate docDate;
 	private BranchResponseDTO branch;
-	private ListOfValuesResponseDTO types;
+	private ListOfValuesDetailsResponseDTO types;
 	private CustomerResponse1DTO customer;
 	private LocationMasterResponseDTO location;
 	private LocalTime timeOfTranfer;
@@ -34,12 +32,12 @@ public class StockTransferChallanResponseDTO {
 	private Long orgId;
 	private String createdBy;
 	private String cancelRemarks;
-	private Double totalInsurance;
-	private Double totalFreight;
-	private Double totalAssVal;
+	private double totalInsurance;
+	private double totalFreight;
+	private double totalAssVal;
 	private String modeOfTransport;
 	private String salesTax;
-	private Double grossAmount;
+	private double grossAmount;
 	private String amountInWords;
 	private String deliverTo;
 	private String paymentTerms;

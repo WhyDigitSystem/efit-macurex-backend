@@ -1,12 +1,12 @@
 package com.efitops.basesetup.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
@@ -39,9 +39,11 @@ public class TransportBillDTO {
     private boolean active;
     private String cancelRemarks;
     private Long createdBy;
+    private String  financialYear;
 
     private List<TransportBillPaymentDetailsDTO> paymentDetails1;
 //    private List<TransportBillPaymentDetails2DTO> paymentDetails2;
+
 
 
 }

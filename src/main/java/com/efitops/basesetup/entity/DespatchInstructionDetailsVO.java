@@ -75,7 +75,6 @@ public class DespatchInstructionDetailsVO {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonBackReference
 	@JoinColumn(name = "despatch_basic_id")
-
 	private DespatchInstructionVO despatchInstructionVO;
 
 }

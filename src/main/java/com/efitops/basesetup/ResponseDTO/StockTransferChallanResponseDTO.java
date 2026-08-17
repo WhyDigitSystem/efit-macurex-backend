@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class StockTransferChallanResponseDTO {
 	private Long id;
 	private BranchResponseDTO branch;
-	private ListOfValuesDetailsResponseDTO types;
+	private ListOfValuesResponseDTO types;
 	private CustomerResponse1DTO customer;
 	private LocationMasterResponseDTO location;
 	private LocalTime timeOfTranfer;

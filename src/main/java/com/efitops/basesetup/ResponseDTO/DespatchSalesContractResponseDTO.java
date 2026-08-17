@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DespatchSalesContractResponseDTO {
 	private String orderAccepCustomerContractNo;
+	private LocalDate date;
+	private Long id;
+	private String type;
 	
 
 }

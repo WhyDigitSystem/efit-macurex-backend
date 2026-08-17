@@ -88,4 +88,67 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
 			    "where im.itemmaster_id=:itemId",
 			    nativeQuery = true)
 			    Object getItemDetails(@Param("itemId") Long itemId);
+         
+//        Items for Stock transfer challan
+         @Query(value = """
+        		 SELECT
+        		     i.item_id,
+        		     i.item_code,
+        		     i.item_description,
+        		     i.customer_part_no,
+        		     dd.desc_qty AS recqty,
+        		     0 AS freight,
+        		     0 AS insur,
+        		     i.excise_tariff_no,
+        		     gm.hsn_sac_code
+        		 FROM despatch_detail dd
+        		 INNER JOIN item i
+        		     ON dd.item = i.item_id
+        		 INNER JOIN despatch_basic db
+        		     ON db.despatch_basic_id = dd.despatch_basic_id
+        		 LEFT JOIN gstratemaster gm
+        		     ON i.hsn_code = gm.hsn_sac_code
+        		 WHERE i.cancel = FALSE
+        		   AND db.cancel = FALSE
+        		   AND db.despatch_basic_id = :despatchNo
+        		   AND db.branch = :branch
+        		   AND db.org_id = :orgId
+
+        		 UNION
+
+        		 SELECT
+        		     i.item_id,
+        		     i.item_code,
+        		     i.item_description,
+        		     i.customer_part_no,
+        		     0 AS recqty,
+        		     0 AS freight,
+        		     0 AS insur,
+        		     i.excise_tariff_no,
+        		     gm.hsn_sac_code
+        		 FROM item i
+        		 INNER JOIN listofvaluesdetails l
+        		     ON i.item_type = l.listofvaluesdetails_id
+        		 LEFT JOIN gstratemaster gm
+        		     ON i.hsn_code = gm.hsn_sac_code
+        		 WHERE i.cancel = FALSE
+        		   AND i.branch = :branch
+        		   AND i.org_id = :orgId
+        		   AND l.value_code IN (
+        		       'RM',
+        		       'SFG',
+        		       'FG',
+        		       'Consumables',
+        		       'Scrap',
+        		       'Machines',
+        		       'Tool',
+        		       'Instruments',
+        		       'Others'
+        		   )
+
+        		 ORDER BY item_code
+        		 """, nativeQuery = true)
+        		 List<Object[]> getItemsForStockTransferChallan(@Param("despatchNo") String despatchNo,
+        		                                 @Param("branch") Long branch,
+        		                                 @Param("orgId") Long orgId);
 }

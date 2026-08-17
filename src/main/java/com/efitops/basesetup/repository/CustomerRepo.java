@@ -123,9 +123,11 @@ List<Object[]> getCustomerDetails(Long orgId, Long branch);
 					"WHERE c.cancel = false " +
 					"AND c.active = true " +
 					"AND LOWER(c.customer_type)='customer' " +
+					"AND c.branch = ?1 " +
+					"AND c.org_id = ?2 " +
 					"ORDER BY c.customer_code",
 					nativeQuery = true)
-					List<Object[]> getStockTransferCustomer();
+					List<Object[]> getCustomerForStockTransferChallan(Long branch,Long orgId);
 					
 					//despatch instruction customer dropdown
 					@Query(value = """

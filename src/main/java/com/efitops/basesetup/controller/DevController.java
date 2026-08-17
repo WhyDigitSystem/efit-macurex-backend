@@ -573,10 +573,10 @@ public class DevController extends BaseController{
 
 		}
 		//dropdown getstocktransfercustomer
-		@GetMapping("/getStockTransferCustomer")
-		public ResponseEntity<ResponseDTO> getCustomerDropdown() {
+		@GetMapping("/getCustomerForStockTransferChallan")
+		public ResponseEntity<ResponseDTO> getCustomerForStockTransferChallan(@RequestParam Long branch,@RequestParam Long orgId) {
 
-		    String methodName = "getStockTransferCustomer()";
+		    String methodName = "getCustomerForStockTransferChallan()";
 		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		    Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -585,7 +585,7 @@ public class DevController extends BaseController{
 		    try {
 
 		        Map<String, Object> responseMap =
-		                transportMasterService.getStockTransferCustomer();
+		                transportMasterService.getCustomerForStockTransferChallan(branch,orgId);
 
 		        responseObjectsMap.put(
 		                CommonConstant.STRING_MESSAGE,
@@ -951,7 +951,113 @@ public class DevController extends BaseController{
 //
 //		    return ResponseEntity.ok(responseDTO);
 //		}
+		
+		
+//   fillgrid api for despatch instruction 
+		
+		@GetMapping("/getFillGridItemsForDespatchInstruction")
+		public ResponseEntity<ResponseDTO> getFillGridItemsForDespatchInstruction(
+		        @RequestParam Long customerId,
+		        @RequestParam Long sdvBasicId,
+		        @RequestParam Long branch,
+		        @RequestParam Long orgId) {
+
+		    String methodName = "getFillGridItemsForDespatchInstruction()";
+		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		    Map<String, Object> responseObjectsMap = new HashMap<>();
+		    ResponseDTO responseDTO;
+
+		    try {
+
+		        List<Map<String, Object>> itemList =
+		                transportMasterService.getFillGridItemsForDespatchInstruction(
+		                        customerId,
+		                        sdvBasicId,
+		                        branch,
+		                        orgId);
+
+		        responseObjectsMap.put(
+		                CommonConstant.STRING_MESSAGE,
+		                "Despatch Instruction Grid Fetched Successfully");
+
+		        responseObjectsMap.put(
+		                "itemList",
+		                itemList);
+
+		        responseDTO = createServiceResponse(responseObjectsMap);
+
+		    } catch (Exception e) {
+
+		        LOGGER.error(
+		                UserConstants.ERROR_MSG_METHOD_NAME,
+		                methodName,
+		                e.getMessage(),
+		                e);
+
+		        responseDTO = createServiceResponseError(
+		                responseObjectsMap,
+		                e.getMessage(),
+		                e.getMessage());
+		    }
+
+		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		    return ResponseEntity.ok(responseDTO);
+		}
+		
+		//item drop down for stocktransfer challan
+		@GetMapping("/getItemsForStockTransferChallan")
+		public ResponseEntity<ResponseDTO> getItemsForStockTransferChallan(
+		        @RequestParam String despatchNo,
+		        @RequestParam Long branch,
+		        @RequestParam Long orgId) {
+
+		    String methodName = "getItemsForStockTransferChallan()";
+		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		    Map<String, Object> responseObjectsMap = new HashMap<>();
+		    ResponseDTO responseDTO;
+
+		    try {
+
+		        Map<String, Object> responseMap =
+		                transportMasterService.getItemsForStockTransferChallan(
+		                        despatchNo,
+		                        branch,
+		                        orgId);
+
+		        responseObjectsMap.put(
+		                CommonConstant.STRING_MESSAGE,
+		                responseMap.get("message"));
+
+		        responseObjectsMap.put(
+		                "itemList",
+		                responseMap.get("itemList"));
+
+		        responseDTO = createServiceResponse(responseObjectsMap);
+
+		    } catch (Exception e) {
+
+		        LOGGER.error(
+		                UserConstants.ERROR_MSG_METHOD_NAME,
+		                methodName,
+		                e.getMessage(),
+		                e);
+
+		        responseDTO = createServiceResponseError(
+		                responseObjectsMap,
+		                e.getMessage(),
+		                e.getMessage());
+		    }
+
+		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		    return ResponseEntity.ok(responseDTO);
+		}
 }
+
+
 		
 
 

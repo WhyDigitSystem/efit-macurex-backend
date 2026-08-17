@@ -82,7 +82,7 @@ public interface TransportMasterService {
 	List<StockTransferChallanResponseDTO> getStockTransferChallanByOrgId(Long orgId, Long branch) throws ApplicationException;
 
 	//stock transfercustomer
-	Map<String, Object> getStockTransferCustomer() throws ApplicationException;
+	Map<String, Object> getCustomerForStockTransferChallan(Long branch, Long orgId) throws ApplicationException;
 
 	
 
@@ -100,6 +100,13 @@ public interface TransportMasterService {
 	Map<String, Object> getPlannedQtyForDespatchInstruction(Long item, Long branch, Long orgId) throws ApplicationException;
 
 	Map<String, Object> getScheduleNoDropdownForDespatchInstruction(Long customer, String monthYear,Long branch, Long orgId)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getFillGridItemsForDespatchInstruction(Long customerId, Long sdvBasicId, Long branch,
+			Long orgId);
+
+	// item drop down for stock transfer challan 
+	Map<String, Object> getItemsForStockTransferChallan(String despatchNo, Long branch, Long orgId)
 			throws ApplicationException;
 
 

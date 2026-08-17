@@ -2532,6 +2532,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		financialYearVO.setCreatedBy(financialYearDTO.getCreatedBy());
 		financialYearVO.setActive(financialYearDTO.isActive());
 		financialYearVO.setCancelRemarks(financialYearDTO.getCancelRemarks());
+		financialYearVO.setFinYearId(financialYearDTO.getFinYearId());
 
 	}
 
@@ -3396,7 +3397,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		documentTypeMasterVO.setDescription(documentTypeMasterDTO.getDescription());
 		documentTypeMasterVO.setOrgId(documentTypeMasterDTO.getOrgId());
 		documentTypeMasterVO.setScreenName(documentTypeMasterDTO.getScreenName());
-	
+
 		// Add any additional fields mapping here
 	}
 
@@ -4563,10 +4564,11 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	@Override
 	public List<Map<String, Object>> getPendingDocumentTypeMapping(Long orgId, String branch, String branchCode,
 			String finYear, String finYearIdentifier) {
-		int finyear= Integer.parseInt(finYear.toString());
-		FinancialYearVO financialYearVO= financialYearRepo.findByOrgIdAndFinYear(orgId,finyear);
+		int finyear = Integer.parseInt(finYear.toString());
+		FinancialYearVO financialYearVO = financialYearRepo.findByOrgIdAndFinYear(orgId, finyear);
+		String finYearIden = financialYearVO.getFinYearId();
 		Set<Object[]> pendingDocTypeDetails = documentTypeMappingRepo.getPendingDoctypeMapping(orgId, branch,
-				branchCode, finYear, finYearIdentifier);
+				branchCode, finYear, finYearIden);
 		return getPendingDocType(pendingDocTypeDetails);
 	}
 

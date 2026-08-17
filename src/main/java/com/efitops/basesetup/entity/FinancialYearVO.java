@@ -33,7 +33,7 @@ public class FinancialYearVO {
 	@Column(name = "financial_year")
 	private int finYear;
 	@Column(name = "fin_year_id")
-	private Long finYearId;
+	private String finYearId;
 	@Column(name = "start_date")
 	private LocalDate startDate;
 	@Column(name = "end_date")

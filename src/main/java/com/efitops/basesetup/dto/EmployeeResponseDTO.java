@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class EmployeeResponseDTO {
 
 	private Long id;
-	private String employeecode;
-//	private String employeeName;
+//	private String employeecode;
+	private String employeeName;
 
 }

@@ -21,15 +21,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "stock_transfer_chellan_detail")
-@Data
+@Table(name = "stock_transfer_challan_detail")
 @AllArgsConstructor
+@Data
 @NoArgsConstructor
 public class StockTransferChallanDetailsVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stock_transfer_chellan_detailgen")
-	@SequenceGenerator(name = "stock_transfer_chellan_detailgen", sequenceName = "stock_transfer_chellan_detailseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "stock_transfer_chellan_detail_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stock_transfer_challan_detailgen")
+	@SequenceGenerator(name = "stock_transfer_challan_detailgen", sequenceName = "stock_transfer_challan_detailseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "stock_transfer_challan_detail_id")
     private Long id;
 	
 	 @ManyToOne(fetch = FetchType.LAZY)
@@ -39,9 +39,11 @@ public class StockTransferChallanDetailsVO {
 	    @Column(name = "tax_type")
 	    private String taxType;
 
-	    @ManyToOne(fetch = FetchType.LAZY)
-	    @JoinColumn(name = "tax_percentage")
-	    private GSTRateMasterVO taxPercentage;
+	    @Column(name = "hsn_code")
+	    private String hsnCode;
+	    
+	    @Column(name = "tax_percentage")
+	    private String taxPercentage;
 
 	    @ManyToOne(fetch = FetchType.LAZY)
 	    @JoinColumn(name = "unit")
@@ -58,13 +60,7 @@ public class StockTransferChallanDetailsVO {
 	    
 	    @Column(name = "total_assessable_value")
 	    private BigDecimal totalAssessableValue;
-	    
-	    @Column(name = "amount_in_rs")
-	    private BigDecimal amountInRs;
-	    
-//	    @ManyToOne
-//	    @JoinColumn(name = "gst_rate")
-//	    private GSTRateMasterVO gstRate;
+
 
 	    @Column(name = "sgst_rate")
 	    private BigDecimal sgstRate;
@@ -88,7 +84,7 @@ public class StockTransferChallanDetailsVO {
 //	    private BigDecimal finalAmount;
 
 	    @ManyToOne
-	    @JoinColumn(name = "stock_transfer_chellan_basic_id")
+	    @JoinColumn(name = "stock_transfer_challan_basic_id")
 	    @JsonBackReference
 	    private StockTransferChallanVO stockTransferChallanVO;
 

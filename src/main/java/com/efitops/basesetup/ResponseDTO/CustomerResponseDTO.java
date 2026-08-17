@@ -46,7 +46,7 @@ public class CustomerResponseDTO {
 	    private boolean groupCompany;
 
 	    private SalesZoneResponseDTO zone;
-	    private String vendorCode;
+	    private String CustomerCode;
 	    private String groupName;
 
 	    private boolean registered;

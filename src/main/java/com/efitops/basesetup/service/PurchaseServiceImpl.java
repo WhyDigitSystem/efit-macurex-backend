@@ -223,6 +223,12 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Autowired PurchaseBillRepo purchaseBillRepo;
     @Autowired PurchaseBillDetailsRepo purchaseBillDetailsRepo;
     @Autowired PurchaseBillTaxGridRepo purchaseBillTaxGridRepo;
+    
+    
+    @Autowired
+    private UomConversionRepo uomConversionRepo;
+    
+    
 
     // ---------- repos used by Purchase Indent (unchanged from your PurchaseIndentServiceImpl) ----------
     @Autowired PurchaseIndentRepo purchaseIndentRepo;
@@ -1308,273 +1314,522 @@ public class PurchaseServiceImpl implements PurchaseService {
         return dto;
     }
 
-    // ==================================================================
+    
     // ============================ PURCHASE INDENT =====================
-    // (logic identical to your PurchaseIndentServiceImpl - FIX #5,#6 applied:
-    // Spring's @Transactional + rollbackFor, instead of javax.transaction.Transactional)
-    // ==================================================================
+   
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO dto, MultipartFile[] files) throws ApplicationException {
-
-        PurchaseIndentVO purchaseIndentVO;
-        String message;
-
-        boolean isUpdate = dto.getId() != null && dto.getId() != 0;
-
-        if (isUpdate) {
-
-            purchaseIndentVO = purchaseIndentRepo.findById(dto.getId())
-                    .orElseThrow(() -> new ApplicationException("Invalid Purchase Indent Details"));
-
-            if (dto.getIndentNo() != null && !dto.getIndentNo().equalsIgnoreCase(purchaseIndentVO.getIndentNo())) {
-                if (purchaseIndentRepo.existsByIndentNoAndOrgIdAndIdNot(dto.getIndentNo(), dto.getOrgId(), dto.getId())) {
-                    throw new ApplicationException("The Indent No : " + dto.getIndentNo() + " already exists in this Organization.");
-                }
-                purchaseIndentVO.setIndentNo(dto.getIndentNo());
-            }
-
-            purchaseIndentVO.setUpdatedBy(dto.getCreatedBy());
-            message = "Purchase Indent Updated Successfully";
-
-        } else {
-
-            if (dto.getIndentNo() != null && !dto.getIndentNo().trim().isEmpty()) {
-
-                if (purchaseIndentRepo.existsByIndentNoAndOrgId(dto.getIndentNo(), dto.getOrgId())) {
-                    throw new ApplicationException("The Indent No : " + dto.getIndentNo() + " already exists in this Organization.");
-                }
-                purchaseIndentVO = new PurchaseIndentVO();
-                purchaseIndentVO.setIndentNo(dto.getIndentNo());
-
-            } else {
-                purchaseIndentVO = new PurchaseIndentVO();
-                purchaseIndentVO.setIndentNo(generateIndentNo(dto.getOrgId()));
-            }
-
-            purchaseIndentVO.setCreatedBy(dto.getCreatedBy());
-            purchaseIndentVO.setUpdatedBy(dto.getCreatedBy());
-            message = "Purchase Indent Created Successfully";
-        }
-
-        createUpdatePurchaseIndentVO(dto, purchaseIndentVO);
-
-        PurchaseIndentVO savedVO;
-        if (isUpdate) {
-            purchaseIndentRepo.flush();
-            savedVO = purchaseIndentVO;
-        } else {
-            savedVO = purchaseIndentRepo.save(purchaseIndentVO);
-        }
-
-        saveIndentAttachments(files, savedVO);
+    @Transactional
+    public Map<String, Object> createUpdatePurchaseIndent(
+            PurchaseIndentDTO purchaseIndentDTO)
+            throws ApplicationException {
 
         Map<String, Object> response = new HashMap<>();
-        response.put("message", message);
-        response.put("purchaseIndentVO", buildPurchaseIndentResponse(savedVO));
-        return response;
+
+        PurchaseIndentVO purchaseIndentVO = null;
+
+        if (purchaseIndentDTO.getId() != null) {
+
+            purchaseIndentVO = purchaseIndentRepo.findById(
+                    purchaseIndentDTO.getId())
+                    .orElseThrow(() ->
+                            new ApplicationException("Purchase Indent not found"));
+
+            purchaseIndentDetailsRepo.deleteByPurchaseIndentVO(
+                    purchaseIndentVO);
+
+            purchaseIndentAttachmentRepo.deleteByPurchaseIndentVO(
+                    purchaseIndentVO);
+
+        } else {
+
+            purchaseIndentVO = new PurchaseIndentVO();
+
+        }
+
+        // ==========================
+        // Header Mapping
+        // ==========================
+
+        purchaseIndentVO.setDocId(
+                purchaseIndentDTO.getDocId());
+
+        purchaseIndentVO.setBelongsTo(
+                purchaseIndentDTO.getBelongsTo());
+
+        purchaseIndentVO.setDocDate(
+                purchaseIndentDTO.getDocDate());
+
+        purchaseIndentVO.setApproved(
+                purchaseIndentDTO.isApproved());
+
+        purchaseIndentVO.setRemarks(
+                purchaseIndentDTO.getRemarks());
+
+        purchaseIndentVO.setOrgId(
+                purchaseIndentDTO.getOrgId());
+
+        purchaseIndentVO.setCreatedBy(
+                purchaseIndentDTO.getCreatedBy());
+
+        purchaseIndentVO.setUpdatedBy(
+                purchaseIndentDTO.getUpdatedBy());
+
+        purchaseIndentVO.setActive(
+                purchaseIndentDTO.isActive());
+
+        purchaseIndentVO.setCancel(
+                purchaseIndentDTO.isCancel());
+
+        purchaseIndentVO.setCancelRemarks(
+                purchaseIndentDTO.getCancelRemarks());
+
+        // ==========================
+        // Branch
+        // ==========================
+
+        if (purchaseIndentDTO.getBranch() != null) {
+
+            BranchVO branchVO =
+                    branchRepo.findById(
+                            purchaseIndentDTO.getBranch())
+                            .orElseThrow(() ->
+                                    new ApplicationException("Branch not found"));
+
+            purchaseIndentVO.setBranch(branchVO);
+        }
+
+        // ==========================
+        // Department
+        // ==========================
+
+        if (purchaseIndentDTO.getDepartment() != null) {
+
+            DepartmentVO departmentVO =
+                    departmentRepo.findById(
+                            purchaseIndentDTO.getDepartment())
+                            .orElseThrow(() ->
+                                    new ApplicationException("Department not found"));
+
+            purchaseIndentVO.setDepartment(departmentVO);
+        }
+
+        // ==========================
+        // Prepared By
+        // ==========================
+
+        if (purchaseIndentDTO.getPreparedBy() != null) {
+
+            EmployeeMasterVO preparedBy =
+                    employeeMasterRepo.findById(
+                            purchaseIndentDTO.getPreparedBy())
+                            .orElseThrow(() ->
+                                    new ApplicationException("Employee not found"));
+
+            purchaseIndentVO.setPreparedBy(preparedBy);
+        }
+
+        // ==========================
+        // By Whom
+        // ==========================
+
+        if (purchaseIndentDTO.getByWhom() != null) {
+
+            EmployeeMasterVO byWhom =
+                    employeeMasterRepo.findById(
+                            purchaseIndentDTO.getByWhom())
+                            .orElseThrow(() ->
+                                    new ApplicationException("Employee not found"));
+
+            purchaseIndentVO.setByWhom(byWhom);
+        }
+
+        // ==========================
+        // Save Header
+        // ==========================
+
+        purchaseIndentVO =
+                purchaseIndentRepo.save(purchaseIndentVO);
+        
+     // ==========================
+     // Details Save
+     // ==========================
+
+     List<PurchaseIndentDetailsVO> detailsList = new ArrayList<>();
+
+     if (purchaseIndentDTO.getDetails() != null) {
+
+         for (PurchaseIndentDetailsDTO detailDTO : purchaseIndentDTO.getDetails()) {
+
+             PurchaseIndentDetailsVO detailsVO = new PurchaseIndentDetailsVO();
+
+             // Parent Mapping
+             detailsVO.setPurchaseIndentVO(purchaseIndentVO);
+
+             // Item
+             if (detailDTO.getItem() != null) {
+
+                 ItemMasterVO itemVO =
+                         itemMasterRepo.findById(detailDTO.getItem())
+                         .orElseThrow(() ->
+                         new ApplicationException("Item not found"));
+
+                 detailsVO.setItem(itemVO);
+             }
+
+             // Qty in Primary Unit
+             detailsVO.setQtyInPrimaryUnit(
+                     detailDTO.getQtyInPrimaryUnit());
+
+             // Conversion Factor
+             if (detailDTO.getConversionFactor() != null) {
+
+                 UomConversionVO conversionVO =
+                         uomConversionRepo.findById(
+                                 detailDTO.getConversionFactor())
+                         .orElseThrow(() ->
+                         new ApplicationException("Conversion Factor not found"));
+
+                 detailsVO.setConversionFactor(conversionVO);
+             }
+
+             // Qty in Purchase Unit
+             detailsVO.setQtyInPurchaseUnit(
+                     detailDTO.getQtyInPurchaseUnit());
+
+             // Required Date
+             detailsVO.setRequiredDate(
+                     detailDTO.getRequiredDate());
+
+             // Purpose
+             detailsVO.setPurpose(
+                     detailDTO.getPurpose());
+
+             detailsList.add(detailsVO);
+         }
+
+         purchaseIndentDetailsRepo.saveAll(detailsList);
+     }
+         
+      // ==========================
+      // Attachment Save
+      // ==========================
+
+      List<PurchaseIndentAttachmentVO> attachmentList = new ArrayList<>();
+
+      if (purchaseIndentDTO.getAttachments() != null) {
+
+          for (PurchaseIndentAttachmentDTO attachmentDTO : purchaseIndentDTO.getAttachments()) {
+
+              PurchaseIndentAttachmentVO attachmentVO =
+                      new PurchaseIndentAttachmentVO();
+
+              attachmentVO.setPurchaseIndentVO(purchaseIndentVO);
+
+              attachmentVO.setName(
+                      attachmentDTO.getName());
+
+              attachmentVO.setFileName(
+                      attachmentDTO.getFileName());
+
+              attachmentVO.setFilePath(
+                      attachmentDTO.getFilePath());
+
+              attachmentVO.setFileSize(
+                      attachmentDTO.getFileSize());
+
+              attachmentVO.setUploadOn(
+                      attachmentDTO.getUploadOn());
+
+              attachmentList.add(attachmentVO);
+          }
+
+          purchaseIndentAttachmentRepo.saveAll(attachmentList);
+      }
+
+
+   // ==========================
+   // Response
+   // ==========================
+
+   String message;
+
+   if (purchaseIndentDTO.getId() == null) {
+       message = "Purchase Indent Created Successfully";
+   } else {
+       message = "Purchase Indent Updated Successfully";
+   }
+
+   PurchaseIndentResponseDTO responseDTO =
+           purchaseIndentResponse(purchaseIndentVO);
+
+   response.put("message", message);
+   response.put("purchaseIndentVO", responseDTO);
+
+   return response;
+   
     }
+    
+    private PurchaseIndentResponseDTO purchaseIndentResponse(
+            PurchaseIndentVO purchaseIndentVO)
+            throws ApplicationException {
 
-    private String generateIndentNo(Long orgId) {
-        long count = purchaseIndentRepo.countByOrgId(orgId);
-        return "PI" + String.format("%06d", count + 1);
-    }
+        PurchaseIndentResponseDTO responseDTO =
+                new PurchaseIndentResponseDTO();
 
-    private void createUpdatePurchaseIndentVO(PurchaseIndentDTO dto, PurchaseIndentVO purchaseIndentVO) throws ApplicationException {
+        // =========================
+        // Header
+        // =========================
 
-        purchaseIndentVO.setIndentDate(dto.getIndentDate());
-        purchaseIndentVO.setApproved(dto.isApproved());
-        purchaseIndentVO.setRemarks(dto.getRemarks());
-        purchaseIndentVO.setOrgId(dto.getOrgId());
-        purchaseIndentVO.setActive(dto.isActive());
-        purchaseIndentVO.setCancelRemarks(dto.getCancelRemarks());
+        responseDTO.setId(purchaseIndentVO.getId());
 
-        if (dto.getPlant() != null && dto.getPlant() != 0) {
-            purchaseIndentVO.setPlant(branchRepo.findById(dto.getPlant()).orElseThrow(() -> new ApplicationException("Plant (Branch) Not Found")));
+        responseDTO.setDocId(
+                purchaseIndentVO.getDocId());
+
+        responseDTO.setBelongsTo(
+                purchaseIndentVO.getBelongsTo());
+
+        responseDTO.setDocDate(
+                purchaseIndentVO.getDocDate());
+
+        responseDTO.setApproved(
+                purchaseIndentVO.isApproved());
+
+        responseDTO.setRemarks(
+                purchaseIndentVO.getRemarks());
+
+        responseDTO.setOrgId(
+                purchaseIndentVO.getOrgId());
+
+        responseDTO.setCreatedBy(
+                purchaseIndentVO.getCreatedBy());
+
+        responseDTO.setUpdatedBy(
+                purchaseIndentVO.getUpdatedBy());
+
+        responseDTO.setCancelRemarks(
+                purchaseIndentVO.getCancelRemarks());
+
+        responseDTO.setActive(
+                purchaseIndentVO.isActive());
+
+        responseDTO.setCancel(
+                purchaseIndentVO.isCancel());
+
+        responseDTO.setScreenName(
+                purchaseIndentVO.getScreenName());
+
+        responseDTO.setScreenCode(
+                purchaseIndentVO.getScreenCode());
+
+        // =========================
+        // Branch
+        // =========================
+
+        if (purchaseIndentVO.getBranch() != null) {
+
+            BranchResponseDTO branchResponse =
+                    new BranchResponseDTO();
+
+            branchResponse.setId(
+                    purchaseIndentVO.getBranch().getId());
+
+            branchResponse.setBranchName(
+                    purchaseIndentVO.getBranch().getBranchName());
+
+            responseDTO.setBranch(branchResponse);
         }
 
-        if (dto.getBelongsTo() != null && dto.getBelongsTo() != 0) {
-            purchaseIndentVO.setBelongsTo(resolveLov(dto.getBelongsTo()));
+        // =========================
+        // Department
+        // =========================
+
+        if (purchaseIndentVO.getDepartment() != null) {
+
+            DepartmentResponseDTO departmentResponse =
+                    new DepartmentResponseDTO();
+
+            departmentResponse.setId(
+                    purchaseIndentVO.getDepartment().getId());
+
+            departmentResponse.setDepartmentName(
+                    purchaseIndentVO.getDepartment().getDepartmentName());
+
+            responseDTO.setDepartment(departmentResponse);
         }
 
-        if (dto.getDepartment() != null && dto.getDepartment() != 0) {
-            purchaseIndentVO.setDepartment(departmentRepo.findById(dto.getDepartment())
-                    .orElseThrow(() -> new ApplicationException("Department Not Found")));
+        // =========================
+        // Prepared By
+        // =========================
+
+        if (purchaseIndentVO.getPreparedBy() != null) {
+
+            EmployeeResponseDTO employeeResponse =
+                    new EmployeeResponseDTO();
+
+            employeeResponse.setId(
+                    purchaseIndentVO.getPreparedBy().getId());
+
+            employeeResponse.setEmployeeName(
+                    purchaseIndentVO.getPreparedBy().getEmployeeName());
+
+            responseDTO.setPreparedBy(employeeResponse);
         }
 
-        EmployeeMasterVO preparedBy = null;
-        if (dto.getPreparedBy() != null) {
-            preparedBy = employeeMasterRepo.findById(dto.getPreparedBy()).orElseThrow(() -> new ApplicationException("Prepared By Not Found"));
-        }
-        purchaseIndentVO.setPreparedBy(preparedBy);
+        // =========================
+        // By Whom
+        // =========================
 
-        EmployeeMasterVO byWhom = null;
-        if (dto.getByWhom() != null) {
-            byWhom = employeeMasterRepo.findById(dto.getByWhom()).orElseThrow(() -> new ApplicationException("By Whom Not Found"));
-        }
-        purchaseIndentVO.setByWhom(byWhom);
+        if (purchaseIndentVO.getByWhom() != null) {
 
-        purchaseIndentVO.getDetails().clear();
+            EmployeeResponseDTO employeeResponse =
+                    new EmployeeResponseDTO();
 
-        if (dto.getDetails() != null) {
-            for (PurchaseIndentDetailsDTO detailDTO : dto.getDetails()) {
+            employeeResponse.setId(
+                    purchaseIndentVO.getByWhom().getId());
 
-                PurchaseIndentDetailsVO detailVO = new PurchaseIndentDetailsVO();
+            employeeResponse.setEmployeeName(
+                    purchaseIndentVO.getByWhom().getEmployeeName());
 
-                if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
-                    detailVO.setItem(itemMasterRepo.findById(detailDTO.getItem()).orElseThrow(() -> new ApplicationException("Item Not Found")));
-                }
-
-                detailVO.setQtyInPrimaryUnit(detailDTO.getQtyInPrimaryUnit());
-                detailVO.setConversionFactor(detailDTO.getConversionFactor());
-                detailVO.setQtyInPurchaseUnit(detailDTO.getQtyInPurchaseUnit());
-                detailVO.setRequiredDate(detailDTO.getRequiredDate());
-                detailVO.setPurpose(detailDTO.getPurpose());
-                detailVO.setPurchaseIndentVO(purchaseIndentVO);
-
-                purchaseIndentVO.getDetails().add(detailVO);
-            }
-        }
-    }
-
-    private void saveIndentAttachments(MultipartFile[] files, PurchaseIndentVO purchaseIndentVO) throws ApplicationException {
-
-        if (files == null || files.length == 0) return;
-
-        try {
-            File folder = new File(purchaseIndentUploadPath);
-            if (!folder.exists()) folder.mkdirs();
-
-            List<PurchaseIndentAttachmentVO> attachmentList = new ArrayList<>();
-            for (MultipartFile file : files) {
-                if (file == null || file.isEmpty()) continue;
-
-                String originalFileName = file.getOriginalFilename();
-                String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
-                Path path = Paths.get(purchaseIndentUploadPath, uniqueFileName);
-
-                try (InputStream inputStream = file.getInputStream()) {
-                    Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-                }
-
-                PurchaseIndentAttachmentVO attachment = new PurchaseIndentAttachmentVO();
-                attachment.setPurchaseIndentVO(purchaseIndentVO);
-                attachment.setName(originalFileName);
-                attachment.setFileName(uniqueFileName);
-                attachment.setFilePath(path.toString());
-                attachment.setFileSize(file.getSize());
-                attachment.setUploadOn(LocalDateTime.now());
-                attachmentList.add(attachment);
-            }
-
-            List<PurchaseIndentAttachmentVO> savedAttachments = purchaseIndentAttachmentRepo.saveAll(attachmentList);
-
-            if (purchaseIndentVO.getAttachments() == null) purchaseIndentVO.setAttachments(new ArrayList<>());
-            purchaseIndentVO.getAttachments().addAll(savedAttachments);
-
-        } catch (IOException e) {
-            throw new ApplicationException("File Upload Failed : " + e.getMessage());
-        }
-    }
-
-    private PurchaseIndentResponseDTO buildPurchaseIndentResponse(PurchaseIndentVO vo) {
-
-        PurchaseIndentResponseDTO dto = new PurchaseIndentResponseDTO();
-
-        dto.setId(vo.getId());
-        dto.setIndentNo(vo.getIndentNo());
-        dto.setIndentDate(vo.getIndentDate());
-        dto.setApproved(vo.isApproved());
-        dto.setRemarks(vo.getRemarks());
-        dto.setOrgId(vo.getOrgId());
-        dto.setCreatedBy(vo.getCreatedBy());
-        dto.setUpdatedBy(vo.getUpdatedBy());
-        dto.setActive(vo.getActiveStr());
-        dto.setCancelRemarks(vo.getCancelRemarks());
-
-        if (vo.getPlant() != null) {
-            dto.setPlant(new BranchResponseDTO(vo.getPlant().getId(), vo.getPlant().getBranchCode(), vo.getPlant().getBranchName()));
-        }
-        if (vo.getBelongsTo() != null) {
-            dto.setBelongsTo(new ListOfVlauesDetailsResponseDTO(vo.getBelongsTo().getId(),
-                    vo.getBelongsTo().getValueCode(), vo.getBelongsTo().getValueDescription()));
-        }
-        if (vo.getDepartment() != null) {
-            DepartmentResponseDTO departmentDTO = new DepartmentResponseDTO();
-            departmentDTO.setId(vo.getDepartment().getId());
-            departmentDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode());
-            departmentDTO.setDepartmentName(vo.getDepartment().getDepartmentName());
-            dto.setDepartment(departmentDTO);
-        }
-        if (vo.getPreparedBy() != null) {
-            dto.setPreparedBy(new EmployeeResponseDTO(vo.getPreparedBy().getId(), vo.getPreparedBy().getEmployeeName()));
-        }
-        if (vo.getByWhom() != null) {
-            dto.setByWhom(new EmployeeResponseDTO(vo.getByWhom().getId(), vo.getByWhom().getEmployeeName()));
+            responseDTO.setByWhom(employeeResponse);
         }
 
-        List<PurchaseIndentDetailsResponseDTO> detailList = new ArrayList<>();
-        if (vo.getDetails() != null) {
-            for (PurchaseIndentDetailsVO detailVO : vo.getDetails()) {
+        // =========================
+        // Details
+        // =========================
 
-                PurchaseIndentDetailsResponseDTO detailDTO = new PurchaseIndentDetailsResponseDTO();
-                detailDTO.setId(detailVO.getId());
+        List<PurchaseIndentDetailsResponseDTO> detailsResponse =
+                new ArrayList<>();
 
+        if (purchaseIndentVO.getDetails() != null) {
+
+            for (PurchaseIndentDetailsVO detailVO :
+                    purchaseIndentVO.getDetails()) {
+
+                PurchaseIndentDetailsResponseDTO detailResponse =
+                        new PurchaseIndentDetailsResponseDTO();
+
+                detailResponse.setId(detailVO.getId());
+
+                // Item
                 if (detailVO.getItem() != null) {
-                    try {
-                        ItemMasterResponseDTO itemDTO = itemMasterService.getItemMasterById(detailVO.getItem().getId());
-                        detailDTO.setItemMasterVO(itemDTO);
-                    } catch (ApplicationException e) {
-                        LOGGER.error("Unable to load item master for id {} : {}", detailVO.getItem().getId(), e.getMessage());
+
+                    PurchaseIndentItemResponseDTO itemResponse =
+                            new PurchaseIndentItemResponseDTO();
+
+                    itemResponse.setId(detailVO.getItem().getId());
+                    itemResponse.setItemCode(detailVO.getItem().getItemCode());
+                    itemResponse.setItemDescription(detailVO.getItem().getItemDescription());
+
+                    if (detailVO.getItem().getPrimaryUnit() != null) {
+                        itemResponse.setPrimaryUnit(
+                                detailVO.getItem().getPrimaryUnit().getUnitId());
                     }
+
+                    if (detailVO.getItem().getPurchaseUnit() != null) {
+                        itemResponse.setPurchaseUnit(
+                                detailVO.getItem().getPurchaseUnit().getUnitId());
+                    }
+                    
+                    detailResponse.setItem(itemResponse);
+                    
+                }
+                // Conversion Factor
+                if (detailVO.getConversionFactor() != null) {
+
+                	UomConversionResponseDTO conversionResponse =
+                	        new UomConversionResponseDTO();
+
+                	conversionResponse.setId(
+                	        detailVO.getConversionFactor().getId());
+
+                	conversionResponse.setMultiplicationFactor(
+                	        detailVO.getConversionFactor().getMultiplicationFactor());
+                    detailResponse.setConversionFactor(conversionResponse);
                 }
 
-                detailDTO.setQtyInPrimaryUnit(detailVO.getQtyInPrimaryUnit());
-                detailDTO.setConversionFactor(detailVO.getConversionFactor());
-                detailDTO.setQtyInPurchaseUnit(detailVO.getQtyInPurchaseUnit());
-                detailDTO.setRequiredDate(detailVO.getRequiredDate());
-                detailDTO.setPurpose(detailVO.getPurpose());
+                detailResponse.setQtyInPrimaryUnit(
+                        detailVO.getQtyInPrimaryUnit());
 
-                detailList.add(detailDTO);
+                detailResponse.setQtyInPurchaseUnit(
+                        detailVO.getQtyInPurchaseUnit());
+
+                detailResponse.setRequiredDate(
+                        detailVO.getRequiredDate());
+
+                detailResponse.setPurpose(
+                        detailVO.getPurpose());
+
+                detailsResponse.add(detailResponse);
             }
         }
-        dto.setDetails(detailList);
 
-        List<PurchaseIndentAttachmentResponseDTO> attachmentList = new ArrayList<>();
-        if (vo.getAttachments() != null) {
-            for (PurchaseIndentAttachmentVO attachmentVO : vo.getAttachments()) {
-                PurchaseIndentAttachmentResponseDTO attachmentDTO = new PurchaseIndentAttachmentResponseDTO();
-                attachmentDTO.setId(attachmentVO.getId());
-                attachmentDTO.setName(attachmentVO.getName());
-                attachmentDTO.setFileName(attachmentVO.getFileName());
-                attachmentDTO.setFilePath(attachmentVO.getFilePath());
-                attachmentDTO.setFileSize(attachmentVO.getFileSize());
-                attachmentDTO.setUploadOn(attachmentVO.getUploadOn());
-                attachmentList.add(attachmentDTO);
+        responseDTO.setDetails(detailsResponse);
+
+        // =========================
+        // Attachments
+        // =========================
+
+        List<PurchaseIndentAttachmentResponseDTO> attachmentResponse =
+                new ArrayList<>();
+
+        if (purchaseIndentVO.getAttachments() != null) {
+
+            for (PurchaseIndentAttachmentVO attachment :
+                    purchaseIndentVO.getAttachments()) {
+
+                PurchaseIndentAttachmentResponseDTO dto =
+                        new PurchaseIndentAttachmentResponseDTO();
+
+                dto.setId(attachment.getId());
+                dto.setName(attachment.getName());
+                dto.setFileName(attachment.getFileName());
+                dto.setFilePath(attachment.getFilePath());
+                dto.setFileSize(attachment.getFileSize());
+                dto.setUploadOn(attachment.getUploadOn());
+
+                attachmentResponse.add(dto);
             }
         }
-        dto.setAttachments(attachmentList);
 
-        return dto;
+        responseDTO.setAttachments(attachmentResponse);
+
+        return responseDTO;
     }
-
+    
     @Override
-    public PurchaseIndentResponseDTO getPurchaseIndentById(Long id) throws ApplicationException {
-        PurchaseIndentVO vo = purchaseIndentRepo.findById(id).orElseThrow(() -> new ApplicationException("Invalid Purchase Indent Details"));
-        return buildPurchaseIndentResponse(vo);
+    public PurchaseIndentResponseDTO getPurchaseIndentById(Long id)
+            throws ApplicationException {
+
+        PurchaseIndentVO purchaseIndentVO = purchaseIndentRepo.findById(id)
+                .orElseThrow(() ->
+                        new ApplicationException("Purchase Indent Not Found"));
+
+        return purchaseIndentResponse(purchaseIndentVO);
     }
-
+    
+    
     @Override
-    public List<PurchaseIndentResponseDTO> getPurchaseIndentByOrgId(Long orgId, Long branch) throws ApplicationException {
-        List<PurchaseIndentVO> voList = purchaseIndentRepo.findByOrgIdAndPlant_Id(orgId, branch);
-        if (voList.isEmpty()) throw new ApplicationException("No Purchase Indent Details Found");
-        List<PurchaseIndentResponseDTO> responseList = new ArrayList<>();
-        for (PurchaseIndentVO vo : voList) responseList.add(buildPurchaseIndentResponse(vo));
+    public List<PurchaseIndentResponseDTO> getPurchaseIndentByOrgId(
+            Long orgId,
+            Long branch)
+            throws ApplicationException {
+
+        List<PurchaseIndentVO> purchaseIndentVOList =
+                purchaseIndentRepo.findByOrgId(orgId, branch);
+
+        List<PurchaseIndentResponseDTO> responseList =
+                new ArrayList<>();
+
+        for (PurchaseIndentVO purchaseIndentVO : purchaseIndentVOList) {
+
+            responseList.add(
+                    purchaseIndentResponse(purchaseIndentVO));
+        }
+
         return responseList;
     }
-
-
+    
 
 // ==================================================================
     // ===================== PURCHASE SHORT CLOSE =======================
@@ -2155,9 +2410,9 @@ public class PurchaseServiceImpl implements PurchaseService {
         dto.setRemarks(vo.getRemarks());
         dto.setNotes(vo.getNotes());
 
-        if (vo.getPreparedBy() != null) dto.setPreparedBy(new EmployeeResponseDTO(vo.getPreparedBy().getId(), vo.getPreparedBy().getEmployeeName()));
-        if (vo.getCheckedBy() != null) dto.setCheckedBy(new EmployeeResponseDTO(vo.getCheckedBy().getId(), vo.getCheckedBy().getEmployeeName()));
-        if (vo.getAuthorisedBy() != null) dto.setAuthorisedBy(new EmployeeResponseDTO(vo.getAuthorisedBy().getId(), vo.getAuthorisedBy().getEmployeeName()));
+//        if (vo.getPreparedBy() != null) dto.setPreparedBy(new EmployeeResponseDTO(vo.getPreparedBy().getId(), vo.getPreparedBy().getEmployeeName()));
+//        if (vo.getCheckedBy() != null) dto.setCheckedBy(new EmployeeResponseDTO(vo.getCheckedBy().getId(), vo.getCheckedBy().getEmployeeName()));
+//        if (vo.getAuthorisedBy() != null) dto.setAuthorisedBy(new EmployeeResponseDTO(vo.getAuthorisedBy().getId(), vo.getAuthorisedBy().getEmployeeName()));
 
         dto.setOrgId(vo.getOrgId());
         dto.setFinancialYear(vo.getFinancialYear());
@@ -2173,13 +2428,13 @@ public class PurchaseServiceImpl implements PurchaseService {
                 LocalPurchaseOrderDetailsResponseDTO line = new LocalPurchaseOrderDetailsResponseDTO();
                 line.setId(d.getId());
 
-                if (d.getIndentDetails() != null) {
-                    line.setIndentDetailId(d.getIndentDetails().getId());
-                    if (d.getIndentDetails().getPurchaseIndentVO() != null) {
-                        line.setIndentNo(d.getIndentDetails().getPurchaseIndentVO().getIndentNo());
-                        line.setIndentDate(d.getIndentDetails().getPurchaseIndentVO().getIndentDate());
-                    }
-                }
+//                if (d.getIndentDetails() != null) {
+//                    line.setIndentDetailId(d.getIndentDetails().getId());
+//                    if (d.getIndentDetails().getPurchaseIndentVO() != null) {
+//                        line.setIndentNo(d.getIndentDetails().getPurchaseIndentVO().getIndentNo());
+//                        line.setIndentDate(d.getIndentDetails().getPurchaseIndentVO().getIndentDate());
+//                    }
+//                }
 
                 if (d.getItem() != null) {
                     ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();

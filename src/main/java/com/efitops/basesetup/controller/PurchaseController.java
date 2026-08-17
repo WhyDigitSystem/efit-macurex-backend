@@ -195,56 +195,116 @@ public class PurchaseController extends BaseController {
     // PURCHASE INDENT — original paths: /api/purchaseindent/**
     // ==================================================================
 
-    @PostMapping(value = "/api/purchaseMaster/createUpdatePurchaseIndent", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/createUpdatePurchaseIndent")
     public ResponseEntity<ResponseDTO> createUpdatePurchaseIndent(
-            @RequestPart("purchaseIndent") String purchaseIndentJson,
-            @RequestPart(value = "files", required = false) MultipartFile[] files) {
+
+            @RequestBody PurchaseIndentDTO purchaseIndentDTO) {
 
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
+
         try {
-            PurchaseIndentDTO dto = objectMapper.readValue(purchaseIndentJson, PurchaseIndentDTO.class);
-            Map<String, Object> result = purchaseService.createUpdatePurchaseIndent(dto, files);
-            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, result.get("message"));
-            responseObjectsMap.put("purchaseIndentVO", result.get("purchaseIndentVO"));
-            responseDTO = createServiceResponse(responseObjectsMap);
+
+            Map<String, Object> purchaseIndentMap =
+                    purchaseService.createUpdatePurchaseIndent(
+                            purchaseIndentDTO);
+
+            responseObjectsMap.put(
+                    CommonConstant.STRING_MESSAGE,
+                    purchaseIndentMap.get("message"));
+
+            responseObjectsMap.put(
+                    "purchaseIndentVO",
+                    purchaseIndentMap.get("purchaseIndentVO"));
+
+            responseDTO = createServiceResponse(
+                    responseObjectsMap);
+
         } catch (Exception e) {
-            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, "createUpdatePurchaseIndent()", e.getMessage());
-            responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+
+            e.printStackTrace();
+
+            responseDTO = createServiceResponseError(
+                    responseObjectsMap,
+                    e.getMessage(),
+                    e.getMessage());
         }
+
         return ResponseEntity.ok(responseDTO);
     }
+    
+   //get by id 
+    
+    @GetMapping("/getPurchaseIndentById/{id}")
+    public ResponseEntity<ResponseDTO> getPurchaseIndentById(
+            @PathVariable Long id) {
 
-    @GetMapping("/api/purchaseMaster/getPurchaseIndentById")
-    public ResponseEntity<ResponseDTO> getPurchaseIndentById(@RequestParam Long id) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
+
         try {
-            PurchaseIndentResponseDTO result = purchaseService.getPurchaseIndentById(id);
-            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Indent retrieved successfully");
-            responseObjectsMap.put("purchaseIndentVO", result);
+
+            PurchaseIndentResponseDTO purchaseIndentResponseDTO =
+                    purchaseService.getPurchaseIndentById(id);
+
+            responseObjectsMap.put(
+                    "purchaseIndentVO",
+                    purchaseIndentResponseDTO);
+
             responseDTO = createServiceResponse(responseObjectsMap);
+
         } catch (Exception e) {
-            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Indent retrieval failed", e.getMessage());
+
+            e.printStackTrace();
+
+            responseDTO = createServiceResponseError(
+                    responseObjectsMap,
+                    e.getMessage(),
+                    e.getMessage());
         }
+
         return ResponseEntity.ok(responseDTO);
     }
+    
+    
+    //get byt orgid
+    
+    
+    @GetMapping("/getPurchaseIndentByOrgId")
+    public ResponseEntity<ResponseDTO> getPurchaseIndentByOrgId(
+            @RequestParam Long orgId,
+            @RequestParam Long branch) {
 
-    @GetMapping("/api/purchaseMaster/getPurchaseIndentByOrgId")
-    public ResponseEntity<ResponseDTO> getPurchaseIndentByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
         Map<String, Object> responseObjectsMap = new HashMap<>();
         ResponseDTO responseDTO;
+
         try {
-            List<PurchaseIndentResponseDTO> result = purchaseService.getPurchaseIndentByOrgId(orgId, branch);
-            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Indent list retrieved successfully");
-            responseObjectsMap.put("purchaseIndentList", result);
+
+            List<PurchaseIndentResponseDTO> purchaseIndentList =
+                    purchaseService.getPurchaseIndentByOrgId(
+                            orgId,
+                            branch);
+
+            responseObjectsMap.put(
+                    "purchaseIndentVO",
+                    purchaseIndentList);
+
             responseDTO = createServiceResponse(responseObjectsMap);
+
         } catch (Exception e) {
-            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Indent retrieval failed", e.getMessage());
+
+            e.printStackTrace();
+
+            responseDTO = createServiceResponseError(
+                    responseObjectsMap,
+                    e.getMessage(),
+                    e.getMessage());
         }
+
         return ResponseEntity.ok(responseDTO);
     }
-
+    
+    
     // ==================================================================
     // PURCHASE SHORT CLOSE — /api/purchaseShortClose/**
     // ==================================================================

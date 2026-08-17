@@ -109,8 +109,8 @@ public class CustomerVO {
 	@JoinColumn(name = "zone")
 	private SalesZoneMasterVO zone;
 
-	@Column(name = "vendor_code")
-	private String vendorCode;
+//	@Column(name = "vendor_code")
+//	private String vendorCode;
 
 	@Column(name = "group_name")
 	private String groupName;

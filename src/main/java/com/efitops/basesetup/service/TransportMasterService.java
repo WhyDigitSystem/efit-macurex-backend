@@ -106,8 +106,10 @@ public interface TransportMasterService {
 			Long orgId);
 
 	// item drop down for stock transfer challan 
-	Map<String, Object> getItemsForStockTransferChallan(String despatchNo, Long branch, Long orgId)
+	Map<String, Object> getItemsForStockTransferChallan( Long branch, Long orgId)
 			throws ApplicationException;
+
+	String getStockTransferChallanDocId(Long orgId, String financialYear, String screenCode);
 
 
 //	Map<String, Object> getDespatchPendingQty(Long itemId, String month, Long branch, Long orgId, Long customerId)

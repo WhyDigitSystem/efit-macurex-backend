@@ -7,7 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.efitops.basesetup.entity.PurchaseIndentAttachmentVO;
 import com.efitops.basesetup.entity.PurchaseIndentVO;
 
-public interface PurchaseIndentAttachmentRepo extends JpaRepository<PurchaseIndentAttachmentVO, Long> {
+public interface PurchaseIndentAttachmentRepo
+        extends JpaRepository<PurchaseIndentAttachmentVO, Long> {
 
-    List<PurchaseIndentAttachmentVO> findByPurchaseIndentVO(PurchaseIndentVO purchaseIndentVO);
+    List<PurchaseIndentAttachmentVO> findByPurchaseIndentVO(
+            PurchaseIndentVO purchaseIndentVO);
+
+    void deleteByPurchaseIndentVO(
+            PurchaseIndentVO purchaseIndentVO);
+
 }

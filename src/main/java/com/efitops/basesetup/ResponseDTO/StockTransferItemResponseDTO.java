@@ -11,12 +11,16 @@ public class StockTransferItemResponseDTO {
 	private Long id;
 	private String itemCode;
 	private String itemDescription;
+	private String hsn;
 	private String customerPartNo;
-	private double receivedQty;
-	private double freight;
-	private double insurance;
-	private Long exciseTariffNo;
-	private Long HsnSacCode;
-	
+
+	private double rate;
+	private double cgst;
+	private double sgst;
+	private double igst;
+
+	private Long unitmasterId;
+	private String unit;
+	private Long gstratemasterId;
 
 }

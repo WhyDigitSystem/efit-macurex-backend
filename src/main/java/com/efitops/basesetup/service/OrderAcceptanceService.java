@@ -52,4 +52,8 @@ public interface OrderAcceptanceService {
 	List<OrderAcceptanceItemDetailsResponseDTO> getOrderAcceptanceItemDetailsDetails(String docId)
 			throws ApplicationException;
 
+	String getSalesOrderShortCloseDocId(Long orgId, String financialYear, String screenCode);
+
+	String getOrderAcceptanceDocId(Long orgId, String financialYear, String screenCode);
+
 }

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DocketInvoiceResponseDTO {
 	 private Long id;
-	 private String docNo;
+	 private String docId;
 	 private BranchResponseDTO branch;
 	 private TransportResponseDTO transport;
      private LocalDate docDate;
@@ -22,7 +22,7 @@ public class DocketInvoiceResponseDTO {
      private LocalDate billDate;
 	 private int totalAmount;
 	 private Long orgId;
-	 private Boolean active;
+	 private String active;
 	 private String createdBy;
 	 private String cancelRemarks;
 	 private List<DocketInvoiceDetResponseDTO>docketInvoiceDetResponseDTO;

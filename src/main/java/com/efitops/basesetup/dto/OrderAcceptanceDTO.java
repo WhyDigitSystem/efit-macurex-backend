@@ -71,6 +71,8 @@ public class OrderAcceptanceDTO {
 	private String note;
 
 	private String gstApproval;
+	
+	private String invoiceType;
 
 	private List<OrderAcceptanceDetailsDTO> orderAcceptanceDetailsDTO;
 

@@ -20,7 +20,9 @@ public class OrderAcceptanceResponseDTO {
 	private LocalDate docDate;
 
 	private String orderNo;
-	
+
+	private String invoiceType;
+
 //	private String gstApproval;
 
 	private String belongsTo;
@@ -47,7 +49,7 @@ public class OrderAcceptanceResponseDTO {
 
 	private String createdBy;
 
-	private boolean active=true;
+	private boolean active = true;
 
 	private boolean cancel = false;
 
@@ -65,7 +67,7 @@ public class OrderAcceptanceResponseDTO {
 
 	private String modeOfTransport;
 
-	private BigDecimal grossalue;
+	private BigDecimal grossValue;
 
 	private String freight;
 

@@ -70,10 +70,10 @@ public class SalesOrderShortCloseVO {
 	private String cancelRemarks;
 
 	@Column(name = "screen_name")
-	private String screenName = "PurchaseShortClose";
+	private String screenName = "SALESORDERSHORTCLOSE";
 
 	@Column(name = "screen_code")
-	private String screenCode = "PSC";
+	private String screenCode = "SOS";
 
 	@Column(name = "org_id")
 	private Long orgId;

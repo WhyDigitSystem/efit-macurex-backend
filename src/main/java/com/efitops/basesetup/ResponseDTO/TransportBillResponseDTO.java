@@ -18,7 +18,7 @@ public class TransportBillResponseDTO {
     private BranchResponseDTO branch;
 
 //    private DocumentTypeResponseDTO documentType;
-    private String docNo;
+    private String docId;
     private LocalDate docDate;
 
     private TransportResponseDTO transportName;

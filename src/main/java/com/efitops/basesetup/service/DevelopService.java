@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
@@ -27,7 +29,6 @@ import com.efitops.basesetup.exception.ApplicationException;
 @Service
 public interface DevelopService {
 
-
 	EnquiryResponseDTO getEnquiryById(Long id) throws ApplicationException;
 
 	List<EnquiryResponseDTO> getEnquiryByOrgId(Long orgId, Long branchId) throws ApplicationException;
@@ -37,22 +38,16 @@ public interface DevelopService {
 //	ResponseEntity<byte[]> viewEnquiryAttachment(Long attachmentId) throws ApplicationException;
 
 	Map<String, Object> updateCreateEnquiry(EnquiryDTO enquiryDTO, MultipartFile[] files) throws ApplicationException;
-	
 
-	
-	//SALES RETURN
+	// SALES RETURN
 
 	Map<String, Object> createUpdateSalesReturn(SalesReturnDTO salesReturnDTO) throws ApplicationException;
 
-	SalesReturnResponseDTO getSalesReturnById(Long id)  throws ApplicationException;
+	SalesReturnResponseDTO getSalesReturnById(Long id) throws ApplicationException;
 
+	List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch) throws ApplicationException;
 
-	List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch)
-	        throws ApplicationException;
-	
-	
-	//salesorderamendment
-	
+	// salesorderamendment
 
 	Map<String, Object> createUpdateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
 			throws ApplicationException;
@@ -62,52 +57,39 @@ public interface DevelopService {
 	List<SalesOrderAmendmentResponseDTO> getSalesOrderAmendmentByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
 
-	
-	List<Map<String, Object>> getOrderAcceptanceBySalesOrderAmendment(
-	        Long orgId,
-	        Long branch)
-	        throws ApplicationException;
-	
+	List<Map<String, Object>> getOrderAcceptanceBySalesOrderAmendment(Long orgId, Long branch)
+			throws ApplicationException;
+
 //	Map<String, Object> getItemDropdownBySalesOrderAmendment(
 //	        Long salesContractId,
 //	        Long orgId,
 //	        Long branch)
 //	        throws ApplicationException;
 
-	List<Map<String, Object>> getOrderAcceptanceItemsWithAmendment(String docId, Long orgId, Long branch) throws ApplicationException;
+	List<Map<String, Object>> getOrderAcceptanceItemsWithAmendment(String docId, Long orgId, Long branch)
+			throws ApplicationException;
 
-	Integer getSalesOrderAmdRevisionNo(String salesOrderNo, Long item, Long orgId, Long branch) throws ApplicationException;
-	
-	
-//	Map<String, Object> createUpdatePurchaseContractAmendment(
-//	        PurchaseContractAmendmentDto purchaseContractAmendmentDto)
-//	        throws ApplicationException;
-//
-//	PurchaseContractAmendmentResponseDto getPurchaseContractAmendmentById(Long id) throws ApplicationException;
-//
-//	
-//	List<PurchaseContractAmendmentResponseDto> getPurchaseContractAmendmentByOrgId(Long orgId, Long branch)
-//			throws ApplicationException;
-//
-//	Map<String, Object> getPurchaseContractAmendmentContractNoDropdown(Long orgId, Long branch)
-//			throws ApplicationException;
-//	
-	
-	
+	Integer getSalesOrderAmdRevisionNo(String salesOrderNo, Long item, Long orgId, Long branch)
+			throws ApplicationException;
 
+	// PurchaseContractAmendment
 
-	
-	
-	
-	
-	
+	Map<String, Object> createUpdatePurchaseContractAmendment(PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+			MultipartFile[] files) throws ApplicationException;
 
-	
+	PurchaseContractAmendmentResponseDto getPurchaseContractAmendmentById(Long id) throws ApplicationException;
+
+	List<PurchaseContractAmendmentResponseDto> getPurchaseContractAmendmentByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<PurchaseContractAmendmentContractDropdownResponseDto> getContractNoDropdownforPurchaseContractAmendment(
+			Long orgId, Long branch) throws ApplicationException;
+
+	List<PurchaseContractAmendmentItemDropdownResponseDto> getItemDropdownForPurchaseContractAmendment(Long contractId)
+			throws ApplicationException;
+
+	Integer getPurchaseContractAmdRevisionNo(String contractNo, Long orgId, Long branch) throws ApplicationException;
+
+	String getEnquiryDocId(Long orgId, String financialYear, String screenCode);
+
 }
-	
-	
-	
-	
-	
-	
-

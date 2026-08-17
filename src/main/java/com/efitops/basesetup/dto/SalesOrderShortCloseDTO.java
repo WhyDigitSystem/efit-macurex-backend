@@ -2,8 +2,6 @@ package com.efitops.basesetup.dto;
 
 import java.util.List;
 
-import com.efitops.basesetup.entity.OrderAcceptanceVO;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,8 +14,6 @@ public class SalesOrderShortCloseDTO {
 	private Long id;
 
 	private Long customer;
-
-	private String docId;
 
 	private String createdBy;
 

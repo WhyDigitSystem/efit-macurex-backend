@@ -38,6 +38,7 @@ import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.QuotationIemFileUploadDetailsVO;
 import com.efitops.basesetup.entity.QuotationItemDetailsVO;
@@ -105,15 +106,12 @@ public class QuotationServiceImpl implements QuotationService {
 
 	@Autowired
 	CurrencyRepo currencyRepo;
-	
+
 	@Value("${server.base-url}")
 	private String serverBaseUrl;
 
-	
-
 	@Autowired
 	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
-	
 
 //	@Override
 //	public Map<String, Object> updateCreateQuotation(QuotationDTO quotationDTO) throws ApplicationException {
@@ -804,60 +802,70 @@ public class QuotationServiceImpl implements QuotationService {
 
 		return responseList;
 	}
-	
-	
+
 	@Override
 	@Transactional
-	public Map<String, Object> createUpdateQuotation(
-	        QuotationDTO quotationDTO,
-	        MultipartFile[] files) throws ApplicationException {
+	public Map<String, Object> createUpdateQuotation(QuotationDTO quotationDTO, MultipartFile[] files)
+			throws ApplicationException {
+		String screenCode = "QO";
 
-	    QuotationVO quotationVO;
-	    String message;
+		QuotationVO quotationVO;
+		String message;
 
-	    if (ObjectUtils.isNotEmpty(quotationDTO.getId())) {
+		if (ObjectUtils.isNotEmpty(quotationDTO.getId())) {
 
-	        quotationVO = quotationRepo.findById(quotationDTO.getId())
-	                .orElseThrow(() -> new ApplicationException("Quotation Not Found"));
+			quotationVO = quotationRepo.findById(quotationDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Quotation Not Found"));
 
-	        quotationVO.setUpdatedBy(quotationDTO.getCreatedBy());
+			quotationVO.setUpdatedBy(quotationDTO.getCreatedBy());
 
-	        message = "Quotation Updated Successfully";
+			message = "Quotation Updated Successfully";
 
-	    } else {
+		} else {
 
-	        quotationVO = new QuotationVO();
+			quotationVO = new QuotationVO();
 
-	        quotationVO.setCreatedBy(quotationDTO.getCreatedBy());
-	        quotationVO.setUpdatedBy(quotationDTO.getCreatedBy());
+			String docId = quotationRepo.getQuotationDocId(quotationDTO.getOrgId(), quotationDTO.getFinancialYear(),
+					screenCode);
 
-	        message = "Quotation Created Successfully";
-	    }
+			quotationVO.setDocId(docId);
 
-	    // Header + Child Mapping
-	    createUpdateQuotationVOByQuotationDTO(quotationDTO, quotationVO);
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(quotationDTO.getOrgId(), quotationDTO.getFinancialYear(),
+							screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
-	    // Save Header
-	    quotationVO = quotationRepo.save(quotationVO);
 
-	    // Save Attachments
-	    saveAttachments(files, quotationVO);
+			quotationVO.setCreatedBy(quotationDTO.getCreatedBy());
+			quotationVO.setUpdatedBy(quotationDTO.getCreatedBy());
 
-	    // Response
-	    QuotationResponseDTO responseDTO = buildQuotationResponse(quotationVO);
+			message = "Quotation Created Successfully";
+		}
 
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("message", message);
-	    response.put("quotationVO", responseDTO);
+		// Header + Child Mapping
+		createUpdateQuotationVOByQuotationDTO(quotationDTO, quotationVO);
 
-	    return response;
+		// Save Header
+		quotationVO = quotationRepo.save(quotationVO);
+
+		// Save Attachments
+		saveAttachments(files, quotationVO);
+
+		// Response
+		QuotationResponseDTO responseDTO = buildQuotationResponse(quotationVO);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("quotationVO", responseDTO);
+
+		return response;
 	}
-	
+
 	private void createUpdateQuotationVOByQuotationDTO(QuotationDTO quotationDTO, QuotationVO quotationVO)
 			throws ApplicationException {
 
 		quotationVO.setUserCategory(quotationDTO.getUserCategory());
-
 
 		if (quotationDTO.getCustomer() != null && quotationDTO.getCustomer() > 0) {
 
@@ -885,7 +893,6 @@ public class QuotationServiceImpl implements QuotationService {
 		quotationVO.setDate(quotationDTO.getDate());
 		quotationVO.setTotalAmount(quotationDTO.getTotalAmount());
 
-		
 		quotationVO.setKindAttention(quotationDTO.getKindAttention());
 
 		quotationVO.setCancelRemarks(quotationDTO.getCancelRemarks());
@@ -947,7 +954,6 @@ public class QuotationServiceImpl implements QuotationService {
 					itemVO.setCurrencyName(currency);
 				}
 
-
 				itemVO.setQtyOffered(dto.getQtyOffered());
 				itemVO.setBasicPrice(dto.getBasicPrice());
 				itemVO.setDiscountAmount(dto.getDiscountAmount());
@@ -956,7 +962,6 @@ public class QuotationServiceImpl implements QuotationService {
 
 				itemVO.setDiscountAmount(
 						dto.getBasicPrice().multiply(dto.getDiscountPercentage()).divide(BigDecimal.valueOf(100)));
-
 
 				itemVO.setQuotationAmount(dto.getQuotationAmount());
 
@@ -991,77 +996,71 @@ public class QuotationServiceImpl implements QuotationService {
 		quotationVO.setAmount(totalAmount);
 //		quotationVO.setQuotationIemFileUploadDetailsVO(fileList);
 	}
-	
+
 	@Value("${quotation.upload.path}")
 	private String uploadPath;
 
-	private void saveAttachments(MultipartFile[] files, QuotationVO quotationVO)
-	        throws ApplicationException {
+	private void saveAttachments(MultipartFile[] files, QuotationVO quotationVO) throws ApplicationException {
 
-	    if (files == null || files.length == 0) {
-	        return;
-	    }
+		if (files == null || files.length == 0) {
+			return;
+		}
 
-	    try {
+		try {
 
-	        File folder = new File(uploadPath);
+			File folder = new File(uploadPath);
 
-	        if (!folder.exists()) {
-	            folder.mkdirs();
-	        }
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
 
-	        List<QuotationIemFileUploadDetailsVO> attachmentList = new ArrayList<>();
+			List<QuotationIemFileUploadDetailsVO> attachmentList = new ArrayList<>();
 
-	        for (MultipartFile file : files) {
+			for (MultipartFile file : files) {
 
-	            if (file == null || file.isEmpty()) {
-	                continue;
-	            }
+				if (file == null || file.isEmpty()) {
+					continue;
+				}
 
-	            String originalFileName = file.getOriginalFilename();
+				String originalFileName = file.getOriginalFilename();
 
-	            String uniqueFileName =
-	                    UUID.randomUUID() + "_" + originalFileName;
+				String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
 
-	            Path path = Paths.get(uploadPath, uniqueFileName);
+				Path path = Paths.get(uploadPath, uniqueFileName);
 
-	            try (InputStream inputStream = file.getInputStream()) {
+				try (InputStream inputStream = file.getInputStream()) {
 
-	                Files.copy(inputStream,
-	                        path,
-	                        StandardCopyOption.REPLACE_EXISTING);
-	            }
+					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+				}
 
-	            QuotationIemFileUploadDetailsVO attachment =
-	                    new QuotationIemFileUploadDetailsVO();
+				QuotationIemFileUploadDetailsVO attachment = new QuotationIemFileUploadDetailsVO();
 
-	            attachment.setQuotationVO(quotationVO);
+				attachment.setQuotationVO(quotationVO);
 
-	            attachment.setName(originalFileName);
+				attachment.setName(originalFileName);
 
-	            attachment.setFileName(uniqueFileName);
+				attachment.setFileName(uniqueFileName);
 
-	            attachment.setFilePath(path.toString());
-	            
-	            attachment.setFileSize(file.getSize());
+				attachment.setFilePath(path.toString());
 
-	            attachment.setUploadOn(LocalDateTime.now());
+				attachment.setFileSize(file.getSize());
 
-	            attachmentList.add(attachment);
-	        }
+				attachment.setUploadOn(LocalDateTime.now());
 
-	        List<QuotationIemFileUploadDetailsVO> savedAttachments =
-	                quotationIemFileUploadDetailsRepo.saveAll(attachmentList);
+				attachmentList.add(attachment);
+			}
 
-	        quotationVO.setQuotationIemFileUploadDetailsVO(savedAttachments);
+			List<QuotationIemFileUploadDetailsVO> savedAttachments = quotationIemFileUploadDetailsRepo
+					.saveAll(attachmentList);
 
-	    } catch (IOException e) {
+			quotationVO.setQuotationIemFileUploadDetailsVO(savedAttachments);
 
-	        throw new ApplicationException(
-	                "File Upload Failed : " + e.getMessage());
-	    }
+		} catch (IOException e) {
+
+			throw new ApplicationException("File Upload Failed : " + e.getMessage());
+		}
 	}
-	
+
 	private QuotationResponseDTO buildQuotationResponse(QuotationVO quotationVO) {
 		QuotationResponseDTO responseDTO = new QuotationResponseDTO();
 
@@ -1099,7 +1098,7 @@ public class QuotationServiceImpl implements QuotationService {
 		responseDTO.setTerms(quotationVO.getTerms());
 		responseDTO.setRemarks(quotationVO.getRemarks());
 		responseDTO.setId(quotationVO.getId());
-		
+
 		responseDTO.setAmount(quotationVO.getAmount());
 		responseDTO.setDate(quotationVO.getDate());
 		responseDTO.setTotalAmount(quotationVO.getTotalAmount());
@@ -1139,27 +1138,25 @@ public class QuotationServiceImpl implements QuotationService {
 
 				if (itemVO.getItem() != null) {
 
-				    ItemMasterResponseDetailsDTO itemCodeDTO = new ItemMasterResponseDetailsDTO();
+					ItemMasterResponseDetailsDTO itemCodeDTO = new ItemMasterResponseDetailsDTO();
 
-				    itemCodeDTO.setId(itemVO.getItem().getId());
-				    itemCodeDTO.setItemCode(itemVO.getItem().getItemCode());
-				    itemCodeDTO.setItemDescription(itemVO.getItem().getItemDescription());
+					itemCodeDTO.setId(itemVO.getItem().getId());
+					itemCodeDTO.setItemCode(itemVO.getItem().getItemCode());
+					itemCodeDTO.setItemDescription(itemVO.getItem().getItemDescription());
 
-				    if (itemVO.getItem().getPrimaryUnit() != null) {
+					if (itemVO.getItem().getPrimaryUnit() != null) {
 
-				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
 
-				        unitDTO.setId(itemVO.getItem().getPrimaryUnit().getId());
-				        unitDTO.setUnitId(itemVO.getItem().getPrimaryUnit().getUnitId());
-				        unitDTO.setUnitDescription(itemVO.getItem().getPrimaryUnit().getDescription());
+						unitDTO.setId(itemVO.getItem().getPrimaryUnit().getId());
+						unitDTO.setUnitId(itemVO.getItem().getPrimaryUnit().getUnitId());
+						unitDTO.setUnitDescription(itemVO.getItem().getPrimaryUnit().getDescription());
 
-				        itemCodeDTO.setUnit(unitDTO);
-				    }
+						itemCodeDTO.setUnit(unitDTO);
+					}
 
-				    itemDTO.setItemCodes(itemCodeDTO);
+					itemDTO.setItemCodes(itemCodeDTO);
 				}
-
-				
 
 				// Currency
 				if (itemVO.getCurrencyName() != null) {
@@ -1170,7 +1167,6 @@ public class QuotationServiceImpl implements QuotationService {
 
 					itemDTO.setCurrency(currencyDTO);
 				}
-
 
 				itemDTO.setQtyOffered(itemVO.getQtyOffered());
 				itemDTO.setBasicPrice(itemVO.getBasicPrice());
@@ -1211,38 +1207,39 @@ public class QuotationServiceImpl implements QuotationService {
 
 		if (quotationVO.getQuotationIemFileUploadDetailsVO() != null) {
 
-		    for (QuotationIemFileUploadDetailsVO fileVO
-		            : quotationVO.getQuotationIemFileUploadDetailsVO()) {
+			for (QuotationIemFileUploadDetailsVO fileVO : quotationVO.getQuotationIemFileUploadDetailsVO()) {
 
-		        QuotationIemFileUploadDetailsDTO fileDTO =
-		                new QuotationIemFileUploadDetailsDTO();
+				QuotationIemFileUploadDetailsDTO fileDTO = new QuotationIemFileUploadDetailsDTO();
 
-		        fileDTO.setId(fileVO.getId());
+				fileDTO.setId(fileVO.getId());
 
-		        fileDTO.setName(fileVO.getName());
+				fileDTO.setName(fileVO.getName());
 
-		        fileDTO.setFileName(fileVO.getFileName());
-		        
-		        String urlPath = uploadPath
-		                .replace("C:/", "/")
-		                .replace("\\", "/");
+				fileDTO.setFileName(fileVO.getFileName());
 
-		        fileDTO.setFilePath(serverBaseUrl + urlPath + fileVO.getFileName());
-		        
-		        fileDTO.setFileSize(fileVO.getFileSize());
+				String urlPath = uploadPath.replace("C:/", "/").replace("\\", "/");
 
-		        fileDTO.setUploadOn(fileVO.getUploadOn());
+				fileDTO.setFilePath(serverBaseUrl + urlPath + fileVO.getFileName());
 
-		        quotationFileUploadList.add(fileDTO);
-		    }
+				fileDTO.setFileSize(fileVO.getFileSize());
+
+				fileDTO.setUploadOn(fileVO.getUploadOn());
+
+				quotationFileUploadList.add(fileDTO);
+			}
 		}
 
 		responseDTO.setQuotationIemFileUploadDetailsDTO(quotationFileUploadList);
 
 		return responseDTO;
 	}
+	
+	
+	@Override
+	public String getQuotationDocId(Long orgId, String financialYear, String screenCode) {
+		String screenCode1 = "QO";
+		String result = quotationRepo.getQuotationDocId(orgId, financialYear, screenCode1);
+		return result;
+	}
 
-	
-	
-	
 }

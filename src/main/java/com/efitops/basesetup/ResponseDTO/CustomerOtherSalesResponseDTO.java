@@ -13,5 +13,6 @@ private String customerName;
 private String customerCode;
 private String customerGstNo;
 private String gstApproval;
+private String state;
 
 }

@@ -1,6 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
 
@@ -22,18 +23,18 @@ public class PurchaseContractAmendmentResponseDto {
 	private String docId;
 	private LocalDate docDate;
 
-	private PurchaseContractAmendmentCustomerResponceDto party;
-
+	private PurchaseContractAmendmentCustomerResponceDto customer;
 	private String contractNo;
 	private LocalDate contractDate;
 
-	private Integer revisionNo;
+	private int revisionNo;
 
 	private String refNo;
 	private LocalDate refDate;
 
 	private String freightType;
 	private String packingType;
+	private double insuranceAmount;
 	private String modeOfDespatch;
 	private String taxDescription;
 	private String preparedBy;
@@ -49,6 +50,11 @@ public class PurchaseContractAmendmentResponseDto {
 
 	private String screenName;
 	private String screenCode;
+	
+	private List<PurchaseContractAmendmentDetailsResponseDto> details;
+	
+	
+	private List<PurchaseContractAmendmentAttachmentResponseDto> attachments;
 
 
 

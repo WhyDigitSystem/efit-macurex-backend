@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.Column;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +25,9 @@ public class OtherSalesInvoiceDTO {
 
 	private Long customer;
 
-	private Long diNo;
+	private String diNo;
+
+	private LocalDate diDate;
 
 	private String stockPosting;
 
@@ -76,7 +80,7 @@ public class OtherSalesInvoiceDTO {
 	private String financialYear;
 
 	private Long branch;
-	
+
 	private String isIgstApplicable;
 
 	private List<OtherSalesInvoiceDetailsDTO> otherSalesInvoiceDetailsDTO;

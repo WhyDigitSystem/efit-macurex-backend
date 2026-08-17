@@ -46,7 +46,7 @@ public interface OtherSalesInvoiceRepo extends JpaRepository<OtherSalesInvoiceVO
 			+ "    ON h.hsn_id = i.hsn_code\r\n"
 			+ "WHERE d.org_id = ?1\r\n"
 			+ "  AND d.branch = ?2\r\n"
-			+ "  AND d.despatch_basic_id = ?3\r\n"
+			+ "  AND d.doc_Id = ?3\r\n"
 			+ "\r\n"
 			+ "UNION ALL\r\n"
 			+ "\r\n"
@@ -71,10 +71,10 @@ public interface OtherSalesInvoiceRepo extends JpaRepository<OtherSalesInvoiceVO
 			+ "      FROM despatch_basic d\r\n"
 			+ "      WHERE d.org_id = ?1\r\n"
 			+ "        AND d.branch = ?2\r\n"
-			+ "        AND d.despatch_basic_id = ?3\r\n"
+			+ "        AND d.doc_Id = ?3\r\n"
 			+ "  )\r\n"
 			+ "ORDER BY item_code")
-	Set<Object[]> getItemDetailsBasedDesPatch(Long orgId, Long branch, Long despatch);
+	Set<Object[]> getItemDetailsBasedDesPatch(Long orgId, Long branch, String despatch);
 
 	
 	@Query(nativeQuery = true, value = "select ob.doc_id,ob.doc_date,ob.order_acceptance_basic_id as id\r\n"
@@ -86,5 +86,61 @@ public interface OtherSalesInvoiceRepo extends JpaRepository<OtherSalesInvoiceVO
 			+ "where p.customer_id =?1 and ob.cancel='F'\r\n"
 			+ "order by  2")
 	Set<Object[]> getSalesOrderNo(Long customer);
+	
+	@Query(nativeQuery = true, value = "select (od.order_amount/od.quantity) rate from order_acceptance_detail od,item i,\r\n"
+			+ "			order_acceptance_basic ob\r\n"
+			+ "			where OB.CANCEL=0  AND i.item_id = od.item\r\n"
+			+ "			and ob.order_acceptance_basic_id =?1\r\n"
+			+ "			and i.item_id =?2\r\n"
+			+ "			and ob.order_acceptance_basic_id not in (Select order_acceptance_basic_id from order_acceptance_basic)\r\n"
+			+ "			union\r\n"
+			+ "			select od.order_rate rate from sales_contract_detail od,item i,\r\n"
+			+ "			sales_contract_basic ob\r\n"
+			+ "			where OB.CANCEL=0  AND i.item_id = od.item\r\n"
+			+ "            and ob.salescontract_id=od.salescontract_id\r\n"
+			+ "			and ob.salescontract_id = ?1\r\n"
+			+ "			and i.item_id =?2\r\n"
+			+ "			and ob.doc_id not in (Select contract_no from sales_contract_amendment_basic)\r\n"
+			+ "            union\r\n"
+			+ "select x.new_rate from sales_contract_amendment_detail x,item i,sales_contract_amendment_basic y,sales_contract_basic o\r\n"
+			+ "where  x.sales_contract_amendment_basic_id=y.sales_contract_amendment_basic_id\r\n"
+			+ "and o.salescontract_id=y.contract_no\r\n"
+			+ "and y.cancel=0\r\n"
+			+ "and i.item_id=x.item\r\n"
+			+ "and o.salescontract_id=?1 \r\n"
+			+ "and i.item_id =?2 \r\n"
+			+ "and y.revision_no = (select max(revision_no) from sales_contract_amendment_detail x,item i,sales_contract_amendment_basic \r\n"
+			+ "y,sales_contract_basic o\r\n"
+			+ "where x.sales_contract_amendment_basic_id=y.sales_contract_amendment_basic_id\r\n"
+			+ "and o.salescontract_id=y.contract_no\r\n"
+			+ "and y.cancel='F'\r\n"
+			+ "and i.item_id=x.item\r\n"
+			+ "and o.salescontract_id =?1 and i.item_id =?2)\r\n"
+			+ "union\r\n"
+			+ "select x.new_rate from sales_order_amendment_detail x,item i,sales_order_amendment_basic y,order_acceptance_basic \r\n"
+			+ "o\r\n"
+			+ "where x.sales_order_amendment_id=y.sales_order_amendment_id\r\n"
+			+ "and o.doc_id=y.salesorder_no\r\n"
+			+ "and y.cancel='F'\r\n"
+			+ "and i.item_id=x.item\r\n"
+			+ "and o.order_acceptance_basic_id  = ?1\r\n"
+			+ "and i.item_id = ?2\r\n"
+			+ "and y.revision_no = (select max(revision_no) from sales_order_amendment_detail x,item i,sales_order_amendment_basic \r\n"
+			+ "y,order_acceptance_basic o\r\n"
+			+ "where x.sales_order_amendment_id=y.sales_order_amendment_id\r\n"
+			+ "and o.doc_id=y.salesorder_no\r\n"
+			+ "and y.cancel='F'\r\n"
+			+ "and i.item_id=x.item\r\n"
+			+ "and o.order_acceptance_basic_id= ?1 \r\n"
+			+ "and i.item_id = ?2)")
+	Set<Object[]> getOrderAmount(Long id,Long item);
+
+	
+	@Query(nativeQuery = true, value = "select c.customer_id,c.customer_name,c.customer_code,c.is_registered,c.gst_no from customer_header c where c.org_id=?1 and c.branch=?2\r\n"
+			+ "and customer_code=?3 and c.active=1 and c.cancel=0 group by c.customer_id,c.customer_name,c.customer_code,c.is_registered,c.gst_no")
+	Set<Object[]> getCustometDetailsFromParty(Long orgId, Long branch, String customerCode);
+	
+	@Query(nativeQuery = true, value = "select despatch_basic_id,doc_id,doc_date from despatch_basic  where  org_id=?1 and  custumer= ?2  group by despatch_basic_id,doc_id,doc_date")
+	Set<Object[]> getCustometDetailsFromDespatch(Long orgId, Long customer);
 
 }

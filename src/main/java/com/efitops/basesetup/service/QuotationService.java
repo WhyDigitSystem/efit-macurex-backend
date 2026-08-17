@@ -30,4 +30,6 @@ public interface QuotationService {
 
 	Map<String, Object> createUpdateQuotation(QuotationDTO quotationDTO, MultipartFile[] files) throws ApplicationException;
 
+	String getQuotationDocId(Long orgId, String financialYear, String screenCode);
+
 }

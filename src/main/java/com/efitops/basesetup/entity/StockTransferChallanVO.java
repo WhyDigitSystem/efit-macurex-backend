@@ -42,7 +42,7 @@ public class StockTransferChallanVO {
 	private String docID;
 	
 	@Column(name = "doc_date")
-	private LocalDate docDate;
+	private LocalDate docDate=LocalDate.now();
 	
 	@ManyToOne
 	@JoinColumn(name = "branch")
@@ -50,8 +50,8 @@ public class StockTransferChallanVO {
 	
 	
 	@ManyToOne
-	@JoinColumn(name = "listofvalues_id")
-	private ListOfValuesVO types;
+	@JoinColumn(name = "types")
+	private ListOfValuesDetailsVO types;
 	
 	@ManyToOne
 	@JoinColumn(name = "customer")
@@ -94,17 +94,17 @@ public class StockTransferChallanVO {
 	private String cancelRemarks;
 	
 	@Column(name = "total_insurance")
-	private Double totalInsurance;
+	private double totalInsurance;
 	@Column(name = "total_freight")
-	private Double totalFreight;
+	private double totalFreight;
 	@Column(name = "total_ass_val")
-	private Double totalAssVal;
+	private double totalAssVal;
 	@Column(name = "mode_of_transport")
 	private String modeOfTransport;
 	@Column(name = "sales_tax")
 	private String salesTax;
 	@Column(name = "gross_amount")
-	private Double grossAmount;
+	private double grossAmount;
 	@Column(name = "amount_in_words")
 	private String amountInWords;
 	@Column(name = "delivery_to")

@@ -145,10 +145,13 @@ public class OrderAcceptanceVO {
 	private String modeOfTransport;
 
 	@Column(name = "gross_value", precision = 10, scale = 2)
-	private BigDecimal grossalue;
+	private BigDecimal grossValue;
 
 	@Column(name = "freight")
 	private String freight;
+	
+	@Column(name = "invoice_type")
+	private String invoiceType;
 
 	@Column(name = "delivery_terms")
 	private String deliveryTerms;

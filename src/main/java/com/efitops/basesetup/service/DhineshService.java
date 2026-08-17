@@ -30,4 +30,6 @@ public interface DhineshService {
 
 	List<SalesContractResponseDTO> getSalesContractByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
 
+	String getSalesContractDocId(Long orgId, String financialYear, String screenCode);
+
 }

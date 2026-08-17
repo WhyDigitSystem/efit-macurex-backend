@@ -30,7 +30,7 @@ public class PurchaseContractAmendmentDetailsVO {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "pcamddetail_seq")
     @SequenceGenerator(name = "pcamddetail_seq",
-            sequenceName = "pcamddetail_seq",
+            sequenceName = "pcamddetail_seq",initialValue = 1000000001,
             allocationSize = 1)
     @Column(name = "pcamddetail_id")
     private Long id;
@@ -39,8 +39,7 @@ public class PurchaseContractAmendmentDetailsVO {
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "pcamdbasic_id")
-
-    private PurchaseContractAmendmentVO purchaseContractAmendment;
+    private PurchaseContractAmendmentVO purchaseContractAmendmentVO;
     // Item Code (Normalized with Item Master)
     @ManyToOne
     @JoinColumn(name = "item")

@@ -44,6 +44,7 @@ import com.efitops.basesetup.dto.SalesContractDetailsDTO;
 import com.efitops.basesetup.dto.SalesContractTaxDetailsDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
@@ -55,6 +56,7 @@ import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
+import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.GstRateMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
@@ -105,10 +107,14 @@ public class DhineshServiceImpl implements DhineshService {
 	@Autowired
 	SalesContractTaxDetailsRepo salesContractTaxDetailsRepo;
 
+	@Autowired
+	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
+
 	@Override
 	@Transactional
 	public Map<String, Object> createUpdateSalesContract(SalesContractDTO dto, MultipartFile[] files)
 			throws ApplicationException {
+		String screenCode = "SAC";
 
 		Map<String, Object> response = new HashMap<>();
 
@@ -118,6 +124,15 @@ public class DhineshServiceImpl implements DhineshService {
 		if (ObjectUtils.isEmpty(dto.getId())) {
 
 			salesContractVO = new SalesContractVO();
+
+			String docId = salesContractRepo.getSalesContractDocId(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+
+			salesContractVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			salesContractVO.setCreatedBy(dto.getCreatedBy());
 			salesContractVO.setUpdatedBy(dto.getCreatedBy());
@@ -132,41 +147,38 @@ public class DhineshServiceImpl implements DhineshService {
 			// Delete old details
 //			salesContractDetailsRepo.deleteAll(salesContractDetailsRepo.findBySalesContract(salesContractVO));
 			// Delete existing child records from DB
-			salesContractDetailsRepo.deleteAll(
-			        salesContractDetailsRepo.findBySalesContract(salesContractVO));
+			salesContractDetailsRepo.deleteAll(salesContractDetailsRepo.findBySalesContract(salesContractVO));
 
-			salesContractTaxDetailsRepo.deleteAll(
-			        salesContractTaxDetailsRepo.findBySalesContract(salesContractVO));
+			salesContractTaxDetailsRepo.deleteAll(salesContractTaxDetailsRepo.findBySalesContract(salesContractVO));
 
-			salesContractAttachRepo.deleteAll(
-			        salesContractAttachRepo.findBySalesContract(salesContractVO));
+			salesContractAttachRepo.deleteAll(salesContractAttachRepo.findBySalesContract(salesContractVO));
 
 //			salesContractVO.getSalesContractDetailsVO().clear();
 //			salesContractVO.getSalesContractTaxDetails().clear();
 //			salesContractVO.getAttachments().clear();
 
 			// Clear managed collections
-			
+
 			// Delete physical files only if a new file is uploaded
 			if (files != null && files.length > 0 && files[0] != null && !files[0].isEmpty()) {
 
-			    for (SalesContractAttachVO attach : salesContractVO.getAttachments()) {
+				for (SalesContractAttachVO attach : salesContractVO.getAttachments()) {
 
-			        if (attach.getPdfAttached() != null) {
+					if (attach.getPdfAttached() != null) {
 
-			            File oldFile = new File(attach.getPdfAttached());
+						File oldFile = new File(attach.getPdfAttached());
 
-			            if (oldFile.exists()) {
-			                oldFile.delete();
-			            }
-			        }
-			    }
+						if (oldFile.exists()) {
+							oldFile.delete();
+						}
+					}
+				}
 
-			    // Delete attachment records
-			    salesContractAttachRepo.deleteAll(salesContractVO.getAttachments());
+				// Delete attachment records
+				salesContractAttachRepo.deleteAll(salesContractVO.getAttachments());
 
-			    // Clear parent collection
-			    salesContractVO.getAttachments().clear();
+				// Clear parent collection
+				salesContractVO.getAttachments().clear();
 			}
 			salesContractVO.getSalesContractDetailsVO().clear();
 			salesContractVO.getSalesContractTaxDetails().clear();
@@ -185,7 +197,7 @@ public class DhineshServiceImpl implements DhineshService {
 		saveAttachments(files, salesContractVO);
 
 		salesContractVO = salesContractRepo.findById(salesContractVO.getId())
-		        .orElseThrow(() -> new ApplicationException("Sales Contract Not Found"));
+				.orElseThrow(() -> new ApplicationException("Sales Contract Not Found"));
 
 		SalesContractResponseDTO responseDTO = convertToResponse(salesContractVO);
 
@@ -349,8 +361,8 @@ public class DhineshServiceImpl implements DhineshService {
 		salesContractVO.getSalesContractDetailsVO().clear();
 
 		for (SalesContractDetailsVO detail : detailList) {
-		    detail.setSalesContract(salesContractVO);
-		    salesContractVO.getSalesContractDetailsVO().add(detail);
+			detail.setSalesContract(salesContractVO);
+			salesContractVO.getSalesContractDetailsVO().add(detail);
 		}
 
 		// ================= TAX DETAILS =================
@@ -379,49 +391,48 @@ public class DhineshServiceImpl implements DhineshService {
 		salesContractVO.setSalesContractTaxDetails(taxDetailList);
 	}
 
-	private void saveAttachments(MultipartFile[] files, SalesContractVO salesContractVO)
-	        throws ApplicationException {
+	private void saveAttachments(MultipartFile[] files, SalesContractVO salesContractVO) throws ApplicationException {
 
-	    if (files == null || files.length == 0) {
-	        return;
-	    }
+		if (files == null || files.length == 0) {
+			return;
+		}
 
-	    try {
+		try {
 
-	        File folder = new File(uploadPath);
+			File folder = new File(uploadPath);
 
-	        if (!folder.exists()) {
-	            folder.mkdirs();
-	        }
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
 
-	        for (MultipartFile file : files) {
+			for (MultipartFile file : files) {
 
-	            if (file == null || file.isEmpty()) {
-	                continue;
-	            }
+				if (file == null || file.isEmpty()) {
+					continue;
+				}
 
-	            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+				String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-	            Path path = Paths.get(uploadPath, fileName);
+				Path path = Paths.get(uploadPath, fileName);
 
-	            // Copy file and automatically close InputStream
-	            try (InputStream inputStream = file.getInputStream()) {
-	                Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-	            }
+				// Copy file and automatically close InputStream
+				try (InputStream inputStream = file.getInputStream()) {
+					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+				}
 
-	            SalesContractAttachVO attach = new SalesContractAttachVO();
-	            attach.setSalesContract(salesContractVO);
-	            attach.setPdfAttached(path.toString());
+				SalesContractAttachVO attach = new SalesContractAttachVO();
+				attach.setSalesContract(salesContractVO);
+				attach.setPdfAttached(path.toString());
 
-	            salesContractVO.getAttachments().add(attach);
-	        }
+				salesContractVO.getAttachments().add(attach);
+			}
 
-	        salesContractRepo.saveAndFlush(salesContractVO);
+			salesContractRepo.saveAndFlush(salesContractVO);
 
-	    } catch (IOException e) {
-	        throw new ApplicationException("File upload failed : " + e.getMessage(), e);
-	    }
-	
+		} catch (IOException e) {
+			throw new ApplicationException("File upload failed : " + e.getMessage(), e);
+		}
+
 	}
 
 	private SalesContractResponseDTO convertToResponse(SalesContractVO vo) {
@@ -666,11 +677,10 @@ public class DhineshServiceImpl implements DhineshService {
 			dto.setQuotationNo(obj[1] != null ? obj[1].toString() : null);
 
 			dto.setQuotationDate(obj[2] != null ? ((java.sql.Date) obj[2]).toLocalDate() : null);
-			
-			dto.setEnquiryNo(obj[3] != null ? obj[3].toString() : null);
-			
-			dto.setEnquiryDate(obj[4] != null ? ((java.sql.Date) obj[4]).toLocalDate() : null);
 
+			dto.setEnquiryNo(obj[3] != null ? obj[3].toString() : null);
+
+			dto.setEnquiryDate(obj[4] != null ? ((java.sql.Date) obj[4]).toLocalDate() : null);
 
 			responseList.add(dto);
 		}
@@ -745,33 +755,36 @@ public class DhineshServiceImpl implements DhineshService {
 
 		return responseList;
 	}
-	
+
 	@Override
-	public SalesContractResponseDTO getSalesContractById(Long id)
-	        throws ApplicationException {
+	public SalesContractResponseDTO getSalesContractById(Long id) throws ApplicationException {
 
-	    SalesContractVO salesContractVO = salesContractRepo.findById(id)
-	            .orElseThrow(() -> new ApplicationException("Sales Contract Not Found"));
+		SalesContractVO salesContractVO = salesContractRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Sales Contract Not Found"));
 
-	    return convertToResponse(salesContractVO);
+		return convertToResponse(salesContractVO);
 	}
-	
+
 	@Override
-	public List<SalesContractResponseDTO> getSalesContractByOrgIdAndBranch(
-	        Long orgId,
-	        Long branch)
-	        throws ApplicationException {
+	public List<SalesContractResponseDTO> getSalesContractByOrgIdAndBranch(Long orgId, Long branch)
+			throws ApplicationException {
 
-	    List<SalesContractVO> salesContracts =
-	            salesContractRepo.findByOrgIdAndBranch(orgId, branch);
+		List<SalesContractVO> salesContracts = salesContractRepo.findByOrgIdAndBranch(orgId, branch);
 
-	    List<SalesContractResponseDTO> responseList = new ArrayList<>();
+		List<SalesContractResponseDTO> responseList = new ArrayList<>();
 
-	    for (SalesContractVO vo : salesContracts) {
-	        responseList.add(convertToResponse(vo));
-	    }
+		for (SalesContractVO vo : salesContracts) {
+			responseList.add(convertToResponse(vo));
+		}
 
-	    return responseList;
+		return responseList;
+	}
+
+	@Override
+	public String getSalesContractDocId(Long orgId, String financialYear, String screenCode) {
+		String screenCode1 = "SAC";
+		String result = salesContractRepo.getSalesContractDocId(orgId, financialYear, screenCode1);
+		return result;
 	}
 
 }

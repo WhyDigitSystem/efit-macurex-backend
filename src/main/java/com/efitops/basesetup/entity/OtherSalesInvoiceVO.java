@@ -60,9 +60,12 @@ public class OtherSalesInvoiceVO {
 	@JoinColumn(name = "customer")
 	private CustomerVO customer;
 
-	@ManyToOne
-	@JoinColumn(name = "di_no")
-	private DespatchInstructionVO diNo;
+	
+	@Column(name = "di_no")
+	private String diNo;
+	
+	@Column(name = "di_date")
+	private LocalDate diDate;
 
 	@Column(name = "stock_posting")
 	private String stockPosting;

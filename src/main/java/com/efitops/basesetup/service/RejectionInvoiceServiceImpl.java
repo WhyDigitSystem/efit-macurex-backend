@@ -15,19 +15,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.efitops.basesetup.ResponseDTO.BankResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerOtherSalesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchInstructionResponseDocIdDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProformaInvoiceDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProformaInvoiceResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProformaInvoiceTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.RejectionInvoiceDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.RejectionInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.RejectionInvoiceTaxDetailsResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
+import com.efitops.basesetup.dto.ProformaInvoiceDTO;
+import com.efitops.basesetup.dto.ProformaInvoiceDetailsDTO;
+import com.efitops.basesetup.dto.ProformaInvoiceTaxDetailsDTO;
 import com.efitops.basesetup.dto.RejectionInvoiceDTO;
 import com.efitops.basesetup.dto.RejectionInvoiceDetailsDTO;
 import com.efitops.basesetup.dto.RejectionInvoiceTaxDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
+import com.efitops.basesetup.entity.BankDetailsVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
@@ -35,10 +43,14 @@ import com.efitops.basesetup.entity.DespatchInstructionVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.ProformaInvoiceDetailsVO;
+import com.efitops.basesetup.entity.ProformaInvoiceTaxDetailsVO;
+import com.efitops.basesetup.entity.ProformaInvoiceVO;
 import com.efitops.basesetup.entity.RejectionInvoiceDetailsVO;
 import com.efitops.basesetup.entity.RejectionInvoiceTaxDetailsVO;
 import com.efitops.basesetup.entity.RejectionInvoiceVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.BankDetailsRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
@@ -46,6 +58,9 @@ import com.efitops.basesetup.repository.DespatchInstructionRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.ProformaInvoiceDetailsRepo;
+import com.efitops.basesetup.repository.ProformaInvoiceRepo;
+import com.efitops.basesetup.repository.ProformaInvoiceTaxDetailsRepo;
 import com.efitops.basesetup.repository.RejectionInvoiceDetailsRepo;
 import com.efitops.basesetup.repository.RejectionInvoiceRepo;
 import com.efitops.basesetup.repository.RejectionInvoiceTaxDetailsRepo;
@@ -54,458 +69,462 @@ import com.efitops.basesetup.repository.SalesOrderShortCloseRepo;
 @Service
 public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(RejectionInvoiceServiceImpl.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(RejectionInvoiceServiceImpl.class);
 
-    @Autowired
-    RejectionInvoiceRepo rejectionInvoiceRepo;
+	@Autowired
+	RejectionInvoiceRepo rejectionInvoiceRepo;
 
-    @Autowired
-    RejectionInvoiceTaxDetailsRepo rejectionInvoiceTaxDetailsRepo;
+	@Autowired
+	RejectionInvoiceTaxDetailsRepo rejectionInvoiceTaxDetailsRepo;
 
-    @Autowired
-    RejectionInvoiceDetailsRepo rejectionInvoiceDetailsRepo;
+	@Autowired
+	RejectionInvoiceDetailsRepo rejectionInvoiceDetailsRepo;
 
-    @Autowired
-    BranchRepo branchRepo;
+	@Autowired
+	BranchRepo branchRepo;
 
-    @Autowired
-    LocationRepo locationRepo;
+	@Autowired
+	LocationRepo locationRepo;
 
-    @Autowired
-    CustomerRepo customerRepo;
+	@Autowired
+	CustomerRepo customerRepo;
 
-    @Autowired
-    ItemMasterRepo itemMasterRepo;
+	@Autowired
+	ItemMasterRepo itemMasterRepo;
 
-    @Autowired
-    CurrencyRepo currencyRepo;
+	@Autowired
+	CurrencyRepo currencyRepo;
 
-    @Autowired
-    DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
+	@Autowired
+	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
 
-    @Autowired
-    SalesOrderShortCloseRepo salesOrderShortCloseRepo;
+	@Autowired
+	SalesOrderShortCloseRepo salesOrderShortCloseRepo;
 
-    @Autowired
-    DespatchInstructionRepo despatchInstructionRepo;
+	@Autowired
+	DespatchInstructionRepo despatchInstructionRepo;
 
-    @Autowired
-    AmountInWordsConverterService amountInWordsConverterService;
+	@Autowired
+	AmountInWordsConverterService amountInWordsConverterService;
 
-    @Override
-    public RejectionInvoiceResponseDTO getRejectionInvoiceById(Long id) throws ApplicationException {
+	@Autowired
+	ProformaInvoiceRepo proformaInvoiceRepo;
 
-        RejectionInvoiceVO rejectionInvoiceVO = rejectionInvoiceRepo.getRejectionInvoiceById(id);
+	@Autowired
+	ProformaInvoiceTaxDetailsRepo proformaInvoiceTaxDetailsRepo;
 
-        if (rejectionInvoiceVO == null) {
-            throw new ApplicationException("Rejection Invoice Not Found");
-        }
+	@Autowired
+	ProformaInvoiceDetailsRepo proformaInvoiceDetailsRepo;
 
-        return buildRejectionInvoiceResponse(rejectionInvoiceVO);
-    }
+	@Autowired
+	BankDetailsRepo bankDetailsRepo;
 
-    @Override
-    public List<RejectionInvoiceResponseDTO> getRejectionInvoiceByOrgId(Long orgId, Long branch)
-            throws ApplicationException {
+	@Override
+	public RejectionInvoiceResponseDTO getRejectionInvoiceById(Long id) throws ApplicationException {
 
-        List<RejectionInvoiceVO> quotationList = rejectionInvoiceRepo.getRejectionInvoiceByOrgId(orgId, branch);
+		RejectionInvoiceVO rejectionInvoiceVO = rejectionInvoiceRepo.getRejectionInvoiceById(id);
 
-        if (quotationList == null || quotationList.isEmpty()) {
-            throw new ApplicationException("Rejection Invoice Not Found");
-        }
+		if (rejectionInvoiceVO == null) {
+			throw new ApplicationException("Rejection Invoice Not Found");
+		}
 
-        List<RejectionInvoiceResponseDTO> responseList = new ArrayList<>();
+		return buildRejectionInvoiceResponse(rejectionInvoiceVO);
+	}
 
-        for (RejectionInvoiceVO rejectionInvoiceVO : quotationList) {
-            responseList.add(buildRejectionInvoiceResponse(rejectionInvoiceVO));
-        }
+	@Override
+	public List<RejectionInvoiceResponseDTO> getRejectionInvoiceByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
 
-        return responseList;
-    }
+		List<RejectionInvoiceVO> quotationList = rejectionInvoiceRepo.getRejectionInvoiceByOrgId(orgId, branch);
 
-    @Override
-    @Transactional
-    public Map<String, Object> createUpdateRejectionInvoice(RejectionInvoiceDTO rejectionInvoiceDTO)
-            throws ApplicationException {
-        String screenCode = "RI"; 
-        RejectionInvoiceVO rejectionInvoiceVO = new RejectionInvoiceVO();
-        String message;
+		if (quotationList == null || quotationList.isEmpty()) {
+			throw new ApplicationException("Rejection Invoice Not Found");
+		}
 
-        if (ObjectUtils.isNotEmpty(rejectionInvoiceDTO.getId())) {
+		List<RejectionInvoiceResponseDTO> responseList = new ArrayList<>();
 
-            rejectionInvoiceVO = rejectionInvoiceRepo.findById(rejectionInvoiceDTO.getId())
-                    .orElseThrow(() -> new ApplicationException("Rejection Invoice Not Found"));
+		for (RejectionInvoiceVO rejectionInvoiceVO : quotationList) {
+			responseList.add(buildRejectionInvoiceResponse(rejectionInvoiceVO));
+		}
 
-            rejectionInvoiceVO.setUpdatedBy(rejectionInvoiceDTO.getCreatedBy());
+		return responseList;
+	}
 
-            message = "Rejection Invoice Updated Successfully";
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateRejectionInvoice(RejectionInvoiceDTO rejectionInvoiceDTO)
+			throws ApplicationException {
+		String screenCode = "RI";
+		RejectionInvoiceVO rejectionInvoiceVO = new RejectionInvoiceVO();
+		String message;
 
-        } else {
+		if (ObjectUtils.isNotEmpty(rejectionInvoiceDTO.getId())) {
 
-            String docId = rejectionInvoiceRepo.getRejectionInvoiceDocId(rejectionInvoiceDTO.getOrgId(), screenCode);
+			rejectionInvoiceVO = rejectionInvoiceRepo.findById(rejectionInvoiceDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Rejection Invoice Not Found"));
 
-            rejectionInvoiceVO.setDocId(docId);
+			rejectionInvoiceVO.setUpdatedBy(rejectionInvoiceDTO.getCreatedBy());
 
-            DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-                    .findByOrgIdScreenCode(rejectionInvoiceDTO.getOrgId(), screenCode);
-            documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-            documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			message = "Rejection Invoice Updated Successfully";
 
-            rejectionInvoiceVO.setCreatedBy(rejectionInvoiceDTO.getCreatedBy());
-            rejectionInvoiceVO.setUpdatedBy(rejectionInvoiceDTO.getCreatedBy());
+		} else {
 
-            message = "Rejection Invoice Created Successfully";
-        }
+			String docId = rejectionInvoiceRepo.getRejectionInvoiceDocId(rejectionInvoiceDTO.getOrgId(), screenCode);
 
-        createUpdateRejectionInvoiceVOByRejectionInvoiceDTO(rejectionInvoiceDTO, rejectionInvoiceVO);
+			rejectionInvoiceVO.setDocId(docId);
 
-        rejectionInvoiceVO = rejectionInvoiceRepo.save(rejectionInvoiceVO);
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdScreenCode(rejectionInvoiceDTO.getOrgId(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
-        RejectionInvoiceResponseDTO responseDTO = buildRejectionInvoiceResponse(rejectionInvoiceVO);
+			rejectionInvoiceVO.setCreatedBy(rejectionInvoiceDTO.getCreatedBy());
+			rejectionInvoiceVO.setUpdatedBy(rejectionInvoiceDTO.getCreatedBy());
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", message);
-        response.put("rejectionInvoiceVO", responseDTO);
+			message = "Rejection Invoice Created Successfully";
+		}
 
-        return response;
-    }
+		createUpdateRejectionInvoiceVOByRejectionInvoiceDTO(rejectionInvoiceDTO, rejectionInvoiceVO);
 
-    private void createUpdateRejectionInvoiceVOByRejectionInvoiceDTO(RejectionInvoiceDTO rejectionInvoiceDTO,
-            RejectionInvoiceVO rejectionInvoiceVO) throws ApplicationException {
+		rejectionInvoiceVO = rejectionInvoiceRepo.save(rejectionInvoiceVO);
 
-        rejectionInvoiceVO.setBelongsTo(rejectionInvoiceDTO.getBelongsTo());
+		RejectionInvoiceResponseDTO responseDTO = buildRejectionInvoiceResponse(rejectionInvoiceVO);
 
-        if (rejectionInvoiceDTO.getCustomer() != null && rejectionInvoiceDTO.getCustomer() != 0) {
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("rejectionInvoiceVO", responseDTO);
 
-            CustomerVO customer = customerRepo.findById(rejectionInvoiceDTO.getCustomer())
-                    .orElseThrow(() -> new ApplicationException("Party Not Found"));
+		return response;
+	}
 
-            rejectionInvoiceVO.setCustomer(customer);
-        }
+	private void createUpdateRejectionInvoiceVOByRejectionInvoiceDTO(RejectionInvoiceDTO rejectionInvoiceDTO,
+			RejectionInvoiceVO rejectionInvoiceVO) throws ApplicationException {
 
-        rejectionInvoiceVO.setId(rejectionInvoiceDTO.getId());
+		rejectionInvoiceVO.setBelongsTo(rejectionInvoiceDTO.getBelongsTo());
 
-        rejectionInvoiceVO.setMonthYear(rejectionInvoiceDTO.getMonthYear());
+		if (rejectionInvoiceDTO.getCustomer() != null && rejectionInvoiceDTO.getCustomer() != 0) {
 
-        rejectionInvoiceVO.setBelongsTo(rejectionInvoiceDTO.getBelongsTo());
+			CustomerVO customer = customerRepo.findById(rejectionInvoiceDTO.getCustomer())
+					.orElseThrow(() -> new ApplicationException("Party Not Found"));
 
-        rejectionInvoiceVO.setDocType(rejectionInvoiceDTO.getDocType());
+			rejectionInvoiceVO.setCustomer(customer);
+		}
 
-        rejectionInvoiceVO.setStockPosting(rejectionInvoiceDTO.getStockPosting());
+		rejectionInvoiceVO.setId(rejectionInvoiceDTO.getId());
 
-        rejectionInvoiceVO.setExcisable(rejectionInvoiceDTO.getExcisable());
+		rejectionInvoiceVO.setMonthYear(rejectionInvoiceDTO.getMonthYear());
 
-        rejectionInvoiceVO.setVehicle(rejectionInvoiceDTO.getVehicle());
+		rejectionInvoiceVO.setBelongsTo(rejectionInvoiceDTO.getBelongsTo());
 
-        rejectionInvoiceVO.setKanbanCardNo(rejectionInvoiceDTO.getKanbanCardNo());
+		rejectionInvoiceVO.setDocType(rejectionInvoiceDTO.getDocType());
 
-        rejectionInvoiceVO.setInvoiceType(rejectionInvoiceDTO.getInvoiceType());
+		rejectionInvoiceVO.setStockPosting(rejectionInvoiceDTO.getStockPosting());
 
-        rejectionInvoiceVO.setSchNo(rejectionInvoiceDTO.getSchNo());
+		rejectionInvoiceVO.setExcisable(rejectionInvoiceDTO.getExcisable());
 
-        rejectionInvoiceVO.setSchDate(rejectionInvoiceDTO.getSchDate());
+		rejectionInvoiceVO.setVehicle(rejectionInvoiceDTO.getVehicle());
 
-        rejectionInvoiceVO.setExchangeRate(rejectionInvoiceDTO.getExchangeRate());
+		rejectionInvoiceVO.setKanbanCardNo(rejectionInvoiceDTO.getKanbanCardNo());
 
-        rejectionInvoiceVO.setTotalInsurance(rejectionInvoiceDTO.getTotalInsurance());
+		rejectionInvoiceVO.setInvoiceType(rejectionInvoiceDTO.getInvoiceType());
 
-        rejectionInvoiceVO.setTotalFreight(rejectionInvoiceDTO.getTotalFreight());
+		rejectionInvoiceVO.setSchNo(rejectionInvoiceDTO.getSchNo());
 
-        rejectionInvoiceVO.setModeOfTransport(rejectionInvoiceDTO.getModeOfTransport());
+		rejectionInvoiceVO.setSchDate(rejectionInvoiceDTO.getSchDate());
 
-        rejectionInvoiceVO.setDeliveryTo(rejectionInvoiceDTO.getDeliveryTo());
+		rejectionInvoiceVO.setExchangeRate(rejectionInvoiceDTO.getExchangeRate());
 
-        rejectionInvoiceVO.setPaymentTerms(rejectionInvoiceDTO.getPaymentTerms());
+		rejectionInvoiceVO.setTotalInsurance(rejectionInvoiceDTO.getTotalInsurance());
 
-        rejectionInvoiceVO.setPurchaseOrder(rejectionInvoiceDTO.getPurchaseOrder());
+		rejectionInvoiceVO.setTotalFreight(rejectionInvoiceDTO.getTotalFreight());
 
-        rejectionInvoiceVO.setPurchaseOrderDate(rejectionInvoiceDTO.getPurchaseOrderDate());
+		rejectionInvoiceVO.setModeOfTransport(rejectionInvoiceDTO.getModeOfTransport());
 
-        rejectionInvoiceVO.setActive(rejectionInvoiceDTO.isActive());
+		rejectionInvoiceVO.setDeliveryTo(rejectionInvoiceDTO.getDeliveryTo());
 
-        rejectionInvoiceVO.setCancelRemarks(rejectionInvoiceDTO.getCancelRemarks());
+		rejectionInvoiceVO.setPaymentTerms(rejectionInvoiceDTO.getPaymentTerms());
 
-        rejectionInvoiceVO.setOrgId(rejectionInvoiceDTO.getOrgId());
+		rejectionInvoiceVO.setPurchaseOrder(rejectionInvoiceDTO.getPurchaseOrder());
 
-        rejectionInvoiceVO.setFinancialYear(rejectionInvoiceDTO.getFinancialYear());
+		rejectionInvoiceVO.setPurchaseOrderDate(rejectionInvoiceDTO.getPurchaseOrderDate());
 
-        rejectionInvoiceVO.setIsIgstApplicable(rejectionInvoiceDTO.getIsIgstApplicable());
+		rejectionInvoiceVO.setActive(rejectionInvoiceDTO.isActive());
 
-//        rejectionInvoiceVO.setRejectionType(rejectionInvoiceDTO.getRejectionType());
-//        
-//        rejectionInvoiceVO.setReasonForRejection(rejectionInvoiceDTO.getReasonForRejection());
-//        
-//        rejectionInvoiceVO.setOriginalInvoiceNo(rejectionInvoiceDTO.getOriginalInvoiceNo());
-//        
-//        rejectionInvoiceVO.setOriginalInvoiceDate(rejectionInvoiceDTO.getOriginalInvoiceDate());
+		rejectionInvoiceVO.setCancelRemarks(rejectionInvoiceDTO.getCancelRemarks());
 
-        if (rejectionInvoiceDTO.getBranch() != null && rejectionInvoiceDTO.getBranch() > 0) {
+		rejectionInvoiceVO.setOrgId(rejectionInvoiceDTO.getOrgId());
 
-            BranchVO branch = branchRepo.findById(rejectionInvoiceDTO.getBranch())
-                    .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+		rejectionInvoiceVO.setFinancialYear(rejectionInvoiceDTO.getFinancialYear());
 
-            rejectionInvoiceVO.setBranch(branch);
-        }
+		rejectionInvoiceVO.setIsIgstApplicable(rejectionInvoiceDTO.getIsIgstApplicable());
 
-        if (rejectionInvoiceDTO.getDiNo() != null && rejectionInvoiceDTO.getDiNo() > 0) {
+		if (rejectionInvoiceDTO.getBranch() != null && rejectionInvoiceDTO.getBranch() > 0) {
 
-            DespatchInstructionVO branch = despatchInstructionRepo.findById(rejectionInvoiceDTO.getDiNo())
-                    .orElseThrow(() -> new ApplicationException("Despatch Not Found"));
+			BranchVO branch = branchRepo.findById(rejectionInvoiceDTO.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
-            rejectionInvoiceVO.setDiNo(branch);
-        }
+			rejectionInvoiceVO.setBranch(branch);
+		}
 
-        if (rejectionInvoiceDTO.getLocation() != null && rejectionInvoiceDTO.getLocation() > 0) {
+		if (rejectionInvoiceDTO.getDiNo() != null && rejectionInvoiceDTO.getDiNo() > 0) {
 
-            LocationVO branch = locationRepo.findById(rejectionInvoiceDTO.getLocation())
-                    .orElseThrow(() -> new ApplicationException("Location Not Found"));
+			DespatchInstructionVO branch = despatchInstructionRepo.findById(rejectionInvoiceDTO.getDiNo())
+					.orElseThrow(() -> new ApplicationException("Despatch Not Found"));
 
-            rejectionInvoiceVO.setLocation(branch);
-        }
+			rejectionInvoiceVO.setDiNo(branch);
+		}
 
-        if (rejectionInvoiceDTO.getCurrency() != null && rejectionInvoiceDTO.getCurrency() > 0) {
+		if (rejectionInvoiceDTO.getLocation() != null && rejectionInvoiceDTO.getLocation() > 0) {
 
-            CurrencyVO branch = currencyRepo.findById(rejectionInvoiceDTO.getCurrency())
-                    .orElseThrow(() -> new ApplicationException("Currency Not Found"));
+			LocationVO branch = locationRepo.findById(rejectionInvoiceDTO.getLocation())
+					.orElseThrow(() -> new ApplicationException("Location Not Found"));
 
-            rejectionInvoiceVO.setCurrency(branch);
-        }
+			rejectionInvoiceVO.setLocation(branch);
+		}
 
-        if (ObjectUtils.isNotEmpty(rejectionInvoiceVO.getId())) {
+		if (rejectionInvoiceDTO.getCurrency() != null && rejectionInvoiceDTO.getCurrency() > 0) {
 
-            List<RejectionInvoiceDetailsVO> rejectionInvoiceDetailsVO = rejectionInvoiceDetailsRepo
-                    .findByRejectionInvoiceVO(rejectionInvoiceVO);
+			CurrencyVO branch = currencyRepo.findById(rejectionInvoiceDTO.getCurrency())
+					.orElseThrow(() -> new ApplicationException("Currency Not Found"));
 
-            rejectionInvoiceDetailsRepo.deleteAll(rejectionInvoiceDetailsVO);
+			rejectionInvoiceVO.setCurrency(branch);
+		}
 
-            List<RejectionInvoiceTaxDetailsVO> rejectionInvoiceTaxDetailsVO = rejectionInvoiceTaxDetailsRepo
-                    .findByRejectionInvoiceVO(rejectionInvoiceVO);
+		if (ObjectUtils.isNotEmpty(rejectionInvoiceVO.getId())) {
 
-            rejectionInvoiceTaxDetailsRepo.deleteAll(rejectionInvoiceTaxDetailsVO);
-        }
+			List<RejectionInvoiceDetailsVO> rejectionInvoiceDetailsVO = rejectionInvoiceDetailsRepo
+					.findByRejectionInvoiceVO(rejectionInvoiceVO);
 
-        BigDecimal finalAmount = BigDecimal.ZERO;
-        BigDecimal assTotal = BigDecimal.ZERO;
+			rejectionInvoiceDetailsRepo.deleteAll(rejectionInvoiceDetailsVO);
 
-        List<RejectionInvoiceDetailsVO> itemDetailsList = new ArrayList<>();
+			List<RejectionInvoiceTaxDetailsVO> rejectionInvoiceTaxDetailsVO = rejectionInvoiceTaxDetailsRepo
+					.findByRejectionInvoiceVO(rejectionInvoiceVO);
 
-        if (rejectionInvoiceDTO.getRejectionInvoiceDetailsDTO() != null) {
+			rejectionInvoiceTaxDetailsRepo.deleteAll(rejectionInvoiceTaxDetailsVO);
+		}
 
-            for (RejectionInvoiceDetailsDTO dto : rejectionInvoiceDTO.getRejectionInvoiceDetailsDTO()) {
+		BigDecimal finalAmount = BigDecimal.ZERO;
+		BigDecimal assTotal = BigDecimal.ZERO;
 
-                RejectionInvoiceDetailsVO detailsVO = new RejectionInvoiceDetailsVO();
+		List<RejectionInvoiceDetailsVO> itemDetailsList = new ArrayList<>();
 
-                if (dto.getItem() != null && dto.getItem() != 0) {
+		if (rejectionInvoiceDTO.getRejectionInvoiceDetailsDTO() != null) {
 
-                    ItemMasterVO item = itemMasterRepo.findById(dto.getItem())
-                            .orElseThrow(() -> new ApplicationException("Item Code Not Found"));
+			for (RejectionInvoiceDetailsDTO dto : rejectionInvoiceDTO.getRejectionInvoiceDetailsDTO()) {
 
-                    detailsVO.setItem(item);
-                }
+				RejectionInvoiceDetailsVO detailsVO = new RejectionInvoiceDetailsVO();
 
-                detailsVO.setTaxType(dto.getTaxType());
+				if (dto.getItem() != null && dto.getItem() != 0) {
 
-                detailsVO.setTariffNo(dto.getTariffNo());
+					ItemMasterVO item = itemMasterRepo.findById(dto.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Code Not Found"));
 
-                detailsVO.setStock(dto.getStock());
+					detailsVO.setItem(item);
+				}
 
-                detailsVO.setSalesOrderContractNo(dto.getSalesOrderContractNo());
+				detailsVO.setTaxType(dto.getTaxType());
 
-                detailsVO.setQty(dto.getQty());
+				detailsVO.setTariffNo(dto.getTariffNo());
 
-                detailsVO.setNoOfPackages(dto.getNoOfPackages());
+				detailsVO.setStock(dto.getStock());
 
-                detailsVO.setPackageType(dto.getPackageType());
+				detailsVO.setSalesOrderContractNo(dto.getSalesOrderContractNo());
 
-                detailsVO.setHsnCode(dto.getHsnCode());
+				detailsVO.setQty(dto.getQty());
 
-                detailsVO.setOrderRate(dto.getOrderRate());
+				detailsVO.setNoOfPackages(dto.getNoOfPackages());
 
-                detailsVO.setTaxPercentage(dto.getTaxPercentage());
+				detailsVO.setPackageType(dto.getPackageType());
 
-                detailsVO.setRateInSelectedCurrency(dto.getRateInSelectedCurrency());
+				detailsVO.setHsnCode(dto.getHsnCode());
 
-                BigDecimal quantity = dto.getQty() == null ? BigDecimal.ZERO : dto.getQty();
+				detailsVO.setOrderRate(dto.getOrderRate());
 
-                BigDecimal amount = dto.getRateInSelectedCurrency() == null ? BigDecimal.ZERO
-                        : dto.getRateInSelectedCurrency();
+				detailsVO.setTaxPercentage(dto.getTaxPercentage());
 
-                BigDecimal orderAmount = quantity.multiply(amount);
+				detailsVO.setRateInSelectedCurrency(dto.getRateInSelectedCurrency());
 
-                detailsVO.setAmtInSelectedCurrency(orderAmount);
+				BigDecimal quantity = dto.getQty() == null ? BigDecimal.ZERO : dto.getQty();
 
-                detailsVO.setAmountInRs(orderAmount);
+				BigDecimal amount = dto.getRateInSelectedCurrency() == null ? BigDecimal.ZERO
+						: dto.getRateInSelectedCurrency();
 
-                assTotal = assTotal.add(detailsVO.getAmountInRs());
+				BigDecimal orderAmount = quantity.multiply(amount);
 
-                BigDecimal igstRate = BigDecimal.ZERO;
-                BigDecimal cgstRate = BigDecimal.ZERO;
-                BigDecimal sgstRate = BigDecimal.ZERO;
+				detailsVO.setAmtInSelectedCurrency(orderAmount);
 
-                BigDecimal igstAmount = BigDecimal.ZERO;
-                BigDecimal cgstAmount = BigDecimal.ZERO;
-                BigDecimal sgstAmount = BigDecimal.ZERO;
+				detailsVO.setAmountInRs(orderAmount);
 
-                if (rejectionInvoiceDTO.getIsIgstApplicable() != null
-                        && rejectionInvoiceDTO.getIsIgstApplicable().equalsIgnoreCase("Yes")) {
+				assTotal = assTotal.add(detailsVO.getAmountInRs());
 
-                    igstRate = dto.getTaxPercentage() != null ? dto.getTaxPercentage() : BigDecimal.ZERO;
+				BigDecimal igstRate = BigDecimal.ZERO;
+				BigDecimal cgstRate = BigDecimal.ZERO;
+				BigDecimal sgstRate = BigDecimal.ZERO;
 
-                    igstAmount = orderAmount.multiply(igstRate).divide(BigDecimal.valueOf(100));
+				BigDecimal igstAmount = BigDecimal.ZERO;
+				BigDecimal cgstAmount = BigDecimal.ZERO;
+				BigDecimal sgstAmount = BigDecimal.ZERO;
 
-                    cgstRate = BigDecimal.ZERO;
-                    sgstRate = BigDecimal.ZERO;
+				if (rejectionInvoiceDTO.getIsIgstApplicable() != null
+						&& rejectionInvoiceDTO.getIsIgstApplicable().equalsIgnoreCase("Yes")) {
 
-                    cgstAmount = BigDecimal.ZERO;
-                    sgstAmount = BigDecimal.ZERO;
+					igstRate = dto.getTaxPercentage() != null ? dto.getTaxPercentage() : BigDecimal.ZERO;
 
-                } else {
+					igstAmount = orderAmount.multiply(igstRate).divide(BigDecimal.valueOf(100));
 
-                    BigDecimal taxPercentage = dto.getTaxPercentage() != null ? dto.getTaxPercentage()
-                            : BigDecimal.ZERO;
+					cgstRate = BigDecimal.ZERO;
+					sgstRate = BigDecimal.ZERO;
 
-                    cgstRate = taxPercentage.divide(BigDecimal.valueOf(2));
+					cgstAmount = BigDecimal.ZERO;
+					sgstAmount = BigDecimal.ZERO;
 
-                    sgstRate = taxPercentage.divide(BigDecimal.valueOf(2));
+				} else {
 
-                    cgstAmount = orderAmount.multiply(cgstRate).divide(BigDecimal.valueOf(100));
+					BigDecimal taxPercentage = dto.getTaxPercentage() != null ? dto.getTaxPercentage()
+							: BigDecimal.ZERO;
 
-                    sgstAmount = orderAmount.multiply(sgstRate).divide(BigDecimal.valueOf(100));
+					cgstRate = taxPercentage.divide(BigDecimal.valueOf(2));
 
-                    igstRate = BigDecimal.ZERO;
-                    igstAmount = BigDecimal.ZERO;
-                }
+					sgstRate = taxPercentage.divide(BigDecimal.valueOf(2));
 
-                detailsVO.setIgstRate(igstRate);
-                detailsVO.setCgstRate(cgstRate);
-                detailsVO.setSgstRate(sgstRate);
+					cgstAmount = orderAmount.multiply(cgstRate).divide(BigDecimal.valueOf(100));
 
-                detailsVO.setIgstAmount(igstAmount);
-                detailsVO.setCgstAmount(cgstAmount);
-                detailsVO.setSgstAmount(sgstAmount);
-                BigDecimal taxAmount = igstAmount.add(cgstAmount).add(sgstAmount);
+					sgstAmount = orderAmount.multiply(sgstRate).divide(BigDecimal.valueOf(100));
 
-                BigDecimal finalAmounts = orderAmount.add(taxAmount);
+					igstRate = BigDecimal.ZERO;
+					igstAmount = BigDecimal.ZERO;
+				}
 
-                finalAmount = finalAmount.add(finalAmounts);
-                detailsVO.setRejectionInvoiceVO(rejectionInvoiceVO);
+				detailsVO.setIgstRate(igstRate);
+				detailsVO.setCgstRate(cgstRate);
+				detailsVO.setSgstRate(sgstRate);
 
-                itemDetailsList.add(detailsVO);
-            }
-        }
+				detailsVO.setIgstAmount(igstAmount);
+				detailsVO.setCgstAmount(cgstAmount);
+				detailsVO.setSgstAmount(sgstAmount);
+				BigDecimal taxAmount = igstAmount.add(cgstAmount).add(sgstAmount);
 
-        rejectionInvoiceVO.setRejectionInvoiceDetailsVO(itemDetailsList);
+				BigDecimal finalAmounts = orderAmount.add(taxAmount);
 
-        List<RejectionInvoiceTaxDetailsVO> taxList = new ArrayList<>();
+				finalAmount = finalAmount.add(finalAmounts);
+				detailsVO.setRejectionInvoiceVO(rejectionInvoiceVO);
 
-        if (rejectionInvoiceDTO.getRejectionInvoiceTaxDetailsDTO() != null) {
+				itemDetailsList.add(detailsVO);
+			}
+		}
 
-            for (RejectionInvoiceTaxDetailsDTO dto : rejectionInvoiceDTO.getRejectionInvoiceTaxDetailsDTO()) {
+		rejectionInvoiceVO.setRejectionInvoiceDetailsVO(itemDetailsList);
 
-                RejectionInvoiceTaxDetailsVO taxVO = new RejectionInvoiceTaxDetailsVO();
+		List<RejectionInvoiceTaxDetailsVO> taxList = new ArrayList<>();
 
-                taxVO.setRejectionInvoiceVO(rejectionInvoiceVO);
+		if (rejectionInvoiceDTO.getRejectionInvoiceTaxDetailsDTO() != null) {
 
-                taxVO.setParticulars(dto.getParticulars());
+			for (RejectionInvoiceTaxDetailsDTO dto : rejectionInvoiceDTO.getRejectionInvoiceTaxDetailsDTO()) {
 
-                taxVO.setAcceptedQtyAmount(dto.getAcceptedQtyAmount());
+				RejectionInvoiceTaxDetailsVO taxVO = new RejectionInvoiceTaxDetailsVO();
 
-                taxVO.setRevisedAmount(dto.getRevisedAmount());
+				taxVO.setRejectionInvoiceVO(rejectionInvoiceVO);
 
-                taxList.add(taxVO);
-            }
-        }
+				taxVO.setParticulars(dto.getParticulars());
 
-        rejectionInvoiceVO.setNetAmount(finalAmount);
+				taxVO.setAcceptedQtyAmount(dto.getAcceptedQtyAmount());
 
-        rejectionInvoiceVO.setTotalAssVal(assTotal);
+				taxVO.setRevisedAmount(dto.getRevisedAmount());
 
-        rejectionInvoiceVO.setAmountInWords(amountInWordsConverterService.convert(rejectionInvoiceVO.getNetAmount()));
+				taxList.add(taxVO);
+			}
+		}
 
-        rejectionInvoiceVO.setRejectionInvoiceTaxDetailsVO(taxList);
+		rejectionInvoiceVO.setNetAmount(finalAmount);
 
-    }
+		rejectionInvoiceVO.setTotalAssVal(assTotal);
 
-    private RejectionInvoiceResponseDTO buildRejectionInvoiceResponse(RejectionInvoiceVO rejectionInvoiceVO) {
+		rejectionInvoiceVO.setAmountInWords(amountInWordsConverterService.convert(rejectionInvoiceVO.getNetAmount()));
 
-        RejectionInvoiceResponseDTO responseDTO = new RejectionInvoiceResponseDTO();
+		rejectionInvoiceVO.setRejectionInvoiceTaxDetailsVO(taxList);
 
-        responseDTO.setId(rejectionInvoiceVO.getId());
+	}
 
-        responseDTO.setDocId(rejectionInvoiceVO.getDocId());
+	private RejectionInvoiceResponseDTO buildRejectionInvoiceResponse(RejectionInvoiceVO rejectionInvoiceVO) {
 
-        responseDTO.setDocDate(rejectionInvoiceVO.getDocDate());
+		RejectionInvoiceResponseDTO responseDTO = new RejectionInvoiceResponseDTO();
 
-        responseDTO.setMonthYear(rejectionInvoiceVO.getMonthYear());
+		responseDTO.setId(rejectionInvoiceVO.getId());
 
-        responseDTO.setBelongsTo(rejectionInvoiceVO.getBelongsTo());
+		responseDTO.setDocId(rejectionInvoiceVO.getDocId());
 
-        responseDTO.setDocType(rejectionInvoiceVO.getDocType());
+		responseDTO.setDocDate(rejectionInvoiceVO.getDocDate());
 
-        responseDTO.setStockPosting(rejectionInvoiceVO.getStockPosting());
+		responseDTO.setMonthYear(rejectionInvoiceVO.getMonthYear());
 
-        responseDTO.setExcisable(rejectionInvoiceVO.getExcisable());
+		responseDTO.setBelongsTo(rejectionInvoiceVO.getBelongsTo());
 
-        responseDTO.setVehicle(rejectionInvoiceVO.getVehicle());
+		responseDTO.setDocType(rejectionInvoiceVO.getDocType());
 
-        responseDTO.setTimeOfIssue(rejectionInvoiceVO.getTimeOfIssue());
+		responseDTO.setStockPosting(rejectionInvoiceVO.getStockPosting());
 
-        responseDTO.setTimeOfIssueDate(rejectionInvoiceVO.getTimeOfIssueDate());
+		responseDTO.setExcisable(rejectionInvoiceVO.getExcisable());
 
-        responseDTO.setTimeOfRemoval(rejectionInvoiceVO.getTimeOfRemoval());
+		responseDTO.setVehicle(rejectionInvoiceVO.getVehicle());
 
-        responseDTO.setTimeOfRemovalDate(rejectionInvoiceVO.getTimeOfRemovalDate());
+		responseDTO.setTimeOfIssue(rejectionInvoiceVO.getTimeOfIssue());
 
-        responseDTO.setKanbanCardNo(rejectionInvoiceVO.getKanbanCardNo());
+		responseDTO.setTimeOfIssueDate(rejectionInvoiceVO.getTimeOfIssueDate());
 
-        responseDTO.setInvoiceType(rejectionInvoiceVO.getInvoiceType());
+		responseDTO.setTimeOfRemoval(rejectionInvoiceVO.getTimeOfRemoval());
 
-        responseDTO.setSchNo(rejectionInvoiceVO.getSchNo());
+		responseDTO.setTimeOfRemovalDate(rejectionInvoiceVO.getTimeOfRemovalDate());
 
-        responseDTO.setSchDate(rejectionInvoiceVO.getSchDate());
+		responseDTO.setKanbanCardNo(rejectionInvoiceVO.getKanbanCardNo());
 
-        responseDTO.setExchangeRate(rejectionInvoiceVO.getExchangeRate());
+		responseDTO.setInvoiceType(rejectionInvoiceVO.getInvoiceType());
 
-        responseDTO.setTotalInsurance(rejectionInvoiceVO.getTotalInsurance());
+		responseDTO.setSchNo(rejectionInvoiceVO.getSchNo());
 
-        responseDTO.setTotalFreight(rejectionInvoiceVO.getTotalFreight());
+		responseDTO.setSchDate(rejectionInvoiceVO.getSchDate());
 
-        responseDTO.setTotalAssVal(rejectionInvoiceVO.getTotalAssVal());
+		responseDTO.setExchangeRate(rejectionInvoiceVO.getExchangeRate());
 
-        responseDTO.setModeOfTransport(rejectionInvoiceVO.getModeOfTransport());
+		responseDTO.setTotalInsurance(rejectionInvoiceVO.getTotalInsurance());
 
-        responseDTO.setNetAmount(rejectionInvoiceVO.getNetAmount());
+		responseDTO.setTotalFreight(rejectionInvoiceVO.getTotalFreight());
 
-        responseDTO.setAmountInWords(rejectionInvoiceVO.getAmountInWords());
+		responseDTO.setTotalAssVal(rejectionInvoiceVO.getTotalAssVal());
 
-        responseDTO.setDeliveryTo(rejectionInvoiceVO.getDeliveryTo());
+		responseDTO.setModeOfTransport(rejectionInvoiceVO.getModeOfTransport());
 
-        responseDTO.setPaymentTerms(rejectionInvoiceVO.getPaymentTerms());
+		responseDTO.setNetAmount(rejectionInvoiceVO.getNetAmount());
 
-        responseDTO.setPurchaseOrder(rejectionInvoiceVO.getPurchaseOrder());
+		responseDTO.setAmountInWords(rejectionInvoiceVO.getAmountInWords());
 
-        responseDTO.setPurchaseOrderDate(rejectionInvoiceVO.getPurchaseOrderDate());
+		responseDTO.setDeliveryTo(rejectionInvoiceVO.getDeliveryTo());
 
-        responseDTO.setIsIgstApplicable(rejectionInvoiceVO.getIsIgstApplicable());
+		responseDTO.setPaymentTerms(rejectionInvoiceVO.getPaymentTerms());
 
-        responseDTO.setCreatedBy(rejectionInvoiceVO.getCreatedBy());
+		responseDTO.setPurchaseOrder(rejectionInvoiceVO.getPurchaseOrder());
 
-        responseDTO.setActive(rejectionInvoiceVO.getActive());
+		responseDTO.setPurchaseOrderDate(rejectionInvoiceVO.getPurchaseOrderDate());
 
-        responseDTO.setCancel(rejectionInvoiceVO.getCancel());
+		responseDTO.setIsIgstApplicable(rejectionInvoiceVO.getIsIgstApplicable());
 
-        responseDTO.setUpdatedBy(rejectionInvoiceVO.getUpdatedBy());
+		responseDTO.setCreatedBy(rejectionInvoiceVO.getCreatedBy());
 
-        responseDTO.setCancelRemarks(rejectionInvoiceVO.getCancelRemarks());
+		responseDTO.setActive(rejectionInvoiceVO.getActive());
 
-        responseDTO.setOrgId(rejectionInvoiceVO.getOrgId());
+		responseDTO.setCancel(rejectionInvoiceVO.getCancel());
 
-        responseDTO.setFinancialYear(rejectionInvoiceVO.getFinancialYear());
+		responseDTO.setUpdatedBy(rejectionInvoiceVO.getUpdatedBy());
 
-        responseDTO.setScreenName(rejectionInvoiceVO.getScreenName());
+		responseDTO.setCancelRemarks(rejectionInvoiceVO.getCancelRemarks());
 
-        responseDTO.setScreenCode(rejectionInvoiceVO.getScreenCode());
-        
+		responseDTO.setOrgId(rejectionInvoiceVO.getOrgId());
+
+		responseDTO.setFinancialYear(rejectionInvoiceVO.getFinancialYear());
+
+		responseDTO.setScreenName(rejectionInvoiceVO.getScreenName());
+
+		responseDTO.setScreenCode(rejectionInvoiceVO.getScreenCode());
+
 //        responseDTO.setRejectionType(rejectionInvoiceVO.getRejectionType());
 //        
 //        responseDTO.setReasonForRejection(rejectionInvoiceVO.getReasonForRejection());
@@ -514,277 +533,732 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 //        
 //        responseDTO.setOriginalInvoiceDate(rejectionInvoiceVO.getOriginalInvoiceDate());
 
-        if (rejectionInvoiceVO.getBranch() != null) {
+		if (rejectionInvoiceVO.getBranch() != null) {
 
-            BranchResponseDTO branchDTO = new BranchResponseDTO();
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
 
-            branchDTO.setId(rejectionInvoiceVO.getBranch().getId());
+			branchDTO.setId(rejectionInvoiceVO.getBranch().getId());
 
-            branchDTO.setBranchCode(rejectionInvoiceVO.getBranch().getBranchCode());
+			branchDTO.setBranchCode(rejectionInvoiceVO.getBranch().getBranchCode());
 
-            branchDTO.setBranchName(rejectionInvoiceVO.getBranch().getBranchName());
+			branchDTO.setBranchName(rejectionInvoiceVO.getBranch().getBranchName());
 
-            responseDTO.setBranch(branchDTO);
-        }
+			responseDTO.setBranch(branchDTO);
+		}
 
-        if (rejectionInvoiceVO.getCustomer() != null) {
+		if (rejectionInvoiceVO.getCustomer() != null) {
 
-            CustomerOtherSalesResponseDTO customerDTO = new CustomerOtherSalesResponseDTO();
+			CustomerOtherSalesResponseDTO customerDTO = new CustomerOtherSalesResponseDTO();
 
-            customerDTO.setId(rejectionInvoiceVO.getCustomer().getId());
-            customerDTO.setCustomerName(rejectionInvoiceVO.getCustomer().getCustomerName());
-            customerDTO.setCustomerCode(rejectionInvoiceVO.getCustomer().getCustomerCode());
-            customerDTO.setCustomerGstNo(rejectionInvoiceVO.getCustomer().getGstNo());
-            customerDTO.setGstApproval(rejectionInvoiceVO.getCustomer().isGstApplicable() ? "Yes" : "No");
-            responseDTO.setCustomer(customerDTO);
-        }
+			customerDTO.setId(rejectionInvoiceVO.getCustomer().getId());
+			customerDTO.setCustomerName(rejectionInvoiceVO.getCustomer().getCustomerName());
+			customerDTO.setCustomerCode(rejectionInvoiceVO.getCustomer().getCustomerCode());
+			customerDTO.setCustomerGstNo(rejectionInvoiceVO.getCustomer().getGstNo());
+			customerDTO.setGstApproval(rejectionInvoiceVO.getCustomer().isGstApplicable() ? "Yes" : "No");
+			responseDTO.setCustomer(customerDTO);
+		}
 
-        if (rejectionInvoiceVO.getDiNo() != null) {
+		if (rejectionInvoiceVO.getDiNo() != null) {
 
-            DespatchInstructionResponseDocIdDTO customerDTO = new DespatchInstructionResponseDocIdDTO();
+			DespatchInstructionResponseDocIdDTO customerDTO = new DespatchInstructionResponseDocIdDTO();
 
-            customerDTO.setId(rejectionInvoiceVO.getDiNo().getId());
-            customerDTO.setDocId(rejectionInvoiceVO.getDiNo().getDocId());
+			customerDTO.setId(rejectionInvoiceVO.getDiNo().getId());
+			customerDTO.setDocId(rejectionInvoiceVO.getDiNo().getDocId());
 
-            responseDTO.setDiNo(customerDTO);
-        }
+			responseDTO.setDiNo(customerDTO);
+		}
 
-        if (rejectionInvoiceVO.getLocation() != null) {
+		if (rejectionInvoiceVO.getLocation() != null) {
 
-            LocationMasterResponseDTO customerDTO = new LocationMasterResponseDTO();
+			LocationMasterResponseDTO customerDTO = new LocationMasterResponseDTO();
 
-            customerDTO.setId(rejectionInvoiceVO.getLocation().getId());
-            customerDTO.setLocationName(rejectionInvoiceVO.getLocation().getLocationName());
+			customerDTO.setId(rejectionInvoiceVO.getLocation().getId());
+			customerDTO.setLocationName(rejectionInvoiceVO.getLocation().getLocationName());
 
-            responseDTO.setLocation(customerDTO);
-        }
+			responseDTO.setLocation(customerDTO);
+		}
 
-        if (rejectionInvoiceVO.getCurrency() != null) {
+		if (rejectionInvoiceVO.getCurrency() != null) {
 
-            CurrencyResponseDTO customerDTO = new CurrencyResponseDTO();
+			CurrencyResponseDTO customerDTO = new CurrencyResponseDTO();
 
-            customerDTO.setId(rejectionInvoiceVO.getCurrency().getId());
-            customerDTO.setCurrencyName(rejectionInvoiceVO.getCurrency().getCurrency());
+			customerDTO.setId(rejectionInvoiceVO.getCurrency().getId());
+			customerDTO.setCurrencyName(rejectionInvoiceVO.getCurrency().getCurrency());
 
-            responseDTO.setCurrency(customerDTO);
+			responseDTO.setCurrency(customerDTO);
 
-        }
+		}
 
-        List<RejectionInvoiceDetailsResponseDTO> detailsList = new ArrayList<>();
+		List<RejectionInvoiceDetailsResponseDTO> detailsList = new ArrayList<>();
 
-        if (rejectionInvoiceVO.getRejectionInvoiceDetailsVO() != null) {
+		if (rejectionInvoiceVO.getRejectionInvoiceDetailsVO() != null) {
 
-            for (RejectionInvoiceDetailsVO detailsVO : rejectionInvoiceVO.getRejectionInvoiceDetailsVO()) {
+			for (RejectionInvoiceDetailsVO detailsVO : rejectionInvoiceVO.getRejectionInvoiceDetailsVO()) {
 
-                RejectionInvoiceDetailsResponseDTO detailsDTO = new RejectionInvoiceDetailsResponseDTO();
+				RejectionInvoiceDetailsResponseDTO detailsDTO = new RejectionInvoiceDetailsResponseDTO();
 
-                detailsDTO.setId(detailsVO.getId());
+				detailsDTO.setId(detailsVO.getId());
 
-                if (detailsVO.getItem() != null) {
+				if (detailsVO.getItem() != null) {
 
-                    ItemMasterDetailsResponseDTO itemMasterDetailsResponseDTO = new ItemMasterDetailsResponseDTO();
+					ItemMasterDetailsResponseDTO itemMasterDetailsResponseDTO = new ItemMasterDetailsResponseDTO();
 
-                    itemMasterDetailsResponseDTO.setId(detailsVO.getItem().getId());
+					itemMasterDetailsResponseDTO.setId(detailsVO.getItem().getId());
 
-                    itemMasterDetailsResponseDTO.setItemCode(detailsVO.getItem().getItemCode());
+					itemMasterDetailsResponseDTO.setItemCode(detailsVO.getItem().getItemCode());
 
-                    itemMasterDetailsResponseDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+					itemMasterDetailsResponseDTO.setItemDescription(detailsVO.getItem().getItemDescription());
 
-                    itemMasterDetailsResponseDTO.setCustomerPoNo(detailsVO.getItem().getCustomerPartNo());
+					itemMasterDetailsResponseDTO.setCustomerPoNo(detailsVO.getItem().getCustomerPartNo());
 
-                    itemMasterDetailsResponseDTO.setHsnCode(detailsVO.getItem().getHsnCode().getHsn());
+					itemMasterDetailsResponseDTO.setHsnCode(detailsVO.getItem().getHsnCode().getHsn());
 
-                    if (detailsVO.getItem().getPricingUnit() != null) {
+					if (detailsVO.getItem().getPricingUnit() != null) {
 
-                        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
 
-                        unitDTO.setId(detailsVO.getItem().getPricingUnit().getId());
-                        unitDTO.setUnitId(detailsVO.getItem().getPricingUnit().getUnitId());
-                        unitDTO.setUnitDescription(detailsVO.getItem().getPricingUnit().getUnitId());
+						unitDTO.setId(detailsVO.getItem().getPricingUnit().getId());
+						unitDTO.setUnitId(detailsVO.getItem().getPricingUnit().getUnitId());
+						unitDTO.setUnitDescription(detailsVO.getItem().getPricingUnit().getUnitId());
 
-                        itemMasterDetailsResponseDTO.setUnit(unitDTO);
-                    }
+						itemMasterDetailsResponseDTO.setUnit(unitDTO);
+					}
 
-                    detailsDTO.setItem(itemMasterDetailsResponseDTO);
-                }
+					detailsDTO.setItem(itemMasterDetailsResponseDTO);
+				}
 
-                detailsDTO.setTaxType(detailsVO.getTaxType());
+				detailsDTO.setTaxType(detailsVO.getTaxType());
 
-                detailsDTO.setTaxPercentage(detailsVO.getTaxPercentage());
+				detailsDTO.setTaxPercentage(detailsVO.getTaxPercentage());
 
-                detailsDTO.setTariffNo(detailsVO.getTariffNo());
+				detailsDTO.setTariffNo(detailsVO.getTariffNo());
 
-                detailsDTO.setStock(detailsVO.getStock());
+				detailsDTO.setStock(detailsVO.getStock());
 
-                detailsDTO.setSalesOrderContractNo(detailsVO.getSalesOrderContractNo());
+				detailsDTO.setSalesOrderContractNo(detailsVO.getSalesOrderContractNo());
 
-                detailsDTO.setQty(detailsVO.getQty());
+				detailsDTO.setQty(detailsVO.getQty());
 
-                detailsDTO.setNoOfPackages(detailsVO.getNoOfPackages());
+				detailsDTO.setNoOfPackages(detailsVO.getNoOfPackages());
 
-                detailsDTO.setHsnCode(detailsVO.getHsnCode());
+				detailsDTO.setHsnCode(detailsVO.getHsnCode());
 
-                detailsDTO.setPackageType(detailsVO.getPackageType());
+				detailsDTO.setPackageType(detailsVO.getPackageType());
 
-                detailsDTO.setOrderRate(detailsVO.getOrderRate());
+				detailsDTO.setOrderRate(detailsVO.getOrderRate());
 
-                detailsDTO.setRateInSelectedCurrency(detailsVO.getRateInSelectedCurrency());
+				detailsDTO.setRateInSelectedCurrency(detailsVO.getRateInSelectedCurrency());
 
-                detailsDTO.setAmtInSelectedCurrency(detailsVO.getAmtInSelectedCurrency());
+				detailsDTO.setAmtInSelectedCurrency(detailsVO.getAmtInSelectedCurrency());
 
-                detailsDTO.setAmountInRs(detailsVO.getAmountInRs());
+				detailsDTO.setAmountInRs(detailsVO.getAmountInRs());
 
-                detailsDTO.setSgstRate(detailsVO.getSgstRate());
+				detailsDTO.setSgstRate(detailsVO.getSgstRate());
 
-                detailsDTO.setSgstAmount(detailsVO.getSgstAmount());
+				detailsDTO.setSgstAmount(detailsVO.getSgstAmount());
 
-                detailsDTO.setCgstRate(detailsVO.getCgstRate());
+				detailsDTO.setCgstRate(detailsVO.getCgstRate());
 
-                detailsDTO.setCgstAmount(detailsVO.getCgstAmount());
+				detailsDTO.setCgstAmount(detailsVO.getCgstAmount());
 
-                detailsDTO.setIgstRate(detailsVO.getIgstRate());
+				detailsDTO.setIgstRate(detailsVO.getIgstRate());
 
-                detailsDTO.setIgstAmount(detailsVO.getIgstAmount());
+				detailsDTO.setIgstAmount(detailsVO.getIgstAmount());
 
-                detailsList.add(detailsDTO);
-            }
-        }
+				detailsList.add(detailsDTO);
+			}
+		}
 
-        responseDTO.setRejectionInvoiceDetailsResponseDTO(detailsList);
+		responseDTO.setRejectionInvoiceDetailsResponseDTO(detailsList);
 
-        List<RejectionInvoiceTaxDetailsResponseDTO> taxList = new ArrayList<>();
+		List<RejectionInvoiceTaxDetailsResponseDTO> taxList = new ArrayList<>();
 
-        if (rejectionInvoiceVO.getRejectionInvoiceTaxDetailsVO() != null) {
+		if (rejectionInvoiceVO.getRejectionInvoiceTaxDetailsVO() != null) {
 
-            for (RejectionInvoiceTaxDetailsVO taxVO : rejectionInvoiceVO.getRejectionInvoiceTaxDetailsVO()) {
+			for (RejectionInvoiceTaxDetailsVO taxVO : rejectionInvoiceVO.getRejectionInvoiceTaxDetailsVO()) {
 
-                RejectionInvoiceTaxDetailsResponseDTO taxDTO = new RejectionInvoiceTaxDetailsResponseDTO();
+				RejectionInvoiceTaxDetailsResponseDTO taxDTO = new RejectionInvoiceTaxDetailsResponseDTO();
 
-                taxDTO.setId(taxVO.getId());
+				taxDTO.setId(taxVO.getId());
 
-                taxDTO.setParticulars(taxVO.getParticulars());
+				taxDTO.setParticulars(taxVO.getParticulars());
 
-                taxDTO.setAcceptedQtyAmount(taxVO.getAcceptedQtyAmount());
+				taxDTO.setAcceptedQtyAmount(taxVO.getAcceptedQtyAmount());
 
-                taxDTO.setRevisedAmount(taxVO.getRevisedAmount());
+				taxDTO.setRevisedAmount(taxVO.getRevisedAmount());
 
-                taxList.add(taxDTO);
-            }
-        }
+				taxList.add(taxDTO);
+			}
+		}
 
-        responseDTO.setRejectionInvoiceTaxDetailsResponseDTO(taxList);
+		responseDTO.setRejectionInvoiceTaxDetailsResponseDTO(taxList);
 
-        return responseDTO;
-    }
+		return responseDTO;
+	}
 
-    @Override
-    public String getRejectionInvoiceDocId(Long orgId, String screenCode) {
-        String result = rejectionInvoiceRepo.getRejectionInvoiceDocId(orgId, screenCode);
-        return result;
-    }
+	@Override
+	public String getRejectionInvoiceDocId(Long orgId, String screenCode) {
+		String result = rejectionInvoiceRepo.getRejectionInvoiceDocId(orgId, screenCode);
+		return result;
+	}
 
-    @Override
-    public List<Map<String, Object>> getExchangeRate(Long orgId, Long currency) {
-        Set<Object[]> chType = rejectionInvoiceRepo.getExchangeRate(orgId, currency);
-        return getExchangeRate(chType);
-    }
+	@Override
+	public List<Map<String, Object>> getTaxValue(Long orgId, Long hsn) {
+		Set<Object[]> chType = proformaInvoiceRepo.getTaxValue(orgId, hsn);
+		return getTaxPercentage(chType);
+	}
 
-    private List<Map<String, Object>> getExchangeRate(Set<Object[]> chType) {
-        List<Map<String, Object>> List1 = new ArrayList<>();
-        for (Object[] ch : chType) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("exchangeRate", ch[0] != null ? new BigDecimal(ch[0].toString()) : BigDecimal.ZERO);
-            List1.add(map);
-        }
-        return List1;
-    }
+	private List<Map<String, Object>> getTaxPercentage(Set<Object[]> chType) {
+		List<Map<String, Object>> List1 = new ArrayList<>();
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("taxPercentage", ch[0] != null ? new BigDecimal(ch[0].toString()) : BigDecimal.ZERO);
+			map.put("igst", ch[1] != null ? new BigDecimal(ch[1].toString()) : BigDecimal.ZERO);
+			map.put("sgst", ch[2] != null ? new BigDecimal(ch[2].toString()) : BigDecimal.ZERO);
+			map.put("cgst", ch[3] != null ? new BigDecimal(ch[3].toString()) : BigDecimal.ZERO);
+			List1.add(map);
+		}
+		return List1;
+	}
 
-    @Override
-    public List<Map<String, Object>> getTaxPercentage(Long orgId, Long hsn) {
-        Set<Object[]> chType = rejectionInvoiceRepo.getTaxPercentage(orgId, hsn);
-        return getTaxPercentage(chType);
-    }
+	// ProformaInvoice
 
-    private List<Map<String, Object>> getTaxPercentage(Set<Object[]> chType) {
-        List<Map<String, Object>> List1 = new ArrayList<>();
-        for (Object[] ch : chType) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("taxPercentage", ch[0] != null ? new BigDecimal(ch[0].toString()) : BigDecimal.ZERO);
-            List1.add(map);
-        }
-        return List1;
-    }
+	@Override
+	public ProformaInvoiceResponseDTO getProformaInvoiceById(Long id) throws ApplicationException {
 
-    @Override
-    public List<Map<String, Object>> getItemDetailsBasedDesPatch(Long orgId, Long branch, Long despatch) {
-        Set<Object[]> chType = rejectionInvoiceRepo.getItemDetailsBasedDesPatch(orgId, branch, despatch);
-        return getItemDetailsBasedDesPatch(chType);
-    }
+		ProformaInvoiceVO proformaInvoiceVO = proformaInvoiceRepo.getProformaInvoiceById(id);
 
-    private List<Map<String, Object>> getItemDetailsBasedDesPatch(Set<Object[]> chType) {
+		if (proformaInvoiceVO == null) {
+			throw new ApplicationException("Proforma Invoice Not Found");
+		}
 
-        List<Map<String, Object>> list = new ArrayList<>();
+		return buildProformaInvoiceResponse(proformaInvoiceVO);
+	}
 
-        for (Object[] ch : chType) {
+	@Override
+	public List<ProformaInvoiceResponseDTO> getProformaInvoiceByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
 
-            Map<String, Object> map = new HashMap<>();
+		List<ProformaInvoiceVO> quotationList = proformaInvoiceRepo.getProformaInvoiceByOrgId(orgId, branch);
 
-            map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
-            map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
-            map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
-            map.put("unitId", ch[3] != null ? ch[3].toString() : "");
-            map.put("hsn", ch[4] != null ? ch[4].toString() : "");
-            map.put("customerPartNo", ch[5] != null ? ch[5].toString() : "");
-            map.put("descQty", ch[6] != null ? new BigDecimal(ch[6].toString()) : BigDecimal.ZERO);
+		if (quotationList == null || quotationList.isEmpty()) {
+			throw new ApplicationException("Proforma Invoice Not Found");
+		}
 
-            list.add(map);
-        }
+		List<ProformaInvoiceResponseDTO> responseList = new ArrayList<>();
 
-        return list;
-    }
+		for (ProformaInvoiceVO proformaInvoiceVO : quotationList) {
+			responseList.add(buildProformaInvoiceResponse(proformaInvoiceVO));
+		}
 
-    @Override
-    public List<Map<String, Object>> getSalesOrderNo(Long customer) {
-        Set<Object[]> chType = rejectionInvoiceRepo.getSalesOrderNo(customer);
-        return getSalesOrderNo(chType);
-    }
+		return responseList;
+	}
 
-    private List<Map<String, Object>> getSalesOrderNo(Set<Object[]> chType) {
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateProformaInvoice(ProformaInvoiceDTO proformaInvoiceDTO)
+			throws ApplicationException {
+		String screenCode = "PI";
+		ProformaInvoiceVO proformaInvoiceVO = new ProformaInvoiceVO();
+		String message;
 
-        List<Map<String, Object>> list = new ArrayList<>();
+		if (ObjectUtils.isNotEmpty(proformaInvoiceDTO.getId())) {
 
-        for (Object[] ch : chType) {
+			proformaInvoiceVO = proformaInvoiceRepo.findById(proformaInvoiceDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Proforma Invoice Not Found"));
 
-            Map<String, Object> map = new HashMap<>();
+			proformaInvoiceVO.setUpdatedBy(proformaInvoiceDTO.getCreatedBy());
 
-            map.put("docId", ch[0] != null ? ch[0].toString() : "");
-            map.put("docDate", ch[1] != null ? ch[1].toString() : "");
-            map.put("id", ch[2] != null ? ch[2].toString() : "");
-            list.add(map);
-        }
+			message = "Proforma Invoice Updated Successfully";
 
-        return list;
-    }
+		} else {
 
-    @Override
-    public List<Map<String, Object>> getOrderAmount(Long id, Long item) {
-        Set<Object[]> chType = rejectionInvoiceRepo.getOrderAmount(id, item);
-        return getOrderAmount(chType);
-    }
+			String docId = proformaInvoiceRepo.getProformaInvoiceDocId(proformaInvoiceDTO.getOrgId(),
+					proformaInvoiceDTO.getFinancialYear(), screenCode);
 
-    private List<Map<String, Object>> getOrderAmount(Set<Object[]> chType) {
+			proformaInvoiceVO.setDocId(docId);
 
-        List<Map<String, Object>> list = new ArrayList<>();
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(proformaInvoiceDTO.getOrgId(),
+							proformaInvoiceDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
-        for (Object[] ch : chType) {
+			proformaInvoiceVO.setCreatedBy(proformaInvoiceDTO.getCreatedBy());
+			proformaInvoiceVO.setUpdatedBy(proformaInvoiceDTO.getCreatedBy());
 
-            Map<String, Object> map = new HashMap<>();
+			message = "Proforma Invoice Created Successfully";
+		}
 
-            map.put("rate", ch[1] != null ? new BigDecimal(ch[1].toString()) : BigDecimal.ZERO);
+		createUpdateProformaInvoiceVOByProformaInvoiceDTO(proformaInvoiceDTO, proformaInvoiceVO);
 
-            list.add(map);
-        }
+		proformaInvoiceVO = proformaInvoiceRepo.save(proformaInvoiceVO);
 
-        return list;
-    }
+		ProformaInvoiceResponseDTO responseDTO = buildProformaInvoiceResponse(proformaInvoiceVO);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("proformaInvoiceVO", responseDTO);
+
+		return response;
+	}
+
+	private void createUpdateProformaInvoiceVOByProformaInvoiceDTO(ProformaInvoiceDTO proformaInvoiceDTO,
+			ProformaInvoiceVO proformaInvoiceVO) throws ApplicationException {
+
+//		proformaInvoiceVO.setBelongsTo(proformaInvoiceDTO.getBelongsTo());
+
+		if (proformaInvoiceDTO.getCustomer() != null && proformaInvoiceDTO.getCustomer() != 0) {
+
+			CustomerVO customer = customerRepo.findById(proformaInvoiceDTO.getCustomer())
+					.orElseThrow(() -> new ApplicationException("Party Not Found"));
+
+			proformaInvoiceVO.setCustomer(customer);
+		}
+
+//		proformaInvoiceVO.setId(proformaInvoiceDTO.getId());
+
+		proformaInvoiceVO.setBelongsTo(proformaInvoiceDTO.getBelongsTo());
+
+		proformaInvoiceVO.setInsurance(proformaInvoiceDTO.getInsurance());
+
+		proformaInvoiceVO.setFreight(proformaInvoiceDTO.getFreight());
+
+		proformaInvoiceVO.setModeOfTransport(proformaInvoiceDTO.getModeOfTransport());
+
+		proformaInvoiceVO.setDeliveryTo(proformaInvoiceDTO.getDeliveryTo());
+
+		proformaInvoiceVO.setPaymentTerms(proformaInvoiceDTO.getPaymentTerms());
+
+		proformaInvoiceVO.setPurchaseOrderNo(proformaInvoiceDTO.getPurchaseOrderNo());
+
+		proformaInvoiceVO.setPurchaseOrderDate(proformaInvoiceDTO.getPurchaseOrderDate());
+
+		proformaInvoiceVO.setRefNo(proformaInvoiceDTO.getRefNo());
+
+		proformaInvoiceVO.setRefDate(proformaInvoiceDTO.getRefDate());
+
+		proformaInvoiceVO.setActive(proformaInvoiceDTO.isActive());
+
+		proformaInvoiceVO.setCancelRemarks(proformaInvoiceDTO.getCancelRemarks());
+
+		proformaInvoiceVO.setOrgId(proformaInvoiceDTO.getOrgId());
+
+		proformaInvoiceVO.setFinancialYear(proformaInvoiceDTO.getFinancialYear());
+
+		proformaInvoiceVO.setKindAttention(proformaInvoiceDTO.getKindAttention());
+		proformaInvoiceVO.setDesignation(proformaInvoiceDTO.getDesignation());
+		proformaInvoiceVO.setNoOfPkg(proformaInvoiceDTO.getNoOfPkg());
+		proformaInvoiceVO.setPkgType(proformaInvoiceDTO.getPkgType());
+		proformaInvoiceVO.setRateOfDuty(proformaInvoiceDTO.getRateOfDuty());
+		proformaInvoiceVO.setTariffNo(proformaInvoiceDTO.getTariffNo());
+
+		proformaInvoiceVO.setNarration(proformaInvoiceDTO.getNarration());
+
+		proformaInvoiceVO.setPaymentPercentage(proformaInvoiceDTO.getPaymentPercentage());
+
+		if (proformaInvoiceDTO.getBranch() != null && proformaInvoiceDTO.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(proformaInvoiceDTO.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			proformaInvoiceVO.setBranch(branch);
+		}
+
+		if (proformaInvoiceDTO.getLocation() != null && proformaInvoiceDTO.getLocation() != 0) {
+
+			LocationVO branch = locationRepo.findById(proformaInvoiceDTO.getLocation())
+					.orElseThrow(() -> new ApplicationException("Location Not Found"));
+
+			proformaInvoiceVO.setLocation(branch);
+		}
+
+		if (proformaInvoiceDTO.getBankName() != null && proformaInvoiceDTO.getBankName() != 0) {
+
+			BankDetailsVO bankDetailsVO = bankDetailsRepo.findById(proformaInvoiceDTO.getBankName())
+					.orElseThrow(() -> new ApplicationException("BankName Not Found"));
+
+			proformaInvoiceVO.setBankName(bankDetailsVO);
+		}
+
+		if (ObjectUtils.isNotEmpty(proformaInvoiceVO.getId())) {
+
+			List<ProformaInvoiceDetailsVO> proformaInvoiceDetailsVO = proformaInvoiceDetailsRepo
+					.findByProformaInvoiceVO(proformaInvoiceVO);
+
+			proformaInvoiceDetailsRepo.deleteAll(proformaInvoiceDetailsVO);
+
+			List<ProformaInvoiceTaxDetailsVO> proformaInvoiceTaxDetailsVO = proformaInvoiceTaxDetailsRepo
+					.findByProformaInvoiceVO(proformaInvoiceVO);
+
+			proformaInvoiceTaxDetailsRepo.deleteAll(proformaInvoiceTaxDetailsVO);
+		}
+
+		BigDecimal finalAmount = BigDecimal.ZERO;
+		BigDecimal assTotal = BigDecimal.ZERO;
+
+		List<ProformaInvoiceDetailsVO> itemDetailsList = new ArrayList<>();
+
+		if (proformaInvoiceDTO.getProformaInvoiceDetailsDTO() != null) {
+
+			for (ProformaInvoiceDetailsDTO dto : proformaInvoiceDTO.getProformaInvoiceDetailsDTO()) {
+
+				ProformaInvoiceDetailsVO detailsVO = new ProformaInvoiceDetailsVO();
+
+				if (dto.getItem() != null && dto.getItem() != 0) {
+
+					ItemMasterVO item = itemMasterRepo.findById(dto.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Code Not Found"));
+
+					detailsVO.setItem(item);
+				}
+
+				detailsVO.setDespatchQty(dto.getDespatchQty());
+
+				detailsVO.setTaxType(dto.getTaxType());
+
+				detailsVO.setHsnCode(dto.getHsnCode());
+
+				detailsVO.setOrderRate(dto.getOrderRate());
+
+				detailsVO.setTaxPercentage(dto.getTaxPercentage());
+
+				BigDecimal quantity = dto.getDespatchQty() == null ? BigDecimal.ZERO : dto.getDespatchQty();
+
+				BigDecimal amount = dto.getOrderRate() == null ? BigDecimal.ZERO : dto.getOrderRate();
+
+				BigDecimal orderAmount = quantity.multiply(amount);
+
+				detailsVO.setAmount(orderAmount);
+
+				assTotal = assTotal.add(detailsVO.getAmount());
+
+				BigDecimal igstRate = BigDecimal.ZERO;
+				BigDecimal cgstRate = BigDecimal.ZERO;
+				BigDecimal sgstRate = BigDecimal.ZERO;
+
+				BigDecimal igstAmount = BigDecimal.ZERO;
+				BigDecimal cgstAmount = BigDecimal.ZERO;
+				BigDecimal sgstAmount = BigDecimal.ZERO;
+
+				if (proformaInvoiceDTO.getIsIgstApplicable() != null
+						&& proformaInvoiceDTO.getIsIgstApplicable().equalsIgnoreCase("Yes")) {
+
+					igstRate = dto.getTaxPercentage() != null ? dto.getTaxPercentage() : BigDecimal.ZERO;
+
+					igstAmount = orderAmount.multiply(igstRate).divide(BigDecimal.valueOf(100));
+
+					cgstRate = BigDecimal.ZERO;
+					sgstRate = BigDecimal.ZERO;
+
+					cgstAmount = BigDecimal.ZERO;
+					sgstAmount = BigDecimal.ZERO;
+
+				} else {
+
+					BigDecimal taxPercentage = dto.getTaxPercentage() != null ? dto.getTaxPercentage()
+							: BigDecimal.ZERO;
+
+					cgstRate = taxPercentage.divide(BigDecimal.valueOf(2));
+
+					sgstRate = taxPercentage.divide(BigDecimal.valueOf(2));
+
+					cgstAmount = orderAmount.multiply(cgstRate).divide(BigDecimal.valueOf(100));
+
+					sgstAmount = orderAmount.multiply(sgstRate).divide(BigDecimal.valueOf(100));
+
+					igstRate = BigDecimal.ZERO;
+					igstAmount = BigDecimal.ZERO;
+				}
+
+				detailsVO.setIgstRate(igstRate);
+				detailsVO.setCgstRate(cgstRate);
+				detailsVO.setSgstRate(sgstRate);
+
+				detailsVO.setIgstAmount(igstAmount);
+				detailsVO.setCgstAmount(cgstAmount);
+				detailsVO.setSgstAmount(sgstAmount);
+				BigDecimal taxAmount = igstAmount.add(cgstAmount).add(sgstAmount);
+
+				BigDecimal finalAmounts = orderAmount.add(taxAmount);
+
+				finalAmount = finalAmount.add(finalAmounts);
+				detailsVO.setProformaInvoiceVO(proformaInvoiceVO);
+
+				itemDetailsList.add(detailsVO);
+			}
+		}
+
+		proformaInvoiceVO.setProformaInvoiceDetailsVO(itemDetailsList);
+
+		List<ProformaInvoiceTaxDetailsVO> taxList = new ArrayList<>();
+
+		if (proformaInvoiceDTO.getProformaInvoiceTaxDetailsDTO() != null) {
+
+			for (ProformaInvoiceTaxDetailsDTO dto : proformaInvoiceDTO.getProformaInvoiceTaxDetailsDTO()) {
+
+				ProformaInvoiceTaxDetailsVO taxVO = new ProformaInvoiceTaxDetailsVO();
+
+				taxVO.setProformaInvoiceVO(proformaInvoiceVO);
+
+				taxVO.setParticulars(dto.getParticulars());
+
+				taxVO.setAmount(dto.getAmount());
+
+				taxList.add(taxVO);
+			}
+		}
+
+		proformaInvoiceVO.setProformaInvoiceTaxDetailsVO(taxList);
+
+		proformaInvoiceVO.setBasicValue(assTotal);
+
+		proformaInvoiceVO.setGrossAmount(finalAmount);
+
+		proformaInvoiceVO.setAmountInWords(amountInWordsConverterService.convert(proformaInvoiceVO.getGrossAmount()));
+
+	}
+
+	private ProformaInvoiceResponseDTO buildProformaInvoiceResponse(ProformaInvoiceVO proformaInvoiceVO) {
+
+		ProformaInvoiceResponseDTO responseDTO = new ProformaInvoiceResponseDTO();
+
+		responseDTO.setId(proformaInvoiceVO.getId());
+		responseDTO.setDocId(proformaInvoiceVO.getDocId());
+		responseDTO.setDocDate(proformaInvoiceVO.getDocDate());
+		responseDTO.setBelongsTo(proformaInvoiceVO.getBelongsTo());
+		responseDTO.setPurchaseOrderNo(proformaInvoiceVO.getPurchaseOrderNo());
+		responseDTO.setPurchaseOrderDate(proformaInvoiceVO.getPurchaseOrderDate());
+		responseDTO.setRefNo(proformaInvoiceVO.getRefNo());
+		responseDTO.setRefDate(proformaInvoiceVO.getRefDate());
+		responseDTO.setKindAttention(proformaInvoiceVO.getKindAttention());
+		responseDTO.setDesignation(proformaInvoiceVO.getDesignation());
+		responseDTO.setTimeOfIssue(proformaInvoiceVO.getTimeOfIssue());
+		responseDTO.setTimeOfIssueDate(proformaInvoiceVO.getTimeOfIssueDate());
+		responseDTO.setInsurance(proformaInvoiceVO.getInsurance());
+		responseDTO.setFreight(proformaInvoiceVO.getFreight());
+		responseDTO.setNoOfPkg(proformaInvoiceVO.getNoOfPkg());
+		responseDTO.setPkgType(proformaInvoiceVO.getPkgType());
+		responseDTO.setRateOfDuty(proformaInvoiceVO.getRateOfDuty());
+		responseDTO.setTariffNo(proformaInvoiceVO.getTariffNo());
+		responseDTO.setBasicValue(proformaInvoiceVO.getBasicValue());
+		responseDTO.setGrossAmount(proformaInvoiceVO.getGrossAmount());
+		responseDTO.setModeOfTransport(proformaInvoiceVO.getModeOfTransport());
+		responseDTO.setAmountInWords(proformaInvoiceVO.getAmountInWords());
+		responseDTO.setDeliveryTo(proformaInvoiceVO.getDeliveryTo());
+		responseDTO.setPaymentTerms(proformaInvoiceVO.getPaymentTerms());
+		responseDTO.setPaymentPercentage(proformaInvoiceVO.getPaymentPercentage());
+		responseDTO.setNarration(proformaInvoiceVO.getNarration());
+		responseDTO.setCreatedBy(proformaInvoiceVO.getCreatedBy());
+		responseDTO.setCreatedBy(proformaInvoiceVO.getCreatedBy());
+		responseDTO.setActive(proformaInvoiceVO.getActive());
+		responseDTO.setCancel(proformaInvoiceVO.getCancel());
+		responseDTO.setUpdatedBy(proformaInvoiceVO.getUpdatedBy());
+		responseDTO.setCancelRemarks(proformaInvoiceVO.getCancelRemarks());
+		responseDTO.setOrgId(proformaInvoiceVO.getOrgId());
+		responseDTO.setKindAttention(proformaInvoiceVO.getKindAttention());
+		responseDTO.setDesignation(proformaInvoiceVO.getDesignation());
+		responseDTO.setNoOfPkg(proformaInvoiceVO.getNoOfPkg());
+		responseDTO.setPkgType(proformaInvoiceVO.getPkgType());
+		responseDTO.setRateOfDuty(proformaInvoiceVO.getRateOfDuty());
+		responseDTO.setTariffNo(proformaInvoiceVO.getTariffNo());
+
+		responseDTO.setNarration(proformaInvoiceVO.getNarration());
+		responseDTO.setScreenName(proformaInvoiceVO.getScreenName());
+		responseDTO.setScreenCode(proformaInvoiceVO.getScreenCode());
+		responseDTO.setFinancialYear(proformaInvoiceVO.getFinancialYear());
+		responseDTO.setPaymentPercentage(proformaInvoiceVO.getPaymentPercentage());
+		responseDTO.setUpdatedBy(proformaInvoiceVO.getUpdatedBy());
+
+		if (proformaInvoiceVO.getBranch() != null) {
+
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+
+			branchDTO.setId(proformaInvoiceVO.getBranch().getId());
+
+			branchDTO.setBranchCode(proformaInvoiceVO.getBranch().getBranchCode());
+
+			branchDTO.setBranchName(proformaInvoiceVO.getBranch().getBranchName());
+
+			responseDTO.setBranch(branchDTO);
+		}
+
+		if (proformaInvoiceVO.getCustomer() != null) {
+
+			CustomerOtherSalesResponseDTO customerDTO = new CustomerOtherSalesResponseDTO();
+
+			customerDTO.setId(proformaInvoiceVO.getCustomer().getId());
+			customerDTO.setCustomerName(proformaInvoiceVO.getCustomer().getCustomerName());
+			customerDTO.setCustomerCode(proformaInvoiceVO.getCustomer().getCustomerCode());
+			customerDTO.setCustomerGstNo(proformaInvoiceVO.getCustomer().getGstNo());
+			customerDTO.setGstApproval(proformaInvoiceVO.getCustomer().isGstApplicable() ? "Yes" : "No");
+			customerDTO.setState(proformaInvoiceVO.getCustomer().getGstState().getStateName());
+			responseDTO.setCustomer(customerDTO);
+		}
+
+		if (proformaInvoiceVO.getLocation() != null) {
+
+			LocationMasterResponseDTO customerDTO = new LocationMasterResponseDTO();
+
+			customerDTO.setId(proformaInvoiceVO.getLocation().getId());
+			customerDTO.setLocationName(proformaInvoiceVO.getLocation().getLocationName());
+
+			responseDTO.setLocation(customerDTO);
+		}
+
+		if (proformaInvoiceVO.getBankName() != null) {
+
+			BankResponseDetailsDTO customerDTO = new BankResponseDetailsDTO();
+
+			customerDTO.setId(proformaInvoiceVO.getBankName().getId());
+			customerDTO.setBankName(proformaInvoiceVO.getBankName().getBankName());
+			responseDTO.setBankName(customerDTO);
+
+		}
+
+		List<ProformaInvoiceDetailsResponseDTO> detailsList = new ArrayList<>();
+
+		if (proformaInvoiceVO.getProformaInvoiceDetailsVO() != null) {
+
+			for (ProformaInvoiceDetailsVO detailsVO : proformaInvoiceVO.getProformaInvoiceDetailsVO()) {
+
+				ProformaInvoiceDetailsResponseDTO detailsDTO = new ProformaInvoiceDetailsResponseDTO();
+
+				detailsDTO.setId(detailsVO.getId());
+
+				if (detailsVO.getItem() != null) {
+
+					ItemMasterDetailsResponseDTO itemMasterDetailsResponseDTO = new ItemMasterDetailsResponseDTO();
+
+					itemMasterDetailsResponseDTO.setId(detailsVO.getItem().getId());
+
+					itemMasterDetailsResponseDTO.setItemCode(detailsVO.getItem().getItemCode());
+
+					itemMasterDetailsResponseDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+
+					itemMasterDetailsResponseDTO.setCustomerPoNo(detailsVO.getItem().getCustomerPartNo());
+
+					itemMasterDetailsResponseDTO.setHsnCode(detailsVO.getItem().getHsnCode().getHsn());
+
+					if (detailsVO.getItem().getPricingUnit() != null) {
+
+						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+
+						unitDTO.setId(detailsVO.getItem().getPricingUnit().getId());
+						unitDTO.setUnitId(detailsVO.getItem().getPricingUnit().getUnitId());
+						unitDTO.setUnitDescription(detailsVO.getItem().getPricingUnit().getUnitId());
+
+						itemMasterDetailsResponseDTO.setUnit(unitDTO);
+					}
+
+					detailsDTO.setItem(itemMasterDetailsResponseDTO);
+				}
+
+				detailsDTO.setTaxPercentage(detailsVO.getTaxPercentage());
+
+				detailsDTO.setTaxType(detailsVO.getTaxType());
+
+				detailsDTO.setHsnCode(detailsVO.getHsnCode());
+
+				detailsDTO.setDespatchQty(detailsVO.getDespatchQty());
+
+				detailsDTO.setAmount(detailsVO.getAmount());
+
+				detailsDTO.setOrderRate(detailsVO.getOrderRate());
+
+				detailsDTO.setSgstRate(detailsVO.getSgstRate());
+
+				detailsDTO.setSgstAmount(detailsVO.getSgstAmount());
+
+				detailsDTO.setCgstRate(detailsVO.getCgstRate());
+
+				detailsDTO.setCgstAmount(detailsVO.getCgstAmount());
+
+				detailsDTO.setIgstRate(detailsVO.getIgstRate());
+
+				detailsDTO.setIgstAmount(detailsVO.getIgstAmount());
+
+				detailsList.add(detailsDTO);
+			}
+		}
+
+		responseDTO.setProformaInvoiceDetailsResponseDTO(detailsList);
+
+		List<ProformaInvoiceTaxDetailsResponseDTO> taxList = new ArrayList<>();
+
+		if (proformaInvoiceVO.getProformaInvoiceTaxDetailsVO() != null
+				&& !proformaInvoiceVO.getProformaInvoiceTaxDetailsVO().isEmpty()) {
+
+			for (ProformaInvoiceTaxDetailsVO taxVO : proformaInvoiceVO.getProformaInvoiceTaxDetailsVO()) {
+
+				ProformaInvoiceTaxDetailsResponseDTO taxDTO = new ProformaInvoiceTaxDetailsResponseDTO();
+
+				taxDTO.setId(taxVO.getId());
+				taxDTO.setParticulars(taxVO.getParticulars());
+				taxDTO.setAmount(taxVO.getAmount());
+
+				taxList.add(taxDTO);
+			}
+		}
+
+		responseDTO.setProformaInvoiceTaxDetailsResponseDTO(taxList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public String getProformaInvoiceDocId(Long orgId, String financialYear, String screenCode) {
+		String screenCode1 = "PI";
+		String result = proformaInvoiceRepo.getProformaInvoiceDocId(orgId, financialYear, screenCode1);
+		return result;
+	}
+
+	@Override
+	public List<Map<String, Object>> getItemDetailsResponse(Long orgId, Long branch) {
+		Set<Object[]> chType = proformaInvoiceRepo.getItemDetailsResponse(orgId, branch);
+		return getItemDetailsResponse(chType);
+	}
+
+	private List<Map<String, Object>> getItemDetailsResponse(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("unitId", ch[3] != null ? ch[3].toString() : "");
+			map.put("hsn", ch[4] != null ? ch[4].toString() : "");
+			map.put("customerPartNo", ch[5] != null ? ch[5].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+//	@Override
+//	public List<Map<String, Object>> getGstState(Long orgId, Long customer) {
+//		Set<Object[]> chType = proformaInvoiceRepo.getGstState(orgId, customer);
+//		return getGstState(chType);
+//	}
+//
+//	private List<Map<String, Object>> getGstState(Set<Object[]> chType) {
+//
+//		List<Map<String, Object>> list = new ArrayList<>();
+//
+//		for (Object[] ch : chType) {
+//
+//			Map<String, Object> map = new HashMap<>();
+//			map.put("stateName", ch[0] != null ? ch[0].toString() : "");
+//			map.put("stateCode", ch[1] != null ? ch[1].toString() : "");
+//
+//			list.add(map);
+//		}
+//
+//		return list;
+//	}
+
 }

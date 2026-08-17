@@ -16,5 +16,7 @@ public class ItemMasterResponseTaxDTO {
 	private String itemDescription;
 
 	private String hsnCode;
+	
+	private String customerPartNo;
 
 }

@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.efitops.basesetup.ResponseDTO.ProformaInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.RejectionInvoiceResponseDTO;
+import com.efitops.basesetup.dto.ProformaInvoiceDTO;
 import com.efitops.basesetup.dto.RejectionInvoiceDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
@@ -21,14 +23,21 @@ public interface RejectionInvoiceService {
 
 	String getRejectionInvoiceDocId(Long orgId, String screenCode);
 
-	List<Map<String, Object>> getExchangeRate(Long orgId, Long currency);
+	
+	//ProfomaInvoice
 
-	List<Map<String, Object>> getTaxPercentage(Long orgId, Long hsn);
+	ProformaInvoiceResponseDTO getProformaInvoiceById(Long id) throws ApplicationException;
 
-	List<Map<String, Object>> getItemDetailsBasedDesPatch(Long orgId, Long branch, Long despatch);
+	List<ProformaInvoiceResponseDTO> getProformaInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-	List<Map<String, Object>> getSalesOrderNo(Long customer);
+	Map<String, Object> createUpdateProformaInvoice(ProformaInvoiceDTO proformaInvoiceDTO) throws ApplicationException;
 
-	List<Map<String, Object>> getOrderAmount(Long id, Long item);
+	List<Map<String, Object>> getTaxValue(Long orgId, Long hsn);
+
+	List<Map<String, Object>> getItemDetailsResponse(Long orgId, Long branch);
+
+	String getProformaInvoiceDocId(Long orgId, String financialYear, String screenCode);
+
+//	List<Map<String, Object>> getGstState(Long orgId, Long customer);
 
 }

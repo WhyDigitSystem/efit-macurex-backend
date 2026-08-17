@@ -82,24 +82,31 @@ public interface TransportMasterService {
 	List<StockTransferChallanResponseDTO> getStockTransferChallanByOrgId(Long orgId, Long branch) throws ApplicationException;
 
 	//stock transfercustomer
-	Map<String, Object> getStockTransferCustomer() throws ApplicationException;
+	Map<String, Object> getCustomerForStockTransferChallan(Long branch, Long orgId) throws ApplicationException;
 
 	
 
 	//despatch instruction schedule no dropdown
 
-	Map<String, Object> getDespatchCustomer(Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getCustomerDropdownForDespatchInstructions(Long branch, Long orgId) throws ApplicationException;
 
 
-	Map<String, Object> getDespatchSalesContract(Long customerId, Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getOrderAndSalesContractDropdownFromDespatchInstruction(Long customerId, Long branch, Long orgId) throws ApplicationException;
 
-	Map<String, Object> getDespatchItems(Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getItemsFromDespatchInstruction(Long item_type,Long branch, Long orgId) throws ApplicationException;
 
-	Map<String, Object> getDespatchScheduleMonth(Long itemId, Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getScheduleMonthForDespatchInstruction(Long item,String dlvno, Long branch, Long orgId) throws ApplicationException;
 
-	Map<String, Object> getDespatchPlannedQty(Long itemId, Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getPlannedQtyForDespatchInstruction(Long item, Long branch, Long orgId) throws ApplicationException;
 
 	Map<String, Object> getScheduleNoDropdownForDespatchInstruction(Long customer, String monthYear,Long branch, Long orgId)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getFillGridItemsForDespatchInstruction(Long customerId, Long sdvBasicId, Long branch,
+			Long orgId);
+
+	// item drop down for stock transfer challan 
+	Map<String, Object> getItemsForStockTransferChallan(String despatchNo, Long branch, Long orgId)
 			throws ApplicationException;
 
 

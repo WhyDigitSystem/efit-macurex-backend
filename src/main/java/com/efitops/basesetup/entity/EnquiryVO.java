@@ -37,8 +37,11 @@ public class EnquiryVO {
 	@Column(name = "enquiry_id")
 	private Long id;
 
-	@Column(name = "enquiry_no")
-	private String enquiryNo;
+	@Column(name = "doc_id")
+	private String docId;
+	
+	@Column(name = "doc_date")
+	private LocalDate docDate=LocalDate.now();
 
 	@ManyToOne
 	@JoinColumn(name = "branch")

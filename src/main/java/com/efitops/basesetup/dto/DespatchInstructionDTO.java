@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 public class DespatchInstructionDTO {
 	private Long id;
 	private Long branch;
-	private String docId;
-	private LocalDate docDate;
+//	private String docId;
+//	private LocalDate docDate;
 	private Long customer;
 	private String schduleNo;
 	private String invoiceType;
@@ -29,7 +29,7 @@ public class DespatchInstructionDTO {
 	private String deliveryInstructions;
 	private String Consignee;
 	private Long orgId;
-	private Boolean active;
+	private boolean active;
 	private String createdBy;
 	private String cancelRemarks;
 	private List<DespatchInstructionDetailsDTO> despatchInstructionDetailsDTO;

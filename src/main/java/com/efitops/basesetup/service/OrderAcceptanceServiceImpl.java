@@ -55,6 +55,7 @@ import com.efitops.basesetup.dto.SalesOrderShortCloseResponseDTO;
 import com.efitops.basesetup.dto.ShortCloseItemResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.OrderAcceptanceDetailsVO;
@@ -184,7 +185,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	@Transactional
 	public Map<String, Object> createUpdateOrderAcceptance(OrderAcceptanceDTO orderAcceptanceDTO, MultipartFile[] files)
 			throws ApplicationException {
-
+		String screenCode = "OA";
 		OrderAcceptanceVO orderAcceptanceVO;
 		String message;
 
@@ -200,6 +201,17 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		} else {
 
 			orderAcceptanceVO = new OrderAcceptanceVO();
+
+			String docId = orderAcceptanceRepo.getOrderAcceptanceDocId(orderAcceptanceDTO.getOrgId(),
+					orderAcceptanceDTO.getFinancialYear(), screenCode);
+
+			orderAcceptanceVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(orderAcceptanceDTO.getOrgId(),
+							orderAcceptanceDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			orderAcceptanceVO.setCreatedBy(orderAcceptanceDTO.getCreatedBy());
 			orderAcceptanceVO.setUpdatedBy(orderAcceptanceDTO.getCreatedBy());
@@ -263,11 +275,12 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		orderAcceptanceVO.setDestination(orderAcceptanceDTO.getDestination());
 		orderAcceptanceVO.setModeOfTransport(orderAcceptanceDTO.getModeOfTransport());
 
-		orderAcceptanceVO.setGrossalue(orderAcceptanceDTO.getGrossalue());
 		orderAcceptanceVO.setFreight(orderAcceptanceDTO.getFreight());
 
 		orderAcceptanceVO.setDeliveryTerms(orderAcceptanceDTO.getDeliveryTerms());
 		orderAcceptanceVO.setPaymentTerms(orderAcceptanceDTO.getPaymentTerms());
+
+		orderAcceptanceVO.setInvoiceType(orderAcceptanceDTO.getInvoiceType());
 
 		orderAcceptanceVO.setSpecification(orderAcceptanceDTO.getSpecification());
 		orderAcceptanceVO.setNote(orderAcceptanceDTO.getNote());
@@ -391,6 +404,10 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				}
 
 				detailsVO.setCurrencyName(dto.getCurrencyName());
+				BigDecimal totalDiscount = detailsVO.getCgstAmount().add(detailsVO.getSgstAmount())
+						.add(detailsVO.getIgstAmount());
+
+				totalAmount = totalAmount.add(amount.add(totalDiscount));
 				detailsVO.setOrderAcceptanceVO(orderAcceptanceVO);
 
 				itemDetailsList.add(detailsVO);
@@ -416,7 +433,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			}
 		}
 
-		orderAcceptanceVO.setTaxableAmount(totalAmount);
+		orderAcceptanceVO.setGrossValue(totalAmount);
 
 		orderAcceptanceVO.setTotalTaxAmount(totalTaxAmount);
 
@@ -574,6 +591,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setCustomerPurchaseOrderDate(orderAcceptanceVO.getCustomerPurchaseOrderDate());
 		responseDTO.setPostRate(orderAcceptanceVO.getPostRate());
 		responseDTO.setCreatedBy(orderAcceptanceVO.getCreatedBy());
+		responseDTO.setInvoiceType(orderAcceptanceVO.getInvoiceType());
 //		responseDTO.setActive(orderAcceptanceVO.isActive());
 //		responseDTO.setCancel(orderAcceptanceVO.isCancel());
 		responseDTO.setUpdatedBy(orderAcceptanceVO.getUpdatedBy());
@@ -582,7 +600,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setFinancialYear(orderAcceptanceVO.getFinancialYear());
 		responseDTO.setDestination(orderAcceptanceVO.getDestination());
 		responseDTO.setModeOfTransport(orderAcceptanceVO.getModeOfTransport());
-		responseDTO.setGrossalue(orderAcceptanceVO.getGrossalue());
+		responseDTO.setGrossValue(orderAcceptanceVO.getGrossValue());
 		responseDTO.setFreight(orderAcceptanceVO.getFreight());
 		responseDTO.setDeliveryTerms(orderAcceptanceVO.getDeliveryTerms());
 		responseDTO.setPaymentTerms(orderAcceptanceVO.getPaymentTerms());
@@ -629,11 +647,9 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 				if (detailsVO.getItem() != null) {
 					detailsDTO.setItems(new ItemMasterResponseTaxDTO(detailsVO.getItem().getId(),
 							detailsVO.getItem().getItemCode(), detailsVO.getItem().getItemDescription(),
-							detailsVO.getItem().getHsnCode() != null ? detailsVO.getItem().getHsnCode().getHsn()
-									: null));
+							detailsVO.getItem().getHsnCode() != null ? detailsVO.getItem().getHsnCode().getHsn() : null,
+							detailsVO.getItem().getCustomerPartNo()));
 				}
-
-//				detailsDTO.setCustomerPartNo(detailsVO.getCustomerPartNo());
 
 				if (detailsVO.getUnit() != null) {
 					detailsDTO
@@ -755,6 +771,8 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	public Map<String, Object> createUpdateSalesOrderShort(SalesOrderShortCloseDTO salesOrderShortCloseDTO)
 			throws ApplicationException {
 
+		String screenCode = "SOS";
+
 		SalesOrderShortCloseVO salesOrderShortCloseVO;
 		String message;
 
@@ -770,6 +788,17 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		} else {
 
 			salesOrderShortCloseVO = new SalesOrderShortCloseVO();
+
+			String docId = salesOrderShortCloseRepo.getSalesOrderShortCloseDocId(salesOrderShortCloseDTO.getOrgId(),
+					salesOrderShortCloseDTO.getFinancialYear(), screenCode);
+
+			salesOrderShortCloseVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(salesOrderShortCloseDTO.getOrgId(),
+							salesOrderShortCloseDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			salesOrderShortCloseVO.setCreatedBy(salesOrderShortCloseDTO.getCreatedBy());
 			salesOrderShortCloseVO.setUpdatedBy(salesOrderShortCloseDTO.getCreatedBy());
@@ -810,8 +839,6 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 			salesOrderShortCloseVO.setSaleOrderNo(customer);
 		}
-
-		salesOrderShortCloseVO.setDocId(salesOrderShortCloseDTO.getDocId());
 
 		salesOrderShortCloseVO.setCancelRemarks(salesOrderShortCloseDTO.getCancelRemarks());
 
@@ -876,7 +903,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 		responseDTO.setId(salesOrderShortCloseVO.getId());
 		responseDTO.setDocId(salesOrderShortCloseVO.getDocId());
-		responseDTO.setDocDate(LocalDate.now());
+		responseDTO.setDocDate(salesOrderShortCloseVO.getDocDate());
 
 		responseDTO.setCreatedBy(salesOrderShortCloseVO.getCreatedBy());
 		responseDTO.setUpdatedBy(salesOrderShortCloseVO.getUpdatedBy());
@@ -1063,6 +1090,20 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		dto.setOrderId(((Number) obj[3]).longValue());
 		dto.setQuantity(((BigDecimal) obj[3]));
 		return dto;
+	}
+
+	@Override
+	public String getSalesOrderShortCloseDocId(Long orgId, String financialYear, String screenCode) {
+		String screenCode1 = "SOS";
+		String result = salesOrderShortCloseRepo.getSalesOrderShortCloseDocId(orgId, financialYear, screenCode1);
+		return result;
+	}
+
+	@Override
+	public String getOrderAcceptanceDocId(Long orgId, String financialYear, String screenCode) {
+		String screenCode1 = "OA";
+		String result = orderAcceptanceRepo.getOrderAcceptanceDocId(orgId, financialYear, screenCode1);
+		return result;
 	}
 
 }

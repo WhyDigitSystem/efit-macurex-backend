@@ -17,66 +17,63 @@ import lombok.Data;
 @Data
 public class SalesDeliveryScheduleVO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sdvbasic_seq")
-    @SequenceGenerator(name = "sdvbasic_seq",sequenceName = "sdvbasic_seq",allocationSize = 1, initialValue = 1000000001)
-    @Column(name = "sdvbasic_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sdvbasic_seq")
+	@SequenceGenerator(name = "sdvbasic_seq", sequenceName = "sdvbasic_seq", allocationSize = 1, initialValue = 1000000001)
+	@Column(name = "sdvbasic_id")
+	private Long id;
 
-    @Column(name = "dlv_no")
-    private String dlvNo;
+	@Column(name = "doc_id")
+	private String docId;
 
-    @Column(name = "dlv_date")
-    private LocalDate dlvDate;
+	@Column(name = "doc_date")
+	private LocalDate docDate = LocalDate.now();
 
-   
-    @ManyToOne
-    @JoinColumn(name = "branch_id")
-    private BranchVO branch;
+	@ManyToOne
+	@JoinColumn(name = "branch_id")
+	private BranchVO branch;
 
-    @Column(name = "month_of_schedule")
-    private String monthOfSchedule;
+	@Column(name = "month_of_schedule")
+	private String monthOfSchedule;
 
-    @Column(name = "belongs_to")
-    private String belongsTo;
+	@Column(name = "belongs_to")
+	private String belongsTo;
 
-    @Column(name = "month_year")
-    private String monthYear;
-    
-    @Column(name = "remarks")
-    private String remarks;
+	@Column(name = "month_year")
+	private String monthYear;
 
- 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private CustomerVO customer;
-    
-    @Column(name = "org_id")
-    private Long orgId;
+	@Column(name = "remarks")
+	private String remarks;
 
-    @Column(name = "financial_year")
-    private String financialYear;
+	@ManyToOne
+	@JoinColumn(name = "customer_id")
+	private CustomerVO customer;
 
-    @Column(name = "created_by")
-    private String createdBy;
+	@Column(name = "org_id")
+	private Long orgId;
 
-    @Column(name = "modified_by")
-    private String updatedBy;
+	@Column(name = "financial_year")
+	private String financialYear;
 
-    @Column(name = "cancel_remarks")
-    private String cancelRemarks;
+	@Column(name = "created_by")
+	private String createdBy;
 
-    @Column(name = "active")
-    private boolean active;
+	@Column(name = "modified_by")
+	private String updatedBy;
 
-    @Column(name = "cancel")
-    private boolean cancel = false;
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
+
+	@Column(name = "active")
+	private boolean active;
+
+	@Column(name = "cancel")
+	private boolean cancel = false;
 
 	@Column(name = "screen_code", length = 30)
 	private String screenCode = "SALESDELIVERYSCHEDULE";
 	@Column(name = "screen_name", length = 30)
 	private String screenName = "SDS";
-	
 
 	@JsonGetter("active")
 	public String getActive() {
@@ -90,20 +87,14 @@ public class SalesDeliveryScheduleVO {
 
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-	
-	@OneToMany(mappedBy = "salesDeliverySchedule",
-	        cascade = CascadeType.ALL)
+
+	@OneToMany(mappedBy = "salesDeliverySchedule", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<SalesDeliveryScheduleDetailsVO> details = new ArrayList<>();
 
-	
-	
 //	@OneToMany(mappedBy = "salesDeliverySchedule",
 //	        cascade = CascadeType.ALL,
 //	        orphanRemoval = true)
 //	private List<SalesDeliverySchedulePlanVO> deliverySchedules = new ArrayList<>();
-
-
-	
 
 }

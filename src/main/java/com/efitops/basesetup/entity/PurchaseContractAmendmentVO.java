@@ -2,6 +2,7 @@ package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -18,7 +19,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -136,13 +136,22 @@ public class PurchaseContractAmendmentVO {
         @Embedded
         private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
         
-        @OneToMany
+        @OneToMany(
+                mappedBy = "purchaseContractAmendmentVO",
+                cascade = CascadeType.ALL
+        )
         @JsonManagedReference
-        private  PurchaseContractAmendmentDetailsVO purchaseContractAmendmentDetails;
-   
-        @OneToMany
-    	@JsonManagedReference
-    	private List<PurchaseContractAmendmentAttachmentVO> purchaseContractAmendmentAttachment;
+        private List<PurchaseContractAmendmentDetailsVO>
+                purchaseContractAmendmentDetails = new ArrayList<>();
+
+
+        @OneToMany(
+                mappedBy = "purchaseContractAmendmentVO",
+                cascade = CascadeType.ALL
+        )
+        @JsonManagedReference
+        private List<PurchaseContractAmendmentAttachmentVO>
+                purchaseContractAmendmentAttachment = new ArrayList<>();
         
 
 	    

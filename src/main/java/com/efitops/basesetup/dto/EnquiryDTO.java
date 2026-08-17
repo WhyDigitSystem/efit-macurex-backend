@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class EnquiryDTO {
 	
 	 private Long id;
-	 private String enquiryNo;
 	 private Long branch;
 	 private Long partyId;
 	 private Long contactNameId;
@@ -31,6 +30,7 @@ public class EnquiryDTO {
 	 private String cancelRemarks;
 //	 private String description;
 	 private boolean active;
+	 private String financialYear;
 	 
 	 private List<EnquiryDetailsDTO> enquiryDetails;
 

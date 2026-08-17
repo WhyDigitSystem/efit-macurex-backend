@@ -37,8 +37,11 @@ public class DocketInvoiceVO {
 	@Column(name = "docket_invoice_basic_id")
     private Long id;
 	
-	@Column(name = "doc_no",unique = true)
-	private String docNo;
+	@Column(name = "doc_id")
+	private String docId;
+	
+	@Column(name = "doc_date")
+	private LocalDate docDate=LocalDate.now();
 	
 	@ManyToOne
 	@JoinColumn(name = "branch")
@@ -47,9 +50,7 @@ public class DocketInvoiceVO {
 	@ManyToOne
 	@JoinColumn(name = "transport_id")
 	private TransportMasterVO transport;
-	
-	@Column(name = "doc_date")
-	private LocalDate docDate;
+
 	
 	@Column(name = "bill_no")
 	private String billNo;

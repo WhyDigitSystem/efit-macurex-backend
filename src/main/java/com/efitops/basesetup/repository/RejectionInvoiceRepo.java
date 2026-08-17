@@ -24,8 +24,6 @@ public interface RejectionInvoiceRepo extends JpaRepository<RejectionInvoiceVO, 
     @Query(nativeQuery = true, value = "select c.selling_ex_rate From dailyexchangerate c,currency cu WHERE c.cancel=0 AND c.currency=cu.currency_id AND cu.currency_id=?2 and cu.org_id=?1")
     Set<Object[]> getExchangeRate(Long orgId, Long currency);
 
-    @Query(nativeQuery = true, value = "select a.rate from gstratemaster a where a.cancel=0 and hsn_sac_code=?2 and org_id=?1")
-    Set<Object[]> getTaxPercentage(Long orgId, Long hsn);
 
     @Query(nativeQuery = true, value = "SELECT\r\n"
             + "    i.item_id,\r\n"

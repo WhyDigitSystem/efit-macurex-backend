@@ -27,8 +27,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StockTransferChallanDetailsVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stocktransferchellandetailgen")
-	@SequenceGenerator(name = "stocktransferchellandetailgen", sequenceName = "stocktransferchellandetailseq", initialValue = 1000000001, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stock_transfer_chellan_detailgen")
+	@SequenceGenerator(name = "stock_transfer_chellan_detailgen", sequenceName = "stock_transfer_chellan_detailseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "stock_transfer_chellan_detail_id")
     private Long id;
 	

@@ -123,27 +123,44 @@ List<Object[]> getCustomerDetails(Long orgId, Long branch);
 					"WHERE c.cancel = false " +
 					"AND c.active = true " +
 					"AND LOWER(c.customer_type)='customer' " +
+					"AND c.branch = ?1 " +
+					"AND c.org_id = ?2 " +
 					"ORDER BY c.customer_code",
 					nativeQuery = true)
-					List<Object[]> getStockTransferCustomer();
+					List<Object[]> getCustomerForStockTransferChallan(Long branch,Long orgId);
 					
-					// despatch customer
+					//despatch instruction customer dropdown
 					@Query(value = """
 						    SELECT
-						        customer_id,
-						        customer_code,
-						        customer_name,
-						        party_credit_limit
-						    FROM customer_header
-						    WHERE active = true
-						    AND branch = :branch
-						    AND org_id = :orgId
-						      AND cancel = false
-						    ORDER BY customer_name
-						    """, nativeQuery = true)
-						List<Object[]> getDespatchCustomer(  @Param("branch") Long branch,
-						        @Param("orgId") Long orgId);
+						        c.customer_id,
+						        c.customer_code,
+						        c.customer_name,
+						        c.account_name
+						    FROM customer_header c
 
+						    LEFT JOIN listofvaluesdetails a
+						        ON c.customer_category = a.listofvaluesdetails_id
+
+						    LEFT JOIN listofvaluesdetails b
+						        ON c.customer_category1 = b.listofvaluesdetails_id
+
+						    LEFT JOIN listofvaluesdetails cc
+						        ON c.customer_category2 = cc.listofvaluesdetails_id
+
+						    WHERE c.cancel = FALSE
+						      AND c.active = TRUE
+						      AND c.branch = :branch
+						      AND c.org_id = :orgId
+						      AND (
+						            a.value_code = 'CUSTOMER'
+						         OR b.value_code = 'CUSTOMER'
+						         OR cc.value_code = 'CUSTOMER'
+						      )
+
+						    ORDER BY c.customer_code
+						    """, nativeQuery = true)
+						List<Object[]> getCustomerDropdownForDespatchInstructions(@Param("branch") Long branch,
+						                                   @Param("orgId") Long orgId);
 
 			@Query(value = """
 			        SELECT

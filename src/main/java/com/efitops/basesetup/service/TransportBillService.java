@@ -14,4 +14,6 @@ public interface TransportBillService {
     TransportBillResponseDTO getTransportBillById(Long id) throws ApplicationException;
 
     List<TransportBillResponseDTO> getTransportBillByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	String getTransportBillDocId(Long orgId, String financialYear, String screenCode);
 }

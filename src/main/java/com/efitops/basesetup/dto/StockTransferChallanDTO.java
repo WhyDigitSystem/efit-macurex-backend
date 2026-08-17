@@ -1,14 +1,8 @@
 package com.efitops.basesetup.dto;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
-
-import javax.persistence.Column;
-
-import com.efitops.basesetup.entity.CustomerVO;
-import com.efitops.basesetup.entity.ListOfValuesVO;
-import com.efitops.basesetup.entity.LocationVO;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,8 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StockTransferChallanDTO {
 	private Long id;
-	private String docID;
-	private LocalDate docDate;
 	private Long branch;
 	private Long types;
 	private Long customer;
@@ -36,17 +28,18 @@ public class StockTransferChallanDTO {
 	private String createdBy;
 	private String cancelRemarks;
 	
-	private Double totalInsurance;
-	private Double totalFreight;
-	private Double totalAssVal;
+	private double totalInsurance;
+	private double totalFreight;
+	private double totalAssVal;
 	private String modeOfTransport;
 	private String salesTax;
-	private Double grossAmount;
+	private double grossAmount;
 	private String amountInWords;
 	private String deliverTo;
 	private String paymentTerms;
 	private String narration;
-	
+	private List<StockTransferChallanDetailsDTO>stockTransferChallanDetailsDTO;
+	private List<StockTransferChallanTaxDetailsDTO>stockTransferChallanTaxDetailsDTO;
 	
 	
 

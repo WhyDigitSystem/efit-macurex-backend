@@ -49,7 +49,10 @@ public class DocumentTypeMappingDetailsVO {
 	private String cancelRemarks;
 	
 	@Column(name = "last_no")
-	private Long lastNo;
+	private Long lastNo = 1L;
+
+	@Column(name = "fin_year", length = 10)
+	private String finYear;
 
 	@JsonGetter("active")
 	public String getActive() {

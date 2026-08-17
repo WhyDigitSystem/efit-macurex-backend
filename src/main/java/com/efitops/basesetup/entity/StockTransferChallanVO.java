@@ -138,11 +138,19 @@ public class StockTransferChallanVO {
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
-	@OneToMany(mappedBy = "stockTransferChallanVO", cascade = CascadeType.ALL)
+	@OneToMany(
+	        mappedBy = "stockTransferChallanVO",
+	        cascade = CascadeType.ALL,
+	        orphanRemoval = true
+	)
 	@JsonManagedReference
 	private List<StockTransferChallanDetailsVO> details = new ArrayList<>();
 
-	@OneToMany(mappedBy = "stockTransferChallanVO", cascade = CascadeType.ALL)
+	@OneToMany(
+	        mappedBy = "stockTransferChallanVO",
+	        cascade = CascadeType.ALL,
+	        orphanRemoval = true
+	)
 	@JsonManagedReference
 	private List<StockTransferChallanTaxDetailsVO> taxDetails = new ArrayList<>();
 // 

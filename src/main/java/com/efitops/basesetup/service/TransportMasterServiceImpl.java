@@ -1125,17 +1125,11 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 					.orElseThrow(() -> new ApplicationException("Invalid Stock Transfer Challan Details"));
 
 			
-			List<StockTransferChallanDetailsVO> oldDetails =
-		            stockTransferChallanDetailsRepo
-		                    .findByStockTransferChallanVO(stockTransferChallanVO);
+			// Remove old details
+		    stockTransferChallanVO.getDetails().clear();
 
-		    stockTransferChallanDetailsRepo.deleteAll(oldDetails);
-
-		    List<StockTransferChallanTaxDetailsVO> oldTaxDetails =
-		            stockTransferChallanTaxDetailsRepo
-		                    .findByStockTransferChallanVO(stockTransferChallanVO);
-
-		    stockTransferChallanTaxDetailsRepo.deleteAll(oldTaxDetails);
+		    // Remove old tax details
+		    stockTransferChallanVO.getTaxDetails().clear();
 		    
 			stockTransferChallanVO.setUpdatedBy(stockTransferChallanDTO.getCreatedBy());
 
@@ -1669,7 +1663,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		            // IGST
 		            // =================================================
 
-		            if ("YES".equalsIgnoreCase(stockTransferChallanVO.getIsIgstApplicable())) {
+		            if ("YES".equalsIgnoreCase(dto.getIsIgstApplicable())) {
 
 		                BigDecimal igstAmount =
 		                        assessableValue

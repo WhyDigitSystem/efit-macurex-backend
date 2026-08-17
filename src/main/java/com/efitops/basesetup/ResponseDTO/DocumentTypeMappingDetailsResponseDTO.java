@@ -19,7 +19,7 @@ public class DocumentTypeMappingDetailsResponseDTO {
 
     private String prefix;
 
-    private Long lastNo;
+    private int lastNo;
 
     private String active;
 }

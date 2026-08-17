@@ -49,6 +49,7 @@ import com.efitops.basesetup.entity.ProformaInvoiceVO;
 import com.efitops.basesetup.entity.RejectionInvoiceDetailsVO;
 import com.efitops.basesetup.entity.RejectionInvoiceTaxDetailsVO;
 import com.efitops.basesetup.entity.RejectionInvoiceVO;
+import com.efitops.basesetup.entity.TSBankVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BankDetailsRepo;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -65,6 +66,7 @@ import com.efitops.basesetup.repository.RejectionInvoiceDetailsRepo;
 import com.efitops.basesetup.repository.RejectionInvoiceRepo;
 import com.efitops.basesetup.repository.RejectionInvoiceTaxDetailsRepo;
 import com.efitops.basesetup.repository.SalesOrderShortCloseRepo;
+import com.efitops.basesetup.repository.TSBankRepo;
 
 @Service
 public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
@@ -117,7 +119,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 	ProformaInvoiceDetailsRepo proformaInvoiceDetailsRepo;
 
 	@Autowired
-	BankDetailsRepo bankDetailsRepo;
+	TSBankRepo bankDetailsRepo;
 
 	@Override
 	public RejectionInvoiceResponseDTO getRejectionInvoiceById(Long id) throws ApplicationException {
@@ -875,7 +877,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 
 		if (proformaInvoiceDTO.getBankName() != null && proformaInvoiceDTO.getBankName() != 0) {
 
-			BankDetailsVO bankDetailsVO = bankDetailsRepo.findById(proformaInvoiceDTO.getBankName())
+			TSBankVO bankDetailsVO = bankDetailsRepo.findById(proformaInvoiceDTO.getBankName())
 					.orElseThrow(() -> new ApplicationException("BankName Not Found"));
 
 			proformaInvoiceVO.setBankName(bankDetailsVO);
@@ -1111,7 +1113,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 			BankResponseDetailsDTO customerDTO = new BankResponseDetailsDTO();
 
 			customerDTO.setId(proformaInvoiceVO.getBankName().getId());
-			customerDTO.setBankName(proformaInvoiceVO.getBankName().getBankName());
+			customerDTO.setBankName(proformaInvoiceVO.getBankName().getBank());
 			responseDTO.setBankName(customerDTO);
 
 		}

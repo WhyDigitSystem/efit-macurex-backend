@@ -26,12 +26,14 @@ import lombok.NoArgsConstructor;
 public class FinancialYearVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "financialyearegen")
-	@SequenceGenerator(name = "financialyearegen", sequenceName = "financialyearseq", initialValue = 1000000001, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "financialyeargen")
+	@SequenceGenerator(name = "financialyeargen", sequenceName = "financialyearseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "financialyear_id")
 	private Long id;
 	@Column(name = "financial_year")
 	private int finYear;
+	@Column(name = "fin_year_id")
+	private Long finYearId;
 	@Column(name = "start_date")
 	private LocalDate startDate;
 	@Column(name = "end_date")

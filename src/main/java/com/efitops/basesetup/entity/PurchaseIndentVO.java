@@ -27,41 +27,43 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "purchaseindent")
+@Table(name = "Indent_Basic")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseIndentVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchaseindentgen")
-    @SequenceGenerator(name = "purchaseindentgen", sequenceName = "purchaseindentseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchaseindent_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Indent_Basicgen")
+    @SequenceGenerator(name = "Indent_Basicgen", sequenceName = "Indent_Basicseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "Indent_Basic_id")
     private Long id;
 
-    @Column(name = "indent_no", length = 30)
-    private String indentNo;
+    @Column(name = "doc_id")
+    private String docId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plant")
-    private BranchVO plant;
+    @ManyToOne
+   	@JoinColumn(name = "branch")
+   	private BranchVO branch;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "belongs_to")
-    private ListOfValuesDetailsVO belongsTo;
+   
+    
+    @Column(name = "belongs_to")
+    private String belongsTo;
 
-    @Column(name = "indent_date")
-    private LocalDate indentDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "doc_date")
+    private LocalDate docDate;
+
+    @ManyToOne
     @JoinColumn(name = "department")
     private DepartmentVO department;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "prepared_by")
     private EmployeeMasterVO preparedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "by_whom")
     private EmployeeMasterVO byWhom;
 
@@ -69,16 +71,16 @@ public class PurchaseIndentVO {
     private boolean approved;
 
     // Indent Summary - kept directly on parent, no child table
-    @Column(name = "remarks", length = 1000)
+    @Column(name = "remarks")
     private String remarks;
 
     @Column(name = "org_id")
     private Long orgId;
 
-    @Column(name = "created_by", length = 30)
+    @Column(name = "created_by")
     private String createdBy;
 
-    @Column(name = "modified_by", length = 30)
+    @Column(name = "modified_by")
     private String updatedBy;
 
     @Column(name = "active")
@@ -87,13 +89,13 @@ public class PurchaseIndentVO {
     @Column(name = "cancel")
     private boolean cancel = false;
 
-    @Column(name = "cancel_remarks", length = 150)
+    @Column(name = "cancel_remarks")
     private String cancelRemarks;
 
-    @Column(name = "screen_code", length = 10)
+    @Column(name = "screen_code")
     private String screenCode = "PI";
 
-    @Column(name = "screen_name", length = 30)
+    @Column(name = "screen_name")
     private String screenName = "PURCHASEINDENT";
 
     @OneToMany(mappedBy = "purchaseIndentVO", cascade = CascadeType.ALL, orphanRemoval = true)

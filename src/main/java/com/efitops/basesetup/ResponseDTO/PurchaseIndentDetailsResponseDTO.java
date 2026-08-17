@@ -3,7 +3,7 @@ package com.efitops.basesetup.ResponseDTO;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.efitops.basesetup.dto.ItemMasterResponseDTO;
+import com.efitops.basesetup.dto.UomConversionResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,12 +16,22 @@ public class PurchaseIndentDetailsResponseDTO {
 
     private Long id;
 
-    // Full item master payload - same shape as /getItemMasterById response
-    private ItemMasterResponseDTO itemMasterVO;
+    // Item
+    private PurchaseIndentItemResponseDTO item;
 
+    // Quantity
     private BigDecimal qtyInPrimaryUnit;
-    private BigDecimal conversionFactor;
+
+    // Conversion Factor
+    private UomConversionResponseDTO conversionFactor;
+
+    // Purchase Quantity
     private BigDecimal qtyInPurchaseUnit;
+
+    // Required Date
     private LocalDate requiredDate;
+
+    // Purpose
     private String purpose;
+
 }

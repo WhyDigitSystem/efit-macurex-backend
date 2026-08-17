@@ -29,16 +29,16 @@ public class SalesReturnVO {
     private Long id;
 
     
-    @Column(name = "doc_no")
-    private String docNo;
+    @Column(name = "doc_id")
+    private String docId;
 
    
     @Column(name = "doc_date")
-    private LocalDate docDate;
+    private LocalDate docDate=LocalDate.now();
 
    
     @ManyToOne
-    @JoinColumn(name = "branch_id")
+    @JoinColumn(name = "branch")
     private BranchVO branch;
 
    
@@ -68,12 +68,12 @@ public class SalesReturnVO {
 
     
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer")
     private CustomerVO customer;
 
    
     @ManyToOne
-    @JoinColumn(name = "location_id")
+    @JoinColumn(name = "location")
     private LocationVO location;
 
    

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class StockTransferChallanTaxDetailsDTO {
 //	private Long id;
 	private Long particularsId;
-	private Long particulars;
+	private String particulars;
 	 private BigDecimal acceptQtyAmount;
 	 private BigDecimal revisedAmoount;
 	 

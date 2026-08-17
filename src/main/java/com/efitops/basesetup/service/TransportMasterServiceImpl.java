@@ -1124,7 +1124,20 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			stockTransferChallanVO = stockTransferChallanRepo.findById(stockTransferChallanDTO.getId())
 					.orElseThrow(() -> new ApplicationException("Invalid Stock Transfer Challan Details"));
 
-			stockTransferChallanVO.setUpdated_By(stockTransferChallanDTO.getCreatedBy());
+			
+			List<StockTransferChallanDetailsVO> oldDetails =
+		            stockTransferChallanDetailsRepo
+		                    .findByStockTransferChallanVO(stockTransferChallanVO);
+
+		    stockTransferChallanDetailsRepo.deleteAll(oldDetails);
+
+		    List<StockTransferChallanTaxDetailsVO> oldTaxDetails =
+		            stockTransferChallanTaxDetailsRepo
+		                    .findByStockTransferChallanVO(stockTransferChallanVO);
+
+		    stockTransferChallanTaxDetailsRepo.deleteAll(oldTaxDetails);
+		    
+			stockTransferChallanVO.setUpdatedBy(stockTransferChallanDTO.getCreatedBy());
 
 			
 			message = "Stock Transfer Challan Updated Successfully";
@@ -1142,7 +1155,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			
 			stockTransferChallanVO.setCreatedBy(stockTransferChallanDTO.getCreatedBy());
 
-			stockTransferChallanVO.setUpdated_By(stockTransferChallanDTO.getCreatedBy());
+			stockTransferChallanVO.setUpdatedBy(stockTransferChallanDTO.getCreatedBy());
 
 			message = "Stock Transfer Challan Created Successfully";
 		}
@@ -1514,6 +1527,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		stockTransferChallanVO.setDeliverTo(dto.getDeliverTo());
 		stockTransferChallanVO.setPaymentTerms(dto.getPaymentTerms());
 		stockTransferChallanVO.setNarration(dto.getNarration());
+		stockTransferChallanVO.setIsIgstApplicable(dto.getIsIgstApplicable());
 
 		// branch mapping
 		if (dto.getBranch() != null && dto.getBranch() != 0) {
@@ -1558,21 +1572,6 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 					.orElseThrow(() -> new ApplicationException("Location Not Found"));
 
 			stockTransferChallanVO.setLocation(locationVO);
-		}
-		
-		if (dto.getId() != null) {
-
-		    List<StockTransferChallanDetailsVO> oldDetails =
-		            stockTransferChallanDetailsRepo
-		                    .findByStockTransferChallanVO(stockTransferChallanVO);
-
-		    stockTransferChallanDetailsRepo.deleteAll(oldDetails);
-
-		    List<StockTransferChallanTaxDetailsVO> oldTaxDetails =
-		            stockTransferChallanTaxDetailsRepo
-		                    .findByStockTransferChallanVO(stockTransferChallanVO);
-
-		    stockTransferChallanTaxDetailsRepo.deleteAll(oldTaxDetails);
 		}
 		
 		 if (dto.getStockTransferChallanDetailsDTO() != null) {
@@ -1733,7 +1732,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		    // DELETE OLD TAX DETAILS
 		    // =========================================================
 
-		    stockTransferChallanVO.getTaxDetails().clear();
+//		    stockTransferChallanVO.getTaxDetails().clear();
 
 		    // =========================================================
 		    // ADD NEW TAX DETAILS
@@ -1751,12 +1750,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		            // PARTICULARS
 		            // -------------------------------------------------
 
-		            if (taxDTO.getParticulars() != null &&
-		                    taxDTO.getParticulars() != 0) {
+		            if (taxDTO.getParticularsId() != null &&
+		                    taxDTO.getParticularsId() != 0) {
 
 		                ListOfValuesDetailsVO particularsVO =
 		                        listOfValuesDetailsRepo
-		                                .findById(taxDTO.getParticulars())
+		                                .findById(taxDTO.getParticularsId())
 		                                .orElseThrow(() ->
 		                                        new ApplicationException(
 		                                                "Tax Particulars Not Found"));

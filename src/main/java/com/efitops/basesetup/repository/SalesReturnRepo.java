@@ -23,9 +23,9 @@ public interface SalesReturnRepo extends JpaRepository<SalesReturnVO, Long> {
             @Param("orgId") Long orgId,
             @Param("branchId") Long branchId);
 
-    boolean existsByDocNoAndOrgIdAndBranch_Id(
-            String docNo,
-            Long orgId,
-            Long branchId);
+//    boolean existsByDocNoAndOrgIdAndBranch_Id(
+//            String docNo,
+//            Long orgId,
+//            Long branchId);
 
 }

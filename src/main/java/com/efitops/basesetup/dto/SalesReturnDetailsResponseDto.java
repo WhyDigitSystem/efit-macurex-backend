@@ -19,7 +19,7 @@ public class SalesReturnDetailsResponseDto {
 	 private Long id;
 
 	    // Item
-	    private SalesReturnItemDetailsResponceDto item;
+	    private ItemMasterResponseDetailsDTO item;
 
 	  
 	    // Tax Type

@@ -92,7 +92,7 @@ public class StockTransferChallanVO {
 	@Column(name = "created_by")
 	private String createdBy;
 	@Column(name = "modified_by")
-	private String updated_By;
+	private String updatedBy;
 	@Column(name = "cancel")
 	private boolean cancel=false;
 	@Column(name = "cancel_remarks")

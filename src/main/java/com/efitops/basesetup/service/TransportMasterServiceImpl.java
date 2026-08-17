@@ -61,6 +61,7 @@ import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DespatchInstructionDetailsVO;
 import com.efitops.basesetup.entity.DespatchInstructionVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
@@ -78,6 +79,7 @@ import com.efitops.basesetup.repository.DespatchInstructionDetailsRepo;
 import com.efitops.basesetup.repository.DespatchInstructionRepo;
 import com.efitops.basesetup.repository.DocketInvoiceDetRepo;
 import com.efitops.basesetup.repository.DocketInvoiceRepo;
+import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
@@ -163,6 +165,9 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	
 	@Autowired
 	StockTransferChallanTaxDetailsRepo stockTransferChallanTaxDetailsRepo;
+	
+	@Autowired
+	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
 	
 	TransportMasterServiceImpl(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
@@ -1109,6 +1114,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	public Map<String, Object> updateCreateStockTransferChallan(StockTransferChallanDTO stockTransferChallanDTO)
 			throws ApplicationException {
 
+		String screenCode="STC";
 		StockTransferChallanVO stockTransferChallanVO = new StockTransferChallanVO();
 
 		String message;
@@ -1125,6 +1131,15 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 		} else {
 
+			String docId = salesContractRepo.getSalesContractDocId(stockTransferChallanDTO.getOrgId(), stockTransferChallanDTO.getFinancialYear(), screenCode);
+
+			stockTransferChallanVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(stockTransferChallanDTO.getOrgId(), stockTransferChallanDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			
 			stockTransferChallanVO.setCreatedBy(stockTransferChallanDTO.getCreatedBy());
 
 			stockTransferChallanVO.setUpdated_By(stockTransferChallanDTO.getCreatedBy());
@@ -1156,6 +1171,8 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	    // =========================================================
 
 	    responseDTO.setId(stockTransferChallanVO.getId());
+	    responseDTO.setDocId(stockTransferChallanVO.getDocId());
+	    responseDTO.setDocDate(stockTransferChallanVO.getDocDate());
 	    responseDTO.setStockPosting(stockTransferChallanVO.getStockPosting());
 	    responseDTO.setDate(stockTransferChallanVO.getDate());
 	    responseDTO.setNoOfPackages(stockTransferChallanVO.getNoOfPackages());
@@ -1773,6 +1790,14 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		        }}
 	}
 
+	
+	@Override
+	public String getStockTransferChallanDocId(Long orgId, String financialYear, String screenCode) {
+		String screenCode1 = "STC";
+		String result = stockTransferChallanRepo.getStockTransferChallanDocId(orgId, financialYear, screenCode1);
+		return result;
+	}
+	
 	@Override
 	public StockTransferChallanResponseDTO getStockTransferChallanById(Long id) throws ApplicationException {
 

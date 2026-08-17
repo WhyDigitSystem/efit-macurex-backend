@@ -39,7 +39,7 @@ public class StockTransferChallanVO {
     private Long id;
 	
 	@Column(name = "doc_id")
-	private String docID;
+	private String docId;
 	
 	@Column(name = "doc_date")
 	private LocalDate docDate=LocalDate.now();
@@ -78,6 +78,9 @@ public class StockTransferChallanVO {
 	
 	@Column(name = "import_local")
 	private String importLocal;
+	
+	@Column(name = "financial_year")
+	private String financialYear;
 	
 	 @Column(name = "is_igst_applicable")
 	    private String isIgstApplicable;

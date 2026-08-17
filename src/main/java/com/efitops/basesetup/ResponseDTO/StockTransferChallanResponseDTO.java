@@ -18,6 +18,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StockTransferChallanResponseDTO {
 	private Long id;
+	private String docId;
+	private LocalDate docDate;
+
 	private BranchResponseDTO branch;
 	private ListOfValuesResponseDTO types;
 	private CustomerDropdownResponseDTO customer;

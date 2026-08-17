@@ -27,7 +27,8 @@ public class StockTransferChallanDTO {
 	private Long orgId;
 	private String createdBy;
 	private String cancelRemarks;
-	
+	private String financialYear;
+
 	private double totalInsurance;
 	private double totalFreight;
 	private double totalAssVal;

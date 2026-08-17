@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.efitops.basesetup.entity.StockTransferChallanVO;
-import com.efitops.basesetup.entity.TransportMasterVO;
 
 public interface StockTransferChallanRepo extends JpaRepository<StockTransferChallanVO, Long>{
 
@@ -21,5 +20,8 @@ public interface StockTransferChallanRepo extends JpaRepository<StockTransferCha
 	        """, nativeQuery = true)
 	List<StockTransferChallanVO> getStockTransferChallanByOrgId(@Param("orgId") Long orgId,
 	                                             @Param("branch") Long branch);
+
+	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
+	String getStockTransferChallanDocId(Long orgId, String financialYear, String screenCode1);
 
 }

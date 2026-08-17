@@ -5,7 +5,6 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,31 +20,31 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "purchaseindentdetails")
+@Table(name = "Indent_Detail")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseIndentDetailsVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchaseindentdetailsgen")
-    @SequenceGenerator(name = "purchaseindentdetailsgen", sequenceName = "purchaseindentdetailsseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchaseindentdetails_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Indent_Detailgen")
+    @SequenceGenerator(name = "Indent_Detailgen", sequenceName = "Indent_Detailseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "Indent_Detail_id")
     private Long id;
 
-    // Item is a full reference to ItemMasterVO - itemCode / itemDescription /
-    // primaryUnit / purchaseUnit are all pulled from here, never stored again.
-    @ManyToOne(fetch = FetchType.LAZY)
+    // Item is a full reference to ItemMasterVO - itemCode / itemDescription / primaryUnit / purchaseUnit 
+    @ManyToOne
     @JoinColumn(name = "item")
     private ItemMasterVO item;
 
-    @Column(name = "qty_in_primary_unit")
+    @Column(name = "qtyinprimary_unit")
     private BigDecimal qtyInPrimaryUnit;
+    
+    @ManyToOne
+    @JoinColumn(name = "conversion_Factor")
+    private UomConversionVO conversionFactor;
 
-    @Column(name = "conversion_factor")
-    private BigDecimal conversionFactor;
-
-    @Column(name = "qty_in_purchase_unit")
+    @Column(name = "qtyinpurchase_unit")
     private BigDecimal qtyInPurchaseUnit;
 
     @Column(name = "required_date")
@@ -55,7 +54,7 @@ public class PurchaseIndentDetailsVO {
     private String purpose;
 
     @ManyToOne
-    @JoinColumn(name = "purchaseindent_id")
+    @JoinColumn(name = "Indent_Basic_id")
     @JsonBackReference
     private PurchaseIndentVO purchaseIndentVO;
 }

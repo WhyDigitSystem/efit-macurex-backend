@@ -29,10 +29,7 @@ public interface PurchaseService {
     List<PurchaseBillResponseDTO> getPurchaseBillByOrgId(Long orgId, Long branchId) throws ApplicationException;
     String getPurchaseBillDocId(Long orgId, String finYear, Long branch);
 
-    // ---------- Purchase Indent ----------
-    Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO dto, MultipartFile[] files) throws ApplicationException;
-    PurchaseIndentResponseDTO getPurchaseIndentById(Long id) throws ApplicationException;
-    List<PurchaseIndentResponseDTO> getPurchaseIndentByOrgId(Long orgId, Long branch) throws ApplicationException;
+    
 
     // ---------- Purchase Short Close ----------
     Map<String, Object> updateCreatePurchaseShortClose(PurchaseShortCloseDTO dto) throws ApplicationException;
@@ -45,6 +42,12 @@ public interface PurchaseService {
     LocalPurchaseOrderResponseDTO getLocalPurchaseOrderById(Long id) throws ApplicationException;
     List<LocalPurchaseOrderResponseDTO> getLocalPurchaseOrderByOrgId(Long orgId, Long branchId) throws ApplicationException;
     String getLocalPurchaseOrderDocId(Long orgId, String finYear, Long branch);
+    
+    
+    //purchase indent
+	Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO purchaseIndentDTO) throws ApplicationException;
+	PurchaseIndentResponseDTO getPurchaseIndentById(Long id) throws ApplicationException;
+	List<PurchaseIndentResponseDTO> getPurchaseIndentByOrgId(Long orgId, Long branch) throws ApplicationException;
 
 
 }

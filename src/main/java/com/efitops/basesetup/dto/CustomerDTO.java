@@ -44,7 +44,7 @@ public class CustomerDTO {
 	    private boolean groupCompany;
 
 	    private Long zone;
-	    private String vendorCode;
+	    private String CustomerCode;
 	    private String groupName;
 
 	    private boolean registered;

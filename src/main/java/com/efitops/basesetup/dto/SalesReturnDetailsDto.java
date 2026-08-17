@@ -15,11 +15,8 @@ import lombok.NoArgsConstructor;
 
 public class SalesReturnDetailsDto {
 	
-	 private Long id;
 
 	    private Long item;
-
-	    private String itemDescription;
 
 	    private String hsnSacCode;
 

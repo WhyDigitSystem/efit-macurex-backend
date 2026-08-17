@@ -12,19 +12,19 @@ import lombok.NoArgsConstructor;
 public class StockTransferChallanDetailsDTO {
 	private Long item;
 	private String taxType;
-	private Long taxPercentage;
+	private String taxPercentage;
+    private String hsnCode;
 	private Long unit;
 	private String stock;
 	private BigDecimal quantity;
 	private BigDecimal rate;
-	private BigDecimal totalAssessableValue;
-	private BigDecimal amountInRs;
+//	private BigDecimal totalAssessableValue;
 	private BigDecimal sgstRate;
-	private BigDecimal sgstAmount;
+//	private BigDecimal sgstAmount;
 	private BigDecimal cgstRate;
-	private BigDecimal cgstAmount;
+//	private BigDecimal cgstAmount;
 	private BigDecimal igstRate;
-	private BigDecimal igstAmount;
+//	private BigDecimal igstAmount;
 	 
 
 	

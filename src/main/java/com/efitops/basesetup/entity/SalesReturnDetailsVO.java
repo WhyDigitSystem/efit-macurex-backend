@@ -37,12 +37,12 @@ public class SalesReturnDetailsVO {
 	
 	
     @ManyToOne
-	@JoinColumn(name = "item_id")
+	@JoinColumn(name = "item_")
 	private ItemMasterVO item;
     
-    @Column(name = "item_description")
-    private String itemDescription;
-
+//    @Column(name = "item_description")
+//    private String itemDescription;
+//
     @Column(name = "hsn_sac_code")
     private String hsnSacCode;
     
@@ -50,9 +50,8 @@ public class SalesReturnDetailsVO {
     @Column(name = "tax_type")
     private String taxType;
 
-    @ManyToOne
-    @JoinColumn(name = "tax_percentage")
-    private GSTRateMasterVO taxPercentage;
+    @Column(name = "tax_percentage")
+    private String taxPercentage;
     
     @ManyToOne
     @JoinColumn(name = "unit_id")

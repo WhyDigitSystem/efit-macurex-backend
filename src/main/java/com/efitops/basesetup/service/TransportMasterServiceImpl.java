@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,52 +34,32 @@ import com.efitops.basesetup.ResponseDTO.DespatchInstructionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchInstructionScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchSalesContractResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchScheduleMonthResponseDTO;
-import com.efitops.basesetup.ResponseDTO.DocketInvoiceDetResponseDTO;
-import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
-import com.efitops.basesetup.ResponseDTO.PendingQtyResponseDTO;
-import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
-import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferCustomerResponseDTO;
-import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
-import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
-import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.CustomerComplaintDTO;
 import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
 import com.efitops.basesetup.dto.DespatchInstructionDTO;
 import com.efitops.basesetup.dto.DespatchInstructionDetailsDTO;
-import com.efitops.basesetup.dto.DocketInvoiceDTO;
-import com.efitops.basesetup.dto.DocketInvoiceDetailsDTO;
-//github.com/WhyDigitSystem/efit-macurex-backend.git
-import com.efitops.basesetup.dto.SalesContractAmdDetailsDTO;
-import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.StockTransferChallanDTO;
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
-import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DespatchInstructionDetailsVO;
 import com.efitops.basesetup.entity.DespatchInstructionVO;
-import com.efitops.basesetup.entity.DocketInvoiceDetailsVO;
-import com.efitops.basesetup.entity.DocketInvoiceVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
-import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
-import com.efitops.basesetup.entity.SalesContractAmdDetailsVO;
-import com.efitops.basesetup.entity.SalesContractAmendmentVO;
-import com.efitops.basesetup.entity.SalesContractVO;
 import com.efitops.basesetup.entity.StockTransferChallanVO;
-import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
@@ -919,15 +898,26 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 				detailDTO.setOrdAccpContrNo(detailVO.getOrdAccpContrNo());
 				detailDTO.setDate(detailVO.getDate());
-
 				if (detailVO.getItem() != null) {
 
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+				    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
 
-					itemDTO.setId(detailVO.getItem().getId());
-					itemDTO.setItemCode(detailVO.getItem().getItemCode());
+				    itemDTO.setId(detailVO.getItem().getId());
+				    itemDTO.setItemCode(detailVO.getItem().getItemCode());
+				    itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
 
-					detailDTO.setItem(itemDTO);
+				    if (detailVO.getItem().getPrimaryUnit() != null) {
+
+				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+
+				        unitDTO.setId(detailVO.getItem().getPrimaryUnit().getId());
+				        unitDTO.setUnitId(detailVO.getItem().getPrimaryUnit().getUnitId());
+				        unitDTO.setUnitDescription(detailVO.getItem().getPrimaryUnit().getDescription());
+
+				        itemDTO.setUnit(unitDTO);
+				    }
+
+				    detailDTO.setItem(itemDTO);
 				}
 
 				detailDTO.setPdi(detailVO.getPdi());
@@ -1183,18 +1173,18 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		// List Of Values Response
 		// =========================
 
-//		if (stockTransferChallanVO.getTypes() != null) {
-//
-//			ListOfValuesDetailsResponseDTO listOfValuesDetailsResponseDTO = new ListOfValuesDetailsResponseDTO();
-//
-//			listOfValuesDetailsResponseDTO.setId(stockTransferChallanVO.getTypes().getId());
-//
-//			listOfValuesDetailsResponseDTO.setListCode(stockTransferChallanVO.getTypes().getValueCode());
-//
-//			listOfValuesDetailsResponseDTO.setListDescription(stockTransferChallanVO.getTypes().getListDescription());
-//
-//			responseDTO.setTypes(listOfValuesDetailsResponseDTO);
-//		}
+		if (stockTransferChallanVO.getTypes() != null) {
+
+			ListOfValuesResponseDTO listOfValuesDetailsResponseDTO = new ListOfValuesResponseDTO();
+
+			listOfValuesDetailsResponseDTO.setId(stockTransferChallanVO.getTypes().getId());
+
+			listOfValuesDetailsResponseDTO.setListCode(stockTransferChallanVO.getTypes().getValueCode());
+
+			
+
+			responseDTO.setTypes(listOfValuesDetailsResponseDTO);
+		}
 
 		// =========================
 		// Customer Response
@@ -1336,9 +1326,9 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// drowdown for stocktransfercustomer
 	@Override
-	public Map<String, Object> getStockTransferCustomer() throws ApplicationException {
+	public Map<String, Object> getCustomerForStockTransferChallan(Long branch, Long  orgId) throws ApplicationException {
 
-		List<Object[]> customerList = customerRepo.getStockTransferCustomer();
+		List<Object[]> customerList = customerRepo.getCustomerForStockTransferChallan( branch, orgId);
 
 		if (customerList == null || customerList.isEmpty()) {
 			throw new ApplicationException("No Customer Found");
@@ -1467,9 +1457,17 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			DespatchSalesContractResponseDTO dto = new DespatchSalesContractResponseDTO();
 
-			dto.setOrderAccepCustomerContractNo(obj[0] != null ? (String) obj[0] : "");
+			dto.setOrderAccepCustomerContractNo(
+			        obj[0] != null ? (String) obj[0] : "");
 
-			
+			dto.setDate(
+			        obj[1] != null ? ((java.sql.Date) obj[1]).toLocalDate() : null);
+
+			dto.setId(
+			        obj[2] != null ? ((Number) obj[2]).longValue() : 0L);
+
+			dto.setType(
+			        obj[3] != null ? (String) obj[3] : "");
 			responseDTOList.add(dto);
 		}
 
@@ -1560,6 +1558,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 		return responseMap;
 	}
+	
 	// pending qty
 //	@Override
 //	public Map<String, Object> getDespatchPendingQty(Long itemId,
@@ -1608,5 +1607,96 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 //
 //	    return responseMap;
 //	}
+	
+//	fillgrid api for the despatch instruction
+	
+	@Override
+	public List<Map<String, Object>> getFillGridItemsForDespatchInstruction(
+	        Long customerId,
+	        Long sdvBasicId,
+	        Long branch,
+	        Long orgId) {
 
+	    List<Object[]> result = despatchInstructionRepo.getFillGridItemsForDespatchInstruction(
+	            customerId,
+	            sdvBasicId,
+	            branch,
+	            orgId);
+
+	    return getFillGridItems(result);
+	}
+
+	private List<Map<String, Object>> getFillGridItems(List<Object[]> result) {
+
+	    List<Map<String, Object>> details = new ArrayList<>();
+
+	    for (Object[] obj : result) {
+
+	        Map<String, Object> item = new HashMap<>();
+
+	        item.put("itemId", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+	        item.put("mark", obj[1] != null ? obj[1].toString() : "");
+	        item.put("itemCode",obj[2] != null ? obj[2].toString() : "");
+	        item.put("itemDescription", obj[3] != null ? obj[3].toString() : "");
+	        item.put("unit", obj[4] != null ? ((Number) obj[4]).longValue() : null);
+	        item.put("sdvBasicId", obj[5] != null ? ((Number) obj[5]).longValue() : null);
+	        item.put("soNoContractNo", obj[6] != null ? obj[6].toString() : "");
+	        item.put("sn", obj[7] != null ? ((Number) obj[7]).intValue() : 0);
+	        item.put("unitMasterId", obj[8] != null ? obj[8].toString() : "");
+
+
+	        details.add(item);
+	    }
+
+	    return details;
+	}
+// item drop down for the stocktransfer 
+	
+	@Override
+	public Map<String, Object> getItemsForStockTransferChallan(String despatchNo, Long branch, Long orgId)
+	        throws ApplicationException {
+
+	    Map<String, Object> responseMap = new HashMap<>();
+
+	    List<Object[]> itemList =
+	            itemMasterRepo.getItemsForStockTransferChallan(despatchNo, branch, orgId);
+
+	    List<StockTransferItemResponseDTO> responseDTOList = new ArrayList<>();
+
+	    for (Object[] obj : itemList) {
+
+	    	StockTransferItemResponseDTO dto = new StockTransferItemResponseDTO();
+
+	        dto.setId(obj[0] != null ? ((Number) obj[0]).longValue() : 0L);
+
+	        dto.setItemCode(obj[1] != null ? (String) obj[1] : "");
+
+	        dto.setItemDescription(obj[2] != null ? (String) obj[2] : "");
+
+	        dto.setCustomerPartNo(obj[3] != null ? (String) obj[3] : "");
+
+	        dto.setReceivedQty(
+	                obj[4] != null ? ((Number) obj[4]).doubleValue() : 0.0);
+
+	        dto.setFreight(
+	                obj[5] != null ? ((Number) obj[5]).doubleValue() : 0.0);
+
+	        dto.setInsurance(
+	                obj[6] != null ? ((Number) obj[6]).doubleValue() : 0.0);
+
+	        dto.setExciseTariffNo(
+	                obj[7] != null ? ((Number) obj[7]).longValue() : 0L);
+
+	        dto.setHsnSacCode(
+	                obj[8] != null ? ((Number) obj[8]).longValue() : 0L);
+
+	        responseDTOList.add(dto);
+	    }
+
+	    responseMap.put("message", "Items Fetched Successfully");
+
+	    responseMap.put("itemList", responseDTOList);
+
+	    return responseMap;
+	}
 }

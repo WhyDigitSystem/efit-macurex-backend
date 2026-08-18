@@ -4321,11 +4321,11 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		if (ObjectUtils.isEmpty(dto.getId())) {
 
-			if (documentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(dto.getBranch(),
-					dto.getFinancialYear(), dto.getOrgId())) {
-
-				throw new ApplicationException("Document Type Mapping already exists.");
-			}
+//			if (documentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(dto.getBranch(),
+//					dto.getFinancialYear(), dto.getOrgId())) {
+//
+//				throw new ApplicationException("Document Type Mapping already exists.");
+//			}
 
 			masterVO = new DocumentTypeMappingVO();
 			masterVO.setCreatedBy(dto.getCreatedBy());
@@ -4375,6 +4375,9 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		masterVO.setActive(dto.isActive());
 		masterVO.setCancelRemarks(dto.getCancelRemarks());
 		masterVO.setDescription(dto.getDescription());
+		masterVO.setBranchCode(dto.getBranchCode());
+		masterVO.setFinYearIdentifier(dto.getFinYearIdentifier());
+
 
 		List<DocumentTypeMappingDetailsVO> detailList = new ArrayList<>();
 
@@ -4383,12 +4386,20 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			for (DocumentTypeMappingDetailsDTO child : dto.getDetails()) {
 
 				DocumentTypeMappingDetailsVO detailVO = new DocumentTypeMappingDetailsVO();
-
+				
 				detailVO.setScreenName(child.getScreenName());
 				detailVO.setScreenCode(child.getScreenCode());
 				detailVO.setDocCode(child.getDocCode());
 				detailVO.setPrefix(child.getPrefix());
-				detailVO.setActive(child.isActive());
+
+				detailVO.setBranch(child.getBranch());
+				detailVO.setBranchCode(child.getBranchCode());
+				detailVO.setFinYear(child.getFinYear());
+				detailVO
+						.setFinYearIdentifier(child.getFinYearIdentifier());
+				detailVO.setConcatenation(child.getScreenCode()
+						+ child.getDocCode());
+				detailVO.setOrgId(dto.getOrgId());
 
 				detailVO.setDocumentTypeMappingMasterVO(masterVO);
 
@@ -4441,7 +4452,14 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				detailDTO.setDocCode(detailVO.getDocCode());
 				detailDTO.setPrefix(detailVO.getPrefix());
 				detailDTO.setLastNo(detailVO.getLastNo());
-				detailDTO.setActive(detailVO.getActive());
+				
+				detailDTO.setBranch(detailVO.getBranch());
+				detailDTO.setBranchCode(detailVO.getBranchCode());
+				detailDTO.setFinYear(detailVO.getFinYear());
+				detailDTO
+						.setFinYearIdentifier(detailVO.getFinYearIdentifier());
+				detailDTO.setConcatenation(detailVO.getConcatenation());
+				detailDTO.setOrgId(dto.getOrgId());
 
 				detailList.add(detailDTO);
 			}

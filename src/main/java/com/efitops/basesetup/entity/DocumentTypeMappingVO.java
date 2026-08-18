@@ -59,9 +59,9 @@ public class DocumentTypeMappingVO {
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 	@Column(name = "screen_name")
-	private String screenName = "";
+	private String screenName = "DT";
 	@Column(name = "screen_code")
-	private String screenCode = "UM";
+	private String screenCode = "DOCUMENTTYPE";
 	
 	@Column(name = "branch_code",length =25)
 	private String branchCode;

@@ -937,6 +937,8 @@ public class TransactionServiceImpl implements TransactionService {
 		responseDTO.setActive(docketInvoiceVO.getActive());
 		responseDTO.setCreatedBy(docketInvoiceVO.getCreatedBy());
 		responseDTO.setCancelRemarks(docketInvoiceVO.getCancelRemarks());
+		
+		responseDTO.setFinancialYear(docketInvoiceVO.getFinancialYear());
 
 		// =========================
 		// Branch Response
@@ -1006,6 +1008,7 @@ public class TransactionServiceImpl implements TransactionService {
 		docketInvoiceVO.setOrgId(dto.getOrgId());
 		docketInvoiceVO.setActive(dto.isActive());
 		docketInvoiceVO.setCancelRemarks(dto.getCancelRemarks());
+		docketInvoiceVO.setFinancialYear(dto.getFinancialYear());
 
 		// =========================
 		// Branch Mapping

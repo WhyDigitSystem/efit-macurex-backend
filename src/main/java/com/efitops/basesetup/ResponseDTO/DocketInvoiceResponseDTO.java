@@ -25,6 +25,7 @@ public class DocketInvoiceResponseDTO {
 	 private String active;
 	 private String createdBy;
 	 private String cancelRemarks;
+	 private String financialYear;
 	 private List<DocketInvoiceDetResponseDTO>docketInvoiceDetResponseDTO;
 
 }

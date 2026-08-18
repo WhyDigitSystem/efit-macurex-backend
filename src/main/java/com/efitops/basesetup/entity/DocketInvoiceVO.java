@@ -74,6 +74,9 @@ public class DocketInvoiceVO {
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 	
+	@Column(name = "financial_year")
+	 private String  financialYear;
+	
 	@Column(name = "screen_name")
 	private String screenName="DOCKET INVOICE DETAILS";
 	@Column(name = "screen_code")

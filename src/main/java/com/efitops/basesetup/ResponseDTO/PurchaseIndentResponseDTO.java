@@ -39,10 +39,10 @@ public class PurchaseIndentResponseDTO {
     // Common
     private Long orgId;
     private String createdBy;
-    private String updatedBy;
+//    private String updatedBy;
     private String cancelRemarks;
     private boolean active;
-    private boolean cancel;
+//    private boolean cancel;
 
     private String screenName;
     private String screenCode;

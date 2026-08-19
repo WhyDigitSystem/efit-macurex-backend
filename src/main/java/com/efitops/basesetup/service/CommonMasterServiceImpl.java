@@ -1781,23 +1781,25 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			listVO.setBranch(branch);
 		}
 
-		if (dto.getId() != null) {
-
-			List<ListOfValuesDetailsVO> oldDetails = listOfValuesDetailsRepo.findByListOfValuesVO(listVO);
-
-			listOfValuesDetailsRepo.deleteAll(oldDetails);
-		}
-
 		List<ListOfValuesDetailsVO> detailList = new ArrayList<>();
 
 		for (ListOfValuesDetailsDTO detailDTO : dto.getDetails()) {
 
-			ListOfValuesDetailsVO detailVO = new ListOfValuesDetailsVO();
+			ListOfValuesDetailsVO detailVO = null;
+
+			if (detailDTO.getId() != null) {
+
+				detailVO = listOfValuesDetailsRepo.findById(detailDTO.getId()).orElse(null);
+			}
+
+			if (detailVO == null) {
+
+				detailVO = new ListOfValuesDetailsVO();
+			}
 
 			detailVO.setValueCode(detailDTO.getValueCode());
 			detailVO.setValueDescription(detailDTO.getValueDescription());
 			detailVO.setActive(detailDTO.isActive());
-
 			detailVO.setListOfValuesVO(listVO);
 
 			detailList.add(detailVO);
@@ -4378,7 +4380,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		masterVO.setBranchCode(dto.getBranchCode());
 		masterVO.setFinYearIdentifier(dto.getFinYearIdentifier());
 
-
 		List<DocumentTypeMappingDetailsVO> detailList = new ArrayList<>();
 
 		if (CollectionUtils.isNotEmpty(dto.getDetails())) {
@@ -4386,7 +4387,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			for (DocumentTypeMappingDetailsDTO child : dto.getDetails()) {
 
 				DocumentTypeMappingDetailsVO detailVO = new DocumentTypeMappingDetailsVO();
-				
+
 				detailVO.setScreenName(child.getScreenName());
 				detailVO.setScreenCode(child.getScreenCode());
 				detailVO.setDocCode(child.getDocCode());
@@ -4395,10 +4396,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				detailVO.setBranch(child.getBranch());
 				detailVO.setBranchCode(child.getBranchCode());
 				detailVO.setFinYear(child.getFinYear());
-				detailVO
-						.setFinYearIdentifier(child.getFinYearIdentifier());
-				detailVO.setConcatenation(child.getScreenCode()
-						+ child.getDocCode());
+				detailVO.setFinYearIdentifier(child.getFinYearIdentifier());
+				detailVO.setConcatenation(child.getScreenCode() + child.getDocCode());
 				detailVO.setOrgId(dto.getOrgId());
 
 				detailVO.setDocumentTypeMappingMasterVO(masterVO);
@@ -4452,12 +4451,11 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				detailDTO.setDocCode(detailVO.getDocCode());
 				detailDTO.setPrefix(detailVO.getPrefix());
 				detailDTO.setLastNo(detailVO.getLastNo());
-				
+
 				detailDTO.setBranch(detailVO.getBranch());
 				detailDTO.setBranchCode(detailVO.getBranchCode());
 				detailDTO.setFinYear(detailVO.getFinYear());
-				detailDTO
-						.setFinYearIdentifier(detailVO.getFinYearIdentifier());
+				detailDTO.setFinYearIdentifier(detailVO.getFinYearIdentifier());
 				detailDTO.setConcatenation(detailVO.getConcatenation());
 				detailDTO.setOrgId(dto.getOrgId());
 

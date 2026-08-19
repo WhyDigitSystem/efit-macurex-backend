@@ -31,35 +31,26 @@ public interface PurchaseContractRepo extends JpaRepository<PurchaseContractVO, 
 			""", nativeQuery = true)
 	List<Object[]> getItemsByContractId(@Param("contractId") Long contractId);
 
-	@Query(value = """
-			SELECT
-			    c.customer_id,
-			    c.customer_code,
-			    c.customer_name
-
-			FROM customer_header c
-
-			LEFT JOIN listofvaluesdetails a
-			    ON c.customer_category = a.listofvaluesdetails_id
-
-			LEFT JOIN listofvaluesdetails b
-			    ON c.customer_category1 = b.listofvaluesdetails_id
-
-			LEFT JOIN listofvaluesdetails cc
-			    ON c.customer_category2 = cc.listofvaluesdetails_id
-
-			WHERE c.cancel = FALSE
-			  AND c.active = TRUE
-			  AND c.branch = :branch
-			  AND c.org_id = :orgId
-			  AND (
-			        a.value_code = 'SUPPLIER'
-			     OR b.value_code = 'SUPPLIER'
-			     OR cc.value_code = 'SUPPLIER'
-			  )
-
-			ORDER BY c.customer_code
-			""", nativeQuery = true)
+	@Query(value = "SELECT\r\n"
+			+ "    c.customer_id,\r\n"
+			+ "    c.customer_code,\r\n"
+			+ "    c.customer_name\r\n"
+			+ "FROM customer_header c\r\n"
+			+ "LEFT JOIN listofvaluesdetails a\r\n"
+			+ "    ON c.customer_category = a.listofvaluesdetails_id\r\n"
+			+ "LEFT JOIN listofvaluesdetails b\r\n"
+			+ "    ON c.customer_category1 = b.listofvaluesdetails_id\r\n"
+			+ "LEFT JOIN listofvaluesdetails cc\r\n"
+			+ "    ON c.customer_category2 = cc.listofvaluesdetails_id\r\n"
+			+ "WHERE c.cancel = FALSE\r\n"
+			+ "  AND c.active = TRUE\r\n"
+			+ "  AND c.branch = :branch\r\n"
+			+ "  AND c.org_id = :orgId\r\n"
+			+ "  AND (a.value_description = 'Supplier'\r\n"
+			+ "        OR b.value_description = 'Supplier'\r\n"
+			+ "        OR cc.value_description = 'Supplier'\r\n"
+			+ "      )\r\n"
+			+ "ORDER BY c.customer_code", nativeQuery = true)
 	List<Object[]> getSupplierDropdownForPurchaseContract(@Param("branch") Long branch, @Param("orgId") Long orgId);
 
 	List<PurchaseContractVO> findByBranchIdAndOrgIdAndCancelFalse(Long branch, Long orgId);

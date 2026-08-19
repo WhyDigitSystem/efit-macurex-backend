@@ -24,69 +24,68 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "documenttype_mapping")
+@Table(name = "document_type_mapping")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 
 public class DocumentTypeMappingVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "documenttypemappingmastergen")
-	@SequenceGenerator(name = "documenttypemappingmastergen", sequenceName = "documenttypemappingmasterseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "documenttypemappingmaster_id")
-    private Long id;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "document_type_mappinggen")
+	@SequenceGenerator(name = "document_type_mappinggen", sequenceName = "document_type_mappingseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "document_type_mapping_id")
+	private Long id;
+
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
+
+	@ManyToOne
+	@JoinColumn(name = "financial_year")
+	private FinancialYearVO financialYear;
+
+	@Column(name = "description")
+	private String description;
+	@Column(name = "org_id")
+	private Long orgId;
+	@Column(name = "active")
+	private boolean active;
+	@Column(name = "created_by")
+	private String createdBy;
+	@Column(name = "modified_by")
+	private String updatedBy;
+	@Column(name = "cancel")
+	private boolean cancel = false;
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
+	@Column(name = "screen_name")
+	private String screenName = "DT";
+	@Column(name = "screen_code")
+	private String screenCode = "DOCUMENTTYPE";
 	
-	 @ManyToOne
-	 @JoinColumn(name = "branch")
-	 private BranchVO branch;
-
-	 @ManyToOne
-	 @JoinColumn(name = "financial_year")
-	 private FinancialYearVO financialYear;
-	 
-	 @Column(name = "description")
-		private String description;
-	    @Column(name = "org_id")
-		private Long orgId;
-		@Column(name = "active")
-		private boolean active;
-		@Column(name = "created_by")
-		private String createdBy;
-		@Column(name = "modified_by")
-		private String updatedBy;
-		@Column(name = "cancel")
-		private boolean cancel=false;
-		@Column(name = "cancel_remarks")
-		private String cancelRemarks;
-		@Column(name = "screen_name")
-		private String screenName="UNITMASTER";
-		@Column(name = "screen_code")
-		private String screenCode="UM";
-		
-		@JsonGetter("active")
-		public String getActive() {
-			return active ? "Active" : "In-Active";
-		}
-
-		
-		@JsonGetter("cancel")
-		public String getCancel() {
-			return cancel ? "T" : "F";
-		}
-		
-
-		@Embedded
-		private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-		
-		@OneToMany(
-		        mappedBy = "documentTypeMappingMasterVO",
-		        cascade = CascadeType.ALL)
-		@JsonManagedReference
-		private List<DocumentTypeMappingDetailsVO> details;
-		
-
+	@Column(name = "branch_code",length =25)
+	private String branchCode;
+	
+	
+	
+	@Column(name = "finyearidentifier",length =50)
+	private String finYearIdentifier;
+	
+	@JsonGetter("active")
+	public String getActive() {
+		return active ? "Active" : "In-Active";
 	}
 
-	
+	@JsonGetter("cancel")
+	public String getCancel() {
+		return cancel ? "T" : "F";
+	}
 
+	@Embedded
+	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 
+	@OneToMany(mappedBy = "documentTypeMappingMasterVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<DocumentTypeMappingDetailsVO> details;
+
+}

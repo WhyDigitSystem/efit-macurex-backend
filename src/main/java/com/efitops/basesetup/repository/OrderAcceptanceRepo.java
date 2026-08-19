@@ -19,7 +19,7 @@ public interface OrderAcceptanceRepo extends JpaRepository<OrderAcceptanceVO, Lo
 	QuotationVO findByDocId(String docId);
 
 	@Query(nativeQuery = true, value = "select * from order_acceptance_basic where org_id=?1  and branch=?2 and active=1 and cancel=0")
-	List<OrderAcceptanceVO> getQuotationByOrgId(Long orgId, Long branchId);
+	List<OrderAcceptanceVO> getOrderAcceptanceByOrgId(Long orgId, Long branchId);
 
 	@Query(value = "SELECT\r\n" + "		    i.item_id,\r\n" + "		    i.item_code,\r\n"
 			+ "		    i.item_description,\r\n" + "		    u.unit_id,\r\n" + "		    i.min_sell_price,\r\n"

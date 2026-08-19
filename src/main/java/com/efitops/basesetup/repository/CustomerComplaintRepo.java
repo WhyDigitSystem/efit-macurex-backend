@@ -15,15 +15,18 @@ public interface CustomerComplaintRepo extends JpaRepository<CustomerComplaintEn
 	CustomerComplaintEntryVO getCustomerComplaintById(Long id);
 
 	@Query(value = """
-	        SELECT *
-	        FROM customercomplaintmaster
-	        WHERE org_id = :orgId
-	          AND branch = :branch
-	          AND cancel = false and active = 1
-	        ORDER BY customercomplaintmaster_id
-	        """, nativeQuery = true)
+			SELECT *
+			FROM customercomplaintmaster
+			WHERE org_id = :orgId
+			  AND branch = :branch
+			  AND cancel = false and active = 1
+			ORDER BY customercomplaintmaster_id
+			""", nativeQuery = true)
 	List<CustomerComplaintEntryVO> getCustomerComplaintByOrgId(@Param("orgId") Long orgId,
 			@Param("branch") Long branch);
+
+	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
+	String getCustomerComplaintDocId(Long orgId, String financialYear, String screenCode);
 
 //	@Query(value =
 //		       "SELECT 'APPLIANCES' AS type " +
@@ -33,5 +36,4 @@ public interface CustomerComplaintRepo extends JpaRepository<CustomerComplaintEn
 //		       nativeQuery = true)
 //		List<Object[]> getTypeDropdown();
 
-	
 }

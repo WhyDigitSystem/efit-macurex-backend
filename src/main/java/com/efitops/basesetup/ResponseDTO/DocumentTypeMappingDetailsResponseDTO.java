@@ -9,17 +9,28 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DocumentTypeMappingDetailsResponseDTO {
 
-    private Long id;
+	private Long id;
 
-    private String screenName;
+	private String screenName;
 
-    private String screenCode;
+	private String screenCode;
 
-    private String docCode;
+	private String docCode;
 
-    private String prefix;
+	private String prefix;
 
-    private Long lastNo;
+	private int lastNo;
 
-    private String active;
+	private Long orgId;
+
+	private String finYear;
+
+	private String branch;
+
+	private String branchCode;
+
+	private String finYearIdentifier;
+
+	private String concatenation;
+
 }

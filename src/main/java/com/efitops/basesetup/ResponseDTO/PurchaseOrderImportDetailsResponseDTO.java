@@ -1,6 +1,5 @@
 package com.efitops.basesetup.ResponseDTO;
 
-
 import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
@@ -12,26 +11,28 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PurchaseOrderImportDetailsResponseDTO {
 
-    private Long id;
+	private Long id;
 
-    private String indentNo;
+	private String indentNo;
 
-    private String indentDate;
+	private String indentDate;
 
-    private ItemMasterDetailsResponseDTO item;
+	private ItemMasterDetailsResponseDTO item;
 
-    private UnitResponseDTO uom;
+	private UnitResponseDTO uom;
 
-    private BigDecimal indentQty;
+	private BigDecimal indentQty;
 
-    private BigDecimal poQty;
+	private BigDecimal poQty;
 
-    private BigDecimal fobRateFc;
+	private BigDecimal fobRateFc;
 
-    private BigDecimal fobValueFc;
+	private BigDecimal fobValueFc;
 
-    private BigDecimal fobRateInr;
+	private BigDecimal fobRateInr;
 
-    private BigDecimal fobValueInr;
+	private BigDecimal fobValueInr;
+
+	private BigDecimal orderRate;
 
 }

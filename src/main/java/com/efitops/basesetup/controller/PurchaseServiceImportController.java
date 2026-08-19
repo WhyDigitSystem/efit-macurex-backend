@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -116,7 +117,7 @@ public class PurchaseServiceImportController extends BaseController {
 	}
 
 	@GetMapping("/getPurchaseOrderById")
-	public ResponseEntity<ResponseDTO> getPurchaseOrderById(@RequestParam Long id, @RequestParam String type) {
+	public ResponseEntity<ResponseDTO> getPurchaseOrderById(@RequestParam Long id, @RequestParam PoType type) {
 
 		String methodName = "getPurchaseOrderById()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -291,8 +292,8 @@ public class PurchaseServiceImportController extends BaseController {
 	}
 
 	@GetMapping("/getMutipleFactorAmount")
-	public ResponseEntity<ResponseDTO> getMutipleFactorAmount(@RequestParam Long orgId, @RequestParam Long branch,
-			@RequestParam Long currency) {
+	public ResponseEntity<ResponseDTO> getMutipleFactorAmount(@RequestParam Long orgId, @RequestParam Long primaryUnit,
+			@RequestParam Long purchaseUnit) {
 		String methodName = "getMutipleFactorAmount()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -301,7 +302,7 @@ public class PurchaseServiceImportController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = purchaseOrderService.getMutipleFactorAmount(orgId, branch, currency);
+			mapp = purchaseOrderService.getMutipleFactorAmount(orgId, primaryUnit, purchaseUnit);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -312,8 +313,7 @@ public class PurchaseServiceImportController extends BaseController {
 			responseObjectsMap.put("mapp", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Rate details",
-					errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Rate details", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

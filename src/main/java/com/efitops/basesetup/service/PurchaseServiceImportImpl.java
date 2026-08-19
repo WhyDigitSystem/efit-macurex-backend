@@ -3,6 +3,7 @@ package com.efitops.basesetup.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -126,9 +127,11 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 	AmountInWordsConverterService amountInWordsConverterService;
 
 	@Override
-	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, String type) throws ApplicationException {
+	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException {
 
-		PurchaseOrderVO orderAcceptanceVO = purchaseOrderRepo.getPurchaseOrderById(id, type);
+		Integer typeValue = type == PoType.Local ? 1 : 0;
+
+		PurchaseOrderVO orderAcceptanceVO = purchaseOrderRepo.getPurchaseOrderById(id, typeValue);
 
 		if (orderAcceptanceVO == null) {
 			throw new ApplicationException("Order Not Found");
@@ -229,6 +232,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 	private void setPurchaseOrderLocalValues(PurchaseOrderDTO dto, PurchaseOrderVO vo) throws ApplicationException {
 		vo.setOrderPlacedDate(dto.getOrderPlacedDate());
+
 		vo.setPoType(PoType.valueOf(dto.getPoType()));
 		vo.setBelongsTo(dto.getBelongsTo());
 		vo.setIsIgstApplicable(dto.getIsIgstApplicable());
@@ -578,7 +582,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 				detailVO.setOrderRate(detailDTO.getOrderRate());
 
-				detailVO.setFobRateFc(detailDTO.getOrderRate().divide(dto.getExchangeRate()));
+//				detailVO.setFobRateFc(detailDTO.getOrderRate().divide(dto.getExchangeRate()));
+				detailVO.setFobRateFc(detailDTO.getOrderRate().divide(dto.getExchangeRate(), 4, RoundingMode.HALF_UP));
 
 				BigDecimal poQty = detailVO.getPoQty() != null ? detailVO.getPoQty() : BigDecimal.ZERO;
 
@@ -827,6 +832,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				importResponse.setFobRateFc(importVO.getFobRateFc());
 				importResponse.setFobValueFc(importVO.getFobValueFc());
 				importResponse.setFobRateInr(importVO.getFobRateInr());
+				importResponse.setOrderRate(importVO.getOrderRate());
 				importResponse.setFobValueInr(importVO.getFobValueInr());
 //				importResponse.setHsnCode(importVO.getHsnCode());
 
@@ -1119,10 +1125,10 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		}
 		return list;
 	}
-	
+
 	@Override
 	public List<Map<String, Object>> getMutipleFactorAmount(Long orgId, Long primaryUnit, Long purchaseUnit) {
-		Set<Object[]> chType = purchaseOrderRepo.getMutipleFactorAmount( orgId,  primaryUnit,  purchaseUnit);
+		Set<Object[]> chType = purchaseOrderRepo.getMutipleFactorAmount(orgId, primaryUnit, purchaseUnit);
 		return getMutipleFactorAmount(chType);
 	}
 

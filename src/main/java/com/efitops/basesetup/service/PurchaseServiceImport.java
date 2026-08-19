@@ -23,8 +23,6 @@ public interface PurchaseServiceImport {
 
 	ResponseEntity<byte[]> viewPurchaseOrderFile(HttpServletRequest request) throws IOException;
 
-	PurchaseOrderResponseDTO getPurchaseOrderById(Long id, String type) throws ApplicationException;
-
 	List<PurchaseOrderResponseDTO> getPurchaseOrderByOrgId(Long orgId, Long branch) throws ApplicationException;
 
 	List<Map<String, Object>> getItemDetailsResponsePurchaseLocal(Long orgId, Long branch);
@@ -38,5 +36,7 @@ public interface PurchaseServiceImport {
 	List<Map<String, Object>> getExchangeRateDetails(Long orgId, Long branch, Long currency);
 
 	List<Map<String, Object>> getMutipleFactorAmount(Long orgId, Long primaryUnit, Long purchaseUnit);
+
+	PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException;
 
 }

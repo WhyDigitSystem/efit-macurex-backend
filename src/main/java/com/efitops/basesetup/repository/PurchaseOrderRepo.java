@@ -13,7 +13,7 @@ import com.efitops.basesetup.entity.PurchaseOrderVO;
 public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrderVO, Long> {
 
 	@Query(nativeQuery = true, value = "select * from purchase_order_basic where purchase_order_basic_id=?1 and active=1 and cancel=0 and po_type=?2")
-	PurchaseOrderVO getPurchaseOrderById(Long id, String type);
+	PurchaseOrderVO getPurchaseOrderById(Long id, Integer type);
 
 	@Query(nativeQuery = true, value = "select * from purchase_order_basic where org_id=?1  and branch=?2 and active=1 and cancel=0")
 	List<PurchaseOrderVO> getPurchaseOrderByOrgId(Long orgId, Long branch);

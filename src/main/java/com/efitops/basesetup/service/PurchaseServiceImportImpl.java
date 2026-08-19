@@ -395,19 +395,20 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 				BigDecimal indentQty = detailDTO.getIndentQty() != null ? detailDTO.getIndentQty() : BigDecimal.ZERO;
 
-				BigDecimal poQtyInPurchaseUnit = BigDecimal.ZERO;
+				BigDecimal poQtyInPurchaseUnit = indentQty;
 
 				Set<Object[]> multipleFactor = purchaseOrderRepo.getMutipleFactorAmount(dto.getOrgId(),
 						detailDTO.getPrimaryUnit(), detailDTO.getPurchaseUnit());
 
 				for (Object[] ledger : multipleFactor) {
 
-					BigDecimal factor = ledger[0] != null
-							? ((Number) ledger[0]) instanceof BigDecimal ? (BigDecimal) ledger[0]
-									: BigDecimal.valueOf(((Number) ledger[0]).doubleValue())
-							: BigDecimal.ZERO;
+					if (ledger[0] != null) {
 
-					poQtyInPurchaseUnit = factor.multiply(indentQty);
+						BigDecimal factor = ledger[0] instanceof BigDecimal ? (BigDecimal) ledger[0]
+								: BigDecimal.valueOf(((Number) ledger[0]).doubleValue());
+
+						poQtyInPurchaseUnit = factor.multiply(indentQty);
+					}
 
 					break;
 				}
@@ -575,7 +576,9 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 				detailVO.setPoQty(detailVO.getIndentQty());
 
-				detailVO.setFobRateFc(detailDTO.getFobRateFc());
+				detailVO.setOrderRate(detailDTO.getOrderRate());
+
+				detailVO.setFobRateFc(detailDTO.getOrderRate().divide(dto.getExchangeRate()));
 
 				BigDecimal poQty = detailVO.getPoQty() != null ? detailVO.getPoQty() : BigDecimal.ZERO;
 
@@ -586,7 +589,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailVO.setFobValueFc(amountInFbValue);
 
 				totalAmounValueFobInFc = totalAmounValueFobInFc.add(detailVO.getFobValueFc());
-				detailVO.setFobRateInr(detailDTO.getFobRateInr());
+				detailVO.setFobRateInr(detailDTO.getOrderRate());
 
 				detailVO.setFobValueInr(detailDTO.getFobRateFc().multiply(dto.getExchangeRate()));
 
@@ -1005,4 +1008,131 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
 	}
 
+	@Override
+	public List<Map<String, Object>> getItemDetailsResponsePurchaseLocal(Long orgId, Long branch) {
+		Set<Object[]> chType = purchaseOrderRepo.getItemDetailsResponsePurchaseLocal(orgId, branch);
+		return getItemDetailsResponsePurchaseLocal(chType);
+	}
+
+	private List<Map<String, Object>> getItemDetailsResponsePurchaseLocal(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("unitId", ch[3] != null ? ch[3].toString() : "");
+			map.put("hsn", ch[4] != null ? ch[4].toString() : "");
+			map.put("customerPartNo", ch[5] != null ? ch[5].toString() : "");
+			map.put("primaryUnit", ch[6] != null ? ((Number) ch[6]).longValue() : null);
+			map.put("purchaseUnit", ch[7] != null ? ((Number) ch[7]).longValue() : null);
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getItemDetailsResponsePurchaseImport(Long orgId, Long branch) {
+		Set<Object[]> chType = purchaseOrderRepo.getItemDetailsResponsePurchaseImport(orgId, branch);
+		return getItemDetailsResponsePurchaseImport(chType);
+	}
+
+	private List<Map<String, Object>> getItemDetailsResponsePurchaseImport(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("unitId", ch[3] != null ? ch[3].toString() : "");
+			map.put("hsn", ch[4] != null ? ch[4].toString() : "");
+			map.put("customerPartNo", ch[5] != null ? ch[5].toString() : "");
+			map.put("uom", ch[6] != null ? ((Number) ch[6]).longValue() : null);
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getSupplierDetails(Long orgId, Long branch) {
+		Set<Object[]> chType = purchaseOrderRepo.getSupplierDetails(orgId, branch);
+		return getSupplierDetails(chType);
+	}
+
+	private List<Map<String, Object>> getSupplierDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("supplierId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("supplierName", ch[1] != null ? ch[1].toString() : "");
+			map.put("supplierCode", ch[2] != null ? ch[2].toString() : "");
+			map.put("address", ch[3] != null ? ch[3].toString() : "");
+			map.put("pinCode", ch[4] != null ? ch[4].toString() : "");
+			map.put("gstNo", ch[5] != null ? ch[5].toString() : "");
+			map.put("stateName", ch[6] != null ? ch[6].toString() : "");
+			map.put("isRegistered", ch[7] != null ? ch[7].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public String getPurchaseOrderDocId(Long orgId, String financialYear, String screenCode, PoType type) {
+
+		if (type == PoType.Import) {
+			String screenCode1 = "POI";
+			return purchaseOrderRepo.getPurchaseOrderImportDocId(orgId, financialYear, screenCode1);
+		} else if (type == PoType.Local) {
+			String screenCode1 = "POL";
+			return purchaseOrderRepo.getPurchaseOrderLocalDocId(orgId, financialYear, screenCode1);
+		}
+		return null;
+	}
+
+	@Override
+	public List<Map<String, Object>> getExchangeRateDetails(Long orgId, Long branch, Long currency) {
+		Set<Object[]> chType = purchaseOrderRepo.getExchangeRateDetails(orgId, branch, currency);
+		return getExchangeRateDetails(chType);
+	}
+
+	private List<Map<String, Object>> getExchangeRateDetails(Set<Object[]> chType) {
+		List<Map<String, Object>> list = new ArrayList<>();
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("exchangeRate", ch[0] != null ? BigDecimal.valueOf(((Number) ch[0]).doubleValue()) : null);
+			list.add(map);
+		}
+		return list;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getMutipleFactorAmount(Long orgId, Long primaryUnit, Long purchaseUnit) {
+		Set<Object[]> chType = purchaseOrderRepo.getMutipleFactorAmount( orgId,  primaryUnit,  purchaseUnit);
+		return getMutipleFactorAmount(chType);
+	}
+
+	private List<Map<String, Object>> getMutipleFactorAmount(Set<Object[]> chType) {
+		List<Map<String, Object>> list = new ArrayList<>();
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("poRate", ch[0] != null ? BigDecimal.valueOf(((Number) ch[0]).doubleValue()) : null);
+			list.add(map);
+		}
+		return list;
+	}
 }

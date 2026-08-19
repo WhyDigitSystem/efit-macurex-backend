@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
+import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
@@ -25,5 +26,17 @@ public interface PurchaseServiceImport {
 	PurchaseOrderResponseDTO getPurchaseOrderById(Long id, String type) throws ApplicationException;
 
 	List<PurchaseOrderResponseDTO> getPurchaseOrderByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getItemDetailsResponsePurchaseLocal(Long orgId, Long branch);
+
+	List<Map<String, Object>> getItemDetailsResponsePurchaseImport(Long orgId, Long branch);
+
+	List<Map<String, Object>> getSupplierDetails(Long orgId, Long branch);
+
+	String getPurchaseOrderDocId(Long orgId, String financialYear, String screenCode, PoType type);
+
+	List<Map<String, Object>> getExchangeRateDetails(Long orgId, Long branch, Long currency);
+
+	List<Map<String, Object>> getMutipleFactorAmount(Long orgId, Long primaryUnit, Long purchaseUnit);
 
 }

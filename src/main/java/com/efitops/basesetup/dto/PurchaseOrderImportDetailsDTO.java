@@ -28,5 +28,7 @@ public class PurchaseOrderImportDetailsDTO {
 	private BigDecimal fobRateInr;
 
 	private BigDecimal fobValueInr;
+	
+	private BigDecimal orderRate;
 
 }

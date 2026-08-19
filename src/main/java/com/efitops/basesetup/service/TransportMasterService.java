@@ -109,6 +109,8 @@ public interface TransportMasterService {
 	Map<String, Object> getItemsForStockTransferChallan(String despatchNo, Long branch, Long orgId)
 			throws ApplicationException;
 
+	String getCustomerComplaintDocId(Long orgId, String financialYear, String screenCode);
+
 
 //	Map<String, Object> getDespatchPendingQty(Long itemId, String month, Long branch, Long orgId, Long customerId)
 //			throws ApplicationException;

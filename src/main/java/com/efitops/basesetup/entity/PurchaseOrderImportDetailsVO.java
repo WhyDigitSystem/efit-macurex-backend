@@ -65,6 +65,9 @@ public class PurchaseOrderImportDetailsVO {
 
 	@Column(name = "fob_value_inr", precision = 10, scale = 2)
 	private BigDecimal fobValueInr;
+	
+	@Column(name = "order_rate", precision = 10, scale = 2)
+	private BigDecimal orderRate;
 
 	@ManyToOne
 	@JsonBackReference

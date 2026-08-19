@@ -36,6 +36,12 @@ public class CustomerComplaintEntryVO {
 	@Column(name = "customercomplaintmaster_id")
 	private Long id;
 	
+	@Column(name = "doc_id")
+	private String docId;
+
+	@Column(name = "doc_date")
+	private LocalDate docDate = LocalDate.now();
+	
 	@Column(name = "qty_no")
 	private Long qtyNo;
 	

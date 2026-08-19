@@ -175,7 +175,7 @@ public class TransactionServiceImpl implements TransactionService {
 			message = "Sales Delivery Schedule Updated Successfully";
 		}
 
-		// Map Header + Details + Delivery Plans
+	
 		createUpdateSalesDeliveryScheduleVOByDTO(salesDeliveryScheduleDTO, salesDeliveryScheduleVO);
 
 		// Cascade saves everything
@@ -1111,7 +1111,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public String getSalesDeliveryScheduleDocId(Long orgId, String financialYear, String screenCode) {
-		String screenCode1 = "SDC";
+		String screenCode1 = "SDS";
 		String result = salesDeliveryScheduleRepo.getSalesDeliveryScheduleDocId(orgId, financialYear, screenCode1);
 		return result;
 	}

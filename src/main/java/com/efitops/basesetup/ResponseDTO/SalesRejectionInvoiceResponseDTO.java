@@ -111,6 +111,7 @@ public class SalesRejectionInvoiceResponseDTO {
 
     private String narration;
 
+    private String financialYear;
 
     // =========================================================
     // DC CUM INVOICE SPECIFIC

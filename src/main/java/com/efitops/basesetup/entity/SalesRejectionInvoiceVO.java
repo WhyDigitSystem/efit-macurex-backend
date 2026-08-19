@@ -205,6 +205,9 @@ public class SalesRejectionInvoiceVO {
 	@Column(name = "gross_weight")
 	private BigDecimal grossWeight;
 	
+	@Column(name = "financial_year")
+	private String financialYear;
+	
 	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "active")

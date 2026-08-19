@@ -24,15 +24,8 @@ List<SalesRejectionInvoiceVO> getSalesRejectionInvoiceByOrgId(
      @Param("orgId") Long orgId,
      @Param("branch") Long branch);
 
-	@Query(value = """
-		    SELECT s.doc_id
-		    FROM sales_rejection_invoice_basic s
-		    WHERE s.org_id = ?1
-		      AND s.screen_code = ?2
-		      AND s.active = 1
-		      AND s.cancel = 0
-		    ORDER BY s.sales_rejection_invoice_basic_id DESC
-		    LIMIT 1
-		    """, nativeQuery = true)
-		String getSalesRejectionInvoiceDocId(Long orgId, String screenCode);
+
+	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
+	String getSalesRejectionInvoiceDocId(Long orgId, String financialYear, String screenCode);
+
 }

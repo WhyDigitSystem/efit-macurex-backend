@@ -1219,14 +1219,13 @@ public class TransactionServiceImpl implements TransactionService {
 		} else {
 
 			salesRejectionInvoiceVO = new SalesRejectionInvoiceVO();
-
-			String docId = salesRejectionInvoiceRepo.getSalesRejectionInvoiceDocId(salesRejectionInvoiceDTO.getOrgId(),
-					screenCode);
+			
+			String docId = salesRejectionInvoiceRepo.getSalesRejectionInvoiceDocId(salesRejectionInvoiceDTO.getOrgId(), salesRejectionInvoiceDTO.getFinancialYear(), screenCode);
 
 			salesRejectionInvoiceVO.setDocId(docId);
 
 			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdScreenCode(salesRejectionInvoiceDTO.getOrgId(), screenCode);
+					.findByOrgIdAndFinYearAndScreenCode(salesRejectionInvoiceDTO.getOrgId(), salesRejectionInvoiceDTO.getFinancialYear(), screenCode);
 			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
 			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
@@ -1276,6 +1275,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 		salesRejectionInvoiceVO.setDispatchInstructionNo(salesRejectionInvoiceDTO.getDispatchInstructionNo());
 
+		salesRejectionInvoiceVO.setFinancialYear(salesRejectionInvoiceDTO.getFinancialYear());
+		
 		salesRejectionInvoiceVO.setTimeOfRemoval(salesRejectionInvoiceDTO.getTimeOfRemoval());
 
 		salesRejectionInvoiceVO.setDateOfRemoval(salesRejectionInvoiceDTO.getDateOfRemoval());
@@ -1743,6 +1744,7 @@ public class TransactionServiceImpl implements TransactionService {
 		dto.setOrgId(vo.getOrgId());
 		dto.setActive(vo.isActive());
 		dto.setCancelRemarks(vo.getCancelRemarks());
+		dto.setFinancialYear(vo.getFinancialYear());
 
 		// =========================================================
 		// DETAILS CHILD

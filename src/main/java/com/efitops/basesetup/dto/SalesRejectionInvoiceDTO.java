@@ -122,6 +122,8 @@ public class SalesRejectionInvoiceDTO {
 	private boolean active;
 
 	private String cancelRemarks;
+	private String financialYear;
+
 
 	List<SalesRejectionInvoiceDetailsDTO> salesRejectionInvoiceDetailsDTO;
 	List<SalesRejectionInvoiceTaxDetailsDTO> salesRejectionInvoiceTaxDetailsDTO;

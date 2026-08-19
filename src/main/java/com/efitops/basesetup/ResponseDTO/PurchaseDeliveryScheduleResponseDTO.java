@@ -18,10 +18,10 @@ public class PurchaseDeliveryScheduleResponseDTO {
     private Long id;
     private BranchResponseDTO branch;
     private String belongsTo;
-    private String docNo;
+    private String docId;
     private LocalDate docDate;
-    private LocalDate schStartDate;
-    private LocalDate schEndDate;
+    private LocalDate scheduleStartDate;
+    private LocalDate scheduleEndDate;
     private SupplierResponseDTO supplier;
     private String purchaseOrderNo;
     private LocalDate purchaseOrderDate;

@@ -38,56 +38,56 @@ public class PurchaseController extends BaseController {
     // PURCHASE CONTRACT — original paths: /api/purchaseContract/**
     // ==================================================================
 
-    @PostMapping(value = "/api/purchaseMaster/updateCreatePurchaseContract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDTO> updateCreatePurchaseContract(
-            @RequestPart("purchaseContractDTO") String purchaseContractJson,
-            @RequestPart(value = "files", required = false) MultipartFile[] files) {
-
-        Map<String, Object> responseObjectsMap = new HashMap<>();
-        ResponseDTO responseDTO;
-        try {
-            PurchaseContractDTO dto = objectMapper.readValue(purchaseContractJson, PurchaseContractDTO.class);
-            Map<String, Object> result = purchaseService.updateCreatePurchaseContract(dto, files);
-            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, result.get("message"));
-            responseObjectsMap.put("purchaseContractVO", result.get("purchaseContractVO"));
-            responseDTO = createServiceResponse(responseObjectsMap);
-        } catch (Exception e) {
-            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, "updateCreatePurchaseContract()", e.getMessage());
-            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Contract Save Failed", e.getMessage());
-        }
-        return ResponseEntity.ok(responseDTO);
-    }
-
-    @GetMapping("/api/purchaseMaster/getPurchaseContractById")
-    public ResponseEntity<ResponseDTO> getPurchaseContractById(@RequestParam Long id) {
-        Map<String, Object> responseObjectsMap = new HashMap<>();
-        ResponseDTO responseDTO;
-        try {
-            PurchaseContractResponseDTO result = purchaseService.getPurchaseContractById(id);
-            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Contract information retrieved successfully");
-            responseObjectsMap.put("purchaseContractVO", result);
-            responseDTO = createServiceResponse(responseObjectsMap);
-        } catch (Exception e) {
-            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Contract information retrieval failed", e.getMessage());
-        }
-        return ResponseEntity.ok(responseDTO);
-    }
-
-    @GetMapping("/api/purchaseMaster/getPurchaseContractByOrgId")
-    public ResponseEntity<ResponseDTO> getPurchaseContractByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
-        Map<String, Object> responseObjectsMap = new HashMap<>();
-        ResponseDTO responseDTO;
-        try {
-            List<PurchaseContractResponseDTO> result = purchaseService.getPurchaseContractByOrgId(orgId, branchId);
-            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Contract information retrieved successfully");
-            responseObjectsMap.put("purchaseContractVO", result);
-            responseDTO = createServiceResponse(responseObjectsMap);
-        } catch (Exception e) {
-            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Contract information retrieval failed", e.getMessage());
-        }
-        return ResponseEntity.ok(responseDTO);
-    }
-
+//    @PostMapping(value = "/api/purchaseMaster/updateCreatePurchaseContract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<ResponseDTO> updateCreatePurchaseContract(
+//            @RequestPart("purchaseContractDTO") String purchaseContractJson,
+//            @RequestPart(value = "files", required = false) MultipartFile[] files) {
+//
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//        ResponseDTO responseDTO;
+//        try {
+//            PurchaseContractDTO dto = objectMapper.readValue(purchaseContractJson, PurchaseContractDTO.class);
+//            Map<String, Object> result = purchaseService.updateCreatePurchaseContract(dto, files);
+//            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, result.get("message"));
+//            responseObjectsMap.put("purchaseContractVO", result.get("purchaseContractVO"));
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//        } catch (Exception e) {
+//            LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, "updateCreatePurchaseContract()", e.getMessage());
+//            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Contract Save Failed", e.getMessage());
+//        }
+//        return ResponseEntity.ok(responseDTO);
+//    }
+//
+//    @GetMapping("/api/purchaseMaster/getPurchaseContractById")
+//    public ResponseEntity<ResponseDTO> getPurchaseContractById(@RequestParam Long id) {
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//        ResponseDTO responseDTO;
+//        try {
+//            PurchaseContractResponseDTO result = purchaseService.getPurchaseContractById(id);
+//            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Contract information retrieved successfully");
+//            responseObjectsMap.put("purchaseContractVO", result);
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//        } catch (Exception e) {
+//            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Contract information retrieval failed", e.getMessage());
+//        }
+//        return ResponseEntity.ok(responseDTO);
+//    }
+//
+//    @GetMapping("/api/purchaseMaster/getPurchaseContractByOrgId")
+//    public ResponseEntity<ResponseDTO> getPurchaseContractByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//        ResponseDTO responseDTO;
+//        try {
+//            List<PurchaseContractResponseDTO> result = purchaseService.getPurchaseContractByOrgId(orgId, branchId);
+//            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Contract information retrieved successfully");
+//            responseObjectsMap.put("purchaseContractVO", result);
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//        } catch (Exception e) {
+//            responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Contract information retrieval failed", e.getMessage());
+//        }
+//        return ResponseEntity.ok(responseDTO);
+//    }
+//
 
 
     // ==================================================================

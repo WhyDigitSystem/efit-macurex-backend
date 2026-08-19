@@ -12,10 +12,10 @@ import com.efitops.basesetup.exception.ApplicationException;
 public interface PurchaseService {
 
     // ---------- Purchase Contract ----------
-    Map<String, Object> updateCreatePurchaseContract(PurchaseContractDTO dto, MultipartFile[] files) throws ApplicationException;
-    PurchaseContractResponseDTO getPurchaseContractById(Long id) throws ApplicationException;
-    List<PurchaseContractResponseDTO> getPurchaseContractByOrgId(Long orgId, Long branchId) throws ApplicationException;
-    String getPurchaseContractDocId(Long orgId, String finYear, Long branch);
+//    Map<String, Object> updateCreatePurchaseContract(PurchaseContractDTO dto, MultipartFile[] files) throws ApplicationException;
+//    PurchaseContractResponseDTO getPurchaseContractById(Long id) throws ApplicationException;
+//    List<PurchaseContractResponseDTO> getPurchaseContractByOrgId(Long orgId, Long branchId) throws ApplicationException;
+//    String getPurchaseContractDocId(Long orgId, String finYear, Long branch);
 
     // ---------- Purchase Delivery Schedule ----------
 //    Map<String, Object> updateCreatePurchaseDeliverySchedule(PurchaseDeliveryScheduleDTO dto) throws ApplicationException;

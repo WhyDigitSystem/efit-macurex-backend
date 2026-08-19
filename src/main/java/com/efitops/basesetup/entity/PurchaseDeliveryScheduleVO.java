@@ -33,17 +33,17 @@ public class PurchaseDeliveryScheduleVO {
     @Column(name = "belongs_to")
     private String belongsTo;
 
-    @Column(name = "doc_no")
-    private String docNo;
+    @Column(name = "doc_id")
+    private String docId;
 
     @Column(name = "doc_date")
-    private LocalDate docDate;
+    private LocalDate docDate = LocalDate.now();
 
-    @Column(name = "sch_start_date")
-    private LocalDate schStartDate;
+    @Column(name = "schedule_start_date")
+    private LocalDate scheduleStartDate;
 
-    @Column(name = "sch_end_date")
-    private LocalDate schEndDate;
+    @Column(name = "schedule_end_date")
+    private LocalDate scheduleEndDate;
 
     @ManyToOne
     @JoinColumn(name = "supplier")
@@ -81,7 +81,10 @@ public class PurchaseDeliveryScheduleVO {
     @OneToMany(mappedBy = "purchaseDeliveryScheduleVO", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PurchaseDeliveryScheduleDetailsVO> purchaseDeliveryScheduleDetailsVO = new ArrayList<>();
 
-   
+    @Column(name = "screen_code", length = 10)
+	private String screenCode = "PDS";
+	@Column(name = "screen_name", length = 30)
+	private String screenName = "Purchase Delivery Schedule";
 
 
 	@JsonGetter("active")

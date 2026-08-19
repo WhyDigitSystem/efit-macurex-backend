@@ -15,9 +15,9 @@ public class PurchaseDeliveryScheduleDTO {
     private Long id;
     private Long branch;
     private String belongsTo;
-    private LocalDate docDate;
-    private LocalDate schStartDate;
-    private LocalDate schEndDate;
+//    private LocalDate docDate;
+    private LocalDate scheduleStartDate;
+    private LocalDate scheduleEndDate;
     private Long supplier;
 
     private String purchaseOrderNo;   // "PURCHASE_CONTRACT" or "LOCAL_PURCHASE_ORDER"

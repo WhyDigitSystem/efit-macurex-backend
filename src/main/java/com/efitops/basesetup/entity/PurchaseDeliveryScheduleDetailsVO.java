@@ -31,6 +31,10 @@ public class PurchaseDeliveryScheduleDetailsVO {
     @ManyToOne
     @JoinColumn(name = "primary_unit")
     private UnitMasterVO primaryUnit;
+    
+    @ManyToOne
+    @JoinColumn(name = "purchase_unit")
+    private UnitMasterVO purchaseUnit;
 
     @Column(name = "demand_qty")
     private BigDecimal demandQty;

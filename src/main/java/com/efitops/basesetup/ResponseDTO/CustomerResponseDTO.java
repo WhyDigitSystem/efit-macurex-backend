@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.EmployeeResponseDTO;
+import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
 
 import lombok.AllArgsConstructor;
@@ -61,6 +63,7 @@ public class CustomerResponseDTO {
 	    private GSTStateResponseDTO gstState;
 
 	    private boolean gstApplicable;
+		private CurrencyResponseDTO primaryCurrency;
 
 	    private String address;
 

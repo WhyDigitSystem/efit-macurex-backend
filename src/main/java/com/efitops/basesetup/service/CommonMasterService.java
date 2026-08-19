@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CompanyResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTRateMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingOfPartyToAccResponseDTO;
 import com.efitops.basesetup.dto.BranchDTO;
@@ -278,9 +279,9 @@ public interface CommonMasterService {
 
 	// DocumentTypeMaster
 
-	List<DocumentTypeMasterVO> getDocumentTypeMasterByOrgId(Long orgId, Long branch);
+//	List<DocumentTypeMasterVO> getDocumentTypeMasterByOrgId(Long orgId, Long branch);
 
-	Optional<DocumentTypeMasterVO> getDocumentTypeMasterById(Long id);
+	DocumentTypeMasterVO getDocumentTypeMasterById(Long id) throws ApplicationException;
 
 	Map<String, Object> createUpdateDocumentTypeMaster(DocumentTypeMasterDTO documentTypeMasterDTO)
 			throws ApplicationException;
@@ -340,9 +341,9 @@ public interface CommonMasterService {
 	Map<String, Object> updateCreateDocumentTypeMapping(DocumentTypeMappingDTO documentTypeMappingDTO)
 			throws ApplicationException;
 
-	DocumentTypeMappingVO getDocumentTypeMappingById(Long id) throws ApplicationException;
+	DocumentTypeMappingResponseDTO getDocumentTypeMappingById(Long id) throws ApplicationException;
 
-	List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch) throws ApplicationException;
+//	List<DocumentTypeMappingResponseDTO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch) throws ApplicationException;
 
 	// saleszonemaster
 
@@ -355,5 +356,13 @@ public interface CommonMasterService {
 	UomConversionResponseDTO getUomConversionById(Long id) throws ApplicationException;
 
 	List<UomConversionResponseDTO> getUomConversionByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+	List<DocumentTypeMasterVO> getAllDocumentTypeMasterByOrgId(Long orgId);
+
+	List<DocumentTypeMappingResponseDTO> getDocumentTypeMappingByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getPendingDocumentTypeMapping(Long orgId, String branch, String branchCode,
+			String finYear, String finYearIdentifier);
 
 }

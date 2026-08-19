@@ -82,7 +82,7 @@ public class ProformaInvoiceVO {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "bank_name")
-	private BankDetailsVO bankName;
+	private TSBankVO bankName;
 
 	@Column(name = "insurance", precision = 10, scale = 2)
 	private BigDecimal insurance;

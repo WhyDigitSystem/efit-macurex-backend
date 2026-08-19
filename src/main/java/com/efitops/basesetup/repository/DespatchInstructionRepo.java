@@ -2,6 +2,7 @@ package com.efitops.basesetup.repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -388,5 +389,160 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			""", nativeQuery = true)
 	List<Object[]> getFillGridItemsForDespatchInstruction(@Param("customerId") Long customerId,
 			@Param("sdvBasicId") Long sdvBasicId, @Param("branch") Long branch, @Param("orgId") Long orgId);
+
+	@Query(value = """
+	        SELECT
+	            db.doc_id,
+	            db.doc_date,
+	            db.schdule_no,
+	            db.schdule_date
+	        FROM despatch_basic db
+	        WHERE db.custumer = ?1
+	          AND db.org_id = ?2
+	          AND db.branch = ?3 and active=1 and cancel=0
+	          AND NOT EXISTS (
+	              SELECT 1
+	              FROM sales_rejection_invoice_basic sri
+	              WHERE sri.dispatch_instruction_no = db.doc_id
+	                AND sri.customer = ?1
+	                AND sri.org_id = ?2
+	                AND sri.branch = ?3
+	                AND sri.doc_type = ?4 and active=1 and cancel=0
+	          )
+	        """, nativeQuery = true)
+	List<Object[]> getDespatchInstructionNoforSalesRejectionInv(
+	        Long customer,
+	        Long orgId,
+	        Long branch,
+	        String docType);
+
+	@Query(value = """
+	        SELECT
+	            i.item_id,
+	            i.item_code,
+	            i.item_description,
+	            h.hsn,
+	            i.customer_part_no,
+	            u.unitmaster_id,
+	            u.unit_id,
+	            gr.gstratemaster_id,
+	            gr.cgst,
+	            gr.sgst,
+	            gr.igst,
+	            dd.ord_accp_contr_no,
+	            dd.desc_qty,
+
+	            (
+	                SELECT x.new_rate
+	                FROM (
+
+	                    /* Sales Contract Amendment */
+	                    SELECT
+	                        scad.new_rate,
+	                        scad.new_validdate AS rate_date
+	                    FROM sales_contract_amendment_basic scab
+	                    INNER JOIN sales_contract_amendment_detail scad
+	                        ON scad.sales_contract_amendment_basic_id =
+	                           scab.sales_contract_amendment_basic_id
+	                    WHERE scab.doc_id = dd.ord_accp_contr_no
+	                      AND scad.item = dd.item
+	                      AND scab.org_id = db.org_id
+	                      AND scab.branch = db.branch
+	                      AND scab.active = 1
+	                      AND scab.cancel = 0
+	                      AND scad.new_validdate IS NOT NULL
+
+	                    UNION ALL
+
+	                    /* Sales Contract */
+	                    SELECT
+	                        scd.order_rate AS new_rate,
+	                        scd.effective_from AS rate_date
+	                    FROM sales_contract_basic scb
+	                    INNER JOIN sales_contract_detail scd
+	                        ON scd.salescontract_id =
+	                           scb.salescontract_id
+	                    WHERE scb.doc_id = dd.ord_accp_contr_no
+	                      AND scd.item = dd.item
+	                      AND scb.org_id = db.org_id
+	                      AND scb.branch = db.branch
+	                      AND scb.active = 1
+	                      AND scb.cancel = 0
+	                      AND scd.effective_from IS NOT NULL
+
+	                    UNION ALL
+
+	                    /* Order Acceptance */
+	                    SELECT
+	                        oad.order_rate AS new_rate,
+	                        oab.doc_date AS rate_date
+	                    FROM order_acceptance_basic oab
+	                    INNER JOIN order_acceptance_detail oad
+	                        ON oad.order_acceptance_basic_id =
+	                           oab.order_acceptance_basic_id
+	                    WHERE oab.doc_id = dd.ord_accp_contr_no
+	                      AND oad.item = dd.item
+	                      AND oab.org_id = db.org_id
+	                      AND oab.branch = db.branch
+	                      AND oab.active = 1
+	                      AND oab.cancel = 0
+	                      AND oab.doc_date IS NOT NULL
+
+	                    UNION ALL
+
+	                    /* Sales Order Amendment */
+	                    SELECT
+	                        soad.new_rate,
+	                        soad.new_delivery_date AS rate_date
+	                    FROM sales_order_amendment_basic soa
+	                    INNER JOIN sales_order_amendment_detail soad
+	                        ON soad.sales_order_amendment_id =
+	                           soa.sales_order_amendment_id
+	                    WHERE soa.doc_id = dd.ord_accp_contr_no
+	                      AND soad.item = dd.item
+	                      AND soa.org_id = db.org_id
+	                      AND soa.branch = db.branch
+	                      AND soa.active = 1
+	                      AND soa.cancel = 0
+	                      AND soad.new_delivery_date IS NOT NULL
+
+	                ) x
+	                ORDER BY x.rate_date DESC
+	                LIMIT 1
+	            ) AS new_rate
+
+	        FROM despatch_basic db
+
+	        INNER JOIN despatch_detail dd
+	            ON db.despatch_basic_id = dd.despatch_basic_id
+
+	        INNER JOIN item i
+	            ON i.item_id = dd.item
+
+	        INNER JOIN unitmaster u
+	            ON u.unitmaster_id = i.primary_unit
+
+	        INNER JOIN hsn h
+	            ON h.hsn_id = i.hsn_code
+
+	        LEFT JOIN gstratemaster gr
+	            ON gr.hsn_sac_code = h.hsn_id
+	            AND gr.active = 1
+	            AND gr.cancel = 0
+	            AND gr.org_id = db.org_id
+	            AND gr.branch = db.branch
+
+	        WHERE db.doc_id = ?1
+	          AND db.org_id = ?2
+	          AND db.branch = ?3
+	          AND db.active = 1
+	          AND db.cancel = 0
+
+	        ORDER BY i.item_code
+	        """, nativeQuery = true)
+	Set<Object[]> getItemDetailsforSalesRejectionInvoice(
+	        String docId,
+	        Long orgId,
+	        Long branch);
 
 }

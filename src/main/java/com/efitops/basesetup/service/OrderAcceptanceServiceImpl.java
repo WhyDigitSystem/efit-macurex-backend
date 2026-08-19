@@ -166,7 +166,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 	public List<OrderAcceptanceResponseDTO> getOrderAcceptanceByOrgId(Long orgId, Long branch)
 			throws ApplicationException {
 
-		List<OrderAcceptanceVO> quotationList = orderAcceptanceRepo.getQuotationByOrgId(orgId, branch);
+		List<OrderAcceptanceVO> quotationList = orderAcceptanceRepo.getOrderAcceptanceByOrgId(orgId, branch);
 
 		if (quotationList == null || quotationList.isEmpty()) {
 			throw new ApplicationException("Quotation Not Found");

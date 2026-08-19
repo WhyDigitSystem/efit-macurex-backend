@@ -11,7 +11,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SupplierResponseDTO {
 	private Long id;
-	private String supplierCode;
 	private String supplierName;
+	private String supplierCode;
+	private String address;
+//	private String supplierRefNo;
+//	private LocalDate supplierRefDate;
+	private String gstNo;
+	private String gstApproval;
+	private String gstSate;
 
 }

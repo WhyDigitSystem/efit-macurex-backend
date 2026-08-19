@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 
+import com.efitops.basesetup.entity.CurrencyVO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,6 +48,8 @@ public class CustomerDTO {
 	    private Long zone;
 	    private String CustomerCode;
 	    private String groupName;
+	    
+		private Long primaryCurrency;
 
 	    private boolean registered;
 	    private boolean excisable;

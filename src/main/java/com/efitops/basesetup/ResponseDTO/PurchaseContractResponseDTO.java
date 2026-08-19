@@ -22,19 +22,15 @@ public class PurchaseContractResponseDTO {
 
     private Long id;
 
-    private BranchResponseDTO plant;
+    private BranchResponseDTO branch;
 
-    private String contractNo;
+//    private String docId;
+//
+//    private LocalDate docDate;
 
-    private LocalDate contractDate;
-
-    private ListOfVlauesDetailsResponseDTO department;
+    private DepartmentResponseDTO department;
 
     private CustomerResponseDetailsDTO supplier;
-
-    private String supplierRefNo;
-
-    private LocalDate refDate;
 
     private GSTStateResponseDTO gstState;
 
@@ -42,9 +38,9 @@ public class PurchaseContractResponseDTO {
 
     private LocalDate validTo;
 
-    private Boolean isIgstAppl;
+    private String isIgstAppl;
 
-    private String poType;
+    private String purchaseOrderType;
 
     // charges summary
     private String modeOfDespatch;
@@ -62,15 +58,16 @@ public class PurchaseContractResponseDTO {
     private String freightForwarder;
     private String notes;
     private String termsConditions;
+    private Long orgId;
+    private String financialYear;
+    private String active;
+    private String cancelRemarks;
+    private String createdBy;
 
     private List<PurchaseContractDetailsResponseDTO> details;
     private List<PurchaseContractTaxDetailsResponseDTO> taxDetails;
     private List<PurchaseContractAttachmentDTO> attachments;
 
-    private Long orgId;
-    private String financialYear;
-    private Boolean active;
-    private String cancelRemarks;
-    private Long createdBy;
-    private Long updatedBy;
+    
+    
 }

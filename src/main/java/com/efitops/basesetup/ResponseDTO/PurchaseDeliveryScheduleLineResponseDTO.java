@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class PurchaseDeliveryScheduleLineResponseDTO {
     private Long id;
     private LocalDate planDate;
-    private Integer weekNo;
+    private int weekNo;
     private BigDecimal scheduleQty;
 }

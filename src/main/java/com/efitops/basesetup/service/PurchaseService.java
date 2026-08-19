@@ -12,16 +12,16 @@ import com.efitops.basesetup.exception.ApplicationException;
 public interface PurchaseService {
 
     // ---------- Purchase Contract ----------
-    Map<String, Object> updateCreatePurchaseContract(PurchaseContractDTO dto, MultipartFile[] files) throws ApplicationException;
-    PurchaseContractResponseDTO getPurchaseContractById(Long id) throws ApplicationException;
-    List<PurchaseContractResponseDTO> getPurchaseContractByOrgId(Long orgId, Long branchId) throws ApplicationException;
-    String getPurchaseContractDocId(Long orgId, String finYear, Long branch);
+//    Map<String, Object> updateCreatePurchaseContract(PurchaseContractDTO dto, MultipartFile[] files) throws ApplicationException;
+//    PurchaseContractResponseDTO getPurchaseContractById(Long id) throws ApplicationException;
+//    List<PurchaseContractResponseDTO> getPurchaseContractByOrgId(Long orgId, Long branchId) throws ApplicationException;
+//    String getPurchaseContractDocId(Long orgId, String finYear, Long branch);
 
     // ---------- Purchase Delivery Schedule ----------
-    Map<String, Object> updateCreatePurchaseDeliverySchedule(PurchaseDeliveryScheduleDTO dto) throws ApplicationException;
-    PurchaseDeliveryScheduleResponseDTO getPurchaseDeliveryScheduleById(Long id) throws ApplicationException;
-    List<PurchaseDeliveryScheduleResponseDTO> getPurchaseDeliveryScheduleByOrgId(Long orgId, Long branchId) throws ApplicationException;
-    String getPurchaseDeliveryScheduleDocId(Long orgId, String finYear, Long branch);
+//    Map<String, Object> updateCreatePurchaseDeliverySchedule(PurchaseDeliveryScheduleDTO dto) throws ApplicationException;
+//    PurchaseDeliveryScheduleResponseDTO getPurchaseDeliveryScheduleById(Long id) throws ApplicationException;
+//    List<PurchaseDeliveryScheduleResponseDTO> getPurchaseDeliveryScheduleByOrgId(Long orgId, Long branchId) throws ApplicationException;
+//    String getPurchaseDeliveryScheduleDocId(Long orgId, String finYear, Long branch);
 
     // ---------- Purchase Bill ----------
     Map<String, Object> updateCreatePurchaseBill(PurchaseBillDTO dto) throws ApplicationException;
@@ -45,9 +45,37 @@ public interface PurchaseService {
     
     
     //purchase indent
-	Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO purchaseIndentDTO) throws ApplicationException;
-	PurchaseIndentResponseDTO getPurchaseIndentById(Long id) throws ApplicationException;
-	List<PurchaseIndentResponseDTO> getPurchaseIndentByOrgId(Long orgId, Long branch) throws ApplicationException;
-
+ // Purchase Indent
+//    Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO purchaseIndentDTO)
+//            throws ApplicationException;
+//
+//    PurchaseIndentResponseDTO getPurchaseIndentById(Long id)
+//            throws ApplicationException;
+//
+//    List<PurchaseIndentResponseDTO> getPurchaseIndentByOrgId(Long orgId, Long branch)
+//            throws ApplicationException;
+//
+//    List<PurchaseIndentDepartmentDropdownResponseDTO> getPurchaseIndentDepartmentDropdown(
+//            Long orgId, Long branch)
+//            throws ApplicationException;
+//
+//    List<PurchaseIndentPreparedByDropdownResponseDTO> getPurchaseIndentPreparedByDropdown(
+//            Long orgId, Long branch)
+//            throws ApplicationException;
+//    
+//    
+//    List<PurchaseIndentByWhomDropdownResponseDTO>
+//    getPurchaseIndentByWhomDropdown(Long orgId, Long branch)
+//            throws ApplicationException;
+//	List<PurchaseIndentItemDropdownResponseDTO> getPurchaseIndentItemDropdown(Long orgId, Long branch)
+//			throws ApplicationException;
+//	
+//	
+//	List<PurchaseIndentConversionFactorDropdownResponseDTO>
+//	getPurchaseIndentConversionFactorDropdown(Long orgId, Long branch)
+//	        throws ApplicationException;
+//	Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO purchaseIndentDTO, MultipartFile[] files)
+//			throws ApplicationException;
+//	String getPurchaseIndentDocId(Long orgId, String financialYear, String screenCode);
 
 }

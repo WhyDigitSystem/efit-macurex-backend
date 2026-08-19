@@ -16,26 +16,21 @@ import lombok.NoArgsConstructor;
 public class PurchaseDeliveryScheduleResponseDTO {
 
     private Long id;
-    private BranchResponseDTO plant;
+    private BranchResponseDTO branch;
     private String belongsTo;
-    private String docNo;
+    private String docId;
     private LocalDate docDate;
-    private LocalDate schStartDate;
-    private LocalDate schEndDate;
-    private Long localPurchaseOrderId;
-    private CustomerResponseDetailsDTO supplier;
-    private String poType;
-    private Long poId;
-    private String poNo;
-    private LocalDate poDate;
-    private String preparedBy;
-    private String note;
-    private List<PurchaseDeliveryScheduleDetailsResponseDTO> scheduleDetails;
-    private List<PurchaseDeliveryScheduleLineResponseDTO> schedule;
+    private LocalDate scheduleStartDate;
+    private LocalDate scheduleEndDate;
+    private SupplierResponseDTO supplier;
+    private String purchaseOrderNo;
+    private LocalDate purchaseOrderDate;
     private Long orgId;
     private String financialYear;
-    private Boolean active;
+    private String active;
     private String cancelRemarks;
-    private Long createdBy;
-    private Long updatedBy;
+    private String createdBy;
+    private List<PurchaseDeliveryScheduleDetailsResponseDTO> scheduleDetails;
+  
+    
 }

@@ -12,17 +12,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PurchaseIndentDetailsDTO {
 
+    private Long id;
 
+    // Item
+    private Long item;
 
-    private Long item; // item master id - itemCode/description/primaryUnit/purchaseUnit come from here
-
+    // Quantity
     private BigDecimal qtyInPrimaryUnit;
 
-    private BigDecimal conversionFactor;
+    // Conversion Factor (Dropdown)
+    private Long conversionFactor;
 
+    // Purchase Quantity
     private BigDecimal qtyInPurchaseUnit;
 
+    // Required Date
     private LocalDate requiredDate;
 
+    // Purpose
     private String purpose;
+
 }

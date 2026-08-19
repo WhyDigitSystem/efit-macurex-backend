@@ -7,14 +7,24 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerDropdownResponseDTO {
+public class CustomerShipingResponseDTO {
 
+	 // =========================
+    // CUSTOMER DETAILS
+    // =========================
     private Long customerId;
     private String customerCode;
     private String customerName;
-    private String address;
+
     private String gstState;
     private String gstNo;
     private boolean igstApplicable;
     private String gstType;
+
+    // =========================
+    // SHIPPING DETAILS
+    // =========================
+    private String shippingAddress;
+    private String shippingCity;
+    private String shippingPincode;
 }

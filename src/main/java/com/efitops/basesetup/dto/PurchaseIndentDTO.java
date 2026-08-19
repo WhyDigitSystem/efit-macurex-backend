@@ -3,7 +3,6 @@ package com.efitops.basesetup.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,34 +13,47 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PurchaseIndentDTO {
 
-    @JsonAlias({ "purchaseindent_id" })
     private Long id;
 
-    private String indentNo; // ignored on create, auto-generated
+    // Header
+    private String docId;
 
-    private Long plant; // branch id
+    private Long branch;
 
-    private Long belongsTo; // listofvaluesdetails id
 
-    private LocalDate indentDate;
+    private String belongsTo;
 
-    private Long department; // department id
+    private LocalDate docDate;
 
-    private Long preparedBy; // employeemaster id
+    private Long department;
 
-    private Long byWhom; // employeemaster id
+    private Long preparedBy;
+
+    private Long byWhom;
 
     private boolean approved;
 
-    private String remarks; // Indent Summary - direct field, no child table
+    // Summary
+    private String remarks;
 
+    // Common
     private Long orgId;
 
     private String createdBy;
 
+    private String updatedBy;
+
     private boolean active;
+
+    private boolean cancel;
 
     private String cancelRemarks;
 
+    // Details Grid
     private List<PurchaseIndentDetailsDTO> details;
+
+    // Attachments
+    private List<PurchaseIndentAttachmentDTO> attachments;
+   
+
 }

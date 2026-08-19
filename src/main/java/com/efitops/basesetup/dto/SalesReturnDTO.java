@@ -12,10 +12,6 @@ public class SalesReturnDTO {
     private Long id;
 
    
-    private String docNo;
-    private LocalDate docDate;
-
-   
     private Long branch;
 
    
@@ -69,18 +65,10 @@ public class SalesReturnDTO {
 
     private String createdBy;
 
-    private String updatedBy;
-
     private String cancelRemarks;
 
     private Boolean active;
 
-    private Boolean cancel;
-
-    private String screenCode;
-
-    private String screenName;
-    
     private List<SalesReturnDetailsDto> salesReturnDetails;
     
     private List<SalesReturnTaxDetailsDTO> salesReturnTaxDetails;

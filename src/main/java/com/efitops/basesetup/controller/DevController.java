@@ -1009,7 +1009,6 @@ public class DevController extends BaseController{
 		//item drop down for stocktransfer challan
 		@GetMapping("/getItemsForStockTransferChallan")
 		public ResponseEntity<ResponseDTO> getItemsForStockTransferChallan(
-		        @RequestParam String despatchNo,
 		        @RequestParam Long branch,
 		        @RequestParam Long orgId) {
 
@@ -1023,7 +1022,6 @@ public class DevController extends BaseController{
 
 		        Map<String, Object> responseMap =
 		                transportMasterService.getItemsForStockTransferChallan(
-		                        despatchNo,
 		                        branch,
 		                        orgId);
 
@@ -1056,8 +1054,41 @@ public class DevController extends BaseController{
 		    return ResponseEntity.ok(responseDTO);
 		}
 		
-		
-		@GetMapping("/getCustomerComplaintDocId")
+  	@GetMapping("/getStockTransferChallanDocId")
+		public ResponseEntity<ResponseDTO> getStockTransferChallanDocId(@RequestParam Long orgId,
+				@RequestParam String financialYear, @RequestParam String screenCode) {
+
+			String methodName = "getStockTransferChallanDocId()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+			String errorMsg = null;
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			ResponseDTO responseDTO = null;
+			String mapp = "";
+
+			try {
+				mapp = transportMasterService.getStockTransferChallanDocId(orgId, financialYear, screenCode);
+			} catch (Exception e) {
+				errorMsg = e.getMessage();
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			}
+
+			if (StringUtils.isBlank(errorMsg)) {
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+						"StockTransferChallan DocId information retrieved successfully");
+				responseObjectsMap.put("StockTransferChallan DocId", mapp);
+				responseDTO = createServiceResponse(responseObjectsMap);
+			} else {
+				responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Proforma getStockTransferChallan DocId",
+						errorMsg);
+			}
+
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+
+
+
+    @GetMapping("/getCustomerComplaintDocId")
 		public ResponseEntity<ResponseDTO> getCustomerComplaintDocId(@RequestParam Long orgId,
 				@RequestParam String financialYear, @RequestParam String screenCode) {
 
@@ -1088,6 +1119,8 @@ public class DevController extends BaseController{
 			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 			return ResponseEntity.ok().body(responseDTO);
 		}
+		
+
 }
 
 

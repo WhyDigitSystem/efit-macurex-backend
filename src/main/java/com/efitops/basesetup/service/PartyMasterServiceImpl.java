@@ -10,15 +10,11 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.efitops.basesetup.ResponseDTO.CityResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerContactDetailsResponseDTO;
-import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerItemDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerShippingDetailsResponseDTO;
@@ -31,17 +27,16 @@ import com.efitops.basesetup.ResponseDTO.PartyCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesZoneResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
-import com.efitops.basesetup.common.CommonConstant;
-import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.CustomerContactDetailsDTO;
 import com.efitops.basesetup.dto.CustomerDTO;
 import com.efitops.basesetup.dto.CustomerItemDetailsDTO;
 import com.efitops.basesetup.dto.CustomerShippingDetailsDTO;
 import com.efitops.basesetup.dto.EmployeeResponseDTO;
-import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CountryVO;
+import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerContactDetailsVO;
 import com.efitops.basesetup.entity.CustomerItemDetailsVO;
 import com.efitops.basesetup.entity.CustomerShippingDetailsVO;
@@ -57,6 +52,7 @@ import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CityRepo;
 import com.efitops.basesetup.repository.CountryRepo;
+import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
 import com.efitops.basesetup.repository.CustomerItemDetailsRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
@@ -125,6 +121,9 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	EmployeeRepo employeeRepo;
 //	@Autowired
 //	TransportRepo transportMasterRepo;
+	
+	@Autowired
+	CurrencyRepo currencyRepo;
 //	
 
 	@Override
@@ -236,6 +235,12 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 		    supplierType = listOfValuesDetailsRepo.findById(dto.getSupplierType())
 		            .orElseThrow(() -> new ApplicationException("Supplier Type Not Found"));
 		}
+		
+		CurrencyVO currency = null;
+		if (dto.getPrimaryCurrency() != null) {
+			currency = currencyRepo.findById(dto.getPrimaryCurrency())
+		            .orElseThrow(() -> new ApplicationException("Currency Not Found"));
+		}
 
 		BranchVO branch = null;
 		if (dto.getBranch() != null) {
@@ -288,7 +293,8 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	    customerVO.setCustomerType(dto.getCustomerType());
 	    customerVO.setAccountName(dto.getAccountName());
 	    customerVO.setCustomerName(dto.getCustomerName());
-	    
+	    customerVO.setCustomerCode(dto.getCustomerCode());
+
 	    customerVO.setPanNo(dto.getPanNo());
 	    customerVO.setEsiNo(dto.getEsiNo());
 	    customerVO.setTinNo(dto.getTinNo());
@@ -320,7 +326,7 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 
 	    customerVO.setZone(zone);	  
 	    
-	    customerVO.setVendorCode(dto.getVendorCode());
+//	    customerVO.setVendorCode(dto.getVendorCode());
 	    customerVO.setGroupName(dto.getGroupName());
 	    customerVO.setRegistered(dto.isRegistered());
 	    customerVO.setExcisable(dto.isExcisable());
@@ -602,7 +608,14 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	        ));
 	    }
 	    
-	    dto.setVendorCode(customerVO.getVendorCode());
+	    if (customerVO.getPrimaryCurrency() != null) {
+	        dto.setPrimaryCurrency(new CurrencyResponseDTO(
+	                customerVO.getPrimaryCurrency().getId(),
+	                customerVO.getPrimaryCurrency().getCurrency()
+	        ));
+	    }
+	    
+	    dto.setCustomerCode(customerVO.getCustomerCode());
 	    dto.setGroupName(customerVO.getGroupName());
 
 	    dto.setRegistered(customerVO.isRegistered());

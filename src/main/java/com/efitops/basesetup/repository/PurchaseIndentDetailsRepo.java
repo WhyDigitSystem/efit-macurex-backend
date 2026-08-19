@@ -10,4 +10,7 @@ import com.efitops.basesetup.entity.PurchaseIndentVO;
 public interface PurchaseIndentDetailsRepo extends JpaRepository<PurchaseIndentDetailsVO, Long> {
 
     List<PurchaseIndentDetailsVO> findByPurchaseIndentVO(PurchaseIndentVO purchaseIndentVO);
+    
+    void deleteByPurchaseIndentVO(
+            PurchaseIndentVO purchaseIndentVO);
 }

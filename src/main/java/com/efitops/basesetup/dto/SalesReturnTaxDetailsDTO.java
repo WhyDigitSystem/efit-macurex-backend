@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class SalesReturnTaxDetailsDTO {
 	  
 	
-       private Long id;
+//       private Long id;
 
 	   // Particulars
 	   private Long particulars;

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DespatchCustomerResponseDTO;
@@ -39,7 +40,9 @@ import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferChallanDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferChallanTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferCustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
@@ -49,6 +52,8 @@ import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
 import com.efitops.basesetup.dto.DespatchInstructionDTO;
 import com.efitops.basesetup.dto.DespatchInstructionDetailsDTO;
 import com.efitops.basesetup.dto.StockTransferChallanDTO;
+import com.efitops.basesetup.dto.StockTransferChallanDetailsDTO;
+import com.efitops.basesetup.dto.StockTransferChallanTaxDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
@@ -60,7 +65,10 @@ import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.StockTransferChallanDetailsVO;
+import com.efitops.basesetup.entity.StockTransferChallanTaxDetailsVO;
 import com.efitops.basesetup.entity.StockTransferChallanVO;
+import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
@@ -80,8 +88,11 @@ import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.SalesContractAmdDetailsRepo;
 import com.efitops.basesetup.repository.SalesContractAmdRepo;
 import com.efitops.basesetup.repository.SalesContractRepo;
+import com.efitops.basesetup.repository.StockTransferChallanDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferChallanRepo;
+import com.efitops.basesetup.repository.StockTransferChallanTaxDetailsRepo;
 import com.efitops.basesetup.repository.TransportRepo;
+import com.efitops.basesetup.repository.UnitMasterRepo;
 import com.efitops.basesetup.security.TokenProvider;
 
 @Service
@@ -142,13 +153,22 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	@Autowired
 	private ListOfValuesRepo listOfValuesRepo;
-
+	
 	@Autowired
 	ListOfValuesDetailsRepo listOfValuesDetailsRepo;
 
 	@Autowired
-	private DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
-
+	UnitMasterRepo unitMasterRepo;
+	
+	@Autowired
+	StockTransferChallanDetailsRepo stockTransferChallanDetailsRepo;
+	
+	@Autowired
+	StockTransferChallanTaxDetailsRepo stockTransferChallanTaxDetailsRepo;
+	
+	@Autowired
+	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
+	
 	TransportMasterServiceImpl(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
 	}
@@ -159,7 +179,6 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	@Transactional
 	public Map<String, Object> updateCreateCustomerComplaint(CustomerComplaintDTO customerComplaintDTO,
 			MultipartFile[] images) throws ApplicationException {
-		String screenCode = "CCE";
 		CustomerComplaintEntryVO customerComplaintEntryVO = new CustomerComplaintEntryVO();
 		String message;
 
@@ -175,17 +194,6 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			message = "Customer Complaint  Updated Successfully";
 
 		} else {
-
-			String docId = customerComplaintRepo.getCustomerComplaintDocId(customerComplaintDTO.getOrgId(),
-					customerComplaintDTO.getFinancialYear(), screenCode);
-
-			customerComplaintEntryVO.setDocId(docId);
-
-			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdAndFinYearAndScreenCode(customerComplaintDTO.getOrgId(),
-							customerComplaintDTO.getFinancialYear(), screenCode);
-			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			customerComplaintEntryVO.setCreatedBy(customerComplaintDTO.getCreatedBy());
 			customerComplaintEntryVO.setUpdated_By(customerComplaintDTO.getCreatedBy());
@@ -238,8 +246,6 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		responseDTO.setComplaintDate(customerComplaintEntryVO.getComplaintDate());
 
 		responseDTO.setCustomerRefNo(customerComplaintEntryVO.getCustomerRefNo());
-
-		responseDTO.setDocId(customerComplaintEntryVO.getDocId());
 
 		if (customerComplaintEntryVO.getBranch() != null) {
 
@@ -919,24 +925,24 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 				detailDTO.setDate(detailVO.getDate());
 				if (detailVO.getItem() != null) {
 
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+				    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
 
-					itemDTO.setId(detailVO.getItem().getId());
-					itemDTO.setItemCode(detailVO.getItem().getItemCode());
-					itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
+				    itemDTO.setId(detailVO.getItem().getId());
+				    itemDTO.setItemCode(detailVO.getItem().getItemCode());
+				    itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
 
-					if (detailVO.getItem().getPrimaryUnit() != null) {
+				    if (detailVO.getItem().getPrimaryUnit() != null) {
 
-						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
 
-						unitDTO.setId(detailVO.getItem().getPrimaryUnit().getId());
-						unitDTO.setUnitId(detailVO.getItem().getPrimaryUnit().getUnitId());
-						unitDTO.setUnitDescription(detailVO.getItem().getPrimaryUnit().getDescription());
+				        unitDTO.setId(detailVO.getItem().getPrimaryUnit().getId());
+				        unitDTO.setUnitId(detailVO.getItem().getPrimaryUnit().getUnitId());
+				        unitDTO.setUnitDescription(detailVO.getItem().getPrimaryUnit().getDescription());
 
-						itemDTO.setUnit(unitDTO);
-					}
+				        itemDTO.setUnit(unitDTO);
+				    }
 
-					detailDTO.setItem(itemDTO);
+				    detailDTO.setItem(itemDTO);
 				}
 
 				detailDTO.setPdi(detailVO.getPdi());
@@ -1101,12 +1107,14 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		return responseList;
 	}
 
+
 	// Stock Transfer Challan
 	@Override
 	@Transactional
 	public Map<String, Object> updateCreateStockTransferChallan(StockTransferChallanDTO stockTransferChallanDTO)
 			throws ApplicationException {
 
+		String screenCode="STC";
 		StockTransferChallanVO stockTransferChallanVO = new StockTransferChallanVO();
 
 		String message;
@@ -1116,15 +1124,32 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			stockTransferChallanVO = stockTransferChallanRepo.findById(stockTransferChallanDTO.getId())
 					.orElseThrow(() -> new ApplicationException("Invalid Stock Transfer Challan Details"));
 
-			stockTransferChallanVO.setUpdated_By(stockTransferChallanDTO.getCreatedBy());
+			
+			// Remove old details
+		    stockTransferChallanVO.getDetails().clear();
 
+		    // Remove old tax details
+		    stockTransferChallanVO.getTaxDetails().clear();
+		    
+			stockTransferChallanVO.setUpdatedBy(stockTransferChallanDTO.getCreatedBy());
+
+			
 			message = "Stock Transfer Challan Updated Successfully";
 
 		} else {
 
+			String docId = salesContractRepo.getSalesContractDocId(stockTransferChallanDTO.getOrgId(), stockTransferChallanDTO.getFinancialYear(), screenCode);
+
+			stockTransferChallanVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(stockTransferChallanDTO.getOrgId(), stockTransferChallanDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			
 			stockTransferChallanVO.setCreatedBy(stockTransferChallanDTO.getCreatedBy());
 
-			stockTransferChallanVO.setUpdated_By(stockTransferChallanDTO.getCreatedBy());
+			stockTransferChallanVO.setUpdatedBy(stockTransferChallanDTO.getCreatedBy());
 
 			message = "Stock Transfer Challan Created Successfully";
 		}
@@ -1143,101 +1168,340 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	}
 
 	private StockTransferChallanResponseDTO stockTransferChallanResponse(
-			StockTransferChallanVO stockTransferChallanVO) {
+	        StockTransferChallanVO stockTransferChallanVO) {
 
-		StockTransferChallanResponseDTO responseDTO = new StockTransferChallanResponseDTO();
+	    StockTransferChallanResponseDTO responseDTO =
+	            new StockTransferChallanResponseDTO();
 
-		// =========================
-		// Basic Details
-		// =========================
+	    // =========================================================
+	    // BASIC DETAILS
+	    // =========================================================
 
-		responseDTO.setId(stockTransferChallanVO.getId());
-		responseDTO.setStockPosting(stockTransferChallanVO.getStockPosting());
-		responseDTO.setDate(stockTransferChallanVO.getDate());
-		responseDTO.setNoOfPackages(stockTransferChallanVO.getNoOfPackages());
-		responseDTO.setOtherPackages(stockTransferChallanVO.getOtherPackages());
-		responseDTO.setImportLocal(stockTransferChallanVO.getImportLocal());
-		responseDTO.setActive(stockTransferChallanVO.getActive());
-		responseDTO.setOrgId(stockTransferChallanVO.getOrgId());
-		responseDTO.setCreatedBy(stockTransferChallanVO.getCreatedBy());
-		responseDTO.setCancelRemarks(stockTransferChallanVO.getCancelRemarks());
-		responseDTO.setTimeOfTranfer(stockTransferChallanVO.getTimeOfTranfer());
-		responseDTO.setTotalInsurance(stockTransferChallanVO.getTotalInsurance());
-		responseDTO.setTotalFreight(stockTransferChallanVO.getTotalFreight());
-		responseDTO.setTotalAssVal(stockTransferChallanVO.getTotalAssVal());
-		responseDTO.setModeOfTransport(stockTransferChallanVO.getModeOfTransport());
-		responseDTO.setSalesTax(stockTransferChallanVO.getSalesTax());
-		responseDTO.setGrossAmount(stockTransferChallanVO.getGrossAmount());
-		responseDTO.setAmountInWords(stockTransferChallanVO.getAmountInWords());
-		responseDTO.setDeliverTo(stockTransferChallanVO.getDeliverTo());
-		responseDTO.setPaymentTerms(stockTransferChallanVO.getPaymentTerms());
-		responseDTO.setNarration(stockTransferChallanVO.getNarration());
+	    responseDTO.setId(stockTransferChallanVO.getId());
+	    responseDTO.setDocId(stockTransferChallanVO.getDocId());
+	    responseDTO.setDocDate(stockTransferChallanVO.getDocDate());
+	    responseDTO.setStockPosting(stockTransferChallanVO.getStockPosting());
+	    responseDTO.setDate(stockTransferChallanVO.getDate());
+	    responseDTO.setNoOfPackages(stockTransferChallanVO.getNoOfPackages());
+	    responseDTO.setOtherPackages(stockTransferChallanVO.getOtherPackages());
+	    responseDTO.setImportLocal(stockTransferChallanVO.getImportLocal());
+	    responseDTO.setActive(stockTransferChallanVO.getActive());
+	    responseDTO.setOrgId(stockTransferChallanVO.getOrgId());
+	    responseDTO.setCreatedBy(stockTransferChallanVO.getCreatedBy());
+	    responseDTO.setCancelRemarks(stockTransferChallanVO.getCancelRemarks());
+	    responseDTO.setTimeOfTranfer(stockTransferChallanVO.getTimeOfTranfer());
 
-		// =========================
-		// Branch Response
-		// =========================
+	    responseDTO.setTotalInsurance(
+	            stockTransferChallanVO.getTotalInsurance());
 
-		if (stockTransferChallanVO.getBranch() != null) {
+	    responseDTO.setTotalFreight(
+	            stockTransferChallanVO.getTotalFreight());
 
-			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+	    responseDTO.setTotalAssVal(
+	            stockTransferChallanVO.getTotalAssVal());
 
-			branchResponseDTO.setId(stockTransferChallanVO.getBranch().getId());
-			branchResponseDTO.setBranchName(stockTransferChallanVO.getBranch().getBranchName());
+	    responseDTO.setModeOfTransport(
+	            stockTransferChallanVO.getModeOfTransport());
 
-			responseDTO.setBranch(branchResponseDTO);
-		}
+	    responseDTO.setSalesTax(
+	            stockTransferChallanVO.getSalesTax());
 
-		// =========================
-		// List Of Values Response
-		// =========================
+	    responseDTO.setGrossAmount(
+	            stockTransferChallanVO.getGrossAmount());
 
-		if (stockTransferChallanVO.getTypes() != null) {
+	    responseDTO.setAmountInWords(
+	            stockTransferChallanVO.getAmountInWords());
 
-			ListOfValuesResponseDTO listOfValuesDetailsResponseDTO = new ListOfValuesResponseDTO();
+	    responseDTO.setDeliverTo(
+	            stockTransferChallanVO.getDeliverTo());
 
-			listOfValuesDetailsResponseDTO.setId(stockTransferChallanVO.getTypes().getId());
+	    responseDTO.setPaymentTerms(
+	            stockTransferChallanVO.getPaymentTerms());
 
-			listOfValuesDetailsResponseDTO.setListCode(stockTransferChallanVO.getTypes().getValueCode());
+	    responseDTO.setNarration(
+	            stockTransferChallanVO.getNarration());
 
-			responseDTO.setTypes(listOfValuesDetailsResponseDTO);
-		}
 
-		// =========================
-		// Customer Response
-		// =========================
+	    // =========================================================
+	    // BRANCH
+	    // =========================================================
 
-		if (stockTransferChallanVO.getCustomer() != null) {
+	    if (stockTransferChallanVO.getBranch() != null) {
 
-			CustomerResponse1DTO customerResponseDTO = new CustomerResponse1DTO();
+	        BranchResponseDTO branchResponseDTO =
+	                new BranchResponseDTO();
 
-			customerResponseDTO.setId(stockTransferChallanVO.getCustomer().getId());
+	        branchResponseDTO.setId(
+	                stockTransferChallanVO.getBranch().getId());
 
-			customerResponseDTO.setCustomerName(stockTransferChallanVO.getCustomer().getCustomerName());
+	        branchResponseDTO.setBranchName(
+	                stockTransferChallanVO.getBranch().getBranchName());
+	        branchResponseDTO.setBranchCode(
+	                stockTransferChallanVO.getBranch().getBranchCode());
 
-			responseDTO.setCustomer(customerResponseDTO);
-		}
+	        responseDTO.setBranch(branchResponseDTO);
+	    }
 
-		// =========================
-		// Location Response
-		// =========================
 
-		if (stockTransferChallanVO.getLocation() != null) {
+	    // =========================================================
+	    // TYPES
+	    // =========================================================
 
-			LocationMasterResponseDTO locationResponseDTO = new LocationMasterResponseDTO();
+	    if (stockTransferChallanVO.getTypes() != null) {
 
-			locationResponseDTO.setId(stockTransferChallanVO.getLocation().getId());
+	        ListOfValuesResponseDTO typesResponseDTO =
+	                new ListOfValuesResponseDTO();
 
-			locationResponseDTO.setLocationName(stockTransferChallanVO.getLocation().getLocationName());
+	        typesResponseDTO.setId(
+	                stockTransferChallanVO.getTypes().getId());
 
-			responseDTO.setLocation(locationResponseDTO);
-		}
+	        typesResponseDTO.setListCode(
+	                stockTransferChallanVO.getTypes().getValueCode());
 
-		return responseDTO;
+	        typesResponseDTO.setListDescription(stockTransferChallanVO.getTypes().getValueDescription());
+	        responseDTO.setTypes(typesResponseDTO);
+	    }
+
+
+	    // =========================================================
+	    // CUSTOMER
+	    // =========================================================
+
+	    if (stockTransferChallanVO.getCustomer() != null) {
+
+	        CustomerDropdownResponseDTO customerResponseDTO =
+	                new CustomerDropdownResponseDTO();
+
+	        customerResponseDTO.setCustomerId(
+	                stockTransferChallanVO.getCustomer().getId());
+
+	        customerResponseDTO.setCustomerCode(
+	                stockTransferChallanVO.getCustomer().getCustomerCode());
+
+	        customerResponseDTO.setCustomerName(
+	                stockTransferChallanVO.getCustomer().getCustomerName());
+
+	        customerResponseDTO.setAddress(
+	                stockTransferChallanVO.getCustomer().getAddress());
+
+	        customerResponseDTO.setGstState(
+	                stockTransferChallanVO.getCustomer().getGstState().getStateName());
+
+	        customerResponseDTO.setGstNo(
+	                stockTransferChallanVO.getCustomer().getGstNo());
+
+	        customerResponseDTO.setIgstApplicable(
+	                stockTransferChallanVO.getCustomer().isGstApplicable());
+
+	        customerResponseDTO.setGstType(
+	                stockTransferChallanVO.getCustomer().getGstType());
+
+	        responseDTO.setCustomer(customerResponseDTO);
+	    }
+
+
+	    // =========================================================
+	    // LOCATION
+	    // =========================================================
+
+	    if (stockTransferChallanVO.getLocation() != null) {
+
+	        LocationMasterResponseDTO locationResponseDTO =
+	                new LocationMasterResponseDTO();
+
+	        locationResponseDTO.setId(
+	                stockTransferChallanVO.getLocation().getId());
+
+	        locationResponseDTO.setLocationName(
+	                stockTransferChallanVO.getLocation().getLocationName());
+
+	        responseDTO.setLocation(locationResponseDTO);
+	    }
+
+
+	    // =========================================================
+	    // STOCK TRANSFER CHALLAN DETAILS
+	    // =========================================================
+
+	    List<StockTransferChallanDetailsResponseDTO> detailsDTOList =
+	            new ArrayList<>();
+
+	    if (stockTransferChallanVO.getDetails() != null) {
+
+	        for (StockTransferChallanDetailsVO detailVO :
+	                stockTransferChallanVO.getDetails()) {
+
+	            StockTransferChallanDetailsResponseDTO detailDTO =
+	                    new StockTransferChallanDetailsResponseDTO();
+
+	            // =========================
+	            // ID
+	            // =========================
+
+	            detailDTO.setId(detailVO.getId());
+
+	            // =========================
+	            // ITEM
+	            // =========================
+
+	            if (detailVO.getItem() != null) {
+
+	                ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+
+	                itemDTO.setId(detailVO.getItem().getId());
+
+	                itemDTO.setItemCode(
+	                        detailVO.getItem().getItemCode());
+
+	                itemDTO.setItemDescription(
+	                        detailVO.getItem().getItemDescription());
+
+	                // =========================
+	                // UNIT
+	                // =========================
+
+	                if (detailVO.getUnit() != null) {
+
+	                    UnitMasterResponseDTO unitDTO =
+	                            new UnitMasterResponseDTO();
+
+	                    unitDTO.setId(
+	                            detailVO.getUnit().getId());
+
+	                    unitDTO.setUnitId(
+	                            detailVO.getUnit().getUnitId());
+
+	                    unitDTO.setUnitDescription(
+	                            detailVO.getUnit().getDescription());
+
+	                    itemDTO.setUnit(unitDTO);
+	                }
+
+	                detailDTO.setItem(itemDTO);
+	            }
+
+	            // =========================
+	            // BASIC DETAILS
+	            // =========================
+
+	            detailDTO.setTaxType(
+	                    detailVO.getTaxType());
+
+	            detailDTO.setTaxPercentage(
+	                    detailVO.getTaxPercentage());
+
+	            detailDTO.setHsnCode(
+	                    detailVO.getHsnCode());
+
+	            detailDTO.setStock(
+	                    detailVO.getStock());
+
+	            detailDTO.setQuantity(
+	                    detailVO.getQuantity());
+
+	            detailDTO.setRate(
+	                    detailVO.getRate());
+
+	            detailDTO.setTotalAssessableValue(
+	                    detailVO.getTotalAssessableValue());
+
+	            // =========================
+	            // CGST
+	            // =========================
+
+	            detailDTO.setCgstRate(
+	                    detailVO.getCgstRate());
+
+	            detailDTO.setCgstAmount(
+	                    detailVO.getCgstAmount());
+
+	            // =========================
+	            // SGST
+	            // =========================
+
+	            detailDTO.setSgstRate(
+	                    detailVO.getSgstRate());
+
+	            detailDTO.setSgstAmount(
+	                    detailVO.getSgstAmount());
+
+	            // =========================
+	            // IGST
+	            // =========================
+
+	            detailDTO.setIgstRate(
+	                    detailVO.getIgstRate());
+
+	            detailDTO.setIgstAmount(
+	                    detailVO.getIgstAmount());
+
+	            detailsDTOList.add(detailDTO);
+	        }
+	    }
+
+	    responseDTO.setStockTransferChallanDetailsResponseDTO(
+	            detailsDTOList);
+
+
+	    // =========================================================
+	    // STOCK TRANSFER CHALLAN TAX DETAILS
+	    // =========================================================
+
+	    List<StockTransferChallanTaxDetailsResponseDTO> taxDetailsResponseDTOList =
+	            new ArrayList<>();
+
+	    if (stockTransferChallanVO.getTaxDetails() != null) {
+
+	        for (StockTransferChallanTaxDetailsVO taxVO :
+	                stockTransferChallanVO.getTaxDetails()) {
+
+	            StockTransferChallanTaxDetailsResponseDTO taxDTO =
+	                    new StockTransferChallanTaxDetailsResponseDTO();
+
+	            // ID
+	            taxDTO.setId(
+	                    taxVO.getId());
+
+	            // Particulars
+	            if (taxVO.getParticulars() != null) {
+
+	                taxDTO.setParticularsId(
+	                        taxVO.getParticulars().getId());
+
+	                taxDTO.setParticularsCode(
+	                        taxVO.getParticulars().getValueCode());
+
+	                taxDTO.setParticularsDesc(
+	                        taxVO.getParticulars().getValueDescription());
+	            }
+
+	            // Amounts
+	            taxDTO.setAcceptQtyAmount(
+	                    taxVO.getAcceptQtyAmount());
+
+	            taxDTO.setRevisedAmoount(
+	                    taxVO.getRevisedAmoount());
+
+	            taxDetailsResponseDTOList.add(taxDTO);
+	        }
+	    }
+
+	    responseDTO.setStockTransferChallanTaxDetailsResponseDTO(
+	            taxDetailsResponseDTOList);
+
+
+	    // =========================================================
+	    // RETURN RESPONSE
+	    // =========================================================
+
+	    return responseDTO;
 	}
+	
 
 	private void createUpdateStockTransferChallanVO(StockTransferChallanDTO dto,
 			StockTransferChallanVO stockTransferChallanVO) throws ApplicationException {
 
+		
 		stockTransferChallanVO.setStockPosting(dto.getStockPosting());
 		stockTransferChallanVO.setDate(dto.getDate());
 		stockTransferChallanVO.setNoOfPackages(dto.getNoOfPackages());
@@ -1257,6 +1521,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		stockTransferChallanVO.setDeliverTo(dto.getDeliverTo());
 		stockTransferChallanVO.setPaymentTerms(dto.getPaymentTerms());
 		stockTransferChallanVO.setNarration(dto.getNarration());
+		stockTransferChallanVO.setIsIgstApplicable(dto.getIsIgstApplicable());
 
 		// branch mapping
 		if (dto.getBranch() != null && dto.getBranch() != 0) {
@@ -1302,8 +1567,230 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			stockTransferChallanVO.setLocation(locationVO);
 		}
+		
+		 if (dto.getStockTransferChallanDetailsDTO() != null) {
+
+		        for (StockTransferChallanDetailsDTO detailDTO :
+		                dto.getStockTransferChallanDetailsDTO()) {
+
+		            StockTransferChallanDetailsVO detailVO =
+		                    new StockTransferChallanDetailsVO();
+
+		            // -------------------------------------------------
+		            // ITEM
+		            // -------------------------------------------------
+
+		            if (detailDTO.getItem() != null &&
+		                    detailDTO.getItem() != 0) {
+
+		                ItemMasterVO itemVO =
+		                        itemMasterRepo.findById(detailDTO.getItem())
+		                                .orElseThrow(() ->
+		                                        new ApplicationException(
+		                                                "Item Not Found"));
+
+		                detailVO.setItem(itemVO);
+		            }
+
+		            // -------------------------------------------------
+		            // UNIT
+		            // -------------------------------------------------
+
+		            if (detailDTO.getUnit() != null &&
+		                    detailDTO.getUnit() != 0) {
+
+		                UnitMasterVO unitVO =
+		                        unitMasterRepo.findById(detailDTO.getUnit())
+		                                .orElseThrow(() ->
+		                                        new ApplicationException(
+		                                                "Unit Not Found"));
+
+		                detailVO.setUnit(unitVO);
+		            }
+
+		            // -------------------------------------------------
+		            // BASIC DETAILS
+		            // -------------------------------------------------
+
+		            detailVO.setTaxType(detailDTO.getTaxType());
+		            detailVO.setTaxPercentage(detailDTO.getTaxPercentage());
+		            detailVO.setHsnCode(detailDTO.getHsnCode());
+		            detailVO.setStock(detailDTO.getStock());
+
+		            detailVO.setQuantity(detailDTO.getQuantity());
+		            detailVO.setRate(detailDTO.getRate());
+
+		            // -------------------------------------------------
+		            // QTY × RATE
+		            // -------------------------------------------------
+
+		            BigDecimal quantity =
+		                    detailDTO.getQuantity() != null
+		                            ? detailDTO.getQuantity()
+		                            : BigDecimal.ZERO;
+
+		            BigDecimal rate =
+		                    detailDTO.getRate() != null
+		                            ? detailDTO.getRate()
+		                            : BigDecimal.ZERO;
+
+		            BigDecimal assessableValue =
+		                    quantity.multiply(rate);
+
+		            detailVO.setTotalAssessableValue(
+		                    assessableValue);
+
+		            // -------------------------------------------------
+		            // GST
+		            // -------------------------------------------------
+
+		            BigDecimal cgstRate =
+		                    detailDTO.getCgstRate() != null
+		                            ? detailDTO.getCgstRate()
+		                            : BigDecimal.ZERO;
+
+		            BigDecimal sgstRate =
+		                    detailDTO.getSgstRate() != null
+		                            ? detailDTO.getSgstRate()
+		                            : BigDecimal.ZERO;
+
+		            BigDecimal igstRate =
+		                    detailDTO.getIgstRate() != null
+		                            ? detailDTO.getIgstRate()
+		                            : BigDecimal.ZERO;
+
+		            // =================================================
+		            // IGST
+		            // =================================================
+
+		            if ("YES".equalsIgnoreCase(dto.getIsIgstApplicable())) {
+
+		                BigDecimal igstAmount =
+		                        assessableValue
+		                                .multiply(igstRate)
+		                                .divide(BigDecimal.valueOf(100));
+
+		                detailVO.setIgstRate(igstRate);
+		                detailVO.setIgstAmount(igstAmount);
+
+		                detailVO.setCgstRate(BigDecimal.ZERO);
+		                detailVO.setCgstAmount(BigDecimal.ZERO);
+
+		                detailVO.setSgstRate(BigDecimal.ZERO);
+		                detailVO.setSgstAmount(BigDecimal.ZERO);
+
+		            }
+
+		            // =================================================
+		            // CGST + SGST
+		            // =================================================
+
+		            else {
+
+		                BigDecimal cgstAmount =
+		                        assessableValue
+		                                .multiply(cgstRate)
+		                                .divide(BigDecimal.valueOf(100));
+
+		                BigDecimal sgstAmount =
+		                        assessableValue
+		                                .multiply(sgstRate)
+		                                .divide(BigDecimal.valueOf(100));
+
+		                detailVO.setCgstRate(cgstRate);
+		                detailVO.setCgstAmount(cgstAmount);
+
+		                detailVO.setSgstRate(sgstRate);
+		                detailVO.setSgstAmount(sgstAmount);
+
+		                detailVO.setIgstRate(BigDecimal.ZERO);
+		                detailVO.setIgstAmount(BigDecimal.ZERO);
+		            }
+
+		            // -------------------------------------------------
+		            // PARENT MAPPING
+		            // -------------------------------------------------
+
+		            detailVO.setStockTransferChallanVO(
+		                    stockTransferChallanVO);
+
+		            // -------------------------------------------------
+		            // ADD CHILD
+		            // -------------------------------------------------
+
+		            stockTransferChallanVO.getDetails().add(detailVO);
+		        }
+		    }
+
+		    // =========================================================
+		    // DELETE OLD TAX DETAILS
+		    // =========================================================
+
+//		    stockTransferChallanVO.getTaxDetails().clear();
+
+		    // =========================================================
+		    // ADD NEW TAX DETAILS
+		    // =========================================================
+
+		    if (dto.getStockTransferChallanTaxDetailsDTO() != null) {
+
+		        for (StockTransferChallanTaxDetailsDTO taxDTO :
+		                dto.getStockTransferChallanTaxDetailsDTO()) {
+
+		            StockTransferChallanTaxDetailsVO taxVO =
+		                    new StockTransferChallanTaxDetailsVO();
+
+		            // -------------------------------------------------
+		            // PARTICULARS
+		            // -------------------------------------------------
+
+		            if (taxDTO.getParticularsId() != null &&
+		                    taxDTO.getParticularsId() != 0) {
+
+		                ListOfValuesDetailsVO particularsVO =
+		                        listOfValuesDetailsRepo
+		                                .findById(taxDTO.getParticularsId())
+		                                .orElseThrow(() ->
+		                                        new ApplicationException(
+		                                                "Tax Particulars Not Found"));
+
+		                taxVO.setParticulars(particularsVO);
+		            }
+
+		            // -------------------------------------------------
+		            // AMOUNTS
+		            // -------------------------------------------------
+
+		            taxVO.setAcceptQtyAmount(
+		                    taxDTO.getAcceptQtyAmount());
+
+		            taxVO.setRevisedAmoount(
+		                    taxDTO.getRevisedAmoount());
+
+		            // -------------------------------------------------
+		            // PARENT
+		            // -------------------------------------------------
+
+		            taxVO.setStockTransferChallanVO(
+		                    stockTransferChallanVO);
+
+		            // -------------------------------------------------
+		            // ADD CHILD
+		            // -------------------------------------------------
+
+		            stockTransferChallanVO.getTaxDetails().add(taxVO);
+		            
+		        }}
 	}
 
+	
+	@Override
+	public String getStockTransferChallanDocId(Long orgId, String financialYear, String screenCode) {
+		String screenCode1 = "STC";
+		String result = stockTransferChallanRepo.getStockTransferChallanDocId(orgId, financialYear, screenCode1);
+		return result;
+	}
+	
 	@Override
 	public StockTransferChallanResponseDTO getStockTransferChallanById(Long id) throws ApplicationException {
 
@@ -1340,9 +1827,9 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// drowdown for stocktransfercustomer
 	@Override
-	public Map<String, Object> getCustomerForStockTransferChallan(Long branch, Long orgId) throws ApplicationException {
+	public Map<String, Object> getCustomerForStockTransferChallan(Long branch, Long  orgId) throws ApplicationException {
 
-		List<Object[]> customerList = customerRepo.getCustomerForStockTransferChallan(branch, orgId);
+		List<Object[]> customerList = customerRepo.getCustomerForStockTransferChallan( branch, orgId);
 
 		if (customerList == null || customerList.isEmpty()) {
 			throw new ApplicationException("No Customer Found");
@@ -1384,13 +1871,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// despatch instruction sheduleno dropdown
 	@Override
-	public Map<String, Object> getScheduleNoDropdownForDespatchInstruction(Long customer, String monthYear, Long branch,
-			Long orgId) throws ApplicationException {
+	public Map<String, Object> getScheduleNoDropdownForDespatchInstruction(Long customer, String monthYear, Long branch, Long orgId)
+			throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> scheduleList = despatchInstructionRepo.getScheduleNoDropdownForDespatchInstruction(customer,
-				monthYear, branch, orgId);
+		List<Object[]> scheduleList = despatchInstructionRepo.getScheduleNoDropdownForDespatchInstruction(customer, monthYear, branch, orgId);
 
 		List<DespatchInstructionScheduleResponseDTO> responseDTOList = new ArrayList<>();
 
@@ -1398,15 +1884,22 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			DespatchInstructionScheduleResponseDTO dto = new DespatchInstructionScheduleResponseDTO();
 
-			dto.setSalesDeliveryScheduleId(obj[0] != null ? ((Number) obj[0]).longValue() : null);
+			 dto.setSalesDeliveryScheduleId(
+		                obj[0] != null ? ((Number) obj[0]).longValue() : null);
 
-			dto.setDlvNo(obj[1] != null ? (String) obj[1] : null);
+		        dto.setDlvNo(
+		                obj[1] != null ? (String) obj[1] : null);
 
-			dto.setDlvdate(obj[2] != null ? ((java.sql.Date) obj[2]).toLocalDate() : null);
+		        dto.setDlvdate(
+		                obj[2] != null ? ((java.sql.Date) obj[2]).toLocalDate() : null);
 
-			dto.setInvoiceType(obj[4] != null ? (String) obj[4] : null);
+		        dto.setInvoiceType(
+		                obj[4] != null ? (String) obj[4] : null);
 
-			dto.setMonthOfSchedule(obj[3] != null ? Month.valueOf(((String) obj[3]).toUpperCase()) : null);
+		        dto.setMonthOfSchedule(
+		                obj[3] != null
+		                        ? Month.valueOf(((String) obj[3]).toUpperCase())
+		                        : null);
 
 			responseDTOList.add(dto);
 		}
@@ -1420,8 +1913,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// despatch customer dropdown
 	@Override
-	public Map<String, Object> getCustomerDropdownForDespatchInstructions(Long branch, Long orgId)
-			throws ApplicationException {
+	public Map<String, Object> getCustomerDropdownForDespatchInstructions(Long branch, Long orgId) throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
@@ -1453,13 +1945,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// despatch contract no dropdown
 	@Override
-	public Map<String, Object> getOrderAndSalesContractDropdownFromDespatchInstruction(Long customerId, Long branch,
-			Long orgId) throws ApplicationException {
+	public Map<String, Object> getOrderAndSalesContractDropdownFromDespatchInstruction(Long customerId, Long branch, Long orgId)
+			throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> salesContractList = despatchInstructionRepo
-				.getOrderAndSalesContractDropdownFromDespatchInstruction(customerId, branch, orgId);
+		List<Object[]> salesContractList = despatchInstructionRepo.getOrderAndSalesContractDropdownFromDespatchInstruction(customerId, branch, orgId);
 
 		List<DespatchSalesContractResponseDTO> responseDTOList = new ArrayList<>();
 
@@ -1467,13 +1958,17 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 			DespatchSalesContractResponseDTO dto = new DespatchSalesContractResponseDTO();
 
-			dto.setOrderAccepCustomerContractNo(obj[0] != null ? (String) obj[0] : "");
+			dto.setOrderAccepCustomerContractNo(
+			        obj[0] != null ? (String) obj[0] : "");
 
-			dto.setDate(obj[1] != null ? ((java.sql.Date) obj[1]).toLocalDate() : null);
+			dto.setDate(
+			        obj[1] != null ? ((java.sql.Date) obj[1]).toLocalDate() : null);
 
-			dto.setId(obj[2] != null ? ((Number) obj[2]).longValue() : 0L);
+			dto.setId(
+			        obj[2] != null ? ((Number) obj[2]).longValue() : 0L);
 
-			dto.setType(obj[3] != null ? (String) obj[3] : "");
+			dto.setType(
+			        obj[3] != null ? (String) obj[3] : "");
 			responseDTOList.add(dto);
 		}
 
@@ -1486,12 +1981,11 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// Despacth Item dropdown
 	@Override
-	public Map<String, Object> getItemsFromDespatchInstruction(Long item_type, Long branch, Long orgId)
-			throws ApplicationException {
+	public Map<String, Object> getItemsFromDespatchInstruction(Long item_type,Long branch, Long orgId) throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> itemList = itemMasterRepo.getItemsFromDespatchInstruction(item_type, branch, orgId);
+		List<Object[]> itemList = itemMasterRepo.getItemsFromDespatchInstruction(item_type,branch, orgId);
 
 		List<ItemResponseDTO> responseDTOList = new ArrayList<>();
 
@@ -1500,16 +1994,18 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			ItemResponseDTO dto = new ItemResponseDTO();
 
 			dto.setId(obj[0] != null ? ((Number) obj[0]).longValue() : 0L);
-			dto.setItemCode(obj[1] != null ? obj[1].toString() : "");
-			dto.setItemDescription(obj[2] != null ? obj[2].toString() : "");
-			if (obj[3] != null) {
-				UnitResponseDTO unit = new UnitResponseDTO();
-				unit.setId(((Number) obj[3]).longValue());
-				dto.setUnit(unit);
-			}
+		    dto.setItemCode(obj[1] != null ? obj[1].toString() : "");
+		    dto.setItemDescription(obj[2] != null ? obj[2].toString() : "");
+		    if (obj[3] != null) {
+		        UnitResponseDTO unit = new UnitResponseDTO();
+		        unit.setId(((Number) obj[3]).longValue());
+		        dto.setUnit(unit);
+		    }
+
 
 			responseDTOList.add(dto);
 		}
+
 
 		responseMap.put("itemList", responseDTOList);
 
@@ -1518,13 +2014,12 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 	// Despatch Schedulemonth
 	@Override
-	public Map<String, Object> getScheduleMonthForDespatchInstruction(Long item, String dlvno, Long branch, Long orgId)
+	public Map<String, Object> getScheduleMonthForDespatchInstruction(Long item,String dlvno, Long branch, Long orgId)
 			throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> scheduleMonthList = despatchInstructionRepo.getScheduleMonthForDespatchInstruction(item, dlvno,
-				branch, orgId);
+		List<Object[]> scheduleMonthList = despatchInstructionRepo.getScheduleMonthForDespatchInstruction(item,dlvno, branch, orgId);
 
 		List<DespatchScheduleMonthResponseDTO> responseDTOList = new ArrayList<>();
 
@@ -1548,8 +2043,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	// despatch planned qty
 
 	@Override
-	public Map<String, Object> getPlannedQtyForDespatchInstruction(Long item, Long branch, Long orgId)
-			throws ApplicationException {
+	public Map<String, Object> getPlannedQtyForDespatchInstruction(Long item, Long branch, Long orgId) throws ApplicationException {
 
 		Map<String, Object> responseMap = new HashMap<>();
 
@@ -1565,7 +2059,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 		return responseMap;
 	}
-
+	
 	// pending qty
 //	@Override
 //	public Map<String, Object> getDespatchPendingQty(Long itemId,
@@ -1614,91 +2108,100 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 //
 //	    return responseMap;
 //	}
-
+	
 //	fillgrid api for the despatch instruction
-
+	
 	@Override
-	public List<Map<String, Object>> getFillGridItemsForDespatchInstruction(Long customerId, Long sdvBasicId,
-			Long branch, Long orgId) {
+	public List<Map<String, Object>> getFillGridItemsForDespatchInstruction(
+	        Long customerId,
+	        Long sdvBasicId,
+	        Long branch,
+	        Long orgId) {
 
-		List<Object[]> result = despatchInstructionRepo.getFillGridItemsForDespatchInstruction(customerId, sdvBasicId,
-				branch, orgId);
+	    List<Object[]> result = despatchInstructionRepo.getFillGridItemsForDespatchInstruction(
+	            customerId,
+	            sdvBasicId,
+	            branch,
+	            orgId);
 
-		return getFillGridItems(result);
+	    return getFillGridItems(result);
 	}
 
 	private List<Map<String, Object>> getFillGridItems(List<Object[]> result) {
 
-		List<Map<String, Object>> details = new ArrayList<>();
+	    List<Map<String, Object>> details = new ArrayList<>();
 
-		for (Object[] obj : result) {
+	    for (Object[] obj : result) {
 
-			Map<String, Object> item = new HashMap<>();
+	        Map<String, Object> item = new HashMap<>();
 
-			item.put("itemId", obj[0] != null ? ((Number) obj[0]).longValue() : null);
-			item.put("mark", obj[1] != null ? obj[1].toString() : "");
-			item.put("itemCode", obj[2] != null ? obj[2].toString() : "");
-			item.put("itemDescription", obj[3] != null ? obj[3].toString() : "");
-			item.put("unit", obj[4] != null ? ((Number) obj[4]).longValue() : null);
-			item.put("sdvBasicId", obj[5] != null ? ((Number) obj[5]).longValue() : null);
-			item.put("soNoContractNo", obj[6] != null ? obj[6].toString() : "");
-			item.put("sn", obj[7] != null ? ((Number) obj[7]).intValue() : 0);
-			item.put("unitMasterId", obj[8] != null ? obj[8].toString() : "");
+	        item.put("itemId", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+	        item.put("mark", obj[1] != null ? obj[1].toString() : "");
+	        item.put("itemCode",obj[2] != null ? obj[2].toString() : "");
+	        item.put("itemDescription", obj[3] != null ? obj[3].toString() : "");
+	        item.put("unit", obj[4] != null ? ((Number) obj[4]).longValue() : null);
+	        item.put("sdvBasicId", obj[5] != null ? ((Number) obj[5]).longValue() : null);
+	        item.put("soNoContractNo", obj[6] != null ? obj[6].toString() : "");
+	        item.put("sn", obj[7] != null ? ((Number) obj[7]).intValue() : 0);
+	        item.put("unitMasterId", obj[8] != null ? obj[8].toString() : "");
 
-			details.add(item);
-		}
 
-		return details;
+	        details.add(item);
+	    }
+
+	    return details;
 	}
 // item drop down for the stocktransfer 
-
+	
 	@Override
-	public Map<String, Object> getItemsForStockTransferChallan(String despatchNo, Long branch, Long orgId)
-			throws ApplicationException {
+	public Map<String, Object> getItemsForStockTransferChallan(Long branch, Long orgId)
+	        throws ApplicationException {
 
-		Map<String, Object> responseMap = new HashMap<>();
+	    Map<String, Object> responseMap = new HashMap<>();
 
-		List<Object[]> itemList = itemMasterRepo.getItemsForStockTransferChallan(despatchNo, branch, orgId);
+	    List<Object[]> itemList =
+	            itemMasterRepo.getItemsForStockTransferChallan(branch, orgId);
 
-		List<StockTransferItemResponseDTO> responseDTOList = new ArrayList<>();
+	    List<StockTransferItemResponseDTO> responseDTOList = new ArrayList<>();
 
-		for (Object[] obj : itemList) {
+	    for (Object[] obj : itemList) {
 
-			StockTransferItemResponseDTO dto = new StockTransferItemResponseDTO();
+	        StockTransferItemResponseDTO dto = new StockTransferItemResponseDTO();
 
-			dto.setId(obj[0] != null ? ((Number) obj[0]).longValue() : 0L);
+	        // 0 - item_id
+	        dto.setId(obj[0] != null ? Long.parseLong(obj[0].toString()) : 0L);
 
-			dto.setItemCode(obj[1] != null ? (String) obj[1] : "");
+	        dto.setItemCode(obj[1] != null ? obj[1].toString() : "");
 
-			dto.setItemDescription(obj[2] != null ? (String) obj[2] : "");
+	        dto.setItemDescription(obj[2] != null ? obj[2].toString() : "");
 
-			dto.setCustomerPartNo(obj[3] != null ? (String) obj[3] : "");
+	        dto.setHsn(obj[3] != null ? obj[3].toString() : "");
 
-			dto.setReceivedQty(obj[4] != null ? ((Number) obj[4]).doubleValue() : 0.0);
+	        dto.setCustomerPartNo(obj[4] != null ? obj[4].toString() : "");
 
-			dto.setFreight(obj[5] != null ? ((Number) obj[5]).doubleValue() : 0.0);
+	        dto.setRate(obj[5] != null ? Double.parseDouble(obj[5].toString()) : 0.0);
 
-			dto.setInsurance(obj[6] != null ? ((Number) obj[6]).doubleValue() : 0.0);
+	        dto.setCgst(obj[6] != null ? Double.parseDouble(obj[6].toString()) : 0.0);
 
-			dto.setExciseTariffNo(obj[7] != null ? ((Number) obj[7]).longValue() : 0L);
+	        dto.setSgst(obj[7] != null ? Double.parseDouble(obj[7].toString()) : 0.0);
 
-			dto.setHsnSacCode(obj[8] != null ? ((Number) obj[8]).longValue() : 0L);
+	        dto.setIgst(obj[8] != null ? Double.parseDouble(obj[8].toString()) : 0.0);
 
-			responseDTOList.add(dto);
-		}
+	        dto.setUnitmasterId(
+	                obj[9] != null ? Long.parseLong(obj[9].toString()) : 0L);
 
-		responseMap.put("message", "Items Fetched Successfully");
+	        dto.setUnit(obj[10] != null ? obj[10].toString() : "");
 
-		responseMap.put("itemList", responseDTOList);
+	        
+	        dto.setGstratemasterId(
+	                obj[11] != null ? Long.parseLong(obj[11].toString()) : 0L);
+	        
+	        responseDTOList.add(dto);
+	    }
 
-		return responseMap;
-	}
+	    responseMap.put("message", "Items Fetched Successfully");
+	    responseMap.put("itemList", responseDTOList);
 
-	@Override
-	public String getCustomerComplaintDocId(Long orgId, String financialYear, String screenCode) {
-		String screenCode1 = "CCE";
-		String result = customerComplaintRepo.getCustomerComplaintDocId(orgId, financialYear, screenCode1);
-		return result;
-	}
-
+	    return responseMap;
+  }
 }

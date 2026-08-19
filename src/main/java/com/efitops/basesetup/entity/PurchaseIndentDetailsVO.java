@@ -20,22 +20,29 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Indent_Detail")
+@Table(name = "indent_detail")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseIndentDetailsVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Indent_Detailgen")
-    @SequenceGenerator(name = "Indent_Detailgen", sequenceName = "Indent_Detailseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "Indent_Detail_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "indent_detailgen")
+    @SequenceGenerator(name = "indent_detailgen", sequenceName = "indent_detailseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "indent_detail_id")
     private Long id;
 
-    // Item is a full reference to ItemMasterVO - itemCode / itemDescription / primaryUnit / purchaseUnit 
+    // Item is a full reference to ItemMasterVO - itemCode / itemDescription 
     @ManyToOne
     @JoinColumn(name = "item")
     private ItemMasterVO item;
+    
+    @ManyToOne
+    @JoinColumn(name = "unit")
+    private UnitMasterVO unit;
+    
+    
+    
 
     @Column(name = "qtyinprimary_unit")
     private BigDecimal qtyInPrimaryUnit;
@@ -54,7 +61,7 @@ public class PurchaseIndentDetailsVO {
     private String purpose;
 
     @ManyToOne
-    @JoinColumn(name = "Indent_Basic_id")
+    @JoinColumn(name = "indent_basic_id")
     @JsonBackReference
     private PurchaseIndentVO purchaseIndentVO;
 }

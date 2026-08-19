@@ -172,4 +172,27 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
         		List<Object[]> getItemsForStockTransferChallan(
         		        @Param("branch") Long branch,
         		        @Param("orgId") Long orgId);
+        		
+        		
+        		
+        		@Query(value = """
+        				SELECT i.item_id,
+        				       i.item_code,
+        				       i.item_description,
+        				       pu.unit_id AS primary_unit,
+        				       uu.unit_id AS purchase_unit
+        				FROM item i
+        				LEFT JOIN unitmaster pu
+        				       ON i.primary_unit = pu.unitmaster_id
+        				LEFT JOIN unitmaster uu
+        				       ON i.purchase_unit = uu.unitmaster_id
+        				WHERE i.active = 1
+        				  AND i.cancel = 0
+        				  AND i.org_id = :orgId
+        				  AND i.branch = :branch
+        				ORDER BY i.item_code
+        				""", nativeQuery = true)
+        				List<Object[]> getPurchaseIndentItemDropdown(
+        				        @Param("orgId") Long orgId,
+        				        @Param("branch") Long branch);
 }

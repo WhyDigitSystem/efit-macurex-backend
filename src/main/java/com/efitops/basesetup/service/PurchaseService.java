@@ -45,9 +45,37 @@ public interface PurchaseService {
     
     
     //purchase indent
-	Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO purchaseIndentDTO) throws ApplicationException;
-	PurchaseIndentResponseDTO getPurchaseIndentById(Long id) throws ApplicationException;
-	List<PurchaseIndentResponseDTO> getPurchaseIndentByOrgId(Long orgId, Long branch) throws ApplicationException;
-
+ // Purchase Indent
+//    Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO purchaseIndentDTO)
+//            throws ApplicationException;
+//
+//    PurchaseIndentResponseDTO getPurchaseIndentById(Long id)
+//            throws ApplicationException;
+//
+//    List<PurchaseIndentResponseDTO> getPurchaseIndentByOrgId(Long orgId, Long branch)
+//            throws ApplicationException;
+//
+//    List<PurchaseIndentDepartmentDropdownResponseDTO> getPurchaseIndentDepartmentDropdown(
+//            Long orgId, Long branch)
+//            throws ApplicationException;
+//
+//    List<PurchaseIndentPreparedByDropdownResponseDTO> getPurchaseIndentPreparedByDropdown(
+//            Long orgId, Long branch)
+//            throws ApplicationException;
+//    
+//    
+//    List<PurchaseIndentByWhomDropdownResponseDTO>
+//    getPurchaseIndentByWhomDropdown(Long orgId, Long branch)
+//            throws ApplicationException;
+//	List<PurchaseIndentItemDropdownResponseDTO> getPurchaseIndentItemDropdown(Long orgId, Long branch)
+//			throws ApplicationException;
+//	
+//	
+//	List<PurchaseIndentConversionFactorDropdownResponseDTO>
+//	getPurchaseIndentConversionFactorDropdown(Long orgId, Long branch)
+//	        throws ApplicationException;
+//	Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO purchaseIndentDTO, MultipartFile[] files)
+//			throws ApplicationException;
+//	String getPurchaseIndentDocId(Long orgId, String financialYear, String screenCode);
 
 }

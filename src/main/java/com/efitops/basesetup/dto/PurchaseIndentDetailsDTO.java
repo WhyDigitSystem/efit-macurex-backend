@@ -3,6 +3,8 @@ package com.efitops.basesetup.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.efitops.basesetup.entity.UnitMasterVO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PurchaseIndentDetailsDTO {
 
-    private Long id;
+//    private Long id;
 
     // Item
     private Long item;
@@ -22,6 +24,9 @@ public class PurchaseIndentDetailsDTO {
 
     // Conversion Factor (Dropdown)
     private Long conversionFactor;
+    
+    //unit
+    private Long unit;
 
     // Purchase Quantity
     private BigDecimal qtyInPurchaseUnit;

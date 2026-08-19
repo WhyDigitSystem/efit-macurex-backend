@@ -7,6 +7,8 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,12 @@ import com.efitops.basesetup.ResponseDTO.*;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.*;
+import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.service.PurchaseService;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin
 @RestController
+@RequestMapping("/api/purchaseservice")
 public class PurchaseController extends BaseController {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(PurchaseController.class);
@@ -194,116 +198,270 @@ public class PurchaseController extends BaseController {
     // ==================================================================
     // PURCHASE INDENT — original paths: /api/purchaseindent/**
     // ==================================================================
-
-    @PutMapping("/createUpdatePurchaseIndent")
-    public ResponseEntity<ResponseDTO> createUpdatePurchaseIndent(
-
-            @RequestBody PurchaseIndentDTO purchaseIndentDTO) {
-
-        Map<String, Object> responseObjectsMap = new HashMap<>();
-        ResponseDTO responseDTO;
-
-        try {
-
-            Map<String, Object> purchaseIndentMap =
-                    purchaseService.createUpdatePurchaseIndent(
-                            purchaseIndentDTO);
-
-            responseObjectsMap.put(
-                    CommonConstant.STRING_MESSAGE,
-                    purchaseIndentMap.get("message"));
-
-            responseObjectsMap.put(
-                    "purchaseIndentVO",
-                    purchaseIndentMap.get("purchaseIndentVO"));
-
-            responseDTO = createServiceResponse(
-                    responseObjectsMap);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            responseDTO = createServiceResponseError(
-                    responseObjectsMap,
-                    e.getMessage(),
-                    e.getMessage());
-        }
-
-        return ResponseEntity.ok(responseDTO);
-    }
-    
-   //get by id 
-    
-    @GetMapping("/getPurchaseIndentById/{id}")
-    public ResponseEntity<ResponseDTO> getPurchaseIndentById(
-            @PathVariable Long id) {
-
-        Map<String, Object> responseObjectsMap = new HashMap<>();
-        ResponseDTO responseDTO;
-
-        try {
-
-            PurchaseIndentResponseDTO purchaseIndentResponseDTO =
-                    purchaseService.getPurchaseIndentById(id);
-
-            responseObjectsMap.put(
-                    "purchaseIndentVO",
-                    purchaseIndentResponseDTO);
-
-            responseDTO = createServiceResponse(responseObjectsMap);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            responseDTO = createServiceResponseError(
-                    responseObjectsMap,
-                    e.getMessage(),
-                    e.getMessage());
-        }
-
-        return ResponseEntity.ok(responseDTO);
-    }
-    
-    
-    //get byt orgid
-    
-    
-    @GetMapping("/getPurchaseIndentByOrgId")
-    public ResponseEntity<ResponseDTO> getPurchaseIndentByOrgId(
-            @RequestParam Long orgId,
-            @RequestParam Long branch) {
-
-        Map<String, Object> responseObjectsMap = new HashMap<>();
-        ResponseDTO responseDTO;
-
-        try {
-
-            List<PurchaseIndentResponseDTO> purchaseIndentList =
-                    purchaseService.getPurchaseIndentByOrgId(
-                            orgId,
-                            branch);
-
-            responseObjectsMap.put(
-                    "purchaseIndentVO",
-                    purchaseIndentList);
-
-            responseDTO = createServiceResponse(responseObjectsMap);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            responseDTO = createServiceResponseError(
-                    responseObjectsMap,
-                    e.getMessage(),
-                    e.getMessage());
-        }
-
-        return ResponseEntity.ok(responseDTO);
-    }
-    
+//
+//    @PostMapping(value = "/createUpdatePurchaseIndent",
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<ResponseDTO> createUpdatePurchaseIndent(
+//            @RequestPart("purchaseIndent") PurchaseIndentDTO purchaseIndentDTO,
+//            @RequestPart(value = "files", required = false) MultipartFile[] files) {
+//
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//        ResponseDTO responseDTO;
+//
+//        try {
+//
+//            Map<String, Object> purchaseIndentMap = purchaseService.createUpdatePurchaseIndent(purchaseIndentDTO,files);
+//
+//            responseObjectsMap.put(CommonConstant.STRING_MESSAGE, purchaseIndentMap.get("message"));
+//
+//            responseObjectsMap.put("purchaseIndentVO",purchaseIndentMap.get("purchaseIndentVO"));
+//
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//
+//        } catch (Exception e) {
+//
+//            e.printStackTrace();
+//
+//            responseDTO = createServiceResponseError(
+//                    responseObjectsMap,
+//                    e.getMessage(),
+//                    e.getMessage());
+//        }
+//
+//        return ResponseEntity.ok(responseDTO);
+//    }
+//    
+//   //get by id 
+//    
+//    @GetMapping("/getPurchaseIndentById")
+//    public ResponseEntity<ResponseDTO> getPurchaseIndentById(@RequestParam Long id) {
+//
+//        String methodName = "getPurchaseIndentById()";
+//        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//        String errorMsg = null;
+//
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//
+//        ResponseDTO responseDTO = null;
+//
+//        try {
+//
+//            PurchaseIndentResponseDTO purchaseIndentResponseDTO =
+//                    purchaseService.getPurchaseIndentById(id);
+//
+//            responseObjectsMap.put(
+//                    CommonConstant.STRING_MESSAGE,
+//                    "Purchase Indent information retrieved successfully");
+//
+//            responseObjectsMap.put(
+//                    "purchaseIndentResponseVO",
+//                    purchaseIndentResponseDTO);
+//
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//
+//        } catch (Exception e) {
+//
+//            errorMsg = e.getMessage();
+//
+//            LOGGER.error(
+//                    UserConstants.ERROR_MSG_METHOD_NAME,
+//                    methodName,
+//                    errorMsg);
+//
+//            responseDTO = createServiceResponseError(
+//                    responseObjectsMap,
+//                    "Purchase Indent information retrieval failed",
+//                    errorMsg);
+//        }
+//
+//        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//        return ResponseEntity.ok(responseDTO);
+//    }
+//    //get byt orgid
+//    
+//    
+//    @GetMapping("/getPurchaseIndentByOrgId")
+//    public ResponseEntity<ResponseDTO> getPurchaseIndentByOrgId(
+//            @RequestParam Long orgId,
+//            @RequestParam Long branch) {
+//
+//        String methodName = "getPurchaseIndentByOrgId()";
+//
+//        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//
+//        ResponseDTO responseDTO;
+//
+//        try {
+//
+//            List<PurchaseIndentResponseDTO> purchaseIndentResponseDTO =
+//                    purchaseService.getPurchaseIndentByOrgId(orgId, branch);
+//
+//            responseObjectsMap.put(
+//                    CommonConstant.STRING_MESSAGE,
+//                    "Purchase Indent information retrieved successfully");
+//
+//            responseObjectsMap.put(
+//                    "purchaseIndentResponseVO",
+//                    purchaseIndentResponseDTO);
+//
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//
+//        } catch (Exception e) {
+//
+//            LOGGER.error(
+//                    UserConstants.ERROR_MSG_METHOD_NAME,
+//                    methodName,
+//                    e.getMessage());
+//
+//            responseDTO = createServiceResponseError(
+//                    responseObjectsMap,
+//                    "Purchase Indent information retrieval failed",
+//                    e.getMessage());
+//        }
+//
+//        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//        return ResponseEntity.ok(responseDTO);
+//    }
+//    
+//    
+//    
+//    @GetMapping("/getPurchaseIndentDocId")
+//    public ResponseEntity<ResponseDTO> getPurchaseIndentDocId(
+//            @RequestParam Long orgId,
+//            @RequestParam String financialYear,
+//            @RequestParam String screenCode) {
+//
+//        String methodName = "getPurchaseIndentDocId()";
+//        LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//        String errorMsg = null;
+//
+//        Map<String, Object> responseObjectsMap = new HashMap<>();
+//
+//        ResponseDTO responseDTO = null;
+//
+//        String docId = "";
+//
+//        try {
+//
+//            docId = purchaseService.getPurchaseIndentDocId(
+//                    orgId,
+//                    financialYear,
+//                    screenCode);
+//
+//        } catch (Exception e) {
+//
+//            errorMsg = e.getMessage();
+//
+//            LOGGER.error(
+//                    UserConstants.ERROR_MSG_METHOD_NAME,
+//                    methodName,
+//                    errorMsg);
+//        }
+//
+//        if (StringUtils.isBlank(errorMsg)) {
+//
+//            responseObjectsMap.put(
+//                    CommonConstant.STRING_MESSAGE,
+//                    "Purchase Indent DocId information retrieved successfully");
+//
+//            responseObjectsMap.put(
+//                    "purchaseIndentDocId",
+//                    docId);
+//
+//            responseDTO = createServiceResponse(responseObjectsMap);
+//
+//        } else {
+//
+//            responseDTO = createServiceResponseError(
+//                    responseObjectsMap,
+//                    "Failed to retrieve Purchase Indent DocId",
+//                    errorMsg);
+//        }
+//
+//        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//        return ResponseEntity.ok().body(responseDTO);
+//    }
+//    
+//    
+//    
+//   //dropdowns
+//   
+//   
+//   
+//    @GetMapping("/api/purchaseMaster/purchaseIndentDepartmentDropdown")
+//    public List<PurchaseIndentDepartmentDropdownResponseDTO>
+//            getPurchaseIndentDepartmentDropdown(
+//            @RequestParam Long orgId,
+//            @RequestParam Long branch)
+//            throws ApplicationException {
+//
+//        return purchaseService.getPurchaseIndentDepartmentDropdown(orgId, branch);
+//    }
+//    
+//    //purchaseindentpreparedbydropdown
+//    
+//    
+//    @GetMapping("/api/purchaseMaster/purchaseIndentPreparedByDropdown")
+//    public List<PurchaseIndentPreparedByDropdownResponseDTO>
+//    getPurchaseIndentPreparedByDropdown(
+//            @RequestParam Long orgId,
+//            @RequestParam Long branch)
+//            throws ApplicationException {
+//
+//        return purchaseService
+//                .getPurchaseIndentPreparedByDropdown(orgId, branch);
+//    }
+//    
+//    
+//    //purchaseindentbywhomedropdown
+//    
+//    
+//    @GetMapping("/api/purchaseMaster/purchaseIndentByWhomDropdown")
+//    public ResponseEntity<List<PurchaseIndentByWhomDropdownResponseDTO>>
+//    getPurchaseIndentByWhomDropdown(
+//            @RequestParam Long orgId,
+//            @RequestParam Long branch) throws ApplicationException {
+//
+//        return ResponseEntity.ok(
+//                purchaseService.getPurchaseIndentByWhomDropdown(orgId, branch));
+//    }
+//    
+//    
+//    //purchaseindentitemcodedropdown
+//    
+//    
+//    @GetMapping("/api/purchaseMaster/purchaseIndentItemDropdown")
+//    public ResponseEntity<List<PurchaseIndentItemDropdownResponseDTO>>
+//    getPurchaseIndentItemDropdown(
+//            @RequestParam Long orgId,
+//            @RequestParam Long branch)
+//            throws ApplicationException {
+//
+//        return ResponseEntity.ok(
+//                purchaseService.getPurchaseIndentItemDropdown(orgId, branch));
+//    }
+//    
+//    
+//    //purchaseindentconversionfactordropdown
+//    
+//    
+//    @GetMapping("/api/purchaseMaster/purchaseIndentConversionFactorDropdown")
+//    public ResponseEntity<List<PurchaseIndentConversionFactorDropdownResponseDTO>>
+//    getPurchaseIndentConversionFactorDropdown(
+//            @RequestParam Long orgId,
+//            @RequestParam Long branch)
+//            throws ApplicationException {
+//
+//        return ResponseEntity.ok(
+//                purchaseService.getPurchaseIndentConversionFactorDropdown(orgId, branch));
+//    }
     
     // ==================================================================
     // PURCHASE SHORT CLOSE — /api/purchaseShortClose/**

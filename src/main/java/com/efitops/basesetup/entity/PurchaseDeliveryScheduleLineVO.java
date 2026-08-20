@@ -13,28 +13,28 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "purchase_delivery_schedule_line")
+@Table(name = "purchase_delivery_schedule_plan_detail")
 public class PurchaseDeliveryScheduleLineVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasedeliveryschedulelinegen")
-    @SequenceGenerator(name = "purchasedeliveryschedulelinegen", sequenceName = "purchasedeliveryschedulelineseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasedeliveryschedulelinegen_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchase_delivery_schedule_plan_detailgen")
+    @SequenceGenerator(name = "purchase_delivery_schedule_plan_detailgen", sequenceName = "purchase_delivery_schedule_plan_detailseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "purchase_delivery_schedule_plan_detail_id")
     private Long id;
 
-    // entered by user
+   
     @Column(name = "plan_date")
     private LocalDate planDate;
 
-    // entered by user - assumed numeric; change to String if shown as "W1", "W2" etc.
+  
     @Column(name = "week_no")
-    private Integer weekNo;
+    private int weekNo;
 
-    // entered by user
+   
     @Column(name = "schedule_qty")
     private BigDecimal scheduleQty;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchasedeliveryschedule_id")
-    private PurchaseDeliveryScheduleVO purchaseDeliveryScheduleVO;
+    @ManyToOne
+    @JoinColumn(name = "purchase_delivery_schedule_details_id")
+    private PurchaseDeliveryScheduleDetailsVO purchaseDeliveryScheduleDetailsVO;
 }

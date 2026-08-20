@@ -27,16 +27,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Indent_Basic")
+@Table(name = "indent_basic")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseIndentVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Indent_Basicgen")
-    @SequenceGenerator(name = "Indent_Basicgen", sequenceName = "Indent_Basicseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "Indent_Basic_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "indent_basicgen")
+    @SequenceGenerator(name = "indent_basicgen", sequenceName = "indent_basicseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "indent_basic_id")
     private Long id;
 
     @Column(name = "doc_id")
@@ -45,15 +45,13 @@ public class PurchaseIndentVO {
     @ManyToOne
    	@JoinColumn(name = "branch")
    	private BranchVO branch;
-
-   
     
     @Column(name = "belongs_to")
     private String belongsTo;
 
 
     @Column(name = "doc_date")
-    private LocalDate docDate;
+    private LocalDate docDate= LocalDate.now();
 
     @ManyToOne
     @JoinColumn(name = "department")

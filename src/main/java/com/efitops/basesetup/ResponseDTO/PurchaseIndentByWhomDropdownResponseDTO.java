@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerResponse1DTO {
-	private Long id;
-//	private String customerCode;
-	private String customerName;
+public class PurchaseIndentByWhomDropdownResponseDTO {
 
-	
+    private Long id;
+    private String employeeId;
+    private String employeeName;
 
 }

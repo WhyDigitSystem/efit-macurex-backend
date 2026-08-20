@@ -5,19 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class PurchaseIndentItemResponseDTO {
+@NoArgsConstructor
+public class PurchaseIndentItemDropdownResponseDTO {
 
     private Long id;
-
     private String itemCode;
-
     private String itemDescription;
-    
-    private PurchaseIndentUnitResponceDTO primaryUnit;
-    
-    private PurchaseIndentUnitResponceDTO purchaseUnit;
-    
+    private String primaryUnit;
+    private String purchaseUnit;
 
 }
+
+

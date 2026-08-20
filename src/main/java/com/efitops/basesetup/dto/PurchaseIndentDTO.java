@@ -16,14 +16,12 @@ public class PurchaseIndentDTO {
     private Long id;
 
     // Header
-    private String docId;
 
     private Long branch;
 
 
     private String belongsTo;
 
-    private LocalDate docDate;
 
     private Long department;
 
@@ -41,11 +39,11 @@ public class PurchaseIndentDTO {
 
     private String createdBy;
 
-    private String updatedBy;
+//    private String updatedBy;
 
     private boolean active;
 
-    private boolean cancel;
+//    private boolean cancel;
 
     private String cancelRemarks;
 

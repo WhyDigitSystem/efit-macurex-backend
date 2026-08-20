@@ -5,13 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class CustomerResponse1DTO {
-	private Long id;
-//	private String customerCode;
-	private String customerName;
-
+@AllArgsConstructor
+public class purchaseindentConversionResponseDTO {
 	
+	private Long id;
+	
+	 private Double multiplicationFactor;
+
 
 }

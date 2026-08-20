@@ -3,6 +3,7 @@ package com.efitops.basesetup.ResponseDTO;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.dto.UomConversionResponseDTO;
 
 import lombok.AllArgsConstructor;
@@ -18,12 +19,18 @@ public class PurchaseIndentDetailsResponseDTO {
 
     // Item
     private PurchaseIndentItemResponseDTO item;
+    
+    //unit
+//    private PurchaseIndentUnitResponceDTO primaryUnit;
+//    
+//    
+//    private PurchaseIndentUnitResponceDTO purchaseUnit;
 
     // Quantity
     private BigDecimal qtyInPrimaryUnit;
 
     // Conversion Factor
-    private UomConversionResponseDTO conversionFactor;
+    private purchaseindentConversionResponseDTO conversionFactor;
 
     // Purchase Quantity
     private BigDecimal qtyInPurchaseUnit;

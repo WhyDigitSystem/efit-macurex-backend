@@ -180,6 +180,33 @@ List<Object[]> getCustomerDetails(Long orgId, Long branch);
 			        @Param("branch") Long branch);
 
 			
+			
+//		Customerdropdown for the purchasedelivaryschedule 
+			
+			@Query(value = "SELECT\r\n"
+					+ "			    c.customer_id,\r\n"
+					+ "			    c.customer_code,\r\n"
+					+ "			    c.customer_name\r\n"
+					+ "			FROM customer_header c\r\n"
+					+ "			LEFT JOIN listofvaluesdetails a\r\n"
+					+ "			    ON c.customer_category = a.listofvaluesdetails_id\r\n"
+					+ "			LEFT JOIN listofvaluesdetails b\r\n"
+					+ "			    ON c.customer_category1 = b.listofvaluesdetails_id\r\n"
+					+ "			LEFT JOIN listofvaluesdetails cc\r\n"
+					+ "			    ON c.customer_category2 = cc.listofvaluesdetails_id\r\n"
+					+ "			WHERE c.cancel = FALSE\r\n"
+					+ "			  AND c.active = TRUE\r\n"
+					+ "			  AND c.branch = :branch\r\n"
+					+ "			  AND c.org_id = :orgId\r\n"
+					+ "			  AND (a.value_description = 'Supplier'\r\n"
+					+ "			        OR b.value_description = 'Supplier'\r\n"
+					+ "			        OR cc.value_description = 'Supplier'\r\n"
+					+ "			      )\r\n"
+					+ "			ORDER BY c.customer_code", nativeQuery = true)
+			List<Object[]> getSupplierDropdownForPurchaseDeliverySchedule(@Param("branch") Long branch,
+			                                   @Param("orgId") Long orgId);
+
+			
 			@Query(value = """
 			        SELECT
 			            c.customer_id AS customerId,
@@ -216,6 +243,7 @@ List<Object[]> getCustomerDetails(Long orgId, Long branch);
 			Set<Object[]> getCustomerDetailsforSalesRejectionInvoice(
 			        Long orgId,
 			        Long branch);
+
 }
 
 

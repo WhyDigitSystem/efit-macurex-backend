@@ -36,6 +36,7 @@ import com.efitops.basesetup.ResponseDTO.MappingBranchResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingOfPartyToAccResponseDTO;
+import com.efitops.basesetup.ResponseDTO.RejectionInvoiceResponseDTO;
 import com.efitops.basesetup.dto.BankDetailsDTO;
 import com.efitops.basesetup.dto.BranchDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
@@ -48,8 +49,6 @@ import com.efitops.basesetup.dto.DocumentTypeMappingDTO;
 import com.efitops.basesetup.dto.DocumentTypeMappingDetailsDTO;
 import com.efitops.basesetup.dto.DocumentTypeMasterDTO;
 import com.efitops.basesetup.dto.EmployeeMasterDetailsReponseDTO;
-import com.efitops.basesetup.dto.EmployeeMasterResponseDTO;
-import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.FinScreenDTO;
 import com.efitops.basesetup.dto.FinancialYearDTO;
 import com.efitops.basesetup.dto.GSTRateMasterDTO;
@@ -111,6 +110,7 @@ import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.MappingDetailsVO;
 import com.efitops.basesetup.entity.MappingOfPartyToAccVO;
 import com.efitops.basesetup.entity.RegionVO;
+import com.efitops.basesetup.entity.RejectionInvoiceVO;
 import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
@@ -1781,23 +1781,25 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			listVO.setBranch(branch);
 		}
 
-		if (dto.getId() != null) {
-
-			List<ListOfValuesDetailsVO> oldDetails = listOfValuesDetailsRepo.findByListOfValuesVO(listVO);
-
-			listOfValuesDetailsRepo.deleteAll(oldDetails);
-		}
-
 		List<ListOfValuesDetailsVO> detailList = new ArrayList<>();
 
 		for (ListOfValuesDetailsDTO detailDTO : dto.getDetails()) {
 
-			ListOfValuesDetailsVO detailVO = new ListOfValuesDetailsVO();
+			ListOfValuesDetailsVO detailVO = null;
+
+			if (detailDTO.getId() != null) {
+
+				detailVO = listOfValuesDetailsRepo.findById(detailDTO.getId()).orElse(null);
+			}
+
+			if (detailVO == null) {
+
+				detailVO = new ListOfValuesDetailsVO();
+			}
 
 			detailVO.setValueCode(detailDTO.getValueCode());
 			detailVO.setValueDescription(detailDTO.getValueDescription());
 			detailVO.setActive(detailDTO.isActive());
-
 			detailVO.setListOfValuesVO(listVO);
 
 			detailList.add(detailVO);
@@ -2532,6 +2534,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		financialYearVO.setCreatedBy(financialYearDTO.getCreatedBy());
 		financialYearVO.setActive(financialYearDTO.isActive());
 		financialYearVO.setCancelRemarks(financialYearDTO.getCancelRemarks());
+		financialYearVO.setFinYearId(financialYearDTO.getFinYearId());
 
 	}
 
@@ -3227,106 +3230,193 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	// DocumentTypeMaster
 
-	@Override
-	public List<DocumentTypeMasterVO> getDocumentTypeMasterByOrgId(Long orgId, Long branch) {
-		return documentTypeMasterRepo.findByOrgIdAndBranch(orgId, branch);
-	}
+//	@Override
+//	public List<DocumentTypeMasterVO> getDocumentTypeMasterByOrgId(Long orgId, Long branch) {
+//		return documentTypeMasterRepo.findByOrgIdAndBranch(orgId, branch);
+//	}
+//
+//	@Override
+//	public Optional<DocumentTypeMasterVO> getDocumentTypeMasterById(Long id) {
+//		return documentTypeMasterRepo.findById(id);
+//	}
+//
+//	@Override
+//	@Transactional
+//	public Map<String, Object> createUpdateDocumentTypeMaster(DocumentTypeMasterDTO documentTypeMasterDTO)
+//			throws ApplicationException {
+//
+//		DocumentTypeMasterVO documentTypeMasterVO;
+//		String message;
+//		DocumentTypeMasterVO oldDocumentTypeMaster = null;
+//
+//		if (ObjectUtils.isEmpty(documentTypeMasterDTO.getId())) {
+//
+//			if (documentTypeMasterRepo.existsByOrgIdAndCodeIgnoreCase(documentTypeMasterDTO.getOrgId(),
+//					documentTypeMasterDTO.getCode())) {
+//
+//				throw new ApplicationException("Document Type Code : " + documentTypeMasterDTO.getCode()
+//						+ " Already Exists in This Organization.");
+//			}
+//
+//			documentTypeMasterVO = new DocumentTypeMasterVO();
+//			documentTypeMasterVO.setCreatedBy(documentTypeMasterDTO.getCreatedBy());
+//			documentTypeMasterVO.setUpdatedBy(documentTypeMasterDTO.getCreatedBy());
+//
+//			message = "Document Type Master Created Successfully";
+//
+//		} else {
+//
+//			oldDocumentTypeMaster = documentTypeMasterRepo.findById(documentTypeMasterDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("Document Type Master Not Found"));
+//
+//			entityManager.detach(oldDocumentTypeMaster);
+//
+//			documentTypeMasterVO = documentTypeMasterRepo.findById(documentTypeMasterDTO.getId()).orElseThrow(
+//					() -> new ApplicationException("This Id Is Not Found : " + documentTypeMasterDTO.getId()));
+//
+//			documentTypeMasterVO.setUpdatedBy(documentTypeMasterDTO.getCreatedBy());
+//
+//			if (!documentTypeMasterVO.getCode().equalsIgnoreCase(documentTypeMasterDTO.getCode())) {
+//
+//				if (documentTypeMasterRepo.existsByOrgIdAndCodeIgnoreCase(documentTypeMasterDTO.getOrgId(),
+//						documentTypeMasterDTO.getCode())) {
+//
+//					throw new ApplicationException("Document Type Code : " + documentTypeMasterDTO.getCode()
+//							+ " Already Exists in This Organization.");
+//				}
+//
+//				documentTypeMasterVO.setCode(documentTypeMasterDTO.getCode().toUpperCase());
+//			}
+//
+//			message = "Document Type Master Updated Successfully";
+//		}
+//
+//		getDocumentTypeMasterVOFromDTO(documentTypeMasterVO, documentTypeMasterDTO);
+//
+//		documentTypeMasterRepo.save(documentTypeMasterVO);
+//
+//		Map<String, Object> response = new HashMap<>();
+//		response.put("message", message);
+//		response.put("documentTypeMasterVO", documentTypeMasterVO);
+//
+//		return response;
+//	}
+//
+//	private void getDocumentTypeMasterVOFromDTO(DocumentTypeMasterVO documentTypeMasterVO,
+//			DocumentTypeMasterDTO documentTypeMasterDTO) throws ApplicationException {
+//
+//		documentTypeMasterVO.setCode(documentTypeMasterDTO.getCode().toUpperCase());
+//
+//		if (documentTypeMasterDTO.getName() != null) {
+//			documentTypeMasterVO.setName(documentTypeMasterDTO.getName().toUpperCase());
+//		}
+//
+//		if (documentTypeMasterDTO.getDes() != null) {
+//			documentTypeMasterVO.setDescription(documentTypeMasterDTO.getDescription().toUpperCase());
+//		}
+//
+//		if (documentTypeMasterDTO.getDocCode() != null) {
+//			documentTypeMasterVO.setDocCode(documentTypeMasterDTO.getDocCode().toUpperCase());
+//		}
+//
+//		documentTypeMasterVO.setOrgId(documentTypeMasterDTO.getOrgId());
+//		documentTypeMasterVO.setActive(documentTypeMasterDTO.isActive());
+//		documentTypeMasterVO.setCancelRemarks(documentTypeMasterDTO.getCancelRemarks());
+//
+//		if (documentTypeMasterDTO.getBranch() != null && documentTypeMasterDTO.getBranch() != 0) {
+//
+//			BranchVO branch = branchRepo.findById(documentTypeMasterDTO.getBranch())
+//					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+//
+//			documentTypeMasterVO.setBranch(branch);
+//		}
+//	}
 
+	// Document Type
 	@Override
-	public Optional<DocumentTypeMasterVO> getDocumentTypeMasterById(Long id) {
-		return documentTypeMasterRepo.findById(id);
-	}
-
-	@Override
-	@Transactional
 	public Map<String, Object> createUpdateDocumentTypeMaster(DocumentTypeMasterDTO documentTypeMasterDTO)
 			throws ApplicationException {
-
-		DocumentTypeMasterVO documentTypeMasterVO;
+		DocumentTypeMasterVO documentTypeMasterVO = new DocumentTypeMasterVO();
 		String message;
-		DocumentTypeMasterVO oldDocumentTypeMaster = null;
 
 		if (ObjectUtils.isEmpty(documentTypeMasterDTO.getId())) {
 
-			if (documentTypeMasterRepo.existsByOrgIdAndCodeIgnoreCase(documentTypeMasterDTO.getOrgId(),
-					documentTypeMasterDTO.getCode())) {
-
-				throw new ApplicationException("Document Type Code : " + documentTypeMasterDTO.getCode()
-						+ " Already Exists in This Organization.");
+			if (documentTypeMasterRepo.existsByOrgIdAndScreenCode(documentTypeMasterDTO.getOrgId(),
+					documentTypeMasterDTO.getScreenCode())) {
+				throw new ApplicationException("ScreenCode already exist ");
 			}
 
-			documentTypeMasterVO = new DocumentTypeMasterVO();
+			if (documentTypeMasterRepo.existsByOrgIdAndDocCode(documentTypeMasterDTO.getOrgId(),
+					documentTypeMasterDTO.getDocCode())) {
+				throw new ApplicationException("Doc Code already exist ");
+			}
+
+			documentTypeMasterVO.setDocCode(documentTypeMasterDTO.getDocCode());
+			documentTypeMasterVO.setScreenCode(documentTypeMasterDTO.getScreenCode());
 			documentTypeMasterVO.setCreatedBy(documentTypeMasterDTO.getCreatedBy());
 			documentTypeMasterVO.setUpdatedBy(documentTypeMasterDTO.getCreatedBy());
-
-			message = "Document Type Master Created Successfully";
+			mapDocumentTypeMasterDTOToVO(documentTypeMasterDTO, documentTypeMasterVO);
+			message = "Document Type Master Created successfully";
 
 		} else {
+			documentTypeMasterVO = documentTypeMasterRepo.findById(documentTypeMasterDTO.getId())
+					.orElseThrow(() -> new ApplicationException(
+							"Document Type Master not found for Id: " + documentTypeMasterDTO.getId()));
 
-			oldDocumentTypeMaster = documentTypeMasterRepo.findById(documentTypeMasterDTO.getId())
-					.orElseThrow(() -> new ApplicationException("Document Type Master Not Found"));
-
-			entityManager.detach(oldDocumentTypeMaster);
-
-			documentTypeMasterVO = documentTypeMasterRepo.findById(documentTypeMasterDTO.getId()).orElseThrow(
-					() -> new ApplicationException("This Id Is Not Found : " + documentTypeMasterDTO.getId()));
-
-			documentTypeMasterVO.setUpdatedBy(documentTypeMasterDTO.getCreatedBy());
-
-			if (!documentTypeMasterVO.getCode().equalsIgnoreCase(documentTypeMasterDTO.getCode())) {
-
-				if (documentTypeMasterRepo.existsByOrgIdAndCodeIgnoreCase(documentTypeMasterDTO.getOrgId(),
-						documentTypeMasterDTO.getCode())) {
-
-					throw new ApplicationException("Document Type Code : " + documentTypeMasterDTO.getCode()
-							+ " Already Exists in This Organization.");
+			if (!documentTypeMasterVO.getScreenCode().equalsIgnoreCase(documentTypeMasterDTO.getScreenCode())) {
+				if (documentTypeMasterRepo.existsByOrgIdAndScreenCode(documentTypeMasterDTO.getOrgId(),
+						documentTypeMasterDTO.getScreenCode())) {
+					throw new ApplicationException("ScreenCode already exist ");
 				}
-
-				documentTypeMasterVO.setCode(documentTypeMasterDTO.getCode().toUpperCase());
+				documentTypeMasterVO.setScreenCode(documentTypeMasterDTO.getScreenCode());
 			}
 
-			message = "Document Type Master Updated Successfully";
-		}
+			// Check DocCode uniqueness if changed
+			if (!documentTypeMasterVO.getDocCode().equalsIgnoreCase(documentTypeMasterDTO.getDocCode())) {
+				if (documentTypeMasterRepo.existsByOrgIdAndDocCode(documentTypeMasterDTO.getOrgId(),
+						documentTypeMasterDTO.getDocCode())) {
+					throw new ApplicationException("Doc Code already exist ");
+				}
+				documentTypeMasterVO.setDocCode(documentTypeMasterDTO.getDocCode());
+			}
 
-		getDocumentTypeMasterVOFromDTO(documentTypeMasterVO, documentTypeMasterDTO);
+			documentTypeMasterVO.setUpdatedBy(documentTypeMasterDTO.getCreatedBy());
+			// Update the remaining fields from DTO to VO
+			mapDocumentTypeMasterDTOToVO(documentTypeMasterDTO, documentTypeMasterVO);
+			message = "Document Type Master Updated successfully";
+		}
 
 		documentTypeMasterRepo.save(documentTypeMasterVO);
 
 		Map<String, Object> response = new HashMap<>();
-		response.put("message", message);
 		response.put("documentTypeMasterVO", documentTypeMasterVO);
-
+		response.put("message", message);
 		return response;
 	}
 
-	private void getDocumentTypeMasterVOFromDTO(DocumentTypeMasterVO documentTypeMasterVO,
-			DocumentTypeMasterDTO documentTypeMasterDTO) throws ApplicationException {
-
-		documentTypeMasterVO.setCode(documentTypeMasterDTO.getCode().toUpperCase());
-
-		if (documentTypeMasterDTO.getName() != null) {
-			documentTypeMasterVO.setName(documentTypeMasterDTO.getName().toUpperCase());
-		}
-
-		if (documentTypeMasterDTO.getDes() != null) {
-			documentTypeMasterVO.setDescription(documentTypeMasterDTO.getDescription().toUpperCase());
-		}
-
-		if (documentTypeMasterDTO.getDocCode() != null) {
-			documentTypeMasterVO.setDocCode(documentTypeMasterDTO.getDocCode().toUpperCase());
-		}
-
+	private void mapDocumentTypeMasterDTOToVO(DocumentTypeMasterDTO documentTypeMasterDTO,
+			DocumentTypeMasterVO documentTypeMasterVO) {
+		documentTypeMasterVO.setDescription(documentTypeMasterDTO.getDescription());
 		documentTypeMasterVO.setOrgId(documentTypeMasterDTO.getOrgId());
-		documentTypeMasterVO.setActive(documentTypeMasterDTO.isActive());
-		documentTypeMasterVO.setCancelRemarks(documentTypeMasterDTO.getCancelRemarks());
+		documentTypeMasterVO.setScreenName(documentTypeMasterDTO.getScreenName());
 
-		if (documentTypeMasterDTO.getBranch() != null && documentTypeMasterDTO.getBranch() != 0) {
+		// Add any additional fields mapping here
+	}
 
-			BranchVO branch = branchRepo.findById(documentTypeMasterDTO.getBranch())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-			documentTypeMasterVO.setBranch(branch);
+	@Override
+	public DocumentTypeMasterVO getDocumentTypeMasterById(Long id) throws ApplicationException {
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ApplicationException("Invalid DocumentTypeMaster Id");
 		}
+		DocumentTypeMasterVO documentTypeMasterVO = documentTypeMasterRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Document Type Master not found for Id: " + id));
+
+		return documentTypeMasterVO;
+	}
+
+	@Override
+	public List<DocumentTypeMasterVO> getAllDocumentTypeMasterByOrgId(Long orgId) {
+		return documentTypeMasterRepo.findAllByOrgId(orgId);
 	}
 
 	@Override
@@ -4233,11 +4323,11 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		if (ObjectUtils.isEmpty(dto.getId())) {
 
-			if (documentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(dto.getBranch(),
-					dto.getFinancialYear(), dto.getOrgId())) {
-
-				throw new ApplicationException("Document Type Mapping already exists.");
-			}
+//			if (documentTypeMappingRepo.existsByBranch_IdAndFinancialYear_IdAndOrgId(dto.getBranch(),
+//					dto.getFinancialYear(), dto.getOrgId())) {
+//
+//				throw new ApplicationException("Document Type Mapping already exists.");
+//			}
 
 			masterVO = new DocumentTypeMappingVO();
 			masterVO.setCreatedBy(dto.getCreatedBy());
@@ -4287,6 +4377,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		masterVO.setActive(dto.isActive());
 		masterVO.setCancelRemarks(dto.getCancelRemarks());
 		masterVO.setDescription(dto.getDescription());
+		masterVO.setBranchCode(dto.getBranchCode());
+		masterVO.setFinYearIdentifier(dto.getFinYearIdentifier());
 
 		List<DocumentTypeMappingDetailsVO> detailList = new ArrayList<>();
 
@@ -4300,7 +4392,13 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				detailVO.setScreenCode(child.getScreenCode());
 				detailVO.setDocCode(child.getDocCode());
 				detailVO.setPrefix(child.getPrefix());
-				detailVO.setActive(child.isActive());
+
+				detailVO.setBranch(child.getBranch());
+				detailVO.setBranchCode(child.getBranchCode());
+				detailVO.setFinYear(child.getFinYear());
+				detailVO.setFinYearIdentifier(child.getFinYearIdentifier());
+				detailVO.setConcatenation(child.getScreenCode() + child.getDocCode());
+				detailVO.setOrgId(dto.getOrgId());
 
 				detailVO.setDocumentTypeMappingMasterVO(masterVO);
 
@@ -4353,7 +4451,13 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				detailDTO.setDocCode(detailVO.getDocCode());
 				detailDTO.setPrefix(detailVO.getPrefix());
 				detailDTO.setLastNo(detailVO.getLastNo());
-				detailDTO.setActive(detailVO.getActive());
+
+				detailDTO.setBranch(detailVO.getBranch());
+				detailDTO.setBranchCode(detailVO.getBranchCode());
+				detailDTO.setFinYear(detailVO.getFinYear());
+				detailDTO.setFinYearIdentifier(detailVO.getFinYearIdentifier());
+				detailDTO.setConcatenation(detailVO.getConcatenation());
+				detailDTO.setOrgId(dto.getOrgId());
 
 				detailList.add(detailDTO);
 			}
@@ -4364,18 +4468,47 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return dto;
 	}
 
-	@Override
-	public DocumentTypeMappingVO getDocumentTypeMappingById(Long id) throws ApplicationException {
+//	@Override
+//	public DocumentTypeMappingVO getDocumentTypeMappingById(Long id) throws ApplicationException {
+//
+//		return documentTypeMappingRepo.findById(id)
+//				.orElseThrow(() -> new ApplicationException("Document Type Mapping not found with id : " + id));
+//	}
+//
+//	@Override
+//	public List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch)
+//			throws ApplicationException {
+//		return documentTypeMappingRepo.findByOrgIdAndBranch(orgId, branch);
+//
+//	}
 
-		return documentTypeMappingRepo.findById(id)
+	@Override
+	public DocumentTypeMappingResponseDTO getDocumentTypeMappingById(Long id) throws ApplicationException {
+		DocumentTypeMappingVO documentTypeMappingVO = documentTypeMappingRepo.findById(id)
 				.orElseThrow(() -> new ApplicationException("Document Type Mapping not found with id : " + id));
+
+		return convertToResponse(documentTypeMappingVO);
 	}
 
 	@Override
-	public List<DocumentTypeMappingVO> getDocumnentTypeMappingByOrgId(Long orgId, Long branch)
+	public List<DocumentTypeMappingResponseDTO> getDocumentTypeMappingByOrgId(Long orgId, Long branch)
 			throws ApplicationException {
-		return documentTypeMappingRepo.findByOrgIdAndBranch(orgId, branch);
 
+		List<DocumentTypeMappingVO> documentTypeMappingList = documentTypeMappingRepo.findByOrgIdAndBranch(orgId,
+				branch);
+
+		if (documentTypeMappingList == null || documentTypeMappingList.isEmpty()) {
+			throw new ApplicationException(
+					"Document Type Mapping not found for OrgId: " + orgId + " and Branch: " + branch);
+		}
+
+		List<DocumentTypeMappingResponseDTO> responseList = new ArrayList<>();
+
+		for (DocumentTypeMappingVO documentTypeMappingVO : documentTypeMappingList) {
+			responseList.add(convertToResponse(documentTypeMappingVO));
+		}
+
+		return responseList;
 	}
 
 	// saleszonemaster
@@ -4442,6 +4575,35 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	public List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId, Long branch) {
 
 		return salesZoneMasterRepo.findByOrgIdAndBranch(orgId, branch);
+	}
+
+	@Override
+	public List<Map<String, Object>> getPendingDocumentTypeMapping(Long orgId, String branch, String branchCode,
+			String finYear, String finYearIdentifier) {
+		int finyear = Integer.parseInt(finYear.toString());
+		FinancialYearVO financialYearVO = financialYearRepo.findByOrgIdAndFinYear(orgId, finyear);
+		String finYearIden = financialYearVO.getFinYearId();
+		Set<Object[]> pendingDocTypeDetails = documentTypeMappingRepo.getPendingDoctypeMapping(orgId, branch,
+				branchCode, finYear, finYearIden);
+		return getPendingDocType(pendingDocTypeDetails);
+	}
+
+	private List<Map<String, Object>> getPendingDocType(Set<Object[]> pendingDocTypeDetails) {
+		List<Map<String, Object>> doctypeMappingDetails = new ArrayList<>();
+		for (Object[] sup : pendingDocTypeDetails) {
+			Map<String, Object> doctype = new HashMap<>();
+			doctype.put("screenName", sup[0] != null ? sup[0].toString() : "");
+			doctype.put("screenCode", sup[1] != null ? sup[1].toString() : "");
+			doctype.put("docCode", sup[2] != null ? sup[2].toString() : "");
+			doctype.put("finYear", sup[3] != null ? sup[3].toString() : "");
+			doctype.put("branch", sup[4] != null ? sup[4].toString() : "");
+			doctype.put("branchCode", sup[5] != null ? sup[5].toString() : "");
+			doctype.put("finYearIdentifier", sup[6] != null ? sup[6].toString() : "");
+			doctype.put("prefixField", sup[7] != null ? sup[7].toString() : "");
+			doctypeMappingDetails.add(doctype);
+		}
+
+		return doctypeMappingDetails;
 	}
 
 }

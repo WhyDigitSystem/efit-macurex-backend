@@ -1054,10 +1054,7 @@ public class DevController extends BaseController{
 		    return ResponseEntity.ok(responseDTO);
 		}
 		
-		
-		//StockTransferChallan Docid
-		
-		@GetMapping("/getStockTransferChallanDocId")
+  	@GetMapping("/getStockTransferChallanDocId")
 		public ResponseEntity<ResponseDTO> getStockTransferChallanDocId(@RequestParam Long orgId,
 				@RequestParam String financialYear, @RequestParam String screenCode) {
 
@@ -1088,6 +1085,42 @@ public class DevController extends BaseController{
 			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 			return ResponseEntity.ok().body(responseDTO);
 		}
+
+
+
+    @GetMapping("/getCustomerComplaintDocId")
+		public ResponseEntity<ResponseDTO> getCustomerComplaintDocId(@RequestParam Long orgId,
+				@RequestParam String financialYear, @RequestParam String screenCode) {
+
+			String methodName = "getCustomerComplaintDocId()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+			String errorMsg = null;
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			ResponseDTO responseDTO = null;
+			String mapp = "";
+
+			try {
+				mapp = transportMasterService.getCustomerComplaintDocId(orgId, financialYear, screenCode);
+			} catch (Exception e) {
+				errorMsg = e.getMessage();
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			}
+
+			if (StringUtils.isBlank(errorMsg)) {
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+						"CustmerDocId DocId information retrieved successfully");
+				responseObjectsMap.put("invoiceDocId", mapp);
+				responseDTO = createServiceResponse(responseObjectsMap);
+			} else {
+				responseDTO = createServiceResponseError(responseObjectsMap,
+						"Failed to retrieve Proforma CustmerDocId", errorMsg);
+			}
+
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+		
+
 }
 
 

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesRejectionInvoiceResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.DocketInvoiceDTO;
@@ -28,6 +29,7 @@ import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
+import com.efitops.basesetup.dto.SalesRejectionInvoiceDTO;
 import com.efitops.basesetup.service.TransactionService;
 
 @CrossOrigin
@@ -649,5 +651,384 @@ public class TransactionController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
+	
+	//SalesRejectionInvoice api
+	
+	
+	@PutMapping(value = "/createUpdateSalesRejectionInvoice")
+	public ResponseEntity<ResponseDTO> createUpdateSalesRejectionInvoice(
+	        @RequestBody SalesRejectionInvoiceDTO salesRejectionInvoiceDTO) {
 
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object> salesRejectionInvoiceMap =
+	        		transactionService
+	                        .createUpdateSalesRejectionInvoice(
+	                                salesRejectionInvoiceDTO);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                salesRejectionInvoiceMap.get("message"));
+
+	        responseObjectsMap.put(
+	                "salesRejectionInvoiceVO",
+	                salesRejectionInvoiceMap.get("salesRejectionInvoiceVO"));
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	//DespatchInstructionNoforSalesRejectionInv
+	
+	@GetMapping("/getDespatchInstructionNoforSalesRejectionInv")
+	public ResponseEntity<ResponseDTO> getDespatchInstructionNoforSalesRejectionInv(
+	        @RequestParam Long customer,
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch,
+	        @RequestParam String docType) {
+
+	    String methodName = "getDespatchInstructionNoforSalesRejectionInv()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+
+	    List<Map<String, Object>> mov = new ArrayList<>();
+
+	    try {
+
+	        mov = transactionService
+	                .getDespatchInstructionNoforSalesRejectionInv(
+	                        customer,
+	                        orgId,
+	                        branch,
+	                        docType);
+
+	        responseObjectsMap.put("despatchInstructions", mov);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                errorMsg,
+	                errorMsg);
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getCurrencyforSalesRejectionInv")
+	public ResponseEntity<ResponseDTO> getCurrencyforSalesRejectionInv(
+	        @RequestParam Long customer,
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getCurrencyforSalesRejectionInv()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    List<Map<String, Object>> mov = new ArrayList<>();
+
+	    try {
+
+	        mov = transactionService.getCurrencyforSalesRejectionInv(
+	                customer,
+	                orgId,
+	                branch);
+
+	        responseObjectsMap.put("currencyDetails", mov);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                errorMsg,
+	                errorMsg);
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getMonthYearForSalesRejectionInv")
+	public ResponseEntity<ResponseDTO> getMonthYearForDropdown(
+	        @RequestParam String docId,
+	        @RequestParam Long branch,
+	        @RequestParam Long orgId) {
+
+	    String methodName = "getMonthYearForSalesRejectionInv()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    List<Map<String, Object>> mov = new ArrayList<>();
+
+	    try {
+
+	        mov = transactionService.getMonthYearForSalesRejectionInv(
+	                docId,
+	                branch,
+	                orgId);
+
+	        responseObjectsMap.put("monthYearDetails", mov);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                errorMsg,
+	                errorMsg);
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getSalesRejectionInvoiceById")
+	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceById(@RequestParam Long id) {
+
+	    String methodName = "getSalesRejectionInvoiceById()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+
+	    SalesRejectionInvoiceResponseDTO salesRejectionInvoice = null;
+
+	    try {
+
+	        salesRejectionInvoice =
+	                transactionService.getSalesRejectionInvoiceById(id);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Sales Rejection Invoice information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "salesRejectionInvoice",
+	                salesRejectionInvoice);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Sales Rejection Invoice information retrieval failed",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getSalesRejectionInvoiceByOrgId")
+	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceByOrgId(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getSalesRejectionInvoiceByOrgId()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<SalesRejectionInvoiceResponseDTO> salesRejectionInvoiceList =
+	                transactionService.getSalesRejectionInvoiceByOrgId(orgId, branch);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Sales Rejection Invoice information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "salesRejectionInvoiceList",
+	                salesRejectionInvoiceList);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Sales Rejection Invoice information retrieval failed",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+
+	
+	@GetMapping("/getItemDetailsforSalesRejectionInvoice")
+	public ResponseEntity<ResponseDTO> getItemDetailsforSalesRejectionInvoice(
+	        @RequestParam String dispatchInstructiondocId,
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getItemDetailsforSalesRejectionInvoice()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+	    List<Map<String, Object>> mov = new ArrayList<>();
+
+	    try {
+
+	        mov = transactionService.getItemDetailsforSalesRejectionInvoice(
+	        		dispatchInstructiondocId, orgId, branch);
+
+	        responseObjectsMap.put("itemDetails", mov);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                errorMsg,
+	                errorMsg);
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getCustomerDetailsforSalesRejectionInvoice")
+	public ResponseEntity<ResponseDTO> getCustomerDetailsforSalesRejectionInvoice(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch,
+	        @RequestParam String customerType) {
+
+	    String methodName = "getCustomerDetailsforSalesRejectionInvoice()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    List<Map<String, Object>> customerDetails = new ArrayList<>();
+
+	    try {
+
+	        customerDetails =
+	                transactionService.getCustomerDetailsforSalesRejectionInvoice(
+	                        orgId, branch, customerType);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Customer details retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "customerDetails",
+	                customerDetails);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Customer details retrieval failed",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
 }
+

@@ -27,6 +27,7 @@ import com.efitops.basesetup.ResponseDTO.PartyCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesZoneResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
+import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.CustomerContactDetailsDTO;
 import com.efitops.basesetup.dto.CustomerDTO;
 import com.efitops.basesetup.dto.CustomerItemDetailsDTO;
@@ -35,6 +36,7 @@ import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CountryVO;
+import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerContactDetailsVO;
 import com.efitops.basesetup.entity.CustomerItemDetailsVO;
 import com.efitops.basesetup.entity.CustomerShippingDetailsVO;
@@ -50,6 +52,7 @@ import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CityRepo;
 import com.efitops.basesetup.repository.CountryRepo;
+import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
 import com.efitops.basesetup.repository.CustomerItemDetailsRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
@@ -118,6 +121,9 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	EmployeeRepo employeeRepo;
 //	@Autowired
 //	TransportRepo transportMasterRepo;
+	
+	@Autowired
+	CurrencyRepo currencyRepo;
 //	
 
 	@Override
@@ -228,6 +234,12 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 		if (dto.getSupplierType() != null) {
 		    supplierType = listOfValuesDetailsRepo.findById(dto.getSupplierType())
 		            .orElseThrow(() -> new ApplicationException("Supplier Type Not Found"));
+		}
+		
+		CurrencyVO currency = null;
+		if (dto.getPrimaryCurrency() != null) {
+			currency = currencyRepo.findById(dto.getPrimaryCurrency())
+		            .orElseThrow(() -> new ApplicationException("Currency Not Found"));
 		}
 
 		BranchVO branch = null;
@@ -593,6 +605,13 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	        dto.setBuyerName(new EmployeeResponseDTO(
 	                customerVO.getBuyerName().getId(),
 	                customerVO.getBuyerName().getEmployeeName()
+	        ));
+	    }
+	    
+	    if (customerVO.getPrimaryCurrency() != null) {
+	        dto.setPrimaryCurrency(new CurrencyResponseDTO(
+	                customerVO.getPrimaryCurrency().getId(),
+	                customerVO.getPrimaryCurrency().getCurrency()
 	        ));
 	    }
 	    

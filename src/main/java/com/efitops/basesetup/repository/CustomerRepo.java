@@ -207,7 +207,7 @@ List<Object[]> getCustomerDetails(Long orgId, Long branch);
 
 			        WHERE c.org_id = ?1
 			          AND c.branch = ?2
-			          AND c.customer_type = ?3
+			          AND c.customer_type = "CUSTOMER"
 			          AND c.active = 1
 			          AND c.cancel = 0
 
@@ -215,8 +215,7 @@ List<Object[]> getCustomerDetails(Long orgId, Long branch);
 			        """, nativeQuery = true)
 			Set<Object[]> getCustomerDetailsforSalesRejectionInvoice(
 			        Long orgId,
-			        Long branch,
-			        String customerType);
+			        Long branch);
 }
 
 

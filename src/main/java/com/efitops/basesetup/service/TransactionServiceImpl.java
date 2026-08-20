@@ -2060,10 +2060,10 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getCustomerDetailsforSalesRejectionInvoice(Long orgId, Long branch,
-			String customerType) throws ApplicationException {
+	public List<Map<String, Object>> getCustomerDetailsforSalesRejectionInvoice(Long orgId, Long branch
+		) throws ApplicationException {
 
-		Set<Object[]> result = customerRepo.getCustomerDetailsforSalesRejectionInvoice(orgId, branch, customerType);
+		Set<Object[]> result = customerRepo.getCustomerDetailsforSalesRejectionInvoice(orgId, branch);
 
 		return getCustomerDetailsforSalesRejectionInvoiceResponse(result);
 	}

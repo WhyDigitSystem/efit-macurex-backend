@@ -38,11 +38,14 @@ public class PurchaseIndentDetailsVO {
     private ItemMasterVO item;
     
     @ManyToOne
-    @JoinColumn(name = "unit")
-    private UnitMasterVO unit;
+    @JoinColumn(name = "primary_unit")
+    private UnitMasterVO primaryUnit;
     
+    @ManyToOne
+    @JoinColumn(name = "purchase_unit")
+    private UnitMasterVO purchaseUnit;
     
-    
+  
 
     @Column(name = "qtyinprimary_unit")
     private BigDecimal qtyInPrimaryUnit;

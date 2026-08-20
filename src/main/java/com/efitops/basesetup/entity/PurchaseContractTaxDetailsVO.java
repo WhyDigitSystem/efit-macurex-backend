@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,9 +27,9 @@ import lombok.NoArgsConstructor;
 public class PurchaseContractTaxDetailsVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasecontracttaxgen")
-    @SequenceGenerator(name = "purchasecontracttaxgen", sequenceName = "purchasecontracttaxseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasecontracttax_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchase_contract_tax_detailsgen")
+    @SequenceGenerator(name = "purchase_contract_tax_detailsgen", sequenceName = "purchase_contract_tax_detailsseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "purchase_contract_tax_details_id")
     private Long id;
 
     // entered by user
@@ -42,7 +44,8 @@ public class PurchaseContractTaxDetailsVO {
     @Column(name = "amount")
     private BigDecimal amount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchasecontract_id")
+    @ManyToOne
+    @JoinColumn(name = "purchase_contract_basic_id")
+    @JsonBackReference
     private PurchaseContractVO purchaseContractVO;
 }

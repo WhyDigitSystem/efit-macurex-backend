@@ -45,8 +45,6 @@ public class PurchaseIndentVO {
     @ManyToOne
    	@JoinColumn(name = "branch")
    	private BranchVO branch;
-
-   
     
     @Column(name = "belongs_to")
     private String belongsTo;

@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseIndentUnitResponceDTO {
-	
-	 private Long id;
-	 private Long primaryunit;
-	 private Long purchaseunit;
+
+    private Long id;
+    private String unitId;
+    private String unitDescription;
 
 }

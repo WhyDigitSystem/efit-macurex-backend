@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CompanyResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DocumentTypeMappingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTRateMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingOfPartyToAccResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
@@ -2235,8 +2236,6 @@ public class CommonMasterController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	// DocumentTypeMaster
-
 	// Document Type Master
 
 	@PutMapping("/createUpdateDocumentTypeMaster")
@@ -2285,7 +2284,7 @@ public class CommonMasterController extends BaseController {
 
 		try {
 
-			DocumentTypeMasterVO documentTypeMasterVO = commonMasterService.getDocumentTypeMasterById(id).orElse(null);
+			DocumentTypeMasterVO documentTypeMasterVO = commonMasterService.getDocumentTypeMasterById(id);
 
 			responseObjectsMap.put("documentTypeMasterVO", documentTypeMasterVO);
 
@@ -2304,11 +2303,10 @@ public class CommonMasterController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	@GetMapping("/getDocumentTypeMasterByOrgId")
-	public ResponseEntity<ResponseDTO> getDocumentTypeMasterByOrgId(@RequestParam Long orgId,
-			@RequestParam Long branch) {
+	@GetMapping("/getAllDocumentTypeMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getAllDocumentTypeMasterByOrgId(@RequestParam Long orgId) {
 
-		String methodName = "getDocumentTypeMasterByOrgId()";
+		String methodName = "getAllDocumentTypeMasterByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -2317,8 +2315,8 @@ public class CommonMasterController extends BaseController {
 
 		try {
 
-			List<DocumentTypeMasterVO> documentTypeMasterList = commonMasterService.getDocumentTypeMasterByOrgId(orgId,
-					branch);
+			List<DocumentTypeMasterVO> documentTypeMasterList = commonMasterService
+					.getAllDocumentTypeMasterByOrgId(orgId);
 
 			responseObjectsMap.put("documentTypeMasterList", documentTypeMasterList);
 
@@ -2936,15 +2934,19 @@ public class CommonMasterController extends BaseController {
 		String methodName = "getDocumentTypeMappingById()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		Map<String, Object> responseObjectsMap = new HashMap<>();
 		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 		ResponseDTO responseDTO = null;
 
 		try {
 
-			DocumentTypeMappingVO documentTypeMappingVO = commonMasterService.getDocumentTypeMappingById(id);
+			DocumentTypeMappingResponseDTO documentTypeMappingResponseDTO = commonMasterService
+					.getDocumentTypeMappingById(id);
 
-			responseObjectsMap.put("documentTypeMappingMasterVO", documentTypeMappingVO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Document Type Mapping information retrieved successfully");
+
+			responseObjectsMap.put("documentTypeMappingResponseVO", documentTypeMappingResponseDTO);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 
@@ -2953,12 +2955,13 @@ public class CommonMasterController extends BaseController {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Document Type Mapping information retrieval failed", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
 
 	@GetMapping("/getDocumentTypeMappingByOrgId")
@@ -2969,29 +2972,31 @@ public class CommonMasterController extends BaseController {
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
-		String errorMsg = null;
-		ResponseDTO responseDTO = null;
+		ResponseDTO responseDTO;
 
 		try {
 
-			List<DocumentTypeMappingVO> documentTypeMappingList = commonMasterService
-					.getDocumnentTypeMappingByOrgId(orgId, branch);
+			List<DocumentTypeMappingResponseDTO> documentTypeMappingResponseDTO = commonMasterService
+					.getDocumentTypeMappingByOrgId(orgId, branch);
 
-			responseObjectsMap.put("documentTypeMappingMasterList", documentTypeMappingList);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Document Type Mapping information retrieved successfully");
+
+			responseObjectsMap.put("documentTypeMappingResponseVO", documentTypeMappingResponseDTO);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 
 		} catch (Exception e) {
 
-			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Document Type Mapping information retrieval failed", e.getMessage());
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
 
 	// saleszonemaster
@@ -3089,4 +3094,34 @@ public class CommonMasterController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 	}
+	
+	
+	@GetMapping("/getPendingDocumentTypeMapping")
+	public ResponseEntity<ResponseDTO> getPendingDocumentTypeMapping(@RequestParam Long orgId,@RequestParam String branch,@RequestParam String branchCode,
+			@RequestParam String finYear,@RequestParam String finYearIdentifier) {
+		String methodName = "getPendingDocumentTypeMapping()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> documentTypeMappingVO = new ArrayList<>();
+		try {
+			documentTypeMappingVO = commonMasterService.getPendingDocumentTypeMapping(orgId, branch, branchCode, finYear, finYearIdentifier);
+			} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Document Type information get successfully");
+			responseObjectsMap.put("documentTypeMappingVO", documentTypeMappingVO);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Document Type information receive failed",
+					errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
 }

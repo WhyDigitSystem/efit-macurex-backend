@@ -2,6 +2,7 @@ package com.efitops.basesetup.repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -177,6 +178,73 @@ List<Object[]> getCustomerDetails(Long orgId, Long branch);
 			List<Map<String, Object>> getAllCustomerDetails(
 			        @Param("orgId") Long orgId,
 			        @Param("branch") Long branch);
+
+			
+			
+//		Customerdropdown for the purchasedelivaryschedule 
+			
+			@Query(value = "SELECT\r\n"
+					+ "			    c.customer_id,\r\n"
+					+ "			    c.customer_code,\r\n"
+					+ "			    c.customer_name\r\n"
+					+ "			FROM customer_header c\r\n"
+					+ "			LEFT JOIN listofvaluesdetails a\r\n"
+					+ "			    ON c.customer_category = a.listofvaluesdetails_id\r\n"
+					+ "			LEFT JOIN listofvaluesdetails b\r\n"
+					+ "			    ON c.customer_category1 = b.listofvaluesdetails_id\r\n"
+					+ "			LEFT JOIN listofvaluesdetails cc\r\n"
+					+ "			    ON c.customer_category2 = cc.listofvaluesdetails_id\r\n"
+					+ "			WHERE c.cancel = FALSE\r\n"
+					+ "			  AND c.active = TRUE\r\n"
+					+ "			  AND c.branch = :branch\r\n"
+					+ "			  AND c.org_id = :orgId\r\n"
+					+ "			  AND (a.value_description = 'Supplier'\r\n"
+					+ "			        OR b.value_description = 'Supplier'\r\n"
+					+ "			        OR cc.value_description = 'Supplier'\r\n"
+					+ "			      )\r\n"
+					+ "			ORDER BY c.customer_code", nativeQuery = true)
+			List<Object[]> getSupplierDropdownForPurchaseDeliverySchedule(@Param("branch") Long branch,
+			                                   @Param("orgId") Long orgId);
+
+			
+			@Query(value = """
+			        SELECT
+			            c.customer_id AS customerId,
+			            c.customer_code AS customerCode,
+			            c.customer_name AS customerName,
+			            gs.state_name AS gstState,
+			            c.gst_no AS gstNo,
+			            c.is_gst_applicable AS igstApplicable,
+			            c.gst_type AS gstType,
+			            cs.shipping_address AS shippingAddress,
+			            city.city AS shippingCity,
+			            cs.shipping_pincode AS shippingPincode
+			        FROM customer_header c
+
+			        LEFT JOIN gststatemaster gs
+			            ON gs.gststatemaster_id = c.gst_state
+			            AND gs.active = 1
+			            AND gs.cancel = 0
+
+			        LEFT JOIN customer_shipping_details cs
+			            ON cs.customer_id = c.customer_id
+
+			        LEFT JOIN city city
+			            ON city.city_id = cs.shipping_city
+
+			        WHERE c.org_id = ?1
+			          AND c.branch = ?2
+			          AND c.customer_type = ?3
+			          AND c.active = 1
+			          AND c.cancel = 0
+
+			        ORDER BY c.customer_name
+			        """, nativeQuery = true)
+			Set<Object[]> getCustomerDetailsforSalesRejectionInvoice(
+			        Long orgId,
+			        Long branch,
+			        String customerType);
+
 }
 
 

@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesRejectionInvoiceResponseDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
+import com.efitops.basesetup.dto.SalesRejectionInvoiceDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -64,6 +66,24 @@ public interface TransactionService {
 		String getSalesDeliveryScheduleDocId(Long orgId, String financialYear, String screenCode);
 
 		String getDocketInvoiceDocId(Long orgId, String financialYear, String screenCode);
+
+		Map<String, Object> createUpdateSalesRejectionInvoice(SalesRejectionInvoiceDTO salesRejectionInvoiceDTO) throws ApplicationException;
+
+		List<Map<String, Object>> getDespatchInstructionNoforSalesRejectionInv(Long customer, Long orgId, Long branch,
+				String docType);
+
+		List<Map<String, Object>> getCurrencyforSalesRejectionInv(Long customer, Long orgId, Long branch);
+
+		List<Map<String, Object>> getMonthYearForSalesRejectionInv(String docId, Long branch, Long orgId);
+
+		SalesRejectionInvoiceResponseDTO getSalesRejectionInvoiceById(Long id) throws ApplicationException;
+
+		List<SalesRejectionInvoiceResponseDTO> getSalesRejectionInvoiceByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+		List<Map<String, Object>> getItemDetailsforSalesRejectionInvoice(String docId, Long orgId, Long branch);
+
+		List<Map<String, Object>> getCustomerDetailsforSalesRejectionInvoice(Long orgId, Long branch,
+				String customerType) throws ApplicationException;
 		
 
 }

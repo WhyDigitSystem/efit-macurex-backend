@@ -10,5 +10,7 @@ import lombok.NoArgsConstructor;
 public class PrimaryUnitImageDTO {
     private Long id;
     private String primaryUnit;
+    private Long unitId;
+    private String unitDescription;
 
 }

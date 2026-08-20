@@ -18,6 +18,8 @@ public class FinancialYearDTO {
 	private Long orgId;
 	private String createdBy;
 	private boolean active;
+	private String finYearId;
+	
 	private String cancelRemarks;
 
 }

@@ -18,6 +18,8 @@ public class CustomerComplaintResponseDTO {
 	
 	private Long id;
 	private Long qtyNo;
+	private String docId;
+	private LocalDate docDate;
 	private String image;
 	private String remarks;
 	private BranchResponseDTO branch;

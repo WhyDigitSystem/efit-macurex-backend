@@ -6,8 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -19,50 +17,50 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "documenttypemaster")
+@Table(name = "document_type_master")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 
 public class DocumentTypeMasterVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "documenttypemastergen")
-	@SequenceGenerator(name = "documenttypemastergen", sequenceName = "documenttypemasterseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "documenttypemaster_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "document_type_mastergen")
+	@SequenceGenerator(name = "document_type_mastergen", sequenceName = "document_type_masterseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "document_type_master_id")
     private Long id;
+      
+ 	
+ 	@Column(name = "screen_code",length =10)
+	private String screenCode;
 	
-	 @Column(name = "code")
-	 private String code;
-     @Column(name = "name")
-	 private String name;
-     @Column(name = "description")
-	 private String description;
-     @Column(name = "doc_code")
-	 private String docCode;
-     @Column(name = "financial_year")
-	 private String financialYear;
-     
-     
-     
-     @Column(name = "org_id")
- 	private Long orgId;
+	@Column(name = "screen_name",length =150)
+	private String screenName;
+	
+	@Column(name = "description",length =150)
+	private String description;
+	
+	@Column(name = "doc_code",length =25)
+	private String docCode;
+	
+	@Column(name = "created_by",length =25)
+	private String createdBy;
+	
+	@Column(name = "modified_by",length =25)
+	private String updatedBy;
+	
+	@Column(name="org_id")
+	private Long orgId;
+	
+//    @Column(name = "financial_year")
+//	 private String financialYear;
+    
  	@Column(name = "active")
  	private boolean active;
- 	@Column(name = "created_by")
- 	private String createdBy;
- 	@Column(name = "modified_by")
- 	private String updatedBy;
+ 	 	
  	@Column(name = "cancel")
  	private boolean cancel=false;
- 	@Column(name = "cancel_remarks")
- 	private String cancelRemarks;
- 	@ManyToOne
- 	@JoinColumn(name = "branch")
- 	private BranchVO branch;
- 	@Column(name = "screen_name")
- 	private String screenName="documenttypemaster";
- 	@Column(name = "screen_code")
- 	private String screenCode="DTM";
+// 	@Column(name = "cancel_remarks")
+// 	private String cancelRemarks;
  	
  	@JsonGetter("active")
  	public String getActive() {

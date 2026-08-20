@@ -16,6 +16,10 @@ public class DocumentTypeMappingDetailsDTO {
         private String docCode;
         private String prefix;
         private boolean active;
+    	private String branchCode;
+    	private String finYear;
+    	private String branch;
+    	private String finYearIdentifier;
 	}
 
 

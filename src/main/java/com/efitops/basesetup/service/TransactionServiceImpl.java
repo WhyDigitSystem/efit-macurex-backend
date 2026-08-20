@@ -224,7 +224,7 @@ public class TransactionServiceImpl implements TransactionService {
 			message = "Sales Delivery Schedule Updated Successfully";
 		}
 
-		// Map Header + Details + Delivery Plans
+	
 		createUpdateSalesDeliveryScheduleVOByDTO(salesDeliveryScheduleDTO, salesDeliveryScheduleVO);
 
 		// Cascade saves everything
@@ -986,6 +986,8 @@ public class TransactionServiceImpl implements TransactionService {
 		responseDTO.setActive(docketInvoiceVO.getActive());
 		responseDTO.setCreatedBy(docketInvoiceVO.getCreatedBy());
 		responseDTO.setCancelRemarks(docketInvoiceVO.getCancelRemarks());
+		
+		responseDTO.setFinancialYear(docketInvoiceVO.getFinancialYear());
 
 		// =========================
 		// Branch Response
@@ -1055,6 +1057,7 @@ public class TransactionServiceImpl implements TransactionService {
 		docketInvoiceVO.setOrgId(dto.getOrgId());
 		docketInvoiceVO.setActive(dto.isActive());
 		docketInvoiceVO.setCancelRemarks(dto.getCancelRemarks());
+		docketInvoiceVO.setFinancialYear(dto.getFinancialYear());
 
 		// =========================
 		// Branch Mapping
@@ -1157,7 +1160,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public String getSalesDeliveryScheduleDocId(Long orgId, String financialYear, String screenCode) {
-		String screenCode1 = "SDC";
+		String screenCode1 = "SDS";
 		String result = salesDeliveryScheduleRepo.getSalesDeliveryScheduleDocId(orgId, financialYear, screenCode1);
 		return result;
 	}

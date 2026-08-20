@@ -45,7 +45,7 @@ public class StockTransferChallanDetailsVO {
 	    @Column(name = "tax_percentage")
 	    private String taxPercentage;
 
-	    @ManyToOne(fetch = FetchType.LAZY)
+	    @ManyToOne
 	    @JoinColumn(name = "unit")
 	    private UnitMasterVO unit;
 	    

@@ -27,16 +27,21 @@ public interface UomConversionRepo extends JpaRepository<UomConversionVO, Long> 
 	
 	
 	@Query(value = """
-	        SELECT uomconversion_id,
-	               multiplication_factor
+	        SELECT
+	            uomconversion_id,
+	            multiplication_factor
 	        FROM uomconversion
 	        WHERE active = 1
 	          AND cancel = 0
 	          AND org_id = :orgId
 	          AND branch = :branch
+	          AND from_unit = :fromUnit
+	          AND to_unit = :toUnit
 	        ORDER BY multiplication_factor
 	        """, nativeQuery = true)
 	List<Object[]> getPurchaseIndentConversionFactorDropdown(
 	        @Param("orgId") Long orgId,
-	        @Param("branch") Long branch);
+	        @Param("branch") Long branch,
+	        @Param("fromUnit") Long fromUnit,
+	        @Param("toUnit") Long toUnit);
 }

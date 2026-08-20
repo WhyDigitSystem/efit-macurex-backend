@@ -22,6 +22,7 @@ import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -147,8 +148,9 @@ public class PurchaseContractVO {
     private String updatedBy;
 
    
-//    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-//    private List<PurchaseContractDetailsVO> purchaseContractDetailsVO = new ArrayList<>();
+    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<PurchaseContractDetailsVO> purchaseContractDetailsVO = new ArrayList<>();
 //
 //    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 //    private List<PurchaseContractTaxDetailsVO> purchaseContractTaxDetailsVO = new ArrayList<>();

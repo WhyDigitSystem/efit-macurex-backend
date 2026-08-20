@@ -21,8 +21,10 @@ public class PurchaseIndentDetailsResponseDTO {
     private PurchaseIndentItemResponseDTO item;
     
     //unit
-    private PurchaseIndentUnitResponceDTO unit;
-
+//    private PurchaseIndentUnitResponceDTO primaryUnit;
+//    
+//    
+//    private PurchaseIndentUnitResponceDTO purchaseUnit;
 
     // Quantity
     private BigDecimal qtyInPrimaryUnit;

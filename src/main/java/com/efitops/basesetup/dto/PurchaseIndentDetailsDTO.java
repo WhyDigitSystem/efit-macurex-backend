@@ -26,7 +26,8 @@ public class PurchaseIndentDetailsDTO {
     private Long conversionFactor;
     
     //unit
-    private Long unit;
+    private Long primaryUnit;
+    private Long purchaseUnit;
 
     // Purchase Quantity
     private BigDecimal qtyInPurchaseUnit;

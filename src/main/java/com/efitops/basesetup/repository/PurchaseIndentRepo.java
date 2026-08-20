@@ -11,18 +11,18 @@ import com.efitops.basesetup.entity.PurchaseIndentVO;
 public interface PurchaseIndentRepo
         extends JpaRepository<PurchaseIndentVO, Long> {
 
-    @Query(value = """
-            SELECT *
-            FROM Indent_Basic
-            WHERE org_id = :orgId
-              AND branch = :branch
-              AND cancel = false
-              AND active = true
-            ORDER BY Indent_Basic_id DESC
-            """, nativeQuery = true)
-    List<PurchaseIndentVO> findByOrgId(
-            @Param("orgId") Long orgId,
-            @Param("branch") Long branch);
+	@Query(value = """
+	        SELECT *
+	        FROM indent_basic p
+	        WHERE p.org_id = :orgId
+	          AND p.branch = :branch
+	          AND p.cancel = false
+	          AND p.active = true
+	        ORDER BY p.indent_basic_id DESC
+	        """, nativeQuery = true)
+	List<PurchaseIndentVO> findByPurchaseIndentByOrgId(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch);
 
     @Query(value = """
             SELECT COALESCE(MAX(doc_id),0)

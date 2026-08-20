@@ -15,9 +15,9 @@ public class PurchaseIndentItemResponseDTO {
 
     private String itemDescription;
     
-    private String primaryUnit;
+    private PurchaseIndentUnitResponceDTO primaryUnit;
     
-    private String purchaseUnit;
+    private PurchaseIndentUnitResponceDTO purchaseUnit;
     
 
 }

@@ -379,50 +379,38 @@ public class PurchaseDeliverySchController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
 	@GetMapping("/getPurchaseContractByOrgId")
-	public ResponseEntity<ResponseDTO> getPurchaseContractByOrgId(
-	        @RequestParam Long branch,
-	        @RequestParam Long orgId) {
+	public ResponseEntity<ResponseDTO> getPurchaseContractByOrgId(@RequestParam Long branch, @RequestParam Long orgId) {
 
-	    String methodName = "getPurchaseContractByOrgId()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getPurchaseContractByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    String errorMsg = null;
-	    ResponseDTO responseDTO = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
 
-	    try {
+		try {
 
-	        List<PurchaseContractResponseDTO> responseList =
-	                purchaseDeliverySchService.getPurchaseContractByOrgId(
-	                        branch,
-	                        orgId);
+			List<PurchaseContractResponseDTO> responseList = purchaseDeliverySchService
+					.getPurchaseContractByOrgId(branch, orgId);
 
-	        responseObjectsMap.put(
-	                "purchaseContractVO",
-	                responseList);
+			responseObjectsMap.put("purchaseContractVO", responseList);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
+			errorMsg = e.getMessage();
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                errorMsg,
-	                errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
 
 	// dropdown api for supplier
@@ -459,54 +447,40 @@ public class PurchaseDeliverySchController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 //	prepared by ,checkedby and authorized by 
-	
+
 	@GetMapping("/getEmployeeDropdownPurchaseContract")
-	public ResponseEntity<ResponseDTO> getEmployeeDropdownPurchaseContract(
-	        @RequestParam Long branch,
-	        @RequestParam Long orgId) {
+	public ResponseEntity<ResponseDTO> getEmployeeDropdownPurchaseContract(@RequestParam Long branch,
+			@RequestParam Long orgId) {
 
-	    String methodName = "getEmployeeDropdownPurchaseContract()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getEmployeeDropdownPurchaseContract()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        List<Map<String, Object>> employeeList =
-	                purchaseDeliverySchService.getEmployeeDropdownPurchaseContract(
-	                        branch,
-	                        orgId);
+			List<Map<String, Object>> employeeList = purchaseDeliverySchService
+					.getEmployeeDropdownPurchaseContract(branch, orgId);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Employee Details Fetched Successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Employee Details Fetched Successfully");
 
-	        responseObjectsMap.put(
-	                "employeeList",
-	                employeeList);
+			responseObjectsMap.put("employeeList", employeeList);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage(),
-	                e);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 }

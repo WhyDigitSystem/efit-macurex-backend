@@ -42,6 +42,15 @@ public interface PurchaseService {
     LocalPurchaseOrderResponseDTO getLocalPurchaseOrderById(Long id) throws ApplicationException;
     List<LocalPurchaseOrderResponseDTO> getLocalPurchaseOrderByOrgId(Long orgId, Long branchId) throws ApplicationException;
     String getLocalPurchaseOrderDocId(Long orgId, String finYear, Long branch);
+//	purchase indent
+    Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO purchaseIndentDTO, MultipartFile[] files)
+			throws ApplicationException;
+	PurchaseIndentResponseDTO getPurchaseIndentById(Long id) throws ApplicationException;
+	List<PurchaseIndentResponseDTO> getPurchaseIndentByOrgId(Long orgId, Long branch) throws ApplicationException;
+	List<Map<String, Object>> getPurchaseIndentPreparedByDropdown(Long orgId, Long branch);
+	List<Map<String, Object>> getPurchaseIndentItemDropdown(Long orgId, Long branch);
+	List<Map<String, Object>> getPurchaseIndentConversionFactorDropdown(Long orgId, Long branch,Long fromUnit,Long toUnit);
+	List<Map<String, Object>> getPurchaseIndentDepartmentDropdown(Long orgId, Long branch);
     
     
     //purchase indent

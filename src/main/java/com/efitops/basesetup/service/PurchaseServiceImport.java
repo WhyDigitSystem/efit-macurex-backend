@@ -39,4 +39,9 @@ public interface PurchaseServiceImport {
 
 	PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException;
 
+	List<Map<String, Object>> getIndentNoBasedLocal(Long orgId, String belongsTo, String type);
+
+
+	List<Map<String, Object>> getIndentNoBasedImport(Long orgId, String type);
+
 }

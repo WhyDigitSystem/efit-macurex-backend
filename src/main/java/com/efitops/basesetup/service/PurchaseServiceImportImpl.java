@@ -1141,4 +1141,90 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		}
 		return list;
 	}
+
+	@Override
+	public List<Map<String, Object>> getIndentNoBasedLocal(Long orgId, String belongsTo, String type) {
+		Set<Object[]> chType = purchaseOrderRepo.getIndentNoBasedLocal(orgId, belongsTo, type);
+		return getIndentNoBasedLocal(chType);
+	}
+
+	private List<Map<String, Object>> getIndentNoBasedLocal(Set<Object[]> chType) {
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("indentBasicId", ch[1] != null ? ((Number) ch[1]).longValue() : null);
+
+			map.put("docDate", ch[2] != null ? ch[2].toString() : "");
+
+			map.put("itemId", ch[3] != null ? ch[3].toString() : "");
+
+			map.put("itemDesc", ch[4] != null ? ch[4].toString() : "");
+
+			map.put("unitId", ch[5] != null ? ch[5].toString() : "");
+
+			map.put("qtyInPurchaseUnit", ch[6] != null ? new BigDecimal(ch[6].toString()) : BigDecimal.ZERO);
+
+			map.put("pndQty", ch[7] != null ? new BigDecimal(ch[7].toString()) : BigDecimal.ZERO);
+
+			map.put("qtyInPrimaryUnit", ch[8] != null ? new BigDecimal(ch[8].toString()) : BigDecimal.ZERO);
+
+			map.put("requiredDate", ch[9] != null ? ch[9].toString() : "");
+
+			map.put("indentDetailId", ch[10] != null ? ((Number) ch[10]).longValue() : null);
+
+			map.put("itemMasterId", ch[11] != null ? ((Number) ch[11]).longValue() : null);
+
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getIndentNoBasedImport(Long orgId, String type) {
+
+		Set<Object[]> chType = purchaseOrderRepo.getIndentNoBasedImport(orgId, type);
+
+		return getIndentNoBasedImport(chType);
+	}
+
+	private List<Map<String, Object>> getIndentNoBasedImport(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("docId", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("indentBasicId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("docDate", ch[2] != null ? ch[2].toString() : "");
+
+			map.put("itemId", ch[3] != null ? ch[3].toString() : "");
+
+			map.put("itemDesc", ch[4] != null ? ch[4].toString() : "");
+
+			map.put("unitId", ch[5] != null ? ch[5].toString() : "");
+
+			map.put("qtyInPurchaseUnit", ch[6] != null ? new BigDecimal(ch[6].toString()) : BigDecimal.ZERO);
+
+			map.put("pndQty", ch[7] != null ? new BigDecimal(ch[7].toString()) : BigDecimal.ZERO);
+
+			map.put("qtyInPrimaryUnit", ch[8] != null ? new BigDecimal(ch[8].toString()) : BigDecimal.ZERO);
+
+			map.put("requiredDate", ch[9] != null ? ch[9].toString() : "");
+
+			map.put("indentDetailId", ch[10] != null ? ((Number) ch[10]).longValue() : null);
+
+			map.put("itemMasterId", ch[11] != null ? ((Number) ch[11]).longValue() : null);
+
+			list.add(map);
+		}
+
+		return list;
+	}
 }

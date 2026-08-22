@@ -35,9 +35,9 @@ public class LocationVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 
-	@ManyToOne
-	@JoinColumn(name = "plant_id")
-	private BranchVO plantId;
+//	@ManyToOne
+//	@JoinColumn(name = "plant_id")
+//	private BranchVO plantId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "location_type")

@@ -45,6 +45,7 @@ import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.GrnDTO;
 import com.efitops.basesetup.dto.GrnDetailsDTO;
 import com.efitops.basesetup.dto.GrnTaxDetailsDTO;
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
@@ -388,6 +389,8 @@ public class GrnServiceImpl implements GrnService {
 					igstRate = taxPercentage;
 
 					igstAmount = amount.multiply(igstRate).divide(BigDecimal.valueOf(100));
+					detailVO.setIgstAmount(igstAmount);
+					detailVO.setIgstRate(igstRate);
 
 				} else {
 
@@ -398,6 +401,11 @@ public class GrnServiceImpl implements GrnService {
 					cgstAmount = amount.multiply(cgstRate).divide(BigDecimal.valueOf(100));
 
 					sgstAmount = amount.multiply(sgstRate).divide(BigDecimal.valueOf(100));
+
+					detailVO.setCgstAmount(cgstAmount);
+					detailVO.setCgstRate(cgstRate);
+					detailVO.setSgstAmount(sgstAmount);
+					detailVO.setSgstRate(sgstRate);
 				}
 
 				totalTaxAmount = totalTaxAmount.add(igstAmount).add(cgstAmount).add(sgstAmount);
@@ -459,6 +467,7 @@ public class GrnServiceImpl implements GrnService {
 		responseDTO.setTotalQtyInKg(vo.getTotalQtyInKg());
 		responseDTO.setPartyDcNo(vo.getPartyDcNo());
 		responseDTO.setDiscount(vo.getDiscount());
+		responseDTO.setCreatedBy(vo.getCreatedBy());
 		responseDTO.setSupplierDcDate(vo.getSupplierDcDate());
 		responseDTO.setActive(vo.getActive());
 		responseDTO.setCancelRemarks(vo.getCancelRemarks());
@@ -469,6 +478,11 @@ public class GrnServiceImpl implements GrnService {
 		responseDTO.setBasicAmount(vo.getBasicAmount());
 		responseDTO.setInvoiceSentOn(vo.getInvoiceSentOn());
 		responseDTO.setRemarks(vo.getRemarks());
+		responseDTO.setCancel(vo.getCancel());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+		responseDTO.setScreenName(vo.getScreenName());
+		responseDTO.setScreenCode(vo.getScreenCode());
 
 		if (vo.getBranch() != null) {
 			BranchResponseDTO branchDTO = new BranchResponseDTO();
@@ -555,22 +569,48 @@ public class GrnServiceImpl implements GrnService {
 					if (detailVO.getItem().getHsnCode() != null) {
 						itemDTO.setHsnCode(detailVO.getItem().getHsnCode().getHsn());
 					}
+					if (detailVO.getItem() != null && detailVO.getItem().getPurchaseUnit() != null) {
+
+						UnitMasterResponseDTO purchaseUnitDTO = new UnitMasterResponseDTO();
+
+						purchaseUnitDTO.setId(detailVO.getItem().getPurchaseUnit().getId());
+
+						purchaseUnitDTO.setUnitId(detailVO.getItem().getPurchaseUnit().getUnitId());
+
+						purchaseUnitDTO.setUnitDescription(detailVO.getItem().getPurchaseUnit().getDescription());
+
+						itemDTO.setPurchaseUnit(purchaseUnitDTO);
+					}
+
+					if (detailVO.getItem() != null && detailVO.getItem().getPrimaryUnit() != null) {
+
+						UnitMasterResponseDTO purchaseUnitDTO = new UnitMasterResponseDTO();
+
+						purchaseUnitDTO.setId(detailVO.getItem().getPrimaryUnit().getId());
+
+						purchaseUnitDTO.setUnitId(detailVO.getItem().getPrimaryUnit().getUnitId());
+
+						purchaseUnitDTO.setUnitDescription(detailVO.getItem().getPrimaryUnit().getDescription());
+
+						itemDTO.setPrimaryUnit(purchaseUnitDTO);
+					}
+
 					detailResponse.setItem(itemDTO);
 				}
 
-				if (detailVO.getPurchaseUnit() != null) {
-					UnitResponseDTO unitDTO = new UnitResponseDTO();
-					unitDTO.setId(detailVO.getPurchaseUnit().getId());
-					unitDTO.setUnitId(detailVO.getPurchaseUnit().getUnitId());
-					detailResponse.setPurchaseUnit(unitDTO);
-				}
-
-				if (detailVO.getPrimaryUnit() != null) {
-					UnitResponseDTO unitDTO = new UnitResponseDTO();
-					unitDTO.setId(detailVO.getPrimaryUnit().getId());
-					unitDTO.setUnitId(detailVO.getPrimaryUnit().getUnitId());
-					detailResponse.setPrimaryUnit(unitDTO);
-				}
+//				if (detailVO.getPurchaseUnit() != null) {
+//					UnitResponseDTO unitDTO = new UnitResponseDTO();
+//					unitDTO.setId(detailVO.getPurchaseUnit().getId());
+//					unitDTO.setUnitId(detailVO.getPurchaseUnit().getUnitId());
+//					detailResponse.setPurchaseUnit(unitDTO);
+//				}
+//
+//				if (detailVO.getPrimaryUnit() != null) {
+//					UnitResponseDTO unitDTO = new UnitResponseDTO();
+//					unitDTO.setId(detailVO.getPrimaryUnit().getId());
+//					unitDTO.setUnitId(detailVO.getPrimaryUnit().getUnitId());
+//					detailResponse.setPrimaryUnit(unitDTO);
+//				}
 
 				if (detailVO.getPoUnit() != null) {
 					UnitResponseDTO unitDTO = new UnitResponseDTO();
@@ -774,6 +814,7 @@ public class GrnServiceImpl implements GrnService {
 			map.put("gstNo", ch[5] != null ? ch[5].toString() : "");
 			map.put("stateName", ch[6] != null ? ch[6].toString() : "");
 			map.put("isRegistered", ch[7] != null ? ch[7].toString() : "");
+			map.put("country", ch[8] != null ? ch[8].toString() : "");
 			list.add(map);
 		}
 

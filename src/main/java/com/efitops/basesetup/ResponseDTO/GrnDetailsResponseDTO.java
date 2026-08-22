@@ -16,8 +16,8 @@ public class GrnDetailsResponseDTO {
 
 	private ItemMasterDetailsResponseDTO item;
 
-	private UnitResponseDTO purchaseUnit;
-	private UnitResponseDTO primaryUnit;
+//	private UnitResponseDTO purchaseUnit;
+//	private UnitResponseDTO primaryUnit;
 	private UnitResponseDTO poUnit;
 	private UnitResponseDTO receivedUnit;
 	private UnitResponseDTO accUnit;

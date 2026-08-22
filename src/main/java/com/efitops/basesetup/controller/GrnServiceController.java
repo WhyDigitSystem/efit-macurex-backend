@@ -92,8 +92,8 @@ public class GrnServiceController extends BaseController {
 
 	@PutMapping(value = "/createUpdateGrn", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdateGrn(
-//			@RequestPart("grn") GrnDTO grnDTO,
-			@RequestBody GrnDTO grnDTO,
+			@RequestPart("grn") GrnDTO grnDTO,
+//			@RequestBody GrnDTO grnDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		String methodName = "createUpdateGrn()";

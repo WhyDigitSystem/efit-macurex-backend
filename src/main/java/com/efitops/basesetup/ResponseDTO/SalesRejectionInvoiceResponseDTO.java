@@ -31,7 +31,7 @@ public class SalesRejectionInvoiceResponseDTO {
 
     private LocationMasterResponseDTO location;
 
-    private ListOfValuesDetailsResponseDTO belongsTo;
+    private String belongsTo;
 
     private String vehicle;
 

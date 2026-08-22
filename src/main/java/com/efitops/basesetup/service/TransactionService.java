@@ -83,6 +83,8 @@ public interface TransactionService {
 		List<Map<String, Object>> getItemDetailsforSalesRejectionInvoice(String docId, Long orgId, Long branch);
 
 		List<Map<String, Object>> getCustomerDetailsforSalesRejectionInvoice(Long orgId, Long branch) throws ApplicationException;
+
+		String getSalesRejectionInvoiceDocId(Long orgId, String financialYear, String docType) throws ApplicationException;
 		
 
 }

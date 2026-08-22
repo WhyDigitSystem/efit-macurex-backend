@@ -30,7 +30,7 @@ public class SalesDeliveryScheduleVO {
 	private LocalDate docDate = LocalDate.now();
 
 	@ManyToOne
-	@JoinColumn(name = "branch_id")
+	@JoinColumn(name = "branch")
 	private BranchVO branch;
 
 	@Column(name = "month_of_schedule")

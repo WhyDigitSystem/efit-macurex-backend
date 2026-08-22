@@ -53,9 +53,8 @@ public class SalesRejectionInvoiceVO {
 	@JoinColumn(name = "location")
 	private LocationVO location;
 
-	@ManyToOne
-	@JoinColumn(name = "belongs_To")
-	private ListOfValuesDetailsVO belongsTo;
+	@Column(name = "belongs_To")
+	private String belongsTo;
 
 	@Column(name = "vehicle")
 	private String vehicle;

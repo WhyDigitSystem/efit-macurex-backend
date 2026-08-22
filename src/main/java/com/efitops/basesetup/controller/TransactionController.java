@@ -980,8 +980,7 @@ public class TransactionController extends BaseController {
 	@GetMapping("/getCustomerDetailsforSalesRejectionInvoice")
 	public ResponseEntity<ResponseDTO> getCustomerDetailsforSalesRejectionInvoice(
 	        @RequestParam Long orgId,
-	        @RequestParam Long branch,
-	        @RequestParam String customerType) {
+	        @RequestParam Long branch) {
 
 	    String methodName = "getCustomerDetailsforSalesRejectionInvoice()";
 
@@ -999,7 +998,7 @@ public class TransactionController extends BaseController {
 
 	        customerDetails =
 	                transactionService.getCustomerDetailsforSalesRejectionInvoice(
-	                        orgId, branch, customerType);
+	                        orgId, branch);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
@@ -1023,6 +1022,61 @@ public class TransactionController extends BaseController {
 	        responseDTO = createServiceResponseError(
 	                responseObjectsMap,
 	                "Customer details retrieval failed",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getSalesRejectionInvoiceDocId")
+	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear,
+	        @RequestParam String docType) {
+
+	    String methodName = "getSalesRejectionInvoiceDocId()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+	    String docId = "";
+
+	    try {
+
+	        docId = transactionService.getSalesRejectionInvoiceDocId(
+	                orgId,
+	                financialYear,
+	                docType);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "DocId information retrieved successfully");
+
+	        responseObjectsMap.put("invoiceDocId", docId);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to retrieve Sales Rejection Invoice docId",
 	                errorMsg);
 	    }
 

@@ -23,7 +23,7 @@ public class SalesRejectionInvoiceDTO {
 
 	private Long location;
 
-	private Long belongsTo;
+	private String belongsTo;
 
 	private String vehicle;
 

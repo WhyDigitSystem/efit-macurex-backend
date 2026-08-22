@@ -245,4 +245,8 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrderVO, Long> 
 	            @Param("orgId") Long orgId,
 	            @Param("type") String type);
 	    
+		@Query(nativeQuery = true, value = "select h.hsn,i.customer_part_no from indent_detail i1,hsn h,item i where i1.item=i.item_id and h.hsn_id=i.hsn_code and i.org_id=?1\r\n"
+				+ "and i.branch=?2 and i.item_id=?3 and i.active=1 and i.cancel=0 and ?4='YES' group by h.hsn,i.customer_part_no")
+		Set<Object[]> getHsnCodeDetails(Long orgId, Long branch, Long item,String type);
+	    
 }

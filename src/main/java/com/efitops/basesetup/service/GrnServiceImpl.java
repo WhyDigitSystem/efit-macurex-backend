@@ -826,4 +826,93 @@ public class GrnServiceImpl implements GrnService {
 		String screenCode1 = "GRN";
 		return grnRepo.getGrnDocId(orgId, financialYear, screenCode1);
 	}
+
+	@Override
+	public List<Map<String, Object>> getGatePassDocId(Long orgId, Long branch, Long supplierCode) {
+		Set<Object[]> chType = grnRepo.getGatePassDocId(orgId, branch, supplierCode);
+		return getGatePassDocId(chType);
+	}
+
+	private List<Map<String, Object>> getGatePassDocId(Set<Object[]> chType) {
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			map.put("gatePassId", ch[2] != null ? ((Number) ch[2]).longValue() : null);
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getPurchaseOrderNoBasedDocId(Long orgId, Long branch, Long supplierCode,
+			String gatePass) {
+		Set<Object[]> chType = grnRepo.getPurchaseOrderNoBasedDocId(orgId, branch, supplierCode, gatePass);
+		return getPurchaseOrderNoBasedDocId(chType);
+	}
+
+	private List<Map<String, Object>> getPurchaseOrderNoBasedDocId(Set<Object[]> chType) {
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			map.put("gatePassId", ch[2] != null ? ((Number) ch[2]).longValue() : null);
+			map.put("Id", ch[3] != null ? ((Number) ch[3]).longValue() : null);
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getScheduleDocId(Long orgId, String purchaseOrderNo, String date,
+			String gatePass) {
+		Set<Object[]> chType = grnRepo.getScheduleDocId(orgId, purchaseOrderNo, date, gatePass);
+		return getScheduleDocId(chType);
+	}
+
+	private List<Map<String, Object>> getScheduleDocId(Set<Object[]> chType) {
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("scheduleId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("docId", ch[1] != null ? ch[1].toString() : "");
+			map.put("docDate", ch[2] != null ? ch[2].toString() : "");
+			map.put("startDate", ch[3] != null ? ch[3].toString() : "");
+			map.put("endDate", ch[4] != null ? ch[4].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getPoNmberBasedItemDetails(Long orgId,Long branch, String purchaseOrderNo) {
+		Set<Object[]> chType = grnRepo.getPoNmberBasedItemDetails( orgId, branch,  purchaseOrderNo);
+		return getPoNmberBasedItemDetails(chType);
+	}
+
+	private List<Map<String, Object>> getPoNmberBasedItemDetails(Set<Object[]> chType) {
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDesc", ch[2] != null ? ch[2].toString() : "");
+			map.put("qty", ch[3] != null ? ch[3].toString() : "");
+			map.put("hsn", ch[4] != null ? ch[4].toString() : "");
+			map.put("primaryUnit", ch[5] != null ?((Number) ch[5]).longValue() : null);
+			map.put("rate", ch[6] != null ? ch[6].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
 }

@@ -90,7 +90,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 	@Autowired
 	private PurchaseOrderLocalDetailsRepo purchaseOrderLocalDetailsRepo;
 
-	
 	@Autowired
 	private PurchaseOrderLocalTaxDetailsRepo purchaseOrderLocalTaxDetailsRepo;
 
@@ -600,6 +599,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailVO.setFobValueInr(detailDTO.getFobRateFc().multiply(dto.getExchangeRate()));
 
 				detailVO.setFobValueInr(detailVO.getPoQty().multiply(detailVO.getFobRateInr()));
+				
+				detailVO.setHsnCode(detailDTO.getHsnCode());
 
 				detailVO.setPurchaseOrderVO(vo);
 
@@ -835,7 +836,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				importResponse.setFobRateInr(importVO.getFobRateInr());
 				importResponse.setOrderRate(importVO.getOrderRate());
 				importResponse.setFobValueInr(importVO.getFobValueInr());
-//				importResponse.setHsnCode(importVO.getHsnCode());
+				importResponse.setHsnCode(importVO.getHsnCode());
 
 				if (importVO.getItem() != null) {
 					ItemMasterDetailsResponseDTO itemDTO = new ItemMasterDetailsResponseDTO();
@@ -1223,6 +1224,27 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 			map.put("itemMasterId", ch[11] != null ? ((Number) ch[11]).longValue() : null);
 
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getHsnCodeDetails(Long orgId, Long branch, Long item, String type) {
+		Set<Object[]> chType = purchaseOrderRepo.getHsnCodeDetails(orgId, branch, item, type);
+		return getHsnCodeDetails(chType);
+	}
+
+	private List<Map<String, Object>> getHsnCodeDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("hsn", ch[0] != null ? ch[0].toString() : "");
+			map.put("customerPartNo", ch[1] != null ? ch[1].toString() : "");
 			list.add(map);
 		}
 

@@ -29,4 +29,12 @@ public interface GrnService {
 
 	String getGrnDocId(Long orgId, String financialYear, String screenCode);
 
+	List<Map<String, Object>> getGatePassDocId(Long orgId, Long branch, Long supplierCode);
+
+	List<Map<String, Object>> getPurchaseOrderNoBasedDocId(Long orgId, Long branch, Long supplierCode, String gatePass);
+
+	List<Map<String, Object>> getScheduleDocId(Long orgId, String purchaseOrderNo, String date, String gatePass);
+
+	List<Map<String, Object>> getPoNmberBasedItemDetails(Long orgId, Long branch, String purchaseOrderNo);
+
 }

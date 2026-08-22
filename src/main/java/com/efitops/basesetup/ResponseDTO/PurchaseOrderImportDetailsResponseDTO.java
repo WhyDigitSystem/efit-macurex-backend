@@ -35,4 +35,6 @@ public class PurchaseOrderImportDetailsResponseDTO {
 
 	private BigDecimal orderRate;
 
+	private String hsnCode;
+
 }

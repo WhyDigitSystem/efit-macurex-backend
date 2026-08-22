@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -335,7 +334,7 @@ public class PurchaseServiceImportController extends BaseController {
 		try {
 			mapp = purchaseOrderService.getIndentNoBasedLocal(orgId, belongsTo, type);
 		} catch (Exception e) {
-			errorMsg = e.getMessage();	
+			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 
@@ -351,10 +350,10 @@ public class PurchaseServiceImportController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
+
 	@GetMapping("/getIndentNoBasedImport")
-	public ResponseEntity<ResponseDTO> getIndentNoBasedImport(@RequestParam Long orgId,@RequestParam(required=false) String type) {
+	public ResponseEntity<ResponseDTO> getIndentNoBasedImport(@RequestParam Long orgId,
+			@RequestParam(required = false) String type) {
 
 		String methodName = "getIndentNoBasedLocal()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -365,9 +364,9 @@ public class PurchaseServiceImportController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = purchaseOrderService.getIndentNoBasedImport(orgId,type);
+			mapp = purchaseOrderService.getIndentNoBasedImport(orgId, type);
 		} catch (Exception e) {
-			errorMsg = e.getMessage();	
+			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
 
@@ -378,6 +377,35 @@ public class PurchaseServiceImportController extends BaseController {
 		} else {
 			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve IndentNo details",
 					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getHsnCodeDetails")
+	public ResponseEntity<ResponseDTO> getHsnCodeDetails(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long item, @RequestParam String type) {
+		String methodName = "getHsnCodeDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getHsnCodeDetails(orgId, branch, item, type);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Rate retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Rate details", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

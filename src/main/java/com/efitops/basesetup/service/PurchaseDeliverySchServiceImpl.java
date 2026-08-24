@@ -329,8 +329,8 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		responseDTO.setId(purchaseDeliveryScheduleVO.getId());
 		responseDTO.setBelongsTo(purchaseDeliveryScheduleVO.getBelongsTo());
-//		responseDTO.setDocId(purchaseDeliveryScheduleVO.getDocId());
-//		responseDTO.setDocDate(purchaseDeliveryScheduleVO.getDocDate());
+		responseDTO.setDocId(purchaseDeliveryScheduleVO.getDocId());
+		responseDTO.setDocDate(purchaseDeliveryScheduleVO.getDocDate());
 		responseDTO.setScheduleStartDate(purchaseDeliveryScheduleVO.getScheduleStartDate());
 		responseDTO.setScheduleEndDate(purchaseDeliveryScheduleVO.getScheduleEndDate());
 		responseDTO.setPurchaseOrderNo(purchaseDeliveryScheduleVO.getPurchaseOrderNo());

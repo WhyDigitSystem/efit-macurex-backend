@@ -980,8 +980,7 @@ public class TransactionController extends BaseController {
 	@GetMapping("/getCustomerDetailsforSalesRejectionInvoice")
 	public ResponseEntity<ResponseDTO> getCustomerDetailsforSalesRejectionInvoice(
 	        @RequestParam Long orgId,
-	        @RequestParam Long branch,
-	        @RequestParam String customerType) {
+	        @RequestParam Long branch) {
 
 	    String methodName = "getCustomerDetailsforSalesRejectionInvoice()";
 
@@ -999,7 +998,7 @@ public class TransactionController extends BaseController {
 
 	        customerDetails =
 	                transactionService.getCustomerDetailsforSalesRejectionInvoice(
-	                        orgId, branch, customerType);
+	                        orgId, branch);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,

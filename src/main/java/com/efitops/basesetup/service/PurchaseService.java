@@ -24,10 +24,10 @@ public interface PurchaseService {
 //    String getPurchaseDeliveryScheduleDocId(Long orgId, String finYear, Long branch);
 
     // ---------- Purchase Bill ----------
-    Map<String, Object> updateCreatePurchaseBill(PurchaseBillDTO dto) throws ApplicationException;
-    PurchaseBillResponseDTO getPurchaseBillById(Long id) throws ApplicationException;
-    List<PurchaseBillResponseDTO> getPurchaseBillByOrgId(Long orgId, Long branchId) throws ApplicationException;
-    String getPurchaseBillDocId(Long orgId, String finYear, Long branch);
+//    Map<String, Object> updateCreatePurchaseBill(PurchaseBillDTO dto) throws ApplicationException;
+//    PurchaseBillResponseDTO getPurchaseBillById(Long id) throws ApplicationException;
+//    List<PurchaseBillResponseDTO> getPurchaseBillByOrgId(Long orgId, Long branchId) throws ApplicationException;
+//    String getPurchaseBillDocId(Long orgId, String finYear, Long branch);
 
     
 
@@ -38,10 +38,10 @@ public interface PurchaseService {
     String getPurchaseShortCloseDocId(Long orgId, String finYear, Long branch);
 
     // ---------- Local Purchase Order ----------
-    Map<String, Object> updateCreateLocalPurchaseOrder(LocalPurchaseOrderDTO dto, MultipartFile[] files) throws ApplicationException;
-    LocalPurchaseOrderResponseDTO getLocalPurchaseOrderById(Long id) throws ApplicationException;
-    List<LocalPurchaseOrderResponseDTO> getLocalPurchaseOrderByOrgId(Long orgId, Long branchId) throws ApplicationException;
-    String getLocalPurchaseOrderDocId(Long orgId, String finYear, Long branch);
+//    Map<String, Object> updateCreateLocalPurchaseOrder(LocalPurchaseOrderDTO dto, MultipartFile[] files) throws ApplicationException;
+//    LocalPurchaseOrderResponseDTO getLocalPurchaseOrderById(Long id) throws ApplicationException;
+//    List<LocalPurchaseOrderResponseDTO> getLocalPurchaseOrderByOrgId(Long orgId, Long branchId) throws ApplicationException;
+//    String getLocalPurchaseOrderDocId(Long orgId, String finYear, Long branch);
 //	purchase indent
     Map<String, Object> createUpdatePurchaseIndent(PurchaseIndentDTO purchaseIndentDTO, MultipartFile[] files)
 			throws ApplicationException;

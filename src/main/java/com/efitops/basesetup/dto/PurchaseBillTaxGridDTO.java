@@ -6,16 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * particulars        -> [USER ENTER]
- * taxPercent         -> [USER ENTER]
- * acceptedQtyAmount  -> [CALCULATED or USER ENTER] ** CONFIRM
- * revisedAmount      -> [USER ENTER]
- * ledgerAccount      -> [USER SELECT] ** NEEDS a Chart of Accounts / Ledger master - CONFIRM table name
- * dbCr               -> [USER SELECT] "DB" or "CR" toggle
- * dbAmt / crAmt      -> [USER ENTER]
- * postToFinanceAc    -> [USER SELECT] Yes/No - whether this line posts to the finance ledger
- */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

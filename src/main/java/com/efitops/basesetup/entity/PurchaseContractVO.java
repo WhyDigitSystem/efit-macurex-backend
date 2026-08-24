@@ -45,6 +45,9 @@ public class PurchaseContractVO {
     @ManyToOne
     @JoinColumn(name = "branch")
     private BranchVO branch;
+    
+    @Column(name  = "belongs_to")
+    private String belongsTo;
 
     @Column(name = "doc_id")
     private String docId;
@@ -65,7 +68,7 @@ public class PurchaseContractVO {
     private GSTStateMasterVO GSTState;
     
     @Column(name = "is_igst_appl")
-    private String isIGSTAppl;
+    private boolean isIGSTAppl;
 
     @Column(name = "valid_from")
     private LocalDate validFrom;
@@ -147,16 +150,24 @@ public class PurchaseContractVO {
     @Column(name = "modified_by")
     private String updatedBy;
 
+
+    @Column(name = "screen_code")
+    private String screenCode = "PC";
+
+    @Column(name = "screen_name")
+    private String screenName = "PURCHASE CONTRACT";
    
-    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<PurchaseContractDetailsVO> purchaseContractDetailsVO = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-//    private List<PurchaseContractTaxDetailsVO> purchaseContractTaxDetailsVO = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-//    private List<PurchaseContractAttachmentVO> purchaseContractAttachmentVO = new ArrayList<>();
+
+    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<PurchaseContractTaxDetailsVO> purchaseContractTaxDetailsVO = new ArrayList<>();
+
+    @OneToMany(mappedBy = "purchaseContractVO", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<PurchaseContractAttachmentVO> purchaseContractAttachmentVO = new ArrayList<>();
 
     @JsonGetter("active")
 	public String getActive() {

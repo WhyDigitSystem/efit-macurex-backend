@@ -19,33 +19,29 @@ import lombok.NoArgsConstructor;
 public class PurchaseBillResponseDTO {
 
     private Long id;
-    private BranchResponseDTO plant;
-    private String pbNo;
+    private BranchResponseDTO branch;
+    private String docId;
     private String belongsTo;
-    private LocalDate pbDate;
-    private CustomerResponseDetailsDTO supplier;
-    private GSTStateResponseDTO gstState;
+    private LocalDate docDate;
+    private PurchaseBillSupplierResponseDTO supplier;
     private String grnNo;
     private LocalDate grnDate;
     private Boolean isIgstAppl;
     private Boolean excisable;
-    private ListOfVlauesDetailsResponseDTO currency;
-    private String gstnNo;
     private String vendorDcNo;
     private BigDecimal exchangeRate;
     private ListOfVlauesDetailsResponseDTO dealerType;
-    private ListOfVlauesDetailsResponseDTO taxCode;
-    private String poType;
-    private Long poId;
-    private String poNo;
-    private LocalDate poDate;
+    private String purchaseorderType;
+    private Long purchaseorderId;
+    private String purchaseorderNo;
+    private LocalDate purchaseorderDate;
     private Boolean isReverseChrg;
     private LocalDate voucherPostingDate;
     private LocalDate date;
     private BigDecimal dutyPerUnit;
     private ListOfVlauesDetailsResponseDTO postingCategory;
     private Boolean modvatCopyReceived;
-    private ListOfVlauesDetailsResponseDTO eccType;
+   
     private String supplierDcInvNo;
     private LocalDate supplierDcInvDate;
 
@@ -58,13 +54,13 @@ public class PurchaseBillResponseDTO {
     private String narration;
     private String paymentTerms;
 
-    private List<PurchaseBillDetailsResponseDTO> purchaseDetails;
-    private List<PurchaseBillTaxGridResponseDTO> taxGrid;
+//    private List<PurchaseBillDetailsResponseDTO> purchaseDetails;
+//    private List<PurchaseBillTaxGridResponseDTO> taxGrid;
 
     private Long orgId;
     private String financialYear;
-    private Boolean active;
+    private String active;
     private String cancelRemarks;
-    private Long createdBy;
-    private Long updatedBy;
+    private String createdBy;
+    private String updatedBy;
 }

@@ -34,7 +34,7 @@ public class PurchaseContractDetailsVO {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "item")
     private ItemMasterVO item;
     
     @Column(name = "hsn_code")
@@ -78,7 +78,7 @@ public class PurchaseContractDetailsVO {
     @Column(name = "valid_to")
     private LocalDate validTo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "purchase_contract_basic_id")
     @JsonBackReference
     private PurchaseContractVO purchaseContractVO;

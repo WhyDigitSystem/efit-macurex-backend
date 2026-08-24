@@ -857,388 +857,388 @@ public class PurchaseServiceImpl implements PurchaseService {
     // FIX #4 (same as PDS): poType/poId -> purchaseContractId direct FK
     // ==================================================================
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> updateCreatePurchaseBill(PurchaseBillDTO dto) throws ApplicationException {
-
-        PurchaseBillVO vo;
-        String message;
-        boolean isUpdate = ObjectUtils.isNotEmpty(dto.getId());
-
-        if (isUpdate) {
-            vo = purchaseBillRepo.findById(dto.getId()).orElseThrow(() -> new ApplicationException("Purchase Bill Not Found"));
-            vo.setUpdatedBy(dto.getCreatedBy());
-            message = "Purchase Bill Updated Successfully";
-        } else {
-            vo = new PurchaseBillVO();
-            vo.setCreatedBy(dto.getCreatedBy());
-            vo.setUpdatedBy(dto.getCreatedBy());
-            vo.setPbNo(purchaseBillRepo.getPurchaseBillDocId(dto.getOrgId(), SCREEN_CODE_PB));
-            message = "Purchase Bill Created Successfully";
-        }
-
-        createUpdatePurchaseBillVOFromDTO(dto, vo);
-
-        if (isUpdate) {
-            purchaseBillRepo.flush();
-        } else {
-            vo = purchaseBillRepo.save(vo);
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", message);
-        response.put("purchaseBillVO", buildPurchaseBillResponse(vo));
-        return response;
-    }
-
-    private void createUpdatePurchaseBillVOFromDTO(PurchaseBillDTO dto, PurchaseBillVO vo) throws ApplicationException {
-
-        if (dto.getBranch() != null && dto.getBranch() != 0) {
-            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
-        }
-        vo.setBelongsTo(dto.getBelongsTo());
-        vo.setPbDate(dto.getPbDate());
-
-        if (dto.getSupplier() != null && dto.getSupplier() != 0) {
-            CustomerVO supplier = customerRepo.findById(dto.getSupplier()).orElseThrow(() -> new ApplicationException("Supplier Not Found"));
-            vo.setSupplier(supplier);
-
-            GSTStateMasterVO gstState = supplier.getGstState();
-            vo.setGstState(gstState);
-
-            boolean isIndia = gstState != null && gstState.getStateName() != null
-                    && gstState.getStateName().toUpperCase().contains(INDIA);
-            if (supplier.getCountry() != null && supplier.getCountry().getCountryName() != null) {
-                isIndia = supplier.getCountry().getCountryName().toUpperCase().contains(INDIA);
-            }
-            vo.setIsIgstAppl(!isIndia);
-            // vo.setGstnNo(supplier.getGstnNo());  // still pending confirmed getter name on CustomerVO
-        }
-
-        vo.setGrnNo(dto.getGrnNo());
-        vo.setGrnDate(dto.getGrnDate());
-        vo.setExcisable(dto.getExcisable());
-        vo.setCurrency(resolveLov(dto.getCurrency()));
-        vo.setVendorDcNo(dto.getVendorDcNo());
-        vo.setExchangeRate(dto.getExchangeRate());
-        vo.setDealerType(resolveLov(dto.getDealerType()));
-        vo.setTaxCode(resolveLov(dto.getTaxCode()));
-
-        if (dto.getLocalPurchaseOrderId() != null) {
-            LocalPurchaseOrderVO lpo = localPurchaseOrderRepo.findById(dto.getLocalPurchaseOrderId())
-                    .orElseThrow(() -> new ApplicationException("Local Purchase Order Not Found"));
-            vo.setLocalPurchaseOrder(lpo);
-            vo.setPoNo(lpo.getPoNo());
-            vo.setPoDate(lpo.getPoDate());
-        } else {
-            vo.setLocalPurchaseOrder(null);
-            vo.setPoNo(null);
-            vo.setPoDate(null);
-        }
-
-        vo.setIsReverseChrg(dto.getIsReverseChrg());
-        vo.setVoucherPostingDate(dto.getVoucherPostingDate());
-        vo.setDate(dto.getDate());
-        vo.setDutyPerUnit(dto.getDutyPerUnit());
-        vo.setPostingCategory(resolveLov(dto.getPostingCategory()));
-        vo.setModvatCopyReceived(dto.getModvatCopyReceived());
-        vo.setEccType(resolveLov(dto.getEccType()));
-        vo.setSupplierDcInvNo(dto.getSupplierDcInvNo());
-        vo.setSupplierDcInvDate(dto.getSupplierDcInvDate());
-
-        vo.setTotalFreight(dto.getTotalFreight());
-        vo.setTotalQty(dto.getTotalQty());
-        vo.setBasicValue(dto.getBasicValue());
-        vo.setTotalAmount(dto.getTotalAmount());
-        vo.setAmountInWords(dto.getAmountInWords());
-        vo.setEntryTaxApplicable(dto.getEntryTaxApplicable());
-        vo.setNarration(dto.getNarration());
-        vo.setPaymentTerms(dto.getPaymentTerms());
-
-        vo.setOrgId(dto.getOrgId());
-        vo.setFinancialYear(dto.getFinancialYear());
-        vo.setActive(dto.isActive());
-        vo.setCancelRemarks(dto.getCancelRemarks());
-
-        buildPurchaseBillDetailsList(dto, vo);
-        buildPurchaseBillTaxGridList(dto, vo);
-    }
-
-    // "1-Purchase Detail" grid — with calculations
-    private void buildPurchaseBillDetailsList(PurchaseBillDTO dto, PurchaseBillVO vo) throws ApplicationException {
-
-        if (vo.getId() != null && vo.getPurchaseBillDetailsVO() != null && !vo.getPurchaseBillDetailsVO().isEmpty()) {
-            purchaseBillDetailsRepo.deleteAll(new ArrayList<>(vo.getPurchaseBillDetailsVO()));
-            purchaseBillDetailsRepo.flush();
-        }
-        vo.getPurchaseBillDetailsVO().clear();
-        if (dto.getPurchaseDetails() == null) return;
-
-        BigDecimal exchangeRate = dto.getExchangeRate() != null ? dto.getExchangeRate() : BigDecimal.ONE;
-
-        for (PurchaseBillDetailsDTO line : dto.getPurchaseDetails()) {
-
-            PurchaseBillDetailsVO detailVO = new PurchaseBillDetailsVO();
-
-            if (line.getItemId() != null && line.getItemId() != 0) {
-                ItemMasterVO item = itemMasterRepo.findById(line.getItemId()).orElseThrow(() -> new ApplicationException("Item Not Found"));
-                detailVO.setItem(item);
-                if (item.getHsnCode() != null) detailVO.setHsnCode(item.getHsnCode());
-                if (item.getPrimaryUnit() != null) detailVO.setUnit(item.getPrimaryUnit());
-            }
-
-            if (line.getTaxType() != null && line.getTaxType() != 0) detailVO.setTaxType(resolveLov(line.getTaxType()));
-            detailVO.setTaxPercent(line.getTaxPercent());
-            detailVO.setTariffNo(line.getTariffNo());
-            detailVO.setExciseToPost(line.getExciseToPost());
-            detailVO.setChallanQty(line.getChallanQty());
-
-            if (line.getUnitId() != null && line.getUnitId() != 0) {
-                detailVO.setUnit(unitMasterRepo.findById(line.getUnitId()).orElseThrow(() -> new ApplicationException("Unit Not Found")));
-            }
-
-            detailVO.setGrnReceivedQty(line.getGrnReceivedQty());
-            detailVO.setAcceptedQty(line.getAcceptedQty());
-            detailVO.setRejectedQty(line.getRejectedQty());
-
-            BigDecimal challanQty = line.getChallanQty() != null ? line.getChallanQty() : BigDecimal.ZERO;
-            BigDecimal acceptedQty = line.getAcceptedQty() != null ? line.getAcceptedQty() : BigDecimal.ZERO;
-            BigDecimal rejectedQty = line.getRejectedQty() != null ? line.getRejectedQty() : BigDecimal.ZERO;
-            BigDecimal shortageQty = challanQty.subtract(acceptedQty).subtract(rejectedQty);
-            if (shortageQty.compareTo(BigDecimal.ZERO) < 0) shortageQty = BigDecimal.ZERO;
-            detailVO.setShortageQty(shortageQty);
-
-            detailVO.setPoRate(line.getPoRate());
-
-            BigDecimal rateInSelectedCurrency = line.getRateInSelectedCurrency() != null ? line.getRateInSelectedCurrency() : BigDecimal.ZERO;
-            BigDecimal rateInInr = rateInSelectedCurrency.multiply(exchangeRate);
-            detailVO.setRateInInr(rateInInr);
-            detailVO.setRateInSelectedCurrency(rateInSelectedCurrency);
-
-            BigDecimal apportionedCost = line.getApportionedCost() != null ? line.getApportionedCost() : BigDecimal.ZERO;
-            detailVO.setApportionedCost(apportionedCost);
-            detailVO.setLandedCostRate(rateInInr.add(apportionedCost));
-
-            BigDecimal amount = acceptedQty.multiply(rateInSelectedCurrency);
-            detailVO.setAmount(amount);
-
-            BigDecimal additionalDuty = line.getAdditionalDuty() != null ? line.getAdditionalDuty() : BigDecimal.ZERO;
-            detailVO.setAdditionalDuty(additionalDuty);
-
-            BigDecimal amountInSelectedCurrency = amount.add(additionalDuty);
-            detailVO.setAmountInSelectedCurrency(amountInSelectedCurrency);
-            detailVO.setAmountInInr(amountInSelectedCurrency.multiply(exchangeRate));
-
-            detailVO.setSgstRate(line.getSgstRate());
-            detailVO.setSgstAmount(calcAmount(amount, line.getSgstRate()));
-            detailVO.setCgstRate(line.getCgstRate());
-            detailVO.setCgstAmount(calcAmount(amount, line.getCgstRate()));
-            detailVO.setIgstRate(line.getIgstRate());
-            detailVO.setIgstAmount(calcAmount(amount, line.getIgstRate()));
-
-            detailVO.setPurchaseBillVO(vo);
-            vo.getPurchaseBillDetailsVO().add(detailVO);
-        }
-    }
-
-    private void buildPurchaseBillTaxGridList(PurchaseBillDTO dto, PurchaseBillVO vo) throws ApplicationException {
-
-        if (vo.getId() != null && vo.getPurchaseBillTaxGridVO() != null && !vo.getPurchaseBillTaxGridVO().isEmpty()) {
-            purchaseBillTaxGridRepo.deleteAll(new ArrayList<>(vo.getPurchaseBillTaxGridVO()));
-            purchaseBillTaxGridRepo.flush();
-        }
-        vo.getPurchaseBillTaxGridVO().clear();
-        if (dto.getTaxGrid() == null) return;
-
-        for (PurchaseBillTaxGridDTO taxDTO : dto.getTaxGrid()) {
-            PurchaseBillTaxGridVO taxVO = new PurchaseBillTaxGridVO();
-            taxVO.setParticulars(taxDTO.getParticulars());
-            taxVO.setTaxPercent(taxDTO.getTaxPercent());
-            taxVO.setAcceptedQtyAmount(taxDTO.getAcceptedQtyAmount());
-            taxVO.setRevisedAmount(taxDTO.getRevisedAmount());
-            taxVO.setLedgerAccount(resolveLov(taxDTO.getLedgerAccount()));
-            taxVO.setDbCr(taxDTO.getDbCr());
-            taxVO.setDbAmt(taxDTO.getDbAmt());
-            taxVO.setCrAmt(taxDTO.getCrAmt());
-            taxVO.setPostToFinanceAc(taxDTO.getPostToFinanceAc());
-            taxVO.setPurchaseBillVO(vo);
-            vo.getPurchaseBillTaxGridVO().add(taxVO);
-        }
-    }
-
-    @Override
-    public PurchaseBillResponseDTO getPurchaseBillById(Long id) throws ApplicationException {
-        PurchaseBillVO vo = purchaseBillRepo.getPurchaseBillById(id);
-        if (vo == null) throw new ApplicationException("Purchase Bill Not Found");
-        return buildPurchaseBillResponse(vo);
-    }
-
-    @Override
-    public List<PurchaseBillResponseDTO> getPurchaseBillByOrgId(Long orgId, Long branchId) throws ApplicationException {
-        List<PurchaseBillVO> list = purchaseBillRepo.getPurchaseBillByOrgId(orgId, branchId);
-        if (list == null || list.isEmpty()) throw new ApplicationException("Purchase Bill Not Found");
-        List<PurchaseBillResponseDTO> responseList = new ArrayList<>();
-        for (PurchaseBillVO vo : list) responseList.add(buildPurchaseBillResponse(vo));
-        return responseList;
-    }
-
-    @Override
-    public String getPurchaseBillDocId(Long orgId, String finYear, Long branch) {
-        return purchaseBillRepo.getPurchaseBillDocId(orgId, SCREEN_CODE_PB);
-    }
-
-    private ListOfVlauesDetailsResponseDTO toLovDTO(ListOfValuesDetailsVO lov) {
-        if (lov == null) return null;
-        return new ListOfVlauesDetailsResponseDTO(lov.getId(), lov.getValueCode(), lov.getValueDescription());
-    }
-
-    private PurchaseBillResponseDTO buildPurchaseBillResponse(PurchaseBillVO vo) {
-
-        PurchaseBillResponseDTO dto = new PurchaseBillResponseDTO();
-        dto.setId(vo.getId());
-
-        if (vo.getPlant() != null) {
-            BranchResponseDTO plantDTO = new BranchResponseDTO();
-            plantDTO.setId(vo.getPlant().getId());
-            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
-            plantDTO.setBranchName(vo.getPlant().getBranchName());
-            dto.setPlant(plantDTO);
-        }
-
-        dto.setPbNo(vo.getPbNo());
-        dto.setBelongsTo(vo.getBelongsTo());
-        dto.setPbDate(vo.getPbDate());
-
-        if (vo.getSupplier() != null) {
-            CustomerResponseDetailsDTO supplierDTO = new CustomerResponseDetailsDTO();
-            supplierDTO.setId(vo.getSupplier().getId());
-            supplierDTO.setCustomerName(vo.getSupplier().getCustomerName());
-            dto.setSupplier(supplierDTO);
-        }
-
-        if (vo.getGstState() != null) {
-            dto.setGstState(new GSTStateResponseDTO(vo.getGstState().getId(), vo.getGstState().getStateCode(),
-                    vo.getGstState().getStateName(), vo.getGstState().getGstStateId()));
-        }
-
-        dto.setGrnNo(vo.getGrnNo());
-        dto.setGrnDate(vo.getGrnDate());
-        dto.setIsIgstAppl(vo.getIsIgstAppl());
-        dto.setExcisable(vo.getExcisable());
-        dto.setCurrency(toLovDTO(vo.getCurrency()));
-        dto.setGstnNo(vo.getGstnNo());
-        dto.setVendorDcNo(vo.getVendorDcNo());
-        dto.setExchangeRate(vo.getExchangeRate());
-        dto.setDealerType(toLovDTO(vo.getDealerType()));
-        dto.setTaxCode(toLovDTO(vo.getTaxCode()));
-
-        dto.setPoNo(vo.getPoNo());
-        dto.setPoDate(vo.getPoDate());
-        dto.setIsReverseChrg(vo.getIsReverseChrg());
-        dto.setVoucherPostingDate(vo.getVoucherPostingDate());
-        dto.setDate(vo.getDate());
-        dto.setDutyPerUnit(vo.getDutyPerUnit());
-        dto.setPostingCategory(toLovDTO(vo.getPostingCategory()));
-        dto.setModvatCopyReceived(vo.getModvatCopyReceived());
-        dto.setEccType(toLovDTO(vo.getEccType()));
-        dto.setSupplierDcInvNo(vo.getSupplierDcInvNo());
-        dto.setSupplierDcInvDate(vo.getSupplierDcInvDate());
-
-        dto.setTotalFreight(vo.getTotalFreight());
-        dto.setTotalQty(vo.getTotalQty());
-        dto.setBasicValue(vo.getBasicValue());
-        dto.setTotalAmount(vo.getTotalAmount());
-        dto.setAmountInWords(vo.getAmountInWords());
-        dto.setEntryTaxApplicable(vo.getEntryTaxApplicable());
-        dto.setNarration(vo.getNarration());
-        dto.setPaymentTerms(vo.getPaymentTerms());
-
-        dto.setOrgId(vo.getOrgId());
-        dto.setFinancialYear(vo.getFinancialYear());
-        dto.setActive(vo.getActive());
-        dto.setCancelRemarks(vo.getCancelRemarks());
-        dto.setCreatedBy(vo.getCreatedBy());
-        dto.setUpdatedBy(vo.getUpdatedBy());
-
-        List<PurchaseBillDetailsResponseDTO> detailsList = new ArrayList<>();
-        if (vo.getPurchaseBillDetailsVO() != null) {
-            for (PurchaseBillDetailsVO d : vo.getPurchaseBillDetailsVO()) {
-
-                PurchaseBillDetailsResponseDTO line = new PurchaseBillDetailsResponseDTO();
-                line.setId(d.getId());
-
-                if (d.getItem() != null) {
-                    ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
-                    itemDTO.setId(d.getItem().getId());
-                    itemDTO.setItemCode(d.getItem().getItemCode());
-                    itemDTO.setItemDescription(d.getItem().getItemDescription());
-                    line.setItemCode(itemDTO);
-                }
-                if (d.getHsnCode() != null) {
-                    HsnResponseImageDTO hsnDTO = new HsnResponseImageDTO();
-                    hsnDTO.setId(d.getHsnCode().getId());
-                    hsnDTO.setHsnCode(d.getHsnCode().getHsn());
-                    line.setHsnCode(hsnDTO);
-                }
-                line.setTaxType(toLovDTO(d.getTaxType()));
-                line.setTaxPercent(d.getTaxPercent());
-                line.setTariffNo(d.getTariffNo());
-                line.setExciseToPost(d.getExciseToPost());
-                line.setChallanQty(d.getChallanQty());
-
-                if (d.getUnit() != null) {
-                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
-                    unitDTO.setId(d.getUnit().getId());
-                    unitDTO.setPrimaryUnit(d.getUnit().getUnitId());
-                    line.setUnit(unitDTO);
-                }
-
-                line.setGrnReceivedQty(d.getGrnReceivedQty());
-                line.setAcceptedQty(d.getAcceptedQty());
-                line.setRejectedQty(d.getRejectedQty());
-                line.setShortageQty(d.getShortageQty());
-                line.setPoRate(d.getPoRate());
-                line.setRateInInr(d.getRateInInr());
-                line.setRateInSelectedCurrency(d.getRateInSelectedCurrency());
-                line.setApportionedCost(d.getApportionedCost());
-                line.setLandedCostRate(d.getLandedCostRate());
-                line.setAmount(d.getAmount());
-                line.setAmountInSelectedCurrency(d.getAmountInSelectedCurrency());
-                line.setAdditionalDuty(d.getAdditionalDuty());
-                line.setAmountInInr(d.getAmountInInr());
-                line.setSgstRate(d.getSgstRate());
-                line.setSgstAmount(d.getSgstAmount());
-                line.setCgstRate(d.getCgstRate());
-                line.setCgstAmount(d.getCgstAmount());
-                line.setIgstRate(d.getIgstRate());
-                line.setIgstAmount(d.getIgstAmount());
-
-                detailsList.add(line);
-            }
-        }
-        dto.setPurchaseDetails(detailsList);
-
-        List<PurchaseBillTaxGridResponseDTO> taxList = new ArrayList<>();
-        if (vo.getPurchaseBillTaxGridVO() != null) {
-            for (PurchaseBillTaxGridVO t : vo.getPurchaseBillTaxGridVO()) {
-                PurchaseBillTaxGridResponseDTO taxDTO = new PurchaseBillTaxGridResponseDTO();
-                taxDTO.setId(t.getId());
-                taxDTO.setParticulars(t.getParticulars());
-                taxDTO.setTaxPercent(t.getTaxPercent());
-                taxDTO.setAcceptedQtyAmount(t.getAcceptedQtyAmount());
-                taxDTO.setRevisedAmount(t.getRevisedAmount());
-                taxDTO.setLedgerAccount(toLovDTO(t.getLedgerAccount()));
-                taxDTO.setDbCr(t.getDbCr());
-                taxDTO.setDbAmt(t.getDbAmt());
-                taxDTO.setCrAmt(t.getCrAmt());
-                taxDTO.setPostToFinanceAc(t.getPostToFinanceAc());
-                taxList.add(taxDTO);
-            }
-        }
-        dto.setTaxGrid(taxList);
-
-        return dto;
-    }
+//    @Override
+//    @Transactional(rollbackFor = Exception.class)
+//    public Map<String, Object> updateCreatePurchaseBill(PurchaseBillDTO dto) throws ApplicationException {
+//
+//        PurchaseBillVO vo;
+//        String message;
+//        boolean isUpdate = ObjectUtils.isNotEmpty(dto.getId());
+//
+//        if (isUpdate) {
+//            vo = purchaseBillRepo.findById(dto.getId()).orElseThrow(() -> new ApplicationException("Purchase Bill Not Found"));
+//            vo.setUpdatedBy(dto.getCreatedBy());
+//            message = "Purchase Bill Updated Successfully";
+//        } else {
+//            vo = new PurchaseBillVO();
+//            vo.setCreatedBy(dto.getCreatedBy());
+//            vo.setUpdatedBy(dto.getCreatedBy());
+//            vo.setPbNo(purchaseBillRepo.getPurchaseBillDocId(dto.getOrgId(), SCREEN_CODE_PB));
+//            message = "Purchase Bill Created Successfully";
+//        }
+//
+//        createUpdatePurchaseBillVOFromDTO(dto, vo);
+//
+//        if (isUpdate) {
+//            purchaseBillRepo.flush();
+//        } else {
+//            vo = purchaseBillRepo.save(vo);
+//        }
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("message", message);
+//        response.put("purchaseBillVO", buildPurchaseBillResponse(vo));
+//        return response;
+//    }
+//
+//    private void createUpdatePurchaseBillVOFromDTO(PurchaseBillDTO dto, PurchaseBillVO vo) throws ApplicationException {
+//
+//        if (dto.getBranch() != null && dto.getBranch() != 0) {
+//            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
+//        }
+//        vo.setBelongsTo(dto.getBelongsTo());
+//        vo.setPbDate(dto.getPbDate());
+//
+//        if (dto.getSupplier() != null && dto.getSupplier() != 0) {
+//            CustomerVO supplier = customerRepo.findById(dto.getSupplier()).orElseThrow(() -> new ApplicationException("Supplier Not Found"));
+//            vo.setSupplier(supplier);
+//
+//            GSTStateMasterVO gstState = supplier.getGstState();
+//            vo.setGstState(gstState);
+//
+//            boolean isIndia = gstState != null && gstState.getStateName() != null
+//                    && gstState.getStateName().toUpperCase().contains(INDIA);
+//            if (supplier.getCountry() != null && supplier.getCountry().getCountryName() != null) {
+//                isIndia = supplier.getCountry().getCountryName().toUpperCase().contains(INDIA);
+//            }
+//            vo.setIsIgstAppl(!isIndia);
+//            // vo.setGstnNo(supplier.getGstnNo());  // still pending confirmed getter name on CustomerVO
+//        }
+//
+//        vo.setGrnNo(dto.getGrnNo());
+//        vo.setGrnDate(dto.getGrnDate());
+//        vo.setExcisable(dto.getExcisable());
+//        vo.setCurrency(resolveLov(dto.getCurrency()));
+//        vo.setVendorDcNo(dto.getVendorDcNo());
+//        vo.setExchangeRate(dto.getExchangeRate());
+//        vo.setDealerType(resolveLov(dto.getDealerType()));
+//        vo.setTaxCode(resolveLov(dto.getTaxCode()));
+//
+//        if (dto.getLocalPurchaseOrderId() != null) {
+//            LocalPurchaseOrderVO lpo = localPurchaseOrderRepo.findById(dto.getLocalPurchaseOrderId())
+//                    .orElseThrow(() -> new ApplicationException("Local Purchase Order Not Found"));
+//            vo.setLocalPurchaseOrder(lpo);
+//            vo.setPoNo(lpo.getPoNo());
+//            vo.setPoDate(lpo.getPoDate());
+//        } else {
+//            vo.setLocalPurchaseOrder(null);
+//            vo.setPoNo(null);
+//            vo.setPoDate(null);
+//        }
+//
+//        vo.setIsReverseChrg(dto.getIsReverseChrg());
+//        vo.setVoucherPostingDate(dto.getVoucherPostingDate());
+//        vo.setDate(dto.getDate());
+//        vo.setDutyPerUnit(dto.getDutyPerUnit());
+//        vo.setPostingCategory(resolveLov(dto.getPostingCategory()));
+//        vo.setModvatCopyReceived(dto.getModvatCopyReceived());
+//        vo.setEccType(resolveLov(dto.getEccType()));
+//        vo.setSupplierDcInvNo(dto.getSupplierDcInvNo());
+//        vo.setSupplierDcInvDate(dto.getSupplierDcInvDate());
+//
+//        vo.setTotalFreight(dto.getTotalFreight());
+//        vo.setTotalQty(dto.getTotalQty());
+//        vo.setBasicValue(dto.getBasicValue());
+//        vo.setTotalAmount(dto.getTotalAmount());
+//        vo.setAmountInWords(dto.getAmountInWords());
+//        vo.setEntryTaxApplicable(dto.getEntryTaxApplicable());
+//        vo.setNarration(dto.getNarration());
+//        vo.setPaymentTerms(dto.getPaymentTerms());
+//
+//        vo.setOrgId(dto.getOrgId());
+//        vo.setFinancialYear(dto.getFinancialYear());
+//        vo.setActive(dto.isActive());
+//        vo.setCancelRemarks(dto.getCancelRemarks());
+//
+//        buildPurchaseBillDetailsList(dto, vo);
+//        buildPurchaseBillTaxGridList(dto, vo);
+//    }
+//
+//    // "1-Purchase Detail" grid — with calculations
+//    private void buildPurchaseBillDetailsList(PurchaseBillDTO dto, PurchaseBillVO vo) throws ApplicationException {
+//
+//        if (vo.getId() != null && vo.getPurchaseBillDetailsVO() != null && !vo.getPurchaseBillDetailsVO().isEmpty()) {
+//            purchaseBillDetailsRepo.deleteAll(new ArrayList<>(vo.getPurchaseBillDetailsVO()));
+//            purchaseBillDetailsRepo.flush();
+//        }
+//        vo.getPurchaseBillDetailsVO().clear();
+//        if (dto.getPurchaseDetails() == null) return;
+//
+//        BigDecimal exchangeRate = dto.getExchangeRate() != null ? dto.getExchangeRate() : BigDecimal.ONE;
+//
+//        for (PurchaseBillDetailsDTO line : dto.getPurchaseDetails()) {
+//
+//            PurchaseBillDetailsVO detailVO = new PurchaseBillDetailsVO();
+//
+//            if (line.getItemId() != null && line.getItemId() != 0) {
+//                ItemMasterVO item = itemMasterRepo.findById(line.getItemId()).orElseThrow(() -> new ApplicationException("Item Not Found"));
+//                detailVO.setItem(item);
+//                if (item.getHsnCode() != null) detailVO.setHsnCode(item.getHsnCode());
+//                if (item.getPrimaryUnit() != null) detailVO.setUnit(item.getPrimaryUnit());
+//            }
+//
+//            if (line.getTaxType() != null && line.getTaxType() != 0) detailVO.setTaxType(resolveLov(line.getTaxType()));
+//            detailVO.setTaxPercent(line.getTaxPercent());
+//            detailVO.setTariffNo(line.getTariffNo());
+//            detailVO.setExciseToPost(line.getExciseToPost());
+//            detailVO.setChallanQty(line.getChallanQty());
+//
+//            if (line.getUnitId() != null && line.getUnitId() != 0) {
+//                detailVO.setUnit(unitMasterRepo.findById(line.getUnitId()).orElseThrow(() -> new ApplicationException("Unit Not Found")));
+//            }
+//
+//            detailVO.setGrnReceivedQty(line.getGrnReceivedQty());
+//            detailVO.setAcceptedQty(line.getAcceptedQty());
+//            detailVO.setRejectedQty(line.getRejectedQty());
+//
+//            BigDecimal challanQty = line.getChallanQty() != null ? line.getChallanQty() : BigDecimal.ZERO;
+//            BigDecimal acceptedQty = line.getAcceptedQty() != null ? line.getAcceptedQty() : BigDecimal.ZERO;
+//            BigDecimal rejectedQty = line.getRejectedQty() != null ? line.getRejectedQty() : BigDecimal.ZERO;
+//            BigDecimal shortageQty = challanQty.subtract(acceptedQty).subtract(rejectedQty);
+//            if (shortageQty.compareTo(BigDecimal.ZERO) < 0) shortageQty = BigDecimal.ZERO;
+//            detailVO.setShortageQty(shortageQty);
+//
+//            detailVO.setPoRate(line.getPoRate());
+//
+//            BigDecimal rateInSelectedCurrency = line.getRateInSelectedCurrency() != null ? line.getRateInSelectedCurrency() : BigDecimal.ZERO;
+//            BigDecimal rateInInr = rateInSelectedCurrency.multiply(exchangeRate);
+//            detailVO.setRateInInr(rateInInr);
+//            detailVO.setRateInSelectedCurrency(rateInSelectedCurrency);
+//
+//            BigDecimal apportionedCost = line.getApportionedCost() != null ? line.getApportionedCost() : BigDecimal.ZERO;
+//            detailVO.setApportionedCost(apportionedCost);
+//            detailVO.setLandedCostRate(rateInInr.add(apportionedCost));
+//
+//            BigDecimal amount = acceptedQty.multiply(rateInSelectedCurrency);
+//            detailVO.setAmount(amount);
+//
+//            BigDecimal additionalDuty = line.getAdditionalDuty() != null ? line.getAdditionalDuty() : BigDecimal.ZERO;
+//            detailVO.setAdditionalDuty(additionalDuty);
+//
+//            BigDecimal amountInSelectedCurrency = amount.add(additionalDuty);
+//            detailVO.setAmountInSelectedCurrency(amountInSelectedCurrency);
+//            detailVO.setAmountInInr(amountInSelectedCurrency.multiply(exchangeRate));
+//
+//            detailVO.setSgstRate(line.getSgstRate());
+//            detailVO.setSgstAmount(calcAmount(amount, line.getSgstRate()));
+//            detailVO.setCgstRate(line.getCgstRate());
+//            detailVO.setCgstAmount(calcAmount(amount, line.getCgstRate()));
+//            detailVO.setIgstRate(line.getIgstRate());
+//            detailVO.setIgstAmount(calcAmount(amount, line.getIgstRate()));
+//
+//            detailVO.setPurchaseBillVO(vo);
+//            vo.getPurchaseBillDetailsVO().add(detailVO);
+//        }
+//    }
+//
+//    private void buildPurchaseBillTaxGridList(PurchaseBillDTO dto, PurchaseBillVO vo) throws ApplicationException {
+//
+//        if (vo.getId() != null && vo.getPurchaseBillTaxGridVO() != null && !vo.getPurchaseBillTaxGridVO().isEmpty()) {
+//            purchaseBillTaxGridRepo.deleteAll(new ArrayList<>(vo.getPurchaseBillTaxGridVO()));
+//            purchaseBillTaxGridRepo.flush();
+//        }
+//        vo.getPurchaseBillTaxGridVO().clear();
+//        if (dto.getTaxGrid() == null) return;
+//
+//        for (PurchaseBillTaxGridDTO taxDTO : dto.getTaxGrid()) {
+//            PurchaseBillTaxGridVO taxVO = new PurchaseBillTaxGridVO();
+//            taxVO.setParticulars(taxDTO.getParticulars());
+//            taxVO.setTaxPercent(taxDTO.getTaxPercent());
+//            taxVO.setAcceptedQtyAmount(taxDTO.getAcceptedQtyAmount());
+//            taxVO.setRevisedAmount(taxDTO.getRevisedAmount());
+//            taxVO.setLedgerAccount(resolveLov(taxDTO.getLedgerAccount()));
+//            taxVO.setDbCr(taxDTO.getDbCr());
+//            taxVO.setDbAmt(taxDTO.getDbAmt());
+//            taxVO.setCrAmt(taxDTO.getCrAmt());
+//            taxVO.setPostToFinanceAc(taxDTO.getPostToFinanceAc());
+//            taxVO.setPurchaseBillVO(vo);
+//            vo.getPurchaseBillTaxGridVO().add(taxVO);
+//        }
+//    }
+//
+//    @Override
+//    public PurchaseBillResponseDTO getPurchaseBillById(Long id) throws ApplicationException {
+//        PurchaseBillVO vo = purchaseBillRepo.getPurchaseBillById(id);
+//        if (vo == null) throw new ApplicationException("Purchase Bill Not Found");
+//        return buildPurchaseBillResponse(vo);
+//    }
+//
+//    @Override
+//    public List<PurchaseBillResponseDTO> getPurchaseBillByOrgId(Long orgId, Long branchId) throws ApplicationException {
+//        List<PurchaseBillVO> list = purchaseBillRepo.getPurchaseBillByOrgId(orgId, branchId);
+//        if (list == null || list.isEmpty()) throw new ApplicationException("Purchase Bill Not Found");
+//        List<PurchaseBillResponseDTO> responseList = new ArrayList<>();
+//        for (PurchaseBillVO vo : list) responseList.add(buildPurchaseBillResponse(vo));
+//        return responseList;
+//    }
+//
+//    @Override
+//    public String getPurchaseBillDocId(Long orgId, String finYear, Long branch) {
+//        return purchaseBillRepo.getPurchaseBillDocId(orgId, SCREEN_CODE_PB);
+//    }
+//
+//    private ListOfVlauesDetailsResponseDTO toLovDTO(ListOfValuesDetailsVO lov) {
+//        if (lov == null) return null;
+//        return new ListOfVlauesDetailsResponseDTO(lov.getId(), lov.getValueCode(), lov.getValueDescription());
+//    }
+//
+//    private PurchaseBillResponseDTO buildPurchaseBillResponse(PurchaseBillVO vo) {
+//
+//        PurchaseBillResponseDTO dto = new PurchaseBillResponseDTO();
+//        dto.setId(vo.getId());
+//
+//        if (vo.getPlant() != null) {
+//            BranchResponseDTO plantDTO = new BranchResponseDTO();
+//            plantDTO.setId(vo.getPlant().getId());
+//            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
+//            plantDTO.setBranchName(vo.getPlant().getBranchName());
+//            dto.setPlant(plantDTO);
+//        }
+//
+//        dto.setPbNo(vo.getPbNo());
+//        dto.setBelongsTo(vo.getBelongsTo());
+//        dto.setPbDate(vo.getPbDate());
+//
+//        if (vo.getSupplier() != null) {
+//            CustomerResponseDetailsDTO supplierDTO = new CustomerResponseDetailsDTO();
+//            supplierDTO.setId(vo.getSupplier().getId());
+//            supplierDTO.setCustomerName(vo.getSupplier().getCustomerName());
+//            dto.setSupplier(supplierDTO);
+//        }
+//
+//        if (vo.getGstState() != null) {
+//            dto.setGstState(new GSTStateResponseDTO(vo.getGstState().getId(), vo.getGstState().getStateCode(),
+//                    vo.getGstState().getStateName(), vo.getGstState().getGstStateId()));
+//        }
+//
+//        dto.setGrnNo(vo.getGrnNo());
+//        dto.setGrnDate(vo.getGrnDate());
+//        dto.setIsIgstAppl(vo.getIsIgstAppl());
+//        dto.setExcisable(vo.getExcisable());
+//        dto.setCurrency(toLovDTO(vo.getCurrency()));
+//        dto.setGstnNo(vo.getGstnNo());
+//        dto.setVendorDcNo(vo.getVendorDcNo());
+//        dto.setExchangeRate(vo.getExchangeRate());
+//        dto.setDealerType(toLovDTO(vo.getDealerType()));
+//        dto.setTaxCode(toLovDTO(vo.getTaxCode()));
+//
+//        dto.setPoNo(vo.getPoNo());
+//        dto.setPoDate(vo.getPoDate());
+//        dto.setIsReverseChrg(vo.getIsReverseChrg());
+//        dto.setVoucherPostingDate(vo.getVoucherPostingDate());
+//        dto.setDate(vo.getDate());
+//        dto.setDutyPerUnit(vo.getDutyPerUnit());
+//        dto.setPostingCategory(toLovDTO(vo.getPostingCategory()));
+//        dto.setModvatCopyReceived(vo.getModvatCopyReceived());
+//        dto.setEccType(toLovDTO(vo.getEccType()));
+//        dto.setSupplierDcInvNo(vo.getSupplierDcInvNo());
+//        dto.setSupplierDcInvDate(vo.getSupplierDcInvDate());
+//
+//        dto.setTotalFreight(vo.getTotalFreight());
+//        dto.setTotalQty(vo.getTotalQty());
+//        dto.setBasicValue(vo.getBasicValue());
+//        dto.setTotalAmount(vo.getTotalAmount());
+//        dto.setAmountInWords(vo.getAmountInWords());
+//        dto.setEntryTaxApplicable(vo.getEntryTaxApplicable());
+//        dto.setNarration(vo.getNarration());
+//        dto.setPaymentTerms(vo.getPaymentTerms());
+//
+//        dto.setOrgId(vo.getOrgId());
+//        dto.setFinancialYear(vo.getFinancialYear());
+//        dto.setActive(vo.getActive());
+//        dto.setCancelRemarks(vo.getCancelRemarks());
+//        dto.setCreatedBy(vo.getCreatedBy());
+//        dto.setUpdatedBy(vo.getUpdatedBy());
+//
+//        List<PurchaseBillDetailsResponseDTO> detailsList = new ArrayList<>();
+//        if (vo.getPurchaseBillDetailsVO() != null) {
+//            for (PurchaseBillDetailsVO d : vo.getPurchaseBillDetailsVO()) {
+//
+//                PurchaseBillDetailsResponseDTO line = new PurchaseBillDetailsResponseDTO();
+//                line.setId(d.getId());
+//
+//                if (d.getItem() != null) {
+//                    ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
+//                    itemDTO.setId(d.getItem().getId());
+//                    itemDTO.setItemCode(d.getItem().getItemCode());
+//                    itemDTO.setItemDescription(d.getItem().getItemDescription());
+//                    line.setItemCode(itemDTO);
+//                }
+//                if (d.getHsnCode() != null) {
+//                    HsnResponseImageDTO hsnDTO = new HsnResponseImageDTO();
+//                    hsnDTO.setId(d.getHsnCode().getId());
+//                    hsnDTO.setHsnCode(d.getHsnCode().getHsn());
+//                    line.setHsnCode(hsnDTO);
+//                }
+//                line.setTaxType(toLovDTO(d.getTaxType()));
+//                line.setTaxPercent(d.getTaxPercent());
+//                line.setTariffNo(d.getTariffNo());
+//                line.setExciseToPost(d.getExciseToPost());
+//                line.setChallanQty(d.getChallanQty());
+//
+//                if (d.getUnit() != null) {
+//                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
+//                    unitDTO.setId(d.getUnit().getId());
+//                    unitDTO.setPrimaryUnit(d.getUnit().getUnitId());
+//                    line.setUnit(unitDTO);
+//                }
+//
+//                line.setGrnReceivedQty(d.getGrnReceivedQty());
+//                line.setAcceptedQty(d.getAcceptedQty());
+//                line.setRejectedQty(d.getRejectedQty());
+//                line.setShortageQty(d.getShortageQty());
+//                line.setPoRate(d.getPoRate());
+//                line.setRateInInr(d.getRateInInr());
+//                line.setRateInSelectedCurrency(d.getRateInSelectedCurrency());
+//                line.setApportionedCost(d.getApportionedCost());
+//                line.setLandedCostRate(d.getLandedCostRate());
+//                line.setAmount(d.getAmount());
+//                line.setAmountInSelectedCurrency(d.getAmountInSelectedCurrency());
+//                line.setAdditionalDuty(d.getAdditionalDuty());
+//                line.setAmountInInr(d.getAmountInInr());
+//                line.setSgstRate(d.getSgstRate());
+//                line.setSgstAmount(d.getSgstAmount());
+//                line.setCgstRate(d.getCgstRate());
+//                line.setCgstAmount(d.getCgstAmount());
+//                line.setIgstRate(d.getIgstRate());
+//                line.setIgstAmount(d.getIgstAmount());
+//
+//                detailsList.add(line);
+//            }
+//        }
+//        dto.setPurchaseDetails(detailsList);
+//
+//        List<PurchaseBillTaxGridResponseDTO> taxList = new ArrayList<>();
+//        if (vo.getPurchaseBillTaxGridVO() != null) {
+//            for (PurchaseBillTaxGridVO t : vo.getPurchaseBillTaxGridVO()) {
+//                PurchaseBillTaxGridResponseDTO taxDTO = new PurchaseBillTaxGridResponseDTO();
+//                taxDTO.setId(t.getId());
+//                taxDTO.setParticulars(t.getParticulars());
+//                taxDTO.setTaxPercent(t.getTaxPercent());
+//                taxDTO.setAcceptedQtyAmount(t.getAcceptedQtyAmount());
+//                taxDTO.setRevisedAmount(t.getRevisedAmount());
+//                taxDTO.setLedgerAccount(toLovDTO(t.getLedgerAccount()));
+//                taxDTO.setDbCr(t.getDbCr());
+//                taxDTO.setDbAmt(t.getDbAmt());
+//                taxDTO.setCrAmt(t.getCrAmt());
+//                taxDTO.setPostToFinanceAc(t.getPostToFinanceAc());
+//                taxList.add(taxDTO);
+//            }
+//        }
+//        dto.setTaxGrid(taxList);
+//
+//        return dto;
+//    }
 
     
     // ============================ PURCHASE INDENT =====================
@@ -2059,468 +2059,468 @@ public class PurchaseServiceImpl implements PurchaseService {
     // to Purchase Indent lines and calculates Pending Indent Qty.
     // ==================================================================
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> updateCreateLocalPurchaseOrder(LocalPurchaseOrderDTO dto, MultipartFile[] files)
-            throws ApplicationException {
-
-        LocalPurchaseOrderVO vo;
-        String message;
-        boolean isUpdate = ObjectUtils.isNotEmpty(dto.getId());
-
-        if (isUpdate) {
-            vo = localPurchaseOrderRepo.findById(dto.getId())
-                    .orElseThrow(() -> new ApplicationException("Local Purchase Order Not Found"));
-            vo.setUpdatedBy(dto.getCreatedBy());
-            message = "Local Purchase Order Updated Successfully";
-        } else {
-            vo = new LocalPurchaseOrderVO();
-            vo.setCreatedBy(dto.getCreatedBy());
-            vo.setUpdatedBy(dto.getCreatedBy());
-            vo.setPoNo(localPurchaseOrderRepo.getLocalPurchaseOrderDocId(dto.getOrgId(), SCREEN_CODE_LPO));
-            message = "Local Purchase Order Created Successfully";
-        }
-
-        createUpdateLocalPurchaseOrderVOFromDTO(dto, vo);
-
-        if (isUpdate) {
-            localPurchaseOrderRepo.flush();
-        } else {
-            vo = localPurchaseOrderRepo.save(vo);
-        }
-
-        if (isUpdate) {
-            deleteExistingLpoAttachments(vo);
-        }
-        saveLpoAttachments(files, vo);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", message);
-        response.put("localPurchaseOrderVO", buildLocalPurchaseOrderResponse(vo));
-        return response;
-    }
-
-    private void createUpdateLocalPurchaseOrderVOFromDTO(LocalPurchaseOrderDTO dto, LocalPurchaseOrderVO vo) throws ApplicationException {
-
-        if (dto.getBranch() != null && dto.getBranch() != 0) {
-            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
-        }
-        vo.setBelongsTo(dto.getBelongsTo());
-        vo.setPoDate(dto.getPoDate());
-
-        if (dto.getDepartment() != null && dto.getDepartment() != 0) {
-            vo.setDepartment(resolveLov(dto.getDepartment()));
-        }
-
-        if (dto.getSupplier() != null && dto.getSupplier() != 0) {
-            CustomerVO supplier = customerRepo.findById(dto.getSupplier())
-                    .orElseThrow(() -> new ApplicationException("Supplier Not Found"));
-            vo.setSupplier(supplier);
-
-            GSTStateMasterVO gstState = supplier.getGstState();
-            vo.setGstState(gstState);
-
-            boolean isIndia = gstState != null && gstState.getStateName() != null
-                    && gstState.getStateName().toUpperCase().contains(INDIA);
-            if (supplier.getCountry() != null && supplier.getCountry().getCountryName() != null) {
-                isIndia = supplier.getCountry().getCountryName().toUpperCase().contains(INDIA);
-            }
-            vo.setIsIgstAppl(!isIndia);
-            // vo.setGstnNo(supplier.getGstnNo()); // still pending confirmed getter name on CustomerVO, same as Purchase Bill
-        }
-
-        vo.setSupplierRefNo(dto.getSupplierRefNo());
-        vo.setAddress(dto.getAddress());
-        vo.setSuppRefDt(dto.getSuppRefDt());
-
-        vo.setTaxCode(resolveLov(dto.getTaxCode()));
-        vo.setIsReverseChrg(dto.getIsReverseChrg());
-        vo.setItemType(dto.getItemType());
-        vo.setIndentRequired(dto.getIndentRequired());
-        vo.setDealerType(resolveLov(dto.getDealerType()));
-
-        vo.setFreightType(dto.getFreightType());
-        vo.setPackingType(dto.getPackingType());
-        vo.setInsurance(dto.getInsurance());
-        vo.setFreight(dto.getFreight());
-        vo.setTotalAmount(dto.getTotalAmount());
-        vo.setModeOfDespatch(dto.getModeOfDespatch());
-        vo.setPaymentTerms(dto.getPaymentTerms());
-        vo.setDeliveryTerms(dto.getDeliveryTerms());
-        vo.setAmountInWords(dto.getAmountInWords());
-        vo.setRemarks(dto.getRemarks());
-        vo.setNotes(dto.getNotes());
-
-        if (dto.getPreparedBy() != null) {
-            vo.setPreparedBy(employeeMasterRepo.findById(dto.getPreparedBy()).orElseThrow(() -> new ApplicationException("Prepared By Not Found")));
-        }
-        if (dto.getCheckedBy() != null) {
-            vo.setCheckedBy(employeeMasterRepo.findById(dto.getCheckedBy()).orElseThrow(() -> new ApplicationException("Checked By Not Found")));
-        }
-        if (dto.getAuthorisedBy() != null) {
-            vo.setAuthorisedBy(employeeMasterRepo.findById(dto.getAuthorisedBy()).orElseThrow(() -> new ApplicationException("Authorised By Not Found")));
-        }
-
-        vo.setOrgId(dto.getOrgId());
-        vo.setFinancialYear(dto.getFinancialYear());
-        vo.setActive(dto.isActive());
-        vo.setCancelRemarks(dto.getCancelRemarks());
-
-        buildLpoDetailsList(dto, vo);
-        buildLpoTaxDetailsList(dto, vo);
-    }
-
-    // "1-PO Detail" grid — with calculations, including Pending Indent Qty
-    private void buildLpoDetailsList(LocalPurchaseOrderDTO dto, LocalPurchaseOrderVO vo) throws ApplicationException {
-
-        if (vo.getId() != null && vo.getLocalPurchaseOrderDetailsVO() != null && !vo.getLocalPurchaseOrderDetailsVO().isEmpty()) {
-            localPurchaseOrderDetailsRepo.deleteAll(new ArrayList<>(vo.getLocalPurchaseOrderDetailsVO()));
-            localPurchaseOrderDetailsRepo.flush();
-        }
-        vo.getLocalPurchaseOrderDetailsVO().clear();
-        if (dto.getDetails() == null) return;
-
-        for (LocalPurchaseOrderDetailsDTO line : dto.getDetails()) {
-
-            LocalPurchaseOrderDetailsVO detailVO = new LocalPurchaseOrderDetailsVO();
-
-            if (line.getItemId() != null && line.getItemId() != 0) {
-                ItemMasterVO item = itemMasterRepo.findById(line.getItemId()).orElseThrow(() -> new ApplicationException("Item Not Found"));
-                detailVO.setItem(item);
-
-                if (line.getHsnId() != null && line.getHsnId() != 0) {
-                    detailVO.setHsnCode(hsnRepo.findById(line.getHsnId()).orElseThrow(() -> new ApplicationException("HSN Not Found")));
-                } else if (item.getHsnCode() != null) {
-                    detailVO.setHsnCode(item.getHsnCode());
-                }
-
-                if (line.getPrimaryUnitId() != null && line.getPrimaryUnitId() != 0) {
-                    detailVO.setPrimaryUnit(unitMasterRepo.findById(line.getPrimaryUnitId()).orElseThrow(() -> new ApplicationException("Primary Unit Not Found")));
-                } else if (item.getPrimaryUnit() != null) {
-                    detailVO.setPrimaryUnit(item.getPrimaryUnit());
-                }
-            }
-
-            // ** NEEDS CONFIRMATION - customerPartNo: using client value; swap to item.getCustomerPartNo()
-            // once that field is confirmed to exist on ItemMasterVO
-            detailVO.setCustomerPartNo(line.getCustomerPartNo());
-
-            if (line.getTaxType() != null && line.getTaxType() != 0) detailVO.setTaxType(resolveLov(line.getTaxType()));
-            detailVO.setTaxPercent(line.getTaxPercent());
-
-            if (line.getPurchaseUnitId() != null && line.getPurchaseUnitId() != 0) {
-                detailVO.setPurchaseUnit(unitMasterRepo.findById(line.getPurchaseUnitId()).orElseThrow(() -> new ApplicationException("Purchase Unit Not Found")));
-            }
-
-            BigDecimal conversionFactor = line.getConversionFactor() != null ? line.getConversionFactor() : BigDecimal.ONE;
-            detailVO.setConversionFactor(conversionFactor);
-
-            // ---- Indent linkage: Indent No / Indent Date / Indent Qty / Pending Indent Qty ----
-            if (line.getIndentDetailId() != null) {
-
-                PurchaseIndentDetailsVO indentDetail = purchaseIndentDetailsRepo.findById(line.getIndentDetailId())
-                        .orElseThrow(() -> new ApplicationException("Indent Line Not Found: " + line.getIndentDetailId()));
-                detailVO.setIndentDetails(indentDetail);
-
-                BigDecimal indentQty = indentDetail.getQtyInPurchaseUnit() != null
-                        ? indentDetail.getQtyInPurchaseUnit() : BigDecimal.ZERO;
-                detailVO.setIndentQty(indentQty);
-
-                // Sum already placed on OTHER local purchase orders against this same indent line
-                BigDecimal alreadyOrdered = localPurchaseOrderDetailsRepo
-                        .getAlreadyOrderedQtyForIndentLine(line.getIndentDetailId(), vo.getId());
-                if (alreadyOrdered == null) alreadyOrdered = BigDecimal.ZERO;
-
-                BigDecimal pendingIndentQty = indentQty.subtract(alreadyOrdered);
-                if (pendingIndentQty.compareTo(BigDecimal.ZERO) < 0) pendingIndentQty = BigDecimal.ZERO;
-                detailVO.setPendingIndentQty(pendingIndentQty);
-            }
-
-            BigDecimal poQtyInPurchaseUnit = line.getPoQtyInPurchaseUnit() != null ? line.getPoQtyInPurchaseUnit() : BigDecimal.ZERO;
-            detailVO.setPoQtyInPurchaseUnit(poQtyInPurchaseUnit);
-            detailVO.setQtyInPrimaryUnit(poQtyInPurchaseUnit.multiply(conversionFactor));
-
-            BigDecimal rateInInr = line.getRateInInr() != null ? line.getRateInInr() : BigDecimal.ZERO;
-            detailVO.setRateInInr(rateInInr);
-
-            BigDecimal baseAmount = poQtyInPurchaseUnit.multiply(rateInInr);
-
-            BigDecimal discountPercent = line.getDiscountPercent() != null ? line.getDiscountPercent() : BigDecimal.ZERO;
-            detailVO.setDiscountPercent(discountPercent);
-
-            BigDecimal discountAmountInr = calcAmount(baseAmount, discountPercent);
-            detailVO.setDiscountAmountInr(discountAmountInr);
-
-            BigDecimal amountInInr = baseAmount.subtract(discountAmountInr);
-            detailVO.setAmountInInr(amountInInr);
-
-            detailVO.setDeliveryDate(line.getDeliveryDate());
-
-            detailVO.setSgstRate(line.getSgstRate());
-            detailVO.setSgstAmount(calcAmount(amountInInr, line.getSgstRate()));
-            detailVO.setCgstRate(line.getCgstRate());
-            detailVO.setCgstAmount(calcAmount(amountInInr, line.getCgstRate()));
-            detailVO.setIgstRate(line.getIgstRate());
-            detailVO.setIgstAmount(calcAmount(amountInInr, line.getIgstRate()));
-
-            detailVO.setLocalPurchaseOrderVO(vo);
-            vo.getLocalPurchaseOrderDetailsVO().add(detailVO);
-        }
-    }
-
-    private void buildLpoTaxDetailsList(LocalPurchaseOrderDTO dto, LocalPurchaseOrderVO vo) {
-
-        if (vo.getId() != null && vo.getLocalPurchaseOrderTaxDetailsVO() != null && !vo.getLocalPurchaseOrderTaxDetailsVO().isEmpty()) {
-            localPurchaseOrderTaxDetailsRepo.deleteAll(new ArrayList<>(vo.getLocalPurchaseOrderTaxDetailsVO()));
-            localPurchaseOrderTaxDetailsRepo.flush();
-        }
-        vo.getLocalPurchaseOrderTaxDetailsVO().clear();
-        if (dto.getTaxDetails() == null) return;
-
-        for (LocalPurchaseOrderTaxDetailsDTO taxDTO : dto.getTaxDetails()) {
-            LocalPurchaseOrderTaxDetailsVO taxVO = new LocalPurchaseOrderTaxDetailsVO();
-            taxVO.setParticulars(taxDTO.getParticulars());
-            taxVO.setTaxPercent(taxDTO.getTaxPercent());
-            taxVO.setAmount(taxDTO.getAmount());
-            taxVO.setLocalPurchaseOrderVO(vo);
-            vo.getLocalPurchaseOrderTaxDetailsVO().add(taxVO);
-        }
-    }
-
-    private void deleteExistingLpoAttachments(LocalPurchaseOrderVO vo) {
-        if (vo.getLocalPurchaseOrderAttachmentVO() == null || vo.getLocalPurchaseOrderAttachmentVO().isEmpty()) return;
-
-        List<LocalPurchaseOrderAttachmentVO> existing = new ArrayList<>(vo.getLocalPurchaseOrderAttachmentVO());
-        for (LocalPurchaseOrderAttachmentVO a : existing) {
-            try {
-                if (a.getFilePath() != null) Files.deleteIfExists(Paths.get(a.getFilePath()));
-            } catch (IOException e) {
-                LOGGER.error("Failed to delete attachment file from disk: {} - {}", a.getFilePath(), e.getMessage());
-            }
-        }
-        localPurchaseOrderAttachmentRepo.deleteAll(existing);
-        localPurchaseOrderAttachmentRepo.flush();
-        vo.getLocalPurchaseOrderAttachmentVO().clear();
-    }
-
-    private void saveLpoAttachments(MultipartFile[] files, LocalPurchaseOrderVO vo) throws ApplicationException {
-        if (files == null || files.length == 0) return;
-
-        try {
-            Path folder = Paths.get(localPurchaseOrderUploadPath);
-            if (!Files.exists(folder)) Files.createDirectories(folder);
-
-            List<LocalPurchaseOrderAttachmentVO> attachmentList = new ArrayList<>();
-            for (MultipartFile file : files) {
-                if (file == null || file.isEmpty()) continue;
-
-                String originalFileName = file.getOriginalFilename();
-                String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
-                Path path = Paths.get(localPurchaseOrderUploadPath, uniqueFileName);
-
-                try (InputStream inputStream = file.getInputStream()) {
-                    Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-                }
-
-                LocalPurchaseOrderAttachmentVO attachment = new LocalPurchaseOrderAttachmentVO();
-                attachment.setLocalPurchaseOrderVO(vo);
-                attachment.setName(originalFileName);
-                attachment.setFileName(uniqueFileName);
-                attachment.setFilePath(path.toString());
-                attachment.setFileSize(file.getSize());
-                attachment.setUploadOn(LocalDateTime.now());
-                attachmentList.add(attachment);
-            }
-            vo.getLocalPurchaseOrderAttachmentVO().addAll(attachmentList);
-        } catch (IOException e) {
-            throw new ApplicationException("File Upload Failed : " + e.getMessage());
-        }
-    }
-
-    @Override
-    public LocalPurchaseOrderResponseDTO getLocalPurchaseOrderById(Long id) throws ApplicationException {
-        LocalPurchaseOrderVO vo = localPurchaseOrderRepo.getLocalPurchaseOrderById(id);
-        if (vo == null) throw new ApplicationException("Local Purchase Order Not Found");
-        return buildLocalPurchaseOrderResponse(vo);
-    }
-
-    @Override
-    public List<LocalPurchaseOrderResponseDTO> getLocalPurchaseOrderByOrgId(Long orgId, Long branchId) throws ApplicationException {
-        List<LocalPurchaseOrderVO> list = localPurchaseOrderRepo.getLocalPurchaseOrderByOrgId(orgId, branchId);
-        if (list == null || list.isEmpty()) throw new ApplicationException("Local Purchase Order Not Found");
-        List<LocalPurchaseOrderResponseDTO> responseList = new ArrayList<>();
-        for (LocalPurchaseOrderVO vo : list) responseList.add(buildLocalPurchaseOrderResponse(vo));
-        return responseList;
-    }
-
-    @Override
-    public String getLocalPurchaseOrderDocId(Long orgId, String finYear, Long branch) {
-        return localPurchaseOrderRepo.getLocalPurchaseOrderDocId(orgId, SCREEN_CODE_LPO);
-    }
-
-    private LocalPurchaseOrderResponseDTO buildLocalPurchaseOrderResponse(LocalPurchaseOrderVO vo) {
-
-        LocalPurchaseOrderResponseDTO dto = new LocalPurchaseOrderResponseDTO();
-        dto.setId(vo.getId());
-
-        if (vo.getPlant() != null) {
-            BranchResponseDTO plantDTO = new BranchResponseDTO();
-            plantDTO.setId(vo.getPlant().getId());
-            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
-            plantDTO.setBranchName(vo.getPlant().getBranchName());
-            dto.setPlant(plantDTO);
-        }
-
-        dto.setPoNo(vo.getPoNo());
-        dto.setBelongsTo(vo.getBelongsTo());
-        dto.setPoDate(vo.getPoDate());
-        dto.setDepartment(toLovDTO(vo.getDepartment()));
-
-        if (vo.getSupplier() != null) {
-            CustomerResponseDetailsDTO supplierDTO = new CustomerResponseDetailsDTO();
-            supplierDTO.setId(vo.getSupplier().getId());
-            supplierDTO.setCustomerName(vo.getSupplier().getCustomerName());
-            dto.setSupplier(supplierDTO);
-        }
-
-        if (vo.getGstState() != null) {
-            dto.setGstState(new GSTStateResponseDTO(vo.getGstState().getId(), vo.getGstState().getStateCode(),
-                    vo.getGstState().getStateName(), vo.getGstState().getGstStateId()));
-        }
-
-        dto.setSupplierRefNo(vo.getSupplierRefNo());
-        dto.setAddress(vo.getAddress());
-        dto.setIsIgstAppl(vo.getIsIgstAppl());
-        dto.setSuppRefDt(vo.getSuppRefDt());
-        dto.setGstnNo(vo.getGstnNo());
-
-        dto.setTaxCode(toLovDTO(vo.getTaxCode()));
-        dto.setIsReverseChrg(vo.getIsReverseChrg());
-        dto.setItemType(vo.getItemType());
-        dto.setIndentRequired(vo.getIndentRequired());
-        dto.setDealerType(toLovDTO(vo.getDealerType()));
-
-        dto.setFreightType(vo.getFreightType());
-        dto.setPackingType(vo.getPackingType());
-        dto.setInsurance(vo.getInsurance());
-        dto.setFreight(vo.getFreight());
-        dto.setTotalAmount(vo.getTotalAmount());
-        dto.setModeOfDespatch(vo.getModeOfDespatch());
-        dto.setPaymentTerms(vo.getPaymentTerms());
-        dto.setDeliveryTerms(vo.getDeliveryTerms());
-        dto.setAmountInWords(vo.getAmountInWords());
-        dto.setRemarks(vo.getRemarks());
-        dto.setNotes(vo.getNotes());
-
-//        if (vo.getPreparedBy() != null) dto.setPreparedBy(new EmployeeResponseDTO(vo.getPreparedBy().getId(), vo.getPreparedBy().getEmployeeName()));
-//        if (vo.getCheckedBy() != null) dto.setCheckedBy(new EmployeeResponseDTO(vo.getCheckedBy().getId(), vo.getCheckedBy().getEmployeeName()));
-//        if (vo.getAuthorisedBy() != null) dto.setAuthorisedBy(new EmployeeResponseDTO(vo.getAuthorisedBy().getId(), vo.getAuthorisedBy().getEmployeeName()));
-
-        dto.setOrgId(vo.getOrgId());
-        dto.setFinancialYear(vo.getFinancialYear());
-        dto.setActive(vo.getActive());
-        dto.setCancelRemarks(vo.getCancelRemarks());
-        dto.setCreatedBy(vo.getCreatedBy());
-        dto.setUpdatedBy(vo.getUpdatedBy());
-
-        List<LocalPurchaseOrderDetailsResponseDTO> detailsList = new ArrayList<>();
-        if (vo.getLocalPurchaseOrderDetailsVO() != null) {
-            for (LocalPurchaseOrderDetailsVO d : vo.getLocalPurchaseOrderDetailsVO()) {
-
-                LocalPurchaseOrderDetailsResponseDTO line = new LocalPurchaseOrderDetailsResponseDTO();
-                line.setId(d.getId());
-
-//                if (d.getIndentDetails() != null) {
-//                    line.setIndentDetailId(d.getIndentDetails().getId());
-//                    if (d.getIndentDetails().getPurchaseIndentVO() != null) {
-//                        line.setIndentNo(d.getIndentDetails().getPurchaseIndentVO().getIndentNo());
-//                        line.setIndentDate(d.getIndentDetails().getPurchaseIndentVO().getIndentDate());
-//                    }
+//    @Override
+//    @Transactional(rollbackFor = Exception.class)
+//    public Map<String, Object> updateCreateLocalPurchaseOrder(LocalPurchaseOrderDTO dto, MultipartFile[] files)
+//            throws ApplicationException {
+//
+//        LocalPurchaseOrderVO vo;
+//        String message;
+//        boolean isUpdate = ObjectUtils.isNotEmpty(dto.getId());
+//
+//        if (isUpdate) {
+//            vo = localPurchaseOrderRepo.findById(dto.getId())
+//                    .orElseThrow(() -> new ApplicationException("Local Purchase Order Not Found"));
+//            vo.setUpdatedBy(dto.getCreatedBy());
+//            message = "Local Purchase Order Updated Successfully";
+//        } else {
+//            vo = new LocalPurchaseOrderVO();
+//            vo.setCreatedBy(dto.getCreatedBy());
+//            vo.setUpdatedBy(dto.getCreatedBy());
+//            vo.setPoNo(localPurchaseOrderRepo.getLocalPurchaseOrderDocId(dto.getOrgId(), SCREEN_CODE_LPO));
+//            message = "Local Purchase Order Created Successfully";
+//        }
+//
+//        createUpdateLocalPurchaseOrderVOFromDTO(dto, vo);
+//
+//        if (isUpdate) {
+//            localPurchaseOrderRepo.flush();
+//        } else {
+//            vo = localPurchaseOrderRepo.save(vo);
+//        }
+//
+//        if (isUpdate) {
+//            deleteExistingLpoAttachments(vo);
+//        }
+//        saveLpoAttachments(files, vo);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("message", message);
+//        response.put("localPurchaseOrderVO", buildLocalPurchaseOrderResponse(vo));
+//        return response;
+//    }
+//
+//    private void createUpdateLocalPurchaseOrderVOFromDTO(LocalPurchaseOrderDTO dto, LocalPurchaseOrderVO vo) throws ApplicationException {
+//
+//        if (dto.getBranch() != null && dto.getBranch() != 0) {
+//            vo.setPlant(branchRepo.findById(dto.getBranch()).orElseThrow(() -> new ApplicationException("Branch Not Found")));
+//        }
+//        vo.setBelongsTo(dto.getBelongsTo());
+//        vo.setPoDate(dto.getPoDate());
+//
+//        if (dto.getDepartment() != null && dto.getDepartment() != 0) {
+//            vo.setDepartment(resolveLov(dto.getDepartment()));
+//        }
+//
+//        if (dto.getSupplier() != null && dto.getSupplier() != 0) {
+//            CustomerVO supplier = customerRepo.findById(dto.getSupplier())
+//                    .orElseThrow(() -> new ApplicationException("Supplier Not Found"));
+//            vo.setSupplier(supplier);
+//
+//            GSTStateMasterVO gstState = supplier.getGstState();
+//            vo.setGstState(gstState);
+//
+//            boolean isIndia = gstState != null && gstState.getStateName() != null
+//                    && gstState.getStateName().toUpperCase().contains(INDIA);
+//            if (supplier.getCountry() != null && supplier.getCountry().getCountryName() != null) {
+//                isIndia = supplier.getCountry().getCountryName().toUpperCase().contains(INDIA);
+//            }
+//            vo.setIsIgstAppl(!isIndia);
+//            // vo.setGstnNo(supplier.getGstnNo()); // still pending confirmed getter name on CustomerVO, same as Purchase Bill
+//        }
+//
+//        vo.setSupplierRefNo(dto.getSupplierRefNo());
+//        vo.setAddress(dto.getAddress());
+//        vo.setSuppRefDt(dto.getSuppRefDt());
+//
+//        vo.setTaxCode(resolveLov(dto.getTaxCode()));
+//        vo.setIsReverseChrg(dto.getIsReverseChrg());
+//        vo.setItemType(dto.getItemType());
+//        vo.setIndentRequired(dto.getIndentRequired());
+//        vo.setDealerType(resolveLov(dto.getDealerType()));
+//
+//        vo.setFreightType(dto.getFreightType());
+//        vo.setPackingType(dto.getPackingType());
+//        vo.setInsurance(dto.getInsurance());
+//        vo.setFreight(dto.getFreight());
+//        vo.setTotalAmount(dto.getTotalAmount());
+//        vo.setModeOfDespatch(dto.getModeOfDespatch());
+//        vo.setPaymentTerms(dto.getPaymentTerms());
+//        vo.setDeliveryTerms(dto.getDeliveryTerms());
+//        vo.setAmountInWords(dto.getAmountInWords());
+//        vo.setRemarks(dto.getRemarks());
+//        vo.setNotes(dto.getNotes());
+//
+//        if (dto.getPreparedBy() != null) {
+//            vo.setPreparedBy(employeeMasterRepo.findById(dto.getPreparedBy()).orElseThrow(() -> new ApplicationException("Prepared By Not Found")));
+//        }
+//        if (dto.getCheckedBy() != null) {
+//            vo.setCheckedBy(employeeMasterRepo.findById(dto.getCheckedBy()).orElseThrow(() -> new ApplicationException("Checked By Not Found")));
+//        }
+//        if (dto.getAuthorisedBy() != null) {
+//            vo.setAuthorisedBy(employeeMasterRepo.findById(dto.getAuthorisedBy()).orElseThrow(() -> new ApplicationException("Authorised By Not Found")));
+//        }
+//
+//        vo.setOrgId(dto.getOrgId());
+//        vo.setFinancialYear(dto.getFinancialYear());
+//        vo.setActive(dto.isActive());
+//        vo.setCancelRemarks(dto.getCancelRemarks());
+//
+//        buildLpoDetailsList(dto, vo);
+//        buildLpoTaxDetailsList(dto, vo);
+//    }
+//
+//    // "1-PO Detail" grid — with calculations, including Pending Indent Qty
+//    private void buildLpoDetailsList(LocalPurchaseOrderDTO dto, LocalPurchaseOrderVO vo) throws ApplicationException {
+//
+//        if (vo.getId() != null && vo.getLocalPurchaseOrderDetailsVO() != null && !vo.getLocalPurchaseOrderDetailsVO().isEmpty()) {
+//            localPurchaseOrderDetailsRepo.deleteAll(new ArrayList<>(vo.getLocalPurchaseOrderDetailsVO()));
+//            localPurchaseOrderDetailsRepo.flush();
+//        }
+//        vo.getLocalPurchaseOrderDetailsVO().clear();
+//        if (dto.getDetails() == null) return;
+//
+//        for (LocalPurchaseOrderDetailsDTO line : dto.getDetails()) {
+//
+//            LocalPurchaseOrderDetailsVO detailVO = new LocalPurchaseOrderDetailsVO();
+//
+//            if (line.getItemId() != null && line.getItemId() != 0) {
+//                ItemMasterVO item = itemMasterRepo.findById(line.getItemId()).orElseThrow(() -> new ApplicationException("Item Not Found"));
+//                detailVO.setItem(item);
+//
+//                if (line.getHsnId() != null && line.getHsnId() != 0) {
+//                    detailVO.setHsnCode(hsnRepo.findById(line.getHsnId()).orElseThrow(() -> new ApplicationException("HSN Not Found")));
+//                } else if (item.getHsnCode() != null) {
+//                    detailVO.setHsnCode(item.getHsnCode());
 //                }
-
-                if (d.getItem() != null) {
-                    ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
-                    itemDTO.setId(d.getItem().getId());
-                    itemDTO.setItemCode(d.getItem().getItemCode());
-                    itemDTO.setItemDescription(d.getItem().getItemDescription());
-                    line.setItemCode(itemDTO);
-                }
-                line.setCustomerPartNo(d.getCustomerPartNo());
-
-                if (d.getHsnCode() != null) {
-                    HsnResponseImageDTO hsnDTO = new HsnResponseImageDTO();
-                    hsnDTO.setId(d.getHsnCode().getId());
-                    hsnDTO.setHsnCode(d.getHsnCode().getHsn());
-                    line.setHsnCode(hsnDTO);
-                }
-                line.setTaxType(toLovDTO(d.getTaxType()));
-                line.setTaxPercent(d.getTaxPercent());
-
-                if (d.getPurchaseUnit() != null) {
-                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
-                    unitDTO.setId(d.getPurchaseUnit().getId());
-                    unitDTO.setPrimaryUnit(d.getPurchaseUnit().getUnitId());
-                    line.setPurchaseUnit(unitDTO);
-                }
-                if (d.getPrimaryUnit() != null) {
-                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
-                    unitDTO.setId(d.getPrimaryUnit().getId());
-                    unitDTO.setPrimaryUnit(d.getPrimaryUnit().getUnitId());
-                    line.setPrimaryUnit(unitDTO);
-                }
-                line.setConversionFactor(d.getConversionFactor());
-
-                line.setIndentQty(d.getIndentQty());
-                line.setPendingIndentQty(d.getPendingIndentQty());
-
-                line.setPoQtyInPurchaseUnit(d.getPoQtyInPurchaseUnit());
-                line.setQtyInPrimaryUnit(d.getQtyInPrimaryUnit());
-
-                line.setRateInInr(d.getRateInInr());
-                line.setDiscountPercent(d.getDiscountPercent());
-                line.setDiscountAmountInr(d.getDiscountAmountInr());
-                line.setAmountInInr(d.getAmountInInr());
-                line.setDeliveryDate(d.getDeliveryDate());
-
-                line.setSgstRate(d.getSgstRate());
-                line.setSgstAmount(d.getSgstAmount());
-                line.setCgstRate(d.getCgstRate());
-                line.setCgstAmount(d.getCgstAmount());
-                line.setIgstRate(d.getIgstRate());
-                line.setIgstAmount(d.getIgstAmount());
-
-                detailsList.add(line);
-            }
-        }
-        dto.setDetails(detailsList);
-
-        List<LocalPurchaseOrderTaxDetailsResponseDTO> taxList = new ArrayList<>();
-        if (vo.getLocalPurchaseOrderTaxDetailsVO() != null) {
-            for (LocalPurchaseOrderTaxDetailsVO t : vo.getLocalPurchaseOrderTaxDetailsVO()) {
-                LocalPurchaseOrderTaxDetailsResponseDTO taxDTO = new LocalPurchaseOrderTaxDetailsResponseDTO();
-                taxDTO.setId(t.getId());
-                taxDTO.setParticulars(t.getParticulars());
-                taxDTO.setTaxPercent(t.getTaxPercent());
-                taxDTO.setAmount(t.getAmount());
-                taxList.add(taxDTO);
-            }
-        }
-        dto.setTaxDetails(taxList);
-
-        List<LocalPurchaseOrderAttachmentDTO> attachmentList = new ArrayList<>();
-        if (vo.getLocalPurchaseOrderAttachmentVO() != null) {
-            for (LocalPurchaseOrderAttachmentVO a : vo.getLocalPurchaseOrderAttachmentVO()) {
-                LocalPurchaseOrderAttachmentDTO attachDTO = new LocalPurchaseOrderAttachmentDTO();
-                attachDTO.setName(a.getName());
-                attachDTO.setFileName(a.getFileName());
-                attachDTO.setFilePath(a.getFilePath());
-                attachDTO.setFileSize(a.getFileSize());
-                attachDTO.setUploadOn(a.getUploadOn());
-                attachmentList.add(attachDTO);
-            }
-        }
-        dto.setAttachments(attachmentList);
-
-        return dto;
-    }
+//
+//                if (line.getPrimaryUnitId() != null && line.getPrimaryUnitId() != 0) {
+//                    detailVO.setPrimaryUnit(unitMasterRepo.findById(line.getPrimaryUnitId()).orElseThrow(() -> new ApplicationException("Primary Unit Not Found")));
+//                } else if (item.getPrimaryUnit() != null) {
+//                    detailVO.setPrimaryUnit(item.getPrimaryUnit());
+//                }
+//            }
+//
+//            // ** NEEDS CONFIRMATION - customerPartNo: using client value; swap to item.getCustomerPartNo()
+//            // once that field is confirmed to exist on ItemMasterVO
+//            detailVO.setCustomerPartNo(line.getCustomerPartNo());
+//
+//            if (line.getTaxType() != null && line.getTaxType() != 0) detailVO.setTaxType(resolveLov(line.getTaxType()));
+//            detailVO.setTaxPercent(line.getTaxPercent());
+//
+//            if (line.getPurchaseUnitId() != null && line.getPurchaseUnitId() != 0) {
+//                detailVO.setPurchaseUnit(unitMasterRepo.findById(line.getPurchaseUnitId()).orElseThrow(() -> new ApplicationException("Purchase Unit Not Found")));
+//            }
+//
+//            BigDecimal conversionFactor = line.getConversionFactor() != null ? line.getConversionFactor() : BigDecimal.ONE;
+//            detailVO.setConversionFactor(conversionFactor);
+//
+//            // ---- Indent linkage: Indent No / Indent Date / Indent Qty / Pending Indent Qty ----
+//            if (line.getIndentDetailId() != null) {
+//
+//                PurchaseIndentDetailsVO indentDetail = purchaseIndentDetailsRepo.findById(line.getIndentDetailId())
+//                        .orElseThrow(() -> new ApplicationException("Indent Line Not Found: " + line.getIndentDetailId()));
+//                detailVO.setIndentDetails(indentDetail);
+//
+//                BigDecimal indentQty = indentDetail.getQtyInPurchaseUnit() != null
+//                        ? indentDetail.getQtyInPurchaseUnit() : BigDecimal.ZERO;
+//                detailVO.setIndentQty(indentQty);
+//
+//                // Sum already placed on OTHER local purchase orders against this same indent line
+//                BigDecimal alreadyOrdered = localPurchaseOrderDetailsRepo
+//                        .getAlreadyOrderedQtyForIndentLine(line.getIndentDetailId(), vo.getId());
+//                if (alreadyOrdered == null) alreadyOrdered = BigDecimal.ZERO;
+//
+//                BigDecimal pendingIndentQty = indentQty.subtract(alreadyOrdered);
+//                if (pendingIndentQty.compareTo(BigDecimal.ZERO) < 0) pendingIndentQty = BigDecimal.ZERO;
+//                detailVO.setPendingIndentQty(pendingIndentQty);
+//            }
+//
+//            BigDecimal poQtyInPurchaseUnit = line.getPoQtyInPurchaseUnit() != null ? line.getPoQtyInPurchaseUnit() : BigDecimal.ZERO;
+//            detailVO.setPoQtyInPurchaseUnit(poQtyInPurchaseUnit);
+//            detailVO.setQtyInPrimaryUnit(poQtyInPurchaseUnit.multiply(conversionFactor));
+//
+//            BigDecimal rateInInr = line.getRateInInr() != null ? line.getRateInInr() : BigDecimal.ZERO;
+//            detailVO.setRateInInr(rateInInr);
+//
+//            BigDecimal baseAmount = poQtyInPurchaseUnit.multiply(rateInInr);
+//
+//            BigDecimal discountPercent = line.getDiscountPercent() != null ? line.getDiscountPercent() : BigDecimal.ZERO;
+//            detailVO.setDiscountPercent(discountPercent);
+//
+//            BigDecimal discountAmountInr = calcAmount(baseAmount, discountPercent);
+//            detailVO.setDiscountAmountInr(discountAmountInr);
+//
+//            BigDecimal amountInInr = baseAmount.subtract(discountAmountInr);
+//            detailVO.setAmountInInr(amountInInr);
+//
+//            detailVO.setDeliveryDate(line.getDeliveryDate());
+//
+//            detailVO.setSgstRate(line.getSgstRate());
+//            detailVO.setSgstAmount(calcAmount(amountInInr, line.getSgstRate()));
+//            detailVO.setCgstRate(line.getCgstRate());
+//            detailVO.setCgstAmount(calcAmount(amountInInr, line.getCgstRate()));
+//            detailVO.setIgstRate(line.getIgstRate());
+//            detailVO.setIgstAmount(calcAmount(amountInInr, line.getIgstRate()));
+//
+//            detailVO.setLocalPurchaseOrderVO(vo);
+//            vo.getLocalPurchaseOrderDetailsVO().add(detailVO);
+//        }
+//    }
+//
+//    private void buildLpoTaxDetailsList(LocalPurchaseOrderDTO dto, LocalPurchaseOrderVO vo) {
+//
+//        if (vo.getId() != null && vo.getLocalPurchaseOrderTaxDetailsVO() != null && !vo.getLocalPurchaseOrderTaxDetailsVO().isEmpty()) {
+//            localPurchaseOrderTaxDetailsRepo.deleteAll(new ArrayList<>(vo.getLocalPurchaseOrderTaxDetailsVO()));
+//            localPurchaseOrderTaxDetailsRepo.flush();
+//        }
+//        vo.getLocalPurchaseOrderTaxDetailsVO().clear();
+//        if (dto.getTaxDetails() == null) return;
+//
+//        for (LocalPurchaseOrderTaxDetailsDTO taxDTO : dto.getTaxDetails()) {
+//            LocalPurchaseOrderTaxDetailsVO taxVO = new LocalPurchaseOrderTaxDetailsVO();
+//            taxVO.setParticulars(taxDTO.getParticulars());
+//            taxVO.setTaxPercent(taxDTO.getTaxPercent());
+//            taxVO.setAmount(taxDTO.getAmount());
+//            taxVO.setLocalPurchaseOrderVO(vo);
+//            vo.getLocalPurchaseOrderTaxDetailsVO().add(taxVO);
+//        }
+//    }
+//
+//    private void deleteExistingLpoAttachments(LocalPurchaseOrderVO vo) {
+//        if (vo.getLocalPurchaseOrderAttachmentVO() == null || vo.getLocalPurchaseOrderAttachmentVO().isEmpty()) return;
+//
+//        List<LocalPurchaseOrderAttachmentVO> existing = new ArrayList<>(vo.getLocalPurchaseOrderAttachmentVO());
+//        for (LocalPurchaseOrderAttachmentVO a : existing) {
+//            try {
+//                if (a.getFilePath() != null) Files.deleteIfExists(Paths.get(a.getFilePath()));
+//            } catch (IOException e) {
+//                LOGGER.error("Failed to delete attachment file from disk: {} - {}", a.getFilePath(), e.getMessage());
+//            }
+//        }
+//        localPurchaseOrderAttachmentRepo.deleteAll(existing);
+//        localPurchaseOrderAttachmentRepo.flush();
+//        vo.getLocalPurchaseOrderAttachmentVO().clear();
+//    }
+//
+//    private void saveLpoAttachments(MultipartFile[] files, LocalPurchaseOrderVO vo) throws ApplicationException {
+//        if (files == null || files.length == 0) return;
+//
+//        try {
+//            Path folder = Paths.get(localPurchaseOrderUploadPath);
+//            if (!Files.exists(folder)) Files.createDirectories(folder);
+//
+//            List<LocalPurchaseOrderAttachmentVO> attachmentList = new ArrayList<>();
+//            for (MultipartFile file : files) {
+//                if (file == null || file.isEmpty()) continue;
+//
+//                String originalFileName = file.getOriginalFilename();
+//                String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
+//                Path path = Paths.get(localPurchaseOrderUploadPath, uniqueFileName);
+//
+//                try (InputStream inputStream = file.getInputStream()) {
+//                    Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+//                }
+//
+//                LocalPurchaseOrderAttachmentVO attachment = new LocalPurchaseOrderAttachmentVO();
+//                attachment.setLocalPurchaseOrderVO(vo);
+//                attachment.setName(originalFileName);
+//                attachment.setFileName(uniqueFileName);
+//                attachment.setFilePath(path.toString());
+//                attachment.setFileSize(file.getSize());
+//                attachment.setUploadOn(LocalDateTime.now());
+//                attachmentList.add(attachment);
+//            }
+//            vo.getLocalPurchaseOrderAttachmentVO().addAll(attachmentList);
+//        } catch (IOException e) {
+//            throw new ApplicationException("File Upload Failed : " + e.getMessage());
+//        }
+//    }
+//
+//    @Override
+//    public LocalPurchaseOrderResponseDTO getLocalPurchaseOrderById(Long id) throws ApplicationException {
+//        LocalPurchaseOrderVO vo = localPurchaseOrderRepo.getLocalPurchaseOrderById(id);
+//        if (vo == null) throw new ApplicationException("Local Purchase Order Not Found");
+//        return buildLocalPurchaseOrderResponse(vo);
+//    }
+//
+//    @Override
+//    public List<LocalPurchaseOrderResponseDTO> getLocalPurchaseOrderByOrgId(Long orgId, Long branchId) throws ApplicationException {
+//        List<LocalPurchaseOrderVO> list = localPurchaseOrderRepo.getLocalPurchaseOrderByOrgId(orgId, branchId);
+//        if (list == null || list.isEmpty()) throw new ApplicationException("Local Purchase Order Not Found");
+//        List<LocalPurchaseOrderResponseDTO> responseList = new ArrayList<>();
+//        for (LocalPurchaseOrderVO vo : list) responseList.add(buildLocalPurchaseOrderResponse(vo));
+//        return responseList;
+//    }
+//
+//    @Override
+//    public String getLocalPurchaseOrderDocId(Long orgId, String finYear, Long branch) {
+//        return localPurchaseOrderRepo.getLocalPurchaseOrderDocId(orgId, SCREEN_CODE_LPO);
+//    }
+//
+//    private LocalPurchaseOrderResponseDTO buildLocalPurchaseOrderResponse(LocalPurchaseOrderVO vo) {
+//
+//        LocalPurchaseOrderResponseDTO dto = new LocalPurchaseOrderResponseDTO();
+//        dto.setId(vo.getId());
+//
+//        if (vo.getPlant() != null) {
+//            BranchResponseDTO plantDTO = new BranchResponseDTO();
+//            plantDTO.setId(vo.getPlant().getId());
+//            plantDTO.setBranchCode(vo.getPlant().getBranchCode());
+//            plantDTO.setBranchName(vo.getPlant().getBranchName());
+//            dto.setPlant(plantDTO);
+//        }
+//
+//        dto.setPoNo(vo.getPoNo());
+//        dto.setBelongsTo(vo.getBelongsTo());
+//        dto.setPoDate(vo.getPoDate());
+//        dto.setDepartment(toLovDTO(vo.getDepartment()));
+//
+//        if (vo.getSupplier() != null) {
+//            CustomerResponseDetailsDTO supplierDTO = new CustomerResponseDetailsDTO();
+//            supplierDTO.setId(vo.getSupplier().getId());
+//            supplierDTO.setCustomerName(vo.getSupplier().getCustomerName());
+//            dto.setSupplier(supplierDTO);
+//        }
+//
+//        if (vo.getGstState() != null) {
+//            dto.setGstState(new GSTStateResponseDTO(vo.getGstState().getId(), vo.getGstState().getStateCode(),
+//                    vo.getGstState().getStateName(), vo.getGstState().getGstStateId()));
+//        }
+//
+//        dto.setSupplierRefNo(vo.getSupplierRefNo());
+//        dto.setAddress(vo.getAddress());
+//        dto.setIsIgstAppl(vo.getIsIgstAppl());
+//        dto.setSuppRefDt(vo.getSuppRefDt());
+//        dto.setGstnNo(vo.getGstnNo());
+//
+//        dto.setTaxCode(toLovDTO(vo.getTaxCode()));
+//        dto.setIsReverseChrg(vo.getIsReverseChrg());
+//        dto.setItemType(vo.getItemType());
+//        dto.setIndentRequired(vo.getIndentRequired());
+//        dto.setDealerType(toLovDTO(vo.getDealerType()));
+//
+//        dto.setFreightType(vo.getFreightType());
+//        dto.setPackingType(vo.getPackingType());
+//        dto.setInsurance(vo.getInsurance());
+//        dto.setFreight(vo.getFreight());
+//        dto.setTotalAmount(vo.getTotalAmount());
+//        dto.setModeOfDespatch(vo.getModeOfDespatch());
+//        dto.setPaymentTerms(vo.getPaymentTerms());
+//        dto.setDeliveryTerms(vo.getDeliveryTerms());
+//        dto.setAmountInWords(vo.getAmountInWords());
+//        dto.setRemarks(vo.getRemarks());
+//        dto.setNotes(vo.getNotes());
+//
+////        if (vo.getPreparedBy() != null) dto.setPreparedBy(new EmployeeResponseDTO(vo.getPreparedBy().getId(), vo.getPreparedBy().getEmployeeName()));
+////        if (vo.getCheckedBy() != null) dto.setCheckedBy(new EmployeeResponseDTO(vo.getCheckedBy().getId(), vo.getCheckedBy().getEmployeeName()));
+////        if (vo.getAuthorisedBy() != null) dto.setAuthorisedBy(new EmployeeResponseDTO(vo.getAuthorisedBy().getId(), vo.getAuthorisedBy().getEmployeeName()));
+//
+//        dto.setOrgId(vo.getOrgId());
+//        dto.setFinancialYear(vo.getFinancialYear());
+//        dto.setActive(vo.getActive());
+//        dto.setCancelRemarks(vo.getCancelRemarks());
+//        dto.setCreatedBy(vo.getCreatedBy());
+//        dto.setUpdatedBy(vo.getUpdatedBy());
+//
+//        List<LocalPurchaseOrderDetailsResponseDTO> detailsList = new ArrayList<>();
+//        if (vo.getLocalPurchaseOrderDetailsVO() != null) {
+//            for (LocalPurchaseOrderDetailsVO d : vo.getLocalPurchaseOrderDetailsVO()) {
+//
+//                LocalPurchaseOrderDetailsResponseDTO line = new LocalPurchaseOrderDetailsResponseDTO();
+//                line.setId(d.getId());
+//
+////                if (d.getIndentDetails() != null) {
+////                    line.setIndentDetailId(d.getIndentDetails().getId());
+////                    if (d.getIndentDetails().getPurchaseIndentVO() != null) {
+////                        line.setIndentNo(d.getIndentDetails().getPurchaseIndentVO().getIndentNo());
+////                        line.setIndentDate(d.getIndentDetails().getPurchaseIndentVO().getIndentDate());
+////                    }
+////                }
+//
+//                if (d.getItem() != null) {
+//                    ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
+//                    itemDTO.setId(d.getItem().getId());
+//                    itemDTO.setItemCode(d.getItem().getItemCode());
+//                    itemDTO.setItemDescription(d.getItem().getItemDescription());
+//                    line.setItemCode(itemDTO);
+//                }
+//                line.setCustomerPartNo(d.getCustomerPartNo());
+//
+//                if (d.getHsnCode() != null) {
+//                    HsnResponseImageDTO hsnDTO = new HsnResponseImageDTO();
+//                    hsnDTO.setId(d.getHsnCode().getId());
+//                    hsnDTO.setHsnCode(d.getHsnCode().getHsn());
+//                    line.setHsnCode(hsnDTO);
+//                }
+//                line.setTaxType(toLovDTO(d.getTaxType()));
+//                line.setTaxPercent(d.getTaxPercent());
+//
+//                if (d.getPurchaseUnit() != null) {
+//                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
+//                    unitDTO.setId(d.getPurchaseUnit().getId());
+//                    unitDTO.setPrimaryUnit(d.getPurchaseUnit().getUnitId());
+//                    line.setPurchaseUnit(unitDTO);
+//                }
+//                if (d.getPrimaryUnit() != null) {
+//                    PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
+//                    unitDTO.setId(d.getPrimaryUnit().getId());
+//                    unitDTO.setPrimaryUnit(d.getPrimaryUnit().getUnitId());
+//                    line.setPrimaryUnit(unitDTO);
+//                }
+//                line.setConversionFactor(d.getConversionFactor());
+//
+//                line.setIndentQty(d.getIndentQty());
+//                line.setPendingIndentQty(d.getPendingIndentQty());
+//
+//                line.setPoQtyInPurchaseUnit(d.getPoQtyInPurchaseUnit());
+//                line.setQtyInPrimaryUnit(d.getQtyInPrimaryUnit());
+//
+//                line.setRateInInr(d.getRateInInr());
+//                line.setDiscountPercent(d.getDiscountPercent());
+//                line.setDiscountAmountInr(d.getDiscountAmountInr());
+//                line.setAmountInInr(d.getAmountInInr());
+//                line.setDeliveryDate(d.getDeliveryDate());
+//
+//                line.setSgstRate(d.getSgstRate());
+//                line.setSgstAmount(d.getSgstAmount());
+//                line.setCgstRate(d.getCgstRate());
+//                line.setCgstAmount(d.getCgstAmount());
+//                line.setIgstRate(d.getIgstRate());
+//                line.setIgstAmount(d.getIgstAmount());
+//
+//                detailsList.add(line);
+//            }
+//        }
+//        dto.setDetails(detailsList);
+//
+//        List<LocalPurchaseOrderTaxDetailsResponseDTO> taxList = new ArrayList<>();
+//        if (vo.getLocalPurchaseOrderTaxDetailsVO() != null) {
+//            for (LocalPurchaseOrderTaxDetailsVO t : vo.getLocalPurchaseOrderTaxDetailsVO()) {
+//                LocalPurchaseOrderTaxDetailsResponseDTO taxDTO = new LocalPurchaseOrderTaxDetailsResponseDTO();
+//                taxDTO.setId(t.getId());
+//                taxDTO.setParticulars(t.getParticulars());
+//                taxDTO.setTaxPercent(t.getTaxPercent());
+//                taxDTO.setAmount(t.getAmount());
+//                taxList.add(taxDTO);
+//            }
+//        }
+//        dto.setTaxDetails(taxList);
+//
+//        List<LocalPurchaseOrderAttachmentDTO> attachmentList = new ArrayList<>();
+//        if (vo.getLocalPurchaseOrderAttachmentVO() != null) {
+//            for (LocalPurchaseOrderAttachmentVO a : vo.getLocalPurchaseOrderAttachmentVO()) {
+//                LocalPurchaseOrderAttachmentDTO attachDTO = new LocalPurchaseOrderAttachmentDTO();
+//                attachDTO.setName(a.getName());
+//                attachDTO.setFileName(a.getFileName());
+//                attachDTO.setFilePath(a.getFilePath());
+//                attachDTO.setFileSize(a.getFileSize());
+//                attachDTO.setUploadOn(a.getUploadOn());
+//                attachmentList.add(attachDTO);
+//            }
+//        }
+//        dto.setAttachments(attachmentList);
+//
+//        return dto;
+//    }
 }

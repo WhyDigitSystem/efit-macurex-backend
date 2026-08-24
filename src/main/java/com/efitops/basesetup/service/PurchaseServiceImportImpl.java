@@ -1545,7 +1545,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 	}
 
 	@Override
-	public String getPurchaseOrderDeliveryScheduleShortCloseDocId(Long orgId, String financialYear, String screenCode) {
+	public String getPurchaseOrderDeliveryScheduleShortCloseDocId(Long orgId, String financialYear) {
 		String screenCode1 = "PODSSC";
 		String result = purchaseOrderDeliveryScheduleShortCloseRepo
 				.getPurchaseOrderDeliveryScheduleShortCloseDocId(orgId, financialYear, screenCode1);

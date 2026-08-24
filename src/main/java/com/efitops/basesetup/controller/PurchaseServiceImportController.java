@@ -516,7 +516,7 @@ public class PurchaseServiceImportController extends BaseController {
 
 	@GetMapping("/getPurchaseOrderDeliveryScheduleShortCloseDocId")
 	public ResponseEntity<ResponseDTO> getPurchaseOrderDeliveryScheduleShortCloseDocId(@RequestParam Long orgId,
-			@RequestParam String financialYear, @RequestParam String screenCode) {
+			@RequestParam String financialYear) {
 
 		String methodName = "getPurchaseOrderDeliveryScheduleShortCloseDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -526,8 +526,7 @@ public class PurchaseServiceImportController extends BaseController {
 		String mapp = "";
 
 		try {
-			mapp = purchaseOrderService.getPurchaseOrderDeliveryScheduleShortCloseDocId(orgId, financialYear,
-					screenCode);
+			mapp = purchaseOrderService.getPurchaseOrderDeliveryScheduleShortCloseDocId(orgId, financialYear);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);

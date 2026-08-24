@@ -40,8 +40,8 @@ public interface PurchaseDeliveryScheduleRepo extends JpaRepository<PurchaseDeli
 			SELECT
 			    CONCAT(i.item_id, '----', i.item_description) AS item,
 			    sb.supplier,
-			    i.primary_unit,
-			    i.purchase_unit
+			u.unit_id,
+   i.item_code,i.item_description,i.item_id
 			FROM item i
 			JOIN purchase_contract_details sd
 			    ON sd.item = i.item_id

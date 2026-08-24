@@ -38,10 +38,10 @@ public interface PurchaseDeliverySchService {
 	List<GateInwardEntryResponseDTO> getGateInwardEntryByOrgId(Long branch, Long orgId) throws ApplicationException;
 //customername dropdown
 
-	List<Map<String, Object>> getCustomerNameDropdownForGateInwardEntry(Long branch, Long orgId) throws ApplicationException;
+	List<Map<String, Object>> getCustomerNameDropdownForGateInwardEntry(Long branch, Long orgId)
+			throws ApplicationException;
 
 //	purchase contract
-	
 
 	List<Map<String, Object>> getSupplierDropdownForPurchaseContract(Long branch, Long orgId);
 
@@ -54,8 +54,7 @@ public interface PurchaseDeliverySchService {
 	Map<String, Object> updateCreatePurchaseContract(PurchaseContractDTO purchaseContractDTO, MultipartFile[] files)
 			throws ApplicationException;
 
-	Map<String, Object> getPurchaseContractItems(Long supplier, Long branch, Long orgId)
-			throws ApplicationException;
+	Map<String, Object> getPurchaseContractItems(Long supplier, Long branch, Long orgId) throws ApplicationException;
 
 //	Purchase bill 
 	Map<String, Object> createUpdatePurchaseBill(PurchaseBillDTO purchaseBillDTO) throws ApplicationException;
@@ -72,9 +71,6 @@ public interface PurchaseDeliverySchService {
 	Map<String, Object> getPurchaseOrderNumberForPurchaseDeliverySchedule(Long customer, LocalDate docdt, Long branch,
 			Long orgId) throws ApplicationException;
 
-	String getPurchaseDeliveryScheduleDocId(Long orgId, String financialYear, String screenCode);
-	
-
-	
+	String getPurchaseDeliveryScheduleDocId(Long orgId, String financialYear);
 
 }

@@ -549,9 +549,15 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 			itemMap.put("supplier", obj[1] != null ? ((Number) obj[1]).longValue() : null);
 
-			itemMap.put("primaryUnit", obj[2] != null ? ((Number) obj[2]).longValue() : null);
+			itemMap.put("primaryUnit", obj[2] != null ? obj[2].toString() : "");
 
-			itemMap.put("purchaseUnit", obj[3] != null ? ((Number) obj[3]).longValue() : null);
+			itemMap.put("purchaseUnit", obj[2] != null ?  obj[2].toString() : "");
+			
+			itemMap.put("itemCode", obj[3] != null ? obj[3].toString() : "");
+
+			itemMap.put("itemDesc", obj[4] != null ?  obj[4].toString() : "");
+			
+			itemMap.put("itemId", obj[5] != null ? ((Number) obj[5]).longValue() : null);
 
 			responseList.add(itemMap);
 		}
@@ -1886,7 +1892,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 	}
 
 	@Override
-	public String getPurchaseDeliveryScheduleDocId(Long orgId, String financialYear, String screenCode) {
+	public String getPurchaseDeliveryScheduleDocId(Long orgId, String financialYear) {
 		String screenCode1 = "PDS";
 		String result = purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleDocId(orgId, financialYear,
 				screenCode1);

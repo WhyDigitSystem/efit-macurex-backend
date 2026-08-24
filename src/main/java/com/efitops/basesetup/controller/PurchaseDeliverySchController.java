@@ -725,7 +725,7 @@ public class PurchaseDeliverySchController extends BaseController {
 	
 	@GetMapping("/getPurchaseDeliveryScheduleDocId")
 	public ResponseEntity<ResponseDTO> getPurchaseDeliveryScheduleDocId(@RequestParam Long orgId,
-			@RequestParam String financialYear, @RequestParam String screenCode) {
+			@RequestParam String financialYear) {
 
 		String methodName = "getPurchaseDeliveryScheduleDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -735,7 +735,7 @@ public class PurchaseDeliverySchController extends BaseController {
 		String mapp = "";
 
 		try {
-			mapp = purchaseDeliverySchService.getPurchaseDeliveryScheduleDocId(orgId, financialYear, screenCode);
+			mapp = purchaseDeliverySchService.getPurchaseDeliveryScheduleDocId(orgId, financialYear);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);

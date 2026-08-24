@@ -1,5 +1,6 @@
 package com.efitops.basesetup.dto;
 
+import com.efitops.basesetup.ResponseDTO.HsnResponseDTO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 
 import lombok.AllArgsConstructor;
@@ -14,5 +15,6 @@ public class ItemMasterResponseDetailsDTO {
 	private String itemDescription;
 	private String itemCode;
 	private UnitMasterResponseDTO unit;
+	private HsnResponseDTO hsn;
 
 }

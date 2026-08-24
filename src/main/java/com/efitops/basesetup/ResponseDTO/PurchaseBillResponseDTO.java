@@ -53,14 +53,21 @@ public class PurchaseBillResponseDTO {
     private Boolean entryTaxApplicable;
     private String narration;
     private String paymentTerms;
-
-//    private List<PurchaseBillDetailsResponseDTO> purchaseDetails;
-//    private List<PurchaseBillTaxGridResponseDTO> taxGrid;
-
+    
+//   purchase Import bill
+    private String creditAcc;
+	private Long statutoryForms;
+	private String supplierInvValue;
+	
     private Long orgId;
     private String financialYear;
     private String active;
     private String cancelRemarks;
     private String createdBy;
     private String updatedBy;
+
+//    private List<PurchaseBillDetailsResponseDTO> purchaseDetails;
+//    private List<PurchaseBillTaxGridResponseDTO> taxGrid;
+
+    
 }

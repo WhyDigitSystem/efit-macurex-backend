@@ -36,7 +36,8 @@ public interface PurchaseBillRepo extends JpaRepository<PurchaseBillVO, Long> {
                 c.gst_type,
                 c.gst_state AS gst_state_id,
                 g.state_code,
-                g.state_name
+                g.state_name,
+                c.is_registered
             FROM customer_header c
             LEFT JOIN gststatemaster g
                    ON c.gst_state = g.gststatemaster_id

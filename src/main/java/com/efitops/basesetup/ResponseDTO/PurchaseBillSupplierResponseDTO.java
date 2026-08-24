@@ -14,5 +14,7 @@ public class PurchaseBillSupplierResponseDTO {
 	private GSTStateResponseDTO gstState;
 	private String gstNNo;
 	private String eccType;
+	private Boolean dealerType;
+	
 
 }

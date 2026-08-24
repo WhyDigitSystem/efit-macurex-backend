@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseCloseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LmeResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseDetailsResponseDTO;
@@ -1364,6 +1365,12 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			PurchaseOrderDeliveryScheduleShortCloseVO purchaseOrderDeliveryScheduleShortCloseVO)
 			throws ApplicationException {
 
+		
+		purchaseOrderDeliveryScheduleShortCloseVO.setActive(purchaseOrderDeliveryScheduleShortCloseDTO.isActive());
+		purchaseOrderDeliveryScheduleShortCloseVO.setCancelRemarks(purchaseOrderDeliveryScheduleShortCloseDTO.getCancelRemarks());
+		purchaseOrderDeliveryScheduleShortCloseVO.setOrgId(purchaseOrderDeliveryScheduleShortCloseDTO.getOrgId());
+		purchaseOrderDeliveryScheduleShortCloseVO.setFinancialYear(purchaseOrderDeliveryScheduleShortCloseDTO.getFinancialYear());
+		purchaseOrderDeliveryScheduleShortCloseVO.setNarration(purchaseOrderDeliveryScheduleShortCloseDTO.getNarration());
 		purchaseOrderDeliveryScheduleShortCloseVO
 				.setBelongsTo(purchaseOrderDeliveryScheduleShortCloseDTO.getBelongsTo());
 
@@ -1392,6 +1399,11 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 			purchaseOrderDeliveryScheduleShortCloseVO.setBranch(branch);
 		}
+		
+		
+		
+		
+		
 
 		if (ObjectUtils.isNotEmpty(purchaseOrderDeliveryScheduleShortCloseVO.getId())) {
 
@@ -1478,7 +1490,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			responseDTO.setSupplierCode(supplierDTO);
 		}
 
-
 		if (purchaseOrderDeliveryScheduleShortCloseVO.getBranch() != null) {
 			BranchResponseDTO branchDTO = new BranchResponseDTO();
 			branchDTO.setId(purchaseOrderDeliveryScheduleShortCloseVO.getBranch().getId());
@@ -1496,18 +1507,17 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailDTO.setId(detailVO.getId());
 
 				if (detailVO.getItem() != null) {
-					ItemMasterDetailsResponseDTO itemDTO = new ItemMasterDetailsResponseDTO();
+					ItemMasterDetailsResponseCloseDTO itemDTO = new ItemMasterDetailsResponseCloseDTO();
 					itemDTO.setId(detailVO.getItem().getId());
 					itemDTO.setItemCode(detailVO.getItem().getItemCode());
 					itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
-					itemDTO.setCustomerPoNo(detailVO.getItem().getCustomerPartNo());
 
 					if (detailVO.getItem().getPrimaryUnit() != null) {
 						UnitMasterResponseDTO unit = new UnitMasterResponseDTO();
 						unit.setId(detailVO.getItem().getPrimaryUnit().getId());
 						unit.setUnitId(detailVO.getItem().getPrimaryUnit().getUnitId());
 						itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
-						
+
 					}
 
 					if (detailVO.getItem().getPricingUnit() != null) {
@@ -1537,12 +1547,11 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 	@Override
 	public String getPurchaseOrderDeliveryScheduleShortCloseDocId(Long orgId, String financialYear, String screenCode) {
 		String screenCode1 = "PODSSC";
-		String result = purchaseOrderDeliveryScheduleShortCloseRepo.getPurchaseOrderDeliveryScheduleShortCloseDocId(orgId, financialYear,
-				screenCode1);
+		String result = purchaseOrderDeliveryScheduleShortCloseRepo
+				.getPurchaseOrderDeliveryScheduleShortCloseDocId(orgId, financialYear, screenCode1);
 		return result;
 	}
-	
-	
+
 	@Override
 	public List<Map<String, Object>> getSupplierDetailsShortClose(Long orgId, Long branch) {
 		Set<Object[]> chType = purchaseOrderDeliveryScheduleShortCloseRepo.getSupplierDetailsShortClose(orgId, branch);
@@ -1559,36 +1568,59 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			map.put("supplierId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
 			map.put("supplierName", ch[1] != null ? ch[1].toString() : "");
 			map.put("supplierCode", ch[2] != null ? ch[2].toString() : "");
-		
+
 			list.add(map);
 		}
 		return list;
 	}
 
-//	@Override
-//	public List<Map<String, Object>> getItemDetailsResponse(Long orgId, Long branch) {
-//		Set<Object[]> chType = purchaseOrderDeliveryScheduleShortCloseRepo.getItemDetailsResponse(orgId, branch);
-//		return getItemDetailsResponse(chType);
-//	}
-//
-//	private List<Map<String, Object>> getItemDetailsResponse(Set<Object[]> chType) {
-//
-//		List<Map<String, Object>> list = new ArrayList<>();
-//
-//		for (Object[] ch : chType) {
-//
-//			Map<String, Object> map = new HashMap<>();
-//			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
-//			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
-//			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
-//			map.put("unitId", ch[3] != null ? ch[3].toString() : "");
-//			map.put("hsn", ch[4] != null ? ch[4].toString() : "");
-//			map.put("customerPartNo", ch[5] != null ? ch[5].toString() : "");
-//
-//			list.add(map);
-//		}
-//
-//		return list;
-//	}
+	@Override
+	public List<Map<String, Object>> getPurchaseOrderNobasedSchedule(Long orgId, Long branch, Long supplier) {
+		Set<Object[]> chType = purchaseOrderDeliveryScheduleShortCloseRepo.getPurchaseOrderNobasedSchedule(orgId,
+				branch, supplier);
+		return getPurchaseOrderNobasedSchedule(chType);
+	}
+
+	private List<Map<String, Object>> getPurchaseOrderNobasedSchedule(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			map.put("purchaseId", ch[2] != null ? ((Number) ch[2]).longValue() : null);
+
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getPurchaseOrderNobasedScheduleDetails(Long orgId, Long branch, Long supplier,
+			String purchaseOrderNo) {
+		Set<Object[]> chType = purchaseOrderDeliveryScheduleShortCloseRepo.getPurchaseOrderNobasedScheduleDetails(orgId,
+				branch, supplier, purchaseOrderNo);
+		return getPurchaseOrderNobasedScheduleDetails(chType);
+	}
+
+	private List<Map<String, Object>> getPurchaseOrderNobasedScheduleDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("uom", ch[3] != null ? ((Number) ch[3]).longValue() : null);
+			map.put("orderQty", ch[4] != null ? new BigDecimal(ch[4].toString()) : BigDecimal.ZERO);
+			map.put("suppliedQty", ch[5] != null ? new BigDecimal(ch[5].toString()) : BigDecimal.ZERO);
+			map.put("pendingQty", ch[6] != null ? new BigDecimal(ch[6].toString()) : BigDecimal.ZERO);
+			list.add(map);
+		}
+		return list;
+	}
 
 }

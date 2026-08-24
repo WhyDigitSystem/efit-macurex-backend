@@ -29,8 +29,6 @@ public class PurchaseOrderDeliveryScheduleShortCloseDTO {
 
 	private boolean cancel;
 
-	private String updatedBy;
-
 	private String cancelRemarks;
 
 	private Long orgId;

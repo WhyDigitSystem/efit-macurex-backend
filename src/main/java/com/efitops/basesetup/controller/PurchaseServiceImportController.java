@@ -15,17 +15,20 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
+import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.service.PurchaseServiceImport;
 
@@ -406,6 +409,166 @@ public class PurchaseServiceImportController extends BaseController {
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
 			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Rate details", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// ShortClose
+
+	@GetMapping("/getPurchaseOrderDeliveryScheduleShortCloseById")
+	public ResponseEntity<ResponseDTO> getPurchaseOrderDeliveryScheduleShortCloseById(@RequestParam Long id) {
+
+		String methodName = "getPurchaseOrderDeliveryScheduleShortCloseById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			PurchaseOrderDeliveryScheduleShortCloseResponseDTO purchaseOrderDeliveryScheduleShortCloseResponseDTO = purchaseOrderService
+					.getPurchaseOrderDeliveryScheduleShortCloseById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "ShortCose information retrieved successfully");
+
+			responseObjectsMap.put("purchaseOrderDeliveryScheduleShortCloseVO",
+					purchaseOrderDeliveryScheduleShortCloseResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "ShortCose information retrieval failed",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getPurchaseOrderDeliveryScheduleShortCloseByOrgId")
+	public ResponseEntity<ResponseDTO> getPurchaseOrderDeliveryScheduleShortCloseByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getPurchaseOrderDeliveryScheduleShortCloseByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<PurchaseOrderDeliveryScheduleShortCloseResponseDTO> purchaseOrderDeliveryScheduleShortCloseResponseDTO = purchaseOrderService
+					.getPurchaseOrderDeliveryScheduleShortCloseByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Proforma Invoice information retrieved successfully");
+
+			responseObjectsMap.put("purchaseOrderDeliveryScheduleShortCloseVO",
+					purchaseOrderDeliveryScheduleShortCloseResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Proforma Invoice information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@PutMapping("/createUpdatePurchaseOrderDeliveryScheduleShortClose")
+	public ResponseEntity<ResponseDTO> createUpdatePurchaseOrderDeliveryScheduleShortClose(
+			@RequestBody PurchaseOrderDeliveryScheduleShortCloseDTO purchaseOrderDeliveryScheduleShortCloseDTO) {
+		String methodName = "createUpdatePurchaseOrderDeliveryScheduleShortClose()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		try {
+			Map<String, Object> purchaseOrderDeliveryScheduleShortCloseVO = purchaseOrderService
+					.createUpdatePurchaseOrderDeliveryScheduleShortClose(purchaseOrderDeliveryScheduleShortCloseDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					purchaseOrderDeliveryScheduleShortCloseVO.get("message"));
+			responseObjectsMap.put("purchaseOrderDeliveryScheduleShortCloseVO",
+					purchaseOrderDeliveryScheduleShortCloseVO.get("purchaseOrderDeliveryScheduleShortCloseVO"));
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getPurchaseOrderDeliveryScheduleShortCloseDocId")
+	public ResponseEntity<ResponseDTO> getPurchaseOrderDeliveryScheduleShortCloseDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear, @RequestParam String screenCode) {
+
+		String methodName = "getPurchaseOrderDeliveryScheduleShortCloseDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+			mapp = purchaseOrderService.getPurchaseOrderDeliveryScheduleShortCloseDocId(orgId, financialYear,
+					screenCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, " DocId information retrieved successfully");
+			responseObjectsMap.put("invoiceDocId", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieveDocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSupplierDetailsShortClose")
+	public ResponseEntity<ResponseDTO> getSupplierDetailsShortClose(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+		String methodName = "getSupplierDetailsShortClose()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getSupplierDetailsShortClose(orgId, branch);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Supplier retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Supplier details",
+					errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

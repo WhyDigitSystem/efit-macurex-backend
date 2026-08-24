@@ -59,4 +59,11 @@ public interface PurchaseServiceImport {
 
 	String getPurchaseOrderDeliveryScheduleShortCloseDocId(Long orgId, String financialYear, String screenCode);
 
+	List<Map<String, Object>> getSupplierDetailsShortClose(Long orgId, Long branch);
+
+	List<Map<String, Object>> getPurchaseOrderNobasedSchedule(Long orgId, Long branch, Long supplier);
+
+	List<Map<String, Object>> getPurchaseOrderNobasedScheduleDetails(Long orgId, Long branch, Long supplier,
+			String purchaseOrderNo);
+
 }

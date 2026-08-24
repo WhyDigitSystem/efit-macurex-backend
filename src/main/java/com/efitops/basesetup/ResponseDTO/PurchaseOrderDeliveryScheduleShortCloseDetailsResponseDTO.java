@@ -15,9 +15,9 @@ public class PurchaseOrderDeliveryScheduleShortCloseDetailsResponseDTO {
 
 	private Long id;
 
-	private ItemMasterDetailsResponseDTO item;
+	private ItemMasterDetailsResponseCloseDTO item;
 
-	private UnitMasterResponseDTO unit;
+//	private UnitMasterResponseDTO unit;
 
 	private BigDecimal orderedQty;
 

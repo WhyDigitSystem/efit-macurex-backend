@@ -71,6 +71,8 @@ public interface PurchaseDeliverySchService {
 
 	Map<String, Object> getPurchaseOrderNumberForPurchaseDeliverySchedule(Long customer, LocalDate docdt, Long branch,
 			Long orgId) throws ApplicationException;
+
+	String getPurchaseDeliveryScheduleDocId(Long orgId, String financialYear, String screenCode);
 	
 
 	

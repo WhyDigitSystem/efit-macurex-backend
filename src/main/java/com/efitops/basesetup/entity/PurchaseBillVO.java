@@ -67,10 +67,6 @@ public class PurchaseBillVO {
 
     @Column(name = "exchange_rate")
     private BigDecimal exchangeRate;
-
-    @ManyToOne
-    @JoinColumn(name = "dealer_type")
-    private ListOfValuesDetailsVO dealerType;
     
     @Column(name = "purchaseorder_number")
     private String purchaseorderNumber;
@@ -93,9 +89,9 @@ public class PurchaseBillVO {
     @Column(name = "duty_per_unit")
     private BigDecimal dutyPerUnit;
 
-    @ManyToOne
-    @JoinColumn(name = "posting_category")
-    private ListOfValuesDetailsVO postingCategory;
+//    @ManyToOne
+//    @JoinColumn(name = "posting_category")
+//    private ListOfValuesDetailsVO postingCategory;
 
     @Column(name = "modvat_copy_received")
     private Boolean modvatCopyReceived;
@@ -105,7 +101,19 @@ public class PurchaseBillVO {
 
     @Column(name = "supplier_dc_inv_date")
     private LocalDate supplierDcInvDate;
-
+    
+//    import purchase bill
+    
+    @Column(name = "credit_acc")
+    private String creditAcc;
+    
+    @ManyToOne
+    @JoinColumn(name = "statutory_forms")
+    private ListOfValuesDetailsVO statutoryForms;
+    
+    @Column(name = "supplier_inv_value")
+    private String supplierInvValue;
+    
     // ---------------- 3. Charges Summary ----------------
     @Column(name = "total_freight")
     private BigDecimal totalFreight;

@@ -55,6 +55,7 @@ import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.GateInwardEntryVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
@@ -73,6 +74,7 @@ import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
+import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.GateInwardEntryRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
@@ -131,14 +133,15 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 	@Autowired
 	ListOfValuesDetailsRepo listOfValuesDetailsRepo;
 	
+	@Autowired
+	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
 	
-
 	@Override
 	@Transactional
 	public Map<String, Object> updateCreatePurchaseDeliverySchedule(
 			PurchaseDeliveryScheduleDTO purchaseDeliveryScheduleDTO) throws ApplicationException {
-
-		PurchaseDeliveryScheduleVO purchaseDeliveryScheduleVO = new PurchaseDeliveryScheduleVO();
+   String screenCode="PDS";
+   PurchaseDeliveryScheduleVO purchaseDeliveryScheduleVO = new PurchaseDeliveryScheduleVO();
 
 		String message;
 
@@ -152,6 +155,21 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 			message = "Purchase Delivery Schedule Updated Successfully";
 
 		} else {
+			
+			
+			String docId = purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleDocId(purchaseDeliveryScheduleDTO.getOrgId(),purchaseDeliveryScheduleDTO.getFinancialYear(),screenCode);
+
+			purchaseDeliveryScheduleVO.setDocId(docId);
+			
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(purchaseDeliveryScheduleDTO.getOrgId(), purchaseDeliveryScheduleDTO.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			purchaseDeliveryScheduleVO.setCreatedBy(purchaseDeliveryScheduleDTO.getCreatedBy());
 
@@ -510,87 +528,73 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		return responseMap;
 	}
+
 //	item dropdown for purchasedeliveryschedule 
 	@Override
-	public Map<String, Object> getItemsForPurchaseDeliverySchedule(
-	        String purchasecontractnumber,
-	        Long customer,
-	        Long branch,
-	        Long orgId) throws ApplicationException {
+	public Map<String, Object> getItemsForPurchaseDeliverySchedule(String purchasecontractnumber, Long customer,
+			Long branch, Long orgId) throws ApplicationException {
 
-	    Map<String, Object> responseMap = new HashMap<>();
+		Map<String, Object> responseMap = new HashMap<>();
 
-	    List<Object[]> itemList = purchaseDeliveryScheduleRepo
-	            .getItemsForPurchaseDeliverySchedule(purchasecontractnumber, customer,branch,orgId);
+		List<Object[]> itemList = purchaseDeliveryScheduleRepo
+				.getItemsForPurchaseDeliverySchedule(purchasecontractnumber, customer, branch, orgId);
 
-	    List<Map<String, Object>> responseList = new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : itemList) {
+		for (Object[] obj : itemList) {
 
-	        Map<String, Object> itemMap = new HashMap<>();
+			Map<String, Object> itemMap = new HashMap<>();
 
-	        itemMap.put("item",
-	                obj[0] != null ? obj[0].toString() : "");
+			itemMap.put("item", obj[0] != null ? obj[0].toString() : "");
 
-	        itemMap.put("supplier",
-	                obj[1] != null ? ((Number) obj[1]).longValue() : null);
+			itemMap.put("supplier", obj[1] != null ? ((Number) obj[1]).longValue() : null);
 
-	        itemMap.put("primaryUnit",
-	                obj[2] != null ? ((Number) obj[2]).longValue() : null);
+			itemMap.put("primaryUnit", obj[2] != null ? ((Number) obj[2]).longValue() : null);
 
-	        itemMap.put("purchaseUnit",
-	                obj[3] != null ? ((Number) obj[3]).longValue() : null);
+			itemMap.put("purchaseUnit", obj[3] != null ? ((Number) obj[3]).longValue() : null);
 
-	        responseList.add(itemMap);
-	    }
+			responseList.add(itemMap);
+		}
 
-	    responseMap.put("message", "Item List Fetched Successfully");
-	    responseMap.put("itemList", responseList);
+		responseMap.put("message", "Item List Fetched Successfully");
+		responseMap.put("itemList", responseList);
 
-	    return responseMap;
+		return responseMap;
 	}
-	
+
 //	Purchasecontractnumber dropdown
 	@Override
-	public Map<String, Object> getPurchaseOrderNumberForPurchaseDeliverySchedule(
-	        Long customer,
-	        LocalDate docdt,
-	        Long branch,
-	        Long orgId) throws ApplicationException {
+	public Map<String, Object> getPurchaseOrderNumberForPurchaseDeliverySchedule(Long customer, LocalDate docdt,
+			Long branch, Long orgId) throws ApplicationException {
 
-	    Map<String, Object> responseMap = new HashMap<>();
+		Map<String, Object> responseMap = new HashMap<>();
 
-	    List<Object[]> contractList =
-	            purchaseDeliveryScheduleRepo
-	                    .getPurchaseOrderNumberForPurchaseDeliverySchedule(
-	                            customer, docdt, branch, orgId);
+		List<Object[]> contractList = purchaseDeliveryScheduleRepo
+				.getPurchaseOrderNumberForPurchaseDeliverySchedule(customer, docdt, branch, orgId);
 
-	    List<Map<String, Object>> responseList = new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : contractList) {
+		for (Object[] obj : contractList) {
 
-	        Map<String, Object> contractMap = new HashMap<>();
+			Map<String, Object> contractMap = new HashMap<>();
 
-	        contractMap.put("id",
-	                obj[0] != null ? ((Number) obj[0]).longValue() : null);
+			contractMap.put("id", obj[0] != null ? ((Number) obj[0]).longValue() : null);
 
-	        contractMap.put("purchaseorderno",
-	                obj[1] != null ? obj[1].toString() : "");
+			contractMap.put("purchaseorderno", obj[1] != null ? obj[1].toString() : "");
 
-	        contractMap.put("docDate",
-	                obj[2] != null ? obj[2] : null);
+			contractMap.put("docDate", obj[2] != null ? obj[2] : null);
 
-	        contractMap.put("supplier",
-	                obj[3] != null ? ((Number) obj[3]).longValue() : null);
+			contractMap.put("supplier", obj[3] != null ? ((Number) obj[3]).longValue() : null);
 
-	        responseList.add(contractMap);
-	    }
+			responseList.add(contractMap);
+		}
 
-	    responseMap.put("message", "Purchase Contract List Fetched Successfully");
-	    responseMap.put("purchaseContractList", responseList);
+		responseMap.put("message", "Purchase Contract List Fetched Successfully");
+		responseMap.put("purchaseContractList", responseList);
 
-	    return responseMap;
+		return responseMap;
 	}
+
 	// GateInwardEntry
 	@Override
 	@Transactional
@@ -1593,25 +1597,17 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		// Dealer Type
 		// ======================================================
 
-		if (dto.getDealerType() != null && dto.getDealerType() > 0) {
-
-			ListOfValuesDetailsVO dealerType = listOfValuesDetailsRepo.findById(dto.getDealerType())
-					.orElseThrow(() -> new ApplicationException("Dealer Type Not Found"));
-
-			vo.setDealerType(dealerType);
-		}
-
 		// ======================================================
 		// Posting Category
 		// ======================================================
 
-		if (dto.getPostingCategory() != null && dto.getPostingCategory() > 0) {
-
-			ListOfValuesDetailsVO postingCategory = listOfValuesDetailsRepo.findById(dto.getPostingCategory())
-					.orElseThrow(() -> new ApplicationException("Posting Category Not Found"));
-
-			vo.setPostingCategory(postingCategory);
-		}
+//		if (dto.getPostingCategory() != null && dto.getPostingCategory() > 0) {
+//
+//			ListOfValuesDetailsVO postingCategory = listOfValuesDetailsRepo.findById(dto.getPostingCategory())
+//					.orElseThrow(() -> new ApplicationException("Posting Category Not Found"));
+//
+//			vo.setPostingCategory(postingCategory);
+//		}
 
 		// ======================================================
 		// ECC Type
@@ -1739,75 +1735,57 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		// ======================================================
 		if (vo.getSupplier() != null) {
 
-		    PurchaseBillSupplierResponseDTO supplierDTO =
-		            new PurchaseBillSupplierResponseDTO();
+			PurchaseBillSupplierResponseDTO supplierDTO = new PurchaseBillSupplierResponseDTO();
 
-		    supplierDTO.setId(vo.getSupplier().getId());
+			supplierDTO.setId(vo.getSupplier().getId());
 
-		    supplierDTO.setSupplierCode(
-		            vo.getSupplier().getCustomerCode());
+			supplierDTO.setSupplierCode(vo.getSupplier().getCustomerCode());
 
-		    supplierDTO.setSupplierName(
-		            vo.getSupplier().getCustomerName());
+			supplierDTO.setSupplierName(vo.getSupplier().getCustomerName());
 
-		    // GST State
-		    if (vo.getSupplier().getGstState() != null) {
+			supplierDTO.setDealerType(vo.getSupplier().isRegistered());
 
-		        GSTStateResponseDTO gstStateDTO =
-		                new GSTStateResponseDTO();
+			// GST State
+			if (vo.getSupplier().getGstState() != null) {
 
-		        gstStateDTO.setId(
-		                vo.getSupplier().getGstState().getId());
+				GSTStateResponseDTO gstStateDTO = new GSTStateResponseDTO();
 
-		        gstStateDTO.setStateCode(
-		                vo.getSupplier().getGstState().getStateCode());
+				gstStateDTO.setId(vo.getSupplier().getGstState().getId());
 
-		        gstStateDTO.setStateName(
-		                vo.getSupplier().getGstState().getStateName());
+				gstStateDTO.setStateCode(vo.getSupplier().getGstState().getStateCode());
 
-		        supplierDTO.setGstState(gstStateDTO);
-		    }
+				gstStateDTO.setStateName(vo.getSupplier().getGstState().getStateName());
 
-		    // GST Number
-		    supplierDTO.setGstNNo(
-		            vo.getSupplier().getGstNo());
+				supplierDTO.setGstState(gstStateDTO);
+			}
 
-		    // ECC Type
-		    supplierDTO.setEccType(
-		            vo.getSupplier().getEccType());
+			// GST Number
+			supplierDTO.setGstNNo(vo.getSupplier().getGstNo());
 
-		    dto.setSupplier(supplierDTO);
+			// ECC Type
+			supplierDTO.setEccType(vo.getSupplier().getEccType());
+
+			dto.setSupplier(supplierDTO);
 		}
 
 		// ======================================================
 		// Dealer Type
 		// ======================================================
 
-		if (vo.getDealerType() != null) {
-
-			ListOfVlauesDetailsResponseDTO dealerTypeDTO = new ListOfVlauesDetailsResponseDTO();
-
-			dealerTypeDTO.setId(vo.getDealerType().getId());
-
-			dealerTypeDTO.setValueCode(vo.getDealerType().getValueCode());
-
-			dto.setDealerType(dealerTypeDTO);
-		}
-
 		// ======================================================
 		// Posting Category
 		// ======================================================
 
-		if (vo.getPostingCategory() != null) {
-
-			ListOfVlauesDetailsResponseDTO postingCategoryDTO = new ListOfVlauesDetailsResponseDTO();
-
-			postingCategoryDTO.setId(vo.getPostingCategory().getId());
-
-			postingCategoryDTO.setValueCode(vo.getPostingCategory().getValueCode());
-
-			dto.setPostingCategory(postingCategoryDTO);
-		}
+//		if (vo.getPostingCategory() != null) {
+//
+//			ListOfVlauesDetailsResponseDTO postingCategoryDTO = new ListOfVlauesDetailsResponseDTO();
+//
+//			postingCategoryDTO.setId(vo.getPostingCategory().getId());
+//
+//			postingCategoryDTO.setValueCode(vo.getPostingCategory().getValueCode());
+//
+//			dto.setPostingCategory(postingCategoryDTO);
+//		}
 
 		// ======================================================
 		// ECC Type
@@ -1862,6 +1840,8 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 				supplierMap.put("stateName", obj[9] != null ? obj[9].toString() : null);
 
+				supplierMap.put("isRegistered", obj[10] != null ? ((Boolean) obj[10]) : null);
+
 				responseList.add(supplierMap);
 			}
 		}
@@ -1903,6 +1883,14 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		}
 
 		return responseList;
+	}
+
+	@Override
+	public String getPurchaseDeliveryScheduleDocId(Long orgId, String financialYear, String screenCode) {
+		String screenCode1 = "PDS";
+		String result = purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleDocId(orgId, financialYear,
+				screenCode1);
+		return result;
 	}
 
 }

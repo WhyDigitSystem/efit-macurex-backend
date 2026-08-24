@@ -41,6 +41,11 @@ public class PurchaseBillDTO {
 	private Long eccType;
 	private String supplierDcInvNo;
 	private LocalDate supplierDcInvDate;
+	
+//	---------import purchase bill
+	private String creditAcc;
+	private Long statutoryForms;
+	private String supplierInvValue;
 
 	// -------- 3. Charges Summary --------
 	private BigDecimal totalFreight;

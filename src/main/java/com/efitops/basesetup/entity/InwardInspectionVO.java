@@ -19,6 +19,7 @@ import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
@@ -55,6 +56,7 @@ public class InwardInspectionVO {
 
 	@ManyToOne
 	@JoinColumn(name = "supplier_code")
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "gstState", "branch", "city", "country", "state", "customerContactDetails", "customerShippingDetails", "CustomerItemDetailsVO"})
 	private CustomerVO supplierCode;
 
 	@Column(name = "time_of_inspection")

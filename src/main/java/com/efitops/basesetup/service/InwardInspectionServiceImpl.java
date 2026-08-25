@@ -54,6 +54,8 @@ import com.efitops.basesetup.entity.InwardInspectionMeasurementsVO;
 import com.efitops.basesetup.entity.InwardInspectionVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.PurchaseDeliveryScheduleDetailsVO;
+import com.efitops.basesetup.entity.PurchaseDeliveryScheduleLineVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -226,13 +228,24 @@ public class InwardInspectionServiceImpl implements InwardInspectionService {
 
 		if (ObjectUtils.isNotEmpty(vo.getId())) {
 			List<InwardInspectionDetailsVO> oldDetails = inwardInspectionDetailsRepo.findByInwardInspectionVO(vo);
+
+			for (InwardInspectionDetailsVO detailVO : oldDetails) {
+
+				List<InwardInspectionMeasurementsVO> oldLines = inwardInspectionMeasurementsRepo
+						.findByInwardInspectionDetailsVO(detailVO);
+
+				inwardInspectionMeasurementsRepo.deleteAll(oldLines);
+			}
+
 			inwardInspectionDetailsRepo.deleteAll(oldDetails);
+
 			List<InwardInspectionFileUploadDetailsVO> oldFileDetails = inwardInspectionFileUploadDetailsRepo
 					.findByInwardInspectionVO(vo);
 			inwardInspectionFileUploadDetailsRepo.deleteAll(oldFileDetails);
 		}
 
 		List<InwardInspectionDetailsVO> detailsList = new ArrayList<>();
+
 		if (dto.getInwardInspectionDetailsDTO() != null) {
 			for (InwardInspectionDetailsDTO detailDTO : dto.getInwardInspectionDetailsDTO()) {
 				InwardInspectionDetailsVO detailVO = new InwardInspectionDetailsVO();
@@ -402,12 +415,12 @@ public class InwardInspectionServiceImpl implements InwardInspectionService {
 			supplierDTO.setId(vo.getSupplierCode().getId());
 			supplierDTO.setSupplierName(vo.getSupplierCode().getCustomerName());
 			supplierDTO.setSupplierCode(vo.getSupplierCode().getCustomerCode());
-			supplierDTO.setAddress(vo.getSupplierCode().getAddress());
-			supplierDTO.setGstNo(vo.getSupplierCode().getGstNo());
-			supplierDTO.setGstApproval(vo.getSupplierCode().isGstApplicable() ? "Yes" : "No");
-			if (vo.getSupplierCode().getGstState() != null) {
-				supplierDTO.setGstSate(vo.getSupplierCode().getGstState().getStateName());
-			}
+//			supplierDTO.setAddress(vo.getSupplierCode().getAddress());
+//			supplierDTO.setGstNo(vo.getSupplierCode().getGstNo());
+//			supplierDTO.setGstApproval(vo.getSupplierCode().isGstApplicable() ? "Yes" : "No");
+//			if (vo.getSupplierCode().getGstState() != null) {
+//				supplierDTO.setGstSate(vo.getSupplierCode().getGstState().getStateName());
+//			}
 			responseDTO.setSupplierCode(supplierDTO);
 		}
 

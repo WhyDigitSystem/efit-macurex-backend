@@ -1618,6 +1618,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			map.put("orderQty", ch[4] != null ? new BigDecimal(ch[4].toString()) : BigDecimal.ZERO);
 			map.put("suppliedQty", ch[5] != null ? new BigDecimal(ch[5].toString()) : BigDecimal.ZERO);
 			map.put("pendingQty", ch[6] != null ? new BigDecimal(ch[6].toString()) : BigDecimal.ZERO);
+			map.put("unitDescription", ch[7] != null ? ch[7].toString() : "");
 			list.add(map);
 		}
 		return list;

@@ -34,6 +34,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DirectPurchaseCashDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DirectPurchaseFileUploadDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DirectPurchaseTaxDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
+import com.efitops.basesetup.ResponseDTO.GSTStateMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ItemCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseCloseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LmeResponseDTO;
@@ -48,6 +55,9 @@ import com.efitops.basesetup.ResponseDTO.SupplierResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
+import com.efitops.basesetup.dto.DirectPurchaseCashDetailsDTO;
+import com.efitops.basesetup.dto.DirectPurchaseDTO;
+import com.efitops.basesetup.dto.DirectPurchaseTaxDetailsDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
@@ -61,7 +71,13 @@ import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
+import com.efitops.basesetup.entity.DirectPurchaseCashDetailsVO;
+import com.efitops.basesetup.entity.DirectPurchaseFileUploadDetailsVO;
+import com.efitops.basesetup.entity.DirectPurchaseTaxDetailsVO;
+import com.efitops.basesetup.entity.DirectPurchaseVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
+import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.LMEVO;
 import com.efitops.basesetup.entity.PurchaseOrderDeliveryScheduleShortCloseDetailsVO;
@@ -77,7 +93,13 @@ import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
+import com.efitops.basesetup.repository.DirectPurchaseCashDetailsRepo;
+import com.efitops.basesetup.repository.DirectPurchaseFileUploadDetailsRepo;
+import com.efitops.basesetup.repository.DirectPurchaseRepo;
+import com.efitops.basesetup.repository.DirectPurchaseTaxDetailsRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
+import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.LMERepo;
 import com.efitops.basesetup.repository.PurchaseOrderDeliveryScheduleShortCloseDetailsRepo;
@@ -141,6 +163,24 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 	@Autowired
 	PurchaseOrderDeliveryScheduleShortCloseDetailsRepo purchaseOrderDeliveryScheduleShortCloseDetailsRepo;
+
+	@Autowired
+	private DirectPurchaseRepo directPurchaseRepo;
+
+	@Autowired
+	private DirectPurchaseCashDetailsRepo directPurchaseCashDetailsRepo;
+
+	@Autowired
+	private DirectPurchaseTaxDetailsRepo directPurchaseTaxDetailsRepo;
+
+	@Autowired
+	private DirectPurchaseFileUploadDetailsRepo directPurchaseFileUploadDetailsRepo;
+
+	@Autowired
+	GSTStateMasterRepo gstStateMasterRepo;
+
+	@Autowired
+	EmployeeMasterRepo employeeMasterRepo;
 
 	@Override
 	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException {
@@ -1365,12 +1405,14 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			PurchaseOrderDeliveryScheduleShortCloseVO purchaseOrderDeliveryScheduleShortCloseVO)
 			throws ApplicationException {
 
-		
 		purchaseOrderDeliveryScheduleShortCloseVO.setActive(purchaseOrderDeliveryScheduleShortCloseDTO.isActive());
-		purchaseOrderDeliveryScheduleShortCloseVO.setCancelRemarks(purchaseOrderDeliveryScheduleShortCloseDTO.getCancelRemarks());
+		purchaseOrderDeliveryScheduleShortCloseVO
+				.setCancelRemarks(purchaseOrderDeliveryScheduleShortCloseDTO.getCancelRemarks());
 		purchaseOrderDeliveryScheduleShortCloseVO.setOrgId(purchaseOrderDeliveryScheduleShortCloseDTO.getOrgId());
-		purchaseOrderDeliveryScheduleShortCloseVO.setFinancialYear(purchaseOrderDeliveryScheduleShortCloseDTO.getFinancialYear());
-		purchaseOrderDeliveryScheduleShortCloseVO.setNarration(purchaseOrderDeliveryScheduleShortCloseDTO.getNarration());
+		purchaseOrderDeliveryScheduleShortCloseVO
+				.setFinancialYear(purchaseOrderDeliveryScheduleShortCloseDTO.getFinancialYear());
+		purchaseOrderDeliveryScheduleShortCloseVO
+				.setNarration(purchaseOrderDeliveryScheduleShortCloseDTO.getNarration());
 		purchaseOrderDeliveryScheduleShortCloseVO
 				.setBelongsTo(purchaseOrderDeliveryScheduleShortCloseDTO.getBelongsTo());
 
@@ -1399,11 +1441,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 			purchaseOrderDeliveryScheduleShortCloseVO.setBranch(branch);
 		}
-		
-		
-		
-		
-		
 
 		if (ObjectUtils.isNotEmpty(purchaseOrderDeliveryScheduleShortCloseVO.getId())) {
 
@@ -1624,4 +1661,566 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		return list;
 	}
 
+	// Direct Purchase
+
+	@Override
+	public DirectPurchaseResponseDTO getDirectPurchaseById(Long id) throws ApplicationException {
+		DirectPurchaseVO directPurchaseVO = directPurchaseRepo.getDirectPurchaseById(id);
+
+		if (directPurchaseVO == null) {
+			throw new ApplicationException("Direct Purchase Not Found");
+		}
+
+		return buildDirectPurchaseResponse(directPurchaseVO);
+	}
+
+	@Override
+	public List<DirectPurchaseResponseDTO> getDirectPurchaseByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+		List<DirectPurchaseVO> inwardInspectionList = directPurchaseRepo.getDirectPurchaseByOrgId(orgId, branch);
+		if (inwardInspectionList == null || inwardInspectionList.isEmpty()) {
+			throw new ApplicationException("Direct Purchase Not Found");
+		}
+		List<DirectPurchaseResponseDTO> responseList = new ArrayList<>();
+		for (DirectPurchaseVO inwardInspectionVO : inwardInspectionList) {
+			responseList.add(buildDirectPurchaseResponse(inwardInspectionVO));
+		}
+		return responseList;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateDirectPurchase(DirectPurchaseDTO directPurchaseDTO, MultipartFile[] files)
+			throws ApplicationException {
+		DirectPurchaseVO directPurchaseVO;
+		String message;
+
+		if (ObjectUtils.isNotEmpty(directPurchaseDTO.getId())) {
+			directPurchaseVO = directPurchaseRepo.findById(directPurchaseDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Direct Purchase Not Found"));
+
+			directPurchaseVO.setUpdatedBy(directPurchaseDTO.getCreatedBy());
+			message = "Direct Purchase Updated Successfully";
+		} else {
+			directPurchaseVO = new DirectPurchaseVO();
+			String screenCode = "DP";
+			String docId = directPurchaseRepo.getDirectPurchaseDocId(directPurchaseDTO.getOrgId(),
+					directPurchaseDTO.getFinancialYear(), screenCode);
+			directPurchaseVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(directPurchaseDTO.getOrgId(),
+							directPurchaseDTO.getFinancialYear(), screenCode);
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			directPurchaseVO.setCreatedBy(directPurchaseDTO.getCreatedBy());
+			directPurchaseVO.setUpdatedBy(directPurchaseDTO.getCreatedBy());
+			message = "Direct Purchase Created Successfully";
+		}
+
+		setDirectPurchaseValues(directPurchaseDTO, directPurchaseVO);
+
+		directPurchaseVO = directPurchaseRepo.save(directPurchaseVO);
+		saveAttachmentss(files, directPurchaseVO);
+
+		DirectPurchaseResponseDTO directPurchaseResponse = buildDirectPurchaseResponse(directPurchaseVO);
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("directPurchaseVO", directPurchaseResponse);
+		return response;
+	}
+
+	private void setDirectPurchaseValues(DirectPurchaseDTO dto, DirectPurchaseVO vo) throws ApplicationException {
+
+		vo.setBelongsTo(dto.getBelongsTo());
+		vo.setSupplierName(dto.getSupplierName());
+		vo.setInvDate(dto.getInvDate());
+		vo.setIsIgstApplicable(dto.getIsIgstApplicable());
+		vo.setIssueTo(dto.getIssueTo());
+		vo.setGstnNo(dto.getGstnNo());
+		vo.setInvNo(dto.getInvNo());
+		vo.setSuppType(dto.getSuppType());
+		vo.setDealerType(dto.getDealerType());
+		vo.setEccNoStNo(dto.getEccNoStNo());
+		vo.setIsReverseCharge(dto.getIsReverseCharge());
+		vo.setRemarks(dto.getRemarks());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		vo.setDiscount(dto.getDiscount());
+		vo.setAfterDiscountTotalAmount(dto.getAfterDiscountTotalAmount());
+		vo.setBasicAmount(dto.getBasicAmount());
+		vo.setTotalAmount(dto.getTotalAmount());
+
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branch);
+		}
+
+		if (dto.getGstState() != null && dto.getGstState() != 0) {
+
+			GSTStateMasterVO gstState = gstStateMasterRepo.findById(dto.getGstState())
+					.orElseThrow(() -> new ApplicationException("GST State Not Found"));
+
+			vo.setGstState(gstState);
+		}
+
+		if (dto.getItemCategory() != null && dto.getItemCategory() != 0) {
+
+			ItemMasterVO itemCategory = itemMasterRepo.findByItemType(dto.getItemCategory())
+					.orElseThrow(() -> new ApplicationException("Item Category Not Found"));
+
+			vo.setItemCategory(itemCategory);
+		}
+
+		if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
+
+			EmployeeMasterVO preparedBy = employeeMasterRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+			vo.setPreparedBy(preparedBy);
+		}
+
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+
+			List<DirectPurchaseCashDetailsVO> oldCashDetails = directPurchaseCashDetailsRepo.findByDirectPurchaseVO(vo);
+
+			if (oldCashDetails != null && !oldCashDetails.isEmpty()) {
+				directPurchaseCashDetailsRepo.deleteAll(oldCashDetails);
+			}
+			
+			List<DirectPurchaseTaxDetailsVO> oldTaxDetails = directPurchaseTaxDetailsRepo.findByDirectPurchaseVO(vo);
+
+			if (oldTaxDetails != null && !oldTaxDetails.isEmpty()) {
+				directPurchaseTaxDetailsRepo.deleteAll(oldTaxDetails);
+			}
+		
+		}
+
+		List<DirectPurchaseCashDetailsVO> cashDetailsList = new ArrayList<>();
+
+		if (dto.getDirectPurchaseCashDetailsDTO() != null && !dto.getDirectPurchaseCashDetailsDTO().isEmpty()) {
+
+			for (DirectPurchaseCashDetailsDTO detailDTO : dto.getDirectPurchaseCashDetailsDTO()) {
+
+				DirectPurchaseCashDetailsVO detailVO = new DirectPurchaseCashDetailsVO();
+
+				detailVO.setItemCode(detailDTO.getItemCode());
+				detailVO.setItemDescription(detailDTO.getItemDescription());
+				detailVO.setHsnCode(detailDTO.getHsnCode());
+				detailVO.setTaxType(detailDTO.getTaxType());
+
+				// Unit
+				if (detailDTO.getUnit() != null && detailDTO.getUnit() > 0) {
+
+					UnitMasterVO unit = unitMasterRepo.findById(detailDTO.getUnit())
+							.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+
+					detailVO.setUnit(unit);
+				}
+
+				detailVO.setDcQty(detailDTO.getDcQty());
+				detailVO.setReceivedQty(detailDTO.getReceivedQty());
+				detailVO.setRate(detailDTO.getRate());
+				detailVO.setTax(detailDTO.getTax());
+
+				BigDecimal quantity = detailDTO.getDcQty() != null ? detailDTO.getDcQty() : BigDecimal.ZERO;
+
+				BigDecimal rate = detailDTO.getRate() != null ? detailDTO.getRate() : BigDecimal.ZERO;
+
+				BigDecimal amount = quantity.multiply(rate);
+
+				detailVO.setAmount(amount);
+
+				BigDecimal taxPercentage = detailDTO.getTax() != null ? detailDTO.getTax() : BigDecimal.ZERO;
+
+				BigDecimal igstRate = BigDecimal.ZERO;
+				BigDecimal cgstRate = BigDecimal.ZERO;
+				BigDecimal sgstRate = BigDecimal.ZERO;
+
+				BigDecimal igstAmount = BigDecimal.ZERO;
+				BigDecimal cgstAmount = BigDecimal.ZERO;
+				BigDecimal sgstAmount = BigDecimal.ZERO;
+
+				if ("Yes".equalsIgnoreCase(dto.getIsIgstApplicable())) {
+
+					igstRate = taxPercentage;
+
+					igstAmount = amount.multiply(igstRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+					detailVO.setIgstRate(igstRate);
+					detailVO.setIgstAmount(igstAmount);
+
+				} else {
+
+					cgstRate = taxPercentage.divide(BigDecimal.valueOf(2), 2, RoundingMode.HALF_UP);
+
+					sgstRate = taxPercentage.divide(BigDecimal.valueOf(2), 2, RoundingMode.HALF_UP);
+
+					cgstAmount = amount.multiply(cgstRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+					sgstAmount = amount.multiply(sgstRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+					detailVO.setCgstRate(cgstRate);
+					detailVO.setCgstAmount(cgstAmount);
+
+					detailVO.setSgstRate(sgstRate);
+					detailVO.setSgstAmount(sgstAmount);
+				}
+
+				detailVO.setDirectPurchaseVO(vo);
+
+				cashDetailsList.add(detailVO);
+			}
+		}
+
+		vo.setDirectPurchaseCashDetailsVO(cashDetailsList);
+
+		List<DirectPurchaseTaxDetailsVO> taxList = new ArrayList<>();
+
+		if (dto.getDirectPurchaseTaxDetailsDTO() != null && !dto.getDirectPurchaseTaxDetailsDTO().isEmpty()) {
+
+			for (DirectPurchaseTaxDetailsDTO taxDTO : dto.getDirectPurchaseTaxDetailsDTO()) {
+
+				DirectPurchaseTaxDetailsVO taxVO = new DirectPurchaseTaxDetailsVO();
+
+				taxVO.setParticulars(taxDTO.getParticulars());
+				taxVO.setTax(taxDTO.getTax());
+				taxVO.setAcceptedQtyAmount(taxDTO.getAcceptedQtyAmount());
+				taxVO.setRevisedAmount(taxDTO.getRevisedAmount());
+				taxVO.setTaxId(taxDTO.getTaxId());
+
+				taxVO.setDirectPurchaseVO(vo);
+
+				taxList.add(taxVO);
+			}
+		}
+
+		vo.setDirectPurchaseTaxDetailsVO(taxList);
+	}
+
+
+	private void createDirectorys(Path path) throws IOException {
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
+	@Value("${direction.purchase}")
+	private String uploadPaths;
+
+	private void saveAttachmentss(MultipartFile[] files, DirectPurchaseVO directPurchaseVO)
+			throws ApplicationException {
+		if (files == null || files.length == 0) {
+			return;
+		}
+
+		try {
+			Path inwardFolder = Paths.get(uploadPaths, "directpurchase", directPurchaseVO.getId().toString());
+			createDirectorys(inwardFolder);
+
+			if (ObjectUtils.isNotEmpty(directPurchaseVO.getId())) {
+				List<DirectPurchaseFileUploadDetailsVO> existingAttachments = directPurchaseFileUploadDetailsRepo
+						.findByDirectPurchaseVO(directPurchaseVO);
+				if (existingAttachments != null && !existingAttachments.isEmpty()) {
+					directPurchaseFileUploadDetailsRepo.deleteAll(existingAttachments);
+				}
+			}
+
+			List<DirectPurchaseFileUploadDetailsVO> attachmentList = new ArrayList<>();
+			for (MultipartFile file : files) {
+				if (file == null || file.isEmpty()) {
+					continue;
+				}
+
+				String originalName = file.getOriginalFilename();
+				if (originalName == null) {
+					originalName = "file";
+				}
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+				if (originalName.contains(".")) {
+					extension = originalName.substring(originalName.lastIndexOf("."));
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				String fileName = originalName + "_" + directPurchaseVO.getId() + extension;
+				Path filePath = inwardFolder.resolve(fileName);
+
+				try (InputStream inputStream = file.getInputStream()) {
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/purchaseOrder/viewDirectPurchaseFile/").toUriString();
+				String relativePath = uploadPath.replace("\\", "/");
+				relativePath = filePath.toString().replace("\\", "/").replace(relativePath + "/", "");
+				String publicUrl = baseUrl + relativePath;
+
+				DirectPurchaseFileUploadDetailsVO attachment = new DirectPurchaseFileUploadDetailsVO();
+				attachment.setDirectPurchaseVO(directPurchaseVO);
+				attachment.setName(file.getOriginalFilename());
+				attachment.setFileName(fileName);
+				attachment.setFilePath(publicUrl);
+				attachment.setFileSize(file.getSize());
+//				attachment.setContentType(file.getContentType());
+//				attachment.setUploadOn(LocalDateTime.now());
+				attachmentList.add(attachment);
+			}
+
+			if (!attachmentList.isEmpty()) {
+				List<DirectPurchaseFileUploadDetailsVO> saved = directPurchaseFileUploadDetailsRepo
+						.saveAll(attachmentList);
+				directPurchaseVO.setDirectPurchaseFileUploadDetailsVO(saved);
+			}
+
+		} catch (IOException e) {
+			throw new ApplicationException("File Upload Failed : " + e.getMessage());
+		}
+	}
+
+	
+
+	@Override
+	public ResponseEntity<byte[]> viewDirectPurchaseFile(HttpServletRequest request) throws IOException {
+		return serveFiles(request, "/api/purchaseOrder/viewDirectPurchaseFile/", uploadPaths);
+	}
+
+	private ResponseEntity<byte[]> serveFiles(HttpServletRequest request, String apiPrefix, String uploadPaths)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+		String relativePath = uri.replace(apiPrefix, "");
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadPaths).toAbsolutePath().normalize();
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+
+	@Override
+	public String getDirectPurchaseDocId(Long orgId, String financialYear) {
+		String screenCode = "DP";
+		return directPurchaseRepo.getDirectPurchaseDocId(orgId, financialYear, screenCode);
+	}
+
+	private DirectPurchaseResponseDTO buildDirectPurchaseResponse(DirectPurchaseVO vo) {
+
+		DirectPurchaseResponseDTO responseDTO = new DirectPurchaseResponseDTO();
+
+		responseDTO.setId(vo.getId());
+		responseDTO.setDocId(vo.getDocId());
+		responseDTO.setDocDate(vo.getDocDate());
+		responseDTO.setBelongsTo(vo.getBelongsTo());
+		responseDTO.setSupplierName(vo.getSupplierName());
+		responseDTO.setInvDate(vo.getInvDate());
+		responseDTO.setIsIgstApplicable(vo.getIsIgstApplicable());
+		responseDTO.setIssueTo(vo.getIssueTo());
+		responseDTO.setGstnNo(vo.getGstnNo());
+		responseDTO.setInvNo(vo.getInvNo());
+		responseDTO.setSuppType(vo.getSuppType());
+		responseDTO.setDealerType(vo.getDealerType());
+		responseDTO.setEccNoStNo(vo.getEccNoStNo());
+		responseDTO.setIsReverseCharge(vo.getIsReverseCharge());
+
+		responseDTO.setBasicAmount(vo.getBasicAmount());
+		responseDTO.setDiscount(vo.getDiscount());
+		responseDTO.setAfterDiscountTotalAmount(vo.getAfterDiscountTotalAmount());
+		responseDTO.setTotalAmount(vo.getTotalAmount());
+
+		responseDTO.setRemarks(vo.getRemarks());
+
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
+		responseDTO.setActive(vo.getActive());
+		responseDTO.setCancel(vo.getCancel());
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+		responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+		responseDTO.setScreenName(vo.getScreenName());
+		responseDTO.setScreenCode(vo.getScreenCode());
+
+		if (vo.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(vo.getBranch().getId());
+			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+			branchDTO.setBranchName(vo.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
+
+		if (vo.getGstState() != null) {
+			GSTStateMasterResponseDTO gstStateDTO = new GSTStateMasterResponseDTO();
+			gstStateDTO.setId(vo.getGstState().getId());
+			gstStateDTO.setGstSate(vo.getGstState().getStateName());
+			gstStateDTO.setGstStateCode(vo.getGstState().getStateCode());
+			responseDTO.setGstState(gstStateDTO);
+		}
+
+		if (vo.getItemCategory() != null) {
+			ItemCategoryResponseDTO itemCategoryDTO = new ItemCategoryResponseDTO();
+			itemCategoryDTO.setId(vo.getItemCategory().getId());
+			itemCategoryDTO.setCategory(vo.getItemCategory().getItemCode());
+			responseDTO.setItemCategory(itemCategoryDTO);
+		}
+
+		if (vo.getPreparedBy() != null) {
+			EmployeeMasterResponseDetailsDTO preparedByDTO = new EmployeeMasterResponseDetailsDTO();
+			preparedByDTO.setId(vo.getPreparedBy().getId());
+			preparedByDTO.setEmployeeCode(vo.getPreparedBy().getEmployeeId());
+			preparedByDTO.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+			responseDTO.setPreparedBy(preparedByDTO);
+		}
+
+		List<DirectPurchaseCashDetailsResponseDTO> cashDetailsList = new ArrayList<>();
+
+		if (vo.getDirectPurchaseCashDetailsVO() != null && !vo.getDirectPurchaseCashDetailsVO().isEmpty()) {
+
+			for (DirectPurchaseCashDetailsVO detailVO : vo.getDirectPurchaseCashDetailsVO()) {
+
+				DirectPurchaseCashDetailsResponseDTO detailResponse = new DirectPurchaseCashDetailsResponseDTO();
+
+				detailResponse.setId(detailVO.getId());
+				detailResponse.setItemCode(detailVO.getItemCode());
+				detailResponse.setItemDescription(detailVO.getItemDescription());
+				detailResponse.setHsnCode(detailVO.getHsnCode());
+				detailResponse.setTaxType(detailVO.getTaxType());
+				detailResponse.setTaxPercentage(detailVO.getTax());
+
+				if (detailVO.getUnit() != null) {
+					UnitResponseDTO unitDTO = new UnitResponseDTO();
+					unitDTO.setId(detailVO.getUnit().getId());
+					unitDTO.setUnitId(detailVO.getUnit().getUnitId());
+					detailResponse.setUnit(unitDTO);
+				}
+
+				detailResponse.setDcQty(detailVO.getDcQty());
+				detailResponse.setReceivedQty(detailVO.getReceivedQty());
+				detailResponse.setRate(detailVO.getRate());
+				detailResponse.setAmount(detailVO.getAmount());
+
+				detailResponse.setCgstRate(detailVO.getCgstRate());
+				detailResponse.setCgstAmount(detailVO.getCgstAmount());
+				detailResponse.setSgstRate(detailVO.getSgstRate());
+				detailResponse.setSgstAmount(detailVO.getSgstAmount());
+				detailResponse.setIgstRate(detailVO.getIgstRate());
+				detailResponse.setIgstAmount(detailVO.getIgstAmount());
+
+				cashDetailsList.add(detailResponse);
+			}
+		}
+
+		responseDTO.setDirectPurchaseCashDetails(cashDetailsList);
+
+		List<DirectPurchaseTaxDetailsResponseDTO> taxList = new ArrayList<>();
+
+		if (vo.getDirectPurchaseTaxDetailsVO() != null && !vo.getDirectPurchaseTaxDetailsVO().isEmpty()) {
+
+			for (DirectPurchaseTaxDetailsVO taxVO : vo.getDirectPurchaseTaxDetailsVO()) {
+
+				DirectPurchaseTaxDetailsResponseDTO taxResponse = new DirectPurchaseTaxDetailsResponseDTO();
+
+				taxResponse.setId(taxVO.getId());
+				taxResponse.setParticulars(taxVO.getParticulars());
+				taxResponse.setTax(taxVO.getTax());
+				taxResponse.setAcceptedQtyAmount(taxVO.getAcceptedQtyAmount());
+				taxResponse.setRevisedAmount(taxVO.getRevisedAmount());
+				taxResponse.setTaxId(taxVO.getTaxId());
+
+				taxList.add(taxResponse);
+			}
+		}
+
+		responseDTO.setDirectPurchaseTaxDetails(taxList);
+
+		List<DirectPurchaseFileUploadDetailsResponseDTO> fileList = new ArrayList<>();
+
+		if (vo.getDirectPurchaseFileUploadDetailsVO() != null && !vo.getDirectPurchaseFileUploadDetailsVO().isEmpty()) {
+
+			for (DirectPurchaseFileUploadDetailsVO fileVO : vo.getDirectPurchaseFileUploadDetailsVO()) {
+
+				DirectPurchaseFileUploadDetailsResponseDTO fileResponse = new DirectPurchaseFileUploadDetailsResponseDTO();
+
+				fileResponse.setId(fileVO.getId());
+				fileResponse.setFileName(fileVO.getFileName());
+				fileResponse.setFilePath(fileVO.getFilePath());
+				fileResponse.setFileType(fileVO.getFileType());
+				fileResponse.setFileSize(fileVO.getFileSize());
+
+				fileList.add(fileResponse);
+			}
+		}
+
+		responseDTO.setDirectPurchaseFileUploadDetails(fileList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public List<Map<String, Object>> getIssueTo(Long orgId, Long branch) {
+		Set<Object[]> chType = directPurchaseRepo.getIssueTo(orgId, branch);
+		return getIssueTo(chType);
+	}
+
+	private List<Map<String, Object>> getIssueTo(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("issueTo", ch[0] != null ? ch[0].toString() : "");
+
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getItemType(Long orgId, Long branch, Long itemType) {
+		Set<Object[]> chType = directPurchaseRepo.getItemType(orgId, branch, itemType);
+		return getItemType(chType);
+	}
+
+	private List<Map<String, Object>> getItemType(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+
+			list.add(map);
+		}
+		return list;
+	}
 }

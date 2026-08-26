@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeMasterResponseDetailsDTO {
+public class ItemCategoryResponseDTO {
 	private Long id;
-	private  String employeeName;
-	private  String employeeCode;
-	
-}
+	private String category;
 
+}

@@ -1,6 +1,7 @@
 package com.efitops.basesetup.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.PurchaseOrderVO;
 
 @Repository
 public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
@@ -195,4 +197,7 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
         				List<Object[]> getPurchaseIndentItemDropdown(
         				        @Param("orgId") Long orgId,
         				        @Param("branch") Long branch);
+
+        	@Query(value = "SELECT * FROM item WHERE item_type = ?1", nativeQuery = true)
+				Optional<ItemMasterVO> findByItemType(Long itemCategory);
 }

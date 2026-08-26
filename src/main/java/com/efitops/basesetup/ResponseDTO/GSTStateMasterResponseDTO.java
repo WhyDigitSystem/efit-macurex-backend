@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeMasterResponseDetailsDTO {
+public class GSTStateMasterResponseDTO {
 	private Long id;
-	private  String employeeName;
-	private  String employeeCode;
-	
+	private String gstSate;
+	private String gstStateCode;
 }
-

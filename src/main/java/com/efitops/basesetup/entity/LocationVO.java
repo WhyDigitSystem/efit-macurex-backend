@@ -58,7 +58,7 @@ public class LocationVO {
 	private EmployeeMasterVO contactPersonName;
 
 	@ManyToOne
-	@JoinColumn(name = "party_name")
+	@JoinColumn(name = "customer")
 	private CustomerVO partyName;
 
 	@Column(name = "address")
@@ -80,12 +80,12 @@ public class LocationVO {
 	private Long orgId;
 	@Column(name = "created_by", length = 25)
 	private String createdBy;
-	@Column(name = "modify_by", length = 25)
+	@Column(name = "modified_by", length = 25)
 	private String updatedBy;
 	@Column(name = "cancel_remarks", length = 150)
 	private String cancelRemarks;
 	@Column(name = "active")
-	private boolean active = true;
+	private boolean active ;
 	@Column(name = "cancel")
 	private boolean cancel = false;
 

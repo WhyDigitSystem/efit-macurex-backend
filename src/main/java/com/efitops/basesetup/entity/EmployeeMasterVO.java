@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 public class EmployeeMasterVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "employeemastergen")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "employeemastergen")
 	@SequenceGenerator(name = "employeemastergen", sequenceName = "employeemasterseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "employeemaster_id")
 	private Long id;
@@ -155,9 +155,9 @@ public class EmployeeMasterVO {
 	@Column(name = "reference_by")
 	private String referenceBy;
 
-	@ManyToOne
-	@JoinColumn(name = "okd_by")
-	private EmployeeMasterVO okdBy;
+//	@ManyToOne
+//	@JoinColumn(name = "okd_by")
+//	private EmployeeMasterVO okdBy;
 
 	@Column(name = "mode_of_payment")
 	private String modeOfPayment;
@@ -184,7 +184,7 @@ public class EmployeeMasterVO {
 	private LocalDate dateOfConfirmation;
 
 	@Column(name = "information_active")
-	private String information_active;
+	private String informationActive;
 
 	@Column(name = "training_start_date")
 	private LocalDate trainingStartDate;
@@ -200,7 +200,7 @@ public class EmployeeMasterVO {
 
 	@Column(name = "current_salary_period_end")
 	private LocalDate currentSalaryPeriodEnd;
-	
+
 	@Column(name = "emp_name")
 	private String employeeName;
 
@@ -210,7 +210,7 @@ public class EmployeeMasterVO {
 	private String createdBy;
 
 	@Column(name = "active")
-	private boolean active = true;
+	private boolean active;
 
 	@Column(name = "cancel")
 	private boolean cancel = false;

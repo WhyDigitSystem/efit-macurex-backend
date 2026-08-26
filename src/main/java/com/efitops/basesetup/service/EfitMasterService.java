@@ -29,7 +29,7 @@ public interface EfitMasterService {
 
 	Map<String, Object> createUpdateDepartment(DepartmentDTO departmentDTO) throws ApplicationException;
 
-	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, Long branch);
+	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId);
 
 	List<DepartmentVO> getDepartmentById(Long id);
 
@@ -45,7 +45,7 @@ public interface EfitMasterService {
 
 	// Designation
 
-	List<DesignationVO> getDesignationByOrgId(Long orgId, Long branch);
+	List<DesignationVO> getDesignationByOrgId(Long orgId);
 
 	List<DesignationVO> getDesignationById(Long id);
 

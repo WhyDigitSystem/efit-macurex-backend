@@ -193,14 +193,14 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		departmentVO.setCreatedBy(departmentDTO.getCreatedBy());
 		departmentVO.setActive(departmentDTO.isActive());
 		departmentVO.setCancelRemarks(departmentDTO.getCancelRemarks());
-
-		if (departmentDTO.getBranch() != null && departmentDTO.getBranch() != 0) {
-
-			BranchVO branch = branchRepo.findById(departmentDTO.getBranch())
-					.orElseThrow(() -> new ApplicationException("branch Not Found"));
-
-			departmentVO.setBranch(branch);
-		}
+//
+//		if (departmentDTO.getBranch() != null && departmentDTO.getBranch() != 0) {
+//
+//			BranchVO branch = branchRepo.findById(departmentDTO.getBranch())
+//					.orElseThrow(() -> new ApplicationException("branch Not Found"));
+//
+//			departmentVO.setBranch(branch);
+//		}
 
 	}
 
@@ -212,11 +212,11 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 	}
 
 	@Override
-	public List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, Long branch) {
+	public List<DepartmentVO> getAllDepartmentByOrgId(Long orgId) {
 		List<DepartmentVO> departmentVO = new ArrayList<>();
 		if (ObjectUtils.isNotEmpty(orgId)) {
 			LOGGER.info("Successfully Received  Department BY OrgId : {}", orgId);
-			departmentVO = departmentRepo.getAllDepartmentByOrgId(orgId, branch);
+			departmentVO = departmentRepo.getAllDepartmentByOrgId(orgId);
 		}
 		return departmentVO;
 	}
@@ -351,11 +351,11 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 	}
 
 	@Override
-	public List<DesignationVO> getDesignationByOrgId(Long orgId, Long branch) {
+	public List<DesignationVO> getDesignationByOrgId(Long orgId) {
 		List<DesignationVO> designationVO = new ArrayList<>();
 		if (ObjectUtils.isNotEmpty(orgId)) {
 			LOGGER.info("Successfully Received ArapAdjustments BY OrgId : {}", orgId);
-			designationVO = designationrepo.getDesignationByOrgId(orgId, branch);
+			designationVO = designationrepo.getDesignationByOrgId(orgId);
 		}
 		return designationVO;
 	}
@@ -402,17 +402,6 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			}
 			message = "Designation  Updated Successfully";
 		} else {
-			createUpdateDesignationVOByDesignationDTO(designationDTO, designationVO);
-//			String docId = designationrepo.getDesignationDocId(designationDTO.getOrgId(), designationDTO.getFinYear(),
-//					designationDTO.getBranch(), screenCode);
-//			designationVO.setDocId(docId);
-
-//			// GETDOCID LASTNO +1
-//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-//					.findByOrgIdAndFinYearAndBranchCodeAndScreenCode(designationDTO.getOrgId(),
-//							designationDTO.getFinYear(), designationDTO.getBranchCode(), screenCode);
-//			documentTypeMappingDetailsVO.setLastno(documentTypeMappingDetailsVO.getLastno() + 1);
-//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			if (designationrepo.existsByDesignationAndDesignationCodeAndOrgId(designationDTO.getDesignation(),
 					designationDTO.getDesignationCode(), designationDTO.getOrgId())) {
@@ -440,6 +429,9 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			designationVO.setUpdatedBy(designationDTO.getCreatedBy());
 			message = "Designation Created Successfully";
 		}
+		
+		createUpdateDesignationVOByDesignationDTO(designationDTO, designationVO);
+
 
 		designationrepo.save(designationVO);
 		Map<String, Object> response = new HashMap<>();
@@ -456,14 +448,6 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		designationVO.setFinYear(designationDTO.getFinYear());
 		designationVO.setActive(designationDTO.isActive());
 		designationVO.setCancelRemarks(designationDTO.getCancelRemarks());
-		if (designationDTO.getBranch() != null && designationDTO.getBranch() != 0) {
-
-			BranchVO branch = branchRepo.findById(designationDTO.getBranch())
-					.orElseThrow(() -> new ApplicationException("branch Not Found"));
-
-			designationVO.setBranch(branch);
-		}
-
 	}
 
 	@Override
@@ -725,14 +709,14 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			message = "Employee Updated Successfully";
 		} else {
 //
-			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
-
-			employeeMasterVO.setEmployeeId(docId);
-
-			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
-			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
+//
+//			employeeMasterVO.setEmployeeId(docId);
+//
+//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+//					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
+//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			employeeMasterVO.setCreatedBy(employeeMasterDTO.getCreatedBy());
 			employeeMasterVO.setUpdatedBy(employeeMasterDTO.getCreatedBy());
@@ -853,14 +837,14 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setOverTimeApplicable(employeeMasterVO.getOverTimeApplicable());
 		responseDTO.setReferenceBy(employeeMasterVO.getReferenceBy());
 
-		if (employeeMasterVO.getOkdBy() != null) {
-
-			EmployeeResponseDTO employeeDTO = new EmployeeResponseDTO();
-			employeeDTO.setId(employeeMasterVO.getOkdBy().getId());
-			employeeDTO.setEmployeeName(employeeMasterVO.getOkdBy().getEmployeeName());
-
-			responseDTO.setOkdBy(employeeDTO);
-		}
+//		if (employeeMasterVO.getOkdBy() != null) {
+//
+//			EmployeeResponseDTO employeeDTO = new EmployeeResponseDTO();
+//			employeeDTO.setId(employeeMasterVO.getOkdBy().getId());
+//			employeeDTO.setEmployeeName(employeeMasterVO.getOkdBy().getEmployeeName());
+//
+//			responseDTO.setOkdBy(employeeDTO);
+//		}
 
 		if (employeeMasterVO.getBranch() != null) {
 			BranchResponseDTO branchDTO = new BranchResponseDTO();
@@ -876,7 +860,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setEsiDispName(employeeMasterVO.getEsiDispName());
 		responseDTO.setVpfPercentage(employeeMasterVO.getVpfPercentage());
 		responseDTO.setDateOfConfirmation(employeeMasterVO.getDateOfConfirmation());
-		responseDTO.setInformationActive(employeeMasterVO.getInformation_active());
+		responseDTO.setInformationActive(employeeMasterVO.getInformationActive());
 		responseDTO.setTrainingStartDate(employeeMasterVO.getTrainingStartDate());
 		responseDTO.setTrainingEndDate(employeeMasterVO.getTrainingEndDate());
 		responseDTO.setNoticePeriod(employeeMasterVO.getNoticePeriod());
@@ -1011,13 +995,13 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setOverTimeApplicable(employeeMasterDTO.getOverTimeApplicable());
 		employeeMasterVO.setReferenceBy(employeeMasterDTO.getReferenceBy());
 
-		if (employeeMasterDTO.getOkdById() != null && employeeMasterDTO.getOkdById() > 0) {
-
-			EmployeeMasterVO employee = employeeMasterRepo.findById(employeeMasterDTO.getOkdById())
-					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
-
-			employeeMasterVO.setOkdBy(employee);
-		}
+//		if (employeeMasterDTO.getOkdById() != null && employeeMasterDTO.getOkdById() > 0) {
+//
+//			EmployeeMasterVO employee = employeeMasterRepo.findById(employeeMasterDTO.getOkdById())
+//					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+//
+//			employeeMasterVO.setOkdBy(employee);
+//		}
 
 		employeeMasterVO.setModeOfPayment(employeeMasterDTO.getModeOfPayment());
 		employeeMasterVO.setBankAccountNo(employeeMasterDTO.getBankAccountNo());
@@ -1027,7 +1011,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setEsiDispName(employeeMasterDTO.getEsiDispName());
 		employeeMasterVO.setVpfPercentage(employeeMasterDTO.getVpfPercentage());
 		employeeMasterVO.setDateOfConfirmation(employeeMasterDTO.getDateOfConfirmation());
-		employeeMasterVO.setInformation_active(employeeMasterDTO.getInformation_active());
+		employeeMasterVO.setInformationActive(employeeMasterDTO.getInformationActive());
 		employeeMasterVO.setTrainingStartDate(employeeMasterDTO.getTrainingStartDate());
 		employeeMasterVO.setTrainingEndDate(employeeMasterDTO.getTrainingEndDate());
 		employeeMasterVO.setNoticePeriod(employeeMasterDTO.getNoticePeriod());

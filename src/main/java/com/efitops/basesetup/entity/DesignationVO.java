@@ -6,8 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -32,8 +30,8 @@ public class DesignationVO {
 	@Column(name = "designation_id")
 	private Long id;
 	
-	@Column(name = "doc_id")
-	private String docId;
+//	@Column(name = "doc_id")
+//	private String docId;
 	
     @Column(name = "designation", length = 30)
     private String designation;
@@ -48,7 +46,7 @@ public class DesignationVO {
 	@Column(name = "modified_by")
 	private String updatedBy;
 	@Column(name = "cancel")
-	private String cancel;
+	private boolean cancel;
 	
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
@@ -56,9 +54,9 @@ public class DesignationVO {
 	@Column(name = "active")
 	private boolean active;
 	
-	@ManyToOne
-	@JoinColumn(name = "branch")
-	private BranchVO branch;
+//	@ManyToOne
+//	@JoinColumn(name = "branch")
+//	private BranchVO branch;
 	
     @Column(name = "financial_year", length = 5)
     private String finYear;
@@ -74,5 +72,10 @@ public class DesignationVO {
 	@JsonGetter("active")
 	public String getActive() {
 		return active ? "Active" : "In-Active";
+	}
+	
+	@JsonGetter("cancel")
+	public String getCancel() {
+		return cancel ? "T" : "F";
 	}
 }

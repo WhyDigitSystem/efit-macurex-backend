@@ -120,7 +120,7 @@ public class EmployeeMasterDTO {
 
 	private LocalDate dateOfConfirmation;
 
-	private String information_active;
+	private String informationActive;
 
 	private LocalDate trainingStartDate;
 

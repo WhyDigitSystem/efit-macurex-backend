@@ -60,13 +60,13 @@ public class EfitMasterController extends BaseController {
 	// Department
 
 	@GetMapping("/getAllDepartmentByOrgId")
-	public ResponseEntity<ResponseDTO> getAllDepartmentByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getAllDepartmentByOrgId(@RequestParam Long orgId) {
 
 		String methodName = "getAllDepartmentByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		try {
-			List<DepartmentVO> departmentVO = efitMasterService.getAllDepartmentByOrgId(orgId, branch);
+			List<DepartmentVO> departmentVO = efitMasterService.getAllDepartmentByOrgId(orgId);
 
 			Map<String, Object> responseObjectsMap = new HashMap<>();
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Department information retrieved successfully.");
@@ -245,7 +245,7 @@ public class EfitMasterController extends BaseController {
 	// designation master
 
 	@GetMapping("/getDesignationByOrgId")
-	public ResponseEntity<ResponseDTO> getDesignationByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getDesignationByOrgId(@RequestParam Long orgId) {
 		String methodName = "getDesignationByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -253,7 +253,7 @@ public class EfitMasterController extends BaseController {
 		ResponseDTO responseDTO = null;
 		List<DesignationVO> designationVO = new ArrayList<>();
 		try {
-			designationVO = efitMasterService.getDesignationByOrgId(orgId, branch);
+			designationVO = efitMasterService.getDesignationByOrgId(orgId);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -300,7 +300,7 @@ public class EfitMasterController extends BaseController {
 
 	@PutMapping("/updateCreateDesignation")
 	public ResponseEntity<ResponseDTO> updateCreateDesignation(@RequestBody DesignationDTO designationdto) {
-		String methodName = "updateCreateTaxInvoice()";
+		String methodName = "updateCreateDesignation()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();

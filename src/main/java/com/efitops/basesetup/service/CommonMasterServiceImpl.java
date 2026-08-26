@@ -488,8 +488,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return dto;
 	}
 
-	@Override
 	@Transactional
+	@Override
 	public CompanyResponseDTO updateCompany(CompanyDTO companyDTO) throws Exception {
 
 		CompanyVO companyVO = companyRepo.findById(companyDTO.getId())
@@ -499,7 +499,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		mapUpdateCompanyDTOToVO(companyVO, companyDTO);
 
-		CompanyVO updatedCompany = companyRepo.save(companyVO);
+		CompanyVO updatedCompany = companyRepo.saveAndFlush(companyVO);
+//		CompanyVO updatedCompany = companyRepo.save(companyVO);
 		return mapCompanyVOToResponseDTO(updatedCompany);
 	}
 

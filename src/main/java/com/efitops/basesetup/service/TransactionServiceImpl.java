@@ -29,6 +29,9 @@ import com.efitops.basesetup.ResponseDTO.SalesContractDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesRejectionInvoiceDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesRejectionInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesRejectionInvoiceTaxDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesReturnDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesReturnResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesReturnTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
@@ -47,6 +50,9 @@ import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.dto.SalesRejectionInvoiceDTO;
 import com.efitops.basesetup.dto.SalesRejectionInvoiceDetailsDTO;
 import com.efitops.basesetup.dto.SalesRejectionInvoiceTaxDetailsDTO;
+import com.efitops.basesetup.dto.SalesReturnDTO;
+import com.efitops.basesetup.dto.SalesReturnDetailsDTO;
+import com.efitops.basesetup.dto.SalesReturnTaxDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
@@ -55,6 +61,7 @@ import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DocketInvoiceDetailsVO;
 import com.efitops.basesetup.entity.DocketInvoiceVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
+import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
@@ -66,6 +73,9 @@ import com.efitops.basesetup.entity.SalesDeliveryScheduleVO;
 import com.efitops.basesetup.entity.SalesRejectionInvoiceDetailsVO;
 import com.efitops.basesetup.entity.SalesRejectionInvoiceTaxDetailsVO;
 import com.efitops.basesetup.entity.SalesRejectionInvoiceVO;
+import com.efitops.basesetup.entity.SalesReturnDetailsVO;
+import com.efitops.basesetup.entity.SalesReturnTaxDetailsVO;
+import com.efitops.basesetup.entity.SalesReturnVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -76,6 +86,7 @@ import com.efitops.basesetup.repository.DespatchInstructionRepo;
 import com.efitops.basesetup.repository.DocketInvoiceDetRepo;
 import com.efitops.basesetup.repository.DocketInvoiceRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
+import com.efitops.basesetup.repository.HsnRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
@@ -89,6 +100,9 @@ import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
 import com.efitops.basesetup.repository.SalesRejectionInvoiceDetailsRepo;
 import com.efitops.basesetup.repository.SalesRejectionInvoiceRepo;
 import com.efitops.basesetup.repository.SalesRejectionInvoiceTaxDetailsRepo;
+import com.efitops.basesetup.repository.SalesReturnDetailsRepo;
+import com.efitops.basesetup.repository.SalesReturnRepo;
+import com.efitops.basesetup.repository.SalesReturnTaxDetailsRepo;
 import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
@@ -163,6 +177,17 @@ public class TransactionServiceImpl implements TransactionService {
 	@Autowired
 	DespatchInstructionRepo despatchInstructionRepo;
 
+	@Autowired
+	SalesReturnRepo salesReturnRepo;
+
+	@Autowired
+	SalesReturnDetailsRepo salesReturnDetailsRepo;
+
+	@Autowired
+	SalesReturnTaxDetailsRepo salesReturnTaxDetailsRepo;
+
+	@Autowired
+	HsnRepo hsnRepo;
 	// salesdeliveryschedule
 
 	@Override
@@ -1378,8 +1403,6 @@ public class TransactionServiceImpl implements TransactionService {
 		// BELONGS TO
 		// =========================================================
 
-	
-
 		// =========================================================
 		// CUSTOMER
 		// =========================================================
@@ -1623,7 +1646,6 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 		// Belongs To
-		
 
 		dto.setVehicle(vo.getVehicle());
 		dto.setDocType(vo.getDocType());
@@ -2102,5 +2124,655 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 		return salesRejectionInvoiceRepo.getSalesRejectionInvoiceDocId(orgId, financialYear, screenCode);
+	}
+
+	// salesReturn
+
+	@Transactional
+	public Map<String, Object> createUpdateSalesReturn(SalesReturnDTO dto) throws ApplicationException {
+
+		String screenCode = "SR";
+
+		Map<String, Object> response = new HashMap<>();
+
+		String message;
+		SalesReturnVO salesReturnVO;
+
+		// =========================================================
+		// CREATE
+		// =========================================================
+
+		if (ObjectUtils.isEmpty(dto.getId())) {
+
+			salesReturnVO = new SalesReturnVO();
+
+			// Generate Document ID
+			String docId = salesReturnRepo.getSalesReturnDocId(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+
+			salesReturnVO.setDocId(docId);
+
+			// Update document last number
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO != null) {
+				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			}
+
+			salesReturnVO.setCreatedBy(dto.getCreatedBy());
+			salesReturnVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Sales Return Created Successfully";
+
+		} else {
+
+			// =====================================================
+			// UPDATE
+			// =====================================================
+
+			salesReturnVO = salesReturnRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Sales Return Not Found"));
+
+			// Delete old detail records
+			List<SalesReturnDetailsVO> oldDetails = salesReturnDetailsRepo.findBySalesReturnId(salesReturnVO.getId());
+
+			if (oldDetails != null && !oldDetails.isEmpty()) {
+				salesReturnDetailsRepo.deleteAll(oldDetails);
+			}
+
+			// Delete old tax records
+			List<SalesReturnTaxDetailsVO> oldTaxDetails = salesReturnTaxDetailsRepo
+					.findBySalesReturnId(salesReturnVO.getId());
+
+			if (oldTaxDetails != null && !oldTaxDetails.isEmpty()) {
+				salesReturnTaxDetailsRepo.deleteAll(oldTaxDetails);
+			}
+
+			salesReturnVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Sales Return Updated Successfully";
+		}
+
+		// =========================================================
+		// HEADER + CHILD MAPPING
+		// =========================================================
+
+		getSalesReturnVOFromDTO(dto, salesReturnVO);
+
+		// =========================================================
+		// SAVE
+		// =========================================================
+
+		salesReturnVO = salesReturnRepo.saveAndFlush(salesReturnVO);
+
+		// Fetch latest saved object
+		salesReturnVO = salesReturnRepo.findById(salesReturnVO.getId())
+				.orElseThrow(() -> new ApplicationException("Sales Return Not Found"));
+
+		// =========================================================
+		// RESPONSE
+		// =========================================================
+
+		response.put("message", message);
+		response.put("salesReturnVO", convertToResponse(salesReturnVO));
+
+		return response;
+	}
+
+	private void getSalesReturnVOFromDTO(SalesReturnDTO dto, SalesReturnVO salesReturnVO) throws ApplicationException {
+
+		// =========================================================
+		// HEADER MAPPING
+		// =========================================================
+
+		BranchVO branch = null;
+
+		if (dto.getBranch() != null) {
+			branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+		}
+
+		CustomerVO customer = null;
+
+		if (dto.getCustomer() != null) {
+			customer = customerRepo.findById(dto.getCustomer())
+					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
+		}
+
+		LocationVO location = null;
+
+		if (dto.getLocation() != null) {
+			location = locationRepo.findById(dto.getLocation())
+					.orElseThrow(() -> new ApplicationException("Location Not Found"));
+		}
+
+		ListOfValuesDetailsVO returnType = null;
+
+		if (dto.getReturnType() != null) {
+			returnType = listOfValuesDetailsRepo.findById(dto.getReturnType())
+					.orElseThrow(() -> new ApplicationException("Return Type Not Found"));
+		}
+
+		// =========================================================
+		// SET HEADER VALUES
+		// =========================================================
+
+		salesReturnVO.setBranch(branch);
+
+		/*
+		 * Your VO belongsTo = String Your DTO belongsTo = Long
+		 */
+
+		salesReturnVO.setBelongsTo(dto.getBelongsTo());
+
+		salesReturnVO.setInvoiceNo(dto.getInvoiceNo());
+		salesReturnVO.setInvoiceDate(dto.getInvoiceDate());
+
+		salesReturnVO.setCustomerInvoiceNo(dto.getCustomerInvoiceNo());
+
+		salesReturnVO.setCustomerInvoiceDate(dto.getCustomerInvoiceDate());
+
+		salesReturnVO.setGatePassNo(dto.getGatePassNo());
+
+		salesReturnVO.setCustomer(customer);
+		salesReturnVO.setLocation(location);
+		salesReturnVO.setReturnType(returnType);
+
+		salesReturnVO.setApprovedByAccounts(dto.getApprovedByAccounts());
+
+		salesReturnVO.setCurrency(dto.getCurrency());
+		salesReturnVO.setExchangeRate(dto.getExchangeRate());
+
+		salesReturnVO.setInvoiceReferenceType(dto.getInvoiceReferenceType());
+
+		salesReturnVO.setNetAmount(dto.getNetAmount());
+		salesReturnVO.setAmountInWords(dto.getAmountInWords());
+		salesReturnVO.setNarration(dto.getNarration());
+		salesReturnVO.setIgstApplicable(dto.isIgstApplicable());
+		salesReturnVO.setOrgId(dto.getOrgId());
+		salesReturnVO.setFinancialYear(dto.getFinancialYear());
+
+		salesReturnVO.setCancelRemarks(dto.getCancelRemarks());
+
+		salesReturnVO.setActive(dto.isActive());
+
+		// =========================================================
+		// DETAIL MAPPING
+		// =========================================================
+
+		List<SalesReturnDetailsVO> detailList = new ArrayList<>();
+
+		if (dto.getSalesReturnDetails() != null && !dto.getSalesReturnDetails().isEmpty()) {
+
+			for (SalesReturnDetailsDTO child : dto.getSalesReturnDetails()) {
+
+				SalesReturnDetailsVO detailVO = new SalesReturnDetailsVO();
+
+				// Item
+				if (child.getItem() != null) {
+
+					ItemMasterVO item = itemMasterRepo.findById(child.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+					detailVO.setItem(item);
+				}
+
+				// HSN / SAC
+				if (child.getHsnSacCode() != null ) {
+
+					HsnVO hsn = hsnRepo.findById(Long.valueOf(child.getHsnSacCode()))
+							.orElseThrow(() -> new ApplicationException("HSN/SAC Code Not Found"));
+
+					detailVO.setHsnSacCode(hsn);
+				}
+
+				// Unit
+				if (child.getUnit() != null) {
+
+					UnitMasterVO unit = unitMasterRepo.findById(child.getUnit())
+							.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+
+					detailVO.setUnit(unit);
+				}
+
+				// Basic fields
+				detailVO.setTaxType(child.getTaxType());
+				detailVO.setTaxPercentage(child.getTaxPercentage());
+
+				detailVO.setStock(child.getStock());
+				detailVO.setQtySold(child.getQtySold());
+				detailVO.setReceivedQty(child.getReceivedQty());
+				detailVO.setRate(child.getRate());
+
+				detailVO.setRateInSelectedCurrency(child.getRateInSelectedCurrency());
+
+				detailVO.setAmountInSelectedCurrency(child.getAmountInSelectedCurrency());
+
+				// =================================================
+				// AMOUNT CALCULATION
+				// =================================================
+
+				BigDecimal qty = child.getReceivedQty() != null ? child.getReceivedQty() : BigDecimal.ZERO;
+
+				BigDecimal rate = child.getRate() != null ? child.getRate() : BigDecimal.ZERO;
+
+				BigDecimal amount = qty.multiply(rate);
+
+				detailVO.setAmount(amount);
+
+				// =================================================
+				// TAX CALCULATION
+				// =================================================
+
+				BigDecimal taxPercentage = BigDecimal.ZERO;
+
+				if (child.getTaxPercentage() != null && !child.getTaxPercentage().isEmpty()) {
+
+					taxPercentage = new BigDecimal(child.getTaxPercentage());
+				}
+
+				BigDecimal taxAmount = amount.multiply(taxPercentage).divide(BigDecimal.valueOf(100), 2,
+						RoundingMode.HALF_UP);
+
+				/*
+				 * You have taxType in DTO.
+				 *
+				 * Example: CGST/SGST -> split tax IGST -> IGST
+				 */
+
+				if (dto.isIgstApplicable()) {
+
+					// ================= IGST =================
+
+					BigDecimal igstRate = child.getIgstRate() != null ? child.getIgstRate() : BigDecimal.ZERO;
+
+					BigDecimal igstAmount = amount.multiply(igstRate).divide(BigDecimal.valueOf(100), 2,
+							RoundingMode.HALF_UP);
+
+					detailVO.setIgstRate(igstRate);
+					detailVO.setIgstAmount(igstAmount);
+
+					detailVO.setCgstRate(BigDecimal.ZERO);
+					detailVO.setCgstAmount(BigDecimal.ZERO);
+
+					detailVO.setSgstRate(BigDecimal.ZERO);
+					detailVO.setSgstAmount(BigDecimal.ZERO);
+
+				} else {
+
+					// ================= CGST =================
+
+					BigDecimal cgstRate = child.getCgstRate() != null ? child.getCgstRate() : BigDecimal.ZERO;
+
+					BigDecimal cgstAmount = amount.multiply(cgstRate).divide(BigDecimal.valueOf(100), 2,
+							RoundingMode.HALF_UP);
+
+					// ================= SGST =================
+
+					BigDecimal sgstRate = child.getSgstRate() != null ? child.getSgstRate() : BigDecimal.ZERO;
+
+					BigDecimal sgstAmount = amount.multiply(sgstRate).divide(BigDecimal.valueOf(100), 2,
+							RoundingMode.HALF_UP);
+
+					detailVO.setCgstRate(cgstRate);
+					detailVO.setCgstAmount(cgstAmount);
+
+					detailVO.setSgstRate(sgstRate);
+					detailVO.setSgstAmount(sgstAmount);
+
+					detailVO.setIgstRate(BigDecimal.ZERO);
+					detailVO.setIgstAmount(BigDecimal.ZERO);
+				}
+				// =================================================
+				// HEADER MAPPING
+				// =================================================
+
+				detailVO.setSalesReturn(salesReturnVO);
+
+				detailList.add(detailVO);
+			}
+		}
+
+		// Clear old managed details
+		salesReturnVO.getSalesReturnDetails().clear();
+
+		// Add new details
+		for (SalesReturnDetailsVO detail : detailList) {
+
+			detail.setSalesReturn(salesReturnVO);
+
+			salesReturnVO.getSalesReturnDetails().add(detail);
+		}
+
+		// =========================================================
+		// TAX DETAILS
+		// =========================================================
+
+		List<SalesReturnTaxDetailsVO> taxDetailList = new ArrayList<>();
+
+		if (dto.getSalesReturnTaxDetails() != null && !dto.getSalesReturnTaxDetails().isEmpty()) {
+
+			for (SalesReturnTaxDetailsDTO taxDTO : dto.getSalesReturnTaxDetails()) {
+
+				SalesReturnTaxDetailsVO taxVO = new SalesReturnTaxDetailsVO();
+
+				if (taxDTO.getParticulars() != null) {
+
+					ListOfValuesDetailsVO particulars = listOfValuesDetailsRepo.findById(taxDTO.getParticulars())
+							.orElseThrow(() -> new ApplicationException("Particulars Not Found"));
+
+					taxVO.setParticulars(particulars);
+				}
+
+				taxVO.setAmount(taxDTO.getAmount());
+
+				taxVO.setGlAccountName(taxDTO.getGlAccountName());
+
+				// Header mapping
+				taxVO.setSalesReturn(salesReturnVO);
+
+				taxDetailList.add(taxVO);
+			}
+		}
+
+		salesReturnVO.setSalesReturnTaxDetails(taxDetailList);
+	}
+
+	private SalesReturnResponseDTO convertToResponse(SalesReturnVO vo) {
+
+		SalesReturnResponseDTO dto = new SalesReturnResponseDTO();
+
+		// =========================================================
+		// HEADER
+		// =========================================================
+
+		dto.setId(vo.getId());
+		dto.setDocId(vo.getDocId());
+		dto.setDocDate(vo.getDocDate());
+
+		// Branch
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+
+			branchDTO.setId(vo.getBranch().getId());
+			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+			branchDTO.setBranchName(vo.getBranch().getBranchName());
+
+			dto.setBranch(branchDTO);
+		}
+
+		dto.setBelongsTo(vo.getBelongsTo());
+
+		dto.setInvoiceNo(vo.getInvoiceNo());
+		dto.setInvoiceDate(vo.getInvoiceDate());
+
+		dto.setCustomerInvoiceNo(vo.getCustomerInvoiceNo());
+
+		dto.setCustomerInvoiceDate(vo.getCustomerInvoiceDate());
+
+		dto.setGatePassNo(vo.getGatePassNo());
+
+		// =========================================================
+		// CUSTOMER
+		// =========================================================
+
+		if (vo.getCustomer() != null) {
+
+			CustomerDropdownResponseDTO customerDTO = new CustomerDropdownResponseDTO();
+
+			customerDTO.setCustomerId(vo.getCustomer().getId());
+
+			customerDTO.setCustomerCode(vo.getCustomer().getCustomerCode());
+
+			customerDTO.setCustomerName(vo.getCustomer().getCustomerName());
+
+			customerDTO.setAddress(vo.getCustomer().getAddress());
+
+			customerDTO.setGstNo(vo.getCustomer().getGstNo());
+
+			customerDTO.setIgstApplicable(vo.getCustomer().isGstApplicable());
+
+			customerDTO.setGstType(vo.getCustomer().getGstType());
+
+			if (vo.getCustomer().getGstState() != null) {
+
+				customerDTO.setGstState(vo.getCustomer().getGstState().getStateName());
+			}
+
+			dto.setCustomer(customerDTO);
+		}
+
+		// =========================================================
+		// LOCATION
+		// =========================================================
+
+		if (vo.getLocation() != null) {
+
+			LocationMasterResponseDTO locationDTO = new LocationMasterResponseDTO();
+
+			locationDTO.setId(vo.getLocation().getId());
+
+			locationDTO.setLocationName(vo.getLocation().getLocationName());
+
+			dto.setLocation(locationDTO);
+		}
+
+		dto.setDate(vo.getDate());
+
+		// =========================================================
+		// RETURN TYPE
+		// =========================================================
+
+		if (vo.getReturnType() != null) {
+
+			ListOfValuesDetailsResponseDTO returnTypeDTO = new ListOfValuesDetailsResponseDTO();
+
+			returnTypeDTO.setId(vo.getReturnType().getId());
+
+			returnTypeDTO.setCode(vo.getReturnType().getValueCode());
+
+			returnTypeDTO.setDescription(vo.getReturnType().getValueDescription());
+
+			dto.setReturnType(returnTypeDTO);
+		}
+
+		dto.setApprovedByAccounts(vo.getApprovedByAccounts());
+
+		dto.setCurrency(vo.getCurrency());
+		dto.setExchangeRate(vo.getExchangeRate());
+
+		dto.setInvoiceReferenceType(vo.getInvoiceReferenceType());
+
+		// =========================================================
+		// IGST APPLICABLE
+		// =========================================================
+
+		dto.setIgstApplicable(vo.isIgstApplicable());
+
+		// =========================================================
+		// SUMMARY
+		// =========================================================
+
+		dto.setNetAmount(vo.getNetAmount());
+
+		dto.setAmountInWords(vo.getAmountInWords());
+
+		dto.setNarration(vo.getNarration());
+
+		dto.setOrgId(vo.getOrgId());
+
+		dto.setFinancialYear(vo.getFinancialYear());
+
+		dto.setCreatedBy(vo.getCreatedBy());
+
+		dto.setUpdatedBy(vo.getUpdatedBy());
+
+		dto.setCancelRemarks(vo.getCancelRemarks());
+
+		dto.setActive(vo.getActive());
+
+		dto.setCancel(vo.getCancel());
+
+		dto.setScreenCode(vo.getScreenCode());
+
+		dto.setScreenName(vo.getScreenName());
+
+		// =========================================================
+		// SALES RETURN DETAILS
+		// =========================================================
+
+		List<SalesReturnDetailsResponseDTO> detailResponse = new ArrayList<>();
+
+		if (vo.getSalesReturnDetails() != null) {
+
+			for (SalesReturnDetailsVO detail : vo.getSalesReturnDetails()) {
+
+				SalesReturnDetailsResponseDTO detailDTO = new SalesReturnDetailsResponseDTO();
+
+				detailDTO.setId(detail.getId());
+
+				// =================================================
+				// ITEM
+				// =================================================
+
+				if (detail.getItem() != null) {
+
+					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+
+					itemDTO.setId(detail.getItem().getId());
+
+					itemDTO.setItemCode(detail.getItem().getItemCode());
+
+					itemDTO.setItemDescription(detail.getItem().getItemDescription());
+
+					// Item Unit
+					if (detail.getItem().getPurchaseUnit() != null) {
+
+						UnitMasterResponseDTO itemUnitDTO = new UnitMasterResponseDTO();
+
+						itemUnitDTO.setId(detail.getItem().getPurchaseUnit().getId());
+
+						itemUnitDTO.setUnitId(detail.getItem().getPurchaseUnit().getUnitId());
+
+						itemUnitDTO.setUnitDescription(detail.getItem().getPurchaseUnit().getDescription());
+
+						itemDTO.setUnit(itemUnitDTO);
+					}
+
+					detailDTO.setItem(itemDTO);
+				}
+
+				// =================================================
+				// HSN / SAC
+				// =================================================
+
+				if (detail.getHsnSacCode() != null) {
+
+					detailDTO.setHsnSacCode(detail.getHsnSacCode().getHsn());
+				}
+
+				detailDTO.setTaxType(detail.getTaxType());
+
+				detailDTO.setTaxPercentage(detail.getTaxPercentage());
+
+				// =================================================
+				// UNIT
+				// =================================================
+
+				if (detail.getUnit() != null) {
+
+					UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+
+					unitDTO.setId(detail.getUnit().getId());
+
+					unitDTO.setUnitId(detail.getUnit().getUnitId());
+
+					unitDTO.setUnitDescription(detail.getUnit().getDescription());
+
+					detailDTO.setUnit(unitDTO);
+				}
+
+				// =================================================
+				// QUANTITY / RATE / AMOUNT
+				// =================================================
+
+				detailDTO.setStock(detail.getStock());
+
+				detailDTO.setQtySold(detail.getQtySold());
+
+				detailDTO.setReceivedQty(detail.getReceivedQty());
+
+				detailDTO.setRate(detail.getRate());
+
+				detailDTO.setRateInSelectedCurrency(detail.getRateInSelectedCurrency());
+
+				detailDTO.setAmountInSelectedCurrency(detail.getAmountInSelectedCurrency());
+
+				detailDTO.setAmount(detail.getAmount());
+
+				// =================================================
+				// GST
+				// =================================================
+
+				detailDTO.setIgstRate(detail.getIgstRate());
+
+				detailDTO.setIgstAmount(detail.getIgstAmount());
+
+				detailDTO.setCgstRate(detail.getCgstRate());
+
+				detailDTO.setCgstAmount(detail.getCgstAmount());
+
+				detailDTO.setSgstRate(detail.getSgstRate());
+
+				detailDTO.setSgstAmount(detail.getSgstAmount());
+
+				detailResponse.add(detailDTO);
+			}
+		}
+
+		dto.setSalesReturnDetails(detailResponse);
+
+		// =========================================================
+		// SALES RETURN TAX DETAILS
+		// =========================================================
+
+		List<SalesReturnTaxDetailsResponseDTO> taxResponse = new ArrayList<>();
+
+		if (vo.getSalesReturnTaxDetails() != null) {
+
+			for (SalesReturnTaxDetailsVO tax : vo.getSalesReturnTaxDetails()) {
+
+				SalesReturnTaxDetailsResponseDTO taxDTO = new SalesReturnTaxDetailsResponseDTO();
+
+				taxDTO.setId(tax.getId());
+
+				// Particulars
+				if (tax.getParticulars() != null) {
+
+					ListOfValuesDetailsResponseDTO particularsDTO = new ListOfValuesDetailsResponseDTO();
+
+					particularsDTO.setId(tax.getParticulars().getId());
+
+					particularsDTO.setCode(tax.getParticulars().getValueCode());
+
+					particularsDTO.setDescription(tax.getParticulars().getValueDescription());
+
+					taxDTO.setParticulars(particularsDTO);
+				}
+
+				taxDTO.setAmount(tax.getAmount());
+
+				taxDTO.setGlAccountName(tax.getGlAccountName());
+
+				taxResponse.add(taxDTO);
+			}
+		}
+
+		dto.setSalesReturnTaxDetails(taxResponse);
+
+		return dto;
 	}
 }

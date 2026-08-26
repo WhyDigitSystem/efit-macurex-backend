@@ -13,6 +13,7 @@ import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.dto.SalesRejectionInvoiceDTO;
+import com.efitops.basesetup.dto.SalesReturnDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -85,6 +86,8 @@ public interface TransactionService {
 		List<Map<String, Object>> getCustomerDetailsforSalesRejectionInvoice(Long orgId, Long branch) throws ApplicationException;
 
 		String getSalesRejectionInvoiceDocId(Long orgId, String financialYear, String docType) throws ApplicationException;
+
+		Map<String, Object> createUpdateSalesReturn(SalesReturnDTO salesReturnDTO) throws ApplicationException;
 		
 
 }

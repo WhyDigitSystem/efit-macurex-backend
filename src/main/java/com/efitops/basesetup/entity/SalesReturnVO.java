@@ -5,7 +5,18 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -42,9 +53,8 @@ public class SalesReturnVO {
     private BranchVO branch;
 
    
-    @ManyToOne
-    @JoinColumn(name = "belongs_to")
-    private ListOfValuesDetailsVO belongsTo;
+    @Column(name = "belongs_to")
+    private String belongsTo;
 
   
     @Column(name = "invoice_no")
@@ -76,6 +86,8 @@ public class SalesReturnVO {
     @JoinColumn(name = "location")
     private LocationVO location;
 
+    @Column(name = "date")
+    private LocalDate date=LocalDate.now();
    
     @ManyToOne
     @JoinColumn(name = "return_type")
@@ -93,16 +105,11 @@ public class SalesReturnVO {
     @Column(name = "exchange_rate")
     private BigDecimal exchangeRate;
 
-    @Column(name = "reference_no")
-    private String referenceNo;
-
-   
-    @Column(name = "reference_date")
-    private LocalDate referenceDate;
-
-    @ManyToOne
-    @JoinColumn(name = "invoice_reference_type")
-    private ListOfValuesDetailsVO invoiceReferenceType;
+    @Column(name = "invoice_reference_type")
+    private String invoiceReferenceType;
+    
+    @Column(name = "is_igst_applicable")
+    private boolean isIgstApplicable;
     
     //summary charges
     
@@ -161,15 +168,13 @@ public class SalesReturnVO {
     
     @OneToMany(
             mappedBy = "salesReturn",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+            cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<SalesReturnDetailsVO> salesReturnDetails = new ArrayList<>();
     
     
     @OneToMany(mappedBy = "salesReturn",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+            cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<SalesReturnTaxDetailsVO> salesReturnTaxDetails;
 

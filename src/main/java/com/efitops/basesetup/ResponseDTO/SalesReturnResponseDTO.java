@@ -1,79 +1,65 @@
-package com.efitops.basesetup.dto;
+package com.efitops.basesetup.ResponseDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
-import com.efitops.basesetup.ResponseDTO.SalesReturnCustomerResponseDTO;
+import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.SalesReturnTaxDetailsDTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SalesReturnResponseDTO {
 
     private Long id;
 
-    // Document
-    private String docNo;
+    private String docId;
+
     private LocalDate docDate;
 
-    // Plant
     private BranchResponseDTO branch;
-    
 
-    // Belongs To
-    private ListOfVlauesDetailsResponseDTO belongsTo;
-  
+    private String belongsTo;
 
-    // Invoice
     private String invoiceNo;
+
     private LocalDate invoiceDate;
 
-    // Customer Invoice
     private String customerInvoiceNo;
+
     private LocalDate customerInvoiceDate;
 
-    
     private String gatePassNo;
 
-  
-    private SalesReturnCustomerResponseDTO customer;
-   
+    private CustomerDropdownResponseDTO customer;
 
-    
-    private LocationResponseDTO location;
+    private LocationMasterResponseDTO location;
 
+    private LocalDate date;
 
+    private ListOfValuesDetailsResponseDTO returnType;
 
-    
-    private ListOfVlauesDetailsResponseDTO returnType;
-   
-   
     private String approvedByAccounts;
 
-  
     private String currency;
 
-   
     private BigDecimal exchangeRate;
 
-   
-    private String referenceNo;
-    private LocalDate referenceDate;
-
-   
-    private Long invoiceReferenceTypeId;
     private String invoiceReferenceType;
-    
-    
+
+    private boolean isIgstApplicable;
+
     private BigDecimal netAmount;
 
     private String amountInWords;
 
     private String narration;
 
-    
     private Long orgId;
 
     private String financialYear;
@@ -84,20 +70,15 @@ public class SalesReturnResponseDTO {
 
     private String cancelRemarks;
 
-    private boolean active;
+    private String active;
 
-    private boolean  cancel;
+    private String cancel;
 
     private String screenCode;
 
     private String screenName;
 
-    
-    
-    private List<SalesReturnDetailsResponseDto> salesReturnDetails;
-    
-    
-    private List<SalesReturnTaxDetailsResponseDto> salesReturnTaxDetails;
-   
+    private List<SalesReturnDetailsResponseDTO> salesReturnDetails;
 
+    private List<SalesReturnTaxDetailsResponseDTO> salesReturnTaxDetails;
 }

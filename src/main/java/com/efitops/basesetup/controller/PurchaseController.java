@@ -185,52 +185,52 @@ public class PurchaseController extends BaseController {
 	// PURCHASE BILL — original paths: /api/purchaseBill/**
 	// ==================================================================
 
-	@PostMapping("/api/purchaseMaster/updateCreatePurchaseBill")
-	public ResponseEntity<ResponseDTO> updateCreatePurchaseBill(@RequestBody PurchaseBillDTO dto) {
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO;
-		try {
-			Map<String, Object> result = purchaseService.updateCreatePurchaseBill(dto);
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, result.get("message"));
-			responseObjectsMap.put("purchaseBillVO", result.get("purchaseBillVO"));
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} catch (Exception e) {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Bill Save Failed", e.getMessage());
-		}
-		return ResponseEntity.ok(responseDTO);
-	}
-
-	@GetMapping("/api/purchaseMaster/getPurchaseBillById")
-	public ResponseEntity<ResponseDTO> getPurchaseBillById(@RequestParam Long id) {
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO;
-		try {
-			PurchaseBillResponseDTO result = purchaseService.getPurchaseBillById(id);
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Bill information retrieved successfully");
-			responseObjectsMap.put("purchaseBillVO", result);
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} catch (Exception e) {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Bill information retrieval failed",
-					e.getMessage());
-		}
-		return ResponseEntity.ok(responseDTO);
-	}
-
-	@GetMapping("/api/purchaseMaster/getPurchaseBillByOrgId")
-	public ResponseEntity<ResponseDTO> getPurchaseBillByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO;
-		try {
-			List<PurchaseBillResponseDTO> result = purchaseService.getPurchaseBillByOrgId(orgId, branchId);
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Bill information retrieved successfully");
-			responseObjectsMap.put("purchaseBillVO", result);
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} catch (Exception e) {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Bill information retrieval failed",
-					e.getMessage());
-		}
-		return ResponseEntity.ok(responseDTO);
-	}
+//	@PostMapping("/api/purchaseMaster/updateCreatePurchaseBill")
+//	public ResponseEntity<ResponseDTO> updateCreatePurchaseBill(@RequestBody PurchaseBillDTO dto) {
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//		ResponseDTO responseDTO;
+//		try {
+//			Map<String, Object> result = purchaseService.updateCreatePurchaseBill(dto);
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, result.get("message"));
+//			responseObjectsMap.put("purchaseBillVO", result.get("purchaseBillVO"));
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//		} catch (Exception e) {
+//			responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Bill Save Failed", e.getMessage());
+//		}
+//		return ResponseEntity.ok(responseDTO);
+//	}
+//
+//	@GetMapping("/api/purchaseMaster/getPurchaseBillById")
+//	public ResponseEntity<ResponseDTO> getPurchaseBillById(@RequestParam Long id) {
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//		ResponseDTO responseDTO;
+//		try {
+//			PurchaseBillResponseDTO result = purchaseService.getPurchaseBillById(id);
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Bill information retrieved successfully");
+//			responseObjectsMap.put("purchaseBillVO", result);
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//		} catch (Exception e) {
+//			responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Bill information retrieval failed",
+//					e.getMessage());
+//		}
+//		return ResponseEntity.ok(responseDTO);
+//	}
+//
+//	@GetMapping("/api/purchaseMaster/getPurchaseBillByOrgId")
+//	public ResponseEntity<ResponseDTO> getPurchaseBillByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//		ResponseDTO responseDTO;
+//		try {
+//			List<PurchaseBillResponseDTO> result = purchaseService.getPurchaseBillByOrgId(orgId, branchId);
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Bill information retrieved successfully");
+//			responseObjectsMap.put("purchaseBillVO", result);
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//		} catch (Exception e) {
+//			responseDTO = createServiceResponseError(responseObjectsMap, "Purchase Bill information retrieval failed",
+//					e.getMessage());
+//		}
+//		return ResponseEntity.ok(responseDTO);
+//	}
 
 	// ==================================================================
 	// PURCHASE INDENT — original paths: /api/purchaseindent/**
@@ -673,59 +673,59 @@ public class PurchaseController extends BaseController {
 	// LOCAL PURCHASE ORDER — /api/localPurchaseOrder/**
 	// ==================================================================
 
-	@PostMapping(value = "/api/purchaseMaster/updateCreateLocalPurchaseOrder", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ResponseDTO> updateCreateLocalPurchaseOrder(
-			@RequestPart("localPurchaseOrderDTO") String localPurchaseOrderJson,
-			@RequestPart(value = "files", required = false) MultipartFile[] files) {
-
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO;
-		try {
-			LocalPurchaseOrderDTO dto = objectMapper.readValue(localPurchaseOrderJson, LocalPurchaseOrderDTO.class);
-			Map<String, Object> result = purchaseService.updateCreateLocalPurchaseOrder(dto, files);
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, result.get("message"));
-			responseObjectsMap.put("localPurchaseOrderVO", result.get("localPurchaseOrderVO"));
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} catch (Exception e) {
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, "updateCreateLocalPurchaseOrder()", e.getMessage());
-			responseDTO = createServiceResponseError(responseObjectsMap, "Local Purchase Order Save Failed",
-					e.getMessage());
-		}
-		return ResponseEntity.ok(responseDTO);
-	}
-
-	@GetMapping("/api/purchaseMaster/getLocalPurchaseOrderById")
-	public ResponseEntity<ResponseDTO> getLocalPurchaseOrderById(@RequestParam Long id) {
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO;
-		try {
-			LocalPurchaseOrderResponseDTO result = purchaseService.getLocalPurchaseOrderById(id);
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-					"Local Purchase Order information retrieved successfully");
-			responseObjectsMap.put("localPurchaseOrderVO", result);
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} catch (Exception e) {
-			responseDTO = createServiceResponseError(responseObjectsMap,
-					"Local Purchase Order information retrieval failed", e.getMessage());
-		}
-		return ResponseEntity.ok(responseDTO);
-	}
-
-	@GetMapping("/api/purchaseMaster/getLocalPurchaseOrderByOrgId")
-	public ResponseEntity<ResponseDTO> getLocalPurchaseOrderByOrgId(@RequestParam Long orgId,
-			@RequestParam Long branchId) {
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO;
-		try {
-			List<LocalPurchaseOrderResponseDTO> result = purchaseService.getLocalPurchaseOrderByOrgId(orgId, branchId);
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-					"Local Purchase Order information retrieved successfully");
-			responseObjectsMap.put("localPurchaseOrderVO", result);
-			responseDTO = createServiceResponse(responseObjectsMap);
-		} catch (Exception e) {
-			responseDTO = createServiceResponseError(responseObjectsMap,
-					"Local Purchase Order information retrieval failed", e.getMessage());
-		}
-		return ResponseEntity.ok(responseDTO);
-	}
+//	@PostMapping(value = "/api/purchaseMaster/updateCreateLocalPurchaseOrder", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//	public ResponseEntity<ResponseDTO> updateCreateLocalPurchaseOrder(
+//			@RequestPart("localPurchaseOrderDTO") String localPurchaseOrderJson,
+//			@RequestPart(value = "files", required = false) MultipartFile[] files) {
+//
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//		ResponseDTO responseDTO;
+//		try {
+//			LocalPurchaseOrderDTO dto = objectMapper.readValue(localPurchaseOrderJson, LocalPurchaseOrderDTO.class);
+//			Map<String, Object> result = purchaseService.updateCreateLocalPurchaseOrder(dto, files);
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, result.get("message"));
+//			responseObjectsMap.put("localPurchaseOrderVO", result.get("localPurchaseOrderVO"));
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//		} catch (Exception e) {
+//			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, "updateCreateLocalPurchaseOrder()", e.getMessage());
+//			responseDTO = createServiceResponseError(responseObjectsMap, "Local Purchase Order Save Failed",
+//					e.getMessage());
+//		}
+//		return ResponseEntity.ok(responseDTO);
+//	}
+//
+//	@GetMapping("/api/purchaseMaster/getLocalPurchaseOrderById")
+//	public ResponseEntity<ResponseDTO> getLocalPurchaseOrderById(@RequestParam Long id) {
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//		ResponseDTO responseDTO;
+//		try {
+//			LocalPurchaseOrderResponseDTO result = purchaseService.getLocalPurchaseOrderById(id);
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+//					"Local Purchase Order information retrieved successfully");
+//			responseObjectsMap.put("localPurchaseOrderVO", result);
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//		} catch (Exception e) {
+//			responseDTO = createServiceResponseError(responseObjectsMap,
+//					"Local Purchase Order information retrieval failed", e.getMessage());
+//		}
+//		return ResponseEntity.ok(responseDTO);
+//	}
+//
+//	@GetMapping("/api/purchaseMaster/getLocalPurchaseOrderByOrgId")
+//	public ResponseEntity<ResponseDTO> getLocalPurchaseOrderByOrgId(@RequestParam Long orgId,
+//			@RequestParam Long branchId) {
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//		ResponseDTO responseDTO;
+//		try {
+//			List<LocalPurchaseOrderResponseDTO> result = purchaseService.getLocalPurchaseOrderByOrgId(orgId, branchId);
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+//					"Local Purchase Order information retrieved successfully");
+//			responseObjectsMap.put("localPurchaseOrderVO", result);
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//		} catch (Exception e) {
+//			responseDTO = createServiceResponseError(responseObjectsMap,
+//					"Local Purchase Order information retrieval failed", e.getMessage());
+//		}
+//		return ResponseEntity.ok(responseDTO);
+//	}
 }

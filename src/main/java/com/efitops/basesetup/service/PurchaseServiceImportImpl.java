@@ -34,8 +34,18 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DirectPurchaseCashDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DirectPurchaseFileUploadDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DirectPurchaseTaxDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
+import com.efitops.basesetup.ResponseDTO.GSTStateMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ItemCategoryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseCloseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LmeResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderImportDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalFileUploadDetailsResponseDTO;
@@ -45,19 +55,33 @@ import com.efitops.basesetup.ResponseDTO.SupplierResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
+import com.efitops.basesetup.dto.DirectPurchaseCashDetailsDTO;
+import com.efitops.basesetup.dto.DirectPurchaseDTO;
+import com.efitops.basesetup.dto.DirectPurchaseTaxDetailsDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
+import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
+import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderImportDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalFileUploadDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalTaxDetailsDTO;
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
+import com.efitops.basesetup.entity.DirectPurchaseCashDetailsVO;
+import com.efitops.basesetup.entity.DirectPurchaseFileUploadDetailsVO;
+import com.efitops.basesetup.entity.DirectPurchaseTaxDetailsVO;
+import com.efitops.basesetup.entity.DirectPurchaseVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
+import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.LMEVO;
+import com.efitops.basesetup.entity.PurchaseOrderDeliveryScheduleShortCloseDetailsVO;
+import com.efitops.basesetup.entity.PurchaseOrderDeliveryScheduleShortCloseVO;
 import com.efitops.basesetup.entity.PurchaseOrderImportDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalFileUploadDetailsVO;
@@ -69,9 +93,17 @@ import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
+import com.efitops.basesetup.repository.DirectPurchaseCashDetailsRepo;
+import com.efitops.basesetup.repository.DirectPurchaseFileUploadDetailsRepo;
+import com.efitops.basesetup.repository.DirectPurchaseRepo;
+import com.efitops.basesetup.repository.DirectPurchaseTaxDetailsRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
+import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.LMERepo;
+import com.efitops.basesetup.repository.PurchaseOrderDeliveryScheduleShortCloseDetailsRepo;
+import com.efitops.basesetup.repository.PurchaseOrderDeliveryScheduleShortCloseRepo;
 import com.efitops.basesetup.repository.PurchaseOrderImportDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderLocalDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderLocalFileUploadDetailsRepo;
@@ -125,6 +157,30 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 	@Autowired
 	AmountInWordsConverterService amountInWordsConverterService;
+
+	@Autowired
+	PurchaseOrderDeliveryScheduleShortCloseRepo purchaseOrderDeliveryScheduleShortCloseRepo;
+
+	@Autowired
+	PurchaseOrderDeliveryScheduleShortCloseDetailsRepo purchaseOrderDeliveryScheduleShortCloseDetailsRepo;
+
+	@Autowired
+	private DirectPurchaseRepo directPurchaseRepo;
+
+	@Autowired
+	private DirectPurchaseCashDetailsRepo directPurchaseCashDetailsRepo;
+
+	@Autowired
+	private DirectPurchaseTaxDetailsRepo directPurchaseTaxDetailsRepo;
+
+	@Autowired
+	private DirectPurchaseFileUploadDetailsRepo directPurchaseFileUploadDetailsRepo;
+
+	@Autowired
+	GSTStateMasterRepo gstStateMasterRepo;
+
+	@Autowired
+	EmployeeMasterRepo employeeMasterRepo;
 
 	@Override
 	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException {
@@ -600,6 +656,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 				detailVO.setFobValueInr(detailVO.getPoQty().multiply(detailVO.getFobRateInr()));
 
+				detailVO.setHsnCode(detailDTO.getHsnCode());
+
 				detailVO.setPurchaseOrderVO(vo);
 
 				itemDetailsLists.add(detailVO);
@@ -834,7 +892,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				importResponse.setFobRateInr(importVO.getFobRateInr());
 				importResponse.setOrderRate(importVO.getOrderRate());
 				importResponse.setFobValueInr(importVO.getFobValueInr());
-//				importResponse.setHsnCode(importVO.getHsnCode());
+				importResponse.setHsnCode(importVO.getHsnCode());
 
 				if (importVO.getItem() != null) {
 					ItemMasterDetailsResponseDTO itemDTO = new ItemMasterDetailsResponseDTO();
@@ -1137,6 +1195,1030 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		for (Object[] ch : chType) {
 			Map<String, Object> map = new HashMap<>();
 			map.put("poRate", ch[0] != null ? BigDecimal.valueOf(((Number) ch[0]).doubleValue()) : null);
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getIndentNoBasedLocal(Long orgId, String belongsTo, String type) {
+		Set<Object[]> chType = purchaseOrderRepo.getIndentNoBasedLocal(orgId, belongsTo, type);
+		return getIndentNoBasedLocal(chType);
+	}
+
+	private List<Map<String, Object>> getIndentNoBasedLocal(Set<Object[]> chType) {
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("indentBasicId", ch[1] != null ? ((Number) ch[1]).longValue() : null);
+
+			map.put("docDate", ch[2] != null ? ch[2].toString() : "");
+
+			map.put("itemId", ch[3] != null ? ch[3].toString() : "");
+
+			map.put("itemDesc", ch[4] != null ? ch[4].toString() : "");
+
+			map.put("unitId", ch[5] != null ? ch[5].toString() : "");
+
+			map.put("qtyInPurchaseUnit", ch[6] != null ? new BigDecimal(ch[6].toString()) : BigDecimal.ZERO);
+
+			map.put("pndQty", ch[7] != null ? new BigDecimal(ch[7].toString()) : BigDecimal.ZERO);
+
+			map.put("qtyInPrimaryUnit", ch[8] != null ? new BigDecimal(ch[8].toString()) : BigDecimal.ZERO);
+
+			map.put("requiredDate", ch[9] != null ? ch[9].toString() : "");
+
+			map.put("indentDetailId", ch[10] != null ? ((Number) ch[10]).longValue() : null);
+
+			map.put("itemMasterId", ch[11] != null ? ((Number) ch[11]).longValue() : null);
+
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getIndentNoBasedImport(Long orgId, String type) {
+
+		Set<Object[]> chType = purchaseOrderRepo.getIndentNoBasedImport(orgId, type);
+
+		return getIndentNoBasedImport(chType);
+	}
+
+	private List<Map<String, Object>> getIndentNoBasedImport(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("docId", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("indentBasicId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("docDate", ch[2] != null ? ch[2].toString() : "");
+
+			map.put("itemId", ch[3] != null ? ch[3].toString() : "");
+
+			map.put("itemDesc", ch[4] != null ? ch[4].toString() : "");
+
+			map.put("unitId", ch[5] != null ? ch[5].toString() : "");
+
+			map.put("qtyInPurchaseUnit", ch[6] != null ? new BigDecimal(ch[6].toString()) : BigDecimal.ZERO);
+
+			map.put("pndQty", ch[7] != null ? new BigDecimal(ch[7].toString()) : BigDecimal.ZERO);
+
+			map.put("qtyInPrimaryUnit", ch[8] != null ? new BigDecimal(ch[8].toString()) : BigDecimal.ZERO);
+
+			map.put("requiredDate", ch[9] != null ? ch[9].toString() : "");
+
+			map.put("indentDetailId", ch[10] != null ? ((Number) ch[10]).longValue() : null);
+
+			map.put("itemMasterId", ch[11] != null ? ((Number) ch[11]).longValue() : null);
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getHsnCodeDetails(Long orgId, Long branch, Long item, String type) {
+		Set<Object[]> chType = purchaseOrderRepo.getHsnCodeDetails(orgId, branch, item, type);
+		return getHsnCodeDetails(chType);
+	}
+
+	private List<Map<String, Object>> getHsnCodeDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("hsn", ch[0] != null ? ch[0].toString() : "");
+			map.put("customerPartNo", ch[1] != null ? ch[1].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	// PurchaseorderDelivaryScheduleshortCose
+
+	@Override
+	public PurchaseOrderDeliveryScheduleShortCloseResponseDTO getPurchaseOrderDeliveryScheduleShortCloseById(Long id)
+			throws ApplicationException {
+
+		PurchaseOrderDeliveryScheduleShortCloseVO purchaseOrderDeliveryScheduleShortCloseVO = purchaseOrderDeliveryScheduleShortCloseRepo
+				.getPurchaseOrderDeliveryScheduleShortCloseById(id);
+
+		if (purchaseOrderDeliveryScheduleShortCloseVO == null) {
+			throw new ApplicationException("ShortClose  Not Found");
+		}
+
+		return buildProformaInvoiceResponse(purchaseOrderDeliveryScheduleShortCloseVO);
+	}
+
+	@Override
+	public List<PurchaseOrderDeliveryScheduleShortCloseResponseDTO> getPurchaseOrderDeliveryScheduleShortCloseByOrgId(
+			Long orgId, Long branch) throws ApplicationException {
+
+		List<PurchaseOrderDeliveryScheduleShortCloseVO> quotationList = purchaseOrderDeliveryScheduleShortCloseRepo
+				.getPurchaseOrderDeliveryScheduleShortCloseByOrgId(orgId, branch);
+
+		if (quotationList == null || quotationList.isEmpty()) {
+			throw new ApplicationException("Proforma Invoice Not Found");
+		}
+
+		List<PurchaseOrderDeliveryScheduleShortCloseResponseDTO> responseList = new ArrayList<>();
+
+		for (PurchaseOrderDeliveryScheduleShortCloseVO purchaseOrderDeliveryScheduleShortCloseVO : quotationList) {
+			responseList.add(buildProformaInvoiceResponse(purchaseOrderDeliveryScheduleShortCloseVO));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdatePurchaseOrderDeliveryScheduleShortClose(
+			PurchaseOrderDeliveryScheduleShortCloseDTO purchaseOrderDeliveryScheduleShortCloseDTO)
+			throws ApplicationException {
+		String screenCode = "PODSSC";
+		PurchaseOrderDeliveryScheduleShortCloseVO purchaseOrderDeliveryScheduleShortCloseVO = new PurchaseOrderDeliveryScheduleShortCloseVO();
+		String message;
+
+		if (ObjectUtils.isNotEmpty(purchaseOrderDeliveryScheduleShortCloseDTO.getId())) {
+
+			purchaseOrderDeliveryScheduleShortCloseVO = purchaseOrderDeliveryScheduleShortCloseRepo
+					.findById(purchaseOrderDeliveryScheduleShortCloseDTO.getId())
+					.orElseThrow(() -> new ApplicationException("ShortClose Invoice Not Found"));
+
+			purchaseOrderDeliveryScheduleShortCloseVO
+					.setUpdatedBy(purchaseOrderDeliveryScheduleShortCloseDTO.getCreatedBy());
+
+			message = "ShortClose Invoice Updated Successfully";
+
+		} else {
+
+			String docId = purchaseOrderDeliveryScheduleShortCloseRepo.getPurchaseOrderDeliveryScheduleShortCloseDocId(
+					purchaseOrderDeliveryScheduleShortCloseDTO.getOrgId(),
+					purchaseOrderDeliveryScheduleShortCloseDTO.getFinancialYear(), screenCode);
+
+			purchaseOrderDeliveryScheduleShortCloseVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(purchaseOrderDeliveryScheduleShortCloseDTO.getOrgId(),
+							purchaseOrderDeliveryScheduleShortCloseDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			purchaseOrderDeliveryScheduleShortCloseVO
+					.setCreatedBy(purchaseOrderDeliveryScheduleShortCloseDTO.getCreatedBy());
+			purchaseOrderDeliveryScheduleShortCloseVO
+					.setUpdatedBy(purchaseOrderDeliveryScheduleShortCloseDTO.getCreatedBy());
+
+			message = "Proforma Invoice Created Successfully";
+		}
+
+		createUpdateResponse(purchaseOrderDeliveryScheduleShortCloseDTO, purchaseOrderDeliveryScheduleShortCloseVO);
+
+		purchaseOrderDeliveryScheduleShortCloseVO = purchaseOrderDeliveryScheduleShortCloseRepo
+				.save(purchaseOrderDeliveryScheduleShortCloseVO);
+
+		PurchaseOrderDeliveryScheduleShortCloseResponseDTO responseDTO = buildProformaInvoiceResponse(
+				purchaseOrderDeliveryScheduleShortCloseVO);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("purchaseOrderDeliveryScheduleShortCloseVO", responseDTO);
+
+		return response;
+	}
+
+	private void createUpdateResponse(
+			PurchaseOrderDeliveryScheduleShortCloseDTO purchaseOrderDeliveryScheduleShortCloseDTO,
+			PurchaseOrderDeliveryScheduleShortCloseVO purchaseOrderDeliveryScheduleShortCloseVO)
+			throws ApplicationException {
+
+		purchaseOrderDeliveryScheduleShortCloseVO.setActive(purchaseOrderDeliveryScheduleShortCloseDTO.isActive());
+		purchaseOrderDeliveryScheduleShortCloseVO
+				.setCancelRemarks(purchaseOrderDeliveryScheduleShortCloseDTO.getCancelRemarks());
+		purchaseOrderDeliveryScheduleShortCloseVO.setOrgId(purchaseOrderDeliveryScheduleShortCloseDTO.getOrgId());
+		purchaseOrderDeliveryScheduleShortCloseVO
+				.setFinancialYear(purchaseOrderDeliveryScheduleShortCloseDTO.getFinancialYear());
+		purchaseOrderDeliveryScheduleShortCloseVO
+				.setNarration(purchaseOrderDeliveryScheduleShortCloseDTO.getNarration());
+		purchaseOrderDeliveryScheduleShortCloseVO
+				.setBelongsTo(purchaseOrderDeliveryScheduleShortCloseDTO.getBelongsTo());
+
+		if (purchaseOrderDeliveryScheduleShortCloseDTO.getSupplierCode() != null
+				&& purchaseOrderDeliveryScheduleShortCloseDTO.getSupplierCode() != 0) {
+
+			CustomerVO customer = customerRepo.findById(purchaseOrderDeliveryScheduleShortCloseDTO.getSupplierCode())
+					.orElseThrow(() -> new ApplicationException("Party Not Found"));
+
+			purchaseOrderDeliveryScheduleShortCloseVO.setSupplierCode(customer);
+		}
+
+		purchaseOrderDeliveryScheduleShortCloseVO.setType(purchaseOrderDeliveryScheduleShortCloseDTO.getType());
+
+		purchaseOrderDeliveryScheduleShortCloseVO
+				.setPurchaseOrderScheduleNo(purchaseOrderDeliveryScheduleShortCloseDTO.getPurchaseOrderScheduleNo());
+
+		purchaseOrderDeliveryScheduleShortCloseVO
+				.setReferenceForShortClose(purchaseOrderDeliveryScheduleShortCloseDTO.getReferenceForShortClose());
+
+		if (purchaseOrderDeliveryScheduleShortCloseDTO.getBranch() != null
+				&& purchaseOrderDeliveryScheduleShortCloseDTO.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(purchaseOrderDeliveryScheduleShortCloseDTO.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			purchaseOrderDeliveryScheduleShortCloseVO.setBranch(branch);
+		}
+
+		if (ObjectUtils.isNotEmpty(purchaseOrderDeliveryScheduleShortCloseVO.getId())) {
+
+			List<PurchaseOrderDeliveryScheduleShortCloseDetailsVO> purchaseOrderDeliveryScheduleShortCloseDetailsVO = purchaseOrderDeliveryScheduleShortCloseDetailsRepo
+					.findByPurchaseOrderDeliveryScheduleShortCloseVO(purchaseOrderDeliveryScheduleShortCloseVO);
+			purchaseOrderDeliveryScheduleShortCloseDetailsRepo
+					.deleteAll(purchaseOrderDeliveryScheduleShortCloseDetailsVO);
+
+		}
+
+		List<PurchaseOrderDeliveryScheduleShortCloseDetailsVO> itemDetailsList = new ArrayList<>();
+
+		if (purchaseOrderDeliveryScheduleShortCloseDTO.getPurchaseOrderDeliveryScheduleShortCloseDetailsDTO() != null) {
+
+			for (PurchaseOrderDeliveryScheduleShortCloseDetailsDTO dto : purchaseOrderDeliveryScheduleShortCloseDTO
+					.getPurchaseOrderDeliveryScheduleShortCloseDetailsDTO()) {
+
+				PurchaseOrderDeliveryScheduleShortCloseDetailsVO detailsVO = new PurchaseOrderDeliveryScheduleShortCloseDetailsVO();
+
+				if (dto.getItem() != null && dto.getItem() != 0) {
+
+					ItemMasterVO item = itemMasterRepo.findById(dto.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Code Not Found"));
+
+					detailsVO.setItem(item);
+				}
+
+				if (dto.getUnit() != null && dto.getUnit() != 0) {
+
+					UnitMasterVO item = unitMasterRepo.findById(dto.getUnit())
+							.orElseThrow(() -> new ApplicationException("Item Code Not Found"));
+
+					detailsVO.setUnit(item);
+				}
+
+				detailsVO.setOrderedQty(dto.getOrderedQty());
+
+				detailsVO.setSuppliedQty(dto.getSuppliedQty());
+
+				detailsVO.setPendingQty(dto.getPendingQty());
+
+				detailsVO.setShortCloseQty(dto.getShortCloseQty());
+
+				detailsVO.setNewRequiredQty(
+						dto.getSuppliedQty().subtract(dto.getPendingQty()).subtract(dto.getShortCloseQty()));
+
+				detailsVO.setPurchaseOrderDeliveryScheduleShortCloseVO(purchaseOrderDeliveryScheduleShortCloseVO);
+
+				itemDetailsList.add(detailsVO);
+			}
+		}
+
+		purchaseOrderDeliveryScheduleShortCloseVO.setPurchaseOrderDeliveryScheduleShortCloseDetailsVO(itemDetailsList);
+
+	}
+
+	private PurchaseOrderDeliveryScheduleShortCloseResponseDTO buildProformaInvoiceResponse(
+			PurchaseOrderDeliveryScheduleShortCloseVO purchaseOrderDeliveryScheduleShortCloseVO) {
+
+		PurchaseOrderDeliveryScheduleShortCloseResponseDTO responseDTO = new PurchaseOrderDeliveryScheduleShortCloseResponseDTO();
+		responseDTO.setId(purchaseOrderDeliveryScheduleShortCloseVO.getId());
+		responseDTO.setDocId(purchaseOrderDeliveryScheduleShortCloseVO.getDocId());
+		responseDTO.setDocDate(purchaseOrderDeliveryScheduleShortCloseVO.getDocDate());
+		responseDTO.setBelongsTo(purchaseOrderDeliveryScheduleShortCloseVO.getBelongsTo());
+		responseDTO.setType(purchaseOrderDeliveryScheduleShortCloseVO.getType());
+		responseDTO.setPurchaseOrderScheduleNo(purchaseOrderDeliveryScheduleShortCloseVO.getPurchaseOrderScheduleNo());
+		responseDTO.setReferenceForShortClose(purchaseOrderDeliveryScheduleShortCloseVO.getReferenceForShortClose());
+		responseDTO.setCreatedBy(purchaseOrderDeliveryScheduleShortCloseVO.getCreatedBy());
+		responseDTO.setNarration(purchaseOrderDeliveryScheduleShortCloseVO.getNarration());
+		responseDTO.setActive(purchaseOrderDeliveryScheduleShortCloseVO.getActive());
+		responseDTO.setCancel(purchaseOrderDeliveryScheduleShortCloseVO.getCancel());
+		responseDTO.setUpdatedBy(purchaseOrderDeliveryScheduleShortCloseVO.getUpdatedBy());
+		responseDTO.setCancelRemarks(purchaseOrderDeliveryScheduleShortCloseVO.getCancelRemarks());
+		responseDTO.setScreenName(purchaseOrderDeliveryScheduleShortCloseVO.getScreenName());
+		responseDTO.setScreenCode(purchaseOrderDeliveryScheduleShortCloseVO.getScreenCode());
+		responseDTO.setOrgId(purchaseOrderDeliveryScheduleShortCloseVO.getOrgId());
+		responseDTO.setFinancialYear(purchaseOrderDeliveryScheduleShortCloseVO.getFinancialYear());
+
+		if (purchaseOrderDeliveryScheduleShortCloseVO.getSupplierCode() != null) {
+			SupplierResponseDTO supplierDTO = new SupplierResponseDTO();
+			supplierDTO.setId(purchaseOrderDeliveryScheduleShortCloseVO.getSupplierCode().getId());
+			supplierDTO.setSupplierCode(purchaseOrderDeliveryScheduleShortCloseVO.getSupplierCode().getCustomerCode());
+			supplierDTO.setSupplierName(purchaseOrderDeliveryScheduleShortCloseVO.getSupplierCode().getCustomerName());
+			responseDTO.setSupplierCode(supplierDTO);
+		}
+
+		if (purchaseOrderDeliveryScheduleShortCloseVO.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(purchaseOrderDeliveryScheduleShortCloseVO.getBranch().getId());
+			branchDTO.setBranchCode(purchaseOrderDeliveryScheduleShortCloseVO.getBranch().getBranchCode());
+			branchDTO.setBranchName(purchaseOrderDeliveryScheduleShortCloseVO.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
+
+		// Set details list
+		List<PurchaseOrderDeliveryScheduleShortCloseDetailsResponseDTO> detailsList = new ArrayList<>();
+		if (purchaseOrderDeliveryScheduleShortCloseVO.getPurchaseOrderDeliveryScheduleShortCloseDetailsVO() != null) {
+			for (PurchaseOrderDeliveryScheduleShortCloseDetailsVO detailVO : purchaseOrderDeliveryScheduleShortCloseVO
+					.getPurchaseOrderDeliveryScheduleShortCloseDetailsVO()) {
+				PurchaseOrderDeliveryScheduleShortCloseDetailsResponseDTO detailDTO = new PurchaseOrderDeliveryScheduleShortCloseDetailsResponseDTO();
+				detailDTO.setId(detailVO.getId());
+
+				if (detailVO.getItem() != null) {
+					ItemMasterDetailsResponseCloseDTO itemDTO = new ItemMasterDetailsResponseCloseDTO();
+					itemDTO.setId(detailVO.getItem().getId());
+					itemDTO.setItemCode(detailVO.getItem().getItemCode());
+					itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
+
+					if (detailVO.getItem().getPrimaryUnit() != null) {
+						UnitMasterResponseDTO unit = new UnitMasterResponseDTO();
+						unit.setId(detailVO.getItem().getPrimaryUnit().getId());
+						unit.setUnitId(detailVO.getItem().getPrimaryUnit().getUnitId());
+						itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
+
+					}
+
+					if (detailVO.getItem().getPricingUnit() != null) {
+						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+						unitDTO.setId(detailVO.getItem().getPricingUnit().getId());
+						unitDTO.setUnitId(detailVO.getItem().getPricingUnit().getUnitId());
+						unitDTO.setUnitDescription(detailVO.getItem().getPricingUnit().getDescription());
+						itemDTO.setUnit(unitDTO);
+					}
+					detailDTO.setItem(itemDTO);
+				}
+
+				detailDTO.setOrderedQty(detailVO.getOrderedQty());
+				detailDTO.setSuppliedQty(detailVO.getSuppliedQty());
+				detailDTO.setPendingQty(detailVO.getPendingQty());
+				detailDTO.setNewRequiredQty(detailVO.getNewRequiredQty());
+				detailDTO.setShortCloseQty(detailVO.getShortCloseQty());
+
+				detailsList.add(detailDTO);
+			}
+		}
+		responseDTO.setPurchaseOrderDeliveryScheduleShortCloseDetailsResponseDTO(detailsList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public String getPurchaseOrderDeliveryScheduleShortCloseDocId(Long orgId, String financialYear) {
+		String screenCode1 = "PODSSC";
+		String result = purchaseOrderDeliveryScheduleShortCloseRepo
+				.getPurchaseOrderDeliveryScheduleShortCloseDocId(orgId, financialYear, screenCode1);
+		return result;
+	}
+
+	@Override
+	public List<Map<String, Object>> getSupplierDetailsShortClose(Long orgId, Long branch) {
+		Set<Object[]> chType = purchaseOrderDeliveryScheduleShortCloseRepo.getSupplierDetailsShortClose(orgId, branch);
+		return getSupplierDetailsShortClose(chType);
+	}
+
+	private List<Map<String, Object>> getSupplierDetailsShortClose(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("supplierId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("supplierName", ch[1] != null ? ch[1].toString() : "");
+			map.put("supplierCode", ch[2] != null ? ch[2].toString() : "");
+
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getPurchaseOrderNobasedSchedule(Long orgId, Long branch, Long supplier) {
+		Set<Object[]> chType = purchaseOrderDeliveryScheduleShortCloseRepo.getPurchaseOrderNobasedSchedule(orgId,
+				branch, supplier);
+		return getPurchaseOrderNobasedSchedule(chType);
+	}
+
+	private List<Map<String, Object>> getPurchaseOrderNobasedSchedule(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			map.put("purchaseId", ch[2] != null ? ((Number) ch[2]).longValue() : null);
+
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getPurchaseOrderNobasedScheduleDetails(Long orgId, Long branch, Long supplier,
+			String purchaseOrderNo) {
+		Set<Object[]> chType = purchaseOrderDeliveryScheduleShortCloseRepo.getPurchaseOrderNobasedScheduleDetails(orgId,
+				branch, supplier, purchaseOrderNo);
+		return getPurchaseOrderNobasedScheduleDetails(chType);
+	}
+
+	private List<Map<String, Object>> getPurchaseOrderNobasedScheduleDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("uom", ch[3] != null ? ((Number) ch[3]).longValue() : null);
+			map.put("orderQty", ch[4] != null ? new BigDecimal(ch[4].toString()) : BigDecimal.ZERO);
+			map.put("suppliedQty", ch[5] != null ? new BigDecimal(ch[5].toString()) : BigDecimal.ZERO);
+			map.put("pendingQty", ch[6] != null ? new BigDecimal(ch[6].toString()) : BigDecimal.ZERO);
+			map.put("unitDescription", ch[7] != null ? ch[7].toString() : "");
+			list.add(map);
+		}
+		return list;
+	}
+
+	// Direct Purchase
+
+	@Override
+	public DirectPurchaseResponseDTO getDirectPurchaseById(Long id) throws ApplicationException {
+		DirectPurchaseVO directPurchaseVO = directPurchaseRepo.getDirectPurchaseById(id);
+
+		if (directPurchaseVO == null) {
+			throw new ApplicationException("Direct Purchase Not Found");
+		}
+
+		return buildDirectPurchaseResponse(directPurchaseVO);
+	}
+
+	@Override
+	public List<DirectPurchaseResponseDTO> getDirectPurchaseByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+		List<DirectPurchaseVO> inwardInspectionList = directPurchaseRepo.getDirectPurchaseByOrgId(orgId, branch);
+		if (inwardInspectionList == null || inwardInspectionList.isEmpty()) {
+			throw new ApplicationException("Direct Purchase Not Found");
+		}
+		List<DirectPurchaseResponseDTO> responseList = new ArrayList<>();
+		for (DirectPurchaseVO inwardInspectionVO : inwardInspectionList) {
+			responseList.add(buildDirectPurchaseResponse(inwardInspectionVO));
+		}
+		return responseList;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateDirectPurchase(DirectPurchaseDTO directPurchaseDTO, MultipartFile[] files)
+			throws ApplicationException {
+		DirectPurchaseVO directPurchaseVO;
+		String message;
+
+		if (ObjectUtils.isNotEmpty(directPurchaseDTO.getId())) {
+			directPurchaseVO = directPurchaseRepo.findById(directPurchaseDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Direct Purchase Not Found"));
+
+			directPurchaseVO.setUpdatedBy(directPurchaseDTO.getCreatedBy());
+			message = "Direct Purchase Updated Successfully";
+		} else {
+			directPurchaseVO = new DirectPurchaseVO();
+			String screenCode = "DP";
+			String docId = directPurchaseRepo.getDirectPurchaseDocId(directPurchaseDTO.getOrgId(),
+					directPurchaseDTO.getFinancialYear(), screenCode);
+			directPurchaseVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(directPurchaseDTO.getOrgId(),
+							directPurchaseDTO.getFinancialYear(), screenCode);
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			directPurchaseVO.setCreatedBy(directPurchaseDTO.getCreatedBy());
+			directPurchaseVO.setUpdatedBy(directPurchaseDTO.getCreatedBy());
+			message = "Direct Purchase Created Successfully";
+		}
+
+		setDirectPurchaseValues(directPurchaseDTO, directPurchaseVO);
+
+		directPurchaseVO = directPurchaseRepo.save(directPurchaseVO);
+		saveAttachmentss(files, directPurchaseVO);
+
+		DirectPurchaseResponseDTO directPurchaseResponse = buildDirectPurchaseResponse(directPurchaseVO);
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("directPurchaseVO", directPurchaseResponse);
+		return response;
+	}
+
+	private void setDirectPurchaseValues(DirectPurchaseDTO dto, DirectPurchaseVO vo) throws ApplicationException {
+
+		vo.setBelongsTo(dto.getBelongsTo());
+		vo.setSupplierName(dto.getSupplierName());
+		vo.setInvDate(dto.getInvDate());
+		vo.setIsIgstApplicable(dto.getIsIgstApplicable());
+		vo.setIssueTo(dto.getIssueTo());
+		vo.setGstnNo(dto.getGstnNo());
+		vo.setInvNo(dto.getInvNo());
+		vo.setSuppType(dto.getSuppType());
+		vo.setDealerType(dto.getDealerType());
+		vo.setEccNoStNo(dto.getEccNoStNo());
+		vo.setIsReverseCharge(dto.getIsReverseCharge());
+		vo.setRemarks(dto.getRemarks());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		vo.setDiscount(dto.getDiscount());
+		vo.setAfterDiscountTotalAmount(dto.getAfterDiscountTotalAmount());
+		vo.setBasicAmount(dto.getBasicAmount());
+		vo.setTotalAmount(dto.getTotalAmount());
+
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branch);
+		}
+
+		if (dto.getGstState() != null && dto.getGstState() != 0) {
+
+			GSTStateMasterVO gstState = gstStateMasterRepo.findById(dto.getGstState())
+					.orElseThrow(() -> new ApplicationException("GST State Not Found"));
+
+			vo.setGstState(gstState);
+		}
+
+		if (dto.getItemCategory() != null && dto.getItemCategory() != 0) {
+
+			ItemMasterVO itemCategory = itemMasterRepo.findByItemType(dto.getItemCategory())
+					.orElseThrow(() -> new ApplicationException("Item Category Not Found"));
+
+			vo.setItemCategory(itemCategory);
+		}
+
+		if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
+
+			EmployeeMasterVO preparedBy = employeeMasterRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+			vo.setPreparedBy(preparedBy);
+		}
+
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+
+			List<DirectPurchaseCashDetailsVO> oldCashDetails = directPurchaseCashDetailsRepo.findByDirectPurchaseVO(vo);
+
+			if (oldCashDetails != null && !oldCashDetails.isEmpty()) {
+				directPurchaseCashDetailsRepo.deleteAll(oldCashDetails);
+			}
+			
+			List<DirectPurchaseTaxDetailsVO> oldTaxDetails = directPurchaseTaxDetailsRepo.findByDirectPurchaseVO(vo);
+
+			if (oldTaxDetails != null && !oldTaxDetails.isEmpty()) {
+				directPurchaseTaxDetailsRepo.deleteAll(oldTaxDetails);
+			}
+		
+		}
+
+		List<DirectPurchaseCashDetailsVO> cashDetailsList = new ArrayList<>();
+
+		if (dto.getDirectPurchaseCashDetailsDTO() != null && !dto.getDirectPurchaseCashDetailsDTO().isEmpty()) {
+
+			for (DirectPurchaseCashDetailsDTO detailDTO : dto.getDirectPurchaseCashDetailsDTO()) {
+
+				DirectPurchaseCashDetailsVO detailVO = new DirectPurchaseCashDetailsVO();
+
+				detailVO.setItemCode(detailDTO.getItemCode());
+				detailVO.setItemDescription(detailDTO.getItemDescription());
+				detailVO.setHsnCode(detailDTO.getHsnCode());
+				detailVO.setTaxType(detailDTO.getTaxType());
+
+				// Unit
+				if (detailDTO.getUnit() != null && detailDTO.getUnit() > 0) {
+
+					UnitMasterVO unit = unitMasterRepo.findById(detailDTO.getUnit())
+							.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+
+					detailVO.setUnit(unit);
+				}
+
+				detailVO.setDcQty(detailDTO.getDcQty());
+				detailVO.setReceivedQty(detailDTO.getReceivedQty());
+				detailVO.setRate(detailDTO.getRate());
+				detailVO.setTax(detailDTO.getTax());
+
+				BigDecimal quantity = detailDTO.getDcQty() != null ? detailDTO.getDcQty() : BigDecimal.ZERO;
+
+				BigDecimal rate = detailDTO.getRate() != null ? detailDTO.getRate() : BigDecimal.ZERO;
+
+				BigDecimal amount = quantity.multiply(rate);
+
+				detailVO.setAmount(amount);
+
+				BigDecimal taxPercentage = detailDTO.getTax() != null ? detailDTO.getTax() : BigDecimal.ZERO;
+
+				BigDecimal igstRate = BigDecimal.ZERO;
+				BigDecimal cgstRate = BigDecimal.ZERO;
+				BigDecimal sgstRate = BigDecimal.ZERO;
+
+				BigDecimal igstAmount = BigDecimal.ZERO;
+				BigDecimal cgstAmount = BigDecimal.ZERO;
+				BigDecimal sgstAmount = BigDecimal.ZERO;
+
+				if ("Yes".equalsIgnoreCase(dto.getIsIgstApplicable())) {
+
+					igstRate = taxPercentage;
+
+					igstAmount = amount.multiply(igstRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+					detailVO.setIgstRate(igstRate);
+					detailVO.setIgstAmount(igstAmount);
+
+				} else {
+
+					cgstRate = taxPercentage.divide(BigDecimal.valueOf(2), 2, RoundingMode.HALF_UP);
+
+					sgstRate = taxPercentage.divide(BigDecimal.valueOf(2), 2, RoundingMode.HALF_UP);
+
+					cgstAmount = amount.multiply(cgstRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+					sgstAmount = amount.multiply(sgstRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+					detailVO.setCgstRate(cgstRate);
+					detailVO.setCgstAmount(cgstAmount);
+
+					detailVO.setSgstRate(sgstRate);
+					detailVO.setSgstAmount(sgstAmount);
+				}
+
+				detailVO.setDirectPurchaseVO(vo);
+
+				cashDetailsList.add(detailVO);
+			}
+		}
+
+		vo.setDirectPurchaseCashDetailsVO(cashDetailsList);
+
+		List<DirectPurchaseTaxDetailsVO> taxList = new ArrayList<>();
+
+		if (dto.getDirectPurchaseTaxDetailsDTO() != null && !dto.getDirectPurchaseTaxDetailsDTO().isEmpty()) {
+
+			for (DirectPurchaseTaxDetailsDTO taxDTO : dto.getDirectPurchaseTaxDetailsDTO()) {
+
+				DirectPurchaseTaxDetailsVO taxVO = new DirectPurchaseTaxDetailsVO();
+
+				taxVO.setParticulars(taxDTO.getParticulars());
+				taxVO.setTax(taxDTO.getTax());
+				taxVO.setAcceptedQtyAmount(taxDTO.getAcceptedQtyAmount());
+				taxVO.setRevisedAmount(taxDTO.getRevisedAmount());
+				taxVO.setTaxId(taxDTO.getTaxId());
+
+				taxVO.setDirectPurchaseVO(vo);
+
+				taxList.add(taxVO);
+			}
+		}
+
+		vo.setDirectPurchaseTaxDetailsVO(taxList);
+	}
+
+
+	private void createDirectorys(Path path) throws IOException {
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
+	@Value("${direction.purchase}")
+	private String uploadPaths;
+
+	private void saveAttachmentss(MultipartFile[] files, DirectPurchaseVO directPurchaseVO)
+			throws ApplicationException {
+		if (files == null || files.length == 0) {
+			return;
+		}
+
+		try {
+			Path inwardFolder = Paths.get(uploadPaths, "directpurchase", directPurchaseVO.getId().toString());
+			createDirectorys(inwardFolder);
+
+			if (ObjectUtils.isNotEmpty(directPurchaseVO.getId())) {
+				List<DirectPurchaseFileUploadDetailsVO> existingAttachments = directPurchaseFileUploadDetailsRepo
+						.findByDirectPurchaseVO(directPurchaseVO);
+				if (existingAttachments != null && !existingAttachments.isEmpty()) {
+					directPurchaseFileUploadDetailsRepo.deleteAll(existingAttachments);
+				}
+			}
+
+			List<DirectPurchaseFileUploadDetailsVO> attachmentList = new ArrayList<>();
+			for (MultipartFile file : files) {
+				if (file == null || file.isEmpty()) {
+					continue;
+				}
+
+				String originalName = file.getOriginalFilename();
+				if (originalName == null) {
+					originalName = "file";
+				}
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+				if (originalName.contains(".")) {
+					extension = originalName.substring(originalName.lastIndexOf("."));
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				String fileName = originalName + "_" + directPurchaseVO.getId() + extension;
+				Path filePath = inwardFolder.resolve(fileName);
+
+				try (InputStream inputStream = file.getInputStream()) {
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/purchaseOrder/viewDirectPurchaseFile/").toUriString();
+				String relativePath = uploadPath.replace("\\", "/");
+				relativePath = filePath.toString().replace("\\", "/").replace(relativePath + "/", "");
+				String publicUrl = baseUrl + relativePath;
+
+				DirectPurchaseFileUploadDetailsVO attachment = new DirectPurchaseFileUploadDetailsVO();
+				attachment.setDirectPurchaseVO(directPurchaseVO);
+				attachment.setName(file.getOriginalFilename());
+				attachment.setFileName(fileName);
+				attachment.setFilePath(publicUrl);
+				attachment.setFileSize(file.getSize());
+//				attachment.setContentType(file.getContentType());
+//				attachment.setUploadOn(LocalDateTime.now());
+				attachmentList.add(attachment);
+			}
+
+			if (!attachmentList.isEmpty()) {
+				List<DirectPurchaseFileUploadDetailsVO> saved = directPurchaseFileUploadDetailsRepo
+						.saveAll(attachmentList);
+				directPurchaseVO.setDirectPurchaseFileUploadDetailsVO(saved);
+			}
+
+		} catch (IOException e) {
+			throw new ApplicationException("File Upload Failed : " + e.getMessage());
+		}
+	}
+
+	
+
+	@Override
+	public ResponseEntity<byte[]> viewDirectPurchaseFile(HttpServletRequest request) throws IOException {
+		return serveFiles(request, "/api/purchaseOrder/viewDirectPurchaseFile/", uploadPaths);
+	}
+
+	private ResponseEntity<byte[]> serveFiles(HttpServletRequest request, String apiPrefix, String uploadPaths)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+		String relativePath = uri.replace(apiPrefix, "");
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadPaths).toAbsolutePath().normalize();
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+
+	@Override
+	public String getDirectPurchaseDocId(Long orgId, String financialYear) {
+		String screenCode = "DP";
+		return directPurchaseRepo.getDirectPurchaseDocId(orgId, financialYear, screenCode);
+	}
+
+	private DirectPurchaseResponseDTO buildDirectPurchaseResponse(DirectPurchaseVO vo) {
+
+		DirectPurchaseResponseDTO responseDTO = new DirectPurchaseResponseDTO();
+
+		responseDTO.setId(vo.getId());
+		responseDTO.setDocId(vo.getDocId());
+		responseDTO.setDocDate(vo.getDocDate());
+		responseDTO.setBelongsTo(vo.getBelongsTo());
+		responseDTO.setSupplierName(vo.getSupplierName());
+		responseDTO.setInvDate(vo.getInvDate());
+		responseDTO.setIsIgstApplicable(vo.getIsIgstApplicable());
+		responseDTO.setIssueTo(vo.getIssueTo());
+		responseDTO.setGstnNo(vo.getGstnNo());
+		responseDTO.setInvNo(vo.getInvNo());
+		responseDTO.setSuppType(vo.getSuppType());
+		responseDTO.setDealerType(vo.getDealerType());
+		responseDTO.setEccNoStNo(vo.getEccNoStNo());
+		responseDTO.setIsReverseCharge(vo.getIsReverseCharge());
+
+		responseDTO.setBasicAmount(vo.getBasicAmount());
+		responseDTO.setDiscount(vo.getDiscount());
+		responseDTO.setAfterDiscountTotalAmount(vo.getAfterDiscountTotalAmount());
+		responseDTO.setTotalAmount(vo.getTotalAmount());
+
+		responseDTO.setRemarks(vo.getRemarks());
+
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
+		responseDTO.setActive(vo.getActive());
+		responseDTO.setCancel(vo.getCancel());
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+		responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+		responseDTO.setScreenName(vo.getScreenName());
+		responseDTO.setScreenCode(vo.getScreenCode());
+
+		if (vo.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(vo.getBranch().getId());
+			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+			branchDTO.setBranchName(vo.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
+
+		if (vo.getGstState() != null) {
+			GSTStateMasterResponseDTO gstStateDTO = new GSTStateMasterResponseDTO();
+			gstStateDTO.setId(vo.getGstState().getId());
+			gstStateDTO.setGstSate(vo.getGstState().getStateName());
+			gstStateDTO.setGstStateCode(vo.getGstState().getStateCode());
+			responseDTO.setGstState(gstStateDTO);
+		}
+
+		if (vo.getItemCategory() != null) {
+			ItemCategoryResponseDTO itemCategoryDTO = new ItemCategoryResponseDTO();
+			itemCategoryDTO.setId(vo.getItemCategory().getId());
+			itemCategoryDTO.setCategory(vo.getItemCategory().getItemCode());
+			responseDTO.setItemCategory(itemCategoryDTO);
+		}
+
+		if (vo.getPreparedBy() != null) {
+			EmployeeMasterResponseDetailsDTO preparedByDTO = new EmployeeMasterResponseDetailsDTO();
+			preparedByDTO.setId(vo.getPreparedBy().getId());
+			preparedByDTO.setEmployeeCode(vo.getPreparedBy().getEmployeeId());
+			preparedByDTO.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+			responseDTO.setPreparedBy(preparedByDTO);
+		}
+
+		List<DirectPurchaseCashDetailsResponseDTO> cashDetailsList = new ArrayList<>();
+
+		if (vo.getDirectPurchaseCashDetailsVO() != null && !vo.getDirectPurchaseCashDetailsVO().isEmpty()) {
+
+			for (DirectPurchaseCashDetailsVO detailVO : vo.getDirectPurchaseCashDetailsVO()) {
+
+				DirectPurchaseCashDetailsResponseDTO detailResponse = new DirectPurchaseCashDetailsResponseDTO();
+
+				detailResponse.setId(detailVO.getId());
+				detailResponse.setItemCode(detailVO.getItemCode());
+				detailResponse.setItemDescription(detailVO.getItemDescription());
+				detailResponse.setHsnCode(detailVO.getHsnCode());
+				detailResponse.setTaxType(detailVO.getTaxType());
+				detailResponse.setTaxPercentage(detailVO.getTax());
+
+				if (detailVO.getUnit() != null) {
+					UnitResponseDTO unitDTO = new UnitResponseDTO();
+					unitDTO.setId(detailVO.getUnit().getId());
+					unitDTO.setUnitId(detailVO.getUnit().getUnitId());
+					detailResponse.setUnit(unitDTO);
+				}
+
+				detailResponse.setDcQty(detailVO.getDcQty());
+				detailResponse.setReceivedQty(detailVO.getReceivedQty());
+				detailResponse.setRate(detailVO.getRate());
+				detailResponse.setAmount(detailVO.getAmount());
+
+				detailResponse.setCgstRate(detailVO.getCgstRate());
+				detailResponse.setCgstAmount(detailVO.getCgstAmount());
+				detailResponse.setSgstRate(detailVO.getSgstRate());
+				detailResponse.setSgstAmount(detailVO.getSgstAmount());
+				detailResponse.setIgstRate(detailVO.getIgstRate());
+				detailResponse.setIgstAmount(detailVO.getIgstAmount());
+
+				cashDetailsList.add(detailResponse);
+			}
+		}
+
+		responseDTO.setDirectPurchaseCashDetails(cashDetailsList);
+
+		List<DirectPurchaseTaxDetailsResponseDTO> taxList = new ArrayList<>();
+
+		if (vo.getDirectPurchaseTaxDetailsVO() != null && !vo.getDirectPurchaseTaxDetailsVO().isEmpty()) {
+
+			for (DirectPurchaseTaxDetailsVO taxVO : vo.getDirectPurchaseTaxDetailsVO()) {
+
+				DirectPurchaseTaxDetailsResponseDTO taxResponse = new DirectPurchaseTaxDetailsResponseDTO();
+
+				taxResponse.setId(taxVO.getId());
+				taxResponse.setParticulars(taxVO.getParticulars());
+				taxResponse.setTax(taxVO.getTax());
+				taxResponse.setAcceptedQtyAmount(taxVO.getAcceptedQtyAmount());
+				taxResponse.setRevisedAmount(taxVO.getRevisedAmount());
+				taxResponse.setTaxId(taxVO.getTaxId());
+
+				taxList.add(taxResponse);
+			}
+		}
+
+		responseDTO.setDirectPurchaseTaxDetails(taxList);
+
+		List<DirectPurchaseFileUploadDetailsResponseDTO> fileList = new ArrayList<>();
+
+		if (vo.getDirectPurchaseFileUploadDetailsVO() != null && !vo.getDirectPurchaseFileUploadDetailsVO().isEmpty()) {
+
+			for (DirectPurchaseFileUploadDetailsVO fileVO : vo.getDirectPurchaseFileUploadDetailsVO()) {
+
+				DirectPurchaseFileUploadDetailsResponseDTO fileResponse = new DirectPurchaseFileUploadDetailsResponseDTO();
+
+				fileResponse.setId(fileVO.getId());
+				fileResponse.setFileName(fileVO.getFileName());
+				fileResponse.setFilePath(fileVO.getFilePath());
+				fileResponse.setFileType(fileVO.getFileType());
+				fileResponse.setFileSize(fileVO.getFileSize());
+
+				fileList.add(fileResponse);
+			}
+		}
+
+		responseDTO.setDirectPurchaseFileUploadDetails(fileList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public List<Map<String, Object>> getIssueTo(Long orgId, Long branch) {
+		Set<Object[]> chType = directPurchaseRepo.getIssueTo(orgId, branch);
+		return getIssueTo(chType);
+	}
+
+	private List<Map<String, Object>> getIssueTo(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("issueTo", ch[0] != null ? ch[0].toString() : "");
+
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getItemType(Long orgId, Long branch, Long itemType) {
+		Set<Object[]> chType = directPurchaseRepo.getItemType(orgId, branch, itemType);
+		return getItemType(chType);
+	}
+
+	private List<Map<String, Object>> getItemType(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+
 			list.add(map);
 		}
 		return list;

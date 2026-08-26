@@ -26,7 +26,7 @@ public class PurchaseContractDTO {
 
     private Long gstState;
     
-    private String isIGSTAppl;
+    private boolean isIGSTAppl;
 
     private LocalDate validFrom;
 
@@ -60,8 +60,8 @@ public class PurchaseContractDTO {
     private String createdBy;
     
 
-//    private List<PurchaseContractDetailsDTO> details;
-//    private List<PurchaseContractTaxDetailsDTO> taxDetails;
-
+    private List<PurchaseContractDetailsDTO> details;
+    private List<PurchaseContractTaxDetailsDTO> taxDetails;
+	
    
 }

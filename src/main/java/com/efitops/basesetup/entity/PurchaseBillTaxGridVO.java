@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,13 +14,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "purchase_bill_tax_grid")
+@Table(name = "purchase_bill_tax_details")
 public class PurchaseBillTaxGridVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasebilltaxgridgen")
-    @SequenceGenerator(name = "purchasebilltaxgridgen", sequenceName = "purchasebilltaxgridseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasebilltaxgrid_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchase_bill_tax_detailsgen")
+    @SequenceGenerator(name = "purchase_bill_tax_detailsgen", sequenceName = "purchase_bill_tax_detailsseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "purchase_bill_tax_details_id")
     private Long id;
 
     @Column(name = "particulars")
@@ -33,9 +35,8 @@ public class PurchaseBillTaxGridVO {
     @Column(name = "revised_amount")
     private BigDecimal revisedAmount;
 
-    // Ledger Account Name -> List Of Values, same pattern as Dealer Type/Tax Code
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ledger_account_id")
+    @ManyToOne
+    @JoinColumn(name = "ledger_account")
     private ListOfValuesDetailsVO ledgerAccount;
 
     @Column(name = "db_cr")
@@ -50,7 +51,8 @@ public class PurchaseBillTaxGridVO {
     @Column(name = "post_to_finance_ac")
     private Boolean postToFinanceAc;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "purchasebill_id")
+    @JsonBackReference
     private PurchaseBillVO purchaseBillVO;
 }

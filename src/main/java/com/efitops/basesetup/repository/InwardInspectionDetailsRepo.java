@@ -13,4 +13,6 @@ public interface InwardInspectionDetailsRepo  extends JpaRepository<InwardInspec
 
 	List<InwardInspectionDetailsVO> findByInwardInspectionVO(InwardInspectionVO vo);
 
+//	List<InwardInspectionDetailsVO> findByInwardInspectionVO(InwardInspectionVO vo);
+
 }

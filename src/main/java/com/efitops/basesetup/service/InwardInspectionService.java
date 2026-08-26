@@ -28,4 +28,9 @@ public interface InwardInspectionService {
 
 	String getInwardInspectionDocId(Long orgId, String financialYear);
 
+	List<Map<String, Object>> getMirnGrnNo(Long orgId, Long branch, Long supplierCode);
+
+	List<Map<String, Object>> getMirnGrnNoItemDetails(Long orgId, Long branch, Long supplierCode,
+			String purchaseOrderNo);
+
 }

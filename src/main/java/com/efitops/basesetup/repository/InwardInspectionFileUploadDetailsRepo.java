@@ -12,6 +12,8 @@ import com.efitops.basesetup.entity.InwardInspectionVO;
 public interface InwardInspectionFileUploadDetailsRepo
 		extends JpaRepository<InwardInspectionFileUploadDetailsVO, Long> {
 
-	List<InwardInspectionFileUploadDetailsVO> findByInwardInspectionVO(InwardInspectionVO vo);
+	List<InwardInspectionFileUploadDetailsVO> findByInwardInspectionVO(InwardInspectionVO inwardInspectionVO);
+
+//	List<InwardInspectionFileUploadDetailsVO> findByInwardInspectionVO(InwardInspectionVO vo);
 
 }

@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -93,7 +92,7 @@ public class InwardInspectionController extends BaseController {
 
 	@PutMapping(value = "/createUpdateInwardInspection", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdateInwardInspection(
-           @RequestPart("inwardInspection") InwardInspectionDTO inwardInspectionDTO,
+			@RequestPart("inwardInspection") InwardInspectionDTO inwardInspectionDTO,
 //			@RequestBody InwardInspectionDTO inwardInspectionDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -166,29 +165,60 @@ public class InwardInspectionController extends BaseController {
 		}
 	}
 
-//    @GetMapping("/getSupplierDetailsForInwardInspection")
-//  public ResponseEntity<ResponseDTO> getSupplierDetailsForInwardInspection(@RequestParam Long orgId, @RequestParam Long branch) {
-//      String methodName = "getSupplierDetailsForInwardInspection()";
-//      LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-//
-//      Map<String, Object> responseObjectsMap = new HashMap<>();
-//      ResponseDTO responseDTO;
-//
-//      try {
-//          List<Map<String, Object>> supplierDetails = inwardInspectionService.getSupplierDetailsForInwardInspection(orgId, branch);
-//
-//          responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Supplier details retrieved successfully");
-//          responseObjectsMap.put("supplierDetails", supplierDetails);
-//
-//          responseDTO = createServiceResponse(responseObjectsMap);
-//
-//      } catch (Exception e) {
-//          LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
-//
-//          responseDTO = createServiceResponseError(responseObjectsMap, "Supplier details retrieval failed", e.getMessage());
-//      }
-//
-//      LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-//      return ResponseEntity.ok(responseDTO);
-//  }
+	@GetMapping("/getMirnGrnNo")
+	public ResponseEntity<ResponseDTO> getMirnGrnNo(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long supplierCode) {
+		String methodName = "getMirnGrnNo()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+			List<Map<String, Object>> grnDetails = inwardInspectionService.getMirnGrnNo(orgId, branch, supplierCode);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "grnNo details retrieved successfully");
+			responseObjectsMap.put("grnDetails", grnDetails);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "grnNo details retrieval failed",
+					e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getMirnGrnNoItemDetails")
+	public ResponseEntity<ResponseDTO> getMirnGrnNoItemDetails(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long supplierCode,@RequestParam String purchaseOrderNo) {
+		String methodName = "getMirnGrnNo()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+			List<Map<String, Object>> grnDetails = inwardInspectionService.getMirnGrnNoItemDetails(orgId, branch, supplierCode,purchaseOrderNo);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "grnNodetails retrieved successfully");
+			responseObjectsMap.put("grnDetails", grnDetails);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "grnNodetails retrieval failed",
+					e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok(responseDTO);
+	}
 }

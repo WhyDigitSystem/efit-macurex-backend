@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -54,8 +55,6 @@ import com.efitops.basesetup.entity.InwardInspectionMeasurementsVO;
 import com.efitops.basesetup.entity.InwardInspectionVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.LocationVO;
-import com.efitops.basesetup.entity.PurchaseDeliveryScheduleDetailsVO;
-import com.efitops.basesetup.entity.PurchaseDeliveryScheduleLineVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -227,25 +226,25 @@ public class InwardInspectionServiceImpl implements InwardInspectionService {
 		}
 
 		if (ObjectUtils.isNotEmpty(vo.getId())) {
+
 			List<InwardInspectionDetailsVO> oldDetails = inwardInspectionDetailsRepo.findByInwardInspectionVO(vo);
 
-			for (InwardInspectionDetailsVO detailVO : oldDetails) {
+			if (oldDetails != null && !oldDetails.isEmpty()) {
 
-				List<InwardInspectionMeasurementsVO> oldLines = inwardInspectionMeasurementsRepo
-						.findByInwardInspectionDetailsVO(detailVO);
+				for (InwardInspectionDetailsVO oldDetail : oldDetails) {
 
-				inwardInspectionMeasurementsRepo.deleteAll(oldLines);
+					List<InwardInspectionMeasurementsVO> oldMeasurements = oldDetail
+							.getInwardInspectionMeasurementsVO();
+
+					if (oldMeasurements != null && !oldMeasurements.isEmpty()) {
+						inwardInspectionMeasurementsRepo.deleteAll(oldMeasurements);
+					}
+				}
+
+				inwardInspectionDetailsRepo.deleteAll(oldDetails);
 			}
-
-			inwardInspectionDetailsRepo.deleteAll(oldDetails);
-
-			List<InwardInspectionFileUploadDetailsVO> oldFileDetails = inwardInspectionFileUploadDetailsRepo
-					.findByInwardInspectionVO(vo);
-			inwardInspectionFileUploadDetailsRepo.deleteAll(oldFileDetails);
 		}
-
 		List<InwardInspectionDetailsVO> detailsList = new ArrayList<>();
-
 		if (dto.getInwardInspectionDetailsDTO() != null) {
 			for (InwardInspectionDetailsDTO detailDTO : dto.getInwardInspectionDetailsDTO()) {
 				InwardInspectionDetailsVO detailVO = new InwardInspectionDetailsVO();
@@ -415,12 +414,12 @@ public class InwardInspectionServiceImpl implements InwardInspectionService {
 			supplierDTO.setId(vo.getSupplierCode().getId());
 			supplierDTO.setSupplierName(vo.getSupplierCode().getCustomerName());
 			supplierDTO.setSupplierCode(vo.getSupplierCode().getCustomerCode());
-//			supplierDTO.setAddress(vo.getSupplierCode().getAddress());
-//			supplierDTO.setGstNo(vo.getSupplierCode().getGstNo());
-//			supplierDTO.setGstApproval(vo.getSupplierCode().isGstApplicable() ? "Yes" : "No");
-//			if (vo.getSupplierCode().getGstState() != null) {
-//				supplierDTO.setGstSate(vo.getSupplierCode().getGstState().getStateName());
-//			}
+			supplierDTO.setAddress(vo.getSupplierCode().getAddress());
+			supplierDTO.setGstNo(vo.getSupplierCode().getGstNo());
+			supplierDTO.setGstApproval(vo.getSupplierCode().isGstApplicable() ? "Yes" : "No");
+			if (vo.getSupplierCode().getGstState() != null) {
+				supplierDTO.setGstSate(vo.getSupplierCode().getGstState().getStateName());
+			}
 			responseDTO.setSupplierCode(supplierDTO);
 		}
 
@@ -707,27 +706,79 @@ public class InwardInspectionServiceImpl implements InwardInspectionService {
 		return inwardInspectionRepo.getInwardInspectionDocId(orgId, financialYear, screenCode);
 	}
 
-//	@Override
-//	public List<Map<String, Object>> getSupplierDetailsForInwardInspection(Long orgId, Long branch) {
-//		Set<Object[]> supplierDetails = inwardInspectionRepo.getSupplierDetailsForInwardInspection(orgId, branch);
-//		return getSupplierDetailsResponse(supplierDetails);
-//	}
-//
-//	private List<Map<String, Object>> getSupplierDetailsResponse(Set<Object[]> supplierDetails) {
-//		List<Map<String, Object>> list = new ArrayList<>();
-//		for (Object[] ch : supplierDetails) {
-//			Map<String, Object> map = new HashMap<>();
-//			map.put("supplierId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
-//			map.put("supplierName", ch[1] != null ? ch[1].toString() : "");
-//			map.put("supplierCode", ch[2] != null ? ch[2].toString() : "");
-//			map.put("address", ch[3] != null ? ch[3].toString() : "");
-//			map.put("pinCode", ch[4] != null ? ch[4].toString() : "");
-//			map.put("gstNo", ch[5] != null ? ch[5].toString() : "");
-//			map.put("stateName", ch[6] != null ? ch[6].toString() : "");
-//			map.put("isRegistered", ch[7] != null ? ch[7].toString() : "");
-//			map.put("country", ch[8] != null ? ch[8].toString() : "");
-//			list.add(map);
-//		}
-//		return list;
-//	}
+	@Override
+	public List<Map<String, Object>> getMirnGrnNo(Long orgId, Long branch, Long supplierCode) {
+		Set<Object[]> supplierDetails = inwardInspectionRepo.getMirnGrnNo(orgId, branch, supplierCode);
+		return getMirnGrnNo(supplierDetails);
+	}
+
+	private List<Map<String, Object>> getMirnGrnNo(Set<Object[]> supplierDetails) {
+		List<Map<String, Object>> list = new ArrayList<>();
+		for (Object[] ch : supplierDetails) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("grnNo", ch[0] != null ? ch[0].toString() : "");
+			map.put("grnDate", ch[1] != null ? ch[1].toString() : "");
+			map.put("grnTime", ch[2] != null ? ch[2].toString() : "");
+			map.put("poNo", ch[3] != null ? ch[3].toString() : "");
+			map.put("scheduleNo", ch[4] != null ? ch[4].toString() : "");
+			map.put("partyDcNo", ch[5] != null ? ch[5].toString() : "");
+			map.put("partyDate", ch[6] != null ? ch[6].toString() : "");
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getMirnGrnNoItemDetails(Long orgId, Long branch, Long supplierCode,
+			String purchaseOrderNo) {
+		Set<Object[]> supplierDetails = inwardInspectionRepo.getMirnGrnNoItemDetails(orgId, branch, supplierCode,
+				purchaseOrderNo);
+		return getMirnGrnNoItemDetails(supplierDetails);
+	}
+
+	private List<Map<String, Object>> getMirnGrnNoItemDetails(Set<Object[]> supplierDetails) {
+		List<Map<String, Object>> list = new ArrayList<>();
+		for (Object[] ch : supplierDetails) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("item", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+
+			map.put("drawingNo", ch[3] != null ? ch[3].toString() : "");
+
+			map.put("inspection", ch[4] != null ? ((Number) ch[4]).longValue() : null);
+
+			if ("100%".equalsIgnoreCase(ch[5] != null ? ch[5].toString() : "")) {
+
+				map.put("inspectionDescription", "Yes");
+
+			} else if ("Sample".equalsIgnoreCase(ch[5] != null ? ch[5].toString() : "")
+					|| "Not Required".equalsIgnoreCase(ch[5] != null ? ch[5].toString() : "")) {
+
+				map.put("inspectionDescription", "No");
+
+			} else {
+
+				map.put("inspectionDescription", "");
+			}
+
+			map.put("primaryUnitId", ch[6] != null ? ((Number) ch[6]).longValue() : null);
+
+			map.put("purchaseUnitId", ch[7] != null ? ((Number) ch[7]).longValue() : null);
+
+			map.put("primaryUnitDescription", ch[8] != null ? ch[8].toString() : "");
+
+			map.put("purchaseUnitDescription", ch[8] != null ? ch[8].toString() : "");
+
+			map.put("poQty", ch[9] != null ? ((Number) ch[9]).doubleValue() : null);
+
+			map.put("receivedQty", ch[10] != null ? ((Number) ch[10]).doubleValue() : null);
+
+			map.put("acceptQty", ch[11] != null ? ((Number) ch[11]).doubleValue() : null);
+			list.add(map);
+		}
+		return list;
+	}
 }

@@ -30,7 +30,7 @@ public class PurchaseBillResponseDTO {
     private Boolean excisable;
     private String vendorDcNo;
     private BigDecimal exchangeRate;
-    private ListOfVlauesDetailsResponseDTO dealerType;
+//    private ListOfVlauesDetailsResponseDTO dealerType;
     private String purchaseorderType;
     private Long purchaseorderId;
     private String purchaseorderNo;
@@ -39,7 +39,7 @@ public class PurchaseBillResponseDTO {
     private LocalDate voucherPostingDate;
     private LocalDate date;
     private BigDecimal dutyPerUnit;
-    private ListOfVlauesDetailsResponseDTO postingCategory;
+//    private ListOfVlauesDetailsResponseDTO postingCategory;
     private Boolean modvatCopyReceived;
    
     private String supplierDcInvNo;
@@ -66,8 +66,8 @@ public class PurchaseBillResponseDTO {
     private String createdBy;
     private String updatedBy;
 
-//    private List<PurchaseBillDetailsResponseDTO> purchaseDetails;
-//    private List<PurchaseBillTaxGridResponseDTO> taxGrid;
+    private List<PurchaseBillDetailsResponseDTO> purchaseDetails;
+    private List<PurchaseBillTaxGridResponseDTO> taxGrid;
 
     
 }

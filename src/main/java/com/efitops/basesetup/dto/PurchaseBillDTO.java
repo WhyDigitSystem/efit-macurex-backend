@@ -66,6 +66,6 @@ public class PurchaseBillDTO {
 	private String updatedBy;
 
 	// -------- children --------
-//	private List<PurchaseBillDetailsDTO> purchaseDetails;
-//	private List<PurchaseBillTaxGridDTO> taxGrid;
+	private List<PurchaseBillDetailsDTO> purchaseDetails;
+	private List<PurchaseBillTaxGridDTO> taxGrid;
 }

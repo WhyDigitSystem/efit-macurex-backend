@@ -1,6 +1,7 @@
 package com.efitops.basesetup.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.GateInwardEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InternalIndentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PhysicalStockReConcilationResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseBillResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.GateInwardEntryDTO;
+import com.efitops.basesetup.dto.InternalIndentDTO;
+import com.efitops.basesetup.dto.PhysicalStockReConcilationDTO;
 import com.efitops.basesetup.dto.PurchaseBillDTO;
 import com.efitops.basesetup.dto.PurchaseContractDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleDTO;
@@ -183,53 +188,41 @@ public class PurchaseDeliverySchController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 //	item dropdown fro purchasedeliveryschedule
 	@GetMapping("/getItemsForPurchaseDeliverySchedule")
 	public ResponseEntity<Map<String, Object>> getItemsForPurchaseDeliverySchedule(
-	        @RequestParam String purchasecontractnumber,
-	        @RequestParam Long customer,
-	        @RequestParam Long branch,
-	        @RequestParam Long orgId) throws ApplicationException {
+			@RequestParam String purchasecontractnumber, @RequestParam Long customer, @RequestParam Long branch,
+			@RequestParam Long orgId) throws ApplicationException {
 
-	    String methodName = "getItemsForPurchaseDeliverySchedule()";
+		String methodName = "getItemsForPurchaseDeliverySchedule()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseMap = purchaseDeliverySchService
-	            .getItemsForPurchaseDeliverySchedule(
-	                    purchasecontractnumber,
-	                    customer,
-	                    branch,
-	                    orgId);
+		Map<String, Object> responseMap = purchaseDeliverySchService
+				.getItemsForPurchaseDeliverySchedule(purchasecontractnumber, customer, branch, orgId);
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseMap);
+		return ResponseEntity.ok(responseMap);
 	}
+
 //	Purchase order number dropdown
 	@GetMapping("/getPurchaseOrderNumberForPurchaseDeliverySchedule")
 	public ResponseEntity<Map<String, Object>> getPurchaseOrderNumberForPurchaseDeliverySchedule(
-	        @RequestParam Long custid,
-	        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate docdt,
-	        @RequestParam Long branch,
-	        @RequestParam Long orgId) throws ApplicationException {
+			@RequestParam Long custid, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate docdt,
+			@RequestParam Long branch, @RequestParam Long orgId) throws ApplicationException {
 
-	    String methodName = "getPurchaseOrderNumberForPurchaseDeliverySchedule()";
+		String methodName = "getPurchaseOrderNumberForPurchaseDeliverySchedule()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseMap =
-	            purchaseDeliverySchService
-	                    .getPurchaseOrderNumberForPurchaseDeliverySchedule(
-	                            custid,
-	                            docdt,
-	                            branch,
-	                            orgId);
+		Map<String, Object> responseMap = purchaseDeliverySchService
+				.getPurchaseOrderNumberForPurchaseDeliverySchedule(custid, docdt, branch, orgId);
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseMap);
+		return ResponseEntity.ok(responseMap);
 	}
 
 //	Gate Inward Entry
@@ -369,44 +362,36 @@ public class PurchaseDeliverySchController extends BaseController {
 	}
 
 //	purchase Contract
-	@PostMapping(value = "/updateCreatePurchaseContract",
-	        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/updateCreatePurchaseContract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreatePurchaseContract(
 
-	        @RequestPart("purchaseContractVO") PurchaseContractDTO purchaseContractDTO,
+			@RequestPart("purchaseContractVO") PurchaseContractDTO purchaseContractDTO,
 
-	        @RequestPart(value = "files", required = false)
-	        MultipartFile[] files) {
+			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> response =
-	                purchaseDeliverySchService.updateCreatePurchaseContract(
-	                        purchaseContractDTO,
-	                        files);
+			Map<String, Object> response = purchaseDeliverySchService.updateCreatePurchaseContract(purchaseContractDTO,
+					files);
 
-	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                response.get("message"));
-	        responseObjectsMap.put("purchaseContractVO",
-	                response.get("purchaseContractVO"));
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
+			responseObjectsMap.put("purchaseContractVO", response.get("purchaseContractVO"));
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        e.printStackTrace();
+			e.printStackTrace();
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
+
 	@GetMapping("/getPurchaseContractById")
 	public ResponseEntity<ResponseDTO> getPurchaseContractById(@RequestParam Long id) {
 
@@ -542,187 +527,143 @@ public class PurchaseDeliverySchController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
+
 // purchase contract item dropdown
 	@GetMapping("/getPurchaseContractItems")
-	public ResponseEntity<ResponseDTO> getPurchaseContractItems(
-	        @RequestParam Long supplier,
-	        @RequestParam Long branch,
-	        @RequestParam Long orgId) {
+	public ResponseEntity<ResponseDTO> getPurchaseContractItems(@RequestParam Long supplier, @RequestParam Long branch,
+			@RequestParam Long orgId) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> response = purchaseDeliverySchService.getPurchaseContractItems(
-	                supplier,
-	                branch,
-	                orgId);
+			Map<String, Object> response = purchaseDeliverySchService.getPurchaseContractItems(supplier, branch, orgId);
 
-	        responseObjectsMap.put("itemList", response.get("itemList"));
+			responseObjectsMap.put("itemList", response.get("itemList"));
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        responseDTO = createServiceResponseError(responseObjectsMap,
-	                e.getMessage(), e.getMessage());
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
 //	purchase bill
-	
+
 	@PutMapping("/createUpdatePurchaseBill")
-	public ResponseEntity<ResponseDTO> createUpdatePurchaseBill(
-	        @RequestBody PurchaseBillDTO purchaseBillDTO) {
+	public ResponseEntity<ResponseDTO> createUpdatePurchaseBill(@RequestBody PurchaseBillDTO purchaseBillDTO) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO;
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> purchaseBillMap =
-	                purchaseDeliverySchService.createUpdatePurchaseBill(
-	                        purchaseBillDTO);
+			Map<String, Object> purchaseBillMap = purchaseDeliverySchService.createUpdatePurchaseBill(purchaseBillDTO);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                purchaseBillMap.get("message"));
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, purchaseBillMap.get("message"));
 
-	        responseObjectsMap.put(
-	                "purchaseBillVO",
-	                purchaseBillMap.get("purchaseBillVO"));
+			responseObjectsMap.put("purchaseBillVO", purchaseBillMap.get("purchaseBillVO"));
 
-	        responseDTO = createServiceResponse(
-	                responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        e.printStackTrace();
+			e.printStackTrace();
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 //	supllier dropdown fro purchase bill
 	@GetMapping("/getSuppliersForPurchaseBill")
-	public ResponseEntity<ResponseDTO> getSuppliersForPurchaseBill(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getSuppliersForPurchaseBill(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO;
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> supplierMap =
-	                purchaseDeliverySchService.getSuppliersForPurchaseBill(
-	                        orgId,
-	                        branch);
+			Map<String, Object> supplierMap = purchaseDeliverySchService.getSuppliersForPurchaseBill(orgId, branch);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Supplier List Fetched Successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Supplier List Fetched Successfully");
 
-	        responseObjectsMap.put(
-	                "supplierList",
-	                supplierMap.get("supplierList"));
+			responseObjectsMap.put("supplierList", supplierMap.get("supplierList"));
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        e.printStackTrace();
+			e.printStackTrace();
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
+
 	@GetMapping("/getPurchaseBillById")
-	public ResponseEntity<ResponseDTO> getPurchaseBillById(
-	        @RequestParam Long id) {
+	public ResponseEntity<ResponseDTO> getPurchaseBillById(@RequestParam Long id) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO;
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        PurchaseBillResponseDTO purchaseBillResponseDTO =
-	                purchaseDeliverySchService.getPurchaseBillById(id);
+			PurchaseBillResponseDTO purchaseBillResponseDTO = purchaseDeliverySchService.getPurchaseBillById(id);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Purchase Bill Fetched Successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Bill Fetched Successfully");
 
-	        responseObjectsMap.put(
-	                "purchaseBillVO",
-	                purchaseBillResponseDTO);
+			responseObjectsMap.put("purchaseBillVO", purchaseBillResponseDTO);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        e.printStackTrace();
+			e.printStackTrace();
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
+
 	@GetMapping("/getPurchaseBillByOrgId")
-	public ResponseEntity<ResponseDTO> getPurchaseBillByOrgId(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getPurchaseBillByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO;
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        List<PurchaseBillResponseDTO> purchaseBillList =
-	                purchaseDeliverySchService
-	                        .getPurchaseBillByOrgId(orgId, branch);
+			List<PurchaseBillResponseDTO> purchaseBillList = purchaseDeliverySchService.getPurchaseBillByOrgId(orgId,
+					branch);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Purchase Bill Details Fetched Successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Bill Details Fetched Successfully");
 
-	        responseObjectsMap.put(
-	                "purchaseBillList",
-	                purchaseBillList);
+			responseObjectsMap.put("purchaseBillList", purchaseBillList);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        e.printStackTrace();
+			e.printStackTrace();
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	@GetMapping("/getPurchaseDeliveryScheduleDocId")
 	public ResponseEntity<ResponseDTO> getPurchaseDeliveryScheduleDocId(@RequestParam Long orgId,
 			@RequestParam String financialYear) {
@@ -754,4 +695,600 @@ public class PurchaseDeliverySchController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
+
+//	grn no dropdown for the purchase bill
+	@GetMapping("/getGrnNoDropdownforPurchaseBill")
+	public ResponseEntity<ResponseDTO> getGrnNoDropdownforPurchaseBill(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long supplier) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> grnMap = purchaseDeliverySchService.getGrnNoDropdownforPurchaseBill(orgId, branch,
+					supplier);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "GRN No List Fetched Successfully");
+
+			responseObjectsMap.put("grnList", grnMap.get("data"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+//	item dropdown for the purchase bill
+	@GetMapping("/getItemDropDownForPurchaseBill")
+	public ResponseEntity<ResponseDTO> getItemDropDownForPurchaseBill(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long supplier, @RequestParam String grnNo) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> itemMap = purchaseDeliverySchService.getItemDropDownForPurchaseBill(orgId, branch,
+					supplier, grnNo);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item List Fetched Successfully");
+
+			responseObjectsMap.put("itemList", itemMap.get("data"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+//	internal indent
+	@PutMapping("/updateCreateInternalIndent")
+
+	public ResponseEntity<ResponseDTO> updateCreateInternalIndent(@RequestBody InternalIndentDTO internalIndentDTO) {
+
+		String methodName = "updateCreateInternalIndent()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> responseMap = purchaseDeliverySchService.updateCreateInternalIndent(internalIndentDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+
+			responseObjectsMap.put("internalIndentVO", responseMap.get("internalIndentVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getInternalIndentDocId")
+
+	public ResponseEntity<ResponseDTO> getInternalIndentDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getInternalIndentDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = purchaseDeliverySchService.getInternalIndentDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Internal Indent DocId information retrieved successfully");
+
+			responseObjectsMap.put("internalIndentDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Internal Indent DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	item dropdown
+
+	@GetMapping("/getItemDropdownForInternalIndent")
+
+	public ResponseEntity<ResponseDTO> getItemDropdownForInternalIndent(@RequestParam Long branch,
+			@RequestParam Long orgId) {
+
+		String methodName = "getItemDropdownForInternalIndent()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> itemList = new ArrayList<>();
+
+		try {
+
+			itemList = purchaseDeliverySchService.getItemDropdownForInternalIndent(branch, orgId);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item information retrieved successfully");
+
+			responseObjectsMap.put("itemDropdown", itemList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Item information",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getInternalIndentById")
+
+	public ResponseEntity<ResponseDTO> getInternalIndentById(@RequestParam Long id) {
+
+		String methodName = "getInternalIndentById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		InternalIndentResponseDTO response = null;
+
+		try {
+
+			response = purchaseDeliverySchService.getInternalIndentById(id);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Internal Indent information retrieved successfully");
+
+			responseObjectsMap.put("internalIndentVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Internal Indent information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getInternalIndentByOrgId")
+
+	public ResponseEntity<ResponseDTO> getInternalIndentByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getInternalIndentByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<InternalIndentResponseDTO> responseList = new ArrayList<>();
+
+		try {
+
+			responseList = purchaseDeliverySchService.getInternalIndentByOrgId(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Internal Indent information retrieved successfully");
+
+			responseObjectsMap.put("internalIndentVO", responseList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Internal Indent information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	physical stock reconcilation
+	@PutMapping("/updateCreatePhysicalStockReConcilation")
+
+	public ResponseEntity<ResponseDTO> updateCreatePhysicalStockReConcilation(
+			@RequestBody PhysicalStockReConcilationDTO physicalStockReConcilationDTO) {
+
+		String methodName = "updateCreatePhysicalStockReConcilation()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> responseMap = purchaseDeliverySchService
+					.updateCreatePhysicalStockReConcilation(physicalStockReConcilationDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+
+			responseObjectsMap.put("physicalStockReConcilationVO", responseMap.get("physicalStockReConcilationVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getPhysicalStockReConcilationById")
+
+	public ResponseEntity<ResponseDTO> getPhysicalStockReConcilationById(
+	        @RequestParam Long id) {
+
+	    String methodName = "getPhysicalStockReConcilationById()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    PhysicalStockReConcilationResponseDTO response = null;
+
+	    try {
+
+	        response = purchaseDeliverySchService
+	                .getPhysicalStockReConcilationById(id);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Physical Stock Reconciliation information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "physicalStockReConcilationVO",
+	                response);
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Physical Stock Reconciliation information",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	@GetMapping("/getPhysicalStockReConcilationByOrgId")
+
+	public ResponseEntity<ResponseDTO> getPhysicalStockReConcilationByOrgId(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getPhysicalStockReConcilationByOrgId()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    List<PhysicalStockReConcilationResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    try {
+
+	        responseList =
+	                purchaseDeliverySchService
+	                        .getPhysicalStockReConcilationByOrgId(
+	                                orgId,
+	                                branch);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Physical Stock Reconciliation information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "physicalStockReConcilationVO",
+	                responseList);
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Physical Stock Reconciliation information",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+//	location dropdown
+	
+	@GetMapping("/getLocationDropdownForPhysicalStockReConcilation")
+
+	public ResponseEntity<ResponseDTO> getLocationDropdownForPhysicalStockReConcilation(
+	        @RequestParam Long locationType,
+	        @RequestParam Long branch,
+	        @RequestParam Long orgId) {
+
+	    String methodName =
+	            "getLocationDropdownForPhysicalStockReConcilation()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    List<Map<String, Object>> locationList =
+	            new ArrayList<>();
+
+	    try {
+
+	        locationList =
+	        		purchaseDeliverySchService
+	                        .getLocationDropdownForPhysicalStockReConcilation(
+	                                locationType,
+	                                branch,
+	                                orgId);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Location information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "locationDropdown",
+	                locationList);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } else {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Location information",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+//	docid for physical stock reconcilation
+	@GetMapping("/getPhysicalStockReConcilationDocId")
+
+	public ResponseEntity<ResponseDTO> getPhysicalStockReConcilationDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName = "getPhysicalStockReConcilationDocId()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String mapp = "";
+
+	    try {
+
+	        mapp = purchaseDeliverySchService
+	                .getPhysicalStockReConcilationDocId(
+	                        orgId,
+	                        financialYear);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Physical Stock Reconciliation DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "reConcilationDocId",
+	                mapp);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } else {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Physical Stock Reconciliation DocId",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
 }

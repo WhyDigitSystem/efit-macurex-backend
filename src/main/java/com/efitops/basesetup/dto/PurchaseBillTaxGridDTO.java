@@ -19,8 +19,8 @@ public class PurchaseBillTaxGridDTO {
     private BigDecimal revisedAmount;
 
     private Long ledgerAccount;
-    private String dbCr;
-    private BigDecimal dbAmt;
-    private BigDecimal crAmt;
+    private String debitCredit;
+    private BigDecimal debitAmount;
+    private BigDecimal creditAmount;
     private Boolean postToFinanceAc;
 }

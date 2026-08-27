@@ -342,6 +342,8 @@ public class GrnServiceImpl implements GrnService {
 				detailVO.setAcceptQty(detailDTO.getAcceptQty());
 
 				detailVO.setAccQtyInPrimaryUnit(detailVO.getAcceptQty());
+				
+				detailVO.setChallanQty(detailDTO.getChallanQty());
 
 				detailVO.setRejectQty(detailDTO.getReceivedQty().subtract(detailDTO.getAcceptQty()));
 

@@ -24,8 +24,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeMasterVO {
 
+public class EmployeeMasterVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "employeemastergen")
 	@SequenceGenerator(name = "employeemastergen", sequenceName = "employeemasterseq", initialValue = 1000000001, allocationSize = 1)

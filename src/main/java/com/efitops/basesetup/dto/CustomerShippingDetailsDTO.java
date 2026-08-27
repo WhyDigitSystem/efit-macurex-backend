@@ -25,7 +25,6 @@ public class CustomerShippingDetailsDTO {
 
     private String email;
     
-    @Column(name = "fax")
     private String fax;
 
     private Long shippingCity;

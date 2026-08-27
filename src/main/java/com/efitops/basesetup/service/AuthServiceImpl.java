@@ -220,36 +220,72 @@ public class AuthServiceImpl implements AuthService {
 //		return userVO;
 //	}
 
-	
 	@Override
-	public void signup(SignUpFormDTO signUpRequest) throws ApplicationException {
-		String methodName = "signup()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-		if (ObjectUtils.isEmpty(signUpRequest)
-				|| StringUtils.isBlank(signUpRequest.getUserName())) {
-			throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_REGISTER_INFORMATION);
-		}
-		EmployeeMasterVO employeeVO = employeeRepo.findById(signUpRequest.getEmployee())
-		        .orElseThrow(() -> new ApplicationException("Employee not found"));
+	public String signup(SignUpFormDTO signUpRequest) throws ApplicationException {
 
-		if (StringUtils.isBlank(employeeVO.getEmail())) {
-		    throw new ApplicationException("Employee email is missing");
-		}
-//		else if (userRepo.existsByUserNameOrEmployeeMaster_Email(signUpRequest.getUserName(), signUpRequest.getEmail())) 
-//		{
-//			throw new ApplicationContextException(UserConstants.ERRROR_MSG_USER_INFORMATION_ALREADY_REGISTERED);
-//		}
-		UserVO userVO = getUserVOFromSignUpFormDTO(signUpRequest);
-		userRepo.save(userVO);
-		userService.createUserAction(userVO.getUserName(), userVO.getId(), UserConstants.USER_ACTION_ADD_ACCOUNT);
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+	    String methodName = "signup()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    if (ObjectUtils.isEmpty(signUpRequest)
+	            || StringUtils.isBlank(signUpRequest.getUserName())) {
+
+	        throw new ApplicationContextException(
+	                UserConstants.ERRROR_MSG_INVALID_USER_REGISTER_INFORMATION
+	        );
+	    }
+
+	    EmployeeMasterVO employeeVO = employeeRepo.findById(signUpRequest.getEmployee())
+	            .orElseThrow(() ->
+	                    new ApplicationException(
+	                            "Employee not found for ID : "
+	                                    + signUpRequest.getEmployee()
+	                    ));
+
+	    if (StringUtils.isBlank(employeeVO.getEmail())) {
+	        throw new ApplicationException("Employee email is missing");
+	    }
+
+	    boolean isUpdate =
+	            signUpRequest.getId() != null
+	                    && signUpRequest.getId() != 0;
+
+	    System.out.println("Employee ID from request = "
+	            + signUpRequest.getEmployee());
+
+	    System.out.println("Employee ID from DB = "
+	            + employeeVO.getId());
+
+	    UserVO userVO = getUserVOFromSignUpFormDTO(
+	            signUpRequest,
+	            employeeVO
+	    );
+
+	    userRepo.save(userVO);
+
+	    userService.createUserAction(
+	            userVO.getUserName(),
+	            userVO.getId(),
+	            UserConstants.USER_ACTION_ADD_ACCOUNT
+	    );
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    if (isUpdate) {
+	        return "User Updated Successfully";
+	    }
+
+	    return "User Created Successfully";
 	}
 
-	private UserVO getUserVOFromSignUpFormDTO(SignUpFormDTO signUpFormDTO) throws ApplicationException {
+	private UserVO getUserVOFromSignUpFormDTO(SignUpFormDTO signUpFormDTO, EmployeeMasterVO employeeVO2) throws ApplicationException {
 
 //		UserVO userVO = new UserVO();
 		EmployeeMasterVO employeeVO = employeeRepo.findById(signUpFormDTO.getEmployee())
-		        .orElseThrow(() -> new ApplicationException("Employee not found"));
+		        .orElseThrow(() ->
+		                new ApplicationException(
+		                        "Employee not found for ID : "
+		                        + signUpFormDTO.getEmployee()));
 //		userVO=userRepo.findByUserNameOrEmailOrMobileNo(signUpFormDTO.getUserName(), signUpFormDTO.getEmail(), signUpFormDTO.getEmail());
 		UserVO userVO;
 
@@ -270,6 +306,7 @@ public class AuthServiceImpl implements AuthService {
 		    if (branches != null && !branches.isEmpty()) {
 		        branchAccessRepo.deleteAll(branches);
 		    }
+		    
 
 		} else {
 
@@ -289,9 +326,16 @@ public class AuthServiceImpl implements AuthService {
 		    userVO = new UserVO();
 		}
 		userVO.setUserName(signUpFormDTO.getUserName());
+		
+		
+		
+		
 		if (ObjectUtils.isEmpty(userVO.getId())) {
 			try {
+				
+				
 				userVO.setPassword(encoder.encode(CryptoUtils.getDecrypt(signUpFormDTO.getPassword())));
+				
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage());
 				throw new ApplicationContextException(UserConstants.ERRROR_MSG_UNABLE_TO_ENCODE_USER_PASSWORD);
@@ -299,13 +343,10 @@ public class AuthServiceImpl implements AuthService {
 		}
 //		userVO.setEmployeeName(signUpFormDTO.getEmployeeName());
 //		userVO.setEmployeeCode(signUpFormDTO.getEmployeeCode());
-		if (signUpFormDTO.getEmployee() != null) {
+		
 
-		    EmployeeMasterVO employeesVO = employeeRepo.findById(signUpFormDTO.getEmployee())
-		            .orElseThrow(() -> new ApplicationException("Employee not found"));
-
-		    userVO.setEmployeeMaster(employeesVO);
-		}
+		    userVO.setEmployeeMaster(employeeVO2);
+		
 		CompanyVO companyVO = companyRepo.findById(signUpFormDTO.getOrgId())
 		        .orElseThrow(() -> new ApplicationException("Company not found"));
 
@@ -317,6 +358,8 @@ public class AuthServiceImpl implements AuthService {
 		userVO.setUserType(signUpFormDTO.getUserType());
 		userVO.setActive(signUpFormDTO.isActive());
 		userVO.setOrgId(signUpFormDTO.getOrgId());
+		userVO.setEmail(signUpFormDTO.getEmail());
+
 		userVO.setAllIndiaAcces(signUpFormDTO.isAllIndiaAcces());
 		userVO.setCreatedby(signUpFormDTO.getCreatedBy());
 		userVO.setUpdatedby(signUpFormDTO.getCreatedBy());

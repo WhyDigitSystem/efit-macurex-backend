@@ -32,9 +32,9 @@ public class CustomerResponseDTO {
 		private String panNo;
 		private String esiNo;
 		private String tinNo;
-		
-	    private String docId;
-	    private LocalDate docDate;
+		private String customerCompanyCode;
+
+	  
 		private PartyCategoryResponseDTO belongsTo;
 		private EmployeeResponseDTO buyerName;
 

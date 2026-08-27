@@ -40,7 +40,7 @@ public class DepartmentVO {
 //	private String docId;
 	@Column(name = "department_code")
 	private String departmentCode;
-	@Column(name = "departmen_tname")
+	@Column(name = "department_name")
 	private String departmentName;
 	@Column(name = "org_id")
 	private Long orgId;

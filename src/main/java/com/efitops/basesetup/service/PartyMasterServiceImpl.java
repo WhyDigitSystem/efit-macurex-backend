@@ -284,13 +284,13 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	    customerVO.setCountry(country);
 
 	    // Set all remaining fields
-	    customerVO.setDocId(dto.getDocId());
-	    customerVO.setDocDate(dto.getDocDate());
+	  
 	    customerVO.setSalutation(dto.getSalutation());
 	    customerVO.setCustomerType(dto.getCustomerType());
 	    customerVO.setAccountName(dto.getAccountName());
 	    customerVO.setCustomerName(dto.getCustomerName());
 	    customerVO.setCustomerCode(dto.getCustomerCode());
+	    customerVO.setCustomerCompanyCode(dto.getCustomerCompanyCode());
 
 	    customerVO.setPanNo(dto.getPanNo());
 	    customerVO.setEsiNo(dto.getEsiNo());
@@ -574,8 +574,8 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	    }
 
 	    // Basic Details
-	    dto.setDocId(customerVO.getDocId());
-	    dto.setDocDate(customerVO.getDocDate());
+	 
+	    dto.setCustomerCompanyCode(customerVO.getCustomerCompanyCode());
 	    dto.setSalutation(customerVO.getSalutation());
 	    dto.setCustomerType(customerVO.getCustomerType());
 	    dto.setAccountName(customerVO.getAccountName());

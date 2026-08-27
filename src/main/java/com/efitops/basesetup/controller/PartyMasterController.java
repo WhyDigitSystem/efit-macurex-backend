@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -46,26 +47,33 @@ public class PartyMasterController extends BaseController {
             @Valid @RequestBody CustomerDTO customerDTO) {
 
         String methodName = "createUpdateCustomer()";
+
         LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-        Map<String, Object> responseObjectsMap = new HashMap<>();
         String errorMsg = null;
+
+        Map<String, Object> responseObjectsMap = new HashMap<>();
+
         ResponseDTO responseDTO = null;
 
         try {
 
-            Map<String, Object> responseMap =
-            		partyMasterService.createUpdateCustomer(customerDTO);
+            Map<String, Object> customerResponse =
+                    partyMasterService.createUpdateCustomer(customerDTO);
 
             responseObjectsMap.put(
                     CommonConstant.STRING_MESSAGE,
-                    responseMap.get("message"));
+                    customerResponse.get("message"));
 
             responseObjectsMap.put(
                     "customer",
-                    responseMap.get("customer"));
+                    customerResponse.get("customer"));
 
             responseDTO = createServiceResponse(responseObjectsMap);
+
+            LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+            return ResponseEntity.ok(responseDTO);
 
         } catch (Exception e) {
 
@@ -74,17 +82,20 @@ public class PartyMasterController extends BaseController {
             LOGGER.error(
                     UserConstants.ERROR_MSG_METHOD_NAME,
                     methodName,
-                    errorMsg);
+                    errorMsg,
+                    e);
 
             responseDTO = createServiceResponseError(
                     responseObjectsMap,
                     errorMsg,
                     errorMsg);
+
+            LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(responseDTO);
         }
-
-        LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-        return ResponseEntity.ok().body(responseDTO);
     }
 
     @GetMapping("/getCustomerById")

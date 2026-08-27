@@ -30,9 +30,11 @@ import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationIssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentAttachmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentCustomerResponceDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentDetailsItemResponseDto;
@@ -56,6 +58,7 @@ import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.IssuesDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
+import com.efitops.basesetup.dto.ParameterMasterDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDetailsDto;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
@@ -77,8 +80,10 @@ import com.efitops.basesetup.entity.EnquiryVO;
 import com.efitops.basesetup.entity.IssuesDetailsVO;
 import com.efitops.basesetup.entity.IssuesVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.OpenStockEntryVO;
+import com.efitops.basesetup.entity.ParameterMasterVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentAttachmentVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentDetailsVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentVO;
@@ -108,6 +113,7 @@ import com.efitops.basesetup.repository.ListOfValuesRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.OpenStockEntryRepo;
 import com.efitops.basesetup.repository.OrderAcceptanceRepo;
+import com.efitops.basesetup.repository.ParameterMasterRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentAttachmentRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentRepo;
@@ -235,6 +241,10 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	@Autowired
 	private DepartmentRepo departmentRepo;
+	
+	
+	@Autowired
+	private ParameterMasterRepo parameterMasterRepo;
 	
 	
 	
@@ -4103,10 +4113,13 @@ private void saveAttachments(MultipartFile[] files,
     
     @Override
     public Map<String, Object> getIssueFromLocationDropdown(
+            Long orgId,
             Long branch) throws ApplicationException {
 
         List<Object[]> result =
-                issuesRepo.getIssueFromLocationDropdown(branch);
+                issuesRepo.getIssueFromLocationDropdown(
+                        orgId,
+                        branch);
 
         Map<String, Object> response =
                 new HashMap<>();
@@ -4153,18 +4166,18 @@ private void saveAttachments(MultipartFile[] files,
         return locationList;
     }
     
-    
   //Issuetodropdown
     
     
     @Override
     public Map<String, Object> getIssueToLocationDropdown(
+            Long orgId,
             Long branch,
-            Long issueFrom)
-            throws ApplicationException {
+            Long issueFrom) throws ApplicationException {
 
         List<Object[]> result =
                 issuesRepo.getIssueToLocationDropdown(
+                        orgId,
                         branch,
                         issueFrom);
 
@@ -4214,5 +4227,367 @@ private void saveAttachments(MultipartFile[] files,
     }
     
     
-   
+  //issuesindentnumberdropdown
+    
+    
+    @Override
+    public Map<String, Object> getIssueIndentNoDropdown(
+            Long orgId,
+            Long branch) throws ApplicationException {
+
+        List<Object[]> result =
+                issuesRepo.getIssueIndentNoDropdown(
+                        orgId,
+                        branch);
+
+        Map<String, Object> response =
+                new HashMap<>();
+
+        response.put(
+                "indentNoList",
+                getIssueIndentNoDetails(result));
+
+        return response;
+    }
+
+    private List<Map<String, Object>> getIssueIndentNoDetails(
+            List<Object[]> result) {
+
+        List<Map<String, Object>> indentNoList =
+                new ArrayList<>();
+
+        for (Object[] obj : result) {
+
+            Map<String, Object> indentNo =
+                    new HashMap<>();
+
+            indentNo.put(
+                    "id",
+                    obj[0] != null
+                            ? Long.valueOf(obj[0].toString())
+                            : null);
+
+            indentNo.put(
+                    "indentNo",
+                    obj[1] != null
+                            ? obj[1].toString()
+                            : null);
+
+            indentNo.put(
+                    "docDate",
+                    obj[2] != null
+                            ? obj[2].toString()
+                            : null);
+
+            indentNoList.add(indentNo);
+        }
+
+        return indentNoList;
+    }
+    
+    
+  //issuesitemcodedropdown
+    
+    
+    @Override
+    public Map<String, Object> getIssueItemCodeDropdown(
+            Long orgId,
+            Long branch,
+            String indentNo) throws ApplicationException {
+
+        List<Object[]> result =
+                issuesRepo.getIssueItemCodeDropdown(
+                        orgId,
+                        branch,
+                        indentNo);
+
+        Map<String, Object> response =
+                new HashMap<>();
+
+        response.put(
+                "itemCodeList",
+                getIssueItemCodeDetails(result));
+
+        return response;
+    }
+
+    private List<Map<String, Object>> getIssueItemCodeDetails(
+            List<Object[]> result) {
+
+        List<Map<String, Object>> itemCodeList =
+                new ArrayList<>();
+
+        for (Object[] obj : result) {
+
+            Map<String, Object> itemCode =
+                    new HashMap<>();
+
+            itemCode.put(
+                    "id",
+                    obj[0] != null
+                            ? Long.valueOf(obj[0].toString())
+                            : null);
+
+            itemCode.put(
+                    "itemCode",
+                    obj[1] != null
+                            ? obj[1].toString()
+                            : null);
+
+            itemCode.put(
+                    "itemDescription",
+                    obj[2] != null
+                            ? obj[2].toString()
+                            : null);
+
+            itemCode.put(
+                    "unitId",
+                    obj[3] != null
+                            ? obj[3].toString()
+                            : null);
+
+            itemCode.put(
+                    "stock",
+                    obj[4] != null
+                            ? obj[4].toString()
+                            : null);
+
+            itemCodeList.add(itemCode);
+        }
+
+        return itemCodeList;
+    }
+    
+    
+  //ParameterMaster
+    
+    
+    @Override
+    @Transactional
+    public Map<String, Object> createUpdateParameterMaster(
+            ParameterMasterDTO parameterMasterDTO)
+            throws ApplicationException {
+
+        ParameterMasterVO parameterMasterVO;
+
+        String message;
+
+        if (ObjectUtils.isNotEmpty(parameterMasterDTO.getId())) {
+
+            parameterMasterVO = parameterMasterRepo
+                    .findById(parameterMasterDTO.getId())
+                    .orElseThrow(() ->
+                            new ApplicationException(
+                                    "Parameter Master Not Found"));
+
+            parameterMasterVO.setUpdatedBy(
+                    parameterMasterDTO.getCreatedBy());
+
+            message = "Parameter Master Updated Successfully";
+
+        } else {
+
+            parameterMasterVO = new ParameterMasterVO();
+
+            parameterMasterVO.setCreatedBy(
+                    parameterMasterDTO.getCreatedBy());
+
+            parameterMasterVO.setUpdatedBy(
+                    parameterMasterDTO.getCreatedBy());
+
+            message = "Parameter Master Created Successfully";
+        }
+
+        // Header Mapping
+        createUpdateParameterMasterVOByDTO(
+                parameterMasterDTO,
+                parameterMasterVO);
+
+        // Save
+        parameterMasterVO =
+                parameterMasterRepo.save(parameterMasterVO);
+
+        // Response
+        ParameterMasterResponseDTO responseDTO =
+                buildParameterMasterResponse(
+                        parameterMasterVO);
+
+        Map<String, Object> response =
+                new HashMap<>();
+
+        response.put(
+                "message",
+                message);
+
+        response.put(
+                "parameterMasterVO",
+                responseDTO);
+
+        return response;
+    }
+    private void createUpdateParameterMasterVOByDTO(
+            ParameterMasterDTO dto,
+            ParameterMasterVO vo)
+            throws ApplicationException {
+
+        // Parameter Code
+        vo.setParameterCode(
+                dto.getParameterCode());
+
+        // Parameter Description
+        vo.setParameterDescription(
+                dto.getParameterDescription());
+
+        // Parameter Type
+        if (dto.getParameterType() != null
+                && dto.getParameterType() > 0) {
+
+            ListOfValuesDetailsVO parameterType =
+                    listOfValuesDetailsRepo
+                            .findById(dto.getParameterType())
+                            .orElseThrow(() ->
+                                    new ApplicationException(
+                                            "Parameter Type Not Found"));
+
+            vo.setParameterType(parameterType);
+        }
+
+        vo.setActive(
+                dto.isActive());
+
+        vo.setOrgId(
+                dto.getOrgId());
+
+        vo.setCreatedBy(
+                dto.getCreatedBy());
+
+        vo.setUpdatedBy(
+                dto.getUpdatedBy());
+
+        vo.setCancel(
+                dto.isCancel());
+
+        vo.setCancelRemarks(
+                dto.getCancelRemarks());
+
+        vo.setScreenName(
+                "PARAMETERMASTER");
+
+        vo.setScreenCode(
+                "PM");
+    }
+    private ParameterMasterResponseDTO buildParameterMasterResponse(
+            ParameterMasterVO parameterMasterVO) {
+
+        ParameterMasterResponseDTO responseDTO =
+                new ParameterMasterResponseDTO();
+
+        responseDTO.setId(parameterMasterVO.getId());
+
+        responseDTO.setParameterCode(
+                parameterMasterVO.getParameterCode());
+
+        responseDTO.setParameterDescription(
+                parameterMasterVO.getParameterDescription());
+
+        responseDTO.setActive(
+                parameterMasterVO.isActive());
+
+        responseDTO.setOrgId(
+                parameterMasterVO.getOrgId());
+
+        responseDTO.setCreatedBy(
+                parameterMasterVO.getCreatedBy());
+
+        responseDTO.setCancelRemarks(
+                parameterMasterVO.getCancelRemarks());
+        
+        
+        responseDTO.setScreenName(
+                parameterMasterVO.getScreenName());
+
+        responseDTO.setScreenCode(
+                parameterMasterVO.getScreenCode());
+
+        
+        // Parameter Type
+
+        if (parameterMasterVO.getParameterType() != null) {
+
+            ListOfValuesDetailsResponseDTO parameterTypeDTO =
+                    new ListOfValuesDetailsResponseDTO();
+
+            parameterTypeDTO.setId(
+                    parameterMasterVO
+                            .getParameterType()
+                            .getId());
+
+            parameterTypeDTO.setCode(
+                    parameterMasterVO
+                            .getParameterType()
+                            .getValueCode());
+
+            parameterTypeDTO.setDescription(
+                    parameterMasterVO
+                            .getParameterType()
+                            .getValueDescription());
+
+            responseDTO.setParameterType(parameterTypeDTO);
+        }
+        
+        
+        return responseDTO;
+    }
+    
+    
+    @Override
+    public ParameterMasterResponseDTO getParameterMasterById(Long id)
+            throws ApplicationException {
+
+        ParameterMasterVO parameterMasterVO =
+                parameterMasterRepo.findById(id)
+                        .orElse(null);
+
+        if (parameterMasterVO == null) {
+            throw new ApplicationException(
+                    "Parameter Master Not Found");
+        }
+
+        return buildParameterMasterResponse(parameterMasterVO);
+    }
+    
+    
+    @Override
+    public List<ParameterMasterResponseDTO> getParameterMasterByOrgId(
+            Long orgId) throws ApplicationException {
+
+        List<ParameterMasterVO> parameterMasterList =
+                parameterMasterRepo.findByOrgId(orgId);
+
+        if (parameterMasterList == null
+                || parameterMasterList.isEmpty()) {
+
+            throw new ApplicationException(
+                    "Parameter Master Not Found");
+        }
+
+        List<ParameterMasterResponseDTO> responseList =
+                new ArrayList<>();
+
+        for (ParameterMasterVO parameterMasterVO :
+                parameterMasterList) {
+
+            responseList.add(
+                    buildParameterMasterResponse(
+                            parameterMasterVO));
+        }
+
+        return responseList;
+    }
+    
+    
+    
+    
+    
+    
 }

@@ -69,6 +69,7 @@ import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.SalesReturnDTO;
 import com.efitops.basesetup.dto.SalesReturnResponseDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
+
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
@@ -1008,9 +1009,9 @@ public class DevelopServiceImpl implements DevelopService {
 
 	/// SALES RETURN
 
-	@Override
-	@Transactional
-	public Map<String, Object> createUpdateSalesReturn(SalesReturnDTO salesReturnDTO) throws ApplicationException {
+//	@Override
+//	@Transactional
+//	public Map<String, Object> createUpdateSalesReturn(SalesReturnDTO salesReturnDTO) throws ApplicationException {
 
 //	    SalesReturnVO salesReturnVO = new SalesReturnVO();
 //
@@ -1639,13 +1640,13 @@ public class DevelopServiceImpl implements DevelopService {
 //	                        new ApplicationException("Sales Return Not Found"));
 
 //	        return salesReturnResponse(salesReturnVO);
-		return null;
-	}
-
-	@Override
-	public List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch) throws ApplicationException {
-
-//	        List<SalesReturnVO> salesReturnList =
+//		return null;
+//	}
+//
+//	@Override
+//	public List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch) throws ApplicationException {
+//
+////	        List<SalesReturnVO> salesReturnList =
 //	                salesReturnRepo.findByOrgIdAndBranch(orgId, branch);
 //
 //	        if (salesReturnList.isEmpty()) {
@@ -1662,14 +1663,14 @@ public class DevelopServiceImpl implements DevelopService {
 //	        }
 
 //	        return responseList;
-		return null;
-	}
-
-	@Override
-	public SalesReturnResponseDTO getSalesReturnById(Long id) throws ApplicationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//		return null;
+//	}
+//
+//	@Override
+//	public SalesReturnResponseDTO getSalesReturnById(Long id) throws ApplicationException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	// salesorderamendment
 

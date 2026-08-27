@@ -38,8 +38,6 @@ import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
-import com.efitops.basesetup.dto.SalesReturnDTO;
-import com.efitops.basesetup.dto.SalesReturnResponseDTO;
 import com.efitops.basesetup.service.DevelopService;
 
 @CrossOrigin
@@ -169,129 +167,129 @@ public class DevelopController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-//SALES RETURN
-
-	@PostMapping("/createUpdateSalesReturn")
-	public ResponseEntity updateCreateSalesReturn(@RequestBody SalesReturnDTO salesReturnDTO) {
-
-		String methodName = "createUpdateSalesReturn()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-
-		String errorMsg = null;
-
-		ResponseDTO responseDTO = null;
-
-		try {
-
-			Map<String, Object> responseMap = developService.createUpdateSalesReturn(salesReturnDTO);
-
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
-
-			responseObjectsMap.put("salesReturnVO", responseMap.get("salesReturnVO"));
-
-			responseDTO = createServiceResponse(responseObjectsMap);
-
-		} catch (Exception e) {
-
-			errorMsg = e.getMessage();
-
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		}
-
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		return ResponseEntity.ok().body(responseDTO);
-	}
-
-	@GetMapping("/getSalesReturnById")
-	public ResponseEntity<ResponseDTO> getSalesReturnById(@RequestParam Long id) {
-
-		String methodName = "getSalesReturnById()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-		String errorMsg = null;
-
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-
-		ResponseDTO responseDTO = null;
-
-		SalesReturnResponseDTO salesReturnResponseDTO = null;
-
-		try {
-
-			salesReturnResponseDTO = developService.getSalesReturnById(id);
-
-		} catch (Exception e) {
-
-			errorMsg = e.getMessage();
-
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-		}
-
-		if (StringUtils.isBlank(errorMsg)) {
-
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales Return retrieved successfully");
-
-			responseObjectsMap.put("salesReturnResponseDTO", salesReturnResponseDTO);
-
-			responseDTO = createServiceResponse(responseObjectsMap);
-
-		} else {
-
-			responseDTO = createServiceResponseError(responseObjectsMap, "Sales Return retrieval failed", errorMsg);
-		}
-
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		return ResponseEntity.ok().body(responseDTO);
-	}
-
-	@GetMapping("/getSalesReturnByOrgId")
-	public ResponseEntity<ResponseDTO> getSalesReturnByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
-
-		String methodName = "getSalesReturnByOrgId()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-		String errorMsg = null;
-
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-
-		ResponseDTO responseDTO = null;
-
-		List<SalesReturnResponseDTO> salesReturnResponseDTO = new ArrayList<>();
-
-		try {
-
-			salesReturnResponseDTO = developService.getAllSalesReturn(orgId, branch);
-
-		} catch (Exception e) {
-
-			errorMsg = e.getMessage();
-
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-		}
-
-		if (StringUtils.isBlank(errorMsg)) {
-
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales Return retrieved successfully");
-
-			responseObjectsMap.put("salesReturnResponseDTO", salesReturnResponseDTO);
-
-			responseDTO = createServiceResponse(responseObjectsMap);
-
-		} else {
-
-			responseDTO = createServiceResponseError(responseObjectsMap, "Sales Return retrieval failed", errorMsg);
-		}
-
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		return ResponseEntity.ok().body(responseDTO);
-	}
+////SALES RETURN
+//
+//	@PostMapping("/createUpdateSalesReturn")
+//	public ResponseEntity updateCreateSalesReturn(@RequestBody SalesReturnDTO salesReturnDTO) {
+//
+//		String methodName = "createUpdateSalesReturn()";
+//		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//
+//		String errorMsg = null;
+//
+//		ResponseDTO responseDTO = null;
+//
+//		try {
+//
+//			Map<String, Object> responseMap = developService.createUpdateSalesReturn(salesReturnDTO);
+//
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+//
+//			responseObjectsMap.put("salesReturnVO", responseMap.get("salesReturnVO"));
+//
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//
+//		} catch (Exception e) {
+//
+//			errorMsg = e.getMessage();
+//
+//			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+//
+//			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+//		}
+//
+//		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//		return ResponseEntity.ok().body(responseDTO);
+//	}
+//
+//	@GetMapping("/getSalesReturnById")
+//	public ResponseEntity<ResponseDTO> getSalesReturnById(@RequestParam Long id) {
+//
+//		String methodName = "getSalesReturnById()";
+//		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//		String errorMsg = null;
+//
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//
+//		ResponseDTO responseDTO = null;
+//
+//		SalesReturnResponseDTO salesReturnResponseDTO = null;
+//
+//		try {
+//
+//			salesReturnResponseDTO = developService.getSalesReturnById(id);
+//
+//		} catch (Exception e) {
+//
+//			errorMsg = e.getMessage();
+//
+//			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+//		}
+//
+//		if (StringUtils.isBlank(errorMsg)) {
+//
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales Return retrieved successfully");
+//
+//			responseObjectsMap.put("salesReturnResponseDTO", salesReturnResponseDTO);
+//
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//
+//		} else {
+//
+//			responseDTO = createServiceResponseError(responseObjectsMap, "Sales Return retrieval failed", errorMsg);
+//		}
+//
+//		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//		return ResponseEntity.ok().body(responseDTO);
+//	}
+//
+//	@GetMapping("/getSalesReturnByOrgId")
+//	public ResponseEntity<ResponseDTO> getSalesReturnByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+//
+//		String methodName = "getSalesReturnByOrgId()";
+//		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+//
+//		String errorMsg = null;
+//
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//
+//		ResponseDTO responseDTO = null;
+//
+//		List<SalesReturnResponseDTO> salesReturnResponseDTO = new ArrayList<>();
+//
+//		try {
+//
+//			salesReturnResponseDTO = developService.getAllSalesReturn(orgId, branch);
+//
+//		} catch (Exception e) {
+//
+//			errorMsg = e.getMessage();
+//
+//			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+//		}
+//
+//		if (StringUtils.isBlank(errorMsg)) {
+//
+//			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales Return retrieved successfully");
+//
+//			responseObjectsMap.put("salesReturnResponseDTO", salesReturnResponseDTO);
+//
+//			responseDTO = createServiceResponse(responseObjectsMap);
+//
+//		} else {
+//
+//			responseDTO = createServiceResponseError(responseObjectsMap, "Sales Return retrieval failed", errorMsg);
+//		}
+//
+//		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+//
+//		return ResponseEntity.ok().body(responseDTO);
+//	}
 
 //salesorderamendment
 

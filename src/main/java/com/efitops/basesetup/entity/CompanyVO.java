@@ -48,7 +48,6 @@ public class CompanyVO {
 	@Column(name = "phone_no")
 	private String phoneNo;
 	@Column(name = "pan_no", length = 10)
-	@Size(min = 10, max = 10, message = "PanNo must be exactly 10 characters.")
 	private String panNo;
 	@Column(name = "gst")
 	private String gst;

@@ -36,8 +36,8 @@ public class DepartmentVO {
 	private Long id;
 //	@Column(name = "docdate")
 //	private LocalDate docDate = LocalDate.now();
-	@Column(name = "doc_id")
-	private String docId;
+//	@Column(name = "doc_id")
+//	private String docId;
 	@Column(name = "department_code")
 	private String departmentCode;
 	@Column(name = "departmen_tname")
@@ -55,9 +55,9 @@ public class DepartmentVO {
 	@Column(name = "cancel")
 	private boolean cancel;
 	
-	@ManyToOne
-	@JoinColumn(name = "branch")
-	private BranchVO branch;
+//	@ManyToOne
+//	@JoinColumn(name = "branch")
+//	private BranchVO branch;
     
 	@Column(name = "financial_year", length = 5)
     private String finYear;

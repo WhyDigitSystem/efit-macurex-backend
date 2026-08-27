@@ -20,4 +20,6 @@ public class SalesReturnTaxDetailsDTO {
 	   // Amount
 	   private BigDecimal amount;
 
+	    private String glAccountName;
+
 }

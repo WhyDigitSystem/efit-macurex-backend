@@ -387,8 +387,8 @@ public class AuthServiceImpl implements AuthService {
 				|| StringUtils.isBlank(loginRequest.getPassword())) {
 			throw new ApplicationContextException(UserConstants.ERRROR_MSG_INVALID_USER_LOGIN_INFORMATION);
 		}
-		UserVO userVO = userRepo.findByUserNameOrEmailOrMobileNoOrEmployeeMaster_EmployeeName(loginRequest.getUserName(), loginRequest.getUserName(),
-				loginRequest.getUserName(),loginRequest.getUserName());
+		UserVO userVO = userRepo.findByUserNameOrEmailOrMobileNo(loginRequest.getUserName(), loginRequest.getUserName(),
+				loginRequest.getUserName());
 
 		if (ObjectUtils.isNotEmpty(userVO)) {
 			if(userVO.getActive()=="In-Active")

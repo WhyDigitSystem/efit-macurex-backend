@@ -20,8 +20,8 @@ public class EmployeeMasterDTO {
 
 	private Long id;
 
-	@NotBlank(message = "Surname is required")
-	@Pattern(regexp = "^[A-Za-z ]+$", message = "Invalid surname")
+//	@NotBlank(message = "Surname is required")
+//	@Pattern(regexp = "^[A-Za-z ]+$", message = "Invalid surname")
 	private String surName;
 
 	private String middleName;
@@ -38,12 +38,12 @@ public class EmployeeMasterDTO {
 
 	private Long telephone;
 
-	@NotNull(message = "Mobile number is required")
-	@Digits(integer = 10, fraction = 0, message = "Mobile number must be 10 digits")
+//	@NotNull(message = "Mobile number is required")
+//	@Digits(integer = 10, fraction = 0, message = "Mobile number must be 10 digits")
 	private Long mobile;
 
-	@NotBlank(message = "Email is required")
-	@Email(message = "Invalid email address")
+//	@NotBlank(message = "Email is required")
+//	@Email(message = "Invalid email address")
 	private String email;
 
 	private String qualification;
@@ -90,7 +90,7 @@ public class EmployeeMasterDTO {
 
 	private LocalDate dateOfJoining;
 
-	private Long plantId;
+//	private Long plantId;
 
 	private Long departmentId;
 
@@ -126,7 +126,7 @@ public class EmployeeMasterDTO {
 
 	private LocalDate trainingEndDate;
 
-	private Integer noticePeriod;
+	private int noticePeriod;
 
 	private LocalDate currentSalaryPeriodStart;
 
@@ -136,13 +136,13 @@ public class EmployeeMasterDTO {
 
 	private String createdBy;
 
-	private String updatedBy;
+//	private String updatedBy;
 
 	private String cancelRemarks;
-
-	private String screenName;
-
-	private String screenCode;
+//
+//	private String screenName;
+//
+//	private String screenCode;
 
 	private Long orgId;
 

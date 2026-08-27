@@ -134,9 +134,9 @@ public class EmployeeMasterVO {
 	@Column(name = "date_of_joining")
 	private LocalDate dateOfJoining;
 
-	@ManyToOne
-	@JoinColumn(name = "plant_id")
-	private BranchVO plantId;
+//	@ManyToOne
+//	@JoinColumn(name = "plant_id")
+//	private BranchVO plantId;
 
 	@ManyToOne
 	@JoinColumn(name = "department")
@@ -155,9 +155,9 @@ public class EmployeeMasterVO {
 	@Column(name = "reference_by")
 	private String referenceBy;
 
-//	@ManyToOne
-//	@JoinColumn(name = "okd_by")
-//	private EmployeeMasterVO okdBy;
+	@ManyToOne
+	@JoinColumn(name = "okd_by")
+	private EmployeeMasterVO okdBy;
 
 	@Column(name = "mode_of_payment")
 	private String modeOfPayment;
@@ -222,10 +222,10 @@ public class EmployeeMasterVO {
 	private String cancelRemarks;
 
 	@Column(name = "screen_name")
-	private String screenName;
+	private String screenName ="EMPLOYEE";
 
 	@Column(name = "screen_code")
-	private String screenCode;
+	private String screenCode= "EMP";
 
 	@Column(name = "org_id")
 	private Long orgId;

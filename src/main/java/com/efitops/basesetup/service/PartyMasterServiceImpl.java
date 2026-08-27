@@ -59,7 +59,6 @@ import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.CustomerShippingDetailsRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
-import com.efitops.basesetup.repository.EmployeeRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
@@ -117,8 +116,6 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	@Autowired
 	EmployeeMasterRepo employeeMasterRepo;
 	
-	@Autowired
-	EmployeeRepo employeeRepo;
 //	@Autowired
 //	TransportRepo transportMasterRepo;
 	
@@ -841,7 +838,7 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 	public List<EmployeeDropdownResponseDTO> getPurchaseEmployees(Long orgId, Long branch)
 	        throws ApplicationException {
 
-	    List<Object[]> list = employeeRepo.getPurchaseEmployees(orgId, branch);
+	    List<Object[]> list = employeeMasterRepo.getPurchaseEmployees(orgId, branch);
 
 	    return convertToEmployeeDropdownDTO(list);
 	}

@@ -61,6 +61,8 @@ import com.efitops.basesetup.repository.MaterialTypeRepo;
 import com.efitops.basesetup.repository.StateRepo;
 import com.efitops.basesetup.repository.UomRepo;
 import com.efitops.basesetup.repository.UserRepo;
+import org.apache.commons.lang3.StringUtils;
+
 
 @Service
 public class EfitMasterServiceImpl implements EfitMasterService {
@@ -429,9 +431,8 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			designationVO.setUpdatedBy(designationDTO.getCreatedBy());
 			message = "Designation Created Successfully";
 		}
-		
-		createUpdateDesignationVOByDesignationDTO(designationDTO, designationVO);
 
+		createUpdateDesignationVOByDesignationDTO(designationDTO, designationVO);
 
 		designationrepo.save(designationVO);
 		Map<String, Object> response = new HashMap<>();
@@ -693,44 +694,351 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 
 	// EmployeeMaster
 
+	
 	@Override
 	public Map<String, Object> updateCreateEmployeeMaster(EmployeeMasterDTO employeeMasterDTO)
-			throws ApplicationException {
+	        throws ApplicationException {
 
-		String screenCode = "MAC";
-		EmployeeMasterVO employeeMasterVO = new EmployeeMasterVO();
-		String message;
-		if (ObjectUtils.isNotEmpty(employeeMasterDTO.getId())) {
+	    String screenCode = "MAC";
 
-			employeeMasterVO = employeeMasterRepo.findById(employeeMasterDTO.getId())
-					.orElseThrow(() -> new ApplicationException("Item not found"));
-			employeeMasterVO.setUpdatedBy(employeeMasterDTO.getCreatedBy());
-			createUpdateEmployeeMasterVOByEmployeeMasterDTO(employeeMasterDTO, employeeMasterVO);
-			message = "Employee Updated Successfully";
-		} else {
-//
-//			String docId = employeeMasterRepo.getEmployeeByDocId(employeeMasterDTO.getOrgId(), screenCode);
-//
-//			employeeMasterVO.setEmployeeId(docId);
-//
-//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-//					.findByOrgIdScreenCode(employeeMasterDTO.getOrgId(), screenCode);
-//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+	    validateEmployeeMaster(employeeMasterDTO);
 
-			employeeMasterVO.setCreatedBy(employeeMasterDTO.getCreatedBy());
-			employeeMasterVO.setUpdatedBy(employeeMasterDTO.getCreatedBy());
-			createUpdateEmployeeMasterVOByEmployeeMasterDTO(employeeMasterDTO, employeeMasterVO);
-			message = "Item Created Successfully";
-		}
+	    EmployeeMasterVO employeeMasterVO = new EmployeeMasterVO();
+	    String message;
 
-		EmployeeMasterVO savedItemMaster = employeeMasterRepo.save(employeeMasterVO);
+	    /*
+	     * ============================================================
+	     * UPDATE
+	     * ============================================================
+	     */
+	    if (employeeMasterDTO.getId() != null) {
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("message", message);
-		response.put("employeeMasterVO", buildEmployeeMasterResponse(savedItemMaster));
+	        employeeMasterVO = employeeMasterRepo.findById(employeeMasterDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Employee not found"));
 
-		return response;
+	        /*
+	         * Passport No
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getPassportNo())) {
+
+	            String passportNo = employeeMasterDTO.getPassportNo().trim();
+
+	            if (employeeMasterRepo.existsByPassportNoAndIdNot(
+	                    passportNo,
+	                    employeeMasterDTO.getId())) {
+
+	                throw new ApplicationException(
+	                        "Passport No : " + passportNo + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * PAN No
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getPanNo())) {
+
+	            String panNo = employeeMasterDTO.getPanNo().trim();
+
+	            if (employeeMasterRepo.existsByPanNoAndIdNot(
+	                    panNo,
+	                    employeeMasterDTO.getId())) {
+
+	                throw new ApplicationException(
+	                        "PAN No : " + panNo + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * Account Head
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getAccountHead())) {
+
+	            String accountHead = employeeMasterDTO.getAccountHead().trim();
+
+	            if (employeeMasterRepo.existsByAccountHeadAndIdNot(
+	                    accountHead,
+	                    employeeMasterDTO.getId())) {
+
+	                throw new ApplicationException(
+	                        "Account Head : " + accountHead + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * Email
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getEmail())) {
+
+	            String email = employeeMasterDTO.getEmail().trim();
+
+	            if (employeeMasterRepo.existsByEmailAndIdNot(
+	                    email,
+	                    employeeMasterDTO.getId())) {
+
+	                throw new ApplicationException(
+	                        "Email : " + email + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * Mobile
+	         */
+	        if (employeeMasterDTO.getMobile() != null) {
+
+	            if (employeeMasterRepo.existsByMobileAndIdNot(
+	                    employeeMasterDTO.getMobile(),
+	                    employeeMasterDTO.getId())) {
+
+	                throw new ApplicationException(
+	                        "Mobile : " + employeeMasterDTO.getMobile()
+	                                + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * Bank Account No
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getBankAccountNo())) {
+
+	            String bankAccountNo =
+	                    employeeMasterDTO.getBankAccountNo().trim();
+
+	            if (employeeMasterRepo.existsByBankAccountNoAndIdNot(
+	                    bankAccountNo,
+	                    employeeMasterDTO.getId())) {
+
+	                throw new ApplicationException(
+	                        "Bank Account No : " + bankAccountNo
+	                                + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * PF No
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getPfNo())) {
+
+	            String pfNo = employeeMasterDTO.getPfNo().trim();
+
+	            if (employeeMasterRepo.existsByPfNoAndIdNot(
+	                    pfNo,
+	                    employeeMasterDTO.getId())) {
+
+	                throw new ApplicationException(
+	                        "PF No : " + pfNo + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * ESI No
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getEsiNo())) {
+
+	            String esiNo = employeeMasterDTO.getEsiNo().trim();
+
+	            if (employeeMasterRepo.existsByEsiNoAndIdNot(
+	                    esiNo,
+	                    employeeMasterDTO.getId())) {
+
+	                throw new ApplicationException(
+	                        "ESI No : " + esiNo + " already exists.");
+	            }
+	        }
+
+	        employeeMasterVO.setUpdatedBy(employeeMasterDTO.getCreatedBy());
+
+	        createUpdateEmployeeMasterVOByEmployeeMasterDTO(
+	                employeeMasterDTO,
+	                employeeMasterVO);
+
+	        message = "Employee Updated Successfully";
+	    }
+
+	    /*
+	     * ============================================================
+	     * CREATE
+	     * ============================================================
+	     */
+	    else {
+
+	        /*
+	         * Passport No
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getPassportNo())) {
+
+	            String passportNo = employeeMasterDTO.getPassportNo().trim();
+
+	            if (employeeMasterRepo.existsByPassportNo(passportNo)) {
+
+	                throw new ApplicationException(
+	                        "Passport No : " + passportNo + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * PAN No
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getPanNo())) {
+
+	            String panNo = employeeMasterDTO.getPanNo().trim();
+
+	            if (employeeMasterRepo.existsByPanNo(panNo)) {
+
+	                throw new ApplicationException(
+	                        "PAN No : " + panNo + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * Account Head
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getAccountHead())) {
+
+	            String accountHead = employeeMasterDTO.getAccountHead().trim();
+
+	            if (employeeMasterRepo.existsByAccountHead(accountHead)) {
+
+	                throw new ApplicationException(
+	                        "Account Head : " + accountHead
+	                                + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * Email
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getEmail())) {
+
+	            String email = employeeMasterDTO.getEmail().trim();
+
+	            if (employeeMasterRepo.existsByEmail(email)) {
+
+	                throw new ApplicationException(
+	                        "Email : " + email + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * Mobile
+	         */
+	        if (employeeMasterDTO.getMobile() != null) {
+
+	            if (employeeMasterRepo.existsByMobile(
+	                    employeeMasterDTO.getMobile())) {
+
+	                throw new ApplicationException(
+	                        "Mobile : " + employeeMasterDTO.getMobile()
+	                                + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * Bank Account No
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getBankAccountNo())) {
+
+	            String bankAccountNo =
+	                    employeeMasterDTO.getBankAccountNo().trim();
+
+	            if (employeeMasterRepo.existsByBankAccountNo(bankAccountNo)) {
+
+	                throw new ApplicationException(
+	                        "Bank Account No : " + bankAccountNo
+	                                + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * PF No
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getPfNo())) {
+
+	            String pfNo = employeeMasterDTO.getPfNo().trim();
+
+	            if (employeeMasterRepo.existsByPfNo(pfNo)) {
+
+	                throw new ApplicationException(
+	                        "PF No : " + pfNo + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * ESI No
+	         */
+	        if (StringUtils.isNotBlank(employeeMasterDTO.getEsiNo())) {
+
+	            String esiNo = employeeMasterDTO.getEsiNo().trim();
+
+	            if (employeeMasterRepo.existsByEsiNo(esiNo)) {
+
+	                throw new ApplicationException(
+	                        "ESI No : " + esiNo + " already exists.");
+	            }
+	        }
+
+	        /*
+	         * Employee ID generation
+	         */
+	        String docId = employeeMasterRepo.getEmployeeByDocId(
+	                employeeMasterDTO.getOrgId(),
+	                screenCode);
+
+	        employeeMasterVO.setEmployeeId(docId);
+
+	        /*
+	         * Document Number Update
+	         */
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo
+	                        .findByOrgIdScreenCode(
+	                                employeeMasterDTO.getOrgId(),
+	                                screenCode);
+
+	        if (documentTypeMappingDetailsVO == null) {
+
+	            throw new ApplicationException(
+	                    "Document Type Mapping Details not found.");
+	        }
+
+	        documentTypeMappingDetailsVO.setLastNo(
+	                documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	        documentTypeMappingDetailsRepo.save(
+	                documentTypeMappingDetailsVO);
+
+	        employeeMasterVO.setCreatedBy(employeeMasterDTO.getCreatedBy());
+	        employeeMasterVO.setUpdatedBy(employeeMasterDTO.getCreatedBy());
+
+	        createUpdateEmployeeMasterVOByEmployeeMasterDTO(
+	                employeeMasterDTO,
+	                employeeMasterVO);
+
+	        message = "Employee Created Successfully";
+	    }
+
+	    /*
+	     * ============================================================
+	     * SAVE
+	     * ============================================================
+	     */
+	    EmployeeMasterVO savedEmployee =
+	            employeeMasterRepo.save(employeeMasterVO);
+
+	    /*
+	     * ============================================================
+	     * RESPONSE
+	     * ============================================================
+	     */
+	    Map<String, Object> response = new HashMap<>();
+
+	    response.put("message", message);
+
+	    response.put(
+	            "employeeMasterVO",
+	            buildEmployeeMasterResponse(savedEmployee));
+
+	    return response;
 	}
 
 	private EmployeeMasterResponseDTO buildEmployeeMasterResponse(EmployeeMasterVO employeeMasterVO) {
@@ -812,12 +1120,12 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setTemporaryCardNo(employeeMasterVO.getTemporaryCardNo());
 		responseDTO.setDateOfJoining(employeeMasterVO.getDateOfJoining());
 
-		if (employeeMasterVO.getPlantId() != null) {
-			BranchResponseDTO primaryUnitDTO = new BranchResponseDTO();
-			primaryUnitDTO.setId(employeeMasterVO.getPlantId().getId());
-			primaryUnitDTO.setBranchName(employeeMasterVO.getPlantId().getBranchName());
-			responseDTO.setPlant(primaryUnitDTO);
-		}
+//		if (employeeMasterVO.getPlantId() != null) {
+//			BranchResponseDTO primaryUnitDTO = new BranchResponseDTO();
+//			primaryUnitDTO.setId(employeeMasterVO.getPlantId().getId());
+//			primaryUnitDTO.setBranchName(employeeMasterVO.getPlantId().getBranchName());
+//			responseDTO.setPlant(primaryUnitDTO);
+//		}
 
 		if (employeeMasterVO.getDepartment() != null) {
 			DepartmentResponseDTO primaryUnitDTO = new DepartmentResponseDTO();
@@ -837,14 +1145,14 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setOverTimeApplicable(employeeMasterVO.getOverTimeApplicable());
 		responseDTO.setReferenceBy(employeeMasterVO.getReferenceBy());
 
-//		if (employeeMasterVO.getOkdBy() != null) {
-//
-//			EmployeeResponseDTO employeeDTO = new EmployeeResponseDTO();
-//			employeeDTO.setId(employeeMasterVO.getOkdBy().getId());
-//			employeeDTO.setEmployeeName(employeeMasterVO.getOkdBy().getEmployeeName());
-//
-//			responseDTO.setOkdBy(employeeDTO);
-//		}
+		if (employeeMasterVO.getOkdBy() != null) {
+
+			EmployeeResponseDTO employeeDTO = new EmployeeResponseDTO();
+			employeeDTO.setId(employeeMasterVO.getOkdBy().getId());
+			employeeDTO.setEmployeeName(employeeMasterVO.getOkdBy().getEmployeeName());
+
+			responseDTO.setOkdBy(employeeDTO);
+		}
 
 		if (employeeMasterVO.getBranch() != null) {
 			BranchResponseDTO branchDTO = new BranchResponseDTO();
@@ -967,13 +1275,13 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setTemporaryCardNo(employeeMasterDTO.getTemporaryCardNo());
 		employeeMasterVO.setDateOfJoining(employeeMasterDTO.getDateOfJoining());
 
-		if (employeeMasterDTO.getPlantId() != null && employeeMasterDTO.getPlantId() != 0) {
-
-			BranchVO plant = branchRepo.findById(employeeMasterDTO.getPlantId())
-					.orElseThrow(() -> new ApplicationException("Plant Not Found"));
-
-			employeeMasterVO.setPlantId(plant);
-		}
+//		if (employeeMasterDTO.getPlantId() != null && employeeMasterDTO.getPlantId() != 0) {
+//
+//			BranchVO plant = branchRepo.findById(employeeMasterDTO.getPlantId())
+//					.orElseThrow(() -> new ApplicationException("Plant Not Found"));
+//
+//			employeeMasterVO.setPlantId(plant);
+//		}
 
 		if (employeeMasterDTO.getDepartmentId() != null && employeeMasterDTO.getDepartmentId() != 0) {
 
@@ -995,13 +1303,13 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setOverTimeApplicable(employeeMasterDTO.getOverTimeApplicable());
 		employeeMasterVO.setReferenceBy(employeeMasterDTO.getReferenceBy());
 
-//		if (employeeMasterDTO.getOkdById() != null && employeeMasterDTO.getOkdById() > 0) {
-//
-//			EmployeeMasterVO employee = employeeMasterRepo.findById(employeeMasterDTO.getOkdById())
-//					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
-//
-//			employeeMasterVO.setOkdBy(employee);
-//		}
+		if (employeeMasterDTO.getOkdById() != null && employeeMasterDTO.getOkdById() > 0) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(employeeMasterDTO.getOkdById())
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+			employeeMasterVO.setOkdBy(employee);
+		}
 
 		employeeMasterVO.setModeOfPayment(employeeMasterDTO.getModeOfPayment());
 		employeeMasterVO.setBankAccountNo(employeeMasterDTO.getBankAccountNo());
@@ -1019,10 +1327,7 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setCurrentSalaryPeriodEnd(employeeMasterDTO.getCurrentSalaryPeriodEnd());
 
 		employeeMasterVO.setCreatedBy(employeeMasterDTO.getCreatedBy());
-		employeeMasterVO.setUpdatedBy(employeeMasterDTO.getUpdatedBy());
 		employeeMasterVO.setCancelRemarks(employeeMasterDTO.getCancelRemarks());
-		employeeMasterVO.setScreenName(employeeMasterDTO.getScreenName());
-		employeeMasterVO.setScreenCode(employeeMasterDTO.getScreenCode());
 		employeeMasterVO.setOrgId(employeeMasterDTO.getOrgId());
 		employeeMasterVO.setFinancialYear(employeeMasterDTO.getFinancialYear());
 		employeeMasterVO.setActive(employeeMasterDTO.isActive());
@@ -1039,6 +1344,57 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 			employeeMasterVO.setBranch(branch);
+		}
+	}
+
+	private void validateEmployeeMaster(EmployeeMasterDTO dto) throws ApplicationException {
+
+		if (dto.getMobile() == null) {
+			throw new ApplicationException("Mobile number is required");
+		}
+
+		if (dto.getMobile().toString().length() != 10) {
+			throw new ApplicationException("Mobile number must be 10 digits");
+		}
+
+		if (dto.getEmail() == null || dto.getEmail().trim().isEmpty()) {
+			throw new ApplicationException("Email is required");
+		}
+
+		if (dto.getTempCityId() == null) {
+			throw new ApplicationException("Temporary City is required");
+		}
+
+		if (dto.getTempStateId() == null) {
+			throw new ApplicationException("Temporary State is required");
+		}
+
+		if (dto.getTempCountryId() == null) {
+			throw new ApplicationException("Temporary Country is required");
+		}
+
+		if (dto.getPermanentCity() == null) {
+			throw new ApplicationException("Permanent City is required");
+		}
+
+		if (dto.getPermanentStateId() == null) {
+			throw new ApplicationException("Permanent State is required");
+		}
+
+		if (dto.getPermanentCountryId() == null) {
+			throw new ApplicationException("Permanent Country is required");
+		}
+
+		if (dto.getDepartmentId() == null) {
+			throw new ApplicationException("Department is required");
+		}
+
+		if (dto.getDesignationId() == null) {
+			throw new ApplicationException("Designation is required");
+		}
+
+		if (dto.getBranchId() == null) {
+			throw new ApplicationException("Branch is required");
 		}
 	}
 
@@ -1073,7 +1429,8 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 	}
 
 	@Override
-	public String getEmployeeByDocId(Long orgId, String screenCode) {
+	public String getEmployeeByDocId(Long orgId) {
+		String screenCode="MAC";
 		String result = employeeMasterRepo.getEmployeeByDocId(orgId, screenCode);
 		return result;
 	}

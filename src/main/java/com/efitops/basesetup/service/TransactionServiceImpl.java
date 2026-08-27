@@ -1403,6 +1403,7 @@ public class TransactionServiceImpl implements TransactionService {
 		// BELONGS TO
 		// =========================================================
 
+
 		// =========================================================
 		// CUSTOMER
 		// =========================================================
@@ -1646,6 +1647,7 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 		// Belongs To
+
 
 		dto.setVehicle(vo.getVehicle());
 		dto.setDocType(vo.getDocType());

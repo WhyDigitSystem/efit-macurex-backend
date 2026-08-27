@@ -168,13 +168,13 @@ public class PurchaseBillVO {
     private String screenName = "PURCHASE BILL";
 
     // ---------------- children ----------------
-//    @OneToMany(mappedBy = "purchaseBillVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-//    @JsonManagedReference
-//    private List<PurchaseBillDetailsVO> purchaseBillDetailsVO = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "purchaseBillVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-//    @JsonManagedReference
-//    private List<PurchaseBillTaxGridVO> purchaseBillTaxGridVO = new ArrayList<>();
+    @OneToMany(mappedBy = "purchaseBillVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<PurchaseBillDetailsVO> purchaseBillDetailsVO = new ArrayList<>();
+
+    @OneToMany(mappedBy = "purchaseBillVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<PurchaseBillTaxGridVO> purchaseBillTaxGridVO = new ArrayList<>();
 
     @JsonGetter("active")
    	public String getActive() {

@@ -28,6 +28,10 @@ public class PurchaseBillDetailsVO {
     private ItemMasterVO item;
 
     @ManyToOne
+    @JoinColumn(name = "gstrate")
+    private GSTRateMasterVO gstRate;
+    
+    @ManyToOne
     @JoinColumn(name = "hsn")
     private HsnVO hsnCode;
 
@@ -37,8 +41,8 @@ public class PurchaseBillDetailsVO {
     @Column(name = "tax_percent")
     private BigDecimal taxPercent;
 
-    @Column(name = "tariff_no")
-    private String tariffNo;
+//    @Column(name = "tariff_no")
+//    private String tariffNo;
 
     @Column(name = "excise_to_post")
     private Boolean exciseToPost;
@@ -97,11 +101,13 @@ public class PurchaseBillDetailsVO {
 
     @Column(name = "cgst_rate")
     private BigDecimal cgstRate;
+    
     @Column(name = "cgst_amount")
     private BigDecimal cgstAmount;
 
     @Column(name = "igst_rate")
     private BigDecimal igstRate;
+    
     @Column(name = "igst_amount")
     private BigDecimal igstAmount;
 

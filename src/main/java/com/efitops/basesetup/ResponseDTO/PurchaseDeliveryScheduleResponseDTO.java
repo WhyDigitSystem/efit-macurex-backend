@@ -23,6 +23,8 @@ public class PurchaseDeliveryScheduleResponseDTO {
     private LocalDate scheduleStartDate;
     private LocalDate scheduleEndDate;
     private SupplierResponseDTO supplier;
+    private EmployeeDetailsDTO preparedBy;
+    private String note;
     private String purchaseOrderNo;
     private LocalDate purchaseOrderDate;
     private Long orgId;

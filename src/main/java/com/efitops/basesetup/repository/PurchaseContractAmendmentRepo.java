@@ -39,13 +39,41 @@ public interface PurchaseContractAmendmentRepo
             @Param("branch") Long branch);
     
     
-    @Query("SELECT p FROM PurchaseContractAmendmentVO p " +
-    	       "WHERE p.orgId = :orgId " +
-    	       "AND p.branch.id = :branch " +
-    	       "AND p.cancel = false " +
-    	       "ORDER BY p.contractNo")
-    	List<PurchaseContractAmendmentVO> findContractNoDropdown(
-    	        @Param("orgId") Long orgId,
-    	        @Param("branch") Long branch);
-
+    @Query(value = """
+            SELECT
+                p.purchase_contract_basic_id,
+                p.doc_id
+            FROM purchase_contract_basic p
+            WHERE p.org_id = :orgId
+              AND p.branch = :branch
+              AND p.cancel = 0
+              AND p.supplier = :customerId
+            ORDER BY p.doc_id
+            """, nativeQuery = true)
+    List<Object[]> findContractNoDropdownforPurchaseContractAmendment(
+            @Param("orgId") Long orgId,
+            @Param("branch") Long branch,
+            @Param("customerId") Long customerId);
+    
+    
+    @Query(value = """
+            SELECT DISTINCT
+                   i.item_id AS id,
+                   i.item_code AS itemCode,
+                   i.item_description AS itemDescription,
+                   d.unit_id AS unitId
+            FROM item i
+            INNER JOIN purchase_contract_details d
+                    ON i.item_id = d.item_id
+            INNER JOIN purchase_contract_basic b
+                    ON b.purchase_contract_basic_id = d.purchase_contract_basic_id
+            WHERE b.cancel = 0
+              AND b.doc_id = :docId
+              AND b.org_id = :orgId
+              AND b.branch = :branch
+            """, nativeQuery = true)
+    List<Object[]> getPurchaseContractAmendmentItemCodeDropdown(
+            @Param("docId") String docId,
+            @Param("branch") Long branch,
+            @Param("orgId") Long orgId);
 }

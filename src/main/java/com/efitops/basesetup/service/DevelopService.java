@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
@@ -22,6 +23,7 @@ import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
+import com.efitops.basesetup.dto.ParameterMasterDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
@@ -143,12 +145,21 @@ public interface DevelopService {
 
 	List<IssuesResponseDTO> getIssuesByOrgId(Long orgId, Long branchId) throws ApplicationException;
 
-	Map<String, Object> getIssueFromLocationDropdown(Long branch)throws ApplicationException ;
+	Map<String, Object> getIssueFromLocationDropdown(Long orgId, Long branch) throws ApplicationException;
 
-	Map<String, Object> getIssueToLocationDropdown(Long branch, Long issueFrom) throws ApplicationException ;
+	Map<String, Object> getIssueToLocationDropdown(Long orgId, Long branch, Long issueFrom) throws ApplicationException;
+
+	Map<String, Object> getIssueIndentNoDropdown(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> getIssueItemCodeDropdown(Long orgId, Long branch, String indentNo) throws ApplicationException ;
+
+	Map<String, Object> createUpdateParameterMaster(ParameterMasterDTO parameterMasterDTO) throws ApplicationException ;
+
+	ParameterMasterResponseDTO getParameterMasterById(Long id) throws ApplicationException ;
+
+	List<ParameterMasterResponseDTO> getParameterMasterByOrgId(Long orgId) throws ApplicationException ;
 
 	
-
 	
 	
 }

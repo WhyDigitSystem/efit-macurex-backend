@@ -224,7 +224,6 @@ public class TransactionServiceImpl implements TransactionService {
 			message = "Sales Delivery Schedule Updated Successfully";
 		}
 
-	
 		createUpdateSalesDeliveryScheduleVOByDTO(salesDeliveryScheduleDTO, salesDeliveryScheduleVO);
 
 		// Cascade saves everything
@@ -986,7 +985,7 @@ public class TransactionServiceImpl implements TransactionService {
 		responseDTO.setActive(docketInvoiceVO.getActive());
 		responseDTO.setCreatedBy(docketInvoiceVO.getCreatedBy());
 		responseDTO.setCancelRemarks(docketInvoiceVO.getCancelRemarks());
-		
+
 		responseDTO.setFinancialYear(docketInvoiceVO.getFinancialYear());
 
 		// =========================
@@ -1183,21 +1182,14 @@ public class TransactionServiceImpl implements TransactionService {
 		String message;
 		String screenCode;
 
-		if ("SALES ORDER INVOICE".equals(salesRejectionInvoiceDTO.getDocType())) {
-
+		if ("Other Sales Invoice".equals(salesRejectionInvoiceDTO.getDocType())) {
 			screenCode = "SOI";
-
-		} else if ("DC CUM INVOICE".equals(salesRejectionInvoiceDTO.getDocType())) {
-
+		} else if ("Invoice".equals(salesRejectionInvoiceDTO.getDocType())) {
 			screenCode = "DCI";
-
-		} else if ("REJECTION INVOICE".equals(salesRejectionInvoiceDTO.getDocType())) {
-
+		} else if ("Rejection".equals(salesRejectionInvoiceDTO.getDocType())) {
 			screenCode = "RI";
-
 		} else {
-
-			screenCode = "";
+			throw new ApplicationException("Invalid Document Type");
 		}
 
 		if (ObjectUtils.isNotEmpty(salesRejectionInvoiceDTO.getId())) {
@@ -1222,13 +1214,15 @@ public class TransactionServiceImpl implements TransactionService {
 		} else {
 
 			salesRejectionInvoiceVO = new SalesRejectionInvoiceVO();
-			
-			String docId = salesRejectionInvoiceRepo.getSalesRejectionInvoiceDocId(salesRejectionInvoiceDTO.getOrgId(), salesRejectionInvoiceDTO.getFinancialYear(), screenCode);
+
+			String docId = salesRejectionInvoiceRepo.getSalesRejectionInvoiceDocId(salesRejectionInvoiceDTO.getOrgId(),
+					salesRejectionInvoiceDTO.getFinancialYear(), screenCode);
 
 			salesRejectionInvoiceVO.setDocId(docId);
 
 			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdAndFinYearAndScreenCode(salesRejectionInvoiceDTO.getOrgId(), salesRejectionInvoiceDTO.getFinancialYear(), screenCode);
+					.findByOrgIdAndFinYearAndScreenCode(salesRejectionInvoiceDTO.getOrgId(),
+							salesRejectionInvoiceDTO.getFinancialYear(), screenCode);
 			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
 			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
@@ -1279,7 +1273,7 @@ public class TransactionServiceImpl implements TransactionService {
 		salesRejectionInvoiceVO.setDispatchInstructionNo(salesRejectionInvoiceDTO.getDispatchInstructionNo());
 
 		salesRejectionInvoiceVO.setFinancialYear(salesRejectionInvoiceDTO.getFinancialYear());
-		
+
 		salesRejectionInvoiceVO.setTimeOfRemoval(salesRejectionInvoiceDTO.getTimeOfRemoval());
 
 		salesRejectionInvoiceVO.setDateOfRemoval(salesRejectionInvoiceDTO.getDateOfRemoval());
@@ -1354,6 +1348,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 		salesRejectionInvoiceVO.setCancelRemarks(salesRejectionInvoiceDTO.getCancelRemarks());
 
+		salesRejectionInvoiceVO.setBelongsTo(salesRejectionInvoiceDTO.getBelongsTo());
+
 		// =========================================================
 		// BRANCH
 		// =========================================================
@@ -1382,13 +1378,7 @@ public class TransactionServiceImpl implements TransactionService {
 		// BELONGS TO
 		// =========================================================
 
-		if (salesRejectionInvoiceDTO.getBelongsTo() != null && salesRejectionInvoiceDTO.getBelongsTo() > 0) {
-
-			ListOfValuesDetailsVO belongsTo = listOfValuesDetailsRepo.findById(salesRejectionInvoiceDTO.getBelongsTo())
-					.orElseThrow(() -> new ApplicationException("Belongs To Not Found"));
-
-			salesRejectionInvoiceVO.setBelongsTo(belongsTo);
-		}
+	
 
 		// =========================================================
 		// CUSTOMER
@@ -1611,6 +1601,7 @@ public class TransactionServiceImpl implements TransactionService {
 		dto.setId(vo.getId());
 		dto.setDocId(vo.getDocId());
 		dto.setDocDate(vo.getDocDate());
+		dto.setBelongsTo(vo.getBelongsTo());
 
 		// Branch
 		if (vo.getBranch() != null) {
@@ -1632,15 +1623,7 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 		// Belongs To
-		if (vo.getBelongsTo() != null) {
-			ListOfValuesDetailsResponseDTO belongsToDTO = new ListOfValuesDetailsResponseDTO();
-
-			belongsToDTO.setId(vo.getBelongsTo().getId());
-			belongsToDTO.setCode(vo.getBelongsTo().getValueCode());
-			belongsToDTO.setDescription(vo.getBelongsTo().getValueDescription());
-
-			dto.setBelongsTo(belongsToDTO);
-		}
+		
 
 		dto.setVehicle(vo.getVehicle());
 		dto.setDocType(vo.getDocType());
@@ -2060,8 +2043,8 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getCustomerDetailsforSalesRejectionInvoice(Long orgId, Long branch
-		) throws ApplicationException {
+	public List<Map<String, Object>> getCustomerDetailsforSalesRejectionInvoice(Long orgId, Long branch)
+			throws ApplicationException {
 
 		Set<Object[]> result = customerRepo.getCustomerDetailsforSalesRejectionInvoice(orgId, branch);
 
@@ -2100,5 +2083,24 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 		return details;
+	}
+
+	@Override
+	public String getSalesRejectionInvoiceDocId(Long orgId, String financialYear, String docType)
+			throws ApplicationException {
+
+		String screenCode;
+
+		if ("Other Sales Invoice".equals(docType)) {
+			screenCode = "SOI";
+		} else if ("Invoice".equals(docType)) {
+			screenCode = "DCI";
+		} else if ("Rejection".equals(docType)) {
+			screenCode = "RI";
+		} else {
+			throw new ApplicationException("Invalid Document Type");
+		}
+
+		return salesRejectionInvoiceRepo.getSalesRejectionInvoiceDocId(orgId, financialYear, screenCode);
 	}
 }

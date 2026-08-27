@@ -15,7 +15,7 @@ public interface SalesDeliveryScheduleRepo extends JpaRepository<SalesDeliverySc
 			SELECT *
 			FROM sdvbasic
 			WHERE org_id = :orgId
-			  AND branch_id = :branch
+			  AND branch = :branch
 			  AND cancel = 0
 			  AND active = 1
 			ORDER BY sdvbasic_id

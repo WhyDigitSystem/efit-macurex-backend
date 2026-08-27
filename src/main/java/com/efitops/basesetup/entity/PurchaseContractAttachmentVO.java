@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,9 +27,9 @@ import lombok.NoArgsConstructor;
 public class PurchaseContractAttachmentVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasecontractattachgen")
-    @SequenceGenerator(name = "purchasecontractattachgen", sequenceName = "purchasecontractattachseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasecontractattach_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchase_contract_attachmentgen")
+    @SequenceGenerator(name = "purchase_contract_attachmentgen", sequenceName = "purchase_contract_attachmentseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "purchase_contract_attachment_id")
     private Long id;
 
     // original file name typed/shown to the user ("File Name")
@@ -48,7 +50,8 @@ public class PurchaseContractAttachmentVO {
     @Column(name = "upload_on")
     private LocalDateTime uploadOn;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchasecontract_id")
+    @ManyToOne
+    @JoinColumn(name = "purchase_contract_basic_id")
+    @JsonBackReference
     private PurchaseContractVO purchaseContractVO;
 }

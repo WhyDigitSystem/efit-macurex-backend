@@ -16,4 +16,6 @@ public class ItemMasterDetailsResponseDTO {
 	private String hsnCode;
 	private String customerPoNo;
 	private UnitMasterResponseDTO unit;
+	private UnitMasterResponseDTO purchaseUnit;
+	private UnitMasterResponseDTO primaryUnit;
 }

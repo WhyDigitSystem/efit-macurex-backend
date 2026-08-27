@@ -72,5 +72,46 @@ public interface PurchaseContractRepo extends JpaRepository<PurchaseContractVO, 
 			ORDER BY e.emp_name
 			""", nativeQuery = true)
 	List<Object[]> getEmployeeDropdownPurchaseContract(@Param("branch") Long branch, @Param("orgId") Long orgId);
+	
+	@Query(value = """
+			SELECT
+			    i.item_id,
+			    i.item_code,
+			    i.item_description,
+			    u.unitmaster_id,
+			    u.unit_id,
+			    g.gstratemaster_id,
+			    g.hsn_sac_code,
+			    g.description
+			FROM item i
+			INNER JOIN unitmaster u
+			    ON i.primary_unit = u.unitmaster_id
+			INNER JOIN customer_header c
+			    ON c.customer_id = i.default_supplier
+			INNER JOIN (
+			    SELECT g1.*
+			    FROM gstratemaster g1
+			    WHERE g1.wef = (
+			        SELECT MAX(g2.wef)
+			        FROM gstratemaster g2
+			        WHERE g1.hsn_sac_code = g2.hsn_sac_code
+			    )
+			) g
+			    ON i.hsn_code = g.hsn_sac_code
+			INNER JOIN listofvaluesdetails l
+			    ON i.item_type = l.listofvaluesdetails_id
+			WHERE i.cancel = false
+			  AND i.active = true
+			  AND c.customer_id = :supplier
+			  AND i.branch = :branch
+			  AND i.org_id = :orgId
+			  AND i.manufactured_or_boughtout = 'Bought Out'
+			  AND l.value_code <> 'FG'
+			ORDER BY i.item_code
+			""", nativeQuery = true)
+			List<Object[]> getPurchaseContractItems(
+			        @Param("supplier") Long supplier,
+			        @Param("branch") Long branch,
+			        @Param("orgId") Long orgId);
 
 }

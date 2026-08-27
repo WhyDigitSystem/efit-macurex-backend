@@ -38,7 +38,7 @@ public class PurchaseContractResponseDTO {
 
     private LocalDate validTo;
 
-    private String isIgstAppl;
+    private boolean isIgstAppl;
 
     private String purchaseOrderType;
 
@@ -66,7 +66,7 @@ public class PurchaseContractResponseDTO {
 
     private List<PurchaseContractDetailsResponseDTO> details;
     private List<PurchaseContractTaxDetailsResponseDTO> taxDetails;
-    private List<PurchaseContractAttachmentDTO> attachments;
+    private List<PurchaseContractAttachmentResponseDTO> attachments;
 
     
     

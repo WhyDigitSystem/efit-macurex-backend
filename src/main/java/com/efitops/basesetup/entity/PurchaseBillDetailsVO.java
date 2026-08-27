@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,29 +18,31 @@ import lombok.NoArgsConstructor;
 public class PurchaseBillDetailsVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchasebilldetailsgen")
-    @SequenceGenerator(name = "purchasebilldetailsgen", sequenceName = "purchasebilldetailsseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "purchasebilldetails_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "purchase_bill_detailsgen")
+    @SequenceGenerator(name = "purchase_bill_detailsgen", sequenceName = "purchase_bill_detailsseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "purchase_bill_details_id")
     private Long id;
 
-    // Item Code -> Item Description/HSN/Unit all resolved from the same ItemMaster record
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    @ManyToOne
+    @JoinColumn(name = "item")
     private ItemMasterVO item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hsn_id")
+    @ManyToOne
+    @JoinColumn(name = "gstrate")
+    private GSTRateMasterVO gstRate;
+    
+    @ManyToOne
+    @JoinColumn(name = "hsn")
     private HsnVO hsnCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tax_type_id")
-    private ListOfValuesDetailsVO taxType;
+    @Column(name = "tax_type")
+    private String taxType;
 
     @Column(name = "tax_percent")
     private BigDecimal taxPercent;
 
-    @Column(name = "tariff_no")
-    private String tariffNo;
+//    @Column(name = "tariff_no")
+//    private String tariffNo;
 
     @Column(name = "excise_to_post")
     private Boolean exciseToPost;
@@ -46,11 +50,10 @@ public class PurchaseBillDetailsVO {
     @Column(name = "challan_qty")
     private BigDecimal challanQty;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "unit_id")
+    @ManyToOne
+    @JoinColumn(name = "unit")
     private UnitMasterVO unit;
 
-    // TODO: link to real GRN line once that module exists
     @Column(name = "grn_received_qty")
     private BigDecimal grnReceivedQty;
 
@@ -63,8 +66,8 @@ public class PurchaseBillDetailsVO {
     @Column(name = "shortage_qty")
     private BigDecimal shortageQty;
 
-    @Column(name = "po_rate")
-    private BigDecimal poRate;
+    @Column(name = "purchaseorder_rate")
+    private BigDecimal purchaseorderRate;
 
     @Column(name = "rate_in_inr")
     private BigDecimal rateInInr;
@@ -92,20 +95,24 @@ public class PurchaseBillDetailsVO {
 
     @Column(name = "sgst_rate")
     private BigDecimal sgstRate;
+
     @Column(name = "sgst_amount")
     private BigDecimal sgstAmount;
 
     @Column(name = "cgst_rate")
     private BigDecimal cgstRate;
+    
     @Column(name = "cgst_amount")
     private BigDecimal cgstAmount;
 
     @Column(name = "igst_rate")
     private BigDecimal igstRate;
+    
     @Column(name = "igst_amount")
     private BigDecimal igstAmount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "purchasebill_id")
+    @JsonBackReference
     private PurchaseBillVO purchaseBillVO;
 }

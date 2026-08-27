@@ -17,18 +17,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PurchaseContractDetailsResponseDTO {
 
-    private Long id;
-
     // item code + item description come from the same ItemMaster record
     private ItemMasterResponseDetailsDTO itemCode;
 
-    private HsnResponseImageDTO hsnCode;
+    private String hsnCode;
 
-    private ListOfVlauesDetailsResponseDTO taxType;
+    private String taxType;
 
     private String taxName;
 
-    private BigDecimal taxPercent;
+    private String taxPercentage;
 
     private PrimaryUnitImageDTO unit;
 

@@ -18,11 +18,12 @@ import lombok.NoArgsConstructor;
 public class PurchaseBillDetailsResponseDTO {
 
     private Long id;
-    private ItemMasterResponseDetailsDTO itemCode;
+    private ItemMasterResponseDetailsDTO item;
+    private GSTRateMasterResponseDTO gstRate;
     private HsnResponseImageDTO hsnCode;
-    private ListOfVlauesDetailsResponseDTO taxType;
+    private String taxType;
     private BigDecimal taxPercent;
-    private String tariffNo;
+//    private String tariffNo;
     private Boolean exciseToPost;
     private BigDecimal challanQty;
     private PrimaryUnitImageDTO unit;
@@ -30,7 +31,7 @@ public class PurchaseBillDetailsResponseDTO {
     private BigDecimal acceptedQty;
     private BigDecimal rejectedQty;
     private BigDecimal shortageQty;
-    private BigDecimal poRate;
+    private BigDecimal purchaseorderRate;
     private BigDecimal rateInInr;
     private BigDecimal rateInSelectedCurrency;
     private BigDecimal apportionedCost;

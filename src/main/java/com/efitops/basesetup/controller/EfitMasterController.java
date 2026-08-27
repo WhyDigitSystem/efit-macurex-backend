@@ -1,7 +1,6 @@
 package com.efitops.basesetup.controller;
 
 import java.util.ArrayList;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,14 +28,12 @@ import com.efitops.basesetup.dto.DepartmentDTO;
 import com.efitops.basesetup.dto.DesignationDTO;
 import com.efitops.basesetup.dto.EmployeeMasterDTO;
 import com.efitops.basesetup.dto.EmployeeMasterResponseDTO;
-import com.efitops.basesetup.dto.ItemMasterResponseDTO;
 import com.efitops.basesetup.dto.MaterialTypeDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.UomDTO;
 import com.efitops.basesetup.entity.BomVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DesignationVO;
-import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.MaterialTypeVO;
 import com.efitops.basesetup.entity.UomVO;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -60,13 +58,13 @@ public class EfitMasterController extends BaseController {
 	// Department
 
 	@GetMapping("/getAllDepartmentByOrgId")
-	public ResponseEntity<ResponseDTO> getAllDepartmentByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getAllDepartmentByOrgId(@RequestParam Long orgId) {
 
 		String methodName = "getAllDepartmentByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		try {
-			List<DepartmentVO> departmentVO = efitMasterService.getAllDepartmentByOrgId(orgId, branch);
+			List<DepartmentVO> departmentVO = efitMasterService.getAllDepartmentByOrgId(orgId);
 
 			Map<String, Object> responseObjectsMap = new HashMap<>();
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Department information retrieved successfully.");
@@ -245,7 +243,7 @@ public class EfitMasterController extends BaseController {
 	// designation master
 
 	@GetMapping("/getDesignationByOrgId")
-	public ResponseEntity<ResponseDTO> getDesignationByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getDesignationByOrgId(@RequestParam Long orgId) {
 		String methodName = "getDesignationByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -253,7 +251,7 @@ public class EfitMasterController extends BaseController {
 		ResponseDTO responseDTO = null;
 		List<DesignationVO> designationVO = new ArrayList<>();
 		try {
-			designationVO = efitMasterService.getDesignationByOrgId(orgId, branch);
+			designationVO = efitMasterService.getDesignationByOrgId(orgId);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -300,7 +298,7 @@ public class EfitMasterController extends BaseController {
 
 	@PutMapping("/updateCreateDesignation")
 	public ResponseEntity<ResponseDTO> updateCreateDesignation(@RequestBody DesignationDTO designationdto) {
-		String methodName = "updateCreateTaxInvoice()";
+		String methodName = "updateCreateDesignation()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -605,13 +603,26 @@ public class EfitMasterController extends BaseController {
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, employeeMasterVO.get("message"));
 			responseObjectsMap.put("employeeMasterVO", employeeMasterVO.get("employeeMasterVO"));
 			responseDTO = createServiceResponse(responseObjectsMap);
+			return ResponseEntity.ok(responseDTO);
 		} catch (Exception e) {
-			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+
+		    errorMsg = e.getMessage();
+
+		    LOGGER.error(
+		            UserConstants.ERROR_MSG_METHOD_NAME,
+		            methodName,
+		            errorMsg,
+		            e);
+
+		    responseDTO = createServiceResponseError(
+		            responseObjectsMap,
+		            errorMsg,
+		            errorMsg);
+
+		    return ResponseEntity
+		            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+		            .body(responseDTO);
 		}
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-		return ResponseEntity.ok().body(responseDTO);
 	}
 
 	@GetMapping("/getEmployeeMasterById")
@@ -680,9 +691,9 @@ public class EfitMasterController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	@GetMapping("/getEmployeeByDocId")
-	public ResponseEntity<ResponseDTO> getEmployeeByDocId(@RequestParam Long orgId,@RequestParam String screenCode) {
+	public ResponseEntity<ResponseDTO> getEmployeeByDocId(@RequestParam Long orgId) {
 
 		String methodName = "getEmployeeByDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -692,7 +703,7 @@ public class EfitMasterController extends BaseController {
 		String mapp = "";
 
 		try {
-			mapp = efitMasterService.getEmployeeByDocId(orgId,screenCode);
+			mapp = efitMasterService.getEmployeeByDocId(orgId);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -701,16 +712,14 @@ public class EfitMasterController extends BaseController {
 		if (StringUtils.isBlank(errorMsg)) {
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
 					"EmployeeDocid DocId information retrieved successfully");
-			responseObjectsMap.put("chartCostCenterDocId", mapp);
+			responseObjectsMap.put("employeeDocId", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap,
-					"Failed to retrieve EmployeeDocid", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve EmployeeDocid", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
-
 
 }

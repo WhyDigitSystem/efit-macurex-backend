@@ -42,27 +42,27 @@ public interface PurchaseOrderDeliveryScheduleShortCloseRepo
 	Set<Object[]> getPurchaseOrderNobasedSchedule(Long orgId, Long branch, Long supplier);
 	
 	
-	@Query(nativeQuery = true, value = "select p1.item,i.item_code,i.item_description,p1.uom,p1.po_qty orderqty,g1.accept_qty suppliedqty,sum(p1.po_qty-g1.accept_qty) as pendingqty from purchase_order_basic p join purchase_order_import_details p1 on p.purchase_order_basic_id=p1.purchase_order_basic_id\r\n"
-			+ "left join item i on i.item_id=p1.item left join grn_basic g on g.po_no=p.doc_id and g.supplier_code=p.supplier_code  \r\n"
-			+ " join grn_details g1 on g1.grn_basic_id=g.grn_basic_id\r\n"
-			+ "where   p.org_id=?1 and p.branch=?2 and p.supplier_code=?3\r\n"
-			+ "and p.doc_id=?4 and p.po_type=0\r\n"
-			+ " group by p1.item,i.item_code,i.item_description,p1.uom,p1.po_qty,g1.accept_qty\r\n"
-			+ " union\r\n"
-			+ "select p1.item,i.item_code,i.item_description,p1.primary_unit,p1.qty_in_primary_unit orderqty,g1.accept_qty suppliedqty,sum(qty_in_primary_unit-g1.accept_qty) as pendingqty from purchase_order_basic p join purchase_order_local_details p1 on p.purchase_order_basic_id=p1.purchase_order_basic_id\r\n"
-			+ "left join item i on i.item_id=p1.item left join grn_basic g on g.po_no=p.doc_id and g.supplier_code=p.supplier_code  \r\n"
-			+ " join grn_details g1 on g1.grn_basic_id=g.grn_basic_id \r\n"
-			+ "where   p.org_id=?1 and p.branch=?2 and p.supplier_code=?3\r\n"
-			+ "and p.doc_id=?4 and p.po_type=1\r\n"
-			+ " group by p1.item,i.item_code,i.item_description,p1.primary_unit,p1.qty_in_primary_unit ,g1.accept_qty\r\n"
-			+ " union \r\n"
-			+ "select p1.item,i.item_code,i.item_description,p1.primary_unit,p1.tentative_qty orderqty,g1.accept_qty suppliedqty,sum(tentative_qty-g1.accept_qty) as pendingqty from \r\n"
-			+ "purchase_delivery_schedule_basic p join purchase_delivery_schedule_details p1 on p.purchase_delivery_schedule_basic_id=p1.purchase_delivery_schedule_basic_id\r\n"
-			+ "left join item i on i.item_id=p1.item left join grn_basic g on g.po_no=p.doc_id and g.supplier_code=p.supplier \r\n"
-			+ " join grn_details g1 on g1.grn_basic_id=g.grn_basic_id \r\n"
-			+ "where   p.org_id=?1 and p.branch=?2 and p.supplier=?3\r\n"
-			+ "and p.doc_id=?4 \r\n"
-			+ " group by p1.item,i.item_code,i.item_description,p1.primary_unit,p1.tentative_qty ,g1.accept_qty")
+	@Query(nativeQuery = true, value = "select p1.item,i.item_code,i.item_description,p1.uom,p1.po_qty orderqty,g1.accept_qty suppliedqty,sum(p1.po_qty-g1.accept_qty) as pendingqty,u.unit_id from purchase_order_basic p join purchase_order_import_details p1 on p.purchase_order_basic_id=p1.purchase_order_basic_id\r\n"
+			+ "			left join item i on i.item_id=p1.item left join grn_basic g on g.po_no=p.doc_id and g.supplier_code=p.supplier_code  \r\n"
+			+ "			 join grn_details g1 on g1.grn_basic_id=g.grn_basic_id left join unitmaster u on u.unitmaster_id=p1.uom\r\n"
+			+ "			where   p.org_id=?1 and p.branch=?2 and p.supplier_code=?3\r\n"
+			+ "			and p.doc_id=?4 and p.po_type=0\r\n"
+			+ "			 group by p1.item,i.item_code,i.item_description,p1.uom,p1.po_qty,g1.accept_qty,u.unit_id\r\n"
+			+ "			 union\r\n"
+			+ "			select p1.item,i.item_code,i.item_description,p1.primary_unit,p1.qty_in_primary_unit orderqty,g1.accept_qty suppliedqty,sum(qty_in_primary_unit-g1.accept_qty) as pendingqty,u.unit_id from purchase_order_basic p join purchase_order_local_details p1 on p.purchase_order_basic_id=p1.purchase_order_basic_id\r\n"
+			+ "			left join item i on i.item_id=p1.item left join grn_basic g on g.po_no=p.doc_id and g.supplier_code=p.supplier_code  \r\n"
+			+ "			 join grn_details g1 on g1.grn_basic_id=g.grn_basic_id left join unitmaster u on u.unitmaster_id=p1.primary_unit\r\n"
+			+ "			where   p.org_id=?1 and p.branch=?2 and p.supplier_code=?3\r\n"
+			+ "			and p.doc_id=?4 and p.po_type=1\r\n"
+			+ "			 group by p1.item,i.item_code,i.item_description,p1.primary_unit,p1.qty_in_primary_unit ,g1.accept_qty,u.unit_id\r\n"
+			+ "			 union \r\n"
+			+ "			select p1.item,i.item_code,i.item_description,p1.primary_unit,p1.tentative_qty orderqty,g1.accept_qty suppliedqty,sum(tentative_qty-g1.accept_qty) as pendingqty,u.unit_id from \r\n"
+			+ "			purchase_delivery_schedule_basic p join purchase_delivery_schedule_details p1 on p.purchase_delivery_schedule_basic_id=p1.purchase_delivery_schedule_basic_id\r\n"
+			+ "			left join item i on i.item_id=p1.item left join grn_basic g on g.po_no=p.doc_id and g.supplier_code=p.supplier \r\n"
+			+ "			 join grn_details g1 on g1.grn_basic_id=g.grn_basic_id left join unitmaster u on u.unitmaster_id=p1.primary_unit\r\n"
+			+ "			where   p.org_id=?1 and p.branch=?2 and p.supplier=?3\r\n"
+			+ "			and p.doc_id=?4 \r\n"
+			+ "			 group by p1.item,i.item_code,i.item_description,p1.primary_unit,p1.tentative_qty ,g1.accept_qty,p1.primary_unit")
 	Set<Object[]> getPurchaseOrderNobasedScheduleDetails(Long orgId, Long branch, Long supplier,String purchaseOrderNo);
 
 }

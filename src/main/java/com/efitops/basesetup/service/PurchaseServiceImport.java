@@ -10,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
+import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
@@ -57,13 +59,31 @@ public interface PurchaseServiceImport {
 			PurchaseOrderDeliveryScheduleShortCloseDTO purchaseOrderDeliveryScheduleShortCloseDTO)
 			throws ApplicationException;
 
-	String getPurchaseOrderDeliveryScheduleShortCloseDocId(Long orgId, String financialYear, String screenCode);
-
 	List<Map<String, Object>> getSupplierDetailsShortClose(Long orgId, Long branch);
 
 	List<Map<String, Object>> getPurchaseOrderNobasedSchedule(Long orgId, Long branch, Long supplier);
 
 	List<Map<String, Object>> getPurchaseOrderNobasedScheduleDetails(Long orgId, Long branch, Long supplier,
 			String purchaseOrderNo);
+
+	String getPurchaseOrderDeliveryScheduleShortCloseDocId(Long orgId, String financialYear);
+
+	
+	// Direction
+
+	DirectPurchaseResponseDTO getDirectPurchaseById(Long id) throws ApplicationException;
+
+	List<DirectPurchaseResponseDTO> getDirectPurchaseByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> createUpdateDirectPurchase(DirectPurchaseDTO directPurchaseDTO, MultipartFile[] files)
+			throws ApplicationException;
+
+	String getDirectPurchaseDocId(Long orgId, String financialYear);
+
+	ResponseEntity<byte[]> viewDirectPurchaseFile(HttpServletRequest request) throws IOException;
+
+	List<Map<String, Object>> getIssueTo(Long orgId, Long branch);
+
+	List<Map<String, Object>> getItemType(Long orgId, Long branch, Long itemType);
 
 }

@@ -21,7 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "sales_return_basic")
+@Table(name = "sales_return_tax_detail")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,14 +29,11 @@ public class SalesReturnTaxDetailsVO {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sales_return_tax_detail_seq")
-    @SequenceGenerator(name = "sales_return_tax_detail_seq",sequenceName = "sales_return_tax_detail_seq",allocationSize = 1)
+    @SequenceGenerator(name = "sales_return_tax_detail_seq",sequenceName = "sales_return_tax_detail_seq",allocationSize = 1,initialValue = 1000000001)
     @Column(name = "sales_return_tax_detail_id")
     private Long id;
 
-    // Header Mapping
-    @ManyToOne
-    @JoinColumn(name = "sales_return_basic_id")
-    private SalesReturnVO salesReturn;
+
 
     // Particulars (List Of Values)
     @ManyToOne
@@ -47,4 +44,13 @@ public class SalesReturnTaxDetailsVO {
     @Column(name = "amount")
     private BigDecimal amount;
 
+    
+    @Column(name = "gl_account_name")
+    private String glAccountName;
+    
+    // Header Mapping
+    @ManyToOne
+    @JoinColumn(name = "sales_return_basic_id")
+    private SalesReturnVO salesReturn;
+    
 }

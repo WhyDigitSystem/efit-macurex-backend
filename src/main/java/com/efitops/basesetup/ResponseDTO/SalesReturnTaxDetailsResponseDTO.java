@@ -1,4 +1,4 @@
-package com.efitops.basesetup.dto;
+package com.efitops.basesetup.ResponseDTO;
 
 import java.math.BigDecimal;
 
@@ -9,14 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalesReturnTaxDetailsResponseDto {
+public class SalesReturnTaxDetailsResponseDTO {
 
     private Long id;
 
-    // Particulars
-    private ListOfVlauesDetailsResponseDTO particulars;
+    private ListOfValuesDetailsResponseDTO particulars;
 
-    // Amount
     private BigDecimal amount;
 
+    private String glAccountName;
 }

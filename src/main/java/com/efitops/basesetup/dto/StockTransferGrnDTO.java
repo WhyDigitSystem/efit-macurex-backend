@@ -2,7 +2,6 @@ package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -17,8 +16,6 @@ import lombok.NoArgsConstructor;
 public class StockTransferGrnDTO {
 
 	private Long id;
-	private String docId;
-	private LocalDate docDate;
 	private String belongsTo;
 	private Long location;
 	private Long supplierCode;
@@ -33,7 +30,6 @@ public class StockTransferGrnDTO {
 	private LocalDate scheduleEndDate;
 	private Long currency;
 	private BigDecimal exchangeRate;
-	private LocalTime grnClearTime;
 	private BigDecimal grossAmount;
 	private String modvatCopyReceived;
 	private BigDecimal totalQtyInKg;

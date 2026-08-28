@@ -68,4 +68,6 @@ public class GrnDetailsDTO {
 
 	private BigDecimal handCharge;
 
+	private BigDecimal challanQty;
+
 }

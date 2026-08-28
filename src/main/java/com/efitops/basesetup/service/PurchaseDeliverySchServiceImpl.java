@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -26,10 +28,22 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeDetailsDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.GSTRateMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GateInwardEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InternalIndentDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InternalIndentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PhysicalStockReConcilationDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PhysicalStockReConcilationResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseBillDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseBillResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseBillSupplierResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseBillTaxGridResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAttachmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractResponseDTO;
@@ -38,12 +52,20 @@ import com.efitops.basesetup.ResponseDTO.PurchaseDeliveryScheduleDetailsResponse
 import com.efitops.basesetup.ResponseDTO.PurchaseDeliveryScheduleLineResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseDTO;
+import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.GateInwardEntryDTO;
+import com.efitops.basesetup.dto.HsnResponseImageDTO;
+import com.efitops.basesetup.dto.InternalIndentDTO;
+import com.efitops.basesetup.dto.InternalIndentDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
+import com.efitops.basesetup.dto.PhysicalStockReConcilationDTO;
+import com.efitops.basesetup.dto.PhysicalStockReConcilationDetailsDTO;
 import com.efitops.basesetup.dto.PrimaryUnitImageDTO;
 import com.efitops.basesetup.dto.PurchaseBillDTO;
+import com.efitops.basesetup.dto.PurchaseBillDetailsDTO;
+import com.efitops.basesetup.dto.PurchaseBillTaxGridDTO;
 import com.efitops.basesetup.dto.PurchaseContractDTO;
 import com.efitops.basesetup.dto.PurchaseContractDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseContractTaxDetailsDTO;
@@ -56,10 +78,19 @@ import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
+import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.GateInwardEntryVO;
+import com.efitops.basesetup.entity.InternalIndentDetailsVO;
+import com.efitops.basesetup.entity.InternalIndentVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
+import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.PhysicalStockReConcilationDetailsVO;
+import com.efitops.basesetup.entity.PhysicalStockReConcilationVO;
+import com.efitops.basesetup.entity.PurchaseBillDetailsVO;
+import com.efitops.basesetup.entity.PurchaseBillTaxGridVO;
 import com.efitops.basesetup.entity.PurchaseBillVO;
 import com.efitops.basesetup.entity.PurchaseContractAttachmentVO;
 import com.efitops.basesetup.entity.PurchaseContractDetailsVO;
@@ -75,11 +106,20 @@ import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.GateInwardEntryRepo;
+import com.efitops.basesetup.repository.GstRateMasterRepo;
+import com.efitops.basesetup.repository.InternalIndentDetailsRepo;
+import com.efitops.basesetup.repository.InternalIndentRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
+import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.PhysicalStockReConcilationDetailsRepo;
+import com.efitops.basesetup.repository.PhysicalStockReConcilationRepo;
+import com.efitops.basesetup.repository.PurchaseBillDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseBillRepo;
+import com.efitops.basesetup.repository.PurchaseBillTaxGridRepo;
 import com.efitops.basesetup.repository.PurchaseContractRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleLineRepo;
@@ -132,16 +172,43 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 	@Autowired
 	ListOfValuesDetailsRepo listOfValuesDetailsRepo;
-	
+
 	@Autowired
 	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
-	
+
+	@Autowired
+	EmployeeMasterRepo employeeRepo;
+
+	@Autowired
+	GstRateMasterRepo gstRateMasterRepo;
+
+	@Autowired
+	PurchaseBillDetailsRepo purchaseBillDetailsRepo;
+
+	@Autowired
+	PurchaseBillTaxGridRepo purchaseBillTaxGridRepo;
+
+	@Autowired
+	InternalIndentRepo internalIndentRepo;
+
+	@Autowired
+	InternalIndentDetailsRepo internalIndentDetailsRepo;
+
+	@Autowired
+	PhysicalStockReConcilationRepo physicalStockReConcilationRepo;
+
+	@Autowired
+	PhysicalStockReConcilationDetailsRepo physicalStockReConcilationDetailsRepo;
+
+	@Autowired
+	LocationRepo locationRepo;
+
 	@Override
 	@Transactional
 	public Map<String, Object> updateCreatePurchaseDeliverySchedule(
 			PurchaseDeliveryScheduleDTO purchaseDeliveryScheduleDTO) throws ApplicationException {
-   String screenCode="PDS";
-   PurchaseDeliveryScheduleVO purchaseDeliveryScheduleVO = new PurchaseDeliveryScheduleVO();
+		String screenCode = "PDS";
+		PurchaseDeliveryScheduleVO purchaseDeliveryScheduleVO = new PurchaseDeliveryScheduleVO();
 
 		String message;
 
@@ -155,14 +222,15 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 			message = "Purchase Delivery Schedule Updated Successfully";
 
 		} else {
-			
-			
-			String docId = purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleDocId(purchaseDeliveryScheduleDTO.getOrgId(),purchaseDeliveryScheduleDTO.getFinancialYear(),screenCode);
+
+			String docId = purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleDocId(
+					purchaseDeliveryScheduleDTO.getOrgId(), purchaseDeliveryScheduleDTO.getFinancialYear(), screenCode);
 
 			purchaseDeliveryScheduleVO.setDocId(docId);
-			
+
 			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdAndFinYearAndScreenCode(purchaseDeliveryScheduleDTO.getOrgId(), purchaseDeliveryScheduleDTO.getFinancialYear(), screenCode);
+					.findByOrgIdAndFinYearAndScreenCode(purchaseDeliveryScheduleDTO.getOrgId(),
+							purchaseDeliveryScheduleDTO.getFinancialYear(), screenCode);
 
 			if (documentTypeMappingDetailsVO == null) {
 				throw new ApplicationException("Document Type Mapping Details Not Found");
@@ -196,10 +264,11 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		purchaseDeliveryScheduleVO.setBelongsTo(dto.getBelongsTo());
 		purchaseDeliveryScheduleVO.setScheduleStartDate(dto.getScheduleStartDate());
-		purchaseDeliveryScheduleVO.setScheduleStartDate(dto.getScheduleEndDate());
-
+		purchaseDeliveryScheduleVO.setScheduleEndDate(dto.getScheduleEndDate());
+		purchaseDeliveryScheduleVO.setNote(dto.getNote());
 		purchaseDeliveryScheduleVO.setFinancialYear(dto.getFinancialYear());
 		purchaseDeliveryScheduleVO.setOrgId(dto.getOrgId());
+
 		purchaseDeliveryScheduleVO.setActive(dto.isActive());
 		purchaseDeliveryScheduleVO.setCancelRemarks(dto.getCancelRemarks());
 
@@ -213,6 +282,15 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 			purchaseDeliveryScheduleVO.setBranch(branch);
+		}
+
+		if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
+
+			EmployeeMasterVO branch = employeeRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			purchaseDeliveryScheduleVO.setPreparedBy(branch);
+			;
 		}
 
 		// =========================
@@ -333,6 +411,8 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		responseDTO.setDocDate(purchaseDeliveryScheduleVO.getDocDate());
 		responseDTO.setScheduleStartDate(purchaseDeliveryScheduleVO.getScheduleStartDate());
 		responseDTO.setScheduleEndDate(purchaseDeliveryScheduleVO.getScheduleEndDate());
+
+		responseDTO.setNote(purchaseDeliveryScheduleVO.getNote());
 		responseDTO.setPurchaseOrderNo(purchaseDeliveryScheduleVO.getPurchaseOrderNo());
 		responseDTO.setPurchaseOrderDate(purchaseDeliveryScheduleVO.getPurchaseOrderDate());
 		responseDTO.setOrgId(purchaseDeliveryScheduleVO.getOrgId());
@@ -354,6 +434,16 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 			branchDTO.setBranchName(purchaseDeliveryScheduleVO.getBranch().getBranchName());
 
 			responseDTO.setBranch(branchDTO);
+		}
+
+		if (purchaseDeliveryScheduleVO.getPreparedBy() != null) {
+
+			EmployeeDetailsDTO branchDTO = new EmployeeDetailsDTO();
+
+			branchDTO.setId(purchaseDeliveryScheduleVO.getPreparedBy().getId());
+			branchDTO.setName(purchaseDeliveryScheduleVO.getPreparedBy().getEmployeeName());
+
+			responseDTO.setPreparedBy(branchDTO);
 		}
 
 		// =========================
@@ -551,12 +641,12 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 			itemMap.put("primaryUnit", obj[2] != null ? obj[2].toString() : "");
 
-			itemMap.put("purchaseUnit", obj[2] != null ?  obj[2].toString() : "");
-			
+			itemMap.put("purchaseUnit", obj[2] != null ? obj[2].toString() : "");
+
 			itemMap.put("itemCode", obj[3] != null ? obj[3].toString() : "");
 
-			itemMap.put("itemDesc", obj[4] != null ?  obj[4].toString() : "");
-			
+			itemMap.put("itemDesc", obj[4] != null ? obj[4].toString() : "");
+
 			itemMap.put("itemId", obj[5] != null ? ((Number) obj[5]).longValue() : null);
 
 			responseList.add(itemMap);
@@ -1494,6 +1584,23 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		purchaseBillVO = purchaseBillRepo.save(purchaseBillVO);
 
 		// ======================================================
+		// Purchase Bill Details
+		// ======================================================
+
+		if (purchaseBillDTO.getPurchaseDetails() != null) {
+
+			createUpdatePurchaseBillDetails(purchaseBillDTO.getPurchaseDetails(), purchaseBillVO);
+		}
+
+		// ======================================================
+		// Purchase Bill Tax Details
+		// ======================================================
+
+		if (purchaseBillDTO.getTaxGrid() != null) {
+
+			createUpdatePurchaseBillTaxDetails(purchaseBillDTO.getTaxGrid(), purchaseBillVO);
+		}
+		// ======================================================
 		// Build Response
 		// ======================================================
 
@@ -1631,6 +1738,339 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 //
 //	        vo.setEccType(eccType);
 //	    }
+	}
+
+	private void createUpdatePurchaseBillDetails(List<PurchaseBillDetailsDTO> detailsDTOList,
+			PurchaseBillVO purchaseBillVO) throws ApplicationException {
+
+		if (detailsDTOList == null || detailsDTOList.isEmpty()) {
+			return;
+		}
+
+		for (PurchaseBillDetailsDTO detailsDTO : detailsDTOList) {
+
+			PurchaseBillDetailsVO detailsVO;
+
+			// ======================================================
+			// Update / Create
+			// ======================================================
+
+			if (detailsDTO.getId() != null) {
+
+				detailsVO = purchaseBillDetailsRepo.findById(detailsDTO.getId())
+						.orElseThrow(() -> new ApplicationException("Purchase Bill Details Not Found"));
+
+			} else {
+
+				detailsVO = new PurchaseBillDetailsVO();
+			}
+
+			// ======================================================
+			// Basic Details
+			// ======================================================
+
+			detailsVO.setTaxType(detailsDTO.getTaxType());
+			detailsVO.setTaxPercent(detailsDTO.getTaxPercent());
+			detailsVO.setExciseToPost(detailsDTO.getExciseToPost());
+
+			detailsVO.setChallanQty(detailsDTO.getChallanQty());
+			detailsVO.setGrnReceivedQty(detailsDTO.getGrnReceivedQty());
+			detailsVO.setAcceptedQty(detailsDTO.getAcceptedQty());
+			detailsVO.setRejectedQty(detailsDTO.getRejectedQty());
+			detailsVO.setShortageQty(detailsDTO.getShortageQty());
+
+			detailsVO.setPurchaseorderRate(detailsDTO.getPurchaseorderRate());
+
+			// ======================================================
+			// Rate In Selected Currency
+			// ======================================================
+
+			BigDecimal rateInSelectedCurrency = detailsDTO.getRateInSelectedCurrency();
+
+			if (rateInSelectedCurrency == null) {
+				rateInSelectedCurrency = BigDecimal.ZERO;
+			}
+
+			detailsVO.setRateInSelectedCurrency(rateInSelectedCurrency);
+
+			// ======================================================
+			// Rate In INR
+			//
+			// Rate In INR = Rate In Selected Currency
+			// * Exchange Rate
+			// ======================================================
+
+			BigDecimal exchangeRate = purchaseBillVO.getExchangeRate();
+
+			if (exchangeRate == null) {
+				exchangeRate = BigDecimal.ONE;
+			}
+
+			BigDecimal rateInInr = rateInSelectedCurrency.multiply(exchangeRate);
+
+			detailsVO.setRateInInr(rateInInr);
+
+			// ======================================================
+			// Quantity
+			// ======================================================
+
+			BigDecimal acceptedQty = detailsDTO.getAcceptedQty();
+
+			if (acceptedQty == null) {
+				acceptedQty = BigDecimal.ZERO;
+			}
+
+			BigDecimal receivedQty = detailsDTO.getGrnReceivedQty();
+
+			if (receivedQty == null) {
+				receivedQty = BigDecimal.ZERO;
+			}
+
+			// ======================================================
+			// Amount In Selected Currency
+			//
+			// Amount In Selected Currency
+			// = Rate In Selected Currency * Accepted Qty
+			// ======================================================
+
+			BigDecimal amountInSelectedCurrency = rateInSelectedCurrency.multiply(acceptedQty);
+
+			detailsVO.setAmountInSelectedCurrency(amountInSelectedCurrency);
+
+			// ======================================================
+			// Amount In INR
+			//
+			// Amount In INR
+			// = Rate In INR * Accepted Qty
+			// ======================================================
+
+			BigDecimal amountInInr = rateInInr.multiply(acceptedQty);
+
+			detailsVO.setAmountInInr(amountInInr);
+
+			// ======================================================
+			// Amount
+			// ======================================================
+			//
+			// If your "amount" field represents the item amount,
+			// use the selected-currency amount here.
+			//
+			// If your business logic uses INR amount for "amount",
+			// change this to amountInInr.
+			// ======================================================
+
+			BigDecimal amount = detailsDTO.getAmount();
+
+			if (amount == null) {
+				amount = amountInSelectedCurrency;
+			}
+
+			detailsVO.setAmount(amount);
+
+			// ======================================================
+			// Apportioned Cost
+			//
+			// Apportioned Cost =
+			// (Total Freight * Item Amount) / Total Item Amount
+			// ======================================================
+
+			BigDecimal totalFreight = purchaseBillVO.getTotalFreight();
+
+			BigDecimal totalItemAmount = purchaseBillVO.getBasicValue();
+
+			BigDecimal apportionedCost = BigDecimal.ZERO;
+
+			if (totalFreight != null && amount != null && totalItemAmount != null
+					&& totalItemAmount.compareTo(BigDecimal.ZERO) > 0) {
+
+				apportionedCost = totalFreight.multiply(amount).divide(totalItemAmount, 2, RoundingMode.HALF_UP);
+			}
+
+			detailsVO.setApportionedCost(apportionedCost);
+
+			// ======================================================
+			// Landed Cost Rate
+			//
+			// Landed Cost Rate = Amount / Received Qty
+			// ======================================================
+
+			BigDecimal landedCostRate = BigDecimal.ZERO;
+
+			if (amount != null && receivedQty.compareTo(BigDecimal.ZERO) > 0) {
+
+				landedCostRate = amount.divide(receivedQty, 2, RoundingMode.HALF_UP);
+			}
+
+			detailsVO.setLandedCostRate(landedCostRate);
+
+			// ======================================================
+			// Additional Duty
+			// ======================================================
+
+			detailsVO.setAdditionalDuty(detailsDTO.getAdditionalDuty());
+
+			// ======================================================
+			// SGST
+			// ======================================================
+
+			detailsVO.setSgstRate(detailsDTO.getSgstRate());
+
+			detailsVO.setSgstAmount(detailsDTO.getSgstAmount());
+
+			// ======================================================
+			// CGST
+			// ======================================================
+
+			detailsVO.setCgstRate(detailsDTO.getCgstRate());
+
+			detailsVO.setCgstAmount(detailsDTO.getCgstAmount());
+
+			// ======================================================
+			// IGST
+			// ======================================================
+
+			detailsVO.setIgstRate(detailsDTO.getIgstRate());
+
+			detailsVO.setIgstAmount(detailsDTO.getIgstAmount());
+
+			// ======================================================
+			// Item
+			// ======================================================
+
+			if (detailsDTO.getItem() != null && detailsDTO.getItem() > 0) {
+
+				ItemMasterVO item = itemRepo.findById(detailsDTO.getItem())
+						.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+				detailsVO.setItem(item);
+			}
+
+			// ======================================================
+			// GST Rate
+			// ======================================================
+
+			if (detailsDTO.getGstRate() != null && detailsDTO.getGstRate() > 0) {
+
+				GSTRateMasterVO gstRate = gstRateMasterRepo.findById(detailsDTO.getGstRate())
+						.orElseThrow(() -> new ApplicationException("GST Rate Not Found"));
+
+				detailsVO.setGstRate(gstRate);
+			}
+
+			// ======================================================
+			// HSN
+			// ======================================================
+
+			/*
+			 * if (detailsDTO.getHsnCode() != null && detailsDTO.getHsnCode() > 0) {
+			 * 
+			 * HsnVO hsn = hsnRepo.findById(detailsDTO.getHsnCode()) .orElseThrow(() -> new
+			 * ApplicationException( "HSN Code Not Found"));
+			 * 
+			 * detailsVO.setHsnCode(hsn); }
+			 */
+
+			// ======================================================
+			// Unit
+			// ======================================================
+
+			if (detailsDTO.getUnit() != null && detailsDTO.getUnit() > 0) {
+
+				UnitMasterVO unit = unitMasterRepo.findById(detailsDTO.getUnit())
+						.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+
+				detailsVO.setUnit(unit);
+			}
+
+			// ======================================================
+			// Parent
+			// ======================================================
+
+			detailsVO.setPurchaseBillVO(purchaseBillVO);
+
+			// ======================================================
+			// Add Details To Parent
+			// ======================================================
+
+			if (!purchaseBillVO.getPurchaseBillDetailsVO().contains(detailsVO)) {
+
+				purchaseBillVO.getPurchaseBillDetailsVO().add(detailsVO);
+			}
+		}
+	}
+
+	private void createUpdatePurchaseBillTaxDetails(List<PurchaseBillTaxGridDTO> taxDTOList,
+			PurchaseBillVO purchaseBillVO) throws ApplicationException {
+
+		if (taxDTOList == null || taxDTOList.isEmpty()) {
+			return;
+		}
+
+		for (PurchaseBillTaxGridDTO taxDTO : taxDTOList) {
+
+			PurchaseBillTaxGridVO taxVO;
+
+			// ======================================================
+			// Update
+			// ======================================================
+
+			if (taxDTO.getId() != null) {
+
+				taxVO = purchaseBillTaxGridRepo.findById(taxDTO.getId())
+						.orElseThrow(() -> new ApplicationException("Purchase Bill Tax Details Not Found"));
+
+			} else {
+
+				// ==================================================
+				// Create
+				// ==================================================
+
+				taxVO = new PurchaseBillTaxGridVO();
+			}
+
+			// ======================================================
+			// Basic Tax Details
+			// ======================================================
+
+			taxVO.setParticulars(taxDTO.getParticulars());
+			taxVO.setTaxPercent(taxDTO.getTaxPercent());
+			taxVO.setAcceptedQtyAmount(taxDTO.getAcceptedQtyAmount());
+			taxVO.setRevisedAmount(taxDTO.getRevisedAmount());
+
+			taxVO.setDebitbCredit(taxDTO.getDebitCredit());
+
+			taxVO.setDebitAmount(taxDTO.getDebitAmount());
+			taxVO.setCreditAmount(taxDTO.getCreditAmount());
+
+			taxVO.setPostToFinanceAc(taxDTO.getPostToFinanceAc());
+
+			// ======================================================
+			// Ledger Account
+			// ======================================================
+
+			if (taxDTO.getLedgerAccount() != null && taxDTO.getLedgerAccount() > 0) {
+
+				ListOfValuesDetailsVO ledgerAccount = listOfValuesDetailsRepo.findById(taxDTO.getLedgerAccount())
+						.orElseThrow(() -> new ApplicationException("Ledger Account Not Found"));
+
+				taxVO.setLedgerAccount(ledgerAccount);
+			}
+
+			// ======================================================
+			// Parent
+			// ======================================================
+
+			taxVO.setPurchaseBillVO(purchaseBillVO);
+
+			// ======================================================
+			// Add to Parent
+			// ======================================================
+
+			if (!purchaseBillVO.getPurchaseBillTaxGridVO().contains(taxVO)) {
+
+				purchaseBillVO.getPurchaseBillTaxGridVO().add(taxVO);
+			}
+		}
 	}
 
 	private PurchaseBillResponseDTO purchaseBillResponse(PurchaseBillVO vo) {
@@ -1774,14 +2214,6 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 			dto.setSupplier(supplierDTO);
 		}
 
-		// ======================================================
-		// Dealer Type
-		// ======================================================
-
-		// ======================================================
-		// Posting Category
-		// ======================================================
-
 //		if (vo.getPostingCategory() != null) {
 //
 //			ListOfVlauesDetailsResponseDTO postingCategoryDTO = new ListOfVlauesDetailsResponseDTO();
@@ -1808,6 +2240,177 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 //	        eccTypeDTO.setValueCode(vo.getEccType().getValueCode());
 //	        dto.setEccType(eccTypeDTO);
 //	    }
+		// ======================================================
+		// Purchase Bill Details
+		// ======================================================
+
+		if (vo.getPurchaseBillDetailsVO() != null) {
+
+			List<PurchaseBillDetailsResponseDTO> detailsList = new ArrayList<>();
+
+			for (PurchaseBillDetailsVO detailsVO : vo.getPurchaseBillDetailsVO()) {
+
+				PurchaseBillDetailsResponseDTO detailsDTO = purchaseBillDetailsResponse(detailsVO);
+
+				detailsList.add(detailsDTO);
+			}
+
+			dto.setPurchaseDetails(detailsList);
+		}
+
+		// ======================================================
+		// Purchase Bill Tax Grid
+		// ======================================================
+
+		if (vo.getPurchaseBillTaxGridVO() != null) {
+
+			List<PurchaseBillTaxGridResponseDTO> taxList = new ArrayList<>();
+
+			for (PurchaseBillTaxGridVO taxVO : vo.getPurchaseBillTaxGridVO()) {
+
+				PurchaseBillTaxGridResponseDTO taxDTO = purchaseBillTaxGridResponse(taxVO);
+
+				taxList.add(taxDTO);
+			}
+
+			dto.setTaxGrid(taxList);
+		}
+
+		return dto;
+
+	}
+
+	private PurchaseBillDetailsResponseDTO purchaseBillDetailsResponse(PurchaseBillDetailsVO vo) {
+
+		PurchaseBillDetailsResponseDTO dto = new PurchaseBillDetailsResponseDTO();
+
+		dto.setId(vo.getId());
+
+		dto.setTaxType(vo.getTaxType());
+		dto.setTaxPercent(vo.getTaxPercent());
+//		dto.setTariffNo(vo.getTariffNo());
+		dto.setExciseToPost(vo.getExciseToPost());
+		dto.setChallanQty(vo.getChallanQty());
+
+		dto.setGrnReceivedQty(vo.getGrnReceivedQty());
+		dto.setAcceptedQty(vo.getAcceptedQty());
+		dto.setRejectedQty(vo.getRejectedQty());
+		dto.setShortageQty(vo.getShortageQty());
+
+		dto.setPurchaseorderRate(vo.getPurchaseorderRate());
+		dto.setRateInInr(vo.getRateInInr());
+		dto.setRateInSelectedCurrency(vo.getRateInSelectedCurrency());
+
+		dto.setApportionedCost(vo.getApportionedCost());
+		dto.setLandedCostRate(vo.getLandedCostRate());
+
+		dto.setAmount(vo.getAmount());
+		dto.setAmountInSelectedCurrency(vo.getAmountInSelectedCurrency());
+
+		dto.setAdditionalDuty(vo.getAdditionalDuty());
+		dto.setAmountInInr(vo.getAmountInInr());
+
+		dto.setSgstRate(vo.getSgstRate());
+		dto.setSgstAmount(vo.getSgstAmount());
+
+		dto.setCgstRate(vo.getCgstRate());
+		dto.setCgstAmount(vo.getCgstAmount());
+
+		dto.setIgstRate(vo.getIgstRate());
+		dto.setIgstAmount(vo.getIgstAmount());
+
+		// ======================================================
+		// Item
+		// ======================================================
+
+		if (vo.getItem() != null) {
+
+			ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
+
+			itemDTO.setId(vo.getItem().getId());
+			// Add the remaining Item fields based on your DTO
+
+			dto.setItem(itemDTO);
+		}
+
+		// ======================================================
+		// GST Rate
+		// ======================================================
+
+		if (vo.getGstRate() != null) {
+
+			GSTRateMasterResponseDTO gstDTO = new GSTRateMasterResponseDTO();
+
+			gstDTO.setId(vo.getGstRate().getId());
+
+			// Add remaining GST fields if required
+
+			dto.setGstRate(gstDTO);
+		}
+
+		// ======================================================
+		// HSN
+		// ======================================================
+
+		if (vo.getHsnCode() != null) {
+
+			HsnResponseImageDTO hsnDTO = new HsnResponseImageDTO();
+
+			hsnDTO.setId(vo.getHsnCode().getId());
+
+			// Add remaining HSN fields if required
+
+			dto.setHsnCode(hsnDTO);
+		}
+
+		// ======================================================
+		// Unit
+		// ======================================================
+
+		if (vo.getUnit() != null) {
+
+			PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
+
+			unitDTO.setId(vo.getUnit().getId());
+
+			// Add remaining Unit fields if required
+
+			dto.setUnit(unitDTO);
+		}
+
+		return dto;
+	}
+
+	private PurchaseBillTaxGridResponseDTO purchaseBillTaxGridResponse(PurchaseBillTaxGridVO vo) {
+
+		PurchaseBillTaxGridResponseDTO dto = new PurchaseBillTaxGridResponseDTO();
+
+		dto.setId(vo.getId());
+		dto.setParticulars(vo.getParticulars());
+		dto.setTaxPercent(vo.getTaxPercent());
+		dto.setAcceptedQtyAmount(vo.getAcceptedQtyAmount());
+		dto.setRevisedAmount(vo.getRevisedAmount());
+
+		dto.setDebitCredit(vo.getDebitbCredit());
+
+		dto.setDebitAmount(vo.getDebitAmount());
+		dto.setCreditAmount(vo.getCreditAmount());
+
+		dto.setPostToFinanceAc(vo.getPostToFinanceAc());
+
+		// ======================================================
+		// Ledger Account
+		// ======================================================
+
+		if (vo.getLedgerAccount() != null) {
+
+			ListOfVlauesDetailsResponseDTO ledgerDTO = new ListOfVlauesDetailsResponseDTO();
+
+			ledgerDTO.setId(vo.getLedgerAccount().getId());
+			ledgerDTO.setValueCode(vo.getLedgerAccount().getValueCode());
+
+			dto.setLedgerAccount(ledgerDTO);
+		}
 
 		return dto;
 	}
@@ -1896,6 +2499,1021 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		String screenCode1 = "PDS";
 		String result = purchaseDeliveryScheduleRepo.getPurchaseDeliveryScheduleDocId(orgId, financialYear,
 				screenCode1);
+		return result;
+	}
+
+//	 grnno dropdown
+	@Override
+	public Map<String, Object> getGrnNoDropdownforPurchaseBill(Long orgId, Long branch, Long supplier)
+			throws ApplicationException {
+
+		String methodName = "getGrnNoDropdownforPurchaseBill()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+
+			List<Object[]> result = purchaseBillRepo.GrnNoDropdownforPurchaseBill(orgId, branch, supplier);
+
+			List<Map<String, Object>> dropdownList = new ArrayList<>();
+
+			for (Object[] obj : result) {
+
+				Map<String, Object> data = new LinkedHashMap<>();
+
+				data.put("id", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+
+				data.put("grnNo", obj[1] != null ? obj[1].toString() : null);
+
+				data.put("grnDate", obj[2] != null ? obj[2] : null);
+
+				data.put("currency", obj[3] != null ? ((Number) obj[3]).longValue() : null);
+
+				data.put("exchangeRate", obj[4] != null ? obj[4] : null);
+
+				data.put("poNo", obj[5] != null ? obj[5].toString() : null);
+
+				data.put("vendorDcNo", obj[6] != null ? obj[6].toString() : null);
+
+				data.put("vendorDcDate", obj[7] != null ? obj[7] : null);
+
+				data.put("poType", obj[8] != null ? obj[8].toString() : null);
+
+				if (obj[9] != null) {
+
+					if (obj[9] instanceof Boolean) {
+						data.put("modvat", obj[9]);
+					} else if (obj[9] instanceof Number) {
+						data.put("modvat", ((Number) obj[9]).intValue() == 1);
+					} else {
+						data.put("modvat", obj[9]);
+					}
+
+				} else {
+					data.put("modvat", null);
+				}
+
+				data.put("supplierDcInvNo", obj[10] != null ? obj[10].toString() : null);
+
+				data.put("supplierDcInvDate", obj[11] != null ? obj[11] : null);
+
+				dropdownList.add(data);
+			}
+
+			response.put("data", dropdownList);
+			response.put("count", dropdownList.size());
+
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+			return response;
+
+		} catch (Exception e) {
+
+			LOGGER.error(CommonConstant.EXCEPTION, methodName, e.getMessage(), e);
+
+			throw new ApplicationException(CommonConstant.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+//	item dropdown for purchasebill
+	@Override
+	public Map<String, Object> getItemDropDownForPurchaseBill(Long orgId, Long branch, Long supplier, String grnNo)
+			throws ApplicationException {
+
+		String methodName = "getItemDropDownForPurchaseBill()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+
+			List<Object[]> result = purchaseBillRepo.GetItemDropDownForPurchaseBill(orgId, branch, supplier, grnNo);
+
+			List<Map<String, Object>> itemList = new ArrayList<>();
+
+			for (Object[] obj : result) {
+
+				Map<String, Object> data = new LinkedHashMap<>();
+
+				// Item
+				data.put("item", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+
+				data.put("itemdesc", obj[1] != null ? obj[1].toString() : null);
+
+				// HSN
+				Map<String, Object> hsnMap = new LinkedHashMap<>();
+
+				hsnMap.put("id", obj[2] != null ? ((Number) obj[2]).longValue() : null);
+
+				hsnMap.put("value", obj[3] != null ? obj[3].toString() : null);
+
+				data.put("hsnCode", hsnMap);
+
+				// Unit
+				Map<String, Object> unitMap = new LinkedHashMap<>();
+
+				unitMap.put("id", obj[4] != null ? ((Number) obj[4]).longValue() : null);
+
+				unitMap.put("value", obj[5] != null ? obj[5].toString() : null);
+
+				data.put("unit", unitMap);
+
+				// Challan Quantity
+				data.put("challan_qty", obj[6] != null ? obj[6] : null);
+
+				// Received Quantity
+				data.put("received_qty", obj[7] != null ? obj[7] : null);
+
+				// Challan Quantity
+				BigDecimal challanQty = obj[6] != null ? (BigDecimal) obj[6] : BigDecimal.ZERO;
+
+				data.put("challan_qty", challanQty);
+
+				// Received Quantity
+				BigDecimal receivedQty = obj[7] != null ? (BigDecimal) obj[7] : BigDecimal.ZERO;
+
+				data.put("received_qty", receivedQty);
+
+				// Shortage Quantity
+				BigDecimal shortageQty = challanQty.subtract(receivedQty);
+
+				if (shortageQty.compareTo(BigDecimal.ZERO) < 0) {
+					shortageQty = BigDecimal.ZERO;
+				}
+
+				data.put("shortage_qty", shortageQty);
+
+				// Accepted Quantity
+				data.put("accepted_qty", obj[8] != null ? obj[8] : null);
+
+				// Rejected Quantity
+				data.put("rejected_qty", obj[9] != null ? obj[9] : null);
+
+				// PO Rate
+				data.put("po_rate", obj[10] != null ? obj[10] : null);
+
+				// GST Rate
+				data.put("gst_rate", obj[11] != null ? obj[11] : null);
+
+				// CGST
+				data.put("cgst_rate", obj[12] != null ? obj[12] : null);
+
+				data.put("cgst_amount", obj[13] != null ? obj[13] : null);
+
+				// SGST
+				data.put("sgst_rate", obj[14] != null ? obj[14] : null);
+
+				data.put("sgst_amount", obj[15] != null ? obj[15] : null);
+
+				// IGST
+				data.put("igst_rate", obj[16] != null ? obj[16] : null);
+
+				data.put("igst_amount", obj[17] != null ? obj[17] : null);
+
+				// Tax Type
+				data.put("tax_type", obj[18] != null ? obj[18].toString() : null);
+
+				itemList.add(data);
+			}
+
+			response.put("data", itemList);
+			response.put("count", itemList.size());
+
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+			return response;
+
+		} catch (Exception e) {
+
+			LOGGER.error(CommonConstant.EXCEPTION, methodName, e.getMessage(), e);
+
+			throw new ApplicationException(CommonConstant.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+//	internal indent
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateInternalIndent(InternalIndentDTO internalIndentDTO)
+			throws ApplicationException {
+
+		String screenCode = "INTI";
+
+		InternalIndentVO internalIndentVO = new InternalIndentVO();
+
+		String message;
+
+		if (ObjectUtils.isNotEmpty(internalIndentDTO.getId())) {
+
+			internalIndentVO = internalIndentRepo.findById(internalIndentDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Internal Indent Details"));
+
+			internalIndentVO.setUpdatedBy(internalIndentDTO.getCreatedBy());
+
+			message = "Internal Indent Updated Successfully";
+
+		} else {
+
+			String docId = internalIndentRepo.getInternalIndentDocId(internalIndentDTO.getOrgId(),
+					internalIndentDTO.getFinancialYear(), screenCode);
+
+			internalIndentVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(internalIndentDTO.getOrgId(),
+							internalIndentDTO.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			internalIndentVO.setCreatedBy(internalIndentDTO.getCreatedBy());
+
+			internalIndentVO.setUpdatedBy(internalIndentDTO.getCreatedBy());
+
+			message = "Internal Indent Created Successfully";
+		}
+
+		createUpdateInternalIndentVO(internalIndentDTO, internalIndentVO);
+
+		InternalIndentVO savedVO = internalIndentRepo.save(internalIndentVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("internalIndentVO", internalIndentResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdateInternalIndentVO(InternalIndentDTO dto, InternalIndentVO internalIndentVO)
+			throws ApplicationException {
+
+		internalIndentVO.setBelongTo(dto.getBelongTo());
+
+		internalIndentVO.setDocDate(dto.getDocDate());
+
+		internalIndentVO.setTimeOfIndent(dto.getTimeOfIndent());
+
+		internalIndentVO.setApprovedByPM(dto.getApprovedByPM());
+
+		internalIndentVO.setRemarks(dto.getRemarks());
+
+		internalIndentVO.setOrgId(dto.getOrgId());
+
+		internalIndentVO.setFinancialYear(dto.getFinancialYear());
+
+		internalIndentVO.setActive(dto.isActive());
+
+		internalIndentVO.setCancelRemarks(dto.getCancelRemarks());
+
+		// =========================
+		// Branch Mapping
+		// =========================
+
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			internalIndentVO.setBranch(branch);
+		}
+
+		// =========================
+		// Department Mapping
+		// =========================
+
+		if (dto.getDepartment() != null && dto.getDepartment() != 0) {
+
+			DepartmentVO department = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Department Not Found"));
+
+			internalIndentVO.setDepartment(department);
+		}
+
+		// =========================
+		// Prepared By Mapping
+		// =========================
+
+		if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
+
+			EmployeeMasterVO preparedBy = employeeRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Prepared By Not Found"));
+
+			internalIndentVO.setPreparedBy(preparedBy);
+		}
+
+		// =========================
+		// Authorized By Mapping
+		// =========================
+
+		if (dto.getAuthorizedBy() != null && dto.getAuthorizedBy() != 0) {
+
+			EmployeeMasterVO authorizedBy = employeeRepo.findById(dto.getAuthorizedBy())
+					.orElseThrow(() -> new ApplicationException("Authorized By Not Found"));
+
+			internalIndentVO.setAuthorizedBy(authorizedBy);
+		}
+
+		// ======================================
+		// Delete Existing Details During Update
+		// ======================================
+
+		if (dto.getId() != null) {
+
+			List<InternalIndentDetailsVO> oldDetails = internalIndentDetailsRepo
+					.findByInternalIndentVO(internalIndentVO);
+
+			internalIndentDetailsRepo.deleteAll(oldDetails);
+		}
+
+		// ======================================
+		// Child Save - Details
+		// ======================================
+
+		List<InternalIndentDetailsVO> detailsList = new ArrayList<>();
+
+		if (dto.getInternalIndentDetailsDTO() != null && !dto.getInternalIndentDetailsDTO().isEmpty()) {
+
+			for (InternalIndentDetailsDTO detailDTO : dto.getInternalIndentDetailsDTO()) {
+
+				InternalIndentDetailsVO detailVO = new InternalIndentDetailsVO();
+
+				// =========================
+				// Item Mapping
+				// =========================
+
+				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
+
+					ItemMasterVO item = itemRepo.findById(detailDTO.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+					detailVO.setItem(item);
+				}
+
+				detailVO.setRequiredQty(detailDTO.getRequiredQty());
+
+				detailVO.setPurpose(detailDTO.getPurpose());
+
+				// =========================
+				// Parent Mapping
+				// =========================
+
+				detailVO.setInternalIndentVO(internalIndentVO);
+
+				detailsList.add(detailVO);
+			}
+
+			internalIndentVO.setInternalIndentDetailsVO(detailsList);
+		}
+
+	}
+
+	private InternalIndentResponseDTO internalIndentResponse(InternalIndentVO internalIndentVO) {
+
+		InternalIndentResponseDTO responseDTO = new InternalIndentResponseDTO();
+
+		responseDTO.setId(internalIndentVO.getId());
+
+		responseDTO.setBelongTo(internalIndentVO.getBelongTo());
+
+		responseDTO.setDocId(internalIndentVO.getDocId());
+
+		responseDTO.setDocDate(internalIndentVO.getDocDate());
+
+		responseDTO.setTimeOfIndent(internalIndentVO.getTimeOfIndent());
+
+		responseDTO.setApprovedByPM(internalIndentVO.getApprovedByPM());
+
+		responseDTO.setRemarks(internalIndentVO.getRemarks());
+
+		responseDTO.setOrgId(internalIndentVO.getOrgId());
+
+		responseDTO.setActive(internalIndentVO.getActive());
+
+		responseDTO.setCancelRemarks(internalIndentVO.getCancelRemarks());
+
+		responseDTO.setCreatedBy(internalIndentVO.getCreatedBy());
+
+		// =========================
+		// Branch Response
+		// =========================
+
+		if (internalIndentVO.getBranch() != null) {
+
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+
+			branchDTO.setId(internalIndentVO.getBranch().getId());
+
+			branchDTO.setBranchName(internalIndentVO.getBranch().getBranchName());
+
+			responseDTO.setBranch(branchDTO);
+		}
+
+		// =========================
+		// Department Response
+		// =========================
+
+		if (internalIndentVO.getDepartment() != null) {
+
+			DepartmentResponseDTO departmentDTO = new DepartmentResponseDTO();
+
+			departmentDTO.setId(internalIndentVO.getDepartment().getId());
+
+			departmentDTO.setDepartmentName(internalIndentVO.getDepartment().getDepartmentName());
+
+			responseDTO.setDepartment(departmentDTO);
+		}
+
+		// =========================
+		// Prepared By Response
+		// =========================
+
+		if (internalIndentVO.getPreparedBy() != null) {
+
+			EmployeeDropdownResponseDTO preparedByDTO = new EmployeeDropdownResponseDTO();
+
+			preparedByDTO.setEmployeeId(internalIndentVO.getPreparedBy().getId());
+
+			preparedByDTO.setEmployeeName(internalIndentVO.getPreparedBy().getEmployeeName());
+
+			responseDTO.setPreparedBy(preparedByDTO);
+		}
+
+		// =========================
+		// Authorized By Response
+		// =========================
+
+		if (internalIndentVO.getAuthorizedBy() != null) {
+
+			EmployeeDropdownResponseDTO authorizedByDTO = new EmployeeDropdownResponseDTO();
+
+			authorizedByDTO.setEmployeeId(internalIndentVO.getAuthorizedBy().getId());
+
+			authorizedByDTO.setEmployeeName(internalIndentVO.getAuthorizedBy().getEmployeeName());
+
+			responseDTO.setAuthorizedBy(authorizedByDTO);
+		}
+
+		// =========================
+		// Details Response
+		// =========================
+
+		List<InternalIndentDetailsResponseDTO> detailResponseList = new ArrayList<>();
+
+		if (internalIndentVO.getInternalIndentDetailsVO() != null
+				&& !internalIndentVO.getInternalIndentDetailsVO().isEmpty()) {
+
+			for (InternalIndentDetailsVO detailVO : internalIndentVO.getInternalIndentDetailsVO()) {
+
+				InternalIndentDetailsResponseDTO detailDTO = new InternalIndentDetailsResponseDTO();
+
+				// =========================
+				// Item Response
+				// =========================
+
+				if (detailVO.getItem() != null) {
+
+					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+
+					itemDTO.setId(detailVO.getItem().getId());
+
+					itemDTO.setItemCode(detailVO.getItem().getItemCode());
+
+					itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
+
+					detailDTO.setItem(itemDTO);
+				}
+
+				detailDTO.setRequiredQty(detailVO.getRequiredQty());
+
+				detailDTO.setPurpose(detailVO.getPurpose());
+
+				detailResponseList.add(detailDTO);
+			}
+		}
+
+		responseDTO.setInternalIndentDetailsResponseDTO(detailResponseList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public String getInternalIndentDocId(Long orgId, String financialYear) {
+
+		String screenCode = "INTI";
+
+		String result = internalIndentRepo.getInternalIndentDocId(orgId, financialYear, screenCode);
+
+		return result;
+	}
+
+//	item dropdown for internal indent
+	@Override
+	public List<Map<String, Object>> getItemDropdownForInternalIndent(Long branch, Long orgId)
+			throws ApplicationException {
+
+		List<Object[]> itemList = internalIndentRepo.getItemDropdownForInternalIndent(branch, orgId);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : itemList) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("id", obj[0]);
+			map.put("itemCode", obj[1]);
+			map.put("itemDescription", obj[2]);
+			map.put("unit", obj[3]);
+
+			responseList.add(map);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public InternalIndentResponseDTO getInternalIndentById(Long id) throws ApplicationException {
+
+		if (ObjectUtils.isEmpty(id)) {
+
+			throw new ApplicationException("Invalid Id");
+		}
+
+		InternalIndentVO internalIndentVO = internalIndentRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Internal Indent Not Found"));
+
+		return internalIndentResponse(internalIndentVO);
+	}
+
+	@Override
+	public List<InternalIndentResponseDTO> getInternalIndentByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<InternalIndentVO> internalIndentList = internalIndentRepo.getInternalIndentByOrgId(orgId, branch);
+
+		if (internalIndentList.isEmpty()) {
+
+			throw new ApplicationException("No Internal Indent Details Found");
+		}
+
+		List<InternalIndentResponseDTO> responseList = new ArrayList<>();
+
+		for (InternalIndentVO internalIndentVO : internalIndentList) {
+
+			responseList.add(internalIndentResponse(internalIndentVO));
+		}
+
+		return responseList;
+	}
+
+//	Physical Stock reconcilation 
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreatePhysicalStockReConcilation(
+			PhysicalStockReConcilationDTO physicalStockReConcilationDTO) throws ApplicationException {
+
+		String screenCode = "PSRC";
+
+		PhysicalStockReConcilationVO physicalStockReConcilationVO = new PhysicalStockReConcilationVO();
+
+		String message;
+
+		if (ObjectUtils.isNotEmpty(physicalStockReConcilationDTO.getId())) {
+
+			physicalStockReConcilationVO = physicalStockReConcilationRepo
+					.findById(physicalStockReConcilationDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Physical Stock Reconciliation Details"));
+
+			physicalStockReConcilationVO.setUpdatedBy(physicalStockReConcilationDTO.getCreatedBy());
+
+			message = "Physical Stock Reconciliation Updated Successfully";
+
+		} else {
+
+			// =========================
+			// Generate Document ID
+			// =========================
+
+			String docId = physicalStockReConcilationRepo.getPhysicalStockReConcilationDocId(
+					physicalStockReConcilationDTO.getOrgId(), physicalStockReConcilationDTO.getFinancialYear(),
+					screenCode);
+
+			physicalStockReConcilationVO.setDocId(docId);
+
+			// =========================
+			// Document Type Mapping
+			// =========================
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(physicalStockReConcilationDTO.getOrgId(),
+							physicalStockReConcilationDTO.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			physicalStockReConcilationVO.setCreatedBy(physicalStockReConcilationDTO.getCreatedBy());
+
+			physicalStockReConcilationVO.setUpdatedBy(physicalStockReConcilationDTO.getCreatedBy());
+
+			message = "Physical Stock Reconciliation Created Successfully";
+		}
+
+		createUpdatePhysicalStockReConcilationVO(physicalStockReConcilationDTO, physicalStockReConcilationVO);
+
+		PhysicalStockReConcilationVO savedVO = physicalStockReConcilationRepo.save(physicalStockReConcilationVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("physicalStockReConcilationVO", physicalStockReConcilationResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdatePhysicalStockReConcilationVO(PhysicalStockReConcilationDTO dto,
+			PhysicalStockReConcilationVO physicalStockReConcilationVO) throws ApplicationException {
+
+		// =========================
+		// Basic Mapping
+		// =========================
+
+		physicalStockReConcilationVO.setBranch(dto.getBranch());
+
+		physicalStockReConcilationVO.setDocDate(dto.getDocDate());
+
+		physicalStockReConcilationVO.setTime(dto.getTime());
+
+		physicalStockReConcilationVO.setRefNo(dto.getRefNo());
+
+		physicalStockReConcilationVO.setRefDate(dto.getRefDate());
+
+		physicalStockReConcilationVO.setBelongsTo(dto.getBelongsTo());
+
+		physicalStockReConcilationVO.setNarration(dto.getNarration());
+
+		physicalStockReConcilationVO.setApprovedByPM(dto.getApprovedByPM());
+
+		physicalStockReConcilationVO.setOrgId(dto.getOrgId());
+
+		physicalStockReConcilationVO.setActive(dto.isActive());
+
+		physicalStockReConcilationVO.setCancelRemarks(dto.getCancelRemarks());
+
+		physicalStockReConcilationVO.setScreenCode("PSRC");
+
+		physicalStockReConcilationVO.setScreenName("PHYSICAL STOCK RECONCILATION ");
+
+		// =========================
+		// Location Type
+		// =========================
+
+		if (dto.getLocationType() != null && dto.getLocationType() != 0) {
+
+			ListOfValuesDetailsVO locationType = listOfValuesDetailsRepo.findById(dto.getLocationType())
+					.orElseThrow(() -> new ApplicationException("Location Type Not Found"));
+
+			physicalStockReConcilationVO.setLocationType(locationType);
+		}
+
+		// =========================
+		// Location
+		// =========================
+
+		if (dto.getLocation() != null && dto.getLocation() != 0) {
+
+			LocationVO location = locationRepo.findById(dto.getLocation())
+					.orElseThrow(() -> new ApplicationException("Location Not Found"));
+
+			physicalStockReConcilationVO.setLocation(location);
+		}
+
+		// =========================
+		// Prepared By
+		// =========================
+
+		if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
+
+			EmployeeMasterVO preparedBy = employeeRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Prepared By Not Found"));
+
+			physicalStockReConcilationVO.setPreparedBy(preparedBy);
+		}
+
+		// ======================================
+		// Delete Existing Details During Update
+		// ======================================
+
+		if (dto.getId() != null) {
+
+			List<PhysicalStockReConcilationDetailsVO> oldDetails = physicalStockReConcilationDetailsRepo
+					.findByPhysicalStockReConcilationVO(physicalStockReConcilationVO);
+
+			physicalStockReConcilationDetailsRepo.deleteAll(oldDetails);
+		}
+
+		// =========================
+		// Details Mapping
+		// =========================
+
+		List<PhysicalStockReConcilationDetailsVO> detailsList = new ArrayList<>();
+
+		if (dto.getPhysicalStockReConcilationDetailsDTO() != null
+				&& !dto.getPhysicalStockReConcilationDetailsDTO().isEmpty()) {
+
+			for (PhysicalStockReConcilationDetailsDTO detailDTO : dto.getPhysicalStockReConcilationDetailsDTO()) {
+
+				PhysicalStockReConcilationDetailsVO detailVO = new PhysicalStockReConcilationDetailsVO();
+
+				// =========================
+				// Item
+				// =========================
+
+				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
+
+					ItemMasterVO item = itemRepo.findById(detailDTO.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+					detailVO.setItem(item);
+				}
+
+				detailVO.setBookStock(detailDTO.getBookStock());
+
+				detailVO.setActualQty(detailDTO.getActualQty());
+
+				BigDecimal difference = BigDecimal.ZERO;
+				// difference
+				if (detailDTO.getActualQty() != null && detailDTO.getBookStock() != null) {
+
+					difference = detailDTO.getActualQty().subtract(detailDTO.getBookStock()).abs();
+					detailVO.setDifference(difference);
+				}
+
+				detailVO.setLcRate(detailDTO.getLcRate());
+
+				detailVO.setRate(detailDTO.getRate());
+
+				detailVO.setReasonCode(detailDTO.getReasonCode());
+
+				// Amount = Rate × Difference
+
+				if (detailDTO.getRate() != null) {
+
+					BigDecimal amount = detailDTO.getRate().multiply(difference).setScale(2, RoundingMode.HALF_UP);
+
+					detailVO.setAmount(amount);
+				}
+				// =========================
+				// Parent Mapping
+				// =========================
+
+				detailVO.setPhysicalStockReConcilationVO(physicalStockReConcilationVO);
+
+				detailsList.add(detailVO);
+			}
+
+			physicalStockReConcilationVO.setPhysicalStockReConcilationDetailsVO(detailsList);
+		}
+	}
+
+	private PhysicalStockReConcilationResponseDTO physicalStockReConcilationResponse(
+			PhysicalStockReConcilationVO physicalStockReConcilationVO) {
+
+		PhysicalStockReConcilationResponseDTO responseDTO = new PhysicalStockReConcilationResponseDTO();
+
+		responseDTO.setId(physicalStockReConcilationVO.getId());
+
+		responseDTO.setDocId(physicalStockReConcilationVO.getDocId());
+
+		responseDTO.setDocDate(physicalStockReConcilationVO.getDocDate());
+
+		responseDTO.setTime(physicalStockReConcilationVO.getTime());
+
+		responseDTO.setRefNo(physicalStockReConcilationVO.getRefNo());
+
+		responseDTO.setRefDate(physicalStockReConcilationVO.getRefDate());
+
+		responseDTO.setBelongsTo(physicalStockReConcilationVO.getBelongsTo());
+
+		responseDTO.setNarration(physicalStockReConcilationVO.getNarration());
+
+		responseDTO.setApprovedByPM(physicalStockReConcilationVO.getApprovedByPM());
+
+		responseDTO.setOrgId(physicalStockReConcilationVO.getOrgId());
+
+		responseDTO.setActive(physicalStockReConcilationVO.getActive());
+
+		responseDTO.setCancelRemarks(physicalStockReConcilationVO.getCancelRemarks());
+
+		responseDTO.setCreatedBy(physicalStockReConcilationVO.getCreatedBy());
+
+		// =========================
+		// Branch Response
+		// =========================
+
+		if (physicalStockReConcilationVO.getBranch() != null) {
+
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+
+			branchDTO.setId(physicalStockReConcilationVO.getBranch().getId());
+
+			branchDTO.setBranchName(physicalStockReConcilationVO.getBranch().getBranchName());
+
+			responseDTO.setBranch(branchDTO);
+		}
+
+		// =========================
+		// Location Type Response
+		// =========================
+
+		if (physicalStockReConcilationVO.getLocationType() != null) {
+
+			ListOfValuesDetailsResponseDTO locationTypeDTO = new ListOfValuesDetailsResponseDTO();
+
+			locationTypeDTO.setId(physicalStockReConcilationVO.getLocationType().getId());
+
+			locationTypeDTO.setCode(physicalStockReConcilationVO.getLocationType().getValueCode());
+			locationTypeDTO.setDescription(physicalStockReConcilationVO.getLocationType().getValueDescription());
+
+			responseDTO.setLocationType(locationTypeDTO);
+		}
+
+		// =========================
+		// Location Response
+		// =========================
+
+		if (physicalStockReConcilationVO.getLocation() != null) {
+
+			LocationMasterResponseDTO locationDTO = new LocationMasterResponseDTO();
+
+			locationDTO.setId(physicalStockReConcilationVO.getLocation().getId());
+
+			locationDTO.setLocationName(physicalStockReConcilationVO.getLocation().getLocationName());
+
+			responseDTO.setLocation(locationDTO);
+		}
+
+		// =========================
+		// Prepared By Response
+		// =========================
+
+		if (physicalStockReConcilationVO.getPreparedBy() != null) {
+
+			EmployeeDropdownResponseDTO preparedByDTO = new EmployeeDropdownResponseDTO();
+
+			preparedByDTO.setEmployeeId(physicalStockReConcilationVO.getPreparedBy().getId());
+
+			preparedByDTO.setEmployeeName(physicalStockReConcilationVO.getPreparedBy().getEmployeeName());
+
+			responseDTO.setPreparedBy(preparedByDTO);
+		}
+
+		// =========================
+		// Details Response
+		// =========================
+
+		List<PhysicalStockReConcilationDetailsResponseDTO> detailResponseList = new ArrayList<>();
+
+		if (physicalStockReConcilationVO.getPhysicalStockReConcilationDetailsVO() != null
+				&& !physicalStockReConcilationVO.getPhysicalStockReConcilationDetailsVO().isEmpty()) {
+
+			for (PhysicalStockReConcilationDetailsVO detailVO : physicalStockReConcilationVO
+					.getPhysicalStockReConcilationDetailsVO()) {
+
+				PhysicalStockReConcilationDetailsResponseDTO detailDTO = new PhysicalStockReConcilationDetailsResponseDTO();
+
+				// =========================
+				// Item Response
+				// =========================
+
+				if (detailVO.getItem() != null) {
+
+					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+
+					itemDTO.setId(detailVO.getItem().getId());
+
+					itemDTO.setItemCode(detailVO.getItem().getItemCode());
+
+					itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
+
+					detailDTO.setItem(itemDTO);
+				}
+
+				detailDTO.setBookStock(detailVO.getBookStock());
+
+				detailDTO.setActualQty(detailVO.getActualQty());
+
+				detailDTO.setDifference(detailVO.getDifference());
+
+				detailDTO.setLcRate(detailVO.getLcRate());
+
+				detailDTO.setRate(detailVO.getRate());
+
+				detailDTO.setReasonCode(detailVO.getReasonCode());
+
+				detailDTO.setAmount(detailVO.getAmount());
+
+				detailResponseList.add(detailDTO);
+			}
+		}
+
+		responseDTO.setPhysicalStockReConcilationDetailsResponseDTO(detailResponseList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public PhysicalStockReConcilationResponseDTO getPhysicalStockReConcilationById(Long id)
+			throws ApplicationException {
+
+		if (ObjectUtils.isEmpty(id)) {
+
+			throw new ApplicationException("Invalid Id");
+		}
+
+		PhysicalStockReConcilationVO physicalStockReConcilationVO = physicalStockReConcilationRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Physical Stock Reconciliation Not Found"));
+
+		return physicalStockReConcilationResponse(physicalStockReConcilationVO);
+	}
+
+	@Override
+	public List<PhysicalStockReConcilationResponseDTO> getPhysicalStockReConcilationByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<PhysicalStockReConcilationVO> physicalStockReConcilationList = physicalStockReConcilationRepo
+				.getPhysicalStockReConcilationByOrgId(orgId, branch);
+
+		if (physicalStockReConcilationList.isEmpty()) {
+
+			throw new ApplicationException("No Physical Stock Reconciliation Details Found");
+		}
+
+		List<PhysicalStockReConcilationResponseDTO> responseList = new ArrayList<>();
+
+		for (PhysicalStockReConcilationVO physicalStockReConcilationVO : physicalStockReConcilationList) {
+
+			responseList.add(physicalStockReConcilationResponse(physicalStockReConcilationVO));
+		}
+
+		return responseList;
+	}
+
+//	 location dropdown for physical stock reconcilation
+	@Override
+	public List<Map<String, Object>> getLocationDropdownForPhysicalStockReConcilation(Long locationType, Long branch,
+			Long orgId) throws ApplicationException {
+
+		List<Object[]> locationList = physicalStockReConcilationRepo
+				.getLocationDropdownForPhysicalStockReConcilation(locationType, branch, orgId);
+
+		if (locationList.isEmpty()) {
+
+			throw new ApplicationException("No Location Details Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : locationList) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("id", obj[0]);
+			map.put("locationId", obj[1]);
+			map.put("locationName", obj[2]);
+
+			responseList.add(map);
+		}
+
+		return responseList;
+	}
+
+//	docid for physicalstockreconcilation
+	@Override
+	public String getPhysicalStockReConcilationDocId(Long orgId, String financialYear) {
+
+		String screenCode = "PSRC";
+
+		String result = physicalStockReConcilationRepo.getPhysicalStockReConcilationDocId(orgId, financialYear,
+				screenCode);
+
 		return result;
 	}
 

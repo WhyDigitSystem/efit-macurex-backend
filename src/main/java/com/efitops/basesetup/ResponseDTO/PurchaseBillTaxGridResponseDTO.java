@@ -20,8 +20,8 @@ public class PurchaseBillTaxGridResponseDTO {
     private BigDecimal acceptedQtyAmount;
     private BigDecimal revisedAmount;
     private ListOfVlauesDetailsResponseDTO ledgerAccount;
-    private String dbCr;
-    private BigDecimal dbAmt;
-    private BigDecimal crAmt;
+    private String debitCredit;
+    private BigDecimal debitAmount;
+    private BigDecimal creditAmount;
     private Boolean postToFinanceAc;
 }

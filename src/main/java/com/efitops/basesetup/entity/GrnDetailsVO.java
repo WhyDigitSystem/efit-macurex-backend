@@ -157,6 +157,9 @@ public class GrnDetailsVO {
 	
 	@Column(name = "hand_charge", precision = 10, scale = 2)
 	private BigDecimal handCharge;
+	
+	@Column(name = "challan_qty", precision = 10, scale = 2)
+	private BigDecimal challanQty;
 
 	@ManyToOne
 	@JsonBackReference

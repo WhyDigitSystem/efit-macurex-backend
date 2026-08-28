@@ -18,8 +18,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PurchaseBillDetailsDTO {
+	
+	private Long id;
 
 	private Long item;
+	
+	private Long gstRate;
 
 	private Long hsnCode;
 
@@ -27,7 +31,7 @@ public class PurchaseBillDetailsDTO {
 
 	private BigDecimal taxPercent;
 
-	private String tariffNo;
+//	private String tariffNo;
 
 	private Boolean exciseToPost;
 

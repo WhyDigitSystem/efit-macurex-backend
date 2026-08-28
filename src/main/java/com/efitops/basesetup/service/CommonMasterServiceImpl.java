@@ -488,8 +488,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		return dto;
 	}
 
-	@Override
 	@Transactional
+	@Override
 	public CompanyResponseDTO updateCompany(CompanyDTO companyDTO) throws Exception {
 
 		CompanyVO companyVO = companyRepo.findById(companyDTO.getId())
@@ -499,7 +499,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		mapUpdateCompanyDTOToVO(companyVO, companyDTO);
 
-		CompanyVO updatedCompany = companyRepo.save(companyVO);
+		CompanyVO updatedCompany = companyRepo.saveAndFlush(companyVO);
+//		CompanyVO updatedCompany = companyRepo.save(companyVO);
 		return mapCompanyVOToResponseDTO(updatedCompany);
 	}
 
@@ -2237,12 +2238,12 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			response.setBranchId(branchDTO);
 		}
 
-		if (locationVO.getPlantId() != null) {
-			BranchResponseDTO plantDTO = new BranchResponseDTO();
-			plantDTO.setId(locationVO.getPlantId().getId());
-			plantDTO.setBranchName(locationVO.getPlantId().getBranchName());
-			response.setPlantId(plantDTO);
-		}
+//		if (locationVO.getPlantId() != null) {
+//			BranchResponseDTO plantDTO = new BranchResponseDTO();
+//			plantDTO.setId(locationVO.getPlantId().getId());
+//			plantDTO.setBranchName(locationVO.getPlantId().getBranchName());
+//			response.setPlantId(plantDTO);
+//		}
 
 		if (locationVO.getLocationType() != null) {
 
@@ -2319,13 +2320,13 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			locationVO.setBelongsTo(listOfValues);
 		}
 
-		if (locationDTO.getPlantId() != null && locationDTO.getPlantId() != 0) {
-
-			BranchVO branch = branchRepo.findById(locationDTO.getPlantId())
-					.orElseThrow(() -> new ApplicationException("branch Not Found"));
-
-			locationVO.setPlantId(branch);
-		}
+//		if (locationDTO.getPlantId() != null && locationDTO.getPlantId() != 0) {
+//
+//			BranchVO branch = branchRepo.findById(locationDTO.getPlantId())
+//					.orElseThrow(() -> new ApplicationException("branch Not Found"));
+//
+//			locationVO.setPlantId(branch);
+//		}
 
 		if (locationDTO.getContactPersonNameId() != null && locationDTO.getContactPersonNameId() != 0) {
 

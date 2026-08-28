@@ -1687,13 +1687,11 @@ public class PurchaseServiceImpl implements PurchaseService {
     
         @Override
         public List<Map<String, Object>> getPurchaseIndentDepartmentDropdown(
-                Long orgId,
-                Long branch) {
+                Long orgId) {
 
             List<Object[]> result =
                     departmentRepo.getPurchaseIndentDepartmentDropdown(
-                            orgId,
-                            branch);
+                            orgId);
 
             return getPurchaseIndentDepartmentDropdown(result);
         }

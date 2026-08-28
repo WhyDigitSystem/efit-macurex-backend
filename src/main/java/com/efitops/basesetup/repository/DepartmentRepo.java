@@ -12,8 +12,8 @@ import com.efitops.basesetup.entity.DepartmentVO;
 @Repository
 public interface DepartmentRepo extends JpaRepository<DepartmentVO, Long> {
 
-	@Query(nativeQuery = true, value = "select * from department  where org_id=?1 and branch=?2 and active=1 and cancel=0")
-	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, Long branch);
+	@Query(nativeQuery = true, value = "select * from department  where org_id=?1  and cancel=0")
+	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId);
 
 	@Query(nativeQuery = true, value = "select * from department where departmentid=?1")
 	List<DepartmentVO> getDepartmentById(Long id);
@@ -34,12 +34,10 @@ public interface DepartmentRepo extends JpaRepository<DepartmentVO, Long> {
 		    WHERE active = 1
 		      AND cancel = 0
 		      AND org_id = :orgId
-		      AND branch = :branch
 		    ORDER BY departmentname
 		    """, nativeQuery = true)
 		List<Object[]> getPurchaseIndentDepartmentDropdown(
-		        @Param("orgId") Long orgId,
-		        @Param("branch") Long branch);
+		        @Param("orgId") Long orgId);
 	
 
 }

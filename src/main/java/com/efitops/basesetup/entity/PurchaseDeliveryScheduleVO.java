@@ -55,6 +55,13 @@ public class PurchaseDeliveryScheduleVO {
    
     @Column(name = "purchase_order_date")
     private LocalDate purchaseOrderDate;
+    
+    @ManyToOne
+    @JoinColumn(name = "prepared_by")
+    private EmployeeMasterVO preparedBy;
+    
+    @Column(name = "note")
+    private String note;
    
 
     @Column(name = "org_id")

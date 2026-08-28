@@ -39,14 +39,14 @@ public class PurchaseBillTaxGridVO {
     @JoinColumn(name = "ledger_account")
     private ListOfValuesDetailsVO ledgerAccount;
 
-    @Column(name = "db_cr")
-    private String dbCr;
+    @Column(name = "debit_credit")
+    private String debitbCredit;
 
-    @Column(name = "db_amt")
-    private BigDecimal dbAmt;
+    @Column(name = "debit_amount")
+    private BigDecimal debitAmount;
 
-    @Column(name = "cr_amt")
-    private BigDecimal crAmt;
+    @Column(name = "credit_amount")
+    private BigDecimal creditAmount;
 
     @Column(name = "post_to_finance_ac")
     private Boolean postToFinanceAc;

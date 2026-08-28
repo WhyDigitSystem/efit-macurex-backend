@@ -15,7 +15,7 @@ public class SalesReturnDTO {
     private Long branch;
 
    
-    private Long belongsTo;
+    private String belongsTo;
 
    
     private String invoiceNo;
@@ -30,6 +30,7 @@ public class SalesReturnDTO {
    
     private Long customer;
 
+    private boolean isIgstApplicable;
    
     private Long location;
 
@@ -45,11 +46,7 @@ public class SalesReturnDTO {
     
     private BigDecimal exchangeRate;
 
-    
-    private String referenceNo;
-    private LocalDate referenceDate;
-
-    private Long invoiceReferenceTypeId;
+    private String invoiceReferenceType;
     
     
     private BigDecimal netAmount;
@@ -67,9 +64,9 @@ public class SalesReturnDTO {
 
     private String cancelRemarks;
 
-    private Boolean active;
+    private boolean active;
 
-    private List<SalesReturnDetailsDto> salesReturnDetails;
+    private List<SalesReturnDetailsDTO> salesReturnDetails;
     
     private List<SalesReturnTaxDetailsDTO> salesReturnTaxDetails;
 

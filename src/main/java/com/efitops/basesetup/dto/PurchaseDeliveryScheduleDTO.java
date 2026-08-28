@@ -19,6 +19,8 @@ public class PurchaseDeliveryScheduleDTO {
     private LocalDate scheduleStartDate;
     private LocalDate scheduleEndDate;
     private Long supplier;
+    private Long preparedBy;
+    private String note;
 
     private String purchaseOrderNo;   // "PURCHASE_CONTRACT" or "LOCAL_PURCHASE_ORDER"
     private LocalDate purchaseOrderDate;

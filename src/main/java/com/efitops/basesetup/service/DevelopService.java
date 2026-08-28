@@ -3,27 +3,35 @@ package com.efitops.basesetup.service;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseOrderAmendmentResponceDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
+import com.efitops.basesetup.dto.IssuesDTO;
+import com.efitops.basesetup.dto.OpenStockEntryDto;
+import com.efitops.basesetup.dto.ParameterMasterDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
+
+import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
+
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
-import com.efitops.basesetup.dto.SalesReturnDTO;
-import com.efitops.basesetup.dto.SalesReturnResponseDTO;
-import com.efitops.basesetup.entity.EnquiryVO;
-import com.efitops.basesetup.entity.PurchaseContractVO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -41,11 +49,11 @@ public interface DevelopService {
 
 	// SALES RETURN
 
-	Map<String, Object> createUpdateSalesReturn(SalesReturnDTO salesReturnDTO) throws ApplicationException;
-
-	SalesReturnResponseDTO getSalesReturnById(Long id) throws ApplicationException;
-
-	List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch) throws ApplicationException;
+//	Map<String, Object> createUpdateSalesReturn(SalesReturnDTO salesReturnDTO) throws ApplicationException;
+//
+//	SalesReturnResponseDTO getSalesReturnById(Long id) throws ApplicationException;
+//
+//	List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch) throws ApplicationException;
 
 	// salesorderamendment
 
@@ -82,14 +90,76 @@ public interface DevelopService {
 	List<PurchaseContractAmendmentResponseDto> getPurchaseContractAmendmentByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
 
-	List<PurchaseContractAmendmentContractDropdownResponseDto> getContractNoDropdownforPurchaseContractAmendment(
-			Long orgId, Long branch) throws ApplicationException;
-
-	List<PurchaseContractAmendmentItemDropdownResponseDto> getItemDropdownForPurchaseContractAmendment(Long contractId)
-			throws ApplicationException;
-
+	
+	
+	
 	Integer getPurchaseContractAmdRevisionNo(String contractNo, Long orgId, Long branch) throws ApplicationException;
 
 	String getEnquiryDocId(Long orgId, String financialYear, String screenCode);
 
+	Map<String, Object> updateCreatePurchaseOrderAmendment(PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
+			MultipartFile[] files) throws ApplicationException;
+
+	PurchaseOrderAmendmentResponceDTO getPurchaseOrderAmendmentById(Long id)
+	        throws ApplicationException;
+	
+
+	List<PurchaseOrderAmendmentResponceDTO> getPurchaseOrderAmendmentByOrgId(Long orgId)
+	        throws ApplicationException;
+
+	Map<String, Object> getPurchaseOrderAmendmentforCustomer(Long customer, Long branch, Long orgId)
+			throws ApplicationException;
+
+	Integer getPurchaseOrderAmendmentRevisionNo(String purchaseOrderNumber, Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(Long customer, Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> getContractNoDropdownforPurchaseContractAmendment(Long orgId, Long branch, Long customerId)
+			throws ApplicationException;
+
+	Map<String, Object> getPurchaseContractAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateOpenStockEntry(OpenStockEntryDto openStockEntryDto)
+			throws ApplicationException;
+
+	OpenStockEntryResponseDTO getOpenStockEntryById(Long id)
+			throws ApplicationException;
+	
+	List<OpenStockEntryResponseDTO> getOpenStockEntryByOrgId(
+	        Long orgId, Long branch)
+	        throws ApplicationException;
+
+	Map<String, Object> getOpenStockEntryItemCodeDropdown(Long orgId, Long branch) throws ApplicationException;
+
+	String getOpenStockEntryDocId(Long orgId, String financialYear, String screenCode);
+
+	Map<String, Object> createUpdateIssues(IssuesDTO issuesDto) throws ApplicationException;
+
+	IssuesResponseDTO getIssuesById(Long id) throws ApplicationException;
+
+	List<IssuesResponseDTO> getIssuesByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+	Map<String, Object> getIssueFromLocationDropdown(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> getIssueToLocationDropdown(Long orgId, Long branch, Long issueFrom) throws ApplicationException;
+
+	Map<String, Object> getIssueIndentNoDropdown(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> getIssueItemCodeDropdown(Long orgId, Long branch, String indentNo) throws ApplicationException ;
+
+	Map<String, Object> createUpdateParameterMaster(ParameterMasterDTO parameterMasterDTO) throws ApplicationException ;
+
+	ParameterMasterResponseDTO getParameterMasterById(Long id) throws ApplicationException ;
+
+	List<ParameterMasterResponseDTO> getParameterMasterByOrgId(Long orgId) throws ApplicationException ;
+
+	
+	
+	
 }

@@ -28,8 +28,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SupplierRateContractItemDetailsVO {
 
-	@Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "supplier_rate_contract_item_detailsgen")
+    @Id
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "supplier_rate_contract_item_detailsgen"
+    )
     @SequenceGenerator(
             name = "supplier_rate_contract_item_detailsgen",
             sequenceName = "supplier_rate_contract_item_detailsseq",
@@ -40,7 +43,10 @@ public class SupplierRateContractItemDetailsVO {
     private Long id;
 
 
-    @Column(name = "incoming_item_code")
+    // Incoming Item Code
+
+    @ManyToOne
+    @JoinColumn(name = "incoming_item_code")
     private ItemMasterVO incomingItemCode;
 
 
@@ -48,7 +54,10 @@ public class SupplierRateContractItemDetailsVO {
     private String incomingItemDescription;
 
 
-    @Column(name = "purchase_unit")
+    // Purchase Unit
+
+    @ManyToOne
+    @JoinColumn(name = "purchase_unit")
     private UnitMasterVO purchaseUnit;
 
 
@@ -78,24 +87,33 @@ public class SupplierRateContractItemDetailsVO {
 
     @Column(name = "cgst_amount")
     private BigDecimal cgstAmount;
-    
+
+
     @Column(name = "igst_rate")
     private BigDecimal igstRate;
 
 
     @Column(name = "igst_amount")
     private BigDecimal igstAmount;
-    
+
+
     @Column(name = "valid_from")
     private LocalDate validFrom;
+
+
     @Column(name = "valid_to")
     private LocalDate validTo;
-    
+
+
     @Column(name = "tool_amortization_rate")
     private BigDecimal toolAmortizationRate;
 
+
+    // Header Mapping
+
     @ManyToOne
-    @JoinColumn(name = "supplier_rate_contractid")
+    @JoinColumn(name = "supplier_rate_contract_id")
     @JsonBackReference
     private SupplierRateContractVO supplierRateContractVO;
+
 }

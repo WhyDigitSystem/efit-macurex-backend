@@ -1,5 +1,6 @@
 package com.efitops.basesetup.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
+import com.efitops.basesetup.dto.MachineMasterDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
 import com.efitops.basesetup.dto.ParameterMasterDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
@@ -158,6 +160,10 @@ public interface DevelopService {
 	ParameterMasterResponseDTO getParameterMasterById(Long id) throws ApplicationException ;
 
 	List<ParameterMasterResponseDTO> getParameterMasterByOrgId(Long orgId) throws ApplicationException ;
+
+	Map<String, Object> createUpdateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files) throws ApplicationException, IOException ;
+
+	String getIssuesDocId(Long orgId, String financialYear);
 
 	
 	

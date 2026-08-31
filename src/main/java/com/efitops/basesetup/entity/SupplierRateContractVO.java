@@ -2,6 +2,7 @@ package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -11,6 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -33,7 +36,10 @@ import lombok.NoArgsConstructor;
 public class SupplierRateContractVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "supplier_rate_contractgen")
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "supplier_rate_contractgen"
+    )
     @SequenceGenerator(
             name = "supplier_rate_contractgen",
             sequenceName = "supplier_rate_contractseq",
@@ -43,13 +49,20 @@ public class SupplierRateContractVO {
     @Column(name = "supplier_rate_contract_id")
     private Long id;
 
-    @Column(name = "branch")
+
+    // =========================
+    // HEADER FIELDS
+    // =========================
+
+    @ManyToOne
+    @JoinColumn(name = "branch")
     private BranchVO branch;
 
     @Column(name = "doc_id")
     private String docId;
 
-    @Column(name = "department")
+    @ManyToOne
+    @JoinColumn(name = "department")
     private DepartmentVO department;
 
     @Column(name = "doc_date")
@@ -64,13 +77,15 @@ public class SupplierRateContractVO {
     @Column(name = "valid_to")
     private LocalDate validTo;
 
-    @Column(name = "customer")
+    @ManyToOne
+    @JoinColumn(name = "customer")
     private CustomerVO customer;
 
     @Column(name = "contract_for")
     private String contractFor;
 
-    @Column(name = "gst_state")
+    @ManyToOne
+    @JoinColumn(name = "gst_state")
     private GSTStateMasterVO gstState;
 
     @Column(name = "is_igst_applicable")
@@ -82,10 +97,12 @@ public class SupplierRateContractVO {
     @Column(name = "tax_type")
     private String taxType;
 
-    @Column(name = "service_name")
+    @ManyToOne
+    @JoinColumn(name = "service_name")
     private CustomerVO serviceName;
 
-    @Column(name = "hsn_sac_code")
+    @ManyToOne
+    @JoinColumn(name = "hsn_sac_code")
     private HsnVO hsnSacCode;
 
     @Column(name = "scrap")
@@ -106,10 +123,12 @@ public class SupplierRateContractVO {
     @Column(name = "freight")
     private BigDecimal freight;
 
-    @Column(name = "freight_type")
+    @ManyToOne
+    @JoinColumn(name = "freight_type")
     private ListOfValuesDetailsVO freightType;
 
-    @Column(name = "packing_type")
+    @ManyToOne
+    @JoinColumn(name = "packing_type")
     private ListOfValuesDetailsVO packingType;
 
     @Column(name = "insurance")
@@ -121,18 +140,21 @@ public class SupplierRateContractVO {
     @Column(name = "inland_charge")
     private BigDecimal inlandCharge;
 
-    @Column(name = "prepared_by")
+    @ManyToOne
+    @JoinColumn(name = "prepared_by")
     private EmployeeMasterVO preparedBy;
 
-    @Column(name = "authoried_by")
+    @ManyToOne
+    @JoinColumn(name = "authoried_by")
     private EmployeeMasterVO authoriedBy;
 
     @Column(name = "narration")
     private String narration;
-    
-    
-    //common fields
-    
+
+
+    // =========================
+    // COMMON FIELDS
+    // =========================
 
     @Column(name = "org_id")
     private Long orgId;
@@ -160,26 +182,32 @@ public class SupplierRateContractVO {
 
     @Column(name = "screen_name")
     private String screenName = "SUPPLIER RATE CONTRACT";
-    
-    @JsonGetter("active")
-	public String getActive() {
-		return active ? "Active" : "In-Active";
-	}
 
-	// Optionally, if you want to control serialization for 'cancel' field similarly
-	@JsonGetter("cancel")
-	public String getCancel() {
-		return cancel ? "T" : "F";
-	}
-	
-	@OneToMany(
-	        mappedBy = "supplierRateContractVO",
-	        cascade = CascadeType.ALL
-	)
-	@JsonManagedReference
-	private List<SupplierRateContractItemDetailsVO> supplierRateContractItemDetailsVO;
-    
-  
+
+    // =========================
+    // HEADER -> ITEM DETAILS
+    // =========================
+
+    @OneToMany(
+            mappedBy = "supplierRateContractVO",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    private List<SupplierRateContractItemDetailsVO> supplierRateContractItemDetailsVO
+            = new ArrayList<>();
+
+
+    @JsonGetter("active")
+    public String getActive() {
+        return active ? "Active" : "In-Active";
+    }
+
+    @JsonGetter("cancel")
+    public String getCancel() {
+        return cancel ? "T" : "F";
+    }
+
 
     @Embedded
     private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();

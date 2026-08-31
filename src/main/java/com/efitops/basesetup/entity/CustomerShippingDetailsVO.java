@@ -25,10 +25,10 @@ import lombok.NoArgsConstructor;
 public class CustomerShippingDetailsVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customershippingdetailsseq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_shipping_detailsgen")
     @SequenceGenerator(
-            name = "customershippingdetailsseq",
-            sequenceName = "customershippingdetailsseq", initialValue = 1000000001,
+            name = "customer_shipping_detailsgen",
+            sequenceName = "customer_shipping_detailsseq", initialValue = 1000000001,
             allocationSize = 1)
     private Long id;
 

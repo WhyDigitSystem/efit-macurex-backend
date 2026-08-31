@@ -50,13 +50,11 @@ public class GradeMasterVO {
  	private boolean cancel=false;
  	@Column(name = "cancel_remarks")
  	private String cancelRemarks;
- 	@ManyToOne
-	@JoinColumn(name = "branch")
-	private BranchVO branch;
+
  	@Column(name = "screen_name")
- 	private String screenName="UNITMASTER";
+ 	private String screenName="GRADE";
  	@Column(name = "screen_code")
- 	private String screenCode="UM";
+ 	private String screenCode="GRD";
  	
  	@JsonGetter("active")
  	public String getActive() {

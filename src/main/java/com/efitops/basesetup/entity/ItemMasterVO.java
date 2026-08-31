@@ -257,8 +257,6 @@ public class ItemMasterVO {
 	@Column(name = "org_id")
 	private Long orgId;
 
-	@Column(name = "financial_year")
-	private String financialYear;
 
 	@ManyToOne
 	@JoinColumn(name = "primary_unit")

@@ -34,8 +34,8 @@ import lombok.NoArgsConstructor;
 public class CustomerVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customergen")
-	@SequenceGenerator(name = "customergen", sequenceName = "customerseq", initialValue = 1000000001, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_headergen")
+	@SequenceGenerator(name = "customer_headergen", sequenceName = "customer_headerseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "customer_id")
 	private Long id;
 
@@ -58,16 +58,10 @@ public class CustomerVO {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
-
-	@Column(name = "doc_id")
-	private String docId;
-
-	@Column(name = "doc_date")
-	private LocalDate docDate;
-
+	
 	@Column(name = "salutation")
 	private String salutation;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "primary_currency")
 	private CurrencyVO primaryCurrency;
@@ -78,7 +72,7 @@ public class CustomerVO {
 	private String esiNo;
 	@Column(name = "tin_no")
 	private String tinNo;
-	
+
 	@Column(name = "customer_type")
 	private String customerType;
 
@@ -87,15 +81,14 @@ public class CustomerVO {
 
 	@Column(name = "customer_code")
 	private String customerCode;
-	
+
 	@Column(name = "customer_name")
 	private String customerName;
 
-	
 	@ManyToOne
 	@JoinColumn(name = "buyer_name")
 	private EmployeeMasterVO buyerName;
-	
+
 	@Column(name = "customer_legal_name")
 	private String customerLegalName;
 
@@ -107,14 +100,13 @@ public class CustomerVO {
 //
 //	@Column(name = "zone")
 //	private String zone;
-	
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "zone")
 	private SalesZoneMasterVO zone;
 
-//	@Column(name = "vendor_code")
-//	private String vendorCode;
+	@Column(name = "customer_company_code")
+	private String customerCompanyCode;
 
 	@Column(name = "group_name")
 	private String groupName;
@@ -131,13 +123,12 @@ public class CustomerVO {
 	@Column(name = "party_credit_period")
 	private int partyCreditPeriod;
 
-	//normalization
+	// normalization
 //	@Column(name = "belongs_to")
 //	private String belongsTo;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "belongs_to")
 	private ListOfValuesDetailsVO belongsTo;
-	
 
 	@Column(name = "gst_type")
 	private String gstType;
@@ -148,106 +139,105 @@ public class CustomerVO {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "gst_state")
 	private GSTStateMasterVO gstState;
-	
-    @Column(name = "is_gst_applicable")
-    private boolean gstApplicable;
 
-    @Column(name = "address", length = 500)
-    private String address;
+	@Column(name = "is_gst_applicable")
+	private boolean gstApplicable;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "city")
-    private CityVO city;
+	@Column(name = "address", length = 500)
+	private String address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "state")
-    private StateVO state;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "city")
+	private CityVO city;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country")
-    private CountryVO country;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "state")
+	private StateVO state;
 
-    @Column(name = "pincode")
-    private String pincode;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "country")
+	private CountryVO country;
 
-    @Column(name = "email")
-    private String email;
+	@Column(name = "pincode")
+	private String pincode;
 
-    @Column(name = "web_address")
-    private String webAddress;
+	@Column(name = "email")
+	private String email;
 
-    @Column(name = "cin_no")
-    private String cinNo;
+	@Column(name = "web_address")
+	private String webAddress;
 
-    @Column(name = "over_due_interest", precision = 18, scale = 2)
-    private BigDecimal overDueInterest;
+	@Column(name = "cin_no")
+	private String cinNo;
 
-    @Column(name = "introduced_by")
-    private String introducedBy;
+	@Column(name = "over_due_interest", precision = 18, scale = 2)
+	private BigDecimal overDueInterest;
 
-    @Column(name = "cst_no")
-    private String cstNo;
+	@Column(name = "introduced_by")
+	private String introducedBy;
 
-    @Column(name = "ecc_no")
-    private String eccNo;
+	@Column(name = "cst_no")
+	private String cstNo;
 
-    @Column(name = "ecc_type")
-    private String eccType;
+	@Column(name = "ecc_no")
+	private String eccNo;
 
-    @Column(name = "kst_no")
-    private String kstNo;
+	@Column(name = "ecc_type")
+	private String eccType;
 
-    @Column(name = "phone")
-    private String phone;
+	@Column(name = "kst_no")
+	private String kstNo;
 
-    @Column(name = "contact_person")
-    private String contactPerson;
+	@Column(name = "phone")
+	private String phone;
 
-    @Column(name = "effective_from")
-    private LocalDate effectiveFrom;
+	@Column(name = "contact_person")
+	private String contactPerson;
 
-    @Column(name = "customer_range")
-    private String range;
+	@Column(name = "effective_from")
+	private LocalDate effectiveFrom;
 
-    @Column(name = "remarks", length = 500)
-    private String remarks;
+	@Column(name = "customer_range")
+	private String range;
 
-    @Column(name = "date_of_approval")
-    private LocalDate dateOfApproval;
+	@Column(name = "remarks", length = 500)
+	private String remarks;
 
-    @Column(name = "iso_status")
-    private String isoStatus;
+	@Column(name = "date_of_approval")
+	private LocalDate dateOfApproval;
 
-    @Column(name = "type_extent_of_control")
-    private String typeExtentOfControl;
+	@Column(name = "iso_status")
+	private String isoStatus;
 
-    @Column(name = "re_assessment_date")
-    private LocalDate reAssessmentDate;
+	@Column(name = "type_extent_of_control")
+	private String typeExtentOfControl;
 
-    @Column(name = "credit_period")
-    private int creditPeriod;
+	@Column(name = "re_assessment_date")
+	private LocalDate reAssessmentDate;
 
-    @Column(name = "approved")
-    private boolean approved;
+	@Column(name = "credit_period")
+	private int creditPeriod;
 
-    @Column(name = "scope_of_supply")
-    private String scopeOfSupply;
+	@Column(name = "approved")
+	private boolean approved;
 
-    @Column(name = "basis_of_approval")
-    private String basisOfApproval;
+	@Column(name = "scope_of_supply")
+	private String scopeOfSupply;
 
-    @Column(name = "bank_name")
-    private String bankName;
+	@Column(name = "basis_of_approval")
+	private String basisOfApproval;
 
-    @Column(name = "bank_acc_no")
-    private String bankAccountNo;
+	@Column(name = "bank_name")
+	private String bankName;
 
-    @Column(name = "payment_mode")
-    private String paymentMode;
+	@Column(name = "bank_acc_no")
+	private String bankAccountNo;
 
-    @Column(name = "ifsc_code")
-    private String ifscCode;
-    
+	@Column(name = "payment_mode")
+	private String paymentMode;
+
+	@Column(name = "ifsc_code")
+	private String ifscCode;
 
 	@Column(name = "org_id")
 	private Long orgId;
@@ -268,15 +258,15 @@ public class CustomerVO {
 	private String screenCode = "CUS";
 	@Column(name = "screen_name", length = 30)
 	private String screenName = "CUSTOMER";
-	
+
 	@OneToMany(mappedBy = "customerVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<CustomerContactDetailsVO> customerContactDetails = new ArrayList<>();
-	
+
 	@OneToMany(mappedBy = "customerVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<CustomerShippingDetailsVO> customerShippingDetails = new ArrayList<>();
-	
+
 	@OneToMany(mappedBy = "customerVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<CustomerItemDetailsVO> CustomerItemDetailsVO = new ArrayList<>();

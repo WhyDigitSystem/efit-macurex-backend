@@ -1,11 +1,6 @@
 package com.efitops.basesetup.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-
-import javax.persistence.Column;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,16 +19,15 @@ public class DailyExchangeRateDTO {
 
 	private LocalDate effectiveFrom;
 
-	private Double sellingExRate;
+	private double sellingExRate;
 
-	private Double buyingExRate;
-    private Month month;
-	private Year year;
+	private double buyingExRate;
+	private String month;
+	private Long year;
 
 
 	private Long orgId;
 	private String createdBy;
 	private String cancelRemarks;
 	private boolean active;
-	private String financialYear;
 }

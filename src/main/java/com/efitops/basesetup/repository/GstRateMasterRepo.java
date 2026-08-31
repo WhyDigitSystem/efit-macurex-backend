@@ -10,10 +10,9 @@ import com.efitops.basesetup.entity.GSTRateMasterVO;
 public interface GstRateMasterRepo extends JpaRepository<GSTRateMasterVO, Long> {
 
 
-	List<GSTRateMasterVO> findByOrgIdAndBranch(Long orgId, String branchCode);
 
-	@Query(nativeQuery = true, value = "select * from gstratemaster where org_id=?1 and branch=?2 and active=1 and cancel=0")
-	List<GSTRateMasterVO> getGSTRateByOrgId(Long orgId, Long branchId);
+	@Query(nativeQuery = true, value = "select * from gstratemaster where org_id=?1  and cancel=0")
+	List<GSTRateMasterVO> getGSTRateByOrgId(Long orgId);
 
 	boolean existsByCategoryIdAndOrgId(Long long1, Long orgId);
 	

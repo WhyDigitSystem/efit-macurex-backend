@@ -3165,7 +3165,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 			physicalStockReConcilationVO.setBranch(branch);
 		}
 
-		physicalStockReConcilationVO.setDocDate(dto.getDocDate());
+//		physicalStockReConcilationVO.setDocDate(dto.getDocDate());
 
 		physicalStockReConcilationVO.setTime(dto.getTime());
 

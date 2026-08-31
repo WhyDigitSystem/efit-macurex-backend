@@ -20,9 +20,9 @@ public class PhysicalStockReConcilationDTO {
 
 	private Long locationType;
 
-	private String docId;
-
-	private LocalDate docDate;
+//	private String docId;
+//
+//	private LocalDate docDate;
 
 	private Long location;
 

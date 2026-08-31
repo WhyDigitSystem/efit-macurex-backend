@@ -752,12 +752,26 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 				if (detailVO.getSparePartId() != null) {
 
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+				    ItemMasterVO item = detailVO.getSparePartId();
 
-					itemDTO.setId(detailVO.getSparePartId().getId());
-					itemDTO.setItemCode(detailVO.getSparePartId().getItemCode());
-					itemDTO.setItemDescription(detailVO.getSparePartId().getItemDescription());
-					detailDTO.setSparePartId(itemDTO);
+				    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+
+				    itemDTO.setId(item.getId());
+				    itemDTO.setItemCode(item.getItemCode());
+				    itemDTO.setItemDescription(item.getItemDescription());
+
+				    if (item.getPrimaryUnit() != null) {
+
+				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+
+				        unitDTO.setId(item.getPrimaryUnit().getId());
+				        unitDTO.setUnitId(item.getPrimaryUnit().getUnitId());
+				        unitDTO.setUnitDescription(item.getPrimaryUnit().getDescription());
+
+				        itemDTO.setUnit(unitDTO);
+				    }
+
+				    detailDTO.setSparePartId(itemDTO);
 				}
 
 				spareList.add(detailDTO);
@@ -781,11 +795,26 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 				if (detailVO.getItem() != null) {
 
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+				    ItemMasterVO item = detailVO.getItem();
 
-					itemDTO.setId(detailVO.getItem().getId());
+				    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
 
-					detailDTO.setItem(itemDTO);
+				    itemDTO.setId(item.getId());
+				    itemDTO.setItemCode(item.getItemCode());
+				    itemDTO.setItemDescription(item.getItemDescription());
+
+				    if (item.getPrimaryUnit() != null) {
+
+				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+
+				        unitDTO.setId(item.getPrimaryUnit().getId());
+				        unitDTO.setUnitId(item.getPrimaryUnit().getUnitId());
+				        unitDTO.setUnitDescription(item.getPrimaryUnit().getDescription());
+
+				        itemDTO.setUnit(unitDTO);
+				    }
+
+				    detailDTO.setItem(itemDTO);
 				}
 
 				componentList.add(detailDTO);
@@ -845,4 +874,38 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 		return dto;
 	}
+	@Override
+	public ToolMasterResponseDTO getToolMasterById(Long id) throws ApplicationException {
+
+	    if (ObjectUtils.isEmpty(id)) {
+	        throw new ApplicationException("Invalid Id");
+	    }
+
+	    ToolMasterVO toolMasterVO = toolMasterRepo.findById(id)
+	            .orElseThrow(() -> new ApplicationException("Tool Master Not Found"));
+
+	    return toolMasterResponse(toolMasterVO);
+	}
+
+	@Override
+	public List<ToolMasterResponseDTO> getToolMasterByOrgId(Long orgId, Long branch)
+	        throws ApplicationException {
+
+	    List<ToolMasterVO> toolMasterList =
+	            toolMasterRepo.getToolMasterByOrgId(orgId, branch);
+
+	    if (toolMasterList.isEmpty()) {
+	        throw new ApplicationException("No Tool Master Details Found");
+	    }
+
+	    List<ToolMasterResponseDTO> responseList = new ArrayList<>();
+
+	    for (ToolMasterVO toolMasterVO : toolMasterList) {
+
+	        responseList.add(toolMasterResponse(toolMasterVO));
+	    }
+
+	    return responseList;
+	}
+	
 }

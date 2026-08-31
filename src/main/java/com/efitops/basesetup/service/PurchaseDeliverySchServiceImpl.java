@@ -289,7 +289,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
 
 			EmployeeMasterVO branch = employeeRepo.findById(dto.getPreparedBy())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
 
 			purchaseDeliveryScheduleVO.setPreparedBy(branch);
 			;

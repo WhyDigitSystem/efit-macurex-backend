@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
@@ -32,6 +33,7 @@ import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
+import com.efitops.basesetup.dto.ParameterMasterDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 import com.efitops.basesetup.dto.PurchaseIndentDTO;
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
@@ -1612,8 +1614,8 @@ public class DevelopController extends BaseController {
 	
 	
 	@GetMapping("/getIssueFromLocationDropdown")
-
 	public ResponseEntity<ResponseDTO> getIssueFromLocationDropdown(
+	        @RequestParam Long orgId,
 	        @RequestParam Long branch) {
 
 	    String methodName = "getIssueFromLocationDropdown()";
@@ -1632,7 +1634,9 @@ public class DevelopController extends BaseController {
 	    try {
 
 	        responseObjectsMap = developService
-	                .getIssueFromLocationDropdown(branch);
+	                .getIssueFromLocationDropdown(
+	                        orgId,
+	                        branch);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
@@ -1666,11 +1670,13 @@ public class DevelopController extends BaseController {
 	}
 	
 	
+	
 	//Issuetodropdown
 	
 	
 	@GetMapping("/getIssueToLocationDropdown")
 	public ResponseEntity<ResponseDTO> getIssueToLocationDropdown(
+	        @RequestParam Long orgId,
 	        @RequestParam Long branch,
 	        @RequestParam Long issueFrom) {
 
@@ -1691,6 +1697,7 @@ public class DevelopController extends BaseController {
 
 	        responseObjectsMap = developService
 	                .getIssueToLocationDropdown(
+	                        orgId,
 	                        branch,
 	                        issueFrom);
 
@@ -1698,8 +1705,9 @@ public class DevelopController extends BaseController {
 	                CommonConstant.STRING_MESSAGE,
 	                "Issue To Location retrieved successfully");
 
-	        responseDTO = createServiceResponse(
-	                responseObjectsMap);
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
 
 	    } catch (Exception e) {
 
@@ -1710,10 +1718,11 @@ public class DevelopController extends BaseController {
 	                methodName,
 	                errorMsg);
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Issue To Location retrieval failed",
-	                errorMsg);
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Issue To Location retrieval failed",
+	                        errorMsg);
 	    }
 
 	    LOGGER.debug(
@@ -1722,6 +1731,287 @@ public class DevelopController extends BaseController {
 
 	    return ResponseEntity.ok(responseDTO);
 	}
+	
+	
+	//issuesindentnumberdropdown
+	
+	
+	@GetMapping("/getIssueIndentNoDropdown")
+	public ResponseEntity<ResponseDTO> getIssueIndentNoDropdown(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getIssueIndentNoDropdown()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        responseObjectsMap = developService
+	                .getIssueIndentNoDropdown(
+	                        orgId,
+	                        branch);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Indent Number retrieved successfully");
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Indent Number retrieval failed",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	//issuesitemcodedropdown
+	
+	
+	@GetMapping("/getIssueItemCodeDropdown")
+	public ResponseEntity<ResponseDTO> getIssueItemCodeDropdown(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch,
+	        @RequestParam String indentNo) {
+
+	    String methodName = "getIssueItemCodeDropdown()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        responseObjectsMap = developService
+	                .getIssueItemCodeDropdown(
+	                        orgId,
+	                        branch,
+	                        indentNo);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Item Code retrieved successfully");
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Item Code retrieval failed",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	//ParameterMaster
+	
+	
+	@PutMapping("/createUpdateParameterMaster")
+	public ResponseEntity<ResponseDTO> createUpdateParameterMaster(
+	        @RequestBody ParameterMasterDTO parameterMasterDTO) {
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object> parameterMasterMap =
+	                developService.createUpdateParameterMaster(
+	                        parameterMasterDTO);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                parameterMasterMap.get("message"));
+
+	        responseObjectsMap.put(
+	                "parameterMasterVO",
+	                parameterMasterMap.get("parameterMasterVO"));
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+	@GetMapping("/getParameterMasterById")
+	public ResponseEntity<ResponseDTO> getParameterMasterById(
+	        @RequestParam Long id) {
+
+	    String methodName = "getParameterMasterById()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        ParameterMasterResponseDTO parameterMasterResponseDTO =
+	                developService.getParameterMasterById(id);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Parameter Master information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "parameterMasterVO",
+	                parameterMasterResponseDTO);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Parameter Master information retrieval failed",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getParameterMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getParameterMasterByOrgId(
+	        @RequestParam Long orgId) {
+
+	    String methodName = "getParameterMasterByOrgId()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<ParameterMasterResponseDTO> parameterMasterResponseDTO =
+	                developService.getParameterMasterByOrgId(
+	                        orgId);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Parameter Master information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "parameterMasterResponseVO",
+	                parameterMasterResponseDTO);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e.getMessage());
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Parameter Master information retrieval failed",
+	                        e.getMessage());
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
 	
 	
 	

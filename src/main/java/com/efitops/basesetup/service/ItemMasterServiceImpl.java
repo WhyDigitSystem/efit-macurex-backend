@@ -1,7 +1,6 @@
 package com.efitops.basesetup.service;
 
 import java.io.IOException;
-
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
@@ -38,8 +36,6 @@ import com.efitops.basesetup.dto.HsnResponseImageDTO;
 import com.efitops.basesetup.dto.ItemDrawingDTO;
 import com.efitops.basesetup.dto.ItemMasterDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDTO;
-import com.efitops.basesetup.dto.ListOfImageResponseDTO;
-import com.efitops.basesetup.dto.ListOfImageResponseDetailsDTO;
 import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
 import com.efitops.basesetup.dto.LocationImageDTO;
 import com.efitops.basesetup.dto.PartyResponseDTO;
@@ -51,7 +47,6 @@ import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.ItemDrawingVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
-import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -60,12 +55,7 @@ import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.GradeMasterRepo;
 import com.efitops.basesetup.repository.HsnRepo;
 import com.efitops.basesetup.repository.ItemDrawingRepo;
-import com.efitops.basesetup.repository.ItemInventoryRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
-import com.efitops.basesetup.repository.ItemOthersRepo;
-import com.efitops.basesetup.repository.ItemPurchaseRepo;
-import com.efitops.basesetup.repository.ItemSalesRepo;
-import com.efitops.basesetup.repository.ItemUnitsRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesRepo;
 import com.efitops.basesetup.repository.LocationRepo;
@@ -78,21 +68,6 @@ public class ItemMasterServiceImpl implements ItemMasterService {
 
 	@Autowired
 	ItemMasterRepo itemMasterRepo;
-
-	@Autowired
-	ItemInventoryRepo itemInventoryRepo;
-
-	@Autowired
-	ItemUnitsRepo itemUnitsRepo;
-
-	@Autowired
-	ItemPurchaseRepo itemPurchaseRepo;
-
-	@Autowired
-	ItemSalesRepo itemSalesRepo;
-
-	@Autowired
-	ItemOthersRepo itemOthersRepo;
 
 	@Autowired
 	ItemDrawingRepo itemDrawingRepo;

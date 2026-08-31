@@ -37,11 +37,11 @@ public class MappingOfPartyToAccVO {
 	@Column(name = "partyacc_id")
 	private Long id;
 	
-	@Column(name = "doc_id")
-	private Long docId;
-	
-	@Column(name = "doc_date")
-	private LocalDate docDate;
+//	@Column(name = "doc_id")
+//	private Long docId;
+//	
+//	@Column(name = "doc_date")
+//	private LocalDate docDate;
 	
 	@Column(name = "as_on_date")
 	private LocalDate asOnDate;
@@ -52,14 +52,14 @@ public class MappingOfPartyToAccVO {
 	
 	@ManyToOne
 	@JoinColumn(name = "category")
-	private ListOfValuesVO category;
+	private ListOfValuesDetailsVO category;
 	
 	
 	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "created_by", length = 25)
 	private String createdBy;
-	@Column(name = "modify_by", length = 25)
+	@Column(name = "modified_by", length = 25)
 	private String updatedBy;
 	@Column(name = "cancel_remarks", length = 150)
 	private String cancelRemarks;
@@ -70,8 +70,8 @@ public class MappingOfPartyToAccVO {
 	
 	
 	
-    @Column(name = "finyear", length = 5)
-    private String finYear;
+    @Column(name = "financial_year", length = 5)
+    private String financialYear;
 	@Column(name = "screencode", length = 30)
 	private String screenCode = "MPA";
 	@Column(name = "screenname", length = 30)

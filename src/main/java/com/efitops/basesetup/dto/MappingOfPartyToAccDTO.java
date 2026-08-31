@@ -15,8 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MappingOfPartyToAccDTO {
 	private Long id;
-	private Long docId;
-	private LocalDate docDate;
+
 	private LocalDate asOnDate;
 	private Long branch;
 	private Long category;

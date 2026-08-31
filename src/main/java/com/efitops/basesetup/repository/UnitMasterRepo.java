@@ -16,11 +16,8 @@ public interface UnitMasterRepo extends JpaRepository<UnitMasterVO, Long> {
 	        SELECT *
 	        FROM unitmaster
 	        WHERE org_id = :orgId
-	          AND branch = :branch
 	          AND cancel = false
-	          AND active = true
 	        ORDER BY unit_id
 	        """, nativeQuery = true)
-	List<UnitMasterVO> findByOrgIdAndBranch(@Param("orgId") Long orgId,
-	                                        @Param("branch") Long branch);
+	List<UnitMasterVO> findByOrgIdAndBranch(@Param("orgId") Long orgId);
 }

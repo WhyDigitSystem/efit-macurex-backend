@@ -21,15 +21,14 @@ public class LocationResponseDTO {
     private String faxNo;
     private String email;
     private String considerMrp;
+    private String active;
 
     private BranchResponseDTO branchId;
-    private BranchResponseDTO plantId;
     private ListOfVlauesDetailsResponseDTO locationTypeId;
     private ListOfVlauesDetailsResponseDTO belongsToId;
     private EmployeeMasterDetailsReponseDTO contactPersonNameId;
     private CustomerResponseDetailsDTO partyNameId;
 
-    private String financialYear;
 
     private String createdBy;
     private String cancelRemarks;

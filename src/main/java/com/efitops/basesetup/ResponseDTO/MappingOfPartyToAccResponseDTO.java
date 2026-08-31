@@ -14,9 +14,9 @@ public class MappingOfPartyToAccResponseDTO {
 
     private Long id;
 
-    private Long docId;
-
-    private LocalDate docDate;
+//    private Long docId;
+//
+//    private LocalDate docDate;
 
     private LocalDate asOnDate;
 

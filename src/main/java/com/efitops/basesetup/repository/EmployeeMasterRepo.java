@@ -71,9 +71,9 @@ public interface EmployeeMasterRepo extends JpaRepository<EmployeeMasterVO, Long
     e.employee_id,
     e.emp_name,email
 FROM employeemaster e
-INNER JOIN designation d
-    ON d.designation_id = e.designation
-WHERE d.designation = 'PURCHASE'
+INNER JOIN department d
+    ON d.departmentid = e.department
+WHERE d.department_name = 'PURCHASE'
   AND e.org_id = ?1
   AND e.branch = ?2
   AND e.active = 1

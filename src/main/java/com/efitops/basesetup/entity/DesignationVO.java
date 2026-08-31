@@ -29,17 +29,17 @@ public class DesignationVO {
 	@SequenceGenerator(name = "designationgen", sequenceName = "designationseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "designation_id")
 	private Long id;
-
+	
 //	@Column(name = "doc_id")
 //	private String docId;
+	
+    @Column(name = "designation")
+    private String designation;
+    
+    @Column(name = "designation_code")
+    private String designationCode;
 
-	@Column(name = "designation", length = 30)
-	private String designation;
-
-	@Column(name = "designation_code")
-	private String designationCode;
-
-	@Column(name = "org_id")
+    @Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "created_by")
 	private String createdBy;
@@ -47,32 +47,33 @@ public class DesignationVO {
 	private String updatedBy;
 	@Column(name = "cancel")
 	private boolean cancel;
-
+	
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
-
+	
 	@Column(name = "active")
 	private boolean active;
-
+	
 //	@ManyToOne
 //	@JoinColumn(name = "branch")
 //	private BranchVO branch;
-
-	@Column(name = "financial_year", length = 5)
-	private String finYear;
-	@Column(name = "screen_code", length = 10)
-	private String screenCode = "DSG";
-	@Column(name = "screen_name", length = 30)
-	private String screenName = "DESIGNATION";
+	
+//    @Column(name = "financial_year", length = 5)
+//    private String finYear;
+	@Column(name = "screen_code",length = 10)
+	private String screenCode ="DSG";
+	@Column(name = "screen_name",length = 30)
+	private String screenName="DESIGNATION";
+	
 
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-
+	
 	@JsonGetter("active")
 	public String getActive() {
 		return active ? "Active" : "In-Active";
 	}
-
+	
 	@JsonGetter("cancel")
 	public String getCancel() {
 		return cancel ? "T" : "F";

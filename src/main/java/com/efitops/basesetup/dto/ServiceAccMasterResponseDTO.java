@@ -20,7 +20,7 @@ public class ServiceAccMasterResponseDTO {
 
     private Long orgId;
 
-    private boolean active;
+    private String active;
 
     private boolean cancel;
 

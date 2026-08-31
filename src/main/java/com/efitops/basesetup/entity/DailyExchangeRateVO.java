@@ -46,22 +46,22 @@ public class DailyExchangeRateVO {
     private LocalDate effectiveFrom;
 
     @Column(name = "selling_ex_rate")
-    private Double sellingExRate;
+    private double sellingExRate;
     
     @Column(name = "buying_ex_rate")
-    private Double buyingExRate;
+    private double buyingExRate;
     
     @Column(name = "month")
-    private Month month;
+    private String month;
     
     @Column(name = "year")
-    private Year year;
+    private Long year;
 	
 	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "created_by", length = 25)
 	private String createdBy;
-	@Column(name = "modify_by", length = 25)
+	@Column(name = "modified_by", length = 25)
 	private String updatedBy;
 	@Column(name = "cancel_remarks", length = 150)
 	private String cancelRemarks;
@@ -70,8 +70,6 @@ public class DailyExchangeRateVO {
 	@Column(name = "cancel")
 	private boolean cancel=false;
 	
-    @Column(name = "financial_year", length = 5)
-    private String financialYear;
 	@Column(name = "screen_code", length = 30)
 	private String screenCode = "DER";
 	@Column(name = "screen_name", length = 30)

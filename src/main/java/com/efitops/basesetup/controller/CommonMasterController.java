@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,7 +71,6 @@ import com.efitops.basesetup.entity.CompanyVO;
 import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.DailyExchangeRateVO;
-import com.efitops.basesetup.entity.DocumentTypeMappingVO;
 import com.efitops.basesetup.entity.DocumentTypeMasterVO;
 import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
@@ -78,16 +79,13 @@ import com.efitops.basesetup.entity.HolidayMasterVO;
 import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.LMEVO;
 import com.efitops.basesetup.entity.ListOfValuesVO;
-import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.StateVO;
 import com.efitops.basesetup.entity.TSBankVO;
-import com.efitops.basesetup.entity.TaxDefinitionVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
-import com.efitops.basesetup.entity.UomConversionVO;
 import com.efitops.basesetup.service.CommonMasterService;
 
 @CrossOrigin
@@ -1312,7 +1310,7 @@ public class CommonMasterController extends BaseController {
 	}
 
 	@GetMapping("/getGSTRateByOrgId")
-	public ResponseEntity<ResponseDTO> getGSTRateByOrgId(@RequestParam Long orgId, @RequestParam Long branchId) {
+	public ResponseEntity<ResponseDTO> getGSTRateByOrgId(@RequestParam Long orgId) {
 
 		String methodName = "getGSTRateByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -1323,7 +1321,7 @@ public class CommonMasterController extends BaseController {
 
 		try {
 
-			List<GSTRateMasterResponseDTO> transportList = commonMasterService.getGSTRateByOrgId(orgId, branchId);
+			List<GSTRateMasterResponseDTO> transportList = commonMasterService.getGSTRateByOrgId(orgId);
 
 			responseObjectsMap.put("transportList", transportList);
 
@@ -1855,7 +1853,7 @@ public class CommonMasterController extends BaseController {
 	}
 
 	@GetMapping("/getUnitMasterByOrgId")
-	public ResponseEntity<ResponseDTO> getUnitMasterByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getUnitMasterByOrgId(@RequestParam Long orgId) {
 
 		String methodName = "getUnitMasterByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -1866,7 +1864,7 @@ public class CommonMasterController extends BaseController {
 
 		try {
 
-			List<UnitMasterVO> unitMasterList = commonMasterService.getUnitMasterByOrgId(orgId, branch);
+			List<UnitMasterVO> unitMasterList = commonMasterService.getUnitMasterByOrgId(orgId);
 
 			responseObjectsMap.put("unitMasterList", unitMasterList);
 
@@ -2110,7 +2108,7 @@ public class CommonMasterController extends BaseController {
 	}
 
 	@GetMapping("/getGradeMasterByOrgId")
-	public ResponseEntity<ResponseDTO> getGradeMasterByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getGradeMasterByOrgId(@RequestParam Long orgId) {
 
 		String methodName = "getGradeMasterByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -2121,7 +2119,7 @@ public class CommonMasterController extends BaseController {
 
 		try {
 
-			List<GradeMasterVO> gradeMasterList = commonMasterService.getGradeMasterByOrgId(orgId, branch);
+			List<GradeMasterVO> gradeMasterList = commonMasterService.getGradeMasterByOrgId(orgId);
 
 			responseObjectsMap.put("gradeMasterList", gradeMasterList);
 
@@ -2546,23 +2544,40 @@ public class CommonMasterController extends BaseController {
 	// Holiday Master
 
 	@PutMapping("/updateCreateHolidayMaster")
-	public ResponseEntity<ResponseDTO> updateCreateHolidayMaster(@RequestBody HolidayMasterDTO holidayMasterDTO) {
+	public ResponseEntity<ResponseDTO> updateCreateHolidayMaster(
+			@RequestBody List<HolidayMasterDTO> holidayMasterDTOList) {
+
 		String methodName = "updateCreateHolidayMaster()";
+
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
 		String errorMsg = null;
+
 		Map<String, Object> responseObjectsMap = new HashMap<>();
+
 		ResponseDTO responseDTO = null;
+
 		try {
-			Map<String, Object> holidayMasterVO = commonMasterService.updateCreateHolidayMaster(holidayMasterDTO);
+
+			Map<String, Object> holidayMasterVO = commonMasterService.updateCreateHolidayMaster(holidayMasterDTOList);
+
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, holidayMasterVO.get("message"));
+
 			responseObjectsMap.put("holidayMasterVO", holidayMasterVO.get("holidayMasterVO"));
+
 			responseDTO = createServiceResponse(responseObjectsMap);
+
 		} catch (Exception e) {
+
 			errorMsg = e.getMessage();
+
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
 			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
 		}
+
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
@@ -2747,34 +2762,48 @@ public class CommonMasterController extends BaseController {
 	}
 
 	// drop down for party
-	@GetMapping("/getParty")
-	public ResponseEntity<ResponseDTO> getParty(@RequestParam Long category, @RequestParam Long orgId,
-			@RequestParam Long branch) {
+	@GetMapping("/getPartyforMappingOfPartyToAcc")
+	public ResponseEntity<ResponseDTO> getParty(
+	        @RequestParam Long category,
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
 
-		String methodName = "getParty()";
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+	    String methodName = "MappingOfPartyToAcc()";
 
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		String errorMsg = null;
-		ResponseDTO responseDTO = null;
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		try {
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
 
-			responseObjectsMap = commonMasterService.getParty(category, orgId, branch);
+	    String errorMsg = null;
+	    ResponseDTO responseDTO = null;
 
-			responseDTO = createServiceResponse(responseObjectsMap);
+	    try {
 
-		} catch (Exception e) {
+	        responseObjectsMap =
+	                commonMasterService.getParty(category, orgId, branch);
 
-			errorMsg = e.getMessage();
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
 
-			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		}
+	    } catch (Exception e) {
 
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+	        errorMsg = e.getMessage();
 
-		return ResponseEntity.ok().body(responseDTO);
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        errorMsg,
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
 	}
 
 	// Daily Exchange Rate
@@ -3065,7 +3094,7 @@ public class CommonMasterController extends BaseController {
 	}
 
 	@GetMapping("/getSalesZoneMasterByOrgId")
-	public ResponseEntity<ResponseDTO> getSalesZoneMasterByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getSalesZoneMasterByOrgId(@RequestParam Long orgId) {
 
 		String methodName = "getSalesZoneMasterByOrgId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -3076,7 +3105,7 @@ public class CommonMasterController extends BaseController {
 
 		try {
 
-			List<SalesZoneMasterVO> salesZoneMasterList = commonMasterService.getSalesZoneMasterByOrgId(orgId, branch);
+			List<SalesZoneMasterVO> salesZoneMasterList = commonMasterService.getSalesZoneMasterByOrgId(orgId);
 
 			responseObjectsMap.put("salesZoneMasterList", salesZoneMasterList);
 
@@ -3094,11 +3123,11 @@ public class CommonMasterController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
+
 	@GetMapping("/getPendingDocumentTypeMapping")
-	public ResponseEntity<ResponseDTO> getPendingDocumentTypeMapping(@RequestParam Long orgId,@RequestParam String branch,@RequestParam String branchCode,
-			@RequestParam String finYear,@RequestParam String finYearIdentifier) {
+	public ResponseEntity<ResponseDTO> getPendingDocumentTypeMapping(@RequestParam Long orgId,
+			@RequestParam String branch, @RequestParam String branchCode, @RequestParam String finYear,
+			@RequestParam String finYearIdentifier) {
 		String methodName = "getPendingDocumentTypeMapping()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -3106,8 +3135,9 @@ public class CommonMasterController extends BaseController {
 		ResponseDTO responseDTO = null;
 		List<Map<String, Object>> documentTypeMappingVO = new ArrayList<>();
 		try {
-			documentTypeMappingVO = commonMasterService.getPendingDocumentTypeMapping(orgId, branch, branchCode, finYear, finYearIdentifier);
-			} catch (Exception e) {
+			documentTypeMappingVO = commonMasterService.getPendingDocumentTypeMapping(orgId, branch, branchCode,
+					finYear, finYearIdentifier);
+		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
@@ -3122,6 +3152,61 @@ public class CommonMasterController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
+
+	// Daily Exchange Rate excel Upload
+
+	@PostMapping(value = "/uploadExcelforExchangeRate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ResponseDTO> uploadExcel(
+	        @RequestPart("files") MultipartFile file) {
+
+	    String methodName = "uploadExcelforExchangeRate()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    Map<String, Object> uploadResponse = new HashMap<>();
+
+	    try {
+
+	        uploadResponse = commonMasterService.uploadExcelforExchangeRate(file);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Daily Exchange Rate Excel uploaded successfully");
+
+	        responseObjectsMap.put(
+	                "dailyExchangeRateVO",
+	                uploadResponse);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Daily Exchange Rate Excel upload failed",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
 }

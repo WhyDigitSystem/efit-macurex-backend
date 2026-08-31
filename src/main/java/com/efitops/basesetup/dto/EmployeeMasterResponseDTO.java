@@ -116,13 +116,11 @@ public class EmployeeMasterResponseDTO {
 
 	private LocalDate dateOfConfirmation;
 
-	private String informationActive;
-
 	private LocalDate trainingStartDate;
 
 	private LocalDate trainingEndDate;
 
-	private Integer noticePeriod;
+	private int noticePeriod;
 
 	private LocalDate currentSalaryPeriodStart;
 
@@ -146,7 +144,8 @@ public class EmployeeMasterResponseDTO {
 
 	private Long orgId;
 
-	private String financialYear;
+	private LocalDate dateOfResignation;
+
 
 	private BranchResponseDTO branch;
 }

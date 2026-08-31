@@ -47,12 +47,18 @@ public interface ListOfValuesRepo extends JpaRepository<ListOfValuesVO, Long> {
 
 
 	
-	@Query(value = "SELECT listofvalues_id, list_code,list_description " +
-	        "FROM listofvalues " +
-	        "WHERE list_code = 'CUSTOMERCATEGORY' " +
-	        "AND org_id = ?1 " +
-	        "AND active = 1 " +
-	        "AND cancel = 0",
+	@Query(value = "SELECT \r\n"
+			+ "    lvd.listofvaluesdetails_id,\r\n"
+			+ "    lvd.value_code,\r\n"
+			+ "    lvd.value_description\r\n"
+			+ "FROM listofvaluesdetails lvd\r\n"
+			+ "INNER JOIN listofvalues lv\r\n"
+			+ "    ON lv.listofvalues_id = lvd.listofvalues_id\r\n"
+			+ "WHERE \r\n"
+			+ "   lv.org_id = ?1\r\n"
+			+ "  AND lvd.active = 1\r\n"
+			+ "  AND lv.active = 1\r\n"
+			+ "  AND lv.cancel = 0;",
 	        nativeQuery = true)
 	List<Object[]> getCustomerCategory(Long orgId);
 

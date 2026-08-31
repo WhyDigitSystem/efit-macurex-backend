@@ -446,7 +446,6 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		designationVO.setDesignation(designationDTO.getDesignation().toUpperCase());
 		designationVO.setDesignationCode(designationDTO.getDesignationCode().toUpperCase());
 		designationVO.setOrgId(designationDTO.getOrgId());
-		designationVO.setFinYear(designationDTO.getFinYear());
 		designationVO.setActive(designationDTO.isActive());
 		designationVO.setCancelRemarks(designationDTO.getCancelRemarks());
 	}
@@ -1168,7 +1167,6 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setEsiDispName(employeeMasterVO.getEsiDispName());
 		responseDTO.setVpfPercentage(employeeMasterVO.getVpfPercentage());
 		responseDTO.setDateOfConfirmation(employeeMasterVO.getDateOfConfirmation());
-		responseDTO.setInformationActive(employeeMasterVO.getInformationActive());
 		responseDTO.setTrainingStartDate(employeeMasterVO.getTrainingStartDate());
 		responseDTO.setTrainingEndDate(employeeMasterVO.getTrainingEndDate());
 		responseDTO.setNoticePeriod(employeeMasterVO.getNoticePeriod());
@@ -1183,9 +1181,9 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		responseDTO.setScreenName(employeeMasterVO.getScreenName());
 		responseDTO.setScreenCode(employeeMasterVO.getScreenCode());
 		responseDTO.setOrgId(employeeMasterVO.getOrgId());
-		responseDTO.setFinancialYear(employeeMasterVO.getFinancialYear());
 		responseDTO.setEmployeeName(employeeMasterVO.getEmployeeName());
 		responseDTO.setEmployeeId(employeeMasterVO.getEmployeeId());
+		responseDTO.setDateOfResignation(employeeMasterVO.getDateOfResignation());
 
 		responseDTO.setActive(employeeMasterVO.getActive());
 
@@ -1196,6 +1194,8 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 			EmployeeMasterVO employeeMasterVO) throws ApplicationException {
 
 		employeeMasterVO.setSurName(employeeMasterDTO.getSurName());
+		employeeMasterVO.setDateOfResignation(employeeMasterDTO.getDateOfResignation());
+
 		employeeMasterVO.setMiddleName(employeeMasterDTO.getMiddleName());
 		employeeMasterVO.setFatherHusbandName(employeeMasterDTO.getFatherHusbandName());
 		employeeMasterVO.setTitle(employeeMasterDTO.getTitle());
@@ -1319,7 +1319,6 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setEsiDispName(employeeMasterDTO.getEsiDispName());
 		employeeMasterVO.setVpfPercentage(employeeMasterDTO.getVpfPercentage());
 		employeeMasterVO.setDateOfConfirmation(employeeMasterDTO.getDateOfConfirmation());
-		employeeMasterVO.setInformationActive(employeeMasterDTO.getInformationActive());
 		employeeMasterVO.setTrainingStartDate(employeeMasterDTO.getTrainingStartDate());
 		employeeMasterVO.setTrainingEndDate(employeeMasterDTO.getTrainingEndDate());
 		employeeMasterVO.setNoticePeriod(employeeMasterDTO.getNoticePeriod());
@@ -1329,7 +1328,6 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 		employeeMasterVO.setCreatedBy(employeeMasterDTO.getCreatedBy());
 		employeeMasterVO.setCancelRemarks(employeeMasterDTO.getCancelRemarks());
 		employeeMasterVO.setOrgId(employeeMasterDTO.getOrgId());
-		employeeMasterVO.setFinancialYear(employeeMasterDTO.getFinancialYear());
 		employeeMasterVO.setActive(employeeMasterDTO.isActive());
 
 		employeeMasterVO

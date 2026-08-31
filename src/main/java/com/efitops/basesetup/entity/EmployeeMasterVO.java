@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
 
 import lombok.AllArgsConstructor;
@@ -134,10 +135,6 @@ public class EmployeeMasterVO {
 	@Column(name = "date_of_joining")
 	private LocalDate dateOfJoining;
 
-//	@ManyToOne
-//	@JoinColumn(name = "plant_id")
-//	private BranchVO plantId;
-
 	@ManyToOne
 	@JoinColumn(name = "department")
 	private DepartmentVO department;
@@ -183,12 +180,12 @@ public class EmployeeMasterVO {
 	@Column(name = "date_of_confirmation")
 	private LocalDate dateOfConfirmation;
 
-	@Column(name = "information_active")
-	private String informationActive;
-
 	@Column(name = "training_start_date")
 	private LocalDate trainingStartDate;
 
+	@Column(name = "date_of_resignation")
+	private LocalDate dateOfResignation;
+	
 	@Column(name = "training_end_date")
 	private LocalDate trainingEndDate;
 
@@ -215,7 +212,7 @@ public class EmployeeMasterVO {
 	@Column(name = "cancel")
 	private boolean cancel = false;
 
-	@Column(name = "updated_by")
+	@Column(name = "modified_by")
 	private String updatedBy;
 
 	@Column(name = "cancel_remarks")
@@ -225,13 +222,13 @@ public class EmployeeMasterVO {
 	private String screenName ="EMPLOYEE";
 
 	@Column(name = "screen_code")
-	private String screenCode= "EMP";
+	private String screenCode= "MAC";
 
 	@Column(name = "org_id")
 	private Long orgId;
 
-	@Column(name = "financial_year")
-	private String financialYear;
+//	@Column(name = "financial_year")
+//	private String financialYear;
 
 	@ManyToOne
 	@JoinColumn(name = "branch")
@@ -247,4 +244,7 @@ public class EmployeeMasterVO {
 	public String getCancel() {
 		return cancel ? "T" : "F";
 	}
+	
+	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
+
 }

@@ -174,7 +174,6 @@ public class ItemMasterDTO {
 
 	private Long orgId;
 
-	private String financialYear;
 
 	private Long itemTypeId;
 

@@ -120,7 +120,6 @@ public class EmployeeMasterDTO {
 
 	private LocalDate dateOfConfirmation;
 
-	private String informationActive;
 
 	private LocalDate trainingStartDate;
 
@@ -131,6 +130,9 @@ public class EmployeeMasterDTO {
 	private LocalDate currentSalaryPeriodStart;
 
 	private LocalDate currentSalaryPeriodEnd;
+	
+	private LocalDate dateOfResignation;
+
 
 	// Common Fields
 
@@ -146,7 +148,6 @@ public class EmployeeMasterDTO {
 
 	private Long orgId;
 
-	private String financialYear;
 
 	private Long branchId;
 	

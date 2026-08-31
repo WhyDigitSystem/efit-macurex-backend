@@ -118,7 +118,7 @@ public class CustomerResponseDTO {
 
 	    private String active;
 
-	    private String financialYear;
+	    private String financialYear;	
 	    
 	    private List<CustomerContactDetailsResponseDTO> customerContactDetails;
 	    

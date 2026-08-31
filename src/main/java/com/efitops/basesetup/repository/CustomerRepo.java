@@ -31,8 +31,7 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long>{
 	                                      @Param("branch") Long branch);
 	
 	//dropdown for mapping party to account
-	
-	@Query(value = "SELECT customer_id AS partyId, customer_name AS partyName " +
+	@Query(value = "SELECT customer_id, customer_code, customer_name " +
 	        "FROM customer_header " +
 	        "WHERE active = 1 " +
 	        "AND cancel = 0 " +
@@ -43,10 +42,11 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long>{
 	        "OR customer_category2 = ?1) " +
 	        "ORDER BY customer_name ASC",
 	        nativeQuery = true)
-	List<PartyProjection> getParty(Long category,
-	                                       Long orgId,
-	                                       Long branch);
-
+	Set<Object[]> getParty(
+	        Long category,
+	        Long orgId,
+	        Long branch);
+	
 @Query(value = "SELECT customer_id, customer_name " +
         "FROM customer_header " +
         "WHERE org_id = ?1 and branch=?2  " +

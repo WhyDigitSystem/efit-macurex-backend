@@ -209,7 +209,7 @@ public interface CommonMasterService {
 
 	GSTRateMasterResponseDTO getGSTRateMasterById(Long id) throws ApplicationException;
 
-	List<GSTRateMasterResponseDTO> getGSTRateByOrgId(Long orgId, Long branchId) throws ApplicationException;
+	List<GSTRateMasterResponseDTO> getGSTRateByOrgId(Long orgId) throws ApplicationException;
 
 	// serviceacc
 
@@ -249,7 +249,7 @@ public interface CommonMasterService {
 
 	// Unit Master
 
-	List<UnitMasterVO> getUnitMasterByOrgId(Long orgId, Long branch);
+	List<UnitMasterVO> getUnitMasterByOrgId(Long orgId);
 
 	Optional<UnitMasterVO> getUnitMasterById(Long id);
 
@@ -265,7 +265,7 @@ public interface CommonMasterService {
 
 	Map<String, Object> createUpdateGradeMaster(GradeMasterDTO gradeMasterDTO) throws ApplicationException;
 
-	List<GradeMasterVO> getGradeMasterByOrgId(Long orgId, Long branch);
+	List<GradeMasterVO> getGradeMasterByOrgId(Long orgId);
 
 	Optional<GradeMasterVO> getGradeMasterById(Long id);
 
@@ -303,7 +303,7 @@ public interface CommonMasterService {
 
 	// Holiday Master
 
-	Map<String, Object> updateCreateHolidayMaster(HolidayMasterDTO holidayMasterDTO) throws ApplicationException;
+	Map<String, Object> updateCreateHolidayMaster(List<HolidayMasterDTO> holidayMasterDTOList) throws ApplicationException;
 
 	HolidayMasterVO getHolidayMasterById(Long id);
 
@@ -351,7 +351,7 @@ public interface CommonMasterService {
 
 	Optional<SalesZoneMasterVO> getSalesZoneMasterById(Long id);
 
-	List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId, Long branch);
+	List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId);
 
 	UomConversionResponseDTO getUomConversionById(Long id) throws ApplicationException;
 
@@ -364,5 +364,9 @@ public interface CommonMasterService {
 
 	List<Map<String, Object>> getPendingDocumentTypeMapping(Long orgId, String branch, String branchCode,
 			String finYear, String finYearIdentifier);
+
+
+	Map<String, Object> uploadExcelforExchangeRate(MultipartFile file) throws Exception;
+
 
 }

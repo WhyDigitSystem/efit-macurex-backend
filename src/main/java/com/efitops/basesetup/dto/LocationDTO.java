@@ -32,6 +32,6 @@ public class LocationDTO {
 
 	private Long partyNameId;
 
-	private String financialYear;
+	private boolean active ;
 
 }

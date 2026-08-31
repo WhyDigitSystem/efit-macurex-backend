@@ -15,13 +15,10 @@ public interface GradeMasterRepo extends JpaRepository<GradeMasterVO, Long> {
 	        SELECT *
 	        FROM grademaster
 	        WHERE org_id = :orgId
-	          AND branch = :branch
 	          AND cancel = false
-	          AND active = true
 	        ORDER BY grade_code
 	        """, nativeQuery = true)
-	List<GradeMasterVO> findByOrgIdAndBranch(@Param("orgId") Long orgId,
-	                                         @Param("branch") Long branch);
+	List<GradeMasterVO> findByOrgIdAndBranch(@Param("orgId") Long orgId);
 
 	
 }

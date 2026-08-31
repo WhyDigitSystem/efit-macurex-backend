@@ -50,10 +50,6 @@ public class SupplierRateContractItemDetailsVO {
     private ItemMasterVO incomingItemCode;
 
 
-    @Column(name = "incoming_item_description")
-    private String incomingItemDescription;
-
-
     // Purchase Unit
 
     @ManyToOne

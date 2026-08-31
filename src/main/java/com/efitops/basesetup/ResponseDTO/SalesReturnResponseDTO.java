@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.CurrencyResponseDTO;
+import com.efitops.basesetup.dto.DailyExchangeRateDTO;
 import com.efitops.basesetup.dto.SalesReturnTaxDetailsDTO;
 
 import lombok.AllArgsConstructor;
@@ -42,11 +44,11 @@ public class SalesReturnResponseDTO {
 
     private LocalDate date;
 
-    private ListOfValuesDetailsResponseDTO returnType;
+    private String returnType;
 
     private String approvedByAccounts;
 
-    private String currency;
+    private CurrencyResponseDTO currency;
 
     private BigDecimal exchangeRate;
 

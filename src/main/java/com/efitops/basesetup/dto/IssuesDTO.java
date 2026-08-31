@@ -18,10 +18,12 @@ public class IssuesDTO {
 
     private Long branch;
 
-    private String docId;
-
-    private LocalDate docDate;
-
+//   private String docId;
+//
+//  private LocalDate docDate;
+  
+  private String financialYear;
+  
     private Long department;
 
     private String belongsTo;

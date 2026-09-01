@@ -116,9 +116,7 @@ public interface DevelopService {
 	Integer getPurchaseOrderAmendmentRevisionNo(String purchaseOrderNumber, Long orgId, Long branch)
 			throws ApplicationException;
 
-	Map<String, Object> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
-			throws ApplicationException;
-
+	
 	List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(Long customer, Long orgId, Long branch)
 			throws ApplicationException;
 
@@ -168,6 +166,13 @@ public interface DevelopService {
 	Map<String, Object> updateCreateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files) throws ApplicationException ;
 
 	String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear, String screenCode);
+
+	MachineMasterResponseDTO getMachineMasterById(Long id) throws ApplicationException;
+
+	List<MachineMasterResponseDTO> getMachineMasterByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
+			throws ApplicationException;
 	
 	
 	

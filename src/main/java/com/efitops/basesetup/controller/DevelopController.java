@@ -1011,47 +1011,67 @@ public class DevelopController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
-
 	@GetMapping("/getPurchaseOrderAmendmentItemCodeDropdown")
-
 	public ResponseEntity<ResponseDTO> getPurchaseOrderAmendmentItemCodeDropdown(
+	        @RequestParam String docId,
+	        @RequestParam Long branch,
+	        @RequestParam Long orgId) {
 
-			@RequestParam String docId,
+	    String methodName = "getPurchaseOrderAmendmentItemCodeDropdown()";
 
-			@RequestParam Long branch,
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-			@RequestParam Long orgId) {
+	    String errorMsg = null;
 
-		String methodName = "getPurchaseOrderAmendmentItemCodeDropdown()";
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
 
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+	    ResponseDTO responseDTO = null;
 
-		String errorMsg = null;
+	    List<Map<String, Object>> itemList = new ArrayList<>();
 
-		Map<String, Object> responseObjectsMap = new HashMap<>();
+	    try {
 
-		ResponseDTO responseDTO = null;
+	        itemList = developService
+	                .getPurchaseOrderAmendmentItemCodeDropdown(
+	                        docId, branch, orgId);
 
-		try {
+	    } catch (Exception e) {
 
-			responseObjectsMap = developService.getPurchaseOrderAmendmentItemCodeDropdown(docId, branch, orgId);
+	        errorMsg = e.getMessage();
 
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item Code retrieved successfully");
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg
+	        );
+	    }
 
-			responseDTO = createServiceResponse(responseObjectsMap);
+	    if (StringUtils.isBlank(errorMsg)) {
 
-		} catch (Exception e) {
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Item information retrieved successfully"
+	        );
 
-			errorMsg = e.getMessage();
+	        responseObjectsMap.put(
+	                "itemCodeDropdown",
+	                itemList
+	        );
 
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+	        responseDTO = createServiceResponse(responseObjectsMap);
 
-			responseDTO = createServiceResponseError(responseObjectsMap, "Item Code retrieval failed", errorMsg);
-		}
+	    } else {
 
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to retrieve Item information",
+	                errorMsg
+	        );
+	    }
 
-		return ResponseEntity.ok(responseDTO);
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
 	}
 
 	@GetMapping("/getCurrencyExchangeRateforPurchaseOrderAmendment")
@@ -1782,5 +1802,109 @@ public class DevelopController extends BaseController {
 		}
 
 		return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getMachineMasterById")
+	public ResponseEntity<ResponseDTO> getMachineMasterById(@RequestParam Long id) {
+
+	    String methodName = "getMachineMasterById()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        MachineMasterResponseDTO machineMasterResponseDTO =
+	                developService.getMachineMasterById(id);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Machine Master information retrieved successfully"
+	        );
+
+	        responseObjectsMap.put(
+	                "machineMasterVO",
+	                machineMasterResponseDTO
+	        );
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg
+	        );
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Machine Master information retrieval failed",
+	                errorMsg
+	        );
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getMachineMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getMachineMasterByOrgId(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getMachineMasterByOrgId()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<MachineMasterResponseDTO> machineMasterResponseDTO =
+	                developService.getMachineMasterByOrgId(orgId, branch);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Machine Master information retrieved successfully"
+	        );
+
+	        responseObjectsMap.put(
+	                "machineMasterResponseVO",
+	                machineMasterResponseDTO
+	        );
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e.getMessage()
+	        );
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Machine Master information retrieval failed",
+	                e.getMessage()
+	        );
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok(responseDTO);
 	}
 }

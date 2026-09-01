@@ -290,6 +290,10 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Value("${server.base-url}")
 	private String serverBaseUrl;
+	
+	 @Value("${machinemaster.upload.path}")
+	    private String machineMasterUploadPath;
+
 
 	@Autowired
 	PurchaseContractAmendmentAttachmentRepo purchaseContractAmendmentAttachmentRepo;
@@ -3095,39 +3099,34 @@ public class DevelopServiceImpl implements DevelopService {
 	// purchaseorderamendmentitemdropdown
 
 	@Override
-	public Map<String, Object> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
-			throws ApplicationException {
+	public List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(
+	        String docId, Long branch, Long orgId) throws ApplicationException {
 
-		List<Object[]> result = purchaseOrderAmendmentRepo.getPurchaseOrderAmendmentItemCodeDropdown(docId, branch,
-				orgId);
+	    List<Object[]> itemList =
+	            purchaseOrderAmendmentRepo.getPurchaseOrderAmendmentItemCodeDropdown(
+	                    docId, branch, orgId);
 
-		Map<String, Object> response = new HashMap<>();
+	    if (itemList.isEmpty()) {
 
-		response.put("itemCodeList", getItemCodeDetails(result));
+	        throw new ApplicationException("No Item Details Found");
+	    }
 
-		return response;
+	    List<Map<String, Object>> responseList = new ArrayList<>();
+
+	    for (Object[] obj : itemList) {
+
+	        Map<String, Object> map = new HashMap<>();
+
+	       
+	        map.put("itemCode", obj[0]);
+	        map.put("hsnSacCode", obj[1]);
+
+	        responseList.add(map);
+	    }
+
+	    return responseList;
 	}
-
-	private List<Map<String, Object>> getItemCodeDetails(List<Object[]> result) {
-
-		List<Map<String, Object>> itemCodeList = new ArrayList<>();
-
-		for (Object[] obj : result) {
-
-			Map<String, Object> itemCode = new HashMap<>();
-
-			itemCode.put("id", obj[0] != null ? ((Number) obj[0]).longValue() : null);
-
-			itemCode.put("itemCode", obj[1] != null ? obj[1].toString() : null);
-
-			itemCode.put("hsnSacCode", obj[2] != null ? obj[2].toString() : null);
-
-			itemCodeList.add(itemCode);
-		}
-
-		return itemCodeList;
-	}
-
+	
 	@Override
 	public List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(Long customer, Long orgId,
 			Long branch) throws ApplicationException {
@@ -4291,10 +4290,11 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files)
-			throws ApplicationException {
-	    MachineMasterVO machineMasterVO = new MachineMasterVO();
+	public Map<String, Object> updateCreateMachineMaster(
+	        MachineMasterDTO machineMasterDTO,
+	        MultipartFile[] files) throws ApplicationException {
 
+	    MachineMasterVO machineMasterVO;
 	    String message;
 
 	    // =========================================================
@@ -4308,20 +4308,28 @@ public class DevelopServiceImpl implements DevelopService {
 	                .orElseThrow(() ->
 	                        new ApplicationException("Invalid Machine Master"));
 
-	        machineMasterVO.setUpdatedBy(machineMasterDTO.getCreatedBy());
+	        // =====================================================
+	        // DELETE OLD ATTACHMENT FILES + DB RECORDS
+	        // =====================================================
+
+	        deleteOldMachineMasterAttachments(machineMasterVO);
+
+	        machineMasterVO.setUpdatedBy(machineMasterDTO.getUpdatedBy());
 
 	        message = "Machine Master Updated Successfully";
 
 	    } else {
 
+	        machineMasterVO = new MachineMasterVO();
+
 	        machineMasterVO.setCreatedBy(machineMasterDTO.getCreatedBy());
-	        machineMasterVO.setUpdatedBy(machineMasterDTO.getCreatedBy());
+	        machineMasterVO.setUpdatedBy(machineMasterDTO.getUpdatedBy());
 
 	        message = "Machine Master Created Successfully";
 	    }
 
 	    // =========================================================
-	    // MAP MASTER + CHILDREN
+	    // MAP MASTER + OTHER CHILDREN
 	    // =========================================================
 
 	    createUpdateMachineMasterVO(
@@ -4329,11 +4337,23 @@ public class DevelopServiceImpl implements DevelopService {
 	            machineMasterVO);
 
 	    // =========================================================
-	    // SAVE
+	    // SAVE MASTER
 	    // =========================================================
 
 	    MachineMasterVO savedVO =
 	            machineMasterRepo.save(machineMasterVO);
+
+	    // =========================================================
+	    // SAVE NEW UPLOADED FILES
+	    // =========================================================
+
+	    try {
+			List<MachineMasterAttachmentVO> attachments =
+			        saveAttachments(files, savedVO);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	    // =========================================================
 	    // RESPONSE
@@ -4342,14 +4362,231 @@ public class DevelopServiceImpl implements DevelopService {
 	    Map<String, Object> response = new HashMap<>();
 
 	    response.put("message", message);
+
 	    response.put(
 	            "machineMasterVO",
 	            machineMasterResponse(savedVO));
 
 	    return response;
 	}
+	
+	private void deleteOldMachineMasterAttachments(
+	        MachineMasterVO machineMasterVO) {
 
+	    List<MachineMasterAttachmentVO> oldAttachments =
+	            machineMasterAttachmentRepo
+	                    .findByMachineMasterVO(machineMasterVO);
 
+	    if (oldAttachments == null || oldAttachments.isEmpty()) {
+
+	        System.out.println("NO OLD ATTACHMENTS FOUND");
+
+	        return;
+	    }
+
+	    for (MachineMasterAttachmentVO attachment : oldAttachments) {
+
+	        try {
+
+	            String filePath = attachment.getFilePath();
+
+	            System.out.println(
+	                    "OLD FILE PATH = " + filePath);
+
+	            if (filePath != null
+	                    && !filePath.trim().isEmpty()) {
+
+	                Path path = Paths.get(filePath);
+
+	                if (Files.exists(path)) {
+
+	                    Files.delete(path);
+
+	                    System.out.println(
+	                            "OLD FILE DELETED = "
+	                                    + path);
+
+	                } else {
+
+	                    System.out.println(
+	                            "OLD FILE DOES NOT EXIST = "
+	                                    + path);
+	                }
+	            }
+
+	        } catch (Exception e) {
+
+	            System.out.println(
+	                    "ERROR DELETING FILE = "
+	                            + e.getMessage());
+	        }
+	    }
+
+	    // =====================================================
+	    // DELETE OLD ATTACHMENT RECORDS FROM DATABASE
+	    // =====================================================
+
+	    machineMasterAttachmentRepo
+	            .deleteByMachineMasterVO(machineMasterVO);
+
+	    System.out.println(
+	            "OLD ATTACHMENT RECORDS DELETED FROM DATABASE");
+
+	    // Clear Hibernate collection also
+	    if (machineMasterVO.getMachineMasterAttachmentVO() != null) {
+
+	        machineMasterVO
+	                .getMachineMasterAttachmentVO()
+	                .clear();
+	    }
+	}
+	
+	private List<MachineMasterAttachmentVO> saveAttachments(
+	        MultipartFile[] files,
+	        MachineMasterVO machineMasterVO) throws IOException {
+
+	    List<MachineMasterAttachmentVO> attachments =
+	            new ArrayList<>();
+
+	    if (files == null || files.length == 0) {
+
+	        System.out.println("NO FILES RECEIVED");
+
+	        return attachments;
+	    }
+
+	    Path uploadDir =
+	            Paths.get(machineMasterUploadPath);
+
+	    Files.createDirectories(uploadDir);
+
+	    System.out.println(
+	            "UPLOAD DIRECTORY = "
+	                    + uploadDir.toAbsolutePath());
+
+	    for (MultipartFile file : files) {
+
+	        if (file == null || file.isEmpty()) {
+
+	            System.out.println("FILE IS EMPTY");
+
+	            continue;
+	        }
+
+	        String originalFileName =
+	                file.getOriginalFilename();
+
+	        if (originalFileName == null
+	                || originalFileName.trim().isEmpty()) {
+
+	            continue;
+	        }
+
+	        String fileName =
+	                UUID.randomUUID()
+	                        + "_"
+	                        + Paths.get(originalFileName)
+	                                .getFileName()
+	                                .toString();
+
+	        Path targetPath =
+	                uploadDir.resolve(fileName);
+
+	        System.out.println(
+	                "======================================");
+
+	        System.out.println(
+	                "ORIGINAL FILE = "
+	                        + originalFileName);
+
+	        System.out.println(
+	                "FILE SIZE = "
+	                        + file.getSize());
+
+	        System.out.println(
+	                "TARGET PATH = "
+	                        + targetPath.toAbsolutePath());
+
+	        System.out.println(
+	                "======================================");
+
+	        // =====================================================
+	        // SAVE PHYSICAL FILE
+	        // =====================================================
+
+	        Files.copy(
+	                file.getInputStream(),
+	                targetPath,
+	                StandardCopyOption.REPLACE_EXISTING
+	        );
+
+	        System.out.println(
+	                "FILE EXISTS AFTER COPY = "
+	                        + Files.exists(targetPath));
+
+	        // =====================================================
+	        // CREATE ATTACHMENT
+	        // =====================================================
+
+	        MachineMasterAttachmentVO attachment =
+	                new MachineMasterAttachmentVO();
+
+	        attachment.setMachineMasterVO(machineMasterVO);
+
+	        attachment.setFileName(
+	                originalFileName);
+
+	        attachment.setFilePath(
+	                targetPath.toString());
+
+	        attachment.setFileSize(
+	                file.getSize());
+
+	        attachment.setContentType(
+	                file.getContentType());
+
+	        attachment.setName(
+	                originalFileName);
+
+	        attachment.setUploadOn(
+	                LocalDateTime.now());
+
+	        // =====================================================
+	        // ADD TO LIST
+	        // =====================================================
+
+	        attachments.add(attachment);
+
+	        // =====================================================
+	        // VERY IMPORTANT
+	        // ADD TO PARENT COLLECTION
+	        // =====================================================
+
+	        if (machineMasterVO.getMachineMasterAttachmentVO()
+	                == null) {
+
+	            machineMasterVO
+	                    .setMachineMasterAttachmentVO(
+	                            new ArrayList<>());
+	        }
+
+	        machineMasterVO
+	                .getMachineMasterAttachmentVO()
+	                .add(attachment);
+	    }
+
+	    // =========================================================
+	    // SAVE ATTACHMENTS
+	    // =========================================================
+
+	    if (!attachments.isEmpty()) {
+
+	        machineMasterAttachmentRepo
+	                .saveAll(attachments);
+	    }
+
+	    return attachments;
+	}
 private void createUpdateMachineMasterVO(
         MachineMasterDTO dto,
         MachineMasterVO vo) throws ApplicationException {
@@ -4805,48 +5042,48 @@ private void createUpdateMachineMasterVO(
     }
 
 
-    // =========================================================
-    // ATTACHMENTS
-    // =========================================================
-
-    vo.getMachineMasterAttachmentVO().clear();
-
-    if (dto.getMachineMasterAttachmentDTO() != null) {
-
-        for (MachineMasterAttachmentDTO attachmentDTO :
-                dto.getMachineMasterAttachmentDTO()) {
-
-            MachineMasterAttachmentVO attachmentVO =
-                    new MachineMasterAttachmentVO();
-
-            attachmentVO.setName(
-                    attachmentDTO.getName());
-
-            attachmentVO.setFileName(
-                    attachmentDTO.getFileName());
-
-            attachmentVO.setFilePath(
-                    attachmentDTO.getFilePath());
-
-            attachmentVO.setFileSize(
-                    attachmentDTO.getFileSize());
-
-            attachmentVO.setContentType(
-                    attachmentDTO.getContentType());
-
-            attachmentVO.setUploadOn(
-                    attachmentDTO.getUploadOn());
-
-            // -------------------------------------------------
-            // Parent
-            // -------------------------------------------------
-
-            attachmentVO.setMachineMasterVO(vo);
-
-            vo.getMachineMasterAttachmentVO()
-                    .add(attachmentVO);
-        }
-    }
+//    // =========================================================
+//    // ATTACHMENTS
+//    // =========================================================
+//
+//    vo.getMachineMasterAttachmentVO().clear();
+//
+//    if (dto.getMachineMasterAttachmentDTO() != null) {
+//
+//        for (MachineMasterAttachmentDTO attachmentDTO :
+//                dto.getMachineMasterAttachmentDTO()) {
+//
+//            MachineMasterAttachmentVO attachmentVO =
+//                    new MachineMasterAttachmentVO();
+//
+//            attachmentVO.setName(
+//                    attachmentDTO.getName());
+//
+//            attachmentVO.setFileName(
+//                    attachmentDTO.getFileName());
+//
+//            attachmentVO.setFilePath(
+//                    attachmentDTO.getFilePath());
+//
+//            attachmentVO.setFileSize(
+//                    attachmentDTO.getFileSize());
+//
+//            attachmentVO.setContentType(
+//                    attachmentDTO.getContentType());
+//
+//            attachmentVO.setUploadOn(
+//                    attachmentDTO.getUploadOn());
+//
+//            // -------------------------------------------------
+//            // Parent
+//            // -------------------------------------------------
+//
+//            attachmentVO.setMachineMasterVO(vo);
+//
+//            vo.getMachineMasterAttachmentVO()
+//                    .add(attachmentVO);
+//        }
+//    }
 }
         
     
@@ -5462,13 +5699,41 @@ private void createUpdateMachineMasterVO(
 
             return dto;
         }
-
-		
         
-    }
+        
+        @Override
+        public MachineMasterResponseDTO getMachineMasterById(Long id) throws ApplicationException {
 
+            if (ObjectUtils.isEmpty(id)) {
+                throw new ApplicationException("Invalid Id");
+            }
 
+            MachineMasterVO machineMasterVO = machineMasterRepo.findById(id)
+                    .orElseThrow(() -> new ApplicationException("Machine Master Not Found"));
 
+            return machineMasterResponse(machineMasterVO);
+        }
 
+        @Override
+        public List<MachineMasterResponseDTO> getMachineMasterByOrgId(Long orgId, Long branch)
+                throws ApplicationException {
 
-	
+            BranchVO branchVO = branchRepo.findById(branch)
+                    .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+            List<MachineMasterVO> machineMasterList =
+                    machineMasterRepo.findByOrgIdAndBranch(orgId, branchVO);
+
+            if (machineMasterList == null || machineMasterList.isEmpty()) {
+                throw new ApplicationException("No Machine Master Details Found");
+            }
+
+            List<MachineMasterResponseDTO> responseList = new ArrayList<>();
+
+            for (MachineMasterVO machineMasterVO : machineMasterList) {
+                responseList.add(machineMasterResponse(machineMasterVO));
+            }
+
+            return responseList;
+        }
+}

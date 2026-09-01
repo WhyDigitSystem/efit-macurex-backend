@@ -27,10 +27,10 @@ public class CustomerItemDetailsVO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator = "customeritemdetailsgen")
+            generator = "customer_item_detailsgen")
     @SequenceGenerator(
-            name = "customeritemdetailsgen",
-            sequenceName = "customeritemdetailsseq",
+            name = "customer_item_detailsgen",
+            sequenceName = "customer_item_detailsseq",
             initialValue = 1000000001,
             allocationSize = 1)
     @Column(name = "customer_item_details_id")

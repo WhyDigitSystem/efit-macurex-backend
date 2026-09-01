@@ -38,9 +38,6 @@ public class GSTRateMasterResponseDTO {
 
     private Long orgId;
 
-    private BranchResponseDTO branch;
-
-    private String financialYear;
 
     private String createdBy;
 

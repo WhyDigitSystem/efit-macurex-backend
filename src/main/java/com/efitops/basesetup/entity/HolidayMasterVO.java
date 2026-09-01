@@ -1,9 +1,7 @@
 package com.efitops.basesetup.entity;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -12,14 +10,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
-import com.efitops.basesetup.dto.HolidayMasterDetailsDTO;
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,11 +36,23 @@ public class HolidayMasterVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 	
-	@Column(name = "doc_id")
-	private String docId;
+	@Column(name = "holiday_date")
+	private LocalDate holidayDate;
 	
-	@Column(name = "date")
-	private LocalDate date;
+	@Column(name = "day")
+	private String day;
+	
+	@Column(name = "holiday_type")
+	private String holidayType;
+	
+	@Column(name = "remarks")
+	private String remarks;
+	
+	@Column(name = "compensatory")
+	private String compensatory;
+	
+	@Column(name = "compensatory_date")
+	private LocalDate compensatoryDate;
 	
 	@Column(name = "created_by")
 	private String createdBy;
@@ -66,12 +73,6 @@ public class HolidayMasterVO {
 	
 	@Column(name = "screen_Code")
 	private String screenCode="HM";
-	
-	@OneToMany(mappedBy = "holidayMasterVO",
-	           cascade = CascadeType.ALL,
-	           orphanRemoval = true)
-	@JsonManagedReference
-	private List<HolidayMasterDetailsVO> holidayMasterDetailsVO;
 	
 	
 	@JsonGetter("active")

@@ -1022,273 +1022,198 @@ public class PurchaseDeliverySchController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
 	@GetMapping("/getPhysicalStockReConcilationById")
 
-	public ResponseEntity<ResponseDTO> getPhysicalStockReConcilationById(
-	        @RequestParam Long id) {
+	public ResponseEntity<ResponseDTO> getPhysicalStockReConcilationById(@RequestParam Long id) {
 
-	    String methodName = "getPhysicalStockReConcilationById()";
+		String methodName = "getPhysicalStockReConcilationById()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    String errorMsg = null;
+		String errorMsg = null;
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO = null;
+		ResponseDTO responseDTO = null;
 
-	    PhysicalStockReConcilationResponseDTO response = null;
+		PhysicalStockReConcilationResponseDTO response = null;
 
-	    try {
+		try {
 
-	        response = purchaseDeliverySchService
-	                .getPhysicalStockReConcilationById(id);
+			response = purchaseDeliverySchService.getPhysicalStockReConcilationById(id);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
+			errorMsg = e.getMessage();
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-	    }
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
 
-	    if (StringUtils.isBlank(errorMsg)) {
+		if (StringUtils.isBlank(errorMsg)) {
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Physical Stock Reconciliation information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Physical Stock Reconciliation information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "physicalStockReConcilationVO",
-	                response);
+			responseObjectsMap.put("physicalStockReConcilationVO", response);
 
-	        responseDTO =
-	                createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } else {
+		} else {
 
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Failed to retrieve Physical Stock Reconciliation information",
-	                        errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Physical Stock Reconciliation information", errorMsg);
+		}
 
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
+
 	@GetMapping("/getPhysicalStockReConcilationByOrgId")
 
-	public ResponseEntity<ResponseDTO> getPhysicalStockReConcilationByOrgId(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getPhysicalStockReConcilationByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    String methodName = "getPhysicalStockReConcilationByOrgId()";
+		String methodName = "getPhysicalStockReConcilationByOrgId()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    String errorMsg = null;
+		String errorMsg = null;
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO = null;
+		ResponseDTO responseDTO = null;
 
-	    List<PhysicalStockReConcilationResponseDTO> responseList =
-	            new ArrayList<>();
+		List<PhysicalStockReConcilationResponseDTO> responseList = new ArrayList<>();
 
-	    try {
+		try {
 
-	        responseList =
-	                purchaseDeliverySchService
-	                        .getPhysicalStockReConcilationByOrgId(
-	                                orgId,
-	                                branch);
+			responseList = purchaseDeliverySchService.getPhysicalStockReConcilationByOrgId(orgId, branch);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
+			errorMsg = e.getMessage();
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-	    }
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
 
-	    if (StringUtils.isBlank(errorMsg)) {
+		if (StringUtils.isBlank(errorMsg)) {
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Physical Stock Reconciliation information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Physical Stock Reconciliation information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "physicalStockReConcilationVO",
-	                responseList);
+			responseObjectsMap.put("physicalStockReConcilationVO", responseList);
 
-	        responseDTO =
-	                createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } else {
+		} else {
 
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Failed to retrieve Physical Stock Reconciliation information",
-	                        errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Physical Stock Reconciliation information", errorMsg);
+		}
 
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
 //	location dropdown
-	
+
 	@GetMapping("/getLocationDropdownForPhysicalStockReConcilation")
 
-	public ResponseEntity<ResponseDTO> getLocationDropdownForPhysicalStockReConcilation(
-	        @RequestParam Long locationType,
-	        @RequestParam Long branch,
-	        @RequestParam Long orgId) {
+	public ResponseEntity<ResponseDTO> getLocationDropdownForPhysicalStockReConcilation(@RequestParam Long locationType,
+			@RequestParam Long branch, @RequestParam Long orgId) {
 
-	    String methodName =
-	            "getLocationDropdownForPhysicalStockReConcilation()";
+		String methodName = "getLocationDropdownForPhysicalStockReConcilation()";
 
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    String errorMsg = null;
+		String errorMsg = null;
 
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO = null;
+		ResponseDTO responseDTO = null;
 
-	    List<Map<String, Object>> locationList =
-	            new ArrayList<>();
+		List<Map<String, Object>> locationList = new ArrayList<>();
 
-	    try {
+		try {
 
-	        locationList =
-	        		purchaseDeliverySchService
-	                        .getLocationDropdownForPhysicalStockReConcilation(
-	                                locationType,
-	                                branch,
-	                                orgId);
+			locationList = purchaseDeliverySchService.getLocationDropdownForPhysicalStockReConcilation(locationType,
+					branch, orgId);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
+			errorMsg = e.getMessage();
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-	    }
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
 
-	    if (StringUtils.isBlank(errorMsg)) {
+		if (StringUtils.isBlank(errorMsg)) {
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Location information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Location information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "locationDropdown",
-	                locationList);
+			responseObjectsMap.put("locationDropdown", locationList);
 
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } else {
+		} else {
 
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Failed to retrieve Location information",
-	                        errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Location information",
+					errorMsg);
+		}
 
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
+
 //	docid for physical stock reconcilation
 	@GetMapping("/getPhysicalStockReConcilationDocId")
 
-	public ResponseEntity<ResponseDTO> getPhysicalStockReConcilationDocId(
-	        @RequestParam Long orgId,
-	        @RequestParam String financialYear) {
+	public ResponseEntity<ResponseDTO> getPhysicalStockReConcilationDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
 
-	    String methodName = "getPhysicalStockReConcilationDocId()";
+		String methodName = "getPhysicalStockReConcilationDocId()";
 
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    String errorMsg = null;
+		String errorMsg = null;
 
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO = null;
+		ResponseDTO responseDTO = null;
 
-	    String mapp = "";
+		String mapp = "";
 
-	    try {
+		try {
 
-	        mapp = purchaseDeliverySchService
-	                .getPhysicalStockReConcilationDocId(
-	                        orgId,
-	                        financialYear);
+			mapp = purchaseDeliverySchService.getPhysicalStockReConcilationDocId(orgId, financialYear);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
+			errorMsg = e.getMessage();
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-	    }
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
 
-	    if (StringUtils.isBlank(errorMsg)) {
+		if (StringUtils.isBlank(errorMsg)) {
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Physical Stock Reconciliation DocId information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Physical Stock Reconciliation DocId information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "reConcilationDocId",
-	                mapp);
+			responseObjectsMap.put("reConcilationDocId", mapp);
 
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } else {
+		} else {
 
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Failed to retrieve Physical Stock Reconciliation DocId",
-	                        errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Physical Stock Reconciliation DocId", errorMsg);
+		}
 
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
 }

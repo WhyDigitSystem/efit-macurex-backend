@@ -30,9 +30,6 @@ public class CustomerDTO {
 		private String esiNo;
 		private String tinNo;
 
-	    private String docId;
-	    private LocalDate docDate;
-
 	    private String salutation;
 	    private String customerType;
 	    private String accountName;
@@ -48,7 +45,8 @@ public class CustomerDTO {
 	    private Long zone;
 	    private String CustomerCode;
 	    private String groupName;
-	    
+		private String customerCompanyCode;
+
 		private Long primaryCurrency;
 
 	    private boolean registered;

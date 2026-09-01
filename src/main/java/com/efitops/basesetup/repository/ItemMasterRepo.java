@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.efitops.basesetup.entity.ItemMasterVO;
-import com.efitops.basesetup.entity.PurchaseOrderVO;
 
 @Repository
 public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
@@ -200,4 +199,28 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
 
         	@Query(value = "SELECT * FROM item WHERE item_type = ?1", nativeQuery = true)
 				Optional<ItemMasterVO> findByItemType(Long itemCategory);
-}
+
+        	 @Query(value = """
+        		        SELECT
+        		            im.item_code AS INO,
+        		            im.item_description AS Idesc,
+        		            im.item_id AS ID,
+        		            u.unitmaster_id AS unitmaster_id,
+        		            u.unit_id AS unitId,
+        		            u.description AS unitDescription
+        		        FROM item im
+        		        LEFT JOIN listofvaluesdetails a
+        		            ON im.item_type = a.listofvaluesdetails_id
+        		        LEFT JOIN unitmaster u
+        		            ON im.purchase_unit = u.unitmaster_id
+        		        WHERE im.cancel = 0
+        		          AND im.active = 1
+        		          AND im.org_id = :orgId
+        		          AND im.branch = :branch
+        		          AND UPPER(a.value_description) = 'SFG'
+        		          AND UPPER(im.manufactured_or_boughtout) = 'SUB CONTRACTED'
+        		        ORDER BY im.item_code
+        		        """, nativeQuery = true)
+        		    List<Object[]> getSupplierRateContractItemDropdown(
+        		            @Param("orgId") Long orgId,
+        		            @Param("branch") Long branch);}

@@ -46,7 +46,7 @@ public class UomConversionVO {
 	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "active")
-	private boolean active=true;
+	private boolean active;
 	@Column(name = "created_by")
 	private String createdBy;
 	@Column(name = "modified_by")
@@ -61,9 +61,9 @@ public class UomConversionVO {
 	private BranchVO branch;
 	
 	@Column(name = "screen_name")
-	private String screenName="UNITMASTER";
+	private String screenName="UOM CONVERSION";
 	@Column(name = "screen_code")
-	private String screenCode="UM";
+	private String screenCode="UOMC";
 	
 	@JsonGetter("active")
 	public String getActive() {

@@ -40,10 +40,6 @@ public class GSTRateMasterDTO {
 	    @NotNull(message = "Organization is required")
 	    private Long orgId;
 
-	    private Long branch;
-
-	    private String financialYear;
-
 	    private String createdBy;
 
 

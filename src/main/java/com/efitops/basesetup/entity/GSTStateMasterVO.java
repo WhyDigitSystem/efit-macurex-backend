@@ -49,13 +49,11 @@ public class GSTStateMasterVO {
 	private boolean cancel=false;
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
-	@ManyToOne
-	@JoinColumn(name = "branch")
-	private BranchVO branch;
+
 	@Column(name = "screen_name")
-	private String screenName="UNITMASTER";
+	private String screenName="GST STATE MASTER";
 	@Column(name = "screen_code")
-	private String screenCode="UM";
+	private String screenCode="GSTSM";
 	
 	@JsonGetter("active")
 	public String getActive() {

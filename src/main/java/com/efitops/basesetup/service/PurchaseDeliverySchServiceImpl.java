@@ -125,6 +125,8 @@ import com.efitops.basesetup.repository.PurchaseDeliveryScheduleDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleLineRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
+import com.efitops.basesetup.dto.BranchResponseDTO;
+
 
 @Service
 public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchService {
@@ -287,7 +289,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
 
 			EmployeeMasterVO branch = employeeRepo.findById(dto.getPreparedBy())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
 
 			purchaseDeliveryScheduleVO.setPreparedBy(branch);
 			;
@@ -3155,7 +3157,13 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		// Basic Mapping
 		// =========================
 
-		physicalStockReConcilationVO.setBranch(dto.getBranch());
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("branch  Not Found"));
+
+			physicalStockReConcilationVO.setBranch(branch);
+		}
 
 		physicalStockReConcilationVO.setDocDate(dto.getDocDate());
 

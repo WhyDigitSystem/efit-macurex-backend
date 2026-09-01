@@ -16,7 +16,7 @@ public class PhysicalStockReConcilationDTO {
 
 	private Long id;
 
-	private BranchVO branch;
+	private Long branch;
 
 	private Long locationType;
 

@@ -1,8 +1,14 @@
 package com.efitops.basesetup.service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +22,13 @@ import javax.validation.Valid;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +49,8 @@ import com.efitops.basesetup.ResponseDTO.MappingBranchResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MappingOfPartyToAccResponseDTO;
-import com.efitops.basesetup.ResponseDTO.RejectionInvoiceResponseDTO;
+import com.efitops.basesetup.common.CommonConstant;
+import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.BankDetailsDTO;
 import com.efitops.basesetup.dto.BranchDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
@@ -55,7 +69,6 @@ import com.efitops.basesetup.dto.GSTRateMasterDTO;
 import com.efitops.basesetup.dto.GSTStateMasterDTO;
 import com.efitops.basesetup.dto.GradeMasterDTO;
 import com.efitops.basesetup.dto.HolidayMasterDTO;
-import com.efitops.basesetup.dto.HolidayMasterDetailsDTO;
 import com.efitops.basesetup.dto.HsnDTO;
 import com.efitops.basesetup.dto.HsnResponseImageDTO;
 import com.efitops.basesetup.dto.LMEDTO;
@@ -100,7 +113,6 @@ import com.efitops.basesetup.entity.FinancialYearVO;
 import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.GradeMasterVO;
-import com.efitops.basesetup.entity.HolidayMasterDetailsVO;
 import com.efitops.basesetup.entity.HolidayMasterVO;
 import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.LMEVO;
@@ -110,7 +122,6 @@ import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.MappingDetailsVO;
 import com.efitops.basesetup.entity.MappingOfPartyToAccVO;
 import com.efitops.basesetup.entity.RegionVO;
-import com.efitops.basesetup.entity.RejectionInvoiceVO;
 import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
@@ -140,7 +151,6 @@ import com.efitops.basesetup.repository.FinancialYearRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.GradeMasterRepo;
 import com.efitops.basesetup.repository.GstRateMasterRepo;
-import com.efitops.basesetup.repository.HolidayMasterDetailsRepo;
 import com.efitops.basesetup.repository.HolidayMasterRepo;
 import com.efitops.basesetup.repository.HsnRepo;
 import com.efitops.basesetup.repository.LMERepo;
@@ -271,9 +281,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	@Autowired
 	HolidayMasterRepo holidayMasterRepo;
-
-	@Autowired
-	HolidayMasterDetailsRepo holidayMaterDetailsRepo;
 
 	@Autowired
 	MappingPartyToAccRepo mappingPartyToAccRepo;
@@ -1855,13 +1862,13 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 					.orElseThrow(() -> new ApplicationException("Invalid GST Rate Master"));
 
 			// Duplicate Check
-			if (!vo.getCategory().getId().equals(dto.getCategory())) {
-
-				if (gstRateMasterRepo.existsByCategoryIdAndOrgId(dto.getCategory(), dto.getOrgId())) {
-
-					throw new ApplicationException("GST Rate Master already exists.");
-				}
-			}
+//			if (!vo.getCategory().getId().equals(dto.getCategory())) {
+//
+//				if (gstRateMasterRepo.existsByCategoryIdAndOrgId(dto.getCategory(), dto.getOrgId())) {
+//
+//					throw new ApplicationException("GST Rate Master already exists.");
+//				}
+//			}
 
 			createUpdateGSTRateMasterVOByDTO(dto, vo);
 
@@ -1872,10 +1879,10 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		} else {
 
 			// Duplicate Check
-			if (gstRateMasterRepo.existsByCategoryIdAndOrgId(dto.getCategory(), dto.getOrgId())) {
-
-				throw new ApplicationException("GST Rate Master already exists.");
-			}
+//			if (gstRateMasterRepo.existsByCategoryIdAndOrgId(dto.getCategory(), dto.getOrgId())) {
+//
+//				throw new ApplicationException("GST Rate Master already exists.");
+//			}
 
 			createUpdateGSTRateMasterVOByDTO(dto, vo);
 
@@ -1919,14 +1926,14 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 			vo.setHsnSacCode(hsn);
 		}
 
-		// Branch
-		if (dto.getBranch() != null && dto.getBranch() != 0) {
-
-			BranchVO branch = branchRepo.findById(dto.getBranch())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-			vo.setBranch(branch);
-		}
+//		// Branch
+//		if (dto.getBranch() != null && dto.getBranch() != 0) {
+//
+//			BranchVO branch = branchRepo.findById(dto.getBranch())
+//					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+//
+//			vo.setBranch(branch);
+//		}
 
 		vo.setDescription(dto.getDescription());
 		vo.setWef(dto.getWef());
@@ -1937,7 +1944,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		vo.setCgst(dto.getCgst());
 		vo.setDuplicateCheck(dto.isDuplicateCheck());
 		vo.setOrgId(dto.getOrgId());
-		vo.setFinancialYear(dto.getFinancialYear());
 		vo.setCancelRemarks(dto.getCancelRemarks());
 		vo.setActive(dto.isActive());
 	}
@@ -1952,9 +1958,9 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	}
 
 	@Override
-	public List<GSTRateMasterResponseDTO> getGSTRateByOrgId(Long orgId, Long branchId) throws ApplicationException {
+	public List<GSTRateMasterResponseDTO> getGSTRateByOrgId(Long orgId) throws ApplicationException {
 
-		List<GSTRateMasterVO> voList = gstRateMasterRepo.getGSTRateByOrgId(orgId, branchId);
+		List<GSTRateMasterVO> voList = gstRateMasterRepo.getGSTRateByOrgId(orgId);
 
 		if (voList.isEmpty()) {
 			throw new ApplicationException("No GST Rate Master Details Found");
@@ -1985,10 +1991,10 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 					vo.getHsnSacCode().getDescription()));
 		}
 
-		if (vo.getBranch() != null) {
-			dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
-					vo.getBranch().getBranchName()));
-		}
+//		if (vo.getBranch() != null) {
+//			dto.setBranch(new BranchResponseDTO(vo.getBranch().getId(), vo.getBranch().getBranchCode(),
+//					vo.getBranch().getBranchName()));
+//		}
 
 		dto.setDescription(vo.getDescription());
 		dto.setWef(vo.getWef());
@@ -1999,7 +2005,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		dto.setCgst(vo.getCgst());
 		dto.setDuplicateCheck(vo.isDuplicateCheck());
 		dto.setOrgId(vo.getOrgId());
-		dto.setFinancialYear(vo.getFinancialYear());
 		dto.setCreatedBy(vo.getCreatedBy());
 		dto.setUpdatedBy(vo.getUpdatedBy());
 		dto.setCancelRemarks(vo.getCancelRemarks());
@@ -2095,6 +2100,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		responseDTO.setCreatedBy(serviceAccMasterVO.getCreatedBy());
 		responseDTO.setUpdatedBy(serviceAccMasterVO.getUpdatedBy());
+		responseDTO.setActive(serviceAccMasterVO.getActive());
 
 		responseDTO.setCancelRemarks(serviceAccMasterVO.getCancelRemarks());
 
@@ -2227,7 +2233,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		response.setConsiderMrp(locationVO.getConsiderMrp());
 		response.setCreatedBy(locationVO.getCreatedBy());
 		response.setCancelRemarks(locationVO.getCancelRemarks());
-		response.setFinancialYear(locationVO.getFinancialYear());
+		response.setActive(locationVO.getActive());
 
 		if (locationVO.getBranch() != null) {
 
@@ -2296,6 +2302,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		locationVO.setAddress(locationDTO.getAddress());
 		locationVO.setPhoneNo(locationDTO.getPhoneNo());
 		locationVO.setLocationName(locationDTO.getLocationName());
+		locationVO.setActive(locationDTO.isActive());
 
 		locationVO.setCancelRemarks(locationDTO.getCancelRemarks());
 		if (locationDTO.getBranchId() != null && locationDTO.getBranchId() != 0) {
@@ -2672,8 +2679,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	// Unit Master
 
 	@Override
-	public List<UnitMasterVO> getUnitMasterByOrgId(Long orgId, Long branch) {
-		return unitMasterRepo.findByOrgIdAndBranch(orgId, branch);
+	public List<UnitMasterVO> getUnitMasterByOrgId(Long orgId) {
+		return unitMasterRepo.findByOrgIdAndBranch(orgId);
 	}
 
 	@Override
@@ -2750,13 +2757,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		unitMasterVO.setCancelRemarks(unitMasterDTO.getCancelRemarks());
 		unitMasterVO.setDescription(unitMasterDTO.getDescription());
 
-		if (unitMasterDTO.getBranch() != null && unitMasterDTO.getBranch() != 0) {
-
-			BranchVO branch = branchRepo.findById(unitMasterDTO.getBranch())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-			unitMasterVO.setBranch(branch);
-		}
 	}
 	// Uom Conversion
 
@@ -3013,8 +3013,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	// Grade Master
 
 	@Override
-	public List<GradeMasterVO> getGradeMasterByOrgId(Long orgId, Long branch) {
-		return gradeMasterRepo.findByOrgIdAndBranch(orgId, branch);
+	public List<GradeMasterVO> getGradeMasterByOrgId(Long orgId) {
+		return gradeMasterRepo.findByOrgIdAndBranch(orgId);
 	}
 
 	@Override
@@ -3110,13 +3110,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		gradeMasterVO.setOrgId(gradeMasterDTO.getOrgId());
 		gradeMasterVO.setCancelRemarks(gradeMasterDTO.getCancelRemarks());
 
-		if (gradeMasterDTO.getBranch() != null && gradeMasterDTO.getBranch() != 0) {
-
-			BranchVO branch = branchRepo.findById(gradeMasterDTO.getBranch())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-			gradeMasterVO.setBranch(branch);
-		}
 	}
 
 	// GSTStateMaster
@@ -3220,13 +3213,13 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		gstStateMasterVO.setActive(gstStateMasterDTO.isActive());
 		gstStateMasterVO.setCancelRemarks(gstStateMasterDTO.getCancelRemarks());
 
-		if (gstStateMasterDTO.getBranch() != null && gstStateMasterDTO.getBranch() != 0) {
-
-			BranchVO branch = branchRepo.findById(gstStateMasterDTO.getBranch())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-			gstStateMasterVO.setBranch(branch);
-		}
+//		if (gstStateMasterDTO.getBranch() != null && gstStateMasterDTO.getBranch() != 0) {
+//
+//			BranchVO branch = branchRepo.findById(gstStateMasterDTO.getBranch())
+//					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+//
+//			gstStateMasterVO.setBranch(branch);
+//		}
 	}
 
 	// DocumentTypeMaster
@@ -3742,37 +3735,46 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateHolidayMaster(@Valid HolidayMasterDTO dto) throws ApplicationException {
+	public Map<String, Object> updateCreateHolidayMaster(List<HolidayMasterDTO> dtoList) throws ApplicationException {
 
-		HolidayMasterVO holidayMasterVO = new HolidayMasterVO();
-		String message;
+		List<HolidayMasterVO> holidayMasterVOList = new ArrayList<>();
+		String message = "";
 
-		if (ObjectUtils.isNotEmpty(dto.getId())) {
+		for (HolidayMasterDTO dto : dtoList) {
 
-			holidayMasterVO = holidayMasterRepo.findById(dto.getId())
-					.orElseThrow(() -> new ApplicationException("Holiday Master Not Found"));
+			HolidayMasterVO holidayMasterVO = new HolidayMasterVO();
 
-			holidayMasterVO.setUpdatedBy(dto.getCreatedBy());
+			if (ObjectUtils.isNotEmpty(dto.getId())) {
 
-			createUpdateholidayMasterVO(dto, holidayMasterVO);
+				holidayMasterVO = holidayMasterRepo.findById(dto.getId())
+						.orElseThrow(() -> new ApplicationException("Holiday Master Not Found"));
 
-			message = "Holiday MAster Updated Successfully";
+				holidayMasterVO.setUpdatedBy(dto.getCreatedBy());
 
-		} else {
+				createUpdateholidayMasterVO(dto, holidayMasterVO);
 
-			holidayMasterVO.setCreatedBy(dto.getCreatedBy());
-			holidayMasterVO.setUpdatedBy(dto.getCreatedBy());
+				message = "Holiday Master Updated Successfully";
 
-			createUpdateholidayMasterVO(dto, holidayMasterVO);
+			} else {
 
-			message = "List Of Values Created Successfully";
+				holidayMasterVO.setCreatedBy(dto.getCreatedBy());
+				holidayMasterVO.setUpdatedBy(dto.getCreatedBy());
+
+				createUpdateholidayMasterVO(dto, holidayMasterVO);
+
+				message = "Holiday Master Created Successfully";
+			}
+
+			holidayMasterVOList.add(holidayMasterVO);
 		}
 
-		holidayMasterVO = holidayMasterRepo.save(holidayMasterVO);
+		// Save all records in one operation
+		holidayMasterVOList = holidayMasterRepo.saveAll(holidayMasterVOList);
 
 		Map<String, Object> response = new HashMap<>();
+
 		response.put("message", message);
-		response.put("holidayMasterVO", holidayMasterVO);
+		response.put("holidayMasterVO", holidayMasterVOList);
 
 		return response;
 	}
@@ -3780,10 +3782,15 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	private void createUpdateholidayMasterVO(HolidayMasterDTO dto, HolidayMasterVO holidayMasterVO)
 			throws ApplicationException {
 
-		holidayMasterVO.setDate(dto.getDate());
 		holidayMasterVO.setOrgId(dto.getOrgId());
 		holidayMasterVO.setActive(dto.getActive());
 		holidayMasterVO.setCancelRemarks(dto.getCancelRemarks());
+		holidayMasterVO.setHolidayDate(dto.getHolidayDate());
+		holidayMasterVO.setDay(dto.getDay());
+		holidayMasterVO.setHolidayType(dto.getHolidayType());
+		holidayMasterVO.setRemarks(dto.getRemarks());
+		holidayMasterVO.setCompensatory(dto.getCompensatory());
+		holidayMasterVO.setCompensatoryDate(dto.getCompensatoryDate());
 
 		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
@@ -3792,33 +3799,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 			holidayMasterVO.setBranch(branch);
 		}
-
-		if (dto.getId() != null) {
-
-			List<HolidayMasterDetailsVO> oldDetails = holidayMaterDetailsRepo.findByHolidayMasterVO(holidayMasterVO);
-
-			holidayMaterDetailsRepo.deleteAll(oldDetails);
-		}
-
-		List<HolidayMasterDetailsVO> detailList = new ArrayList<>();
-
-		for (HolidayMasterDetailsDTO detailDTO : dto.getDetails()) {
-
-			HolidayMasterDetailsVO detailVO = new HolidayMasterDetailsVO();
-
-			detailVO.setHolidayDate(detailDTO.getHolidayDate());
-			detailVO.setDay(detailDTO.getDay());
-			detailVO.setHolidayType(detailDTO.getHolidayType());
-			detailVO.setRemarks(detailDTO.getRemarks());
-			detailVO.setCompensatory(detailDTO.getCompensatory());
-			detailVO.setCompensatoryDate(detailDTO.getCompensatoryDate());
-
-			detailVO.setHolidayMasterVO(holidayMasterVO);
-
-			detailList.add(detailVO);
-		}
-
-		holidayMasterVO.setHolidayMasterDetailsVO(detailList);
 	}
 
 	@Override
@@ -3879,7 +3859,6 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	private void createUpdatemappingOfPartyToAccVO(MappingOfPartyToAccDTO dto,
 			MappingOfPartyToAccVO mappingOfPartyToAccVO) throws ApplicationException {
 
-		mappingOfPartyToAccVO.setDocDate(dto.getDocDate());
 		mappingOfPartyToAccVO.setAsOnDate(dto.getAsOnDate());
 		mappingOfPartyToAccVO.setOrgId(dto.getOrgId());
 		mappingOfPartyToAccVO.setActive(dto.isActive());
@@ -3894,7 +3873,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		}
 		if (dto.getCategory() != null && dto.getCategory() != 0) {
 
-			ListOfValuesVO category = listOfValuesRepo.findById(dto.getCategory())
+			ListOfValuesDetailsVO category = listOfValuesDetailsRepo.findById(dto.getCategory())
 					.orElseThrow(() -> new ApplicationException("Category Not Found"));
 
 			mappingOfPartyToAccVO.setCategory(category);
@@ -3918,7 +3897,7 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				CustomerVO detailLov = customerRepo.findById(detailDTO.getPartyId())
 						.orElseThrow(() -> new RuntimeException("Party details Not Found"));
 
-				detailVO.setPartyId(detailLov);
+				detailVO.setCustomer(detailLov);
 			}
 			detailVO.setAccountName(detailDTO.getAccountName());
 
@@ -3935,8 +3914,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		MappingOfPartyToAccResponseDTO dto = new MappingOfPartyToAccResponseDTO();
 
 		dto.setId(vo.getId());
-		dto.setDocId(vo.getDocId());
-		dto.setDocDate(vo.getDocDate());
+//		dto.setDocId(vo.getDocId());
+//		dto.setDocDate(vo.getDocDate());
 		dto.setAsOnDate(vo.getAsOnDate());
 		dto.setOrgId(vo.getOrgId());
 		dto.setCreatedBy(vo.getCreatedBy());
@@ -3950,8 +3929,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		}
 
 		if (vo.getCategory() != null) {
-			dto.setCategory(new MappingCategoryResponseDTO(vo.getCategory().getId(), vo.getCategory().getListCode(),
-					vo.getCategory().getListDescription()));
+			dto.setCategory(new MappingCategoryResponseDTO(vo.getCategory().getId(), vo.getCategory().getValueCode(),
+					vo.getCategory().getValueDescription()));
 		}
 
 		List<MappingDetailsResponseDTO> details = new ArrayList<>();
@@ -3965,12 +3944,12 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 				detailDTO.setId(detailVO.getId());
 				detailDTO.setAccountName(detailVO.getAccountName());
 
-				if (detailVO.getPartyId() != null) {
+				if (detailVO.getCustomer() != null) {
 
 					PartyResponseDTO partyDTO = new PartyResponseDTO();
 
-					partyDTO.setId(detailVO.getPartyId().getId());
-					partyDTO.setPartyName(detailVO.getPartyId().getCustomerName());
+					partyDTO.setId(detailVO.getCustomer().getId());
+					partyDTO.setPartyName(detailVO.getCustomer().getCustomerName());
 
 					detailDTO.setParty(partyDTO);
 				}
@@ -4065,20 +4044,56 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	// Dropdown for Party Id
 	@Override
-	public Map<String, Object> getParty(Long category, Long orgId, Long branch) throws ApplicationException {
+	public Map<String, Object> getParty(Long category, Long orgId, Long branch)
+	        throws ApplicationException {
 
-		Map<String, Object> response = new HashMap<>();
+	    Map<String, Object> response = new HashMap<>();
 
-		List<PartyProjection> partyList = customerRepo.getParty(category, orgId, branch);
+	    Set<Object[]> result =
+	            customerRepo.getParty(category, orgId, branch);
 
-		if (partyList.isEmpty()) {
-			throw new ApplicationException("No Party Found");
-		}
+	    if (result.isEmpty()) {
+	        throw new ApplicationException("No Party Found");
+	    }
 
-		response.put("partyList", partyList);
+	    List<Map<String, Object>> partyList =
+	            getPartyDetails(result);
 
-		return response;
+	    response.put("partyList", partyList);
+
+	    return response;
 	}
+
+	private List<Map<String, Object>> getPartyDetails(Set<Object[]> result) {
+
+	    List<Map<String, Object>> details = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("partyId",
+	                fs[0] != null
+	                        ? Long.valueOf(fs[0].toString())
+	                        : null);
+
+	        part.put("customerCode",
+	                fs[1] != null
+	                        ? fs[1].toString()
+	                        : "");
+
+	        part.put("partyName",
+	                fs[2] != null
+	                        ? fs[2].toString()
+	                        : "");
+
+	        details.add(part);
+	    }
+
+	    return details;
+	}
+	
+
 
 	// Daily Exchange rate
 	@Override
@@ -4524,13 +4539,11 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 		SalesZoneMasterVO salesZoneMasterVO;
 
-		BranchVO branchVO = branchRepo.findById(salesZoneMasterDTO.getBranch()).orElseThrow(
-				() -> new ApplicationException("Branch not found with id : " + salesZoneMasterDTO.getBranch()));
-
+	
 		if (ObjectUtils.isEmpty(salesZoneMasterDTO.getId())) {
 
-			if (salesZoneMasterRepo.existsByOrgIdAndZoneIdAndBranch_Id(salesZoneMasterDTO.getOrgId(),
-					salesZoneMasterDTO.getZoneId(), salesZoneMasterDTO.getBranch())) {
+			if (salesZoneMasterRepo.existsByOrgIdAndZoneId(salesZoneMasterDTO.getOrgId(),
+					salesZoneMasterDTO.getZoneId())) {
 
 				throw new ApplicationException("Sales Zone already exists.");
 			}
@@ -4556,7 +4569,8 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		salesZoneMasterVO.setOrgId(salesZoneMasterDTO.getOrgId());
 		salesZoneMasterVO.setActive(salesZoneMasterDTO.isActive());
 		salesZoneMasterVO.setCancelRemarks(salesZoneMasterDTO.getCancelRemarks());
-		salesZoneMasterVO.setBranch(branchVO);
+		salesZoneMasterVO.setScreenName("SALES ZONE");
+		salesZoneMasterVO.setScreenCode("SZ");
 
 		salesZoneMasterRepo.save(salesZoneMasterVO);
 
@@ -4573,9 +4587,9 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	}
 
 	@Override
-	public List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId, Long branch) {
+	public List<SalesZoneMasterVO> getSalesZoneMasterByOrgId(Long orgId) {
 
-		return salesZoneMasterRepo.findByOrgIdAndBranch(orgId, branch);
+		return salesZoneMasterRepo.findByOrgId(orgId);
 	}
 
 	@Override
@@ -4605,6 +4619,631 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 		}
 
 		return doctypeMappingDetails;
+	}
+
+	// Exchange Rate upload
+
+	@Override
+	public Map<String, Object> uploadExcelforExchangeRate(MultipartFile file) throws Exception {
+
+		String methodName = "uploadExcelforExchangeRate()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<DailyExchangeRateVO> dailyExchangeRateList = new ArrayList<>();
+
+		List<String> errorList = new ArrayList<>();
+
+		try {
+
+			if (file == null || file.isEmpty()) {
+				throw new Exception("Please upload a valid Excel file");
+			}
+
+			String fileName = file.getOriginalFilename();
+
+			if (fileName == null || !(fileName.endsWith(".xlsx") || fileName.endsWith(".xls"))) {
+
+				throw new Exception("Only Excel files are allowed");
+			}
+
+			try (InputStream inputStream = file.getInputStream(); Workbook workbook = new XSSFWorkbook(inputStream)) {
+
+				Sheet sheet = workbook.getSheetAt(0);
+
+				Iterator<Row> rowIterator = sheet.iterator();
+
+				// Skip header
+				if (rowIterator.hasNext()) {
+					rowIterator.next();
+				}
+
+				int rowNumber = 1;
+
+				while (rowIterator.hasNext()) {
+
+					Row row = rowIterator.next();
+
+					rowNumber++;
+
+					if (isEmptyRow(row)) {
+						continue;
+					}
+
+					try {
+
+						Long branchId = getLongValue(row.getCell(0));
+
+						Long currencyId = getLongValue(row.getCell(1));
+
+						LocalDate effectiveFrom = getDateValue(row.getCell(2));
+
+						Double sellingExRate = getDoubleValue(row.getCell(3));
+
+						Double buyingExRate = getDoubleValue(row.getCell(4));
+
+						String month = getStringValue(row.getCell(5));
+
+						Long year = getLongValue(row.getCell(6));
+
+						Long orgId = getLongValue(row.getCell(7));
+
+						String createdBy = getStringValue(row.getCell(8));
+
+						boolean active = getBooleanValue(row.getCell(9));
+
+						String financialYear = getStringValue(row.getCell(10));
+
+						if (branchId == null) {
+							throw new Exception("Branch is required");
+						}
+
+						if (currencyId == null) {
+							throw new Exception("Currency is required");
+						}
+
+						if (effectiveFrom == null) {
+							throw new Exception("Effective From is required");
+						}
+
+						if (sellingExRate == null) {
+							throw new Exception("Selling Exchange Rate is required");
+						}
+
+						if (buyingExRate == null) {
+							throw new Exception("Buying Exchange Rate is required");
+						}
+
+						BranchVO branch = branchRepo.findById(branchId)
+								.orElseThrow(() -> new Exception("Branch not found : " + branchId));
+
+						CurrencyVO currency = currencyRepo.findById(currencyId)
+								.orElseThrow(() -> new Exception("Currency not found : " + currencyId));
+
+						DailyExchangeRateVO vo = new DailyExchangeRateVO();
+
+						vo.setBranch(branch);
+
+						vo.setCurrency(currency);
+
+						vo.setEffectiveFrom(effectiveFrom);
+
+						vo.setSellingExRate(sellingExRate);
+
+						vo.setBuyingExRate(buyingExRate);
+
+						vo.setMonth(month);
+
+						vo.setYear(year);
+
+						vo.setOrgId(orgId);
+
+						vo.setCreatedBy(createdBy);
+
+						vo.setActive(active);
+
+						vo.setCancel(false);
+
+						vo.setScreenCode("DER");
+
+						vo.setScreenName("dailyExchangeRate");
+
+						dailyExchangeRateList.add(vo);
+
+					} catch (Exception e) {
+
+						errorList.add("Row " + rowNumber + " : " + e.getMessage());
+					}
+				}
+			}
+
+			if (!dailyExchangeRateList.isEmpty()) {
+
+				dailyExchangeRateRepo.saveAll(dailyExchangeRateList);
+			}
+
+			responseObjectsMap.put("totalRows", dailyExchangeRateList.size() + errorList.size());
+
+			responseObjectsMap.put("successRows", dailyExchangeRateList.size());
+
+			responseObjectsMap.put("failedRows", errorList.size());
+
+			responseObjectsMap.put("errors", errorList);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			throw e;
+
+		} finally {
+
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		}
+
+		return responseObjectsMap;
+	}
+	
+	// ============================================================
+	// GET STRING VALUE
+	// ============================================================
+
+	private String getStringValue(Cell cell) {
+
+	    if (cell == null) {
+	        return null;
+	    }
+
+	    if (cell.getCellType() == CellType.STRING) {
+
+	        String value = cell.getStringCellValue();
+
+	        if (value != null) {
+	            value = value.trim();
+	        }
+
+	        return value;
+	    }
+
+	    if (cell.getCellType() == CellType.NUMERIC) {
+
+	        double value = cell.getNumericCellValue();
+
+	        // Avoid 1000000001.0
+	        if (value == Math.floor(value)) {
+	            return String.valueOf((long) value);
+	        }
+
+	        return String.valueOf(value);
+	    }
+
+	    if (cell.getCellType() == CellType.BOOLEAN) {
+
+	        return String.valueOf(
+	                cell.getBooleanCellValue());
+	    }
+
+	    if (cell.getCellType() == CellType.FORMULA) {
+
+	        return cell.getStringCellValue();
+	    }
+
+	    return null;
+	}
+
+
+	// ============================================================
+	// GET LONG VALUE
+	// ============================================================
+
+	private Long getLongValue(Cell cell) {
+
+	    if (cell == null) {
+	        return null;
+	    }
+
+	    if (cell.getCellType() == CellType.NUMERIC) {
+
+	        return (long) cell.getNumericCellValue();
+	    }
+
+	    if (cell.getCellType() == CellType.STRING) {
+
+	        String value =
+	                cell.getStringCellValue().trim();
+
+	        if (value.isEmpty()) {
+	            return null;
+	        }
+
+	        return Long.parseLong(value);
+	    }
+
+	    if (cell.getCellType() == CellType.FORMULA) {
+
+	        if (cell.getCachedFormulaResultType()
+	                == CellType.NUMERIC) {
+
+	            return (long) cell.getNumericCellValue();
+	        }
+
+	        if (cell.getCachedFormulaResultType()
+	                == CellType.STRING) {
+
+	            return Long.parseLong(
+	                    cell.getStringCellValue().trim());
+	        }
+	    }
+
+	    return null;
+	}
+
+
+	// ============================================================
+	// GET DOUBLE VALUE
+	// ============================================================
+
+	private Double getDoubleValue(Cell cell) {
+
+	    if (cell == null) {
+	        return null;
+	    }
+
+	    if (cell.getCellType() == CellType.NUMERIC) {
+
+	        return cell.getNumericCellValue();
+	    }
+
+	    if (cell.getCellType() == CellType.STRING) {
+
+	        String value =
+	                cell.getStringCellValue().trim();
+
+	        if (value.isEmpty()) {
+	            return null;
+	        }
+
+	        return Double.parseDouble(value);
+	    }
+
+	    if (cell.getCellType() == CellType.FORMULA) {
+
+	        if (cell.getCachedFormulaResultType()
+	                == CellType.NUMERIC) {
+
+	            return cell.getNumericCellValue();
+	        }
+	    }
+
+	    return null;
+	}
+
+
+	// ============================================================
+	// GET DATE VALUE
+	// ============================================================
+
+	private LocalDate getDateValue(Cell cell) {
+
+	    if (cell == null) {
+	        return null;
+	    }
+
+	    /*
+	     * Excel date cell
+	     */
+	    if (cell.getCellType() == CellType.NUMERIC
+	            && DateUtil.isCellDateFormatted(cell)) {
+
+	        return cell
+	                .getLocalDateTimeCellValue()
+	                .toLocalDate();
+	    }
+
+	    /*
+	     * Excel date stored as string
+	     *
+	     * Supported:
+	     * 29-08-2026
+	     * 29/08/2026
+	     * 2026-08-29
+	     */
+
+	    if (cell.getCellType() == CellType.STRING) {
+
+	        String value =
+	                cell.getStringCellValue().trim();
+
+	        if (value.isEmpty()) {
+	            return null;
+	        }
+
+	        DateTimeFormatter[] formatters = {
+
+	                DateTimeFormatter.ofPattern("dd-MM-yyyy"),
+
+	                DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+
+	                DateTimeFormatter.ofPattern("yyyy-MM-dd")
+	        };
+
+	        for (DateTimeFormatter formatter : formatters) {
+
+	            try {
+
+	                return LocalDate.parse(
+	                        value,
+	                        formatter);
+
+	            } catch (Exception ignored) {
+	            }
+	        }
+
+	        throw new IllegalArgumentException(
+	                "Invalid date format: " + value);
+	    }
+
+	    return null;
+	}
+
+
+	// ============================================================
+	// GET MONTH VALUE
+	// ============================================================
+
+	private Month getMonthValue(Cell cell) {
+
+	    if (cell == null) {
+	        return null;
+	    }
+
+	    /*
+	     * Excel numeric month
+	     *
+	     * 1  = JANUARY
+	     * 2  = FEBRUARY
+	     * ...
+	     * 12 = DECEMBER
+	     */
+
+	    if (cell.getCellType() == CellType.NUMERIC) {
+
+	        int monthNumber =
+	                (int) cell.getNumericCellValue();
+
+	        if (monthNumber >= 1
+	                && monthNumber <= 12) {
+
+	            return Month.of(monthNumber);
+	        }
+
+	        throw new IllegalArgumentException(
+	                "Invalid month number: "
+	                        + monthNumber);
+	    }
+
+	    /*
+	     * Excel string month
+	     *
+	     * JANUARY
+	     * January
+	     * january
+	     * JAN
+	     */
+
+	    if (cell.getCellType() == CellType.STRING) {
+
+	        String value =
+	                cell.getStringCellValue()
+	                        .trim()
+	                        .toUpperCase();
+
+	        if (value.isEmpty()) {
+	            return null;
+	        }
+
+	        // Full month name
+	        try {
+
+	            return Month.valueOf(value);
+
+	        } catch (Exception ignored) {
+	        }
+
+	        // Short month name
+	        for (Month month : Month.values()) {
+
+	            if (month.name()
+	                    .substring(0, 3)
+	                    .equals(value)) {
+
+	                return month;
+	            }
+	        }
+
+	        throw new IllegalArgumentException(
+	                "Invalid month: " + value);
+	    }
+
+	    return null;
+	}
+
+
+	// ============================================================
+	// GET YEAR VALUE
+	// ============================================================
+
+	private Year getYearValue(Cell cell) {
+
+	    if (cell == null) {
+	        return null;
+	    }
+
+	    if (cell.getCellType() == CellType.NUMERIC) {
+
+	        int year =
+	                (int) cell.getNumericCellValue();
+
+	        return Year.of(year);
+	    }
+
+	    if (cell.getCellType() == CellType.STRING) {
+
+	        String value =
+	                cell.getStringCellValue().trim();
+
+	        if (value.isEmpty()) {
+	            return null;
+	        }
+
+	        return Year.of(
+	                Integer.parseInt(value));
+	    }
+
+	    if (cell.getCellType() == CellType.FORMULA) {
+
+	        if (cell.getCachedFormulaResultType()
+	                == CellType.NUMERIC) {
+
+	            return Year.of(
+	                    (int) cell.getNumericCellValue());
+	        }
+
+	        if (cell.getCachedFormulaResultType()
+	                == CellType.STRING) {
+
+	            return Year.of(
+	                    Integer.parseInt(
+	                            cell.getStringCellValue()
+	                                    .trim()));
+	        }
+	    }
+
+	    return null;
+	}
+
+
+	// ============================================================
+	// GET BOOLEAN VALUE
+	// ============================================================
+
+	private boolean getBooleanValue(Cell cell) {
+
+	    if (cell == null) {
+	        return false;
+	    }
+
+	    if (cell.getCellType() == CellType.BOOLEAN) {
+
+	        return cell.getBooleanCellValue();
+	    }
+
+	    if (cell.getCellType() == CellType.STRING) {
+
+	        String value =
+	                cell.getStringCellValue()
+	                        .trim()
+	                        .toLowerCase();
+
+	        if (value.equals("true")
+	                || value.equals("yes")
+	                || value.equals("y")
+	                || value.equals("1")
+	                || value.equals("active")) {
+
+	            return true;
+	        }
+
+	        if (value.equals("false")
+	                || value.equals("no")
+	                || value.equals("n")
+	                || value.equals("0")
+	                || value.equals("inactive")
+	                || value.equals("in-active")) {
+
+	            return false;
+	        }
+	    }
+
+	    if (cell.getCellType() == CellType.NUMERIC) {
+
+	        return cell.getNumericCellValue() == 1;
+	    }
+
+	    if (cell.getCellType() == CellType.FORMULA) {
+
+	        if (cell.getCachedFormulaResultType()
+	                == CellType.BOOLEAN) {
+
+	            return cell.getBooleanCellValue();
+	        }
+
+	        if (cell.getCachedFormulaResultType()
+	                == CellType.NUMERIC) {
+
+	            return cell.getNumericCellValue() == 1;
+	        }
+
+	        if (cell.getCachedFormulaResultType()
+	                == CellType.STRING) {
+
+	            String value =
+	                    cell.getStringCellValue()
+	                            .trim()
+	                            .toLowerCase();
+
+	            return value.equals("true")
+	                    || value.equals("yes")
+	                    || value.equals("active")
+	                    || value.equals("1");
+	        }
+	    }
+
+	    return false;
+	}
+
+
+	// ============================================================
+	// CHECK EMPTY ROW
+	// ============================================================
+
+	private boolean isEmptyRow(Row row) {
+
+	    if (row == null) {
+	        return true;
+	    }
+
+	    for (int i = 0; i <= 10; i++) {
+
+	        Cell cell = row.getCell(i);
+
+	        if (cell == null) {
+	            continue;
+	        }
+
+	        if (cell.getCellType()
+	                == CellType.BLANK) {
+	            continue;
+	        }
+
+	        String value = null;
+
+	        try {
+	            value = getStringValue(cell);
+	        } catch (Exception e) {
+	            return false;
+	        }
+
+	        if (value != null
+	                && !value.trim().isEmpty()) {
+
+	            return false;
+	        }
+	    }
+
+	    return true;
 	}
 
 }

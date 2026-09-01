@@ -24,7 +24,7 @@ public interface UserBranchAccessRepo  extends JpaRepository<UserLoginBranchAcce
 		    WHERE u.orgid = ?1
 		      AND u.userid = ?2
 		    """, nativeQuery = true)
-	Set<Object[]> findGlobalParametersBranchByUserName(Long orgid, Long user);
+		Set<Object[]> findGlobalParametersBranchByUserName(Long orgid, Long user);
 
 	List<UserLoginBranchAccessibleVO> findByUserVO(UserVO userVO);
 

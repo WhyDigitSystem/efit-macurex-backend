@@ -22,7 +22,6 @@ public class GSTStateMasterDTO {
 	private String cancelRemarks;
     private String description;
 	private boolean active;
-	private Long branch;
 
 
 }

@@ -33,7 +33,7 @@ public class DesignationVO {
 //	@Column(name = "doc_id")
 //	private String docId;
 	
-    @Column(name = "designation", length = 30)
+    @Column(name = "designation")
     private String designation;
     
     @Column(name = "designation_code")
@@ -58,8 +58,8 @@ public class DesignationVO {
 //	@JoinColumn(name = "branch")
 //	private BranchVO branch;
 	
-    @Column(name = "financial_year", length = 5)
-    private String finYear;
+//    @Column(name = "financial_year", length = 5)
+//    private String finYear;
 	@Column(name = "screen_code",length = 10)
 	private String screenCode ="DSG";
 	@Column(name = "screen_name",length = 30)

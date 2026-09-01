@@ -66,6 +66,7 @@ import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.IssuesDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 import com.efitops.basesetup.dto.MachineHistoryDTO;
+import com.efitops.basesetup.dto.MachineMasterAttachmentDTO;
 import com.efitops.basesetup.dto.MachineMasterDTO;
 import com.efitops.basesetup.dto.MachineSpareDetailsDTO;
 import com.efitops.basesetup.dto.MachineTechnicalInfoDTO;
@@ -3153,6 +3154,23 @@ public class DevelopServiceImpl implements DevelopService {
 
 		return currencyDetails;
 	}
+	
+	//DOCID
+	
+	
+	@Override
+	public String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear, String screenCode) {
+
+	    String screenCode1 = "POA";
+
+	    String result = purchaseOrderAmendmentRepo
+	            .getPurchaseOrderAmendmentDocId(orgId, financialYear, screenCode1);
+
+	    return result;
+	}
+	
+	
+	
 
 	// openstockentry
 
@@ -4267,1101 +4285,1190 @@ public class DevelopServiceImpl implements DevelopService {
 		return responseList;
 	}
 
+
 	// machine/instrumentmaster
+
 
 	@Override
 	@Transactional
-	public Map<String, Object> createUpdateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files)
-			throws ApplicationException, IOException {
-
-		String screenCode = "MM";
-
-		MachineMasterVO machineMasterVO;
-		String message;
-
-		// ======================================================
-		// CREATE / UPDATE
-		// ======================================================
-
-		if (ObjectUtils.isNotEmpty(machineMasterDTO.getId())) {
-
-			machineMasterVO = machineMasterRepo.findById(machineMasterDTO.getId())
-					.orElseThrow(() -> new ApplicationException("Machine Master Not Found"));
-
-			machineMasterVO.setUpdatedBy(machineMasterDTO.getCreatedBy());
-
-			message = "Machine Master Updated Successfully";
-
-		} else {
-
-			machineMasterVO = new MachineMasterVO();
-
-			machineMasterVO.setCreatedBy(machineMasterDTO.getCreatedBy());
-
-			machineMasterVO.setUpdatedBy(machineMasterDTO.getCreatedBy());
-
-			message = "Machine Master Created Successfully";
-		}
-
-		// ======================================================
-		// HEADER + TECHNICAL + SPARE + HISTORY
-		// ======================================================
-
-		createUpdateMachineMasterVOByDTO(machineMasterDTO, machineMasterVO);
-
-		// ======================================================
-		// SAVE MASTER FIRST
-		// ======================================================
-
-		machineMasterVO = machineMasterRepo.save(machineMasterVO);
-
-		// ======================================================
-		// ATTACHMENTS
-		// ======================================================
-
-		if (files != null && files.length > 0) {
-
-			List<MachineMasterAttachmentVO> oldAttachments = machineMasterAttachmentRepo
-					.findByMachineMasterVO(machineMasterVO);
-
-			// --------------------------------------------------
-			// Delete old physical files
-			// --------------------------------------------------
-
-			for (MachineMasterAttachmentVO attachment : oldAttachments) {
-
-				if (attachment.getFilePath() != null) {
-
-					File oldFile = new File(attachment.getFilePath());
-
-					if (oldFile.exists()) {
-						oldFile.delete();
-					}
-				}
-			}
-
-			// --------------------------------------------------
-			// Delete old DB records
-			// --------------------------------------------------
-
-			machineMasterAttachmentRepo.deleteAll(oldAttachments);
-
-			// --------------------------------------------------
-			// Clear parent collection
-			// --------------------------------------------------
-
-			machineMasterVO.getMachineMasterAttachmentVO().clear();
-
-			// --------------------------------------------------
-			// Save new attachments
-			// --------------------------------------------------
-
-			saveAttachments(files, machineMasterVO);
-		}
-
-		// ======================================================
-		// FINAL SAVE
-		// ======================================================
-
-		machineMasterVO = machineMasterRepo.save(machineMasterVO);
-
-		// ======================================================
-		// RESPONSE
-		// ======================================================
-
-		Map<String, Object> responseMap = new HashMap<>();
-
-		responseMap.put("message", message);
-
-		responseMap.put("machineMasterVO", machineMasterVO);
-
-		return responseMap;
-	}
-
-	private void createUpdateMachineMasterVOByDTO(MachineMasterDTO dto, MachineMasterVO vo)
+	public Map<String, Object> updateCreateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files)
 			throws ApplicationException {
+	    MachineMasterVO machineMasterVO = new MachineMasterVO();
 
-		// ======================================================
-		// Header Mapping
-		// ======================================================
+	    String message;
 
-		vo.setMachineInstrumentNo(dto.getMachineInstrumentNo());
+	    // =========================================================
+	    // CREATE / UPDATE
+	    // =========================================================
 
-		vo.setMachineInstrumentName(dto.getMachineInstrumentName());
+	    if (ObjectUtils.isNotEmpty(machineMasterDTO.getId())) {
 
-		vo.setCalibrationRequired(dto.getCalibrationRequired());
+	        machineMasterVO = machineMasterRepo
+	                .findById(machineMasterDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Invalid Machine Master"));
 
-		vo.setProcessNo(dto.getProcessNo());
+	        machineMasterVO.setUpdatedBy(machineMasterDTO.getCreatedBy());
 
-		vo.setSection(dto.getSection());
+	        message = "Machine Master Updated Successfully";
 
-		vo.setModel(dto.getModel());
+	    } else {
 
-		vo.setSerialNo(dto.getSerialNo());
+	        machineMasterVO.setCreatedBy(machineMasterDTO.getCreatedBy());
+	        machineMasterVO.setUpdatedBy(machineMasterDTO.getCreatedBy());
 
-		vo.setStatus(dto.getStatus());
+	        message = "Machine Master Created Successfully";
+	    }
 
-		vo.setManufacturedBy(dto.getManufacturedBy());
+	    // =========================================================
+	    // MAP MASTER + CHILDREN
+	    // =========================================================
 
-		vo.setModeOfPurchase(dto.getModeOfPurchase());
+	    createUpdateMachineMasterVO(
+	            machineMasterDTO,
+	            machineMasterVO);
 
-		vo.setMachineInstrumentIncharge(dto.getMachineInstrumentIncharge());
+	    // =========================================================
+	    // SAVE
+	    // =========================================================
 
-		vo.setMachineInstrumentUsedFor(dto.getMachineInstrumentUsedFor());
+	    MachineMasterVO savedVO =
+	            machineMasterRepo.save(machineMasterVO);
 
-		vo.setPmChecklistNo(dto.getPmChecklistNo());
+	    // =========================================================
+	    // RESPONSE
+	    // =========================================================
 
-		vo.setRemarks(dto.getRemarks());
+	    Map<String, Object> response = new HashMap<>();
 
-		vo.setMake(dto.getMake());
+	    response.put("message", message);
+	    response.put(
+	            "machineMasterVO",
+	            machineMasterResponse(savedVO));
 
-		vo.setMachineInstrumentImageName(dto.getMachineInstrumentImageName());
-
-		vo.setMachineOrInstrument(dto.getMachineOrInstrument());
-
-		vo.setActive(dto.isActive());
-
-		vo.setOrgId(dto.getOrgId());
-
-		vo.setCreatedBy(dto.getCreatedBy());
-
-		vo.setUpdatedBy(dto.getUpdatedBy());
-
-		vo.setCancel(dto.isCancel());
-
-		vo.setCancelRemarks(dto.getCancelRemarks());
-
-		vo.setScreenName(dto.getScreenName());
-
-		vo.setScreenCode(dto.getScreenCode());
-
-		// ======================================================
-		// Branch
-		// ======================================================
-
-		if (dto.getBranch() != null && dto.getBranch() > 0) {
-
-			BranchVO branch = branchRepo.findById(dto.getBranch())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-			vo.setBranch(branch);
-		}
-
-		// ======================================================
-		// Department
-		// ======================================================
-
-		if (dto.getDepartment() != null && dto.getDepartment() > 0) {
-
-			DepartmentVO department = departmentRepo.findById(dto.getDepartment())
-					.orElseThrow(() -> new ApplicationException("Department Not Found"));
-
-			vo.setDepartment(department);
-		}
-
-		// ======================================================
-		// Type
-		// ======================================================
-
-		if (dto.getType() != null && dto.getType() > 0) {
-
-			ListOfValuesDetailsVO type = listOfValuesDetailsRepo.findById(dto.getType())
-					.orElseThrow(() -> new ApplicationException("Type Not Found"));
-
-			vo.setType(type);
-		}
-
-		// ======================================================
-		// Location
-		// ======================================================
-
-		if (dto.getLocation() != null && dto.getLocation() > 0) {
-
-			LocationVO location = locationRepo.findById(dto.getLocation())
-					.orElseThrow(() -> new ApplicationException("Location Not Found"));
-
-			vo.setLocation(location);
-		}
-
-		// ======================================================
-		// Machine Instrument Category
-		// ======================================================
-
-		if (dto.getMachineInstrumentCategory() != null && dto.getMachineInstrumentCategory() > 0) {
-
-			ListOfValuesDetailsVO category = listOfValuesDetailsRepo.findById(dto.getMachineInstrumentCategory())
-					.orElseThrow(() -> new ApplicationException("Machine Instrument Category Not Found"));
-
-			vo.setMachineInstrumentCategory(category);
-		}
-
-		// ======================================================
-		// Made In - Country
-		// ======================================================
-
-		if (dto.getMadeIn() != null && dto.getMadeIn() > 0) {
-
-			CountryVO country = countryRepo.findById(dto.getMadeIn())
-					.orElseThrow(() -> new ApplicationException("Country Not Found"));
-
-			vo.setMadeIn(country);
-		}
-
-		// ======================================================
-		// Purchased From - Customer
-		// ======================================================
-
-		if (dto.getPurchasedFrom() != null && dto.getPurchasedFrom() > 0) {
-
-			CustomerVO customer = customerRepo.findById(dto.getPurchasedFrom())
-					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
-
-			vo.setPurchasedFrom(customer);
-		}
-
-		// ======================================================
-		// Update - Delete Old Technical Info
-		// ======================================================
-
-		if (ObjectUtils.isNotEmpty(vo.getId())) {
-
-			List<MachineTechnicalInfoVO> technicalInfo = machineTechnicalInfoRepo.findByMachineMasterVO(vo);
-
-			machineTechnicalInfoRepo.deleteAll(technicalInfo);
-		}
-
-		// ======================================================
-		// Technical Info Mapping
-		// ======================================================
-
-		List<MachineTechnicalInfoVO> technicalInfoList = new ArrayList<>();
-
-		if (dto.getMachineTechnicalInfoDTO() != null) {
-
-			for (MachineTechnicalInfoDTO detailDTO : dto.getMachineTechnicalInfoDTO()) {
-
-				MachineTechnicalInfoVO detailVO = new MachineTechnicalInfoVO();
-
-				// ==================================================
-				// Basic Technical Information
-				// ==================================================
-
-				detailVO.setInstallationDate(detailDTO.getInstallationDate());
-
-				detailVO.setPowerConsumption(detailDTO.getPowerConsumption());
-
-				detailVO.setConsumption(detailDTO.getConsumption());
-
-				detailVO.setPowerProduced(detailDTO.getPowerProduced());
-
-				detailVO.setTechnicalSpecification(detailDTO.getTechnicalSpecification());
-
-				detailVO.setCapacity(detailDTO.getCapacity());
-
-				// ==================================================
-				// Unit - Item Master
-				// ==================================================
-
-				if (detailDTO.getUnit() != null && detailDTO.getUnit() > 0) {
-
-					ItemMasterVO item = itemMasterRepo.findById(detailDTO.getUnit())
-							.orElseThrow(() -> new ApplicationException("Unit Item Not Found"));
-
-					detailVO.setUnit(item);
-				}
-
-				// ==================================================
-				// Machine Dimensions / Electrical
-				// ==================================================
-
-				detailVO.setBedSizeMm(detailDTO.getBedSizeMm());
-
-				detailVO.setCurrentInAmps(detailDTO.getCurrentInAmps());
-
-				detailVO.setVoltage(detailDTO.getVoltage());
-
-				detailVO.setCushionTonnage(detailDTO.getCushionTonnage());
-
-				detailVO.setParallelity(detailDTO.getParallelity());
-
-				// ==================================================
-				// Machine Type - List Of Values
-				// ==================================================
-
-				if (detailDTO.getMachineType() != null && detailDTO.getMachineType() > 0) {
-
-					ListOfValuesDetailsVO machineType = listOfValuesDetailsRepo.findById(detailDTO.getMachineType())
-							.orElseThrow(() -> new ApplicationException("Machine Type Not Found"));
-
-					detailVO.setMachineType(machineType);
-				}
-
-				// ==================================================
-				// Rate / Weight
-				// ==================================================
-
-				detailVO.setHourlyRate(detailDTO.getHourlyRate());
-
-				detailVO.setMachineInstrumentWeight(detailDTO.getMachineInstrumentWeight());
-
-				// ==================================================
-				// UOM - Unit Master
-				// ==================================================
-
-				if (detailDTO.getUom() != null && detailDTO.getUom() > 0) {
-
-					UnitMasterVO uom = unitMasterRepo.findById(detailDTO.getUom())
-							.orElseThrow(() -> new ApplicationException("UOM Not Found"));
-
-					detailVO.setUom(uom);
-				}
-
-				// ==================================================
-				// Warranty / Calibration
-				// ==================================================
-
-				detailVO.setWarrantyStartDate(detailDTO.getWarrantyStartDate());
-
-				detailVO.setWarrantyEndDate(detailDTO.getWarrantyEndDate());
-
-				detailVO.setLastCalibratedDate(detailDTO.getLastCalibratedDate());
-
-				detailVO.setNextDueDate(detailDTO.getNextDueDate());
-
-				detailVO.setLifeCycleYear(detailDTO.getLifeCycleYear());
-
-				detailVO.setRange(detailDTO.getRange());
-
-				detailVO.setErrorAllowed(detailDTO.getErrorAllowed());
-
-				detailVO.setFrequencyOfCalibration(detailDTO.getFrequencyOfCalibration());
-
-				detailVO.setInstrumentCost(detailDTO.getInstrumentCost());
-
-				detailVO.setCalibrationCost(detailDTO.getCalibrationCost());
-
-				detailVO.setCalibrationAgency(detailDTO.getCalibrationAgency());
-
-				detailVO.setCertificateNo(detailDTO.getCertificateNo());
-
-				// ==================================================
-				// Machine Measurements
-				// ==================================================
-
-				detailVO.setShutHeightMm(detailDTO.getShutHeightMm());
-
-				detailVO.setStrokeMm(detailDTO.getStrokeMm());
-
-				detailVO.setCushion(detailDTO.getCushion());
-
-				detailVO.setHp(detailDTO.getHp());
-
-				detailVO.setHcNo(detailDTO.getHcNo());
-
-				detailVO.setRangeSize(detailDTO.getRangeSize());
-
-				detailVO.setLeastcount(detailDTO.getLeastcount());
-
-				detailVO.setGoSize(detailDTO.getGoSize());
-
-				detailVO.setNoGoSize(detailDTO.getNoGoSize());
-
-				detailVO.setRamSize(detailDTO.getRamSize());
-
-				detailVO.setThroatDepth(detailDTO.getThroatDepth());
-
-				detailVO.setThroatGap(detailDTO.getThroatGap());
-
-				detailVO.setMaintenanceDate(detailDTO.getMaintenanceDate());
-
-				// ==================================================
-				// Parent Machine
-				// ==================================================
-
-				detailVO.setMachineMasterVO(vo);
-
-				technicalInfoList.add(detailVO);
-			}
-		}
-
-		// ======================================================
-		// Set Technical Info to Machine Master
-		// ======================================================
-
-		vo.setMachineTechnicalInfoVO(technicalInfoList);
-
-		// ======================================================
-		// Update - Delete Old Spare Details
-		// ======================================================
-
-		if (ObjectUtils.isNotEmpty(vo.getId())) {
-
-			List<MachineSpareDetailsVO> spareDetails = machineSpareDetailsRepo.findByMachineMasterVO(vo);
-
-			machineSpareDetailsRepo.deleteAll(spareDetails);
-		}
-
-		// ======================================================
-		// Spare Details Mapping
-		// ======================================================
-
-		List<MachineSpareDetailsVO> spareDetailsList = new ArrayList<>();
-
-		if (dto.getMachineSpareDetailsDTO() != null) {
-
-			for (MachineSpareDetailsDTO spareDTO : dto.getMachineSpareDetailsDTO()) {
-
-				MachineSpareDetailsVO spareVO = new MachineSpareDetailsVO();
-
-				// ==================================================
-				// Spare ID - Item Master
-				// ==================================================
-
-				if (spareDTO.getSpareId() != null && spareDTO.getSpareId() > 0) {
-
-					ItemMasterVO item = itemMasterRepo.findById(spareDTO.getSpareId())
-							.orElseThrow(() -> new ApplicationException("Spare Item Not Found"));
-
-					spareVO.setSpareId(item);
-
-					// Description from Item Master
-					spareVO.setSpareDescription(item.getItemDescription());
-
-					// Unit from Item Master
-					if (item.getPrimaryUnit() != null) {
-
-						spareVO.setUnit(item.getPrimaryUnit());
-					}
-				}
-
-				// ==================================================
-				// Spare Details Fields
-				// ==================================================
-
-				spareVO.setQuantity(spareDTO.getQuantity());
-
-				spareVO.setCritical(spareDTO.isCritical());
-
-				spareVO.setModelNo(spareDTO.getModelNo());
-
-				spareVO.setSerialNo(spareDTO.getSerialNo());
-
-				spareVO.setManufacturer(spareDTO.getManufacturer());
-
-				spareVO.setWarrantyTillDate(spareDTO.getWarrantyTillDate());
-
-				spareVO.setCalibrationRequired(spareDTO.getCalibrationRequired());
-
-				spareVO.setLastCalibratedDate(spareDTO.getLastCalibratedDate());
-
-				// ==================================================
-				// Parent Machine
-				// ==================================================
-
-				spareVO.setMachineMasterVO(vo);
-
-				spareDetailsList.add(spareVO);
-			}
-		}
-
-		// ======================================================
-		// Set Spare Details to Machine Master
-		// ======================================================
-
-		vo.setMachineSpareDetailsVO(spareDetailsList);
-		// ======================================================
-		// Update - Delete Old History Details
-		// ======================================================
-
-		if (ObjectUtils.isNotEmpty(vo.getId())) {
-
-			List<MachineHistoryVO> oldHistoryList = machineHistoryRepo.findByMachineMasterVO(vo);
-
-			machineHistoryRepo.deleteAll(oldHistoryList);
-		}
-
-		// ======================================================
-		// History Details Mapping
-		// ======================================================
-
-		List<MachineHistoryVO> historyList = new ArrayList<>();
-
-		if (dto.getMachineHistoryDTO() != null) {
-
-			for (MachineHistoryDTO historyDTO : dto.getMachineHistoryDTO()) {
-
-				MachineHistoryVO historyVO = new MachineHistoryVO();
-
-				// --------------------------------------------------
-				// History ID
-				// --------------------------------------------------
-
-				historyVO.setId(historyDTO.getId());
-
-				// --------------------------------------------------
-				// History Fields
-				// --------------------------------------------------
-
-				historyVO.setDate(historyDTO.getDate());
-
-				historyVO.setDescription(historyDTO.getDescription());
-
-				historyVO.setChangedDate(historyDTO.getChangedDate());
-
-				historyVO.setCost(historyDTO.getCost());
-
-				historyVO.setPurpose(historyDTO.getPurpose());
-
-				historyVO.setRemarks(historyDTO.getRemarks());
-
-				// --------------------------------------------------
-				// Parent Machine Master
-				// --------------------------------------------------
-
-				historyVO.setMachineMasterVO(vo);
-
-				historyList.add(historyVO);
-			}
-
-			// IMPORTANT
-			vo.setMachineHistoryVO(historyList);
-		}
+	    return response;
 	}
 
-	@Value("${machinemaster.upload.path}")
-	private String machinemasterUploadPath;
 
-	private void saveAttachments(MultipartFile[] files, MachineMasterVO machineMasterVO) throws IOException {
+private void createUpdateMachineMasterVO(
+        MachineMasterDTO dto,
+        MachineMasterVO vo) throws ApplicationException {
 
-		if (files == null || files.length == 0) {
-			return;
-		}
+    // =========================================================
+    // MASTER MAPPING
+    // =========================================================
 
-		String uploadDirectory = machinemasterUploadPath;
+    if (dto.getBranch() != null) {
 
-		File directory = new File(uploadDirectory);
+        BranchVO branch = branchRepo.findById(dto.getBranch())
+                .orElseThrow(() ->
+                        new ApplicationException("Branch Not Found"));
 
-		if (!directory.exists()) {
-			directory.mkdirs();
-		}
+        vo.setBranch(branch);
+    }
 
-		for (MultipartFile file : files) {
+    if (dto.getDepartment() != null) {
 
-			if (file == null || file.isEmpty()) {
-				continue;
-			}
+        DepartmentVO department =
+                departmentRepo.findById(dto.getDepartment())
+                .orElseThrow(() ->
+                        new ApplicationException("Department Not Found"));
 
-			String originalFileName = file.getOriginalFilename();
+        vo.setDepartment(department);
+    }
 
-			if (originalFileName == null || originalFileName.trim().isEmpty()) {
-				continue;
-			}
+    if (dto.getType() != null) {
 
-			String cleanFileName = originalFileName.replace("\\", "/");
+        ListOfValuesDetailsVO type =
+                listOfValuesDetailsRepo.findById(dto.getType())
+                .orElseThrow(() ->
+                        new ApplicationException("Type Not Found"));
 
-			cleanFileName = cleanFileName.substring(cleanFileName.lastIndexOf("/") + 1);
+        vo.setType(type);
+    }
 
-			String uniqueFileName = UUID.randomUUID().toString() + "_" + cleanFileName;
+    if (dto.getLocation() != null) {
 
-			File destination = new File(directory, uniqueFileName);
+        LocationVO location =
+                locationRepo.findById(dto.getLocation())
+                .orElseThrow(() ->
+                        new ApplicationException("Location Not Found"));
 
-			file.transferTo(destination);
+        vo.setLocation(location);
+    }
 
-			MachineMasterAttachmentVO attachmentVO = new MachineMasterAttachmentVO();
+    if (dto.getMachineInstrumentCategory() != null) {
 
-			attachmentVO.setName(cleanFileName);
-			attachmentVO.setFileName(uniqueFileName);
-			attachmentVO.setFilePath(destination.getAbsolutePath());
-			attachmentVO.setFileSize(file.getSize());
-			attachmentVO.setContentType(file.getContentType());
-			attachmentVO.setUploadOn(LocalDateTime.now());
+        ListOfValuesDetailsVO category =
+                listOfValuesDetailsRepo
+                        .findById(dto.getMachineInstrumentCategory())
+                        .orElseThrow(() ->
+                                new ApplicationException(
+                                        "Machine Instrument Category Not Found"));
 
-			// VERY IMPORTANT
-			attachmentVO.setMachineMasterVO(machineMasterVO);
+        vo.setMachineInstrumentCategory(category);
+    }
 
-			machineMasterAttachmentRepo.save(attachmentVO);
+    if (dto.getMadeIn() != null) {
 
-			// Also keep parent collection updated
-			machineMasterVO.getMachineMasterAttachmentVO().add(attachmentVO);
-		}
-	}
+        CountryVO country =
+                countryRepo.findById(dto.getMadeIn())
+                .orElseThrow(() ->
+                        new ApplicationException("Country Not Found"));
 
-	private MachineMasterResponseDTO buildMachineMasterResponse(MachineMasterVO vo) {
+        vo.setMadeIn(country);
+    }
 
-		MachineMasterResponseDTO dto = new MachineMasterResponseDTO();
+    if (dto.getPurchasedFrom() != null) {
 
-		// ======================================================
-		// Header Mapping
-		// ======================================================
+        CustomerVO customer =
+                customerRepo.findById(dto.getPurchasedFrom())
+                .orElseThrow(() ->
+                        new ApplicationException(
+                                "Purchased From Customer Not Found"));
 
-		dto.setId(vo.getId());
+        vo.setPurchasedFrom(customer);
+    }
 
-		dto.setMachineInstrumentNo(vo.getMachineInstrumentNo());
+    // =========================================================
+    // SIMPLE MASTER FIELDS
+    // =========================================================
 
-		dto.setMachineInstrumentName(vo.getMachineInstrumentName());
+    vo.setMachineInstrumentNo(dto.getMachineInstrumentNo());
 
-		dto.setCalibrationRequired(vo.getCalibrationRequired());
+    vo.setMachineInstrumentName(
+            dto.getMachineInstrumentName());
 
-		dto.setProcessNo(vo.getProcessNo());
+    vo.setCalibrationRequired(
+            dto.getCalibrationRequired());
 
-		dto.setSection(vo.getSection());
+    vo.setProcessNo(dto.getProcessNo());
 
-		dto.setModel(vo.getModel());
+    vo.setSection(dto.getSection());
 
-		dto.setSerialNo(vo.getSerialNo());
+    vo.setModel(dto.getModel());
 
-		dto.setStatus(vo.getStatus());
+    vo.setSerialNo(dto.getSerialNo());
 
-		dto.setManufacturedBy(vo.getManufacturedBy());
+    vo.setStatus(dto.getStatus());
 
-		dto.setModeOfPurchase(vo.getModeOfPurchase());
+    vo.setManufacturedBy(dto.getManufacturedBy());
 
-		dto.setMachineInstrumentIncharge(vo.getMachineInstrumentIncharge());
+    vo.setModeOfPurchase(dto.getModeOfPurchase());
 
-		dto.setMachineInstrumentUsedFor(vo.getMachineInstrumentUsedFor());
+    vo.setMachineInstrumentIncharge(
+            dto.getMachineInstrumentIncharge());
 
-		dto.setPmChecklistNo(vo.getPmChecklistNo());
+    vo.setMachineInstrumentUsedFor(
+            dto.getMachineInstrumentUsedFor());
 
-		dto.setRemarks(vo.getRemarks());
+    vo.setPmChecklistNo(dto.getPmChecklistNo());
 
-		dto.setMake(vo.getMake());
+    vo.setRemarks(dto.getRemarks());
 
-		dto.setOrgId(vo.getOrgId());
+    vo.setMake(dto.getMake());
 
-		dto.setCreatedBy(vo.getCreatedBy());
+    vo.setMachineInstrumentImageName(
+            dto.getMachineInstrumentImageName());
 
-		dto.setCancelRemarks(vo.getCancelRemarks());
+    vo.setMachineOrInstrument(
+            dto.getMachineOrInstrument());
 
-		dto.setActive(vo.isActive());
+    vo.setActive(dto.isActive());
 
-		dto.setCancel(vo.isCancel());
+    vo.setOrgId(dto.getOrgId());
 
-		// ======================================================
-		// Branch
-		// ======================================================
+    vo.setCancel(dto.isCancel());
 
-		if (vo.getBranch() != null) {
+    vo.setCancelRemarks(dto.getCancelRemarks());
 
-			BranchResponseDTO branchDTO = new BranchResponseDTO();
+    vo.setScreenName(dto.getScreenName());
 
-			branchDTO.setId(vo.getBranch().getId());
+    vo.setScreenCode(dto.getScreenCode());
 
-			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
 
-			branchDTO.setBranchName(vo.getBranch().getBranchName());
+    // =========================================================
+    // TECHNICAL INFORMATION
+    // =========================================================
 
-			dto.setBranch(branchDTO);
-		}
+    vo.getMachineTechnicalInfoVO().clear();
 
-		// ======================================================
-		// Department
-		// ======================================================
+    if (dto.getMachineTechnicalInfoDTO() != null) {
 
-		if (vo.getDepartment() != null) {
+        for (MachineTechnicalInfoDTO detailDTO :
+                dto.getMachineTechnicalInfoDTO()) {
 
-			DepartmentResponseDTO departmentDTO = new DepartmentResponseDTO();
+            MachineTechnicalInfoVO detailVO =
+                    new MachineTechnicalInfoVO();
 
-			departmentDTO.setId(vo.getDepartment().getId());
+            // -------------------------------------------------
+            // Item Master - Unit
+            // -------------------------------------------------
 
-			departmentDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+            if (detailDTO.getUnit() != null) {
 
-			departmentDTO.setDepartmentName(vo.getDepartment().getDepartmentName());
+                ItemMasterVO unit =
+                        itemMasterRepo.findById(detailDTO.getUnit())
+                        .orElseThrow(() ->
+                                new ApplicationException(
+                                        "Technical Unit Not Found"));
 
-			dto.setDepartment(departmentDTO);
-		}
+                detailVO.setUnit(unit);
+            }
 
-		// ======================================================
-		// Type - List Of Values
-		// ======================================================
+            // -------------------------------------------------
+            // Machine Type
+            // -------------------------------------------------
 
-		if (vo.getType() != null) {
+            if (detailDTO.getMachineType() != null) {
 
-			ListOfValuesDetailsResponseDTO typeDTO = new ListOfValuesDetailsResponseDTO();
+                ListOfValuesDetailsVO machineType =
+                        listOfValuesDetailsRepo
+                                .findById(detailDTO.getMachineType())
+                                .orElseThrow(() ->
+                                        new ApplicationException(
+                                                "Machine Type Not Found"));
 
-			typeDTO.setId(vo.getType().getId());
+                detailVO.setMachineType(machineType);
+            }
 
-			typeDTO.setCode(vo.getType().getValueCode());
+            // -------------------------------------------------
+            // UOM
+            // -------------------------------------------------
 
-			typeDTO.setDescription(vo.getType().getValueDescription());
+            if (detailDTO.getUom() != null) {
 
-			dto.setType(typeDTO);
-		}
+                UnitMasterVO uom =
+                        unitMasterRepo.findById(detailDTO.getUom())
+                        .orElseThrow(() ->
+                                new ApplicationException(
+                                        "UOM Not Found"));
 
-		// ======================================================
-		// Location
-		// ======================================================
+                detailVO.setUom(uom);
+            }
 
-		if (vo.getLocation() != null) {
+            // -------------------------------------------------
+            // Technical Fields
+            // -------------------------------------------------
 
-			LocationMasterResponseDTO locationDTO = new LocationMasterResponseDTO();
+            detailVO.setInstallationDate(
+                    detailDTO.getInstallationDate());
 
-			locationDTO.setId(vo.getLocation().getId());
+            detailVO.setPowerConsumption(
+                    detailDTO.getPowerConsumption());
 
-			locationDTO.setLocationName(vo.getLocation().getLocationName());
+            detailVO.setConsumption(
+                    detailDTO.getConsumption());
 
-			dto.setLocation(locationDTO);
-		}
+            detailVO.setPowerProduced(
+                    detailDTO.getPowerProduced());
 
-		// ======================================================
-		// Machine / Instrument Category
-		// ======================================================
+            detailVO.setTechnicalSpecification(
+                    detailDTO.getTechnicalSpecification());
 
-		if (vo.getMachineInstrumentCategory() != null) {
+            detailVO.setCapacity(
+                    detailDTO.getCapacity());
 
-			ListOfValuesDetailsResponseDTO categoryDTO = new ListOfValuesDetailsResponseDTO();
+            detailVO.setBedSizeMm(
+                    detailDTO.getBedSizeMm());
 
-			categoryDTO.setId(vo.getMachineInstrumentCategory().getId());
+            detailVO.setCurrentInAmps(
+                    detailDTO.getCurrentInAmps());
 
-			categoryDTO.setCode(vo.getMachineInstrumentCategory().getValueCode());
+            detailVO.setVoltage(
+                    detailDTO.getVoltage());
 
-			categoryDTO.setDescription(vo.getMachineInstrumentCategory().getValueDescription());
+            detailVO.setCushionTonnage(
+                    detailDTO.getCushionTonnage());
 
-			dto.setMachineInstrumentCategory(categoryDTO);
-		}
+            detailVO.setParallelity(
+                    detailDTO.getParallelity());
 
-		// ======================================================
-		// Made In - Country
-		// ======================================================
+            detailVO.setHourlyRate(
+                    detailDTO.getHourlyRate());
 
-		if (vo.getMadeIn() != null) {
+            detailVO.setMachineInstrumentWeight(
+                    detailDTO.getMachineInstrumentWeight());
 
-			CountryResponseDTO countryDTO = new CountryResponseDTO();
+            detailVO.setWarrantyStartDate(
+                    detailDTO.getWarrantyStartDate());
 
-			countryDTO.setId(vo.getMadeIn().getId());
+            detailVO.setWarrantyEndDate(
+                    detailDTO.getWarrantyEndDate());
 
-			countryDTO.setCountryCode(vo.getMadeIn().getCountryCode());
+            detailVO.setLastCalibratedDate(
+                    detailDTO.getLastCalibratedDate());
 
-			countryDTO.setCountryName(vo.getMadeIn().getCountryName());
+            detailVO.setNextDueDate(
+                    detailDTO.getNextDueDate());
 
-			dto.setMadeIn(countryDTO);
-		}
+            detailVO.setLifeCycleYear(
+                    detailDTO.getLifeCycleYear());
 
-		// ======================================================
-		// Purchased From - Customer
-		// ======================================================
+            detailVO.setRange(
+                    detailDTO.getRange());
 
-		if (vo.getPurchasedFrom() != null) {
+            detailVO.setErrorAllowed(
+                    detailDTO.getErrorAllowed());
 
-			CustomerResponse1DTO customerDTO = new CustomerResponse1DTO();
+            detailVO.setFrequencyOfCalibration(
+                    detailDTO.getFrequencyOfCalibration());
 
-			customerDTO.setId(vo.getPurchasedFrom().getId());
+            detailVO.setInstrumentCost(
+                    detailDTO.getInstrumentCost());
 
-			customerDTO.setCustomerName(vo.getPurchasedFrom().getCustomerName());
+            detailVO.setCalibrationCost(
+                    detailDTO.getCalibrationCost());
 
-			dto.setPurchasedFrom(customerDTO);
-		}
+            detailVO.setCalibrationAgency(
+                    detailDTO.getCalibrationAgency());
 
-		// ======================================================
-		// Technical Information Details
-		// ======================================================
+            detailVO.setCertificateNo(
+                    detailDTO.getCertificateNo());
 
-		List<MachineTechnicalInfoResponseDTO> technicalInfoList = new ArrayList<>();
+            detailVO.setShutHeightMm(
+                    detailDTO.getShutHeightMm());
 
-		if (vo.getMachineTechnicalInfoVO() != null) {
+            detailVO.setStrokeMm(
+                    detailDTO.getStrokeMm());
 
-			for (MachineTechnicalInfoVO detailVO : vo.getMachineTechnicalInfoVO()) {
+            detailVO.setCushion(
+                    detailDTO.getCushion());
 
-				MachineTechnicalInfoResponseDTO detailDTO = new MachineTechnicalInfoResponseDTO();
+            detailVO.setHp(
+                    detailDTO.getHp());
 
-				detailDTO.setId(detailVO.getId());
+            detailVO.setHcNo(
+                    detailDTO.getHcNo());
 
-				detailDTO.setInstallationDate(detailVO.getInstallationDate());
+            detailVO.setRangeSize(
+                    detailDTO.getRangeSize());
 
-				detailDTO.setPowerConsumption(detailVO.getPowerConsumption());
+            detailVO.setLeastcount(
+                    detailDTO.getLeastcount());
 
-				detailDTO.setConsumption(detailVO.getConsumption());
+            detailVO.setGoSize(
+                    detailDTO.getGoSize());
 
-				detailDTO.setPowerProduced(detailVO.getPowerProduced());
+            detailVO.setNoGoSize(
+                    detailDTO.getNoGoSize());
 
-				detailDTO.setTechnicalSpecification(detailVO.getTechnicalSpecification());
+            detailVO.setRamSize(
+                    detailDTO.getRamSize());
 
-				detailDTO.setCapacity(detailVO.getCapacity());
+            detailVO.setThroatDepth(
+                    detailDTO.getThroatDepth());
 
-				// ==================================================
-				// Unit - Item Master
-				// ==================================================
+            detailVO.setThroatGap(
+                    detailDTO.getThroatGap());
 
-				if (detailVO.getUnit() != null) {
+            detailVO.setMaintenanceDate(
+                    detailDTO.getMaintenanceDate());
 
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+            // -------------------------------------------------
+            // Parent Reference
+            // -------------------------------------------------
 
-					itemDTO.setId(detailVO.getUnit().getId());
+            detailVO.setMachineMasterVO(vo);
 
-					itemDTO.setItemCode(detailVO.getUnit().getItemCode());
+            vo.getMachineTechnicalInfoVO().add(detailVO);
+        }
+    }
 
-					itemDTO.setItemDescription(detailVO.getUnit().getItemDescription());
 
-					if (detailVO.getUnit().getPrimaryUnit() != null) {
+    // =========================================================
+    // SPARE DETAILS
+    // =========================================================
 
-						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+    vo.getMachineSpareDetailsVO().clear();
 
-						unitDTO.setId(detailVO.getUnit().getPrimaryUnit().getId());
+    if (dto.getMachineSpareDetailsDTO() != null) {
 
-						unitDTO.setUnitId(detailVO.getUnit().getPrimaryUnit().getUnitId());
+        for (MachineSpareDetailsDTO detailDTO :
+                dto.getMachineSpareDetailsDTO()) {
 
-						unitDTO.setUnitDescription(detailVO.getUnit().getPrimaryUnit().getDescription());
+            MachineSpareDetailsVO detailVO =
+                    new MachineSpareDetailsVO();
 
-						itemDTO.setUnit(unitDTO);
-					}
+            // -------------------------------------------------
+            // Spare Item
+            // -------------------------------------------------
 
-					detailDTO.setUnit(itemDTO);
-				}
+            if (detailDTO.getSpareId() != null) {
 
-				detailDTO.setBedSizeMm(detailVO.getBedSizeMm());
+                ItemMasterVO spare =
+                        itemMasterRepo.findById(detailDTO.getSpareId())
+                        .orElseThrow(() ->
+                                new ApplicationException(
+                                        "Spare Item Not Found"));
 
-				detailDTO.setCurrentInAmps(detailVO.getCurrentInAmps());
+                detailVO.setSpareId(spare);
+            }
 
-				detailDTO.setVoltage(detailVO.getVoltage());
+            // -------------------------------------------------
+            // Unit
+            // -------------------------------------------------
 
-				detailDTO.setCushionTonnage(detailVO.getCushionTonnage());
+            if (detailDTO.getUnit() != null) {
 
-				detailDTO.setParallelity(detailVO.getParallelity());
+                UnitMasterVO unit =
+                        unitMasterRepo.findById(detailDTO.getUnit())
+                        .orElseThrow(() ->
+                                new ApplicationException(
+                                        "Spare Unit Not Found"));
 
-				// ==================================================
-				// Machine Type - List Of Values
-				// ==================================================
+                detailVO.setUnit(unit);
+            }
 
-				if (detailVO.getMachineType() != null) {
+            // -------------------------------------------------
+            // Spare Fields
+            // -------------------------------------------------
 
-					ListOfValuesDetailsResponseDTO machineTypeDTO = new ListOfValuesDetailsResponseDTO();
+            detailVO.setSpareDescription(
+                    detailDTO.getSpareDescription());
 
-					machineTypeDTO.setId(detailVO.getMachineType().getId());
+            detailVO.setQuantity(
+                    detailDTO.getQuantity());
 
-					machineTypeDTO.setCode(detailVO.getMachineType().getValueCode());
+            detailVO.setCritical(
+                    detailDTO.isCritical());
 
-					machineTypeDTO.setDescription(detailVO.getMachineType().getValueDescription());
+            detailVO.setModelNo(
+                    detailDTO.getModelNo());
 
-					detailDTO.setMachineType(machineTypeDTO);
-				}
+            detailVO.setSerialNo(
+                    detailDTO.getSerialNo());
 
-				detailDTO.setHourlyRate(detailVO.getHourlyRate());
+            detailVO.setManufacturer(
+                    detailDTO.getManufacturer());
 
-				detailDTO.setMachineInstrumentWeight(detailVO.getMachineInstrumentWeight());
+            detailVO.setWarrantyTillDate(
+                    detailDTO.getWarrantyTillDate());
 
-				// ==================================================
-				// UOM - Unit Master
-				// ==================================================
+            detailVO.setCalibrationRequired(
+                    detailDTO.getCalibrationRequired());
 
-				if (detailVO.getUom() != null) {
+            detailVO.setLastCalibratedDate(
+                    detailDTO.getLastCalibratedDate());
 
-					UnitMasterResponseDTO uomDTO = new UnitMasterResponseDTO();
+            // -------------------------------------------------
+            // Parent
+            // -------------------------------------------------
 
-					uomDTO.setId(detailVO.getUom().getId());
+            detailVO.setMachineMasterVO(vo);
 
-					uomDTO.setUnitId(detailVO.getUom().getUnitId());
+            vo.getMachineSpareDetailsVO().add(detailVO);
+        }
+    }
 
-					uomDTO.setUnitDescription(detailVO.getUom().getDescription());
 
-					detailDTO.setUom(uomDTO);
-				}
+    // =========================================================
+    // HISTORY
+    // =========================================================
 
-				detailDTO.setWarrantyStartDate(detailVO.getWarrantyStartDate());
+    vo.getMachineHistoryVO().clear();
 
-				detailDTO.setWarrantyEndDate(detailVO.getWarrantyEndDate());
+    if (dto.getMachineHistoryDTO() != null) {
 
-				detailDTO.setLastCalibratedDate(detailVO.getLastCalibratedDate());
+        for (MachineHistoryDTO detailDTO :
+                dto.getMachineHistoryDTO()) {
 
-				detailDTO.setNextDueDate(detailVO.getNextDueDate());
+            MachineHistoryVO detailVO =
+                    new MachineHistoryVO();
 
-				detailDTO.setLifeCycleYear(detailVO.getLifeCycleYear());
+            detailVO.setDate(
+                    detailDTO.getDate());
 
-				detailDTO.setRange(detailVO.getRange());
+            detailVO.setDescription(
+                    detailDTO.getDescription());
 
-				detailDTO.setErrorAllowed(detailVO.getErrorAllowed());
+            detailVO.setChangedDate(
+                    detailDTO.getChangedDate());
 
-				detailDTO.setFrequencyOfCalibration(detailVO.getFrequencyOfCalibration());
+            detailVO.setCost(
+                    detailDTO.getCost());
 
-				detailDTO.setInstrumentCost(detailVO.getInstrumentCost());
+            detailVO.setPurpose(
+                    detailDTO.getPurpose());
 
-				detailDTO.setCalibrationCost(detailVO.getCalibrationCost());
+            detailVO.setRemarks(
+                    detailDTO.getRemarks());
 
-				detailDTO.setCalibrationAgency(detailVO.getCalibrationAgency());
+            // -------------------------------------------------
+            // Parent
+            // -------------------------------------------------
 
-				detailDTO.setCertificateNo(detailVO.getCertificateNo());
+            detailVO.setMachineMasterVO(vo);
 
-				detailDTO.setShutHeightMm(detailVO.getShutHeightMm());
+            vo.getMachineHistoryVO().add(detailVO);
+        }
+    }
 
-				detailDTO.setStrokeMm(detailVO.getStrokeMm());
 
-				detailDTO.setCushion(detailVO.getCushion());
+    // =========================================================
+    // ATTACHMENTS
+    // =========================================================
 
-				detailDTO.setHp(detailVO.getHp());
+    vo.getMachineMasterAttachmentVO().clear();
 
-				detailDTO.setHcNo(detailVO.getHcNo());
+    if (dto.getMachineMasterAttachmentDTO() != null) {
 
-				detailDTO.setRangeSize(detailVO.getRangeSize());
+        for (MachineMasterAttachmentDTO attachmentDTO :
+                dto.getMachineMasterAttachmentDTO()) {
 
-				detailDTO.setLeastcount(detailVO.getLeastcount());
+            MachineMasterAttachmentVO attachmentVO =
+                    new MachineMasterAttachmentVO();
 
-				detailDTO.setGoSize(detailVO.getGoSize());
+            attachmentVO.setName(
+                    attachmentDTO.getName());
 
-				detailDTO.setNoGoSize(detailVO.getNoGoSize());
+            attachmentVO.setFileName(
+                    attachmentDTO.getFileName());
 
-				detailDTO.setRamSize(detailVO.getRamSize());
+            attachmentVO.setFilePath(
+                    attachmentDTO.getFilePath());
 
-				detailDTO.setThroatDepth(detailVO.getThroatDepth());
+            attachmentVO.setFileSize(
+                    attachmentDTO.getFileSize());
 
-				detailDTO.setThroatGap(detailVO.getThroatGap());
+            attachmentVO.setContentType(
+                    attachmentDTO.getContentType());
 
-				detailDTO.setMaintenanceDate(detailVO.getMaintenanceDate());
+            attachmentVO.setUploadOn(
+                    attachmentDTO.getUploadOn());
 
-				technicalInfoList.add(detailDTO);
-			}
-		}
+            // -------------------------------------------------
+            // Parent
+            // -------------------------------------------------
 
-		dto.setMachineTechnicalInfoResponseDTO(technicalInfoList);
+            attachmentVO.setMachineMasterVO(vo);
 
-		// ======================================================
-		// Spare Details
-		// ======================================================
-
-		List<MachineSpareDetailsResponseDTO> spareDetailsList = new ArrayList<>();
-
-		if (vo.getMachineSpareDetailsVO() != null) {
-
-			for (MachineSpareDetailsVO spareVO : vo.getMachineSpareDetailsVO()) {
-
-				MachineSpareDetailsResponseDTO spareDTO = new MachineSpareDetailsResponseDTO();
-
-				// ID
-				spareDTO.setId(spareVO.getId());
-
-				// ==================================================
-				// Spare Item
-				// ==================================================
-
-				if (spareVO.getSpareId() != null) {
-
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
-
-					itemDTO.setId(spareVO.getSpareId().getId());
-
-					itemDTO.setItemCode(spareVO.getSpareId().getItemCode());
-
-					itemDTO.setItemDescription(spareVO.getSpareId().getItemDescription());
-
-					spareDTO.setSpareId(itemDTO);
-				}
-
-				// ==================================================
-				// Spare Description
-				// ==================================================
-
-				spareDTO.setSpareDescription(spareVO.getSpareDescription());
-
-				// ==================================================
-				// Unit
-				// ==================================================
-
-				if (spareVO.getUnit() != null) {
-
-					UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
-
-					unitDTO.setId(spareVO.getUnit().getId());
-
-					unitDTO.setUnitId(spareVO.getUnit().getUnitId());
-
-					unitDTO.setUnitDescription(spareVO.getUnit().getDescription());
-
-					spareDTO.setUnit(unitDTO);
-				}
-
-				// ==================================================
-				// Remaining Spare Details
-				// ==================================================
-
-				spareDTO.setQuantity(spareVO.getQuantity());
-
-				spareDTO.setCritical(spareVO.isCritical());
-
-				spareDTO.setModelNo(spareVO.getModelNo());
-
-				spareDTO.setSerialNo(spareVO.getSerialNo());
-
-				spareDTO.setManufacturer(spareVO.getManufacturer());
-
-				spareDTO.setWarrantyTillDate(spareVO.getWarrantyTillDate());
-
-				spareDTO.setCalibrationRequired(spareVO.getCalibrationRequired());
-
-				spareDTO.setLastCalibratedDate(spareVO.getLastCalibratedDate());
-
-				spareDetailsList.add(spareDTO);
-			}
-		}
-
-		// Set response
-		dto.setMachineSpareDetailsResponseDTO(spareDetailsList);
-		// ======================================================
-		// Machine History
-		// ======================================================
-
-		List<MachineHistoryResponseDTO> historyList = new ArrayList<>();
-
-		if (vo.getMachineHistoryVO() != null) {
-
-			for (MachineHistoryVO historyVO : vo.getMachineHistoryVO()) {
-
-				MachineHistoryResponseDTO historyDTO = new MachineHistoryResponseDTO();
-
-				historyDTO.setId(historyVO.getId());
-
-				historyDTO.setDate(historyVO.getDate());
-
-				historyDTO.setDescription(historyVO.getDescription());
-
-				historyDTO.setChangedDate(historyVO.getChangedDate());
-
-				historyDTO.setCost(historyVO.getCost());
-
-				historyDTO.setPurpose(historyVO.getPurpose());
-
-				historyDTO.setRemarks(historyVO.getRemarks());
-
-				historyList.add(historyDTO);
-			}
-		}
-
-		dto.setMachineHistoryResponseDTO(historyList);
-
-		// ======================================================
-		// Attachments
-		// ======================================================
-
-		// ======================================================
-		// Attachments
-		// ======================================================
-
-		List<MachineMasterAttachmentResponseDTO> attachmentList = new ArrayList<>();
-
-		if (vo.getMachineMasterAttachmentVO() != null) {
-
-			for (MachineMasterAttachmentVO attachmentVO : vo.getMachineMasterAttachmentVO()) {
-
-				MachineMasterAttachmentResponseDTO attachmentDTO = new MachineMasterAttachmentResponseDTO();
-
-				attachmentDTO.setId(attachmentVO.getId());
-				attachmentDTO.setName(attachmentVO.getName());
-				attachmentDTO.setFileName(attachmentVO.getFileName());
-
-				String urlPath = machinemasterUploadPath.replace("C:/", "/").replace("\\", "/");
-
-				if (!urlPath.endsWith("/")) {
-					urlPath = urlPath + "/";
-				}
-
-				attachmentDTO.setFilePath(serverBaseUrl + urlPath + attachmentVO.getFileName());
-
-				attachmentDTO.setFileSize(attachmentVO.getFileSize());
-				attachmentDTO.setContentType(attachmentVO.getContentType());
-				attachmentDTO.setUploadOn(attachmentVO.getUploadOn());
-
-				attachmentList.add(attachmentDTO);
-			}
-		}
-
-		dto.setMachineMasterAttachmentResponseDTO(attachmentList);
-
-		return dto;
-	}
+            vo.getMachineMasterAttachmentVO()
+                    .add(attachmentVO);
+        }
+    }
 }
+        
+    
+        
+        private MachineMasterResponseDTO machineMasterResponse(
+                MachineMasterVO vo) {
+
+            MachineMasterResponseDTO dto =
+                    new MachineMasterResponseDTO();
+
+            dto.setId(vo.getId());
+
+            // =========================================================
+            // BRANCH
+            // =========================================================
+
+            if (vo.getBranch() != null) {
+
+                BranchResponseDTO branchDTO =
+                        new BranchResponseDTO();
+
+                branchDTO.setId(vo.getBranch().getId());
+                branchDTO.setBranchCode(
+                        vo.getBranch().getBranchCode());
+                branchDTO.setBranchName(
+                        vo.getBranch().getBranchName());
+
+                dto.setBranch(branchDTO);
+            }
+
+            // =========================================================
+            // DEPARTMENT
+            // =========================================================
+
+            if (vo.getDepartment() != null) {
+
+                DepartmentResponseDTO departmentDTO =
+                        new DepartmentResponseDTO();
+
+                departmentDTO.setId(vo.getDepartment().getId());
+                departmentDTO.setDepartmentCode(
+                        vo.getDepartment().getDepartmentCode());
+                departmentDTO.setDepartmentName(
+                        vo.getDepartment().getDepartmentName());
+
+                dto.setDepartment(departmentDTO);
+            }
+
+            // =========================================================
+            // TYPE
+            // =========================================================
+
+            if (vo.getType() != null) {
+
+                ListOfValuesDetailsResponseDTO typeDTO =
+                        new ListOfValuesDetailsResponseDTO();
+
+                typeDTO.setId(vo.getType().getId());
+                typeDTO.setCode(
+                        vo.getType().getValueCode());
+                typeDTO.setDescription(
+                        vo.getType().getValueDescription());
+
+                dto.setType(typeDTO);
+            }
+
+            // =========================================================
+            // LOCATION
+            // =========================================================
+
+            if (vo.getLocation() != null) {
+
+                LocationMasterResponseDTO locationDTO =
+                        new LocationMasterResponseDTO();
+
+                locationDTO.setId(vo.getLocation().getId());
+//                locationDTO.setLocationId(
+//                        vo.getLocation().getLocationId());
+                locationDTO.setLocationName(
+                        vo.getLocation().getLocationName());
+
+                dto.setLocation(locationDTO);
+            }
+
+            // =========================================================
+            // MACHINE CATEGORY
+            // =========================================================
+
+            if (vo.getMachineInstrumentCategory() != null) {
+
+                ListOfValuesDetailsResponseDTO categoryDTO =
+                        new ListOfValuesDetailsResponseDTO();
+
+                categoryDTO.setId(
+                        vo.getMachineInstrumentCategory().getId());
+
+                categoryDTO.setCode(
+                        vo.getMachineInstrumentCategory().getValueCode());
+
+                categoryDTO.setDescription(
+                        vo.getMachineInstrumentCategory()
+                                .getValueDescription());
+
+                dto.setMachineInstrumentCategory(categoryDTO);
+            }
+
+            // =========================================================
+            // COUNTRY
+            // =========================================================
+
+            if (vo.getMadeIn() != null) {
+
+                CountryResponseDTO countryDTO =
+                        new CountryResponseDTO();
+
+                countryDTO.setId(vo.getMadeIn().getId());
+                countryDTO.setCountryCode(
+                        vo.getMadeIn().getCountryCode());
+                countryDTO.setCountryName(
+                        vo.getMadeIn().getCountryName());
+
+                dto.setMadeIn(countryDTO);
+            }
+
+            // =========================================================
+            // PURCHASED FROM
+            // =========================================================
+
+            if (vo.getPurchasedFrom() != null) {
+
+                CustomerResponse1DTO customerDTO =
+                        new CustomerResponse1DTO();
+
+                customerDTO.setId(
+                        vo.getPurchasedFrom().getId());
+
+//                customerDTO.setCustomerCode(
+//                        vo.getPurchasedFrom().getCustomerCode());
+
+                customerDTO.setCustomerName(
+                        vo.getPurchasedFrom().getCustomerName());
+
+                dto.setPurchasedFrom(customerDTO);
+            }
+
+            // =========================================================
+            // MASTER FIELDS
+            // =========================================================
+
+            dto.setMachineInstrumentNo(
+                    vo.getMachineInstrumentNo());
+
+            dto.setMachineInstrumentName(
+                    vo.getMachineInstrumentName());
+
+            dto.setCalibrationRequired(
+                    vo.getCalibrationRequired());
+
+            dto.setProcessNo(
+                    vo.getProcessNo());
+
+            dto.setSection(
+                    vo.getSection());
+
+            dto.setModel(
+                    vo.getModel());
+
+            dto.setSerialNo(
+                    vo.getSerialNo());
+
+            dto.setStatus(
+                    vo.getStatus());
+
+            dto.setManufacturedBy(
+                    vo.getManufacturedBy());
+
+            dto.setModeOfPurchase(
+                    vo.getModeOfPurchase());
+
+            dto.setMachineInstrumentIncharge(
+                    vo.getMachineInstrumentIncharge());
+
+            dto.setMachineInstrumentUsedFor(
+                    vo.getMachineInstrumentUsedFor());
+
+            dto.setPmChecklistNo(
+                    vo.getPmChecklistNo());
+
+            dto.setRemarks(
+                    vo.getRemarks());
+
+            dto.setMake(
+                    vo.getMake());
+
+            dto.setMachineInstrumentImageName(
+                    vo.getMachineInstrumentImageName());
+
+            dto.setMachineOrInstrument(
+                    vo.getMachineOrInstrument());
+
+            dto.setActive(
+                    vo.isActive());
+
+            dto.setOrgId(
+                    vo.getOrgId());
+
+            dto.setCreatedBy(
+                    vo.getCreatedBy());
+
+            dto.setUpdatedBy(
+                    vo.getUpdatedBy());
+
+            dto.setCancel(
+                    vo.isCancel());
+
+            dto.setCancelRemarks(
+                    vo.getCancelRemarks());
+
+//            dto.setScreenName(
+//                    vo.getScreenName());
+//
+//            dto.setScreenCode(
+//                    vo.getScreenCode());
+
+
+            // =========================================================
+            // TECHNICAL INFORMATION RESPONSE
+            // =========================================================
+
+            List<MachineTechnicalInfoResponseDTO>
+                    technicalList = new ArrayList<>();
+
+            if (vo.getMachineTechnicalInfoVO() != null) {
+
+                for (MachineTechnicalInfoVO detailVO :
+                        vo.getMachineTechnicalInfoVO()) {
+
+                    MachineTechnicalInfoResponseDTO detailDTO =
+                            new MachineTechnicalInfoResponseDTO();
+
+                    detailDTO.setId(detailVO.getId());
+
+                    detailDTO.setInstallationDate(
+                            detailVO.getInstallationDate());
+
+                    detailDTO.setPowerConsumption(
+                            detailVO.getPowerConsumption());
+
+                    detailDTO.setConsumption(
+                            detailVO.getConsumption());
+
+                    detailDTO.setPowerProduced(
+                            detailVO.getPowerProduced());
+
+                    detailDTO.setTechnicalSpecification(
+                            detailVO.getTechnicalSpecification());
+
+                    detailDTO.setCapacity(
+                            detailVO.getCapacity());
+
+                    // -------------------------------------------------
+                    // Unit Item
+                    // -------------------------------------------------
+
+                    if (detailVO.getUnit() != null) {
+
+                        ItemResponse1DTO itemDTO =
+                                new ItemResponse1DTO();
+
+                        itemDTO.setId(
+                                detailVO.getUnit().getId());
+
+                        itemDTO.setItemCode(
+                                detailVO.getUnit().getItemCode());
+
+                        itemDTO.setItemDescription(
+                                detailVO.getUnit()
+                                        .getItemDescription());
+
+                        detailDTO.setUnit(itemDTO);
+                    }
+
+                    detailDTO.setBedSizeMm(
+                            detailVO.getBedSizeMm());
+
+                    detailDTO.setCurrentInAmps(
+                            detailVO.getCurrentInAmps());
+
+                    detailDTO.setVoltage(
+                            detailVO.getVoltage());
+
+                    detailDTO.setCushionTonnage(
+                            detailVO.getCushionTonnage());
+
+                    detailDTO.setParallelity(
+                            detailVO.getParallelity());
+
+                    // -------------------------------------------------
+                    // Machine Type
+                    // -------------------------------------------------
+
+                    if (detailVO.getMachineType() != null) {
+
+                        ListOfValuesDetailsResponseDTO
+                                machineTypeDTO =
+                                new ListOfValuesDetailsResponseDTO();
+
+                        machineTypeDTO.setId(
+                                detailVO.getMachineType().getId());
+
+                        machineTypeDTO.setCode(
+                                detailVO.getMachineType()
+                                        .getValueCode());
+
+                        machineTypeDTO.setDescription(
+                                detailVO.getMachineType()
+                                        .getValueDescription());
+
+                        detailDTO.setMachineType(
+                                machineTypeDTO);
+                    }
+
+                    detailDTO.setHourlyRate(
+                            detailVO.getHourlyRate());
+
+                    detailDTO.setMachineInstrumentWeight(
+                            detailVO.getMachineInstrumentWeight());
+
+                    // -------------------------------------------------
+                    // UOM
+                    // -------------------------------------------------
+
+                    if (detailVO.getUom() != null) {
+
+                        UnitMasterResponseDTO uomDTO =
+                                new UnitMasterResponseDTO();
+
+                        uomDTO.setId(
+                                detailVO.getUom().getId());
+
+                        uomDTO.setUnitId(
+                                detailVO.getUom().getUnitId());
+
+                        uomDTO.setUnitDescription(
+                                detailVO.getUom().getDescription());
+
+                        detailDTO.setUom(uomDTO);
+                    }
+
+                    detailDTO.setWarrantyStartDate(
+                            detailVO.getWarrantyStartDate());
+
+                    detailDTO.setWarrantyEndDate(
+                            detailVO.getWarrantyEndDate());
+
+                    detailDTO.setLastCalibratedDate(
+                            detailVO.getLastCalibratedDate());
+
+                    detailDTO.setNextDueDate(
+                            detailVO.getNextDueDate());
+
+                    detailDTO.setLifeCycleYear(
+                            detailVO.getLifeCycleYear());
+
+                    detailDTO.setRange(
+                            detailVO.getRange());
+
+                    detailDTO.setErrorAllowed(
+                            detailVO.getErrorAllowed());
+
+                    detailDTO.setFrequencyOfCalibration(
+                            detailVO.getFrequencyOfCalibration());
+
+                    detailDTO.setInstrumentCost(
+                            detailVO.getInstrumentCost());
+
+                    detailDTO.setCalibrationCost(
+                            detailVO.getCalibrationCost());
+
+                    detailDTO.setCalibrationAgency(
+                            detailVO.getCalibrationAgency());
+
+                    detailDTO.setCertificateNo(
+                            detailVO.getCertificateNo());
+
+                    detailDTO.setShutHeightMm(
+                            detailVO.getShutHeightMm());
+
+                    detailDTO.setStrokeMm(
+                            detailVO.getStrokeMm());
+
+                    detailDTO.setCushion(
+                            detailVO.getCushion());
+
+                    detailDTO.setHp(
+                            detailVO.getHp());
+
+                    detailDTO.setHcNo(
+                            detailVO.getHcNo());
+
+                    detailDTO.setRangeSize(
+                            detailVO.getRangeSize());
+
+                    detailDTO.setLeastcount(
+                            detailVO.getLeastcount());
+
+                    detailDTO.setGoSize(
+                            detailVO.getGoSize());
+
+                    detailDTO.setNoGoSize(
+                            detailVO.getNoGoSize());
+
+                    detailDTO.setRamSize(
+                            detailVO.getRamSize());
+
+                    detailDTO.setThroatDepth(
+                            detailVO.getThroatDepth());
+
+                    detailDTO.setThroatGap(
+                            detailVO.getThroatGap());
+
+                    detailDTO.setMaintenanceDate(
+                            detailVO.getMaintenanceDate());
+
+                    technicalList.add(detailDTO);
+                }
+            }
+
+            dto.setMachineTechnicalInfoResponseDTO(
+                    technicalList);
+
+
+            // =========================================================
+            // SPARE DETAILS RESPONSE
+            // =========================================================
+
+            List<MachineSpareDetailsResponseDTO>
+                    spareList = new ArrayList<>();
+
+            if (vo.getMachineSpareDetailsVO() != null) {
+
+                for (MachineSpareDetailsVO detailVO :
+                        vo.getMachineSpareDetailsVO()) {
+
+                    MachineSpareDetailsResponseDTO detailDTO =
+                            new MachineSpareDetailsResponseDTO();
+
+                    detailDTO.setId(detailVO.getId());
+
+                    // -------------------------------------------------
+                    // Spare Item
+                    // -------------------------------------------------
+
+                    if (detailVO.getSpareId() != null) {
+
+                        ItemResponse1DTO itemDTO =
+                                new ItemResponse1DTO();
+
+                        itemDTO.setId(
+                                detailVO.getSpareId().getId());
+
+                        itemDTO.setItemCode(
+                                detailVO.getSpareId().getItemCode());
+
+                        itemDTO.setItemDescription(
+                                detailVO.getSpareId()
+                                        .getItemDescription());
+
+                        detailDTO.setSpareId(itemDTO);
+                    }
+
+                    detailDTO.setSpareDescription(
+                            detailVO.getSpareDescription());
+
+                    // -------------------------------------------------
+                    // Unit
+                    // -------------------------------------------------
+
+                    if (detailVO.getUnit() != null) {
+
+                        UnitMasterResponseDTO unitDTO =
+                                new UnitMasterResponseDTO();
+
+                        unitDTO.setId(
+                                detailVO.getUnit().getId());
+
+                        unitDTO.setUnitId(
+                                detailVO.getUnit().getUnitId());
+
+                  unitDTO.setUnitDescription(
+                		  detailVO.getUnit().getDescription());
+
+                        detailDTO.setUnit(unitDTO);
+                    }
+
+                    detailDTO.setQuantity(
+                            detailVO.getQuantity());
+
+                    detailDTO.setCritical(
+                            detailVO.isCritical());
+
+                    detailDTO.setModelNo(
+                            detailVO.getModelNo());
+
+                    detailDTO.setSerialNo(
+                            detailVO.getSerialNo());
+
+                    detailDTO.setManufacturer(
+                            detailVO.getManufacturer());
+
+                    detailDTO.setWarrantyTillDate(
+                            detailVO.getWarrantyTillDate());
+
+                    detailDTO.setCalibrationRequired(
+                            detailVO.getCalibrationRequired());
+
+                    detailDTO.setLastCalibratedDate(
+                            detailVO.getLastCalibratedDate());
+
+                    spareList.add(detailDTO);
+                }
+            }
+
+            dto.setMachineSpareDetailsResponseDTO(
+                    spareList);
+
+
+            // =========================================================
+            // HISTORY RESPONSE
+            // =========================================================
+
+            List<MachineHistoryResponseDTO>
+                    historyList = new ArrayList<>();
+
+            if (vo.getMachineHistoryVO() != null) {
+
+                for (MachineHistoryVO detailVO :
+                        vo.getMachineHistoryVO()) {
+
+                    MachineHistoryResponseDTO detailDTO =
+                            new MachineHistoryResponseDTO();
+
+                    detailDTO.setId(detailVO.getId());
+
+                    detailDTO.setDate(
+                            detailVO.getDate());
+
+                    detailDTO.setDescription(
+                            detailVO.getDescription());
+
+                    detailDTO.setChangedDate(
+                            detailVO.getChangedDate());
+
+                    detailDTO.setCost(
+                            detailVO.getCost());
+
+                    detailDTO.setPurpose(
+                            detailVO.getPurpose());
+
+                    detailDTO.setRemarks(
+                            detailVO.getRemarks());
+
+                    historyList.add(detailDTO);
+                }
+            }
+
+            dto.setMachineHistoryResponseDTO(
+                    historyList);
+
+
+            // =========================================================
+            // ATTACHMENT RESPONSE
+            // =========================================================
+
+            List<MachineMasterAttachmentResponseDTO>
+                    attachmentList = new ArrayList<>();
+
+            if (vo.getMachineMasterAttachmentVO() != null) {
+
+                for (MachineMasterAttachmentVO attachmentVO :
+                        vo.getMachineMasterAttachmentVO()) {
+
+                    MachineMasterAttachmentResponseDTO attachmentDTO =
+                            new MachineMasterAttachmentResponseDTO();
+
+                    attachmentDTO.setId(
+                            attachmentVO.getId());
+
+                    attachmentDTO.setName(
+                            attachmentVO.getName());
+
+                    attachmentDTO.setFileName(
+                            attachmentVO.getFileName());
+
+                    attachmentDTO.setFilePath(
+                            attachmentVO.getFilePath());
+
+                    attachmentDTO.setFileSize(
+                            attachmentVO.getFileSize());
+
+                    attachmentDTO.setContentType(
+                            attachmentVO.getContentType());
+
+                    attachmentDTO.setUploadOn(
+                            attachmentVO.getUploadOn());
+
+                    attachmentList.add(attachmentDTO);
+                }
+            }
+
+            dto.setMachineMasterAttachmentResponseDTO(
+                    attachmentList);
+
+            return dto;
+        }
+
+		
+        
+    }
+
+
+
+
+
+	

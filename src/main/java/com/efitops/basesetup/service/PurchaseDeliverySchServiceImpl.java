@@ -72,6 +72,7 @@ import com.efitops.basesetup.dto.PurchaseContractTaxDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleLineDTO;
+import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
@@ -125,8 +126,6 @@ import com.efitops.basesetup.repository.PurchaseDeliveryScheduleDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleLineRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
-import com.efitops.basesetup.dto.BranchResponseDTO;
-
 
 @Service
 public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchService {
@@ -3525,4 +3524,32 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		return result;
 	}
 
+// purchase order amendment dropdown for po no
+	
+	@Override
+	public List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(
+	        Long branch, Long customerId, Long orgId) throws ApplicationException {
+
+	    List<Object[]> purchaseOrderList =
+	            purchaseDeliveryScheduleRepo.getPurchaseOrderDropdownForPurchaseOrderAmendment(
+	                    customerId, branch, orgId);
+
+	    if (purchaseOrderList.isEmpty()) {
+	        throw new ApplicationException("No Purchase Order Details Found");
+	    }
+
+	    List<Map<String, Object>> responseList = new ArrayList<>();
+
+	    for (Object[] obj : purchaseOrderList) {
+
+	        Map<String, Object> map = new HashMap<>();
+
+	        map.put("id", obj[0]);
+	        map.put("docId", obj[1]);
+
+	        responseList.add(map);
+	    }
+
+	    return responseList;
+	}
 }

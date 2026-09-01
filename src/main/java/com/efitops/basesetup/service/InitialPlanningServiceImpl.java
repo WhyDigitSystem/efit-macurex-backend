@@ -148,32 +148,32 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 			// Generate Doc ID
 			// =========================
 
-//			String docId = initialPlanningRepo.getInitialPlanningDocId(initialPlanningDTO.getOrgId(),
-//					initialPlanningDTO.getFinancialYear(), screenCode);
-//
-//			if (StringUtils.isBlank(docId)) {
-//
-//				throw new ApplicationException("Initial Planning DocId Not Found");
-//			}
-//
-//			initialPlanningVO.setDocId(docId);
+			String docId = initialPlanningRepo.getInitialPlanningDocId(initialPlanningDTO.getOrgId(),
+					initialPlanningDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+
+				throw new ApplicationException("Initial Planning DocId Not Found");
+			}
+
+			initialPlanningVO.setDocId(docId);
 
 			// =========================
 			// Document Mapping
 			// =========================
 
-//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-//					.findByOrgIdAndFinYearAndScreenCode(initialPlanningDTO.getOrgId(),
-//							initialPlanningDTO.getFinancialYear(), screenCode);
-//
-//			if (documentTypeMappingDetailsVO == null) {
-//
-//				throw new ApplicationException("Document Type Mapping Details Not Found");
-//			}
-//
-//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-//
-//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(initialPlanningDTO.getOrgId(),
+							initialPlanningDTO.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			initialPlanningVO.setCreatedBy(initialPlanningDTO.getCreatedBy());
 

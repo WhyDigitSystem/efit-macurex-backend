@@ -87,6 +87,7 @@ import com.efitops.basesetup.entity.PurchaseOrderLocalDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalFileUploadDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalTaxDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderVO;
+import com.efitops.basesetup.entity.StockTransferGrnFileUploadDetailsVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -1725,7 +1726,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		setDirectPurchaseValues(directPurchaseDTO, directPurchaseVO);
 
 		directPurchaseVO = directPurchaseRepo.save(directPurchaseVO);
-		saveAttachmentss(files, directPurchaseVO);
+		saveDirectPurchaseAttachments(files, directPurchaseVO);
 
 		DirectPurchaseResponseDTO directPurchaseResponse = buildDirectPurchaseResponse(directPurchaseVO);
 		Map<String, Object> response = new HashMap<>();
@@ -1794,16 +1795,16 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 			List<DirectPurchaseCashDetailsVO> oldCashDetails = directPurchaseCashDetailsRepo.findByDirectPurchaseVO(vo);
 
-			if (oldCashDetails != null && !oldCashDetails.isEmpty()) {
-				directPurchaseCashDetailsRepo.deleteAll(oldCashDetails);
-			}
-			
+			directPurchaseCashDetailsRepo.deleteAll(oldCashDetails);
+
 			List<DirectPurchaseTaxDetailsVO> oldTaxDetails = directPurchaseTaxDetailsRepo.findByDirectPurchaseVO(vo);
 
-			if (oldTaxDetails != null && !oldTaxDetails.isEmpty()) {
-				directPurchaseTaxDetailsRepo.deleteAll(oldTaxDetails);
-			}
-		
+			directPurchaseTaxDetailsRepo.deleteAll(oldTaxDetails);
+			
+			List<DirectPurchaseFileUploadDetailsVO> direct = directPurchaseFileUploadDetailsRepo.findByDirectPurchaseVO(vo);
+
+			directPurchaseFileUploadDetailsRepo.deleteAll(direct);
+
 		}
 
 		List<DirectPurchaseCashDetailsVO> cashDetailsList = new ArrayList<>();
@@ -1908,25 +1909,134 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setDirectPurchaseTaxDetailsVO(taxList);
 	}
 
+//	private void createDirectorys(Path path) throws IOException {
+//		if (!Files.exists(path)) {
+//			Files.createDirectories(path);
+//		}
+//	}	
 
-	private void createDirectorys(Path path) throws IOException {
-		if (!Files.exists(path)) {
-			Files.createDirectories(path);
-		}
-	}
+//	private void saveAttachmentss(MultipartFile[] files, DirectPurchaseVO directPurchaseVO)
+//			throws ApplicationException {
+//		if (files == null || files.length == 0) {
+//			return;
+//		}
+//
+//		try {
+//			Path inwardFolder = Paths.get(uploadPaths, "directpurchase", directPurchaseVO.getId().toString());
+//			createDirectorys(inwardFolder);
+//
+//			if (ObjectUtils.isNotEmpty(directPurchaseVO.getId())) {
+//				List<DirectPurchaseFileUploadDetailsVO> existingAttachments = directPurchaseFileUploadDetailsRepo
+//						.findByDirectPurchaseVO(directPurchaseVO);
+//				if (existingAttachments != null && !existingAttachments.isEmpty()) {
+//					directPurchaseFileUploadDetailsRepo.deleteAll(existingAttachments);
+//				}
+//			}
+//
+//			List<DirectPurchaseFileUploadDetailsVO> attachmentList = new ArrayList<>();
+//			for (MultipartFile file : files) {
+//				if (file == null || file.isEmpty()) {
+//					continue;
+//				}
+//
+//				String originalName = file.getOriginalFilename();
+//				if (originalName == null) {
+//					originalName = "file";
+//				}
+//				originalName = originalName.replaceAll("\\s+", "_");
+//
+//				String extension = "";
+//				if (originalName.contains(".")) {
+//					extension = originalName.substring(originalName.lastIndexOf("."));
+//					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+//				}
+//
+//				String fileName = originalName + "_" + directPurchaseVO.getId() + extension;
+//				Path filePath = inwardFolder.resolve(fileName);
+//
+//				try (InputStream inputStream = file.getInputStream()) {
+//					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+//				}
+//
+//				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+//						.path("/api/purchaseOrder/viewDirectPurchaseFile/").toUriString();
+//				String relativePath = uploadPath.replace("\\", "/");
+//				relativePath = filePath.toString().replace("\\", "/").replace(relativePath + "/", "");
+//				String publicUrl = baseUrl + relativePath;
+//
+//				DirectPurchaseFileUploadDetailsVO attachment = new DirectPurchaseFileUploadDetailsVO();
+//				attachment.setDirectPurchaseVO(directPurchaseVO);
+//				attachment.setName(file.getOriginalFilename());
+//				attachment.setFileName(fileName);
+//				attachment.setFilePath(publicUrl);
+//				attachment.setFileSize(file.getSize());
+////				attachment.setContentType(file.getContentType());
+////				attachment.setUploadOn(LocalDateTime.now());
+//				attachmentList.add(attachment);
+//			}
+//
+//			if (!attachmentList.isEmpty()) {
+//				List<DirectPurchaseFileUploadDetailsVO> saved = directPurchaseFileUploadDetailsRepo
+//						.saveAll(attachmentList);
+//				directPurchaseVO.setDirectPurchaseFileUploadDetailsVO(saved);
+//			}
+//
+//		} catch (IOException e) {
+//			throw new ApplicationException("File Upload Failed : " + e.getMessage());
+//		}
+//	}
+//
+//	
+//
+//	@Override
+//	public ResponseEntity<byte[]> viewDirectPurchaseFile(HttpServletRequest request) throws IOException {
+//		return serveFiles(request, "/api/purchaseOrder/viewDirectPurchaseFile/", uploadPaths);
+//	}
+//
+//	private ResponseEntity<byte[]> serveFiles(HttpServletRequest request, String apiPrefix, String uploadPaths)
+//			throws IOException {
+//
+//		String uri = request.getRequestURI();
+//		String relativePath = uri.replace(apiPrefix, "");
+//		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+//
+//		if (relativePath.startsWith("uploads/")) {
+//			relativePath = relativePath.substring("uploads/".length());
+//		}
+//
+//		Path baseDir = Paths.get(uploadPaths).toAbsolutePath().normalize();
+//		Path filePath = baseDir.resolve(relativePath).normalize();
+//
+//		if (!filePath.startsWith(baseDir)) {
+//			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//		}
+//
+//		if (!Files.exists(filePath)) {
+//			return ResponseEntity.notFound().build();
+//		}
+//
+//		String contentType = Files.probeContentType(filePath);
+//		if (contentType == null) {
+//			contentType = "application/octet-stream";
+//		}
+//
+//		byte[] data = Files.readAllBytes(filePath);
+//		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+//				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+//	}
 
 	@Value("${direction.purchase}")
 	private String uploadPaths;
 
-	private void saveAttachmentss(MultipartFile[] files, DirectPurchaseVO directPurchaseVO)
+	private void saveDirectPurchaseAttachments(MultipartFile[] files, DirectPurchaseVO directPurchaseVO)
 			throws ApplicationException {
 		if (files == null || files.length == 0) {
 			return;
 		}
 
 		try {
-			Path inwardFolder = Paths.get(uploadPaths, "directpurchase", directPurchaseVO.getId().toString());
-			createDirectorys(inwardFolder);
+			Path stockTransferGrnFolder = Paths.get(uploadPaths, "directpurchase", directPurchaseVO.getId().toString());
+			createDirectorys(stockTransferGrnFolder);
 
 			if (ObjectUtils.isNotEmpty(directPurchaseVO.getId())) {
 				List<DirectPurchaseFileUploadDetailsVO> existingAttachments = directPurchaseFileUploadDetailsRepo
@@ -1937,6 +2047,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			}
 
 			List<DirectPurchaseFileUploadDetailsVO> attachmentList = new ArrayList<>();
+
 			for (MultipartFile file : files) {
 				if (file == null || file.isEmpty()) {
 					continue;
@@ -1946,16 +2057,17 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				if (originalName == null) {
 					originalName = "file";
 				}
-				originalName = originalName.replaceAll("\\s+", "_");
 
+				originalName = originalName.replaceAll("\\s+", "_");
 				String extension = "";
+
 				if (originalName.contains(".")) {
 					extension = originalName.substring(originalName.lastIndexOf("."));
 					originalName = originalName.substring(0, originalName.lastIndexOf("."));
 				}
 
 				String fileName = originalName + "_" + directPurchaseVO.getId() + extension;
-				Path filePath = inwardFolder.resolve(fileName);
+				Path filePath = stockTransferGrnFolder.resolve(fileName);
 
 				try (InputStream inputStream = file.getInputStream()) {
 					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -1963,8 +2075,10 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
 						.path("/api/purchaseOrder/viewDirectPurchaseFile/").toUriString();
-				String relativePath = uploadPath.replace("\\", "/");
+
+				String relativePath = uploadPaths.replace("\\", "/");
 				relativePath = filePath.toString().replace("\\", "/").replace(relativePath + "/", "");
+
 				String publicUrl = baseUrl + relativePath;
 
 				DirectPurchaseFileUploadDetailsVO attachment = new DirectPurchaseFileUploadDetailsVO();
@@ -1973,8 +2087,9 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				attachment.setFileName(fileName);
 				attachment.setFilePath(publicUrl);
 				attachment.setFileSize(file.getSize());
-//				attachment.setContentType(file.getContentType());
-//				attachment.setUploadOn(LocalDateTime.now());
+				attachment.setContentType(file.getContentType());
+				attachment.setUploadOn(LocalDateTime.now());
+
 				attachmentList.add(attachment);
 			}
 
@@ -1989,16 +2104,19 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		}
 	}
 
-	
+	private void createDirectorys(Path path) throws IOException {
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
 
 	@Override
 	public ResponseEntity<byte[]> viewDirectPurchaseFile(HttpServletRequest request) throws IOException {
-		return serveFiles(request, "/api/purchaseOrder/viewDirectPurchaseFile/", uploadPaths);
+		return serveStockTransferFile(request, "/api/purchaseOrder/viewDirectPurchaseFile/", uploadPaths);
 	}
 
-	private ResponseEntity<byte[]> serveFiles(HttpServletRequest request, String apiPrefix, String uploadPaths)
-			throws IOException {
-
+	private ResponseEntity<byte[]> serveStockTransferFile(HttpServletRequest request, String apiPrefix,
+			String uploadBasePath) throws IOException {
 		String uri = request.getRequestURI();
 		String relativePath = uri.replace(apiPrefix, "");
 		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
@@ -2007,7 +2125,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			relativePath = relativePath.substring("uploads/".length());
 		}
 
-		Path baseDir = Paths.get(uploadPaths).toAbsolutePath().normalize();
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
 		Path filePath = baseDir.resolve(relativePath).normalize();
 
 		if (!filePath.startsWith(baseDir)) {
@@ -2024,6 +2142,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		}
 
 		byte[] data = Files.readAllBytes(filePath);
+
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
 				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
 	}

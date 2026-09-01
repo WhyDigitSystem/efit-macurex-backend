@@ -1,5 +1,7 @@
 package com.efitops.basesetup.entity;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,7 +33,7 @@ public class DirectPurchaseFileUploadDetailsVO {
 
 	@Column(name = "file_name")
 	private String fileName;
-	
+
 	@Column(name = "name")
 	private String name;
 
@@ -43,6 +45,12 @@ public class DirectPurchaseFileUploadDetailsVO {
 
 	@Column(name = "file_size")
 	private Long fileSize;
+
+	@Column(name = "content_type")
+	private String contentType;
+
+	@Column(name = "upload_on")
+	private LocalDateTime uploadOn;
 
 	@ManyToOne
 	@JoinColumn(name = "direct_purchase_basic_id")

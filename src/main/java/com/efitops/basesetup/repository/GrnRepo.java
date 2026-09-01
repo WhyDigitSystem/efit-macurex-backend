@@ -58,7 +58,7 @@ public interface GrnRepo extends JpaRepository<GrnVO, Long> {
 			+ "            WHERE org_id = ?1\r\n" + "                AND branch = ?2\r\n"
 			+ "                AND supplier_code = ?3  \r\n" + "                AND cancel = 1\r\n"
 			+ "                AND active = 1\r\n" + "                AND gate_pass_no IS NOT NULL))")
-	Set<Object[]> getGatePassDocId(Long orgId, Long branch, Long supplierCode);
+	Set<Object[]> getGatePassDocIdDetails(Long orgId, Long branch, Long supplierCode);
 
 //	@Query(nativeQuery = true, value = "Select  distinct A.doc_id AS ORDNO,A.doc_date, A.purchase_order_basic_id AS ID,1 as sno\r\n"
 //			+ "From purchase_order_basic A,purchase_order_local_details B,customer_header PM, gate_inward_entry_basic G\r\n"
@@ -493,7 +493,7 @@ public interface GrnRepo extends JpaRepository<GrnVO, Long> {
 			+ "where P.cancel=0 AND gp.customer = p.supplier\r\n"
 			+ "and ?3 between p.schedule_start_date and p.schedule_end_date\r\n" + "and gp.doc_id = ?4\r\n"
 			+ "and  s.doc_id=p.purchase_order_no \r\n" + "and s.doc_id =?2  and p.org_id=?1")
-	Set<Object[]> getScheduleDocId(Long orgId, String purchaseOrderNo, String date, String gatePass);
+	Set<Object[]> getScheduleDocIdDetails(Long orgId, String purchaseOrderNo, String date, String gatePass);
 	
 	@Query(nativeQuery = true, value = "select i.item_id,i.item_code,i.item_description,p1.qty_in_primary_unit,h.hsn,u.unitmaster_id,p1.rate_in_inr from purchase_order_basic p join purchase_order_local_details p1 \r\n"
 			+ "on p.purchase_order_basic_id=p1.purchase_order_basic_id left join item i on i.item_id=p1.item left join hsn h on h.hsn_id=i.hsn_code\r\n"

@@ -19,29 +19,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "direct_purchase_file_upload_details")
+@Table(name = "stock_transfer_grn_attached_po_copy")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DirectPurchaseFileUploadDetailsVO {
+public class StockTransferGrnFileUploadDetailsVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "direct_purchase_file_upload_detailsgen")
-	@SequenceGenerator(name = "direct_purchase_file_upload_detailsgen", sequenceName = "direct_purchase_file_upload_detailsseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "direct_purchase_file_upload_details_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stock_transfer_grn_attached_po_copygen")
+	@SequenceGenerator(name = "stock_transfer_grn_attached_po_copygen", sequenceName = "stock_transfer_grn_attached_po_copyseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "stock_transfer_grn_attached_po_copy_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
-
-	@Column(name = "file_name")
-	private String fileName;
-
-	@Column(name = "name")
-	private String name;
-
-	@Column(name = "file_path")
-	private String filePath;
-
-	@Column(name = "file_type")
-	private String fileType;
 
 	@Column(name = "file_size")
 	private Long fileSize;
@@ -52,9 +40,17 @@ public class DirectPurchaseFileUploadDetailsVO {
 	@Column(name = "upload_on")
 	private LocalDateTime uploadOn;
 
-	@ManyToOne
-	@JoinColumn(name = "direct_purchase_basic_id")
-	@JsonBackReference
-	private DirectPurchaseVO directPurchaseVO;
+	@Column(name = "file_name")
+	private String fileName;
 
+	@Column(name = "file_path")
+	private String filePath;
+
+	@Column(name = "name")
+	private String name;
+
+	@ManyToOne
+	@JsonBackReference
+	@JoinColumn(name = "stock_transfer_grn_basic_id")
+	private StockTransferGrnVO stockTransferGrnVO;
 }

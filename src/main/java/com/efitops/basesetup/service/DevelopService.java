@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
@@ -161,10 +162,14 @@ public interface DevelopService {
 
 	List<ParameterMasterResponseDTO> getParameterMasterByOrgId(Long orgId) throws ApplicationException ;
 
-	Map<String, Object> createUpdateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files) throws ApplicationException, IOException ;
-
 	String getIssuesDocId(Long orgId, String financialYear);
 
+
+	Map<String, Object> updateCreateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files) throws ApplicationException ;
+
+	String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear, String screenCode);
+	
+	
 	
 	
 	

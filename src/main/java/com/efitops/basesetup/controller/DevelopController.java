@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
@@ -837,7 +838,8 @@ public class DevelopController extends BaseController {
 	@PostMapping(value = "/updateCreatePurchaseOrderAmendment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreatePurchaseOrderAmendment(
 
-			@RequestPart("purchaseOrderAmendment") PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
+//			@RequestPart("purchaseOrderAmendment") PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
+			@RequestBody PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
 
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -1086,6 +1088,69 @@ public class DevelopController extends BaseController {
 		}
 
 		return ResponseEntity.ok(responseDTO);
+	}
+	
+	//DOCID
+	
+	
+	@GetMapping("/getPurchaseOrderAmendmentDocId")
+	public ResponseEntity<ResponseDTO> getPurchaseOrderAmendmentDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear,
+	        @RequestParam String screenCode) {
+
+	    String methodName = "getPurchaseOrderAmendmentDocId()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String mapp = "";
+
+	    try {
+
+	        mapp = developService.getPurchaseOrderAmendmentDocId(
+	                orgId,
+	                financialYear,
+	                screenCode);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Purchase Order Amendment DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "purchaseOrderAmendmentDocId",
+	                mapp);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to retrieve Purchase Order Amendment DocId",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
 	}
 
 	// openstockentry
@@ -1688,12 +1753,11 @@ public class DevelopController extends BaseController {
 
 	// machine/instrumentmaster
 
-	@PostMapping(value = "/createUpdateMachineMaster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ResponseDTO> createUpdateMachineMaster(
+	@PostMapping(value = "/updateCreateMachineMaster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ResponseDTO> updateCreateMachineMaster(
 
-			@RequestPart("machineMaster") MachineMasterDTO machineMasterDTO,
-//			@RequestBody MachineMasterDTO machineMasterDTO,
-
+			@RequestPart("machineMasterVO") MachineMasterDTO machineMasterDTO,
+//	        @RequestBody() MachineMasterDTO machineMasterDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -1702,11 +1766,11 @@ public class DevelopController extends BaseController {
 
 		try {
 
-			Map<String, Object> machineMasterMap = developService.createUpdateMachineMaster(machineMasterDTO, files);
+			Map<String, Object> response = developService.updateCreateMachineMaster(machineMasterDTO, files);
 
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, machineMasterMap.get("message"));
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
 
-			responseObjectsMap.put("machineMasterVO", machineMasterMap.get("machineMasterVO"));
+			responseObjectsMap.put("machineMasterVO", response.get("machineMasterVO"));
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 
@@ -1719,5 +1783,4 @@ public class DevelopController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
-
 }

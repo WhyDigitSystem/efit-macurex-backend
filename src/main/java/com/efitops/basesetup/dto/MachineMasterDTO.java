@@ -89,5 +89,5 @@ public class MachineMasterDTO {
     private List<MachineHistoryDTO> machineHistoryDTO;
     
     
-    private List<MachineMasterAttachmentDTO> MachineMasterAttachmentDTO;
+    private List<MachineMasterAttachmentDTO> machineMasterAttachmentDTO;
 }

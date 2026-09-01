@@ -1907,4 +1907,65 @@ public class DevelopController extends BaseController {
 
 	    return ResponseEntity.ok(responseDTO);
 	}
+	
+	
+	@GetMapping("/getMachineMasterDocId")
+	public ResponseEntity<ResponseDTO> getMachineMasterDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear,
+	        @RequestParam String screenCode) {
+
+	    String methodName = "getMachineMasterDocId()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String mapp = "";
+
+	    try {
+
+	        mapp = developService.getMachineMasterDocId(
+	                orgId,
+	                financialYear,
+	                screenCode);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Machine Master DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "machineMasterDocId",
+	                mapp);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to retrieve Machine Master DocId",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
 }

@@ -5736,4 +5736,24 @@ private void createUpdateMachineMasterVO(
 
             return responseList;
         }
+        
+        //docid
+        
+        
+        @Override
+        public String getMachineMasterDocId(Long orgId, String financialYear, String screenCode) {
+
+            String screenCode1 = "MM";
+
+            String result = machineMasterRepo.getMachineMasterDocId(
+                    orgId,
+                    financialYear,
+                    screenCode1
+            );
+
+            return result;
+        }
+        
+        
 }
+

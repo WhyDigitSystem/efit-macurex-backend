@@ -58,6 +58,7 @@ import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerShippingDetailsVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.DailyExchangeRateVO;
 import com.efitops.basesetup.entity.DocketInvoiceDetailsVO;
 import com.efitops.basesetup.entity.DocketInvoiceVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
@@ -82,6 +83,7 @@ import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
+import com.efitops.basesetup.repository.DailyExchangeRateRepo;
 import com.efitops.basesetup.repository.DespatchInstructionRepo;
 import com.efitops.basesetup.repository.DocketInvoiceDetRepo;
 import com.efitops.basesetup.repository.DocketInvoiceRepo;
@@ -185,6 +187,9 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	SalesReturnTaxDetailsRepo salesReturnTaxDetailsRepo;
+	
+	@Autowired
+	DailyExchangeRateRepo dailyExchangeRateRepo;
 
 	@Autowired
 	HsnRepo hsnRepo;
@@ -2149,19 +2154,19 @@ public class TransactionServiceImpl implements TransactionService {
 			salesReturnVO = new SalesReturnVO();
 
 			// Generate Document ID
-			String docId = salesReturnRepo.getSalesReturnDocId(dto.getOrgId(), dto.getFinancialYear(), screenCode);
-
-			salesReturnVO.setDocId(docId);
-
-			// Update document last number
-			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
-
-			if (documentTypeMappingDetailsVO != null) {
-				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-
-				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
-			}
+//			String docId = salesReturnRepo.getSalesReturnDocId(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+//
+//			salesReturnVO.setDocId(docId);
+//
+//			// Update document last number
+//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+//					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+//
+//			if (documentTypeMappingDetailsVO != null) {
+//				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//			}
 
 			salesReturnVO.setCreatedBy(dto.getCreatedBy());
 			salesReturnVO.setUpdatedBy(dto.getCreatedBy());
@@ -2209,10 +2214,6 @@ public class TransactionServiceImpl implements TransactionService {
 
 		salesReturnVO = salesReturnRepo.saveAndFlush(salesReturnVO);
 
-		// Fetch latest saved object
-		salesReturnVO = salesReturnRepo.findById(salesReturnVO.getId())
-				.orElseThrow(() -> new ApplicationException("Sales Return Not Found"));
-
 		// =========================================================
 		// RESPONSE
 		// =========================================================
@@ -2250,13 +2251,6 @@ public class TransactionServiceImpl implements TransactionService {
 					.orElseThrow(() -> new ApplicationException("Location Not Found"));
 		}
 
-		ListOfValuesDetailsVO returnType = null;
-
-		if (dto.getReturnType() != null) {
-			returnType = listOfValuesDetailsRepo.findById(dto.getReturnType())
-					.orElseThrow(() -> new ApplicationException("Return Type Not Found"));
-		}
-
 		// =========================================================
 		// SET HEADER VALUES
 		// =========================================================
@@ -2280,12 +2274,23 @@ public class TransactionServiceImpl implements TransactionService {
 
 		salesReturnVO.setCustomer(customer);
 		salesReturnVO.setLocation(location);
-		salesReturnVO.setReturnType(returnType);
+		salesReturnVO.setReturnType(dto.getReturnType());
 
 		salesReturnVO.setApprovedByAccounts(dto.getApprovedByAccounts());
+		if (dto.getCurrency() != null) {
+		    CurrencyVO currency = currencyRepo.findById(dto.getCurrency())
+		            .orElseThrow(() -> new ApplicationException("Currency Not Found"));
 
-		salesReturnVO.setCurrency(dto.getCurrency());
-		salesReturnVO.setExchangeRate(dto.getExchangeRate());
+		    salesReturnVO.setCurrency(currency);
+		}
+
+		if (dto.getExchangeRate() != null) {
+		    DailyExchangeRateVO exchangeRate = dailyExchangeRateRepo.findById(dto.getExchangeRate())
+		            .orElseThrow(() -> new ApplicationException("Exchange Rate Not Found"));
+
+		    salesReturnVO.setExchangeRate(exchangeRate);
+		}
+
 
 		salesReturnVO.setInvoiceReferenceType(dto.getInvoiceReferenceType());
 
@@ -2348,9 +2353,29 @@ public class TransactionServiceImpl implements TransactionService {
 				detailVO.setReceivedQty(child.getReceivedQty());
 				detailVO.setRate(child.getRate());
 
-				detailVO.setRateInSelectedCurrency(child.getRateInSelectedCurrency());
+				BigDecimal rateInSelectedCurrency = BigDecimal.ZERO;
+				BigDecimal amountInSelectedCurrency = BigDecimal.ZERO;
 
-				detailVO.setAmountInSelectedCurrency(child.getAmountInSelectedCurrency());
+				DailyExchangeRateVO exchangeRate = dailyExchangeRateRepo.findById(dto.getExchangeRate())
+				        .orElseThrow(() -> new ApplicationException("Exchange Rate Not Found"));
+				
+				BigDecimal exchangeRateValue = BigDecimal.valueOf(exchangeRate.getBuyingExRate());
+				
+				if (exchangeRateValue != null
+				        && exchangeRateValue.compareTo(BigDecimal.ZERO) != 0
+				        && child.getRate() != null) {
+
+				    rateInSelectedCurrency = child.getRate()
+				            .divide(exchangeRateValue, 2, RoundingMode.HALF_UP);
+
+				    if (child.getReceivedQty() != null) {
+				        amountInSelectedCurrency = child.getReceivedQty()
+				                .multiply(rateInSelectedCurrency);
+				    }
+				}
+
+				detailVO.setRateInSelectedCurrency(rateInSelectedCurrency);
+				detailVO.setAmountInSelectedCurrency(amountInSelectedCurrency);
 
 				// =================================================
 				// AMOUNT CALCULATION
@@ -2363,26 +2388,6 @@ public class TransactionServiceImpl implements TransactionService {
 				BigDecimal amount = qty.multiply(rate);
 
 				detailVO.setAmount(amount);
-
-				// =================================================
-				// TAX CALCULATION
-				// =================================================
-
-				BigDecimal taxPercentage = BigDecimal.ZERO;
-
-				if (child.getTaxPercentage() != null && !child.getTaxPercentage().isEmpty()) {
-
-					taxPercentage = new BigDecimal(child.getTaxPercentage());
-				}
-
-				BigDecimal taxAmount = amount.multiply(taxPercentage).divide(BigDecimal.valueOf(100), 2,
-						RoundingMode.HALF_UP);
-
-				/*
-				 * You have taxType in DTO.
-				 *
-				 * Example: CGST/SGST -> split tax IGST -> IGST
-				 */
 
 				if (dto.isIgstApplicable()) {
 
@@ -2460,13 +2465,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 				SalesReturnTaxDetailsVO taxVO = new SalesReturnTaxDetailsVO();
 
-				if (taxDTO.getParticulars() != null) {
-
-					ListOfValuesDetailsVO particulars = listOfValuesDetailsRepo.findById(taxDTO.getParticulars())
-							.orElseThrow(() -> new ApplicationException("Particulars Not Found"));
-
-					taxVO.setParticulars(particulars);
-				}
+				
+				taxVO.setParticulars(taxDTO.getParticulars());
 
 				taxVO.setAmount(taxDTO.getAmount());
 
@@ -2568,23 +2568,29 @@ public class TransactionServiceImpl implements TransactionService {
 		// RETURN TYPE
 		// =========================================================
 
-		if (vo.getReturnType() != null) {
 
-			ListOfValuesDetailsResponseDTO returnTypeDTO = new ListOfValuesDetailsResponseDTO();
-
-			returnTypeDTO.setId(vo.getReturnType().getId());
-
-			returnTypeDTO.setCode(vo.getReturnType().getValueCode());
-
-			returnTypeDTO.setDescription(vo.getReturnType().getValueDescription());
-
-			dto.setReturnType(returnTypeDTO);
-		}
+		dto.setReturnType(vo.getReturnType());
 
 		dto.setApprovedByAccounts(vo.getApprovedByAccounts());
 
-		dto.setCurrency(vo.getCurrency());
-		dto.setExchangeRate(vo.getExchangeRate());
+		if (vo.getExchangeRate() != null) {
+		    dto.setExchangeRate(
+		        BigDecimal.valueOf(vo.getExchangeRate().getBuyingExRate())
+		    );
+		} else {
+		    dto.setExchangeRate(BigDecimal.ZERO);
+		}
+		
+		if (vo.getCurrency() != null) {
+
+		    CurrencyResponseDTO currencyDTO = new CurrencyResponseDTO();
+
+		    currencyDTO.setId(vo.getCurrency().getId());
+		    currencyDTO.setCurrencyName(vo.getCurrency().getMainCurrency());
+
+		    dto.setCurrency(currencyDTO);
+		}
+		
 
 		dto.setInvoiceReferenceType(vo.getInvoiceReferenceType());
 
@@ -2751,20 +2757,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 				taxDTO.setId(tax.getId());
 
-				// Particulars
-				if (tax.getParticulars() != null) {
-
-					ListOfValuesDetailsResponseDTO particularsDTO = new ListOfValuesDetailsResponseDTO();
-
-					particularsDTO.setId(tax.getParticulars().getId());
-
-					particularsDTO.setCode(tax.getParticulars().getValueCode());
-
-					particularsDTO.setDescription(tax.getParticulars().getValueDescription());
-
-					taxDTO.setParticulars(particularsDTO);
-				}
-
+				taxDTO.setParticulars(tax.getParticulars());
+	
 				taxDTO.setAmount(tax.getAmount());
 
 				taxDTO.setGlAccountName(tax.getGlAccountName());
@@ -2776,5 +2770,273 @@ public class TransactionServiceImpl implements TransactionService {
 		dto.setSalesReturnTaxDetails(taxResponse);
 
 		return dto;
+	}
+	
+	
+	@Override
+	public List<Map<String, Object>> getSalesRejectionInvoiceforSalesReturn(
+	        Long orgId, Long branch) {
+
+	    List<Object[]> result =
+	    		salesReturnRepo
+	                    .getSalesRejectionInvoiceforSalesReturn(orgId, branch);
+
+	    return getSalesRejectionInvoiceDropdownDetails(result);
+	}
+
+	private List<Map<String, Object>> getSalesRejectionInvoiceDropdownDetails(
+	        List<Object[]> result) {
+
+	    List<Map<String, Object>> details = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("docId",
+	                fs[0] != null ? fs[0].toString() : null);
+
+	        part.put("docDate",
+	                fs[1] != null ? fs[1].toString() : null);
+
+	        part.put("docType",
+	                fs[2] != null ? fs[2].toString() : null);
+
+	        details.add(part);
+	    }
+
+	    return details;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getGateInwardForSalesReturn(
+	        Long custcode,
+	        String type,
+	        String invno,
+	        Long orgId,
+	        Long branch) {
+
+	    List<Object[]> result = salesReturnRepo
+	            .getGateInwardForSalesReturn(
+	                    custcode,
+	                    type,
+	                    invno,
+	                    orgId,
+	                    branch);
+
+	    return getGateInwardForSalesReturnDetails(result);
+	}
+	
+	private List<Map<String, Object>> getGateInwardForSalesReturnDetails(
+	        List<Object[]> result) {
+
+	    List<Map<String, Object>> details = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("gateInwardId", fs[0] != null
+	                ? ((Number) fs[0]).longValue()
+	                : null);
+
+	        part.put("gateInwardDocId", fs[1] != null
+	                ? fs[1].toString()
+	                : null);
+
+	        part.put("docDate", fs[2] != null
+	                ? fs[2]
+	                : null);
+
+	        part.put("supplierInvoiceNumber", fs[3] != null
+	                ? fs[3].toString()
+	                : null);
+
+	        part.put("supplierInvoiceDate", fs[4] != null
+	                ? fs[4]
+	                : null);
+
+	        details.add(part);
+	    }
+
+	    return details;
+	}
+	
+	
+	@Override
+	public List<Map<String, Object>> getSalesRejectionInvoiceItemDetailsForSalesRetuen(
+	        String invoiceId,
+	        Long orgId,
+	        Long branch) throws ApplicationException {
+
+	    Set<Object[]> result =
+	            salesReturnRepo
+	                    .getSalesRejectionInvoiceItemDetailsForSalesRetuen(
+	                            invoiceId,
+	                            orgId,
+	                            branch);
+
+	    return getSalesRejectionInvoiceItemDetailsResponse(result);
+	}
+	
+	private List<Map<String, Object>> getSalesRejectionInvoiceItemDetailsResponse(
+	        Set<Object[]> result) {
+
+	    List<Map<String, Object>> details = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("itemId",
+	                fs[0] != null
+	                        ? Long.valueOf(fs[0].toString())
+	                        : null);
+
+	        part.put("itemCode",
+	                fs[1] != null
+	                        ? fs[1].toString()
+	                        : null);
+
+	        part.put("itemDescription",
+	                fs[2] != null
+	                        ? fs[2].toString()
+	                        : null);
+
+	        part.put("hsnSacCode",
+	                fs[3] != null
+	                        ? fs[3].toString()
+	                        : null);
+
+	        part.put("qtySold",
+	                fs[4] != null
+	                        ? new BigDecimal(fs[4].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("unitId",
+	                fs[5] != null
+	                        ? Long.valueOf(fs[5].toString())
+	                        : null);
+
+	        part.put("unitCode",
+	                fs[6] != null
+	                        ? fs[6].toString()
+	                        : null);
+
+	        part.put("unitDescription",
+	                fs[7] != null
+	                        ? fs[7].toString()
+	                        : null);
+
+	        part.put("rate",
+	                fs[8] != null
+	                        ? new BigDecimal(fs[8].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("cgstRate",
+	                fs[9] != null
+	                        ? new BigDecimal(fs[9].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("sgstRate",
+	                fs[10] != null
+	                        ? new BigDecimal(fs[10].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("igstRate",
+	                fs[11] != null
+	                        ? new BigDecimal(fs[11].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("newRate",
+	                fs[12] != null
+	                        ? new BigDecimal(fs[12].toString())
+	                        : BigDecimal.ZERO);
+	        
+	        details.add(part);
+	    }
+
+	    return details;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getItemDetailsForSalesReturn(
+	        Long orgId, Long branch) throws ApplicationException {
+
+	    Set<Object[]> result =
+	    		salesReturnRepo.
+	                    getItemDetailsForSalesReturn(orgId, branch);
+
+	    return getItemDetailsForSalesReturnResponse(result);
+	}
+	
+	private List<Map<String, Object>> getItemDetailsForSalesReturnResponse(
+	        Set<Object[]> result) {
+
+	    List<Map<String, Object>> details = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+	        
+	        part.put("itemId",
+	                fs[0] != null
+	                        ? Long.valueOf(fs[0].toString())
+	                        : null);
+
+	        part.put("itemCode",
+	                fs[1] != null
+	                        ? fs[1].toString()
+	                        : null);
+
+	        part.put("itemDescription",
+	                fs[2] != null
+	                        ? fs[2].toString()
+	                        : null);
+
+	        part.put("hsnSacCode",
+	                fs[3] != null
+	                        ? fs[3].toString()
+	                        : null);
+
+	        part.put("unitId",
+	                fs[4] != null
+	                        ? Long.valueOf(fs[4].toString())
+	                        : null);
+
+	        part.put("unitCode",
+	                fs[5] != null
+	                        ? fs[5].toString()
+	                        : null);
+
+	        part.put("unitDescription",
+	                fs[6] != null
+	                        ? fs[6].toString()
+	                        : null);
+
+	        part.put("rate",
+	                fs[7] != null
+	                        ? new BigDecimal(fs[7].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("cgstRate",
+	                fs[8] != null
+	                        ? new BigDecimal(fs[8].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("sgstRate",
+	                fs[9] != null
+	                        ? new BigDecimal(fs[9].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("igstRate",
+	                fs[10] != null
+	                        ? new BigDecimal(fs[10].toString())
+	                        : BigDecimal.ZERO);
+
+	        details.add(part);
+	    }
+
+	    return details;
 	}
 }

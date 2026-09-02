@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.GrnResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferGrnResponseDTO;
 import com.efitops.basesetup.dto.GrnDTO;
+import com.efitops.basesetup.dto.StockTransferGrnDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -29,12 +31,36 @@ public interface GrnService {
 
 	String getGrnDocId(Long orgId, String financialYear, String screenCode);
 
-	List<Map<String, Object>> getGatePassDocId(Long orgId, Long branch, Long supplierCode);
+	List<Map<String, Object>> getGatePassDocIdDetails(Long orgId, Long branch, Long supplierCode);
 
 	List<Map<String, Object>> getPurchaseOrderNoBasedDocId(Long orgId, Long branch, Long supplierCode, String gatePass);
 
-	List<Map<String, Object>> getScheduleDocId(Long orgId, String purchaseOrderNo, String date, String gatePass);
+	List<Map<String, Object>> getScheduleDocIdDetails(Long orgId, String purchaseOrderNo, String date, String gatePass);
 
 	List<Map<String, Object>> getPoNmberBasedItemDetails(Long orgId, Long branch, String purchaseOrderNo);
+
+	// Stcok transfer
+
+	StockTransferGrnResponseDTO getStockTransferGrnById(Long id) throws ApplicationException;
+
+	List<StockTransferGrnResponseDTO> getStockTransferGrnByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> createUpdateStockTransferGrn(StockTransferGrnDTO stockTransferGrnDTO, MultipartFile[] files)
+			throws ApplicationException;
+
+	ResponseEntity<byte[]> viewStockTransferGrnFile(HttpServletRequest request) throws IOException;
+
+	String getStockTransferGrnDocId(Long orgId, String financialYear);
+
+	List<Map<String, Object>> getGatePassDocIdDetailsForStockTransfer(Long orgId, Long branch, Long supplierCode);
+
+	List<Map<String, Object>> getPurchaseOrderNumberStockTransfer(Long orgId, Long branch, Long supplierCode);
+
+	List<Map<String, Object>> getScheduleDocIdStockTransfer(Long orgId, Long branch, Long supplierCode,
+			String purchaseOrderNo);
+
+	List<Map<String, Object>> getItemDetailsForStockTransfer(Long orgId, Long branch, String purchaseOrderNo);
+
+	List<Map<String, Object>> getLocationDetails(Long orgId, Long branch);
 
 }

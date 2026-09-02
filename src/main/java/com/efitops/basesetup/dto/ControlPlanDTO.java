@@ -59,6 +59,10 @@ public class ControlPlanDTO {
 	    
 	    
 	    private List<ControlPlanDetailDTO> controlPlanDetailDTO;
+	    
+	    private List<ControlPlanParameterDTO> controlPlanParameterDTO;
+	    
+	    
 
 	  
 }

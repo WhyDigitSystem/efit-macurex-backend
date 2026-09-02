@@ -115,6 +115,11 @@ public class ControlPlanVO {
 		@JsonManagedReference
 		private List<ControlPlanParameterVO> controlPlanParameterVO = new ArrayList<>();
 		
+		@OneToMany(mappedBy = "controlPlanVO", cascade = CascadeType.ALL)
+		@JsonManagedReference
+		private List<ControlPlanSampleVO> controlPlansample = new ArrayList<>();
+		
+		
 		@JsonGetter("activeStatus")
 		public String getActiveStatus() {
 			return active ? "Active" : "In-Active";

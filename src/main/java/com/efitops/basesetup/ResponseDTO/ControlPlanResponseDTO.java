@@ -57,6 +57,9 @@ public class ControlPlanResponseDTO {
 	    private String cancelRemarks;
 	    
 	    private List<ControlPlanDetailResponseDTO> ControlPlanDetailResponseDTO;
+	    
+	    private List<ParameterMasterResponseDTO> ParameterMasterResponseDTO;
+
 
 
 }

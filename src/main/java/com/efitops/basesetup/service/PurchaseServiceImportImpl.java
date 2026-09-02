@@ -1149,6 +1149,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			map.put("gstNo", ch[5] != null ? ch[5].toString() : "");
 			map.put("stateName", ch[6] != null ? ch[6].toString() : "");
 			map.put("isRegistered", ch[7] != null ? ch[7].toString() : "");
+			map.put("stateCode", ch[8] != null ? ch[8].toString() : "");
 
 			list.add(map);
 		}

@@ -565,8 +565,7 @@ public class GrnServiceController extends BaseController {
 	}
 
 	@GetMapping("/getLocationDetails")
-	public ResponseEntity<ResponseDTO> getLocationDetails(@RequestParam Long orgId,
-			@RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getLocationDetails(@RequestParam Long orgId, @RequestParam Long branch) {
 		String methodName = "getLocationDetails()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -586,7 +585,8 @@ public class GrnServiceController extends BaseController {
 			responseObjectsMap.put("mapp", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Location Details", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Location Details",
+					errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

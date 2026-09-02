@@ -1,6 +1,5 @@
 package com.efitops.basesetup.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,9 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InitialPlanningInstrumentDetailsDTO {
 
-	private String instrumentNo;
-
-	private String instrumentName;
+	private Long instrumentNo;
 
 	private String range;
 

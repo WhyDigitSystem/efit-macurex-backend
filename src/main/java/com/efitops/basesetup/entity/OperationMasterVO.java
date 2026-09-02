@@ -1,16 +1,23 @@
 package com.efitops.basesetup.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,18 +34,17 @@ public class OperationMasterVO {
 	@SequenceGenerator(name = "operation_master_basicgen", sequenceName = "operation_master_basicseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "operation_master_basic_id")
 	private Long id;
-	
+
 	@Column(name = "operation_id")
 	private String operationId;
-	
+
 	@Column(name = "description")
 	private String description;
-	
-    
-    @Column(name = "active")
+
+	@Column(name = "active")
 	private boolean active;
-    
-    @Column(name = "org_id")
+
+	@Column(name = "org_id")
 	private Long orgId;
 
 	@Column(name = "created_by")
@@ -53,8 +59,7 @@ public class OperationMasterVO {
 	private String screenName = "OPERATION MASTER";
 	@Column(name = "screen_code")
 	private String screenCode = "OM";
-	
-	
+
 	@JsonGetter("activeStatus")
 	public String getActiveStatus() {
 		return active ? "Active" : "In-Active";
@@ -68,5 +73,15 @@ public class OperationMasterVO {
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 
+	@OneToMany(mappedBy = "operationMasterVO", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference
+	private List<OperationMasterMachineDetailsVO> operationMasterMachineDetailsVO = new ArrayList<>();
 
+	@OneToMany(mappedBy = "operationMasterVO", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference
+	private List<OperationMasterToolDetailsVO> operationMasterToolDetailsVO = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "operationMasterVO", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference
+	private List<OperationMasterConsumableDetailsVO> operationMasterConsumableDetailsVO = new ArrayList<>();
 }

@@ -1,9 +1,11 @@
 package com.efitops.basesetup.ResponseDTO;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -75,9 +77,39 @@ public class ToolMasterResponseDTO {
 	private String cancelRemarks;
 
 	private String createdBy;
+	
+	
+	private BigDecimal toolWeight;
 
-	private List<ToolMasterTechnicalInfoDetailsResponseDTO> toolMasterTechnicalInfoDetailsDTO;
+	private UnitMasterResponseDTO unit;
 
+	private String toolFixtureSize;
+
+	private String lifeOfTool;
+
+	private ListOfValuesDetailsResponseDTO lifeType;
+
+	private BigDecimal reconditionFreq;
+
+	private BigDecimal setUpTimeInMinutes;
+
+	private BigDecimal completedLifeCycle;
+
+	private String toolMadeOf;
+
+	private String technicalSpecification;
+
+	private BigDecimal noOfStokesCompleted;
+
+	private BigDecimal strokesCompletedAfterReconditioning;
+
+	private LocalDate reconditionedDate;
+
+	private BigDecimal toolFixtureCost;
+
+	private BigDecimal toolFixtureAmortizedRecovered;
+
+	
 	private List<ToolMasterSpareDetailsResponseDTO> toolMasterSpareDetailsDTO;
 
 	private List<ToolMasterComponentOutPutDetailsResponseDTO> toolMasterComponentOutPutDetailsDTO;

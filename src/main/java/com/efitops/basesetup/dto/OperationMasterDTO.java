@@ -1,6 +1,6 @@
 package com.efitops.basesetup.dto;
 
-import javax.persistence.Column;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,5 +24,13 @@ public class OperationMasterDTO {
 	private String createdBy;
 	
 	private String cancelRemarks;
+	
+	private List<OperationMasterToolDetailsDTO> operationMasterToolDetailsDTO;
+	
+	private List<OperationMasterMachineDetailsDTO> operationMasterMachineDetailsDTO;
+	
+	private List<OperationMasterConsumableDetailsDTO> operationMasterConsumableDetailsDTO;
+	
+	
 
 }

@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.efitops.basesetup.ResponseDTO.InitialPlanningResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMasterResponseDTO;
 import com.efitops.basesetup.dto.InitialPlanningDTO;
+import com.efitops.basesetup.dto.OperationMasterDTO;
 import com.efitops.basesetup.dto.ProblemSolvingEntryDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
@@ -30,5 +32,14 @@ public interface InitialPlanningService {
 
 	Map<String, Object> getTeamMemberDropdownForProblemSolvingEntry(Long branch, Long department, Long orgId)
 			throws ApplicationException;
+
+	List<Map<String, Object>> getMachineInstrumentDropdownForInitialPlanning(Long orgId, Long branch) throws ApplicationException;
+
+//operation master
+	Map<String, Object> updateCreateOperationMaster(OperationMasterDTO operationMasterDTO) throws ApplicationException;
+
+	OperationMasterResponseDTO getOperationMasterById(Long id) throws ApplicationException;
+
+	List<OperationMasterResponseDTO> getOperationMasterByOrgId(Long orgId) throws ApplicationException;
 
 }

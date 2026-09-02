@@ -28,14 +28,12 @@ public class InitialPlanningInstrumentDetailsVO {
 	@Column(name = "initial_planning_instruments_details_id")
 	private Long id;
 	
-	@Column(name = "instrument_no")
-	private String instrumentNo;
+	@ManyToOne
+	@JoinColumn(name = "instrument_no")
+	private MachineMasterVO instrumentNo;
 	
-	@Column(name = "instrument_name")
-	private String instrumentName;
-	
-	@Column(name = "Instrument_range")
-	private String range;
+	@Column(name = "range")
+	private String  range;
 	
 	@ManyToOne
 	@JoinColumn(name = "initial_planning_details_id")

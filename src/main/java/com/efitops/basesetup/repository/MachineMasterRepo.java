@@ -1,6 +1,7 @@
 package com.efitops.basesetup.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,10 @@ public interface MachineMasterRepo extends JpaRepository<MachineMasterVO, Long> 
 
 	List<MachineMasterVO> findByOrgIdAndBranch(Long orgId, BranchVO branchVO);
 	
+	@Query(value = "SELECT * FROM machine_equipments_master " +
+            "WHERE machine_equipments_master_id = ?1",
+    nativeQuery = true)
+Optional<MachineMasterVO> findMachineById(Long id);
 	
 	@Query(nativeQuery = true, value =
 	        "select concat(prefix, lpad(last_no, 5, 0)) AS docid " +

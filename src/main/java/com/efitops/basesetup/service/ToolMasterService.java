@@ -18,4 +18,6 @@ public interface ToolMasterService {
 
 	List<ToolMasterResponseDTO> getToolMasterByOrgId(Long orgId, Long branch) throws ApplicationException;
 
+	List<Map<String, Object>> getLocationForToolMaster(Long orgId, Long branchId) throws ApplicationException;
+
 }

@@ -1,6 +1,7 @@
 package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,6 +122,54 @@ public class ToolMasterVO {
 	@Column(name = "remarks")
 	private String remarks;
 	
+//	technical info
+	@Column(name = "tool_weight")
+	private BigDecimal toolWeight;
+	
+	@ManyToOne
+	@JoinColumn(name = "unit")
+	private UnitMasterVO unit;
+	
+	@Column(name = "tool_fixture_size")
+	private String toolFixtureSize;
+	
+	@Column(name = "life_of_tool")
+	private String lifeOfTool;
+	
+	@ManyToOne
+	@JoinColumn(name = "life_type")
+	private ListOfValuesDetailsVO lifeType;
+	
+	@Column(name = "recondition_freq")
+	private BigDecimal reconditionFreq;
+	
+	@Column(name = "set_up_time_in_minutes")
+	private BigDecimal setUpTimeInMinutes;
+	
+	@Column(name = "completed_life_cycle")
+	private BigDecimal completedLifeCycle;
+	
+	@Column(name = "tool_made_of")
+	private String toolMadeOf;
+	
+	@Column(name = "technical_specification")
+	private String technicalSpecification;
+	
+	@Column(name = "no_of_strokes_completed")
+	private BigDecimal noOfStokesCompleted;
+	
+	@Column(name = "strokes_completed_after_reconditioning")
+	private BigDecimal strokesCompletedAfterReconditioning;
+	
+	@Column(name = "reconditioned_date")
+	private LocalDate reconditionedDate;
+	
+	@Column(name = "tool_fixture_cost")
+	private BigDecimal toolFixtureCost;
+	
+	@Column(name = "tool_fixture_amortized_recovered")
+	private BigDecimal toolFixtureAmortizedRecovered;
+	
 //	images 
 	
 	@Column(name = "tool_name")
@@ -156,9 +205,7 @@ public class ToolMasterVO {
 	@Column(name = "screen_name")
 	private String screenName = "TOOL MASTER";
 
-    @OneToMany(mappedBy = "toolMasterVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<ToolMasterTechnicalInfoDetailsVO> toolMasterTechnicalInfoDetailsVO = new ArrayList<>();
+   
     
     @OneToMany(mappedBy = "toolMasterVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JsonManagedReference

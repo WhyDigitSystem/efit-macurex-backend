@@ -3107,7 +3107,6 @@ public class DevelopServiceImpl implements DevelopService {
 	                    docId, branch, orgId);
 
 	    if (itemList.isEmpty()) {
-
 	        throw new ApplicationException("No Item Details Found");
 	    }
 
@@ -3117,9 +3116,10 @@ public class DevelopServiceImpl implements DevelopService {
 
 	        Map<String, Object> map = new HashMap<>();
 
-	       
-	        map.put("itemCode", obj[0]);
-	        map.put("hsnSacCode", obj[1]);
+	        map.put("id", obj[0]);
+	        map.put("itemCode", obj[1]);
+	        map.put("itemDescription", obj[2]);
+	        map.put("hsnSacCode", obj[3]);
 
 	        responseList.add(map);
 	    }
@@ -3128,32 +3128,40 @@ public class DevelopServiceImpl implements DevelopService {
 	}
 	
 	@Override
-	public List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(Long customer, Long orgId,
-			Long branch) throws ApplicationException {
+	public List<Map<String, Object>> getCurrencyExchangeRateForPurchaseOrderAmendment(
+	        String docId, Long orgId, Long branch) throws ApplicationException {
 
-		Set<Object[]> result = purchaseOrderAmendmentRepo.getCurrencyExchangeRateforPurchaseOrderAmendment(customer,
-				orgId, branch);
+	    List<Object[]> result =
+	            purchaseOrderAmendmentRepo.getCurrencyExchangeRateForPurchaseOrderAmendment(
+	                    docId, orgId, branch);
 
-		List<Map<String, Object>> currencyDetails = new ArrayList<>();
+	    if (result.isEmpty()) {
+	        throw new ApplicationException("No Currency Exchange Rate Details Found");
+	    }
 
-		for (Object[] obj : result) {
+	    List<Map<String, Object>> currencyDetails = new ArrayList<>();
 
-			Map<String, Object> currency = new HashMap<>();
+	    for (Object[] obj : result) {
 
-			currency.put("currencyId", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+	        Map<String, Object> currency = new HashMap<>();
 
-			currency.put("currency", obj[1] != null ? obj[1].toString() : null);
+	        currency.put("currencyId",
+	                obj[0] != null ? ((Number) obj[0]).longValue() : null);
 
-			currency.put("exchangeRate", obj[2] != null ? ((Number) obj[2]).doubleValue() : null);
+	        currency.put("currency",
+	                obj[1] != null ? obj[1].toString() : null);
 
-			currency.put("buyingExRate", obj[3] != null ? ((Number) obj[3]).doubleValue() : null);
+	        currency.put("exchangeRate",
+	                obj[2] != null ? ((Number) obj[2]).doubleValue() : null);
 
-			currencyDetails.add(currency);
-		}
+	        currency.put("buyingExRate",
+	                obj[3] != null ? ((Number) obj[3]).doubleValue() : null);
 
-		return currencyDetails;
+	        currencyDetails.add(currency);
+	    }
+
+	    return currencyDetails;
 	}
-	
 	//DOCID
 	
 	
@@ -5657,45 +5665,45 @@ private void createUpdateMachineMasterVO(
             // =========================================================
             // ATTACHMENT RESPONSE
             // =========================================================
-
-            List<MachineMasterAttachmentResponseDTO>
-                    attachmentList = new ArrayList<>();
-
-            if (vo.getMachineMasterAttachmentVO() != null) {
-
-                for (MachineMasterAttachmentVO attachmentVO :
-                        vo.getMachineMasterAttachmentVO()) {
-
-                    MachineMasterAttachmentResponseDTO attachmentDTO =
-                            new MachineMasterAttachmentResponseDTO();
-
-                    attachmentDTO.setId(
-                            attachmentVO.getId());
-
-                    attachmentDTO.setName(
-                            attachmentVO.getName());
-
-                    attachmentDTO.setFileName(
-                            attachmentVO.getFileName());
-
-                    attachmentDTO.setFilePath(
-                            attachmentVO.getFilePath());
-
-                    attachmentDTO.setFileSize(
-                            attachmentVO.getFileSize());
-
-                    attachmentDTO.setContentType(
-                            attachmentVO.getContentType());
-
-                    attachmentDTO.setUploadOn(
-                            attachmentVO.getUploadOn());
-
-                    attachmentList.add(attachmentDTO);
-                }
-            }
-
-            dto.setMachineMasterAttachmentResponseDTO(
-                    attachmentList);
+//
+//            List<MachineMasterAttachmentResponseDTO>
+//                    attachmentList = new ArrayList<>();
+//
+//            if (vo.getMachineMasterAttachmentVO() != null) {
+//
+//                for (MachineMasterAttachmentVO attachmentVO :
+//                        vo.getMachineMasterAttachmentVO()) {
+//
+//                    MachineMasterAttachmentResponseDTO attachmentDTO =
+//                            new MachineMasterAttachmentResponseDTO();
+//
+//                    attachmentDTO.setId(
+//                            attachmentVO.getId());
+//
+//                    attachmentDTO.setName(
+//                            attachmentVO.getName());
+//
+//                    attachmentDTO.setFileName(
+//                            attachmentVO.getFileName());
+//
+//                    attachmentDTO.setFilePath(
+//                            attachmentVO.getFilePath());
+//
+//                    attachmentDTO.setFileSize(
+//                            attachmentVO.getFileSize());
+//
+//                    attachmentDTO.setContentType(
+//                            attachmentVO.getContentType());
+//
+//                    attachmentDTO.setUploadOn(
+//                            attachmentVO.getUploadOn());
+//
+//                    attachmentList.add(attachmentDTO);
+//                }
+//            }
+//
+//            dto.setMachineMasterAttachmentResponseDTO(
+//                    attachmentList);
 
             return dto;
         }
@@ -5741,14 +5749,14 @@ private void createUpdateMachineMasterVO(
         
         
         @Override
-        public String getMachineMasterDocId(Long orgId, String financialYear, String screenCode) {
+        public String getMachineMasterDocId(Long orgId, String financialYear) {
 
-            String screenCode1 = "MM";
+            String screenCode = "MM";
 
             String result = machineMasterRepo.getMachineMasterDocId(
                     orgId,
                     financialYear,
-                    screenCode1
+                    screenCode
             );
 
             return result;

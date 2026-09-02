@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InitialPlanningInstrumentDetailsResponseDTO {
+public class MachineInstrumentResponseDTO {
 	
-	private MachineInstrumentResponseDTO instrumentNo;
-
-
-	private String range;
+	private Long id;
+	private  String machineInstrumentNo;
+	private String machineInstrumentName;
 
 }

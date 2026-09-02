@@ -117,7 +117,7 @@ public interface DevelopService {
 			throws ApplicationException;
 
 	
-	List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(Long customer, Long orgId, Long branch)
+	List<Map<String, Object>> getCurrencyExchangeRateForPurchaseOrderAmendment(String docId, Long orgId, Long branch)
 			throws ApplicationException;
 
 	Map<String, Object> getContractNoDropdownforPurchaseContractAmendment(Long orgId, Long branch, Long customerId)
@@ -175,6 +175,10 @@ public interface DevelopService {
 			throws ApplicationException;
 
 	String getMachineMasterDocId(Long orgId, String financialYear, String screenCode);
+
+	
+
+	
 	
 	
 	

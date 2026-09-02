@@ -37,8 +37,7 @@ public class ToolMasterController extends BaseController {
 	ToolMasterService toolMasterService;
 
 	@PostMapping(value = "/updateCreateToolMaster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseDTO updateCreateToolMaster(
-			@RequestPart("toolMasterVO") ToolMasterDTO toolMasterDTO,
+	public ResponseDTO updateCreateToolMaster(@RequestPart("toolMasterVO") ToolMasterDTO toolMasterDTO,
 //			@RequestBody ToolMasterDTO toolMasterDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -103,6 +102,34 @@ public class ToolMasterController extends BaseController {
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Tool Master Details Fetched Successfully");
 
 			responseObjectsMap.put("toolMasterList", toolMasterList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+//	location dropdown
+
+	@GetMapping("/getLocationForToolMaster")
+	public ResponseEntity<ResponseDTO> getLocationForToolMaster(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<Map<String, Object>> locationList = toolMasterService.getLocationForToolMaster(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Location Details Fetched Successfully");
+
+			responseObjectsMap.put("locationList", locationList);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 

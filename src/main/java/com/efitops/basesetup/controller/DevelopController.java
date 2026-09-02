@@ -838,8 +838,8 @@ public class DevelopController extends BaseController {
 	@PostMapping(value = "/updateCreatePurchaseOrderAmendment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreatePurchaseOrderAmendment(
 
-//			@RequestPart("purchaseOrderAmendment") PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
-			@RequestBody PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
+			@RequestPart("purchaseOrderAmendment") PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
+//			@RequestBody PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
 
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -1075,7 +1075,7 @@ public class DevelopController extends BaseController {
 	}
 
 	@GetMapping("/getCurrencyExchangeRateforPurchaseOrderAmendment")
-	public ResponseEntity<ResponseDTO> getCurrencyExchangeRateforPurchaseOrderAmendment(@RequestParam Long customer,
+	public ResponseEntity<ResponseDTO> getCurrencyExchangeRateforPurchaseOrderAmendment(@RequestParam String docId,
 			@RequestParam Long orgId, @RequestParam Long branch) {
 
 		String methodName = "getCurrencyExchangeRateforPurchaseOrderAmendment()";
@@ -1092,7 +1092,7 @@ public class DevelopController extends BaseController {
 
 		try {
 
-			mov = developService.getCurrencyExchangeRateforPurchaseOrderAmendment(customer, orgId, branch);
+			mov = developService.getCurrencyExchangeRateForPurchaseOrderAmendment(docId, orgId, branch);
 
 			responseObjectsMap.put("currencyDetails", mov);
 

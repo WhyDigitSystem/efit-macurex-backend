@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InitialPlanningInstrumentDetailsDTO {
-
-	private Long instrumentNo;
-
-	private String range;
+public class OperationMasterToolDetailsDTO {
+	
+	private Long toolId;
 
 }

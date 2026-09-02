@@ -922,4 +922,33 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 	    return responseList;
 	}
+	
+//	dropdown for the location
+	
+	@Override
+	public List<Map<String, Object>> getLocationForToolMaster(
+	        Long orgId, Long branchId) throws ApplicationException {
+
+	    List<Object[]> locationList =
+	            toolMasterRepo.getLocationForToolMaster(orgId, branchId);
+
+	    if (locationList.isEmpty()) {
+	        throw new ApplicationException("No Location Details Found");
+	    }
+
+	    List<Map<String, Object>> responseList = new ArrayList<>();
+
+	    for (Object[] obj : locationList) {
+
+	        Map<String, Object> map = new HashMap<>();
+
+	        map.put("id", obj[0]);
+	        map.put("locationId", obj[1]);
+	        map.put("locationName", obj[2]);
+
+	        responseList.add(map);
+	    }
+
+	    return responseList;
+	}
 }

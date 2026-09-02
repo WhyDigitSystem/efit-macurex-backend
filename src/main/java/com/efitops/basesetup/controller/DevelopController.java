@@ -1912,8 +1912,7 @@ public class DevelopController extends BaseController {
 	@GetMapping("/getMachineMasterDocId")
 	public ResponseEntity<ResponseDTO> getMachineMasterDocId(
 	        @RequestParam Long orgId,
-	        @RequestParam String financialYear,
-	        @RequestParam String screenCode) {
+	        @RequestParam String financialYear) {
 
 	    String methodName = "getMachineMasterDocId()";
 
@@ -1931,8 +1930,7 @@ public class DevelopController extends BaseController {
 
 	        mapp = developService.getMachineMasterDocId(
 	                orgId,
-	                financialYear,
-	                screenCode);
+	                financialYear);
 
 	    } catch (Exception e) {
 

@@ -5665,45 +5665,45 @@ private void createUpdateMachineMasterVO(
             // =========================================================
             // ATTACHMENT RESPONSE
             // =========================================================
-
-            List<MachineMasterAttachmentResponseDTO>
-                    attachmentList = new ArrayList<>();
-
-            if (vo.getMachineMasterAttachmentVO() != null) {
-
-                for (MachineMasterAttachmentVO attachmentVO :
-                        vo.getMachineMasterAttachmentVO()) {
-
-                    MachineMasterAttachmentResponseDTO attachmentDTO =
-                            new MachineMasterAttachmentResponseDTO();
-
-                    attachmentDTO.setId(
-                            attachmentVO.getId());
-
-                    attachmentDTO.setName(
-                            attachmentVO.getName());
-
-                    attachmentDTO.setFileName(
-                            attachmentVO.getFileName());
-
-                    attachmentDTO.setFilePath(
-                            attachmentVO.getFilePath());
-
-                    attachmentDTO.setFileSize(
-                            attachmentVO.getFileSize());
-
-                    attachmentDTO.setContentType(
-                            attachmentVO.getContentType());
-
-                    attachmentDTO.setUploadOn(
-                            attachmentVO.getUploadOn());
-
-                    attachmentList.add(attachmentDTO);
-                }
-            }
-
-            dto.setMachineMasterAttachmentResponseDTO(
-                    attachmentList);
+//
+//            List<MachineMasterAttachmentResponseDTO>
+//                    attachmentList = new ArrayList<>();
+//
+//            if (vo.getMachineMasterAttachmentVO() != null) {
+//
+//                for (MachineMasterAttachmentVO attachmentVO :
+//                        vo.getMachineMasterAttachmentVO()) {
+//
+//                    MachineMasterAttachmentResponseDTO attachmentDTO =
+//                            new MachineMasterAttachmentResponseDTO();
+//
+//                    attachmentDTO.setId(
+//                            attachmentVO.getId());
+//
+//                    attachmentDTO.setName(
+//                            attachmentVO.getName());
+//
+//                    attachmentDTO.setFileName(
+//                            attachmentVO.getFileName());
+//
+//                    attachmentDTO.setFilePath(
+//                            attachmentVO.getFilePath());
+//
+//                    attachmentDTO.setFileSize(
+//                            attachmentVO.getFileSize());
+//
+//                    attachmentDTO.setContentType(
+//                            attachmentVO.getContentType());
+//
+//                    attachmentDTO.setUploadOn(
+//                            attachmentVO.getUploadOn());
+//
+//                    attachmentList.add(attachmentDTO);
+//                }
+//            }
+//
+//            dto.setMachineMasterAttachmentResponseDTO(
+//                    attachmentList);
 
             return dto;
         }

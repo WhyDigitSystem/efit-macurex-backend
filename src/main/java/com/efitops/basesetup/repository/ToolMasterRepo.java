@@ -18,18 +18,16 @@ public interface ToolMasterRepo extends JpaRepository<ToolMasterVO, Long>{
 	
 	@Query(value = """
 		    SELECT
-		        l.id,
-		        l.location_id,
-		        l.location_name
+		        l.location_name AS locationName
 		    FROM location l
-		    WHERE l.branch = :branchId
+		    WHERE l.branch = :branch
 		      AND l.org_id = :orgId
 		      AND l.active = 1
 		      AND (l.cancel = 0 OR l.cancel IS NULL)
 		    """, nativeQuery = true)
-		List<Object[]> getLocationForToolMaster(
-		        @Param("branchId") Long branchId,
-		        @Param("orgId") Long orgId
+		List<String> getLocationForToolMaster(
+		        @Param("orgId") Long orgId,
+		        @Param("branch") Long branch
 		);
 
 }

@@ -927,10 +927,10 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 	
 	@Override
 	public List<Map<String, Object>> getLocationForToolMaster(
-	        Long orgId, Long branchId) throws ApplicationException {
+	        Long orgId, Long branch) throws ApplicationException {
 
 	    List<Object[]> locationList =
-	            toolMasterRepo.getLocationForToolMaster(orgId, branchId);
+	            toolMasterRepo.getLocationForToolMaster(orgId, branch);
 
 	    if (locationList.isEmpty()) {
 	        throw new ApplicationException("No Location Details Found");
@@ -942,9 +942,7 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 	        Map<String, Object> map = new HashMap<>();
 
-	        map.put("id", obj[0]);
-	        map.put("locationId", obj[1]);
-	        map.put("locationName", obj[2]);
+	        map.put("locationName", obj[0]);
 
 	        responseList.add(map);
 	    }

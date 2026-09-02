@@ -94,7 +94,7 @@ public class MachineMasterResponseDTO {
     private List<MachineHistoryResponseDTO> machineHistoryResponseDTO;
     
     
-    private List<MachineMasterAttachmentResponseDTO> machineMasterAttachmentResponseDTO;
+//    private List<MachineMasterAttachmentResponseDTO> machineMasterAttachmentResponseDTO;
     
 
 }

@@ -57,17 +57,17 @@ public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrderVO, Long> 
 			+ "    		                i.customer_part_no order by i.item_id")
 	Set<Object[]> getItemDetailsResponsePurchaseImport(Long orgId, Long branch);
 
-	@Query(nativeQuery = true, value = "SELECT\r\n" + "    c.customer_id,\r\n" + "    c.customer_name,\r\n"
-			+ "    c.customer_code,\r\n" + "    c.address,\r\n" + "    c.pincode,\r\n" + "    c.gst_no,\r\n"
-			+ "    g.state_name,\r\n" + "    c.is_registered\r\n" + "FROM customer_header c\r\n"
-			+ "LEFT JOIN listofvaluesdetails l1\r\n" + "    ON c.customer_category = l1.listofvaluesdetails_id\r\n"
-			+ "LEFT JOIN listofvaluesdetails l2\r\n" + "    ON c.customer_category1 = l2.listofvaluesdetails_id\r\n"
-			+ "LEFT JOIN listofvaluesdetails l3\r\n" + "    ON c.customer_category2 = l3.listofvaluesdetails_id\r\n"
-			+ "left JOIN gststatemaster g\r\n" + "    ON g.gststatemaster_id = c.gst_state\r\n"
-			+ "WHERE c.org_id = ?1\r\n" + "  AND c.branch = ?2\r\n" + "  AND c.active = 1\r\n"
-			+ "  AND c.cancel = 0\r\n" + "  AND (\r\n" + "        l1.value_description = 'Supplier'\r\n"
-			+ "        OR l2.value_description = 'Supplier'\r\n" + "        OR l3.value_description = 'Supplier'\r\n"
-			+ "      )\r\n" + "ORDER BY c.customer_code")
+	@Query(nativeQuery = true, value = "SELECT     c.customer_id,     c.customer_name,\r\n"
+			+ "			    c.customer_code,     c.address,     c.pincode,     c.gst_no,\r\n"
+			+ "			    g.state_name,     c.is_registered,g.state_code FROM customer_header c\r\n"
+			+ "			LEFT JOIN listofvaluesdetails l1     ON c.customer_category = l1.listofvaluesdetails_id\r\n"
+			+ "			LEFT JOIN listofvaluesdetails l2     ON c.customer_category1 = l2.listofvaluesdetails_id\r\n"
+			+ "			LEFT JOIN listofvaluesdetails l3     ON c.customer_category2 = l3.listofvaluesdetails_id\r\n"
+			+ "			left JOIN gststatemaster g     ON g.gststatemaster_id = c.gst_state\r\n"
+			+ "			WHERE c.org_id =?1  AND c.branch = ?2   AND c.active = 1\r\n"
+			+ "			  AND c.cancel = 0   AND (         l1.value_description = 'Supplier'\r\n"
+			+ "			        OR l2.value_description = 'Supplier'         OR l3.value_description = 'Supplier'\r\n"
+			+ "			      ) ORDER BY c.customer_code")
 	Set<Object[]> getSupplierDetails(Long orgId, Long branch);
 
 	@Query(nativeQuery = true, value = "select d.selling_ex_rate from currency c join dailyexchangerate d on c.currency_id=d.currency  where d.org_id=?1\r\n"

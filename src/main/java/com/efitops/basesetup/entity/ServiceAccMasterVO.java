@@ -60,8 +60,8 @@ public class ServiceAccMasterVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 	
-    @Column(name = "finyear", length = 5)
-    private String finYear;
+//    @Column(name = "finyear", length = 5)
+//    private String finYear;
 	@Column(name = "screen_code", length = 30)
 	private String screenCode = "SAM";
 	@Column(name = "screen_name", length = 30)

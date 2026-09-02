@@ -21,7 +21,6 @@ public class SalesZoneMasterDTO {
 	private String cancelRemarks;
 	private String description;
     private boolean active;
-	private Long branch;
 		
 		
 

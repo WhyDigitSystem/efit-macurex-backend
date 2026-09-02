@@ -28,17 +28,16 @@ import lombok.NoArgsConstructor;
 public class SalesReturnTaxDetailsVO {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sales_return_tax_detail_seq")
-    @SequenceGenerator(name = "sales_return_tax_detail_seq",sequenceName = "sales_return_tax_detail_seq",allocationSize = 1,initialValue = 1000000001)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sales_return_tax_detailgen")
+    @SequenceGenerator(name = "sales_return_tax_detailgen",sequenceName = "sales_return_tax_detailseq",allocationSize = 1,initialValue = 1000000001)
     @Column(name = "sales_return_tax_detail_id")
     private Long id;
 
 
 
     // Particulars (List Of Values)
-    @ManyToOne
-    @JoinColumn(name = "particulars")
-    private ListOfValuesDetailsVO particulars;
+    @Column(name = "particulars")
+    private String particulars;
 
     // Calculated Amount
     @Column(name = "amount")

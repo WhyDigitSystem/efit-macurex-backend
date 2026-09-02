@@ -36,7 +36,7 @@ public class TSBankVO {
 	@Column(name = "bank_name")
 	private String bank;
 	
-	@Column(name = "ac_no")
+	@Column(name = "account_no")
 	private String acno;
 	
 	@Column(name = "branch")
@@ -60,8 +60,8 @@ public class TSBankVO {
 	
 	
 	
-    @Column(name = "finyear", length = 5)
-    private String finYear;
+//    @Column(name = "finyear", length = 5)
+//    private String finYear;
 	@Column(name = "screencode", length = 30)
 	private String screenCode = "BM";
 	@Column(name = "screenname", length = 30)

@@ -89,9 +89,6 @@ public class LocationVO {
 	@Column(name = "cancel")
 	private boolean cancel = false;
 
-	@Column(name = "financial_year")
-	private String financialYear;
-
 	@Column(name = "screen_code", length = 30)
 	private String screenCode = "LM";
 	@Column(name = "screen_name", length = 30)

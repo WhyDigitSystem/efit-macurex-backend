@@ -89,6 +89,16 @@ public interface TransactionService {
 
 
 		Map<String, Object> createUpdateSalesReturn(SalesReturnDTO salesReturnDTO) throws ApplicationException;
+
+		List<Map<String, Object>> getSalesRejectionInvoiceforSalesReturn(Long orgId, Long branch);
+
+		List<Map<String, Object>> getGateInwardForSalesReturn(Long customer, String type, String invno, Long orgId,
+				Long branch);
+
+		List<Map<String, Object>> getSalesRejectionInvoiceItemDetailsForSalesRetuen(String invoiceNo, Long orgId,
+				Long branch) throws ApplicationException;
+
+		List<Map<String, Object>> getItemDetailsForSalesReturn(Long orgId, Long branch) throws ApplicationException;
 		
 
 }

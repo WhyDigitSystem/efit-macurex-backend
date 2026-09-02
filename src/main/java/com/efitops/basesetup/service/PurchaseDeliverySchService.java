@@ -109,4 +109,10 @@ public interface PurchaseDeliverySchService {
 
 	String getPhysicalStockReConcilationDocId(Long orgId, String financialYear);
 
+//	purchase order amendment dropdown
+	
+
+	List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(Long customerId, Long branch,
+			Long orgId) throws ApplicationException;
+
 }

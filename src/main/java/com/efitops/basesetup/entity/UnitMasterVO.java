@@ -47,9 +47,6 @@ public class UnitMasterVO {
 	private boolean cancel=false;
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
-	@ManyToOne
-	@JoinColumn(name = "branch")
-	private BranchVO branch;
 	@Column(name = "screen_name")
 	private String screenName="UNITMASTER";
 	@Column(name = "screen_code")

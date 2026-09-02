@@ -72,6 +72,7 @@ import com.efitops.basesetup.dto.PurchaseContractTaxDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleLineDTO;
+import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
@@ -287,7 +288,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
 
 			EmployeeMasterVO branch = employeeRepo.findById(dto.getPreparedBy())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
 
 			purchaseDeliveryScheduleVO.setPreparedBy(branch);
 			;
@@ -3155,9 +3156,15 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		// Basic Mapping
 		// =========================
 
-		physicalStockReConcilationVO.setBranch(dto.getBranch());
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
-		physicalStockReConcilationVO.setDocDate(dto.getDocDate());
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("branch  Not Found"));
+
+			physicalStockReConcilationVO.setBranch(branch);
+		}
+
+//		physicalStockReConcilationVO.setDocDate(dto.getDocDate());
 
 		physicalStockReConcilationVO.setTime(dto.getTime());
 
@@ -3517,4 +3524,32 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		return result;
 	}
 
+// purchase order amendment dropdown for po no
+	
+	@Override
+	public List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(
+	        Long branch, Long customerId, Long orgId) throws ApplicationException {
+
+	    List<Object[]> purchaseOrderList =
+	            purchaseDeliveryScheduleRepo.getPurchaseOrderDropdownForPurchaseOrderAmendment(
+	                    customerId, branch, orgId);
+
+	    if (purchaseOrderList.isEmpty()) {
+	        throw new ApplicationException("No Purchase Order Details Found");
+	    }
+
+	    List<Map<String, Object>> responseList = new ArrayList<>();
+
+	    for (Object[] obj : purchaseOrderList) {
+
+	        Map<String, Object> map = new HashMap<>();
+
+	        map.put("id", obj[0]);
+	        map.put("docId", obj[1]);
+
+	        responseList.add(map);
+	    }
+
+	    return responseList;
+	}
 }

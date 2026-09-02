@@ -35,16 +35,16 @@ public class SalesReturnDTO {
     private Long location;
 
    
-    private Long returnType;
+    private String returnType;
 
    
     private String approvedByAccounts;
 
    
-    private String currency;
+    private Long currency;
 
     
-    private BigDecimal exchangeRate;
+    private Long exchangeRate;
 
     private String invoiceReferenceType;
     

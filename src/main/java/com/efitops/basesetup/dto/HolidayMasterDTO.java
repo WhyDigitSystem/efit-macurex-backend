@@ -1,9 +1,6 @@
 package com.efitops.basesetup.dto;
 
 import java.time.LocalDate;
-import java.util.List;
-
-import com.efitops.basesetup.entity.BranchVO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,13 +13,17 @@ public class HolidayMasterDTO {
 
 	private Long id;
 	private Long branch;
-	private LocalDate date;
+	private LocalDate holidayDate;	
+	private String day;	
+	private String holidayType;
+	private String remarks;
+	private String compensatory;
+	private LocalDate compensatoryDate;
 	private String createdBy;
 	private Boolean active;
 	private String cancelRemarks;
 	private Long orgId;
 	
-	private List<HolidayMasterDetailsDTO> details;
 
 	
 	

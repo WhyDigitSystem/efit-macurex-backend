@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -22,10 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.GrnResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferGrnResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.GrnDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
+import com.efitops.basesetup.dto.StockTransferGrnDTO;
 import com.efitops.basesetup.service.GrnService;
 
 @RestController
@@ -192,10 +195,10 @@ public class GrnServiceController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	@GetMapping("/getGatePassDocId")
-	public ResponseEntity<ResponseDTO> getGatePassDocId(@RequestParam Long orgId, @RequestParam Long branch,
+	@GetMapping("/getGatePassDocIdDetails")
+	public ResponseEntity<ResponseDTO> getGatePassDocIdDetails(@RequestParam Long orgId, @RequestParam Long branch,
 			@RequestParam Long supplierCode) {
-		String methodName = "getGatePassDocId()";
+		String methodName = "getGatePassDocIdDetails()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -203,7 +206,7 @@ public class GrnServiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = grnService.getGatePassDocId(orgId, branch, supplierCode);
+			mapp = grnService.getGatePassDocIdDetails(orgId, branch, supplierCode);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -252,10 +255,10 @@ public class GrnServiceController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	@GetMapping("/getScheduleDocId")
-	public ResponseEntity<ResponseDTO> getScheduleDocId(@RequestParam Long orgId, @RequestParam String purchaseOrderNo,
-			@RequestParam String date, @RequestParam String gatePass) {
-		String methodName = "getScheduleDocId()";
+	@GetMapping("/getScheduleDocIdDetails")
+	public ResponseEntity<ResponseDTO> getScheduleDocIdDetails(@RequestParam Long orgId,
+			@RequestParam String purchaseOrderNo, @RequestParam String date, @RequestParam String gatePass) {
+		String methodName = "getScheduleDocIdDetails()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -263,7 +266,7 @@ public class GrnServiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = grnService.getScheduleDocId(orgId, purchaseOrderNo, date, gatePass);
+			mapp = grnService.getScheduleDocIdDetails(orgId, purchaseOrderNo, date, gatePass);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -281,9 +284,10 @@ public class GrnServiceController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
 	@GetMapping("/getPoNmberBasedItemDetails")
-	public ResponseEntity<ResponseDTO> getPoNmberBasedItemDetails(@RequestParam Long orgId,@RequestParam Long branch, @RequestParam String purchaseOrderNo) {
+	public ResponseEntity<ResponseDTO> getPoNmberBasedItemDetails(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam String purchaseOrderNo) {
 		String methodName = "getPoNmberBasedItemDetails()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -292,7 +296,7 @@ public class GrnServiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = grnService.getPoNmberBasedItemDetails(orgId,branch, purchaseOrderNo);
+			mapp = grnService.getPoNmberBasedItemDetails(orgId, branch, purchaseOrderNo);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -303,8 +307,286 @@ public class GrnServiceController extends BaseController {
 			responseObjectsMap.put("mapp", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Item details",
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Item details", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// StockTransfer
+
+	@GetMapping("/getStockTransferGrnByOrgId")
+	public ResponseEntity<ResponseDTO> getStockTransferGrnByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getStockTransferGrnByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<StockTransferGrnResponseDTO> stockTransferGrnList = grnService.getStockTransferGrnByOrgId(orgId,
+					branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Stock Transfer GRN retrieved successfully");
+
+			responseObjectsMap.put("stockTransferGrnVO", stockTransferGrnList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Stock Transfer GRN retrieval failed",
+					e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getStockTransferGrnById")
+	public ResponseEntity<ResponseDTO> getStockTransferGrnById(@RequestParam Long id) {
+
+		String methodName = "getStockTransferGrnById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			StockTransferGrnResponseDTO stockTransferGrnResponse = grnService.getStockTransferGrnById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Stock Transfer GRN retrieved successfully");
+
+			responseObjectsMap.put("stockTransferGrnVO", stockTransferGrnResponse);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Stock Transfer GRN retrieval failed",
+					e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@PutMapping(value = "/createUpdateStockTransferGrn", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ResponseDTO> createUpdateStockTransferGrn(
+			@RequestPart("stockTransferGrn") StockTransferGrnDTO stockTransferGrnDTO,
+//			@RequestBody StockTransferGrnDTO stockTransferGrnDTO,
+			@RequestPart(value = "files", required = false) MultipartFile[] files) {
+
+		String methodName = "createUpdateStockTransferGrn()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> stockTransferGrnMap = grnService.createUpdateStockTransferGrn(stockTransferGrnDTO,
+					files);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, stockTransferGrnMap.get("message"));
+
+			responseObjectsMap.put("stockTransferGrnVO", stockTransferGrnMap.get("stockTransferGrnVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Stock Transfer GRN creation/update failed",
+					e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/viewStockTransferGrnFile/**")
+	public ResponseEntity<byte[]> viewStockTransferGrnFile(HttpServletRequest request) {
+
+		String methodName = "viewStockTransferGrnFile()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		try {
+
+			return grnService.viewStockTransferGrnFile(request);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			return ResponseEntity.status(500).build();
+		}
+	}
+
+	@GetMapping("/getStockTransferGrnDocId")
+	public ResponseEntity<ResponseDTO> getStockTransferGrnDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getGrnDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+			mapp = grnService.getStockTransferGrnDocId(orgId, financialYear);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "DocId information retrieved successfully");
+			responseObjectsMap.put("stockTransferGrnId", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve DocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getGatePassDocIdDetailsForStockTransfer")
+	public ResponseEntity<ResponseDTO> getGatePassDocIdDetailsForStockTransfer(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long supplierCode) {
+		String methodName = "getGatePassDocIdDetailsForStockTransfer()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = grnService.getGatePassDocIdDetailsForStockTransfer(orgId, branch, supplierCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "GatePass retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve GatePass details",
 					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getPurchaseOrderNumberStockTransfer")
+	public ResponseEntity<ResponseDTO> getPurchaseOrderNumberStockTransfer(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long supplierCode) {
+		String methodName = "getPurchaseOrderNumberStockTransfer()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = grnService.getPurchaseOrderNumberStockTransfer(orgId, branch, supplierCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Order retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Purchase Order details",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getScheduleDocIdStockTransfer")
+	public ResponseEntity<ResponseDTO> getScheduleDocIdStockTransfer(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long supplierCode, @RequestParam String purchaseOrderNo) {
+		String methodName = "getScheduleDocIdStockTransfer()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = grnService.getScheduleDocIdStockTransfer(orgId, branch, supplierCode, purchaseOrderNo);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Schedule retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Schedule details",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getLocationDetails")
+	public ResponseEntity<ResponseDTO> getLocationDetails(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+		String methodName = "getLocationDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = grnService.getLocationDetails(orgId, branch);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Location Details retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Location Details", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

@@ -16,13 +16,13 @@ public class PhysicalStockReConcilationDTO {
 
 	private Long id;
 
-	private BranchVO branch;
+	private Long branch;
 
 	private Long locationType;
 
-	private String docId;
-
-	private LocalDate docDate;
+//	private String docId;
+//
+//	private LocalDate docDate;
 
 	private Long location;
 

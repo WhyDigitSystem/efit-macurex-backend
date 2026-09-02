@@ -14,17 +14,13 @@ public interface SalesZoneMasterRepo extends JpaRepository<SalesZoneMasterVO, Lo
             SELECT *
             FROM saleszonemaster
             WHERE org_id = :orgId
-              AND branch = :branch
               AND cancel = false
-              AND active = true
             ORDER BY saleszonemaster_id
             """, nativeQuery = true)
-    List<SalesZoneMasterVO> findByOrgIdAndBranch(
-            @Param("orgId") Long orgId,
-            @Param("branch") Long branch);
+    List<SalesZoneMasterVO> findByOrgId(
+            @Param("orgId") Long orgId);
 
-    boolean existsByOrgIdAndZoneIdAndBranch_Id(
+    boolean existsByOrgIdAndZoneId(
             Long orgId,
-            String zoneId,
-            Long branch);
+            String zoneId);
 }

@@ -82,12 +82,10 @@ public class GSTRateMasterVO {
 	@Column(name = "cancel")
 	private boolean cancel=false;
 	
-	@ManyToOne
-	@JoinColumn(name = "branch")
-	private BranchVO branch;
+//	@ManyToOne
+//	@JoinColumn(name = "branch")
+//	private BranchVO branch;
 	
-    @Column(name = "financial_year", length = 5)
-    private String financialYear;
 	@Column(name = "screencode", length = 30)
 	private String screenCode = "GSTRM";
 	@Column(name = "screenname", length = 30)

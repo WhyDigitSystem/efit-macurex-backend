@@ -15,7 +15,7 @@ public class SalesReturnTaxDetailsDTO {
 //       private Long id;
 
 	   // Particulars
-	   private Long particulars;
+	   private String particulars;
 
 	   // Amount
 	   private BigDecimal amount;

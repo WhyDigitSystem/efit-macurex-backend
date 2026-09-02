@@ -13,7 +13,7 @@ public class SalesReturnTaxDetailsResponseDTO {
 
     private Long id;
 
-    private ListOfValuesDetailsResponseDTO particulars;
+    private String particulars;
 
     private BigDecimal amount;
 

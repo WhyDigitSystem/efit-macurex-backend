@@ -1080,4 +1080,171 @@ public class TransactionController extends BaseController {
 
 	    return ResponseEntity.ok().body(responseDTO);
 	}
+	
+	@GetMapping("/getSalesRejectionInvoiceforSalesReturn")
+	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceDropdown(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getSalesRejectionInvoiceforSalesReturn()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<Map<String, Object>> details =
+	        		transactionService.getSalesRejectionInvoiceforSalesReturn(
+	                        orgId, branch);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Sales Rejection Invoice Dropdown fetched successfully");
+
+	        responseObjectsMap.put("salesRejectionInvoice", details);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e.getMessage());
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getGateInwardForSalesReturn")
+	public ResponseEntity<ResponseDTO> getGateInwardForSalesReturn(
+	        @RequestParam Long customer,
+	        @RequestParam String type,
+	        @RequestParam(required = false) String invno,
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getGateInwardForSalesReturn()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<Map<String, Object>> gateInwardDetails =
+	        		transactionService.getGateInwardForSalesReturn(
+	                        customer,
+	                        type,
+	                        invno,
+	                        orgId,
+	                        branch);
+
+	        responseObjectsMap.put(
+	                "gateInwardDetails",
+	                gateInwardDetails);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Gate Inward details fetched successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e.getMessage());
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getSalesRejectionInvoiceItemDetailsForSalesRetuen")
+	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceItemDetailsForSalesretuen(
+	        @RequestParam String invoiceNo,
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName = "getSalesRejectionInvoiceItemDetailsForSalesRetuen()";
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<Map<String, Object>> itemDetails =
+	        		transactionService.getSalesRejectionInvoiceItemDetailsForSalesRetuen(
+	                        invoiceNo, orgId, branch);
+
+	        responseObjectsMap.put("itemDetails", itemDetails);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Sales Rejection Invoice Item Details fetched successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getItemDetailsForSalesReturn")
+	public ResponseEntity<ResponseDTO> getItemDetailsForSalesReturn(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<Map<String, Object>> itemDetails =
+	        		transactionService.getItemDetailsForSalesReturn(
+	                        orgId, branch);
+
+	        responseObjectsMap.put("itemDetails", itemDetails);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Item Details fetched successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
 }

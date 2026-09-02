@@ -197,6 +197,14 @@ public class SupplierRateContractVO {
     private List<SupplierRateContractItemDetailsVO> supplierRateContractItemDetailsVO
             = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "supplierRateContractVO",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    private List<SupplierRateContractTaxDetailsVO> supplierRateContractTaxDetailsVO
+            = new ArrayList<>();
 
     @JsonGetter("active")
     public String getActive() {

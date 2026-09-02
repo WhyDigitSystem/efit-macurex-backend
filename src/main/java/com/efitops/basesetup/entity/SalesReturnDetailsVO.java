@@ -25,8 +25,8 @@ import lombok.NoArgsConstructor;
 public class SalesReturnDetailsVO {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sales_return__detailseq")
-	@SequenceGenerator(name = "sales_return_detail_seq",sequenceName = "sales_return_detail_seq",allocationSize = 1,initialValue = 1000000001)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sales_return_detailgen")
+	@SequenceGenerator(name = "sales_return_detailgen",sequenceName = "sales_return_detailseq",allocationSize = 1,initialValue = 1000000001)
 	@Column(name = "sales_return_detail_id")
 	private Long id;
 	

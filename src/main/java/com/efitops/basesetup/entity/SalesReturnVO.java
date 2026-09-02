@@ -89,21 +89,21 @@ public class SalesReturnVO {
     @Column(name = "date")
     private LocalDate date=LocalDate.now();
    
-    @ManyToOne
-    @JoinColumn(name = "return_type")
-    private ListOfValuesDetailsVO returnType;
+    @Column(name = "return_type")
+    private String returnType;
 
     
     @Column(name = "approved_by_accounts")
     private String approvedByAccounts;
 
    
-    @Column(name = "currency")
-    private String currency;
+    @ManyToOne
+    @JoinColumn(name = "currency")
+    private CurrencyVO currency;
 
-   
-    @Column(name = "exchange_rate")
-    private BigDecimal exchangeRate;
+    @ManyToOne
+    @JoinColumn(name = "exchange_rate")
+    private DailyExchangeRateVO exchangeRate;
 
     @Column(name = "invoice_reference_type")
     private String invoiceReferenceType;

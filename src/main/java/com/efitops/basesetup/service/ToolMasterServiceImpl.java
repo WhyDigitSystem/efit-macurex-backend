@@ -34,12 +34,10 @@ import com.efitops.basesetup.ResponseDTO.ToolMasterComponentOutPutDetailsRespons
 import com.efitops.basesetup.ResponseDTO.ToolMasterMachineHistoryDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolMasterSpareDetailsResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ToolMasterTechnicalInfoDetailsResponseDTO;
 import com.efitops.basesetup.dto.ToolMasterComponentOutPutDetailsDTO;
 import com.efitops.basesetup.dto.ToolMasterDTO;
 import com.efitops.basesetup.dto.ToolMasterMachineHistoryDetailsDTO;
 import com.efitops.basesetup.dto.ToolMasterSpareDetailsDTO;
-import com.efitops.basesetup.dto.ToolMasterTechnicalInfoDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.ToolMasterAttachementDTO;
@@ -54,7 +52,6 @@ import com.efitops.basesetup.entity.ToolMasterAttachementVO;
 import com.efitops.basesetup.entity.ToolMasterComponentOutPutDetailsVO;
 import com.efitops.basesetup.entity.ToolMasterMachineHistoryDetailsVO;
 import com.efitops.basesetup.entity.ToolMasterSpareDetailsVO;
-import com.efitops.basesetup.entity.ToolMasterTechnicalInfoDetailsVO;
 import com.efitops.basesetup.entity.ToolMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -70,7 +67,6 @@ import com.efitops.basesetup.repository.ToolMasterComponentOutputRepo;
 import com.efitops.basesetup.repository.ToolMasterMachineHistoryDetailsRepo;
 import com.efitops.basesetup.repository.ToolMasterRepo;
 import com.efitops.basesetup.repository.ToolMasterSpareDetailsRepo;
-import com.efitops.basesetup.repository.ToolMasterTechnicalInfoDetailsRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 import com.efitops.basesetup.service.ToolMasterService;
 
@@ -80,8 +76,7 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 	@Autowired
 	private ToolMasterRepo toolMasterRepo;
 
-	@Autowired
-	private ToolMasterTechnicalInfoDetailsRepo toolMasterTechnicalInfoDetailsRepo;
+
 
 	@Autowired
 	private ToolMasterSpareDetailsRepo toolMasterSpareDetailsRepo;
@@ -302,52 +297,46 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 		vo.setCancelRemarks(dto.getCancelRemarks());
 
 		/*
-		 * Technical Information Details
-		 */
-		vo.getToolMasterTechnicalInfoDetailsVO().clear();
+	     * Technical Information - Header Fields
+	     */
+	    vo.setToolWeight(dto.getToolWeight());
+	    vo.setToolFixtureSize(dto.getToolFixtureSize());
+	    vo.setLifeOfTool(dto.getLifeOfTool());
+	    vo.setReconditionFreq(dto.getReconditionFreq());
+	    vo.setSetUpTimeInMinutes(dto.getSetUpTimeInMinutes());
+	    vo.setCompletedLifeCycle(dto.getCompletedLifeCycle());
+	    vo.setToolMadeOf(dto.getToolMadeOf());
+	    vo.setTechnicalSpecification(dto.getTechnicalSpecification());
+	    vo.setNoOfStokesCompleted(dto.getNoOfStokesCompleted());
+	    vo.setStrokesCompletedAfterReconditioning(dto.getStrokesCompletedAfterReconditioning());
+	    vo.setReconditionedDate(dto.getReconditionedDate());
+	    vo.setToolFixtureCost(dto.getToolFixtureCost());
+	    vo.setToolFixtureAmortizedRecovered(dto.getToolFixtureAmortizedRecovered());
+	    
+	    /*
+	     * Unit
+	     */
+	    if (dto.getUnit() != null) {
 
-		if (dto.getToolMasterTechnicalInfoDetailsDTO() != null) {
+	        UnitMasterVO unit = unitMasterRepo.findById(dto.getUnit())
+	                .orElseThrow(() -> new ApplicationException("Unit Not Found"));
 
-			for (ToolMasterTechnicalInfoDetailsDTO detailDTO : dto.getToolMasterTechnicalInfoDetailsDTO()) {
+	        vo.setUnit(unit);
+	    }
 
-				ToolMasterTechnicalInfoDetailsVO detailVO = new ToolMasterTechnicalInfoDetailsVO();
+	    /*
+	     * Life Type
+	     */
+	    if (dto.getLifeType() != null) {
 
-				if (detailDTO.getUnit() != null) {
+	        ListOfValuesDetailsVO lifeType = listOfValuesDetailsRepo.findById(dto.getLifeType())
+	                .orElseThrow(() -> new ApplicationException("Life Type Not Found"));
 
-					UnitMasterVO unit = unitMasterRepo.findById(detailDTO.getUnit())
-							.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+	        vo.setLifeType(lifeType);
+	    }
 
-					detailVO.setUnit(unit);
-				}
 
-				if (detailDTO.getLifeType() != null) {
-
-					ListOfValuesDetailsVO lifeType = listOfValuesDetailsRepo.findById(detailDTO.getLifeType())
-							.orElseThrow(() -> new ApplicationException("Life Type Not Found"));
-
-					detailVO.setLifeType(lifeType);
-				}
-
-				detailVO.setToolWeight(detailDTO.getToolWeight());
-				detailVO.setToolFixtureSize(detailDTO.getToolFixtureSize());
-				detailVO.setLifeOfTool(detailDTO.getLifeOfTool());
-				detailVO.setReconditionFreq(detailDTO.getReconditionFreq());
-				detailVO.setSetUpTimeInMinutes(detailDTO.getSetUpTimeInMinutes());
-				detailVO.setCompletedLifeCycle(detailDTO.getCompletedLifeCycle());
-				detailVO.setToolMadeOf(detailDTO.getToolMadeOf());
-				detailVO.setTechnicalSpecification(detailDTO.getTechnicalSpecification());
-				detailVO.setNoOfStokesCompleted(detailDTO.getNoOfStokesCompleted());
-				detailVO.setStrokesCompletedAfterReconditioning(detailDTO.getStrokesCompletedAfterReconditioning());
-				detailVO.setReconditionedDate(detailDTO.getReconditionedDate());
-				detailVO.setToolFixtureCost(detailDTO.getToolFixtureCost());
-				detailVO.setToolFixtureAmortizedRecovered(detailDTO.getToolFixtureAmortizedRecovered());
-
-				detailVO.setToolMasterVO(vo);
-
-				vo.getToolMasterTechnicalInfoDetailsVO().add(detailVO);
-			}
-		}
-
+		
 		/*
 		 * Spare Details
 		 */
@@ -430,25 +419,7 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 			}
 		}
 
-		/*
-		 * Attachments from DTO
-		 */
-		vo.getToolMasterAttachementVO().clear();
-
-		if (dto.getToolMasterAttachementDTO() != null) {
-
-			for (ToolMasterAttachementDTO attachmentDTO : dto.getToolMasterAttachementDTO()) {
-
-				ToolMasterAttachementVO attachmentVO = new ToolMasterAttachementVO();
-
-				attachmentVO.setName(attachmentDTO.getName());
-				attachmentVO.setFileName(attachmentDTO.getFileName());
-
-				attachmentVO.setToolMasterVO(vo);
-
-				vo.getToolMasterAttachementVO().add(attachmentVO);
-			}
-		}
+		
 	}
 
 	@Value("${toolmaster.upload.path}")
@@ -689,60 +660,52 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 		dto.setCancelRemarks(vo.getCancelRemarks());
 
 		/*
-		 * Technical Information Response
+		 * Technical Information - Header Fields
 		 */
-		List<ToolMasterTechnicalInfoDetailsResponseDTO> technicalList = new ArrayList<>();
 
-		if (vo.getToolMasterTechnicalInfoDetailsVO() != null) {
+		dto.setToolWeight(vo.getToolWeight());
+		dto.setToolFixtureSize(vo.getToolFixtureSize());
+		dto.setLifeOfTool(vo.getLifeOfTool());
+		dto.setReconditionFreq(vo.getReconditionFreq());
+		dto.setSetUpTimeInMinutes(vo.getSetUpTimeInMinutes());
+		dto.setCompletedLifeCycle(vo.getCompletedLifeCycle());
+		dto.setToolMadeOf(vo.getToolMadeOf());
+		dto.setTechnicalSpecification(vo.getTechnicalSpecification());
+		dto.setNoOfStokesCompleted(vo.getNoOfStokesCompleted());
+		dto.setStrokesCompletedAfterReconditioning(vo.getStrokesCompletedAfterReconditioning());
+		dto.setReconditionedDate(vo.getReconditionedDate());
+		dto.setToolFixtureCost(vo.getToolFixtureCost());
+		dto.setToolFixtureAmortizedRecovered(vo.getToolFixtureAmortizedRecovered());
+		
+		/*
+		 * Unit
+		 */
 
-			for (ToolMasterTechnicalInfoDetailsVO detailVO : vo.getToolMasterTechnicalInfoDetailsVO()) {
+		if (vo.getUnit() != null) {
 
-				ToolMasterTechnicalInfoDetailsResponseDTO detailDTO = new ToolMasterTechnicalInfoDetailsResponseDTO();
+		    UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
 
-				detailDTO.setId(detailVO.getId());
-				detailDTO.setToolWeight(detailVO.getToolWeight());
-				detailDTO.setToolFixtureSize(detailVO.getToolFixtureSize());
-				detailDTO.setLifeOfTool(detailVO.getLifeOfTool());
-				detailDTO.setReconditionFreq(detailVO.getReconditionFreq());
-				detailDTO.setSetUpTimeInMinutes(detailVO.getSetUpTimeInMinutes());
-				detailDTO.setCompletedLifeCycle(detailVO.getCompletedLifeCycle());
-				detailDTO.setToolMadeOf(detailVO.getToolMadeOf());
-				detailDTO.setTechnicalSpecification(detailVO.getTechnicalSpecification());
-				detailDTO.setNoOfStokesCompleted(detailVO.getNoOfStokesCompleted());
-				detailDTO.setStrokesCompletedAfterReconditioning(detailVO.getStrokesCompletedAfterReconditioning());
-				detailDTO.setReconditionedDate(detailVO.getReconditionedDate());
-				detailDTO.setToolFixtureCost(detailVO.getToolFixtureCost());
-				detailDTO.setToolFixtureAmortizedRecovered(detailVO.getToolFixtureAmortizedRecovered());
+		    unitDTO.setId(vo.getUnit().getId());
+		    unitDTO.setUnitId(vo.getUnit().getUnitId());
+		    unitDTO.setUnitDescription(vo.getUnit().getDescription());
 
-				if (detailVO.getUnit() != null) {
-
-					UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
-
-					unitDTO.setId(detailVO.getUnit().getId() );
-					unitDTO.setUnitId(detailVO.getUnit().getUnitId());
-					unitDTO.setUnitDescription(detailVO.getUnit().getDescription());
-					
-					detailDTO.setUnit(unitDTO);
-				}
-
-				if (detailVO.getLifeType() != null) {
-
-					ListOfValuesDetailsResponseDTO lifeTypeDTO = new ListOfValuesDetailsResponseDTO();
-
-					lifeTypeDTO.setId(detailVO.getLifeType().getId());
-					lifeTypeDTO.setCode(detailVO.getLifeType().getValueCode());
-					lifeTypeDTO.setDescription(detailVO.getLifeType().getValueDescription());
-
-					
-
-					detailDTO.setLifeType(lifeTypeDTO);
-				}
-
-				technicalList.add(detailDTO);
-			}
+		    dto.setUnit(unitDTO);
 		}
 
-		dto.setToolMasterTechnicalInfoDetailsDTO(technicalList);
+		/*
+		 * Life Type
+		 */
+
+		if (vo.getLifeType() != null) {
+
+		    ListOfValuesDetailsResponseDTO lifeTypeDTO = new ListOfValuesDetailsResponseDTO();
+
+		    lifeTypeDTO.setId(vo.getLifeType().getId());
+		    lifeTypeDTO.setCode(vo.getLifeType().getValueCode());
+		    lifeTypeDTO.setDescription(vo.getLifeType().getValueDescription());
+
+		    dto.setLifeType(lifeTypeDTO);
+		}
 
 		/*
 		 * Spare Details Response

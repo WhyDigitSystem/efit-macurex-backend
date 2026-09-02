@@ -46,6 +46,7 @@ import com.efitops.basesetup.dto.ProblemSolvingActionDetailsDTO;
 import com.efitops.basesetup.dto.ProblemSolvingEntryDTO;
 import com.efitops.basesetup.dto.ProblemSolvingOtherDetailsDTO;
 import com.efitops.basesetup.dto.ProblemSolvingRootDetailsDTO;
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
@@ -1565,21 +1566,20 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 
 				if (detailDTO.getMachine() != null) {
 
-				    System.out.println("Machine ID = " + detailDTO.getMachine());
+					System.out.println("Machine ID = " + detailDTO.getMachine());
 
-				    Optional<MachineMasterVO> machineOptional =
-				            machineMasterRepo.findMachineById(detailDTO.getMachine());
+					Optional<MachineMasterVO> machineOptional = machineMasterRepo
+							.findMachineById(detailDTO.getMachine());
 
-				    System.out.println("Machine found = " + machineOptional.isPresent());
+					System.out.println("Machine found = " + machineOptional.isPresent());
 
-				    if (machineOptional.isEmpty()) {
-				        throw new ApplicationException(
-				                "Machine Not Found for ID: " + detailDTO.getMachine());
-				    }
+					if (machineOptional.isEmpty()) {
+						throw new ApplicationException("Machine Not Found for ID: " + detailDTO.getMachine());
+					}
 
-				    detailVO.setMachine(machineOptional.get());
+					detailVO.setMachine(machineOptional.get());
 				}
-				
+
 				detailVO.setOperationMasterVO(vo);
 
 				vo.getOperationMasterMachineDetailsVO().add(detailVO);
@@ -1685,7 +1685,7 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 					machineDTO.setId(machineVO.getMachine().getId());
 					machineDTO.setMachineNo(machineVO.getMachine().getMachineInstrumentNo());
 
-					machineDTO.setMachineName(machineVO.getMachine().getMachineInstrumentImageName());
+					machineDTO.setMachineName(machineVO.getMachine().getMachineInstrumentName());
 
 					machineResponseDTO.setMachine(machineDTO);
 				}
@@ -1715,15 +1715,26 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 
 				if (consumableVO.getConsumables() != null) {
 
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+				    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
 
-					itemDTO.setId(consumableVO.getConsumables().getId());
-					itemDTO.setItemCode(consumableVO.getConsumables().getItemCode());
-					itemDTO.setItemDescription(consumableVO.getConsumables().getItemDescription());
+				    itemDTO.setId(consumableVO.getConsumables().getId());
+				    itemDTO.setItemCode(consumableVO.getConsumables().getItemCode());
+				    itemDTO.setItemDescription(consumableVO.getConsumables().getItemDescription());
 
-					consumableResponseDTO.setConsumables(itemDTO);
+				    if (consumableVO.getConsumables().getPricingUnit() != null) {
+
+				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+
+				        unitDTO.setId(consumableVO.getConsumables().getPricingUnit().getId());
+				        unitDTO.setUnitId(consumableVO.getConsumables().getPricingUnit().getUnitId());
+				        unitDTO.setUnitDescription(
+				                consumableVO.getConsumables().getPricingUnit().getDescription());
+
+				        itemDTO.setUnit(unitDTO);
+				    }
+
+				    consumableResponseDTO.setConsumables(itemDTO);
 				}
-
 				consumableResponseDTO.setQuantity(consumableVO.getQuantity());
 
 				// =========================
@@ -1748,5 +1759,39 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 		dto.setOperationMasterConsumablesDetailsResponseDTO(consumableResponseList);
 
 		return dto;
+	}
+
+	@Override
+	public OperationMasterResponseDTO getOperationMasterById(Long id) throws ApplicationException {
+
+		if (ObjectUtils.isEmpty(id)) {
+
+			throw new ApplicationException("Invalid Id");
+		}
+
+		OperationMasterVO operationMasterVO = operationMasterRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Operation Master Not Found"));
+
+		return operationMasterResponse(operationMasterVO);
+	}
+
+	@Override
+	public List<OperationMasterResponseDTO> getOperationMasterByOrgId(Long orgId) throws ApplicationException {
+
+		List<OperationMasterVO> operationMasterList = operationMasterRepo.getOperationMasterByOrgId(orgId);
+
+		if (operationMasterList.isEmpty()) {
+
+			throw new ApplicationException("No Operation Master Details Found");
+		}
+
+		List<OperationMasterResponseDTO> responseList = new ArrayList<>();
+
+		for (OperationMasterVO operationMasterVO : operationMasterList) {
+
+			responseList.add(operationMasterResponse(operationMasterVO));
+		}
+
+		return responseList;
 	}
 }

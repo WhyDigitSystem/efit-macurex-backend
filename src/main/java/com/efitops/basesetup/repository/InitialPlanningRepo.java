@@ -17,6 +17,7 @@ public interface InitialPlanningRepo extends JpaRepository<InitialPlanningVO, Lo
 			FROM initial_planning_basic
 			WHERE org_id = ?1
 			  AND cancel = FALSE
+			  AND active = True
 			ORDER BY initial_planning_basic_id DESC
 			""", nativeQuery = true)
 	List<InitialPlanningVO> getInitialPlanningByOrgId(Long orgId);

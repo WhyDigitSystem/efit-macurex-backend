@@ -2,6 +2,8 @@ package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -82,5 +84,19 @@ public class SupplierRateContractDTO {
     private String cancelRemarks;
 
     private boolean active;
+    
+    
+ // =========================
+    // ITEM DETAILS
+    // =========================
+
+    private List<SupplierRateContractItemDetailsDTO> supplierRateContractItemDetailsDTO;
+
+
+    // =========================
+    // TAX DETAILS
+    // =========================
+
+    private List<SupplierRateContractTaxDetailsDTO> supplierRateContractTaxDetailsDTO;
 
 }

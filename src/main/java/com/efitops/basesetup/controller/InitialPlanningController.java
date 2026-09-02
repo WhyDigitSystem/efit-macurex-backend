@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.efitops.basesetup.ResponseDTO.InitialPlanningResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMasterResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.InitialPlanningDTO;
@@ -488,6 +489,54 @@ public class InitialPlanningController extends BaseController {
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
 			responseObjectsMap.put("operationMasterVO", response.get("operationMasterVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getOperationMasterById")
+	public ResponseEntity<ResponseDTO> getOperationMasterById(@RequestParam Long id) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			OperationMasterResponseDTO response = initialPlanningService.getOperationMasterById(id);
+
+			responseObjectsMap.put("operationMasterVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getOperationMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getOperationMasterByOrgId(@RequestParam Long orgId) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<OperationMasterResponseDTO> response = initialPlanningService.getOperationMasterByOrgId(orgId);
+
+			responseObjectsMap.put("operationMasterVO", response);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 

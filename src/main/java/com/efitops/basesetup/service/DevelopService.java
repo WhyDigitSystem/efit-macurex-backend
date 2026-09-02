@@ -173,12 +173,8 @@ public interface DevelopService {
 
 	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
 			throws ApplicationException;
-
-	String getMachineMasterDocId(Long orgId, String financialYear, String screenCode);
-
 	
-
-	
+	String getMachineMasterDocId(Long orgId, String financialYear);
 	
 	
 	

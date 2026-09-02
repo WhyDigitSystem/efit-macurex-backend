@@ -5749,14 +5749,14 @@ private void createUpdateMachineMasterVO(
         
         
         @Override
-        public String getMachineMasterDocId(Long orgId, String financialYear, String screenCode) {
+        public String getMachineMasterDocId(Long orgId, String financialYear) {
 
-            String screenCode1 = "MM";
+            String screenCode = "MM";
 
             String result = machineMasterRepo.getMachineMasterDocId(
                     orgId,
                     financialYear,
-                    screenCode1
+                    screenCode
             );
 
             return result;

@@ -209,7 +209,7 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 			LocationVO location = locationRepo.findById(dto.getLocation())
 					.orElseThrow(() -> new ApplicationException("Location Not Found"));
 
-			vo.setLocatrion(location);
+			vo.setLocation(location);
 		}
 
 		/*
@@ -539,7 +539,9 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 			ListOfValuesDetailsResponseDTO typeDTO = new ListOfValuesDetailsResponseDTO();
 
 			typeDTO.setId(vo.getType().getId());
-
+			typeDTO.setCode(vo.getType().getValueCode());
+			typeDTO.setDescription(vo.getType().getValueDescription());
+			
 			dto.setType(typeDTO);
 		}
 
@@ -560,11 +562,12 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 		/*
 		 * Location
 		 */
-		if (vo.getLocatrion() != null) {
+		if (vo.getLocation() != null) {
 
 			LocationMasterResponseDTO locationDTO = new LocationMasterResponseDTO();
 
-			locationDTO.setId(vo.getLocatrion().getId());
+			locationDTO.setId(vo.getLocation().getId());
+			locationDTO.setLocationName(vo.getLocation().getLocationName());
 
 			dto.setLocation(locationDTO);
 		}
@@ -590,6 +593,8 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 			ListOfValuesDetailsResponseDTO madeInDTO = new ListOfValuesDetailsResponseDTO();
 
 			madeInDTO.setId(vo.getMadeIn().getId());
+			madeInDTO.setCode(vo.getMadeIn().getValueCode());
+			madeInDTO.setDescription(vo.getMadeIn().getValueDescription());
 
 			dto.setMadeIn(madeInDTO);
 		}
@@ -616,6 +621,8 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 			ListOfValuesDetailsResponseDTO modeDTO = new ListOfValuesDetailsResponseDTO();
 
 			modeDTO.setId(vo.getModeOfPurchase().getId());
+			modeDTO.setCode(vo.getModeOfPurchase().getValueCode());
+			modeDTO.setDescription(vo.getModeOfPurchase().getValueDescription());
 
 			dto.setModeOfPurchase(modeDTO);
 		}
@@ -659,6 +666,7 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 			LocationMasterResponseDTO locationDTO = new LocationMasterResponseDTO();
 
 			locationDTO.setId(vo.getPresentLocation().getId());
+			locationDTO.setLocationName(vo.getPresentLocation().getLocationName());
 
 			dto.setPresentLocation(locationDTO);
 		}
@@ -711,7 +719,9 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 					UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
 
 					unitDTO.setId(detailVO.getUnit().getId() );
-
+					unitDTO.setUnitId(detailVO.getUnit().getUnitId());
+					unitDTO.setUnitDescription(detailVO.getUnit().getDescription());
+					
 					detailDTO.setUnit(unitDTO);
 				}
 
@@ -720,6 +730,10 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 					ListOfValuesDetailsResponseDTO lifeTypeDTO = new ListOfValuesDetailsResponseDTO();
 
 					lifeTypeDTO.setId(detailVO.getLifeType().getId());
+					lifeTypeDTO.setCode(detailVO.getLifeType().getValueCode());
+					lifeTypeDTO.setDescription(detailVO.getLifeType().getValueDescription());
+
+					
 
 					detailDTO.setLifeType(lifeTypeDTO);
 				}
@@ -752,12 +766,26 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 				if (detailVO.getSparePartId() != null) {
 
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+				    ItemMasterVO item = detailVO.getSparePartId();
 
-					itemDTO.setId(detailVO.getSparePartId().getId());
-					itemDTO.setItemCode(detailVO.getSparePartId().getItemCode());
-					itemDTO.setItemDescription(detailVO.getSparePartId().getItemDescription());
-					detailDTO.setSparePartId(itemDTO);
+				    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+
+				    itemDTO.setId(item.getId());
+				    itemDTO.setItemCode(item.getItemCode());
+				    itemDTO.setItemDescription(item.getItemDescription());
+
+				    if (item.getPrimaryUnit() != null) {
+
+				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+
+				        unitDTO.setId(item.getPrimaryUnit().getId());
+				        unitDTO.setUnitId(item.getPrimaryUnit().getUnitId());
+				        unitDTO.setUnitDescription(item.getPrimaryUnit().getDescription());
+
+				        itemDTO.setUnit(unitDTO);
+				    }
+
+				    detailDTO.setSparePartId(itemDTO);
 				}
 
 				spareList.add(detailDTO);
@@ -781,11 +809,26 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 				if (detailVO.getItem() != null) {
 
-					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+				    ItemMasterVO item = detailVO.getItem();
 
-					itemDTO.setId(detailVO.getItem().getId());
+				    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
 
-					detailDTO.setItem(itemDTO);
+				    itemDTO.setId(item.getId());
+				    itemDTO.setItemCode(item.getItemCode());
+				    itemDTO.setItemDescription(item.getItemDescription());
+
+				    if (item.getPrimaryUnit() != null) {
+
+				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+
+				        unitDTO.setId(item.getPrimaryUnit().getId());
+				        unitDTO.setUnitId(item.getPrimaryUnit().getUnitId());
+				        unitDTO.setUnitDescription(item.getPrimaryUnit().getDescription());
+
+				        itemDTO.setUnit(unitDTO);
+				    }
+
+				    detailDTO.setItem(itemDTO);
 				}
 
 				componentList.add(detailDTO);
@@ -844,5 +887,39 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 		dto.setToolMasterAttachementDTO(attachmentList);
 
 		return dto;
+	}
+	
+	@Override
+	public ToolMasterResponseDTO getToolMasterById(Long id) throws ApplicationException {
+
+	    if (ObjectUtils.isEmpty(id)) {
+	        throw new ApplicationException("Invalid Id");
+	    }
+
+	    ToolMasterVO toolMasterVO = toolMasterRepo.findById(id)
+	            .orElseThrow(() -> new ApplicationException("Tool Master Not Found"));
+
+	    return toolMasterResponse(toolMasterVO);
+	}
+
+	@Override
+	public List<ToolMasterResponseDTO> getToolMasterByOrgId(Long orgId, Long branch)
+	        throws ApplicationException {
+
+	    List<ToolMasterVO> toolMasterList =
+	            toolMasterRepo.getToolMasterByOrgId(orgId, branch);
+
+	    if (toolMasterList.isEmpty()) {
+	        throw new ApplicationException("No Tool Master Details Found");
+	    }
+
+	    List<ToolMasterResponseDTO> responseList = new ArrayList<>();
+
+	    for (ToolMasterVO toolMasterVO : toolMasterList) {
+
+	        responseList.add(toolMasterResponse(toolMasterVO));
+	    }
+
+	    return responseList;
 	}
 }

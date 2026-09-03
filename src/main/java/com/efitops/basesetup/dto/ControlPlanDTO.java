@@ -62,6 +62,10 @@ public class ControlPlanDTO {
 	    
 	    private List<ControlPlanParameterDTO> controlPlanParameterDTO;
 	    
+	    private List<ControlPlanSampleDTO> controlPlanSampleDTO;
+	    
+	    private List<ControlPlanMachineFixtureDTO> controlPlanMachineFixtureDTO;
+	    
 	    
 
 	  

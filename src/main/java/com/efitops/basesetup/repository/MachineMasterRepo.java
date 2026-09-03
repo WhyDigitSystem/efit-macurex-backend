@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.MachineMasterVO;
@@ -13,13 +14,71 @@ public interface MachineMasterRepo extends JpaRepository<MachineMasterVO, Long> 
 	List<MachineMasterVO> findByOrgIdAndBranch(Long orgId, BranchVO branchVO);
 	
 	
-	@Query(nativeQuery = true, value =
-	        "select concat(prefix, lpad(last_no, 5, 0)) AS docid " +
-	        "from documenttypemapping_details " +
-	        "where org_id=?1 and fin_year=?2 and screen_code=?3")
-	String getMachineMasterDocId(
-	        Long orgId,
-	        String financialYear,
-	        String screenCode);
+	@Query(value = """
+	        SELECT
+	            tcd.tool_category_detail_id AS toolCategoryId,
+	            tcd.category
+	        FROM tool_category_basic tcb
+	        INNER JOIN tool_category_detail tcd
+	            ON tcd.tool_category_basic_id = tcb.tool_category_basic_id
+	        WHERE tcb.apllicable_for = 'MACHINE'
+	          AND tcb.org_id = :orgId
+	         
+	         
 
+	        UNION
+
+	        SELECT
+	            tcd.tool_category_detail_id AS toolCategoryId,
+	            tcd.category
+	        FROM tool_category_basic tcb
+	        INNER JOIN tool_category_detail tcd
+	            ON tcd.tool_category_basic_id = tcb.tool_category_basic_id
+	        WHERE tcb.apllicable_for = 'INSTRUMENT'
+	          AND tcb.org_id = :orgId
+	         
+	         
+
+	        UNION
+
+	        SELECT
+	            tcd.tool_category_detail_id AS toolCategoryId,
+	            tcd.category
+	        FROM tool_category_basic tcb
+	        INNER JOIN tool_category_detail tcd
+	            ON tcd.tool_category_basic_id = tcb.tool_category_basic_id
+	        WHERE tcb.apllicable_for = 'TOOL'
+	          AND tcb.org_id = :orgId
+	         
+	        UNION
+
+	        SELECT
+	            tcd.tool_category_detail_id AS toolCategoryId,
+	            tcd.category
+	        FROM tool_category_basic tcb
+	        INNER JOIN tool_category_detail tcd
+	            ON tcd.tool_category_basic_id = tcb.tool_category_basic_id
+	        WHERE tcb.apllicable_for = 'FIXTURE'
+	          AND tcb.org_id = :orgId
+	         
+	         
+
+	        UNION
+
+	        SELECT
+	            tcd.tool_category_detail_id AS toolCategoryId,
+	            tcd.category
+	        FROM tool_category_basic tcb
+	        INNER JOIN tool_category_detail tcd
+	            ON tcd.tool_category_basic_id = tcb.tool_category_basic_id
+	        WHERE tcb.apllicable_for = 'DIE'
+	          AND tcb.org_id = :orgId
+	          
+	         
+
+	        ORDER BY category
+	        """, nativeQuery = true)
+	List<Object[]> getToolCategoryforMachineMaster(
+	        @Param("orgId") Long orgId);
 }
+	       

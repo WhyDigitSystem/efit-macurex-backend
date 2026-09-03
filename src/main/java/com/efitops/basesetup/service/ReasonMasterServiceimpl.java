@@ -1,5 +1,6 @@
 package com.efitops.basesetup.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,13 +16,40 @@ import org.springframework.transaction.annotation.Transactional;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ReasonMasterResponseDTO;
+import com.efitops.basesetup.dto.ControlPlanDTO;
+import com.efitops.basesetup.dto.ControlPlanDetailDTO;
+import com.efitops.basesetup.dto.ControlPlanMachineFixtureDTO;
+import com.efitops.basesetup.dto.ControlPlanParameterDTO;
+import com.efitops.basesetup.dto.ControlPlanSampleDTO;
 import com.efitops.basesetup.dto.ReasonMasterDTO;
+import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.ControlPlanDetailVO;
+import com.efitops.basesetup.entity.ControlPlanMachineFixtureVO;
+import com.efitops.basesetup.entity.ControlPlanParameterVO;
+import com.efitops.basesetup.entity.ControlPlanSampleVO;
+import com.efitops.basesetup.entity.ControlPlanVO;
 import com.efitops.basesetup.entity.DepartmentVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
+import com.efitops.basesetup.entity.GradeMasterVO;
+import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
+import com.efitops.basesetup.entity.MachineMasterVO;
+import com.efitops.basesetup.entity.ParameterMasterVO;
 import com.efitops.basesetup.entity.ReasonMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.ControlPlanDetailRepo;
+import com.efitops.basesetup.repository.ControlPlanMachineFixtureRepo;
+import com.efitops.basesetup.repository.ControlPlanParameterRepo;
+import com.efitops.basesetup.repository.ControlPlanRepo;
+import com.efitops.basesetup.repository.ControlPlanSampleRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
+import com.efitops.basesetup.repository.GradeMasterRepo;
+import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
+import com.efitops.basesetup.repository.MachineMasterRepo;
+import com.efitops.basesetup.repository.ParameterMasterRepo;
 import com.efitops.basesetup.repository.ReasonMasterRepo;
 
 
@@ -39,6 +67,53 @@ public class ReasonMasterServiceimpl implements ReasonMasterService {
 	
 	@Autowired
 	private ListOfValuesDetailsRepo listOfValuesDetailsRepo;
+	
+	@Autowired
+	private ControlPlanRepo controlPlanRepo;
+	
+	@Autowired
+	private BranchRepo branchRepo;
+	
+	@Autowired
+	private ItemMasterRepo itemMasterRepo;
+	
+	@Autowired
+	private GradeMasterRepo gradeMasterRepo;
+	
+	@Autowired
+	private EmployeeMasterRepo employeeMasterRepo;
+	
+	@Autowired
+	private ControlPlanDetailRepo controlPlanDetailRepo;
+	
+	@Autowired
+	private ControlPlanParameterRepo controlPlanParameterRepo;
+	
+	@Autowired
+	private ControlPlanSampleRepo controlPlanSampleRepo;
+	
+	@Autowired
+	private ControlPlanMachineFixtureRepo controlPlanMachineFixtureRepo;
+	
+	@Autowired
+	private MachineMasterRepo machineMasterRepo;
+	
+	@Autowired
+	private ParameterMasterRepo parameterMasterRepo;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 //Reasonmaster
 	
@@ -324,6 +399,392 @@ public class ReasonMasterServiceimpl implements ReasonMasterService {
 
 	    return responseList;
 	}
+	
+	
+	//CONTROL PLAN
+	
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateControlPlan(ControlPlanDTO controlPlanDTO)
+	        throws ApplicationException {
+
+	    ControlPlanVO controlPlanVO = new ControlPlanVO();
+	    String message;
+
+	    // =========================
+	    // Update
+	    // =========================
+	    if (ObjectUtils.isNotEmpty(controlPlanDTO.getId())) {
+
+	        controlPlanVO = controlPlanRepo.findById(controlPlanDTO.getId())
+	                .orElseThrow(() -> new ApplicationException("Invalid Control Plan Details"));
+
+	        controlPlanVO.setUpdatedBy(controlPlanDTO.getCreatedBy());
+
+	        message = "Control Plan Updated Successfully";
+
+	    } else {
+
+	        // =========================
+	        // Create
+	        // =========================
+	        controlPlanVO = new ControlPlanVO();
+
+	        controlPlanVO.setCreatedBy(controlPlanDTO.getCreatedBy());
+	        controlPlanVO.setUpdatedBy(controlPlanDTO.getCreatedBy());
+	        controlPlanVO.setDocDate(LocalDate.now());
+
+	        message = "Control Plan Created Successfully";
+	    }
+
+	    // =========================
+	    // Basic Mapping
+	    // =========================
+	    createUpdateControlPlanVO(controlPlanDTO, controlPlanVO);
+
+	    // =========================
+	    // Save Parent
+	    // =========================
+	    ControlPlanVO savedVO = controlPlanRepo.save(controlPlanVO);
+
+	    // =========================
+	    // Response
+	    // =========================
+	    Map<String, Object> response = new HashMap<>();
+
+	    response.put("message", message);
+//	    response.put("controlPlanVO", controlPlanResponse(savedVO));
+
+	    return response;
+	}
+	
+	private void createUpdateControlPlanVO(
+	        ControlPlanDTO dto,
+	        ControlPlanVO controlPlanVO) throws ApplicationException {
+
+	    // =========================
+	    // Basic Fields
+	    // =========================
+
+	    controlPlanVO.setRevisionDate(dto.getRevisionDate());
+	    controlPlanVO.setPlanNo(dto.getPlanNo());
+	    controlPlanVO.setItemDescription(dto.getItemDescription());
+	    controlPlanVO.setItemSize(dto.getItemSize());
+	    controlPlanVO.setProcessSheetNo(dto.getProcessSheetNo());
+	    controlPlanVO.setApproved(dto.isApproved());
+	    controlPlanVO.setActive(dto.isActive());
+	    controlPlanVO.setOrgId(dto.getOrgId());
+	    controlPlanVO.setCancel(dto.isCancel());
+	    controlPlanVO.setCancelRemarks(dto.getCancelRemarks());
+
+	    // =========================
+	    // Branch
+	    // =========================
+
+	    if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+	        BranchVO branch = branchRepo.findById(dto.getBranch())
+	                .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+	        controlPlanVO.setBranch(branch);
+	    }
+
+	    // =========================
+	    // Control Plan Type
+	    // =========================
+
+	    if (dto.getControlPlanType() != null && dto.getControlPlanType() != 0) {
+
+	        ListOfValuesDetailsVO controlPlanType =
+	                listOfValuesDetailsRepo.findById(dto.getControlPlanType())
+	                .orElseThrow(() -> new ApplicationException("Control Plan Type Not Found"));
+
+	        controlPlanVO.setControlPlanType(controlPlanType);
+	    }
+
+	    // =========================
+	    // FG Item Code
+	    // =========================
+
+	    if (dto.getFgItemCode() != null && dto.getFgItemCode() != 0) {
+
+	        ItemMasterVO item = itemMasterRepo.findById(dto.getFgItemCode())
+	                .orElseThrow(() -> new ApplicationException("FG Item Not Found"));
+
+	        controlPlanVO.setFgItemCode(item);
+	    }
+
+	    // =========================
+	    // Item Grade
+	    // =========================
+
+	    if (dto.getItemGrade() != null && dto.getItemGrade() != 0) {
+
+	        GradeMasterVO grade = gradeMasterRepo.findById(dto.getItemGrade())
+	                .orElseThrow(() -> new ApplicationException("Item Grade Not Found"));
+
+	        controlPlanVO.setItemGrade(grade);
+	    }
+
+	    // =========================
+	    // Prepared By
+	    // =========================
+
+	    if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
+
+	        EmployeeMasterVO preparedBy = employeeMasterRepo.findById(dto.getPreparedBy())
+	                .orElseThrow(() -> new ApplicationException("Prepared By Not Found"));
+
+	        controlPlanVO.setPreparedBy(preparedBy);
+	    }
+
+	    // =========================
+	    // Checked By
+	    // =========================
+
+	    if (dto.getCheckedBy() != null && dto.getCheckedBy() != 0) {
+
+	        EmployeeMasterVO checkedBy = employeeMasterRepo.findById(dto.getCheckedBy())
+	                .orElseThrow(() -> new ApplicationException("Checked By Not Found"));
+
+	        controlPlanVO.setCheckedBy(checkedBy);
+	    }
+
+	    // ============================================================
+	    // UPDATE - DELETE EXISTING CHILD GRIDS
+	    // ============================================================
+
+	    if (dto.getId() != null) {
+
+	        // Detail
+	        if (controlPlanVO.getControlPlanDetailVO() != null
+	                && !controlPlanVO.getControlPlanDetailVO().isEmpty()) {
+
+	            controlPlanDetailRepo.deleteAll(
+	                    controlPlanVO.getControlPlanDetailVO());
+	        }
+
+	        // Parameter
+	        if (controlPlanVO.getControlPlanParameterVO() != null
+	                && !controlPlanVO.getControlPlanParameterVO().isEmpty()) {
+
+	            controlPlanParameterRepo.deleteAll(
+	                    controlPlanVO.getControlPlanParameterVO());
+	        }
+
+	        // Sample
+	        if (controlPlanVO.getControlPlansampleVO() != null
+	                && !controlPlanVO.getControlPlansampleVO().isEmpty()) {
+
+	            controlPlanSampleRepo.deleteAll(
+	                    controlPlanVO.getControlPlansampleVO());
+	        }
+
+	        // Machine / Fixture
+	        if (controlPlanVO.getControlPlanMachineFixtureVO() != null
+	                && !controlPlanVO.getControlPlanMachineFixtureVO().isEmpty()) {
+
+	            controlPlanMachineFixtureRepo.deleteAll(
+	                    controlPlanVO.getControlPlanMachineFixtureVO());
+	        }
+
+	        // Clear parent collections
+	        controlPlanVO.getControlPlanDetailVO().clear();
+	        controlPlanVO.getControlPlanParameterVO().clear();
+	        controlPlanVO.getControlPlansampleVO().clear();
+	        controlPlanVO.getControlPlanMachineFixtureVO().clear();
+	    }
+
+	    // ============================================================
+	    // DETAIL GRID
+	    // ============================================================
+
+	    List<ControlPlanDetailVO> detailList = new ArrayList<>();
+
+	    if (dto.getControlPlanDetailDTO() != null
+	            && !dto.getControlPlanDetailDTO().isEmpty()) {
+
+	        for (ControlPlanDetailDTO detailDTO :
+	                dto.getControlPlanDetailDTO()) {
+
+	            ControlPlanDetailVO detailVO = new ControlPlanDetailVO();
+
+	            // =========================
+	            // Basic Detail Fields
+	            // =========================
+
+	            detailVO.setOperationNo(detailDTO.getOperationNo());
+	            detailVO.setProcess(detailDTO.getProcess());
+	            detailVO.setSpecification(detailDTO.getSpecification());
+	            detailVO.setRiskClassSpecialCharacter(
+	                    detailDTO.getRiskClassSpecialCharacter());
+	            detailVO.setEvaluationTechnique(
+	                    detailDTO.getEvaluationTechnique());
+	            detailVO.setReactionPlan(detailDTO.getReactionPlan());
+	            detailVO.setRecord(detailDTO.getRecord());
+
+	            // =========================
+	            // Machine Device
+	            // =========================
+
+	            if (detailDTO.getMachineDevice() != null
+	                    && detailDTO.getMachineDevice() != 0) {
+
+	                MachineMasterVO machineDevice =
+	                        machineMasterRepo.findById(detailDTO.getMachineDevice())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Machine Device Not Found"));
+
+	                detailVO.setMachineDevice(machineDevice);
+	            }
+
+	            // =========================
+	            // Control Method
+	            // =========================
+
+	            if (detailDTO.getControlMethod() != null
+	                    && detailDTO.getControlMethod() != 0) {
+
+	                ListOfValuesDetailsVO controlMethod =
+	                        listOfValuesDetailsRepo.findById(
+	                                detailDTO.getControlMethod())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Control Method Not Found"));
+
+	                detailVO.setControlMethod(controlMethod);
+	            }
+
+	            // =========================
+	            // Parent Mapping
+	            // =========================
+
+	            detailVO.setControlPlanVO(controlPlanVO);
+
+	            detailList.add(detailVO);
+	        }
+	    }
+
+	    controlPlanVO.setControlPlanDetailVO(detailList);
 
 
+	 // ============================================================
+	 // PARAMETER GRID
+	 // ============================================================
+
+	 List<ControlPlanParameterVO> parameterList = new ArrayList<>();
+
+	 if (dto.getControlPlanParameterDTO() != null
+	         && !dto.getControlPlanParameterDTO().isEmpty()) {
+
+	     for (ControlPlanParameterDTO parameterDTO :
+	             dto.getControlPlanParameterDTO()) {
+
+	         ControlPlanParameterVO parameterVO =
+	                 new ControlPlanParameterVO();
+
+	         if (parameterDTO.getParameter() != null
+	                 && parameterDTO.getParameter() != 0) {
+
+	             ParameterMasterVO parameter =
+	                     parameterMasterRepo.findById(
+	                             parameterDTO.getParameter())
+	                     .orElseThrow(() ->
+	                             new ApplicationException(
+	                                     "Parameter Not Found"));
+
+	             parameterVO.setParameter(parameter);
+
+	             if (parameter.getParameterType() != null) {
+
+	                 parameterVO.setParameterType(
+	                         parameter.getParameterType()
+	                                 .getValueDescription());
+	             }
+	         }
+
+	         parameterVO.setTol(parameterDTO.getTol());
+
+	         parameterVO.setControlPlanVO(controlPlanVO);
+
+	         parameterList.add(parameterVO);
+	     }
+	 }
+
+	 controlPlanVO.setControlPlanParameterVO(parameterList);
+
+
+	 // ============================================================
+	 // SAMPLE GRID
+	 // ============================================================
+
+	 List<ControlPlanSampleVO> sampleList = new ArrayList<>();
+
+	 if (dto.getControlPlanSampleDTO() != null
+	         && !dto.getControlPlanSampleDTO().isEmpty()) {
+
+	     for (ControlPlanSampleDTO sampleDTO :
+	             dto.getControlPlanSampleDTO()) {
+
+	         ControlPlanSampleVO sampleVO =
+	                 new ControlPlanSampleVO();
+
+	         sampleVO.setSampleFrequency(
+	                 sampleDTO.getSampleFrequency());
+
+	         sampleVO.setSize(
+	                 sampleDTO.getSize());
+
+	         sampleVO.setControlPlanVO(controlPlanVO);
+
+	         sampleList.add(sampleVO);
+	     }
+	 }
+
+	 controlPlanVO.setControlPlansampleVO(sampleList);
+
+
+	 // ============================================================
+	 // MACHINE / FIXTURE GRID
+	 // ============================================================
+
+	 List<ControlPlanMachineFixtureVO> machineFixtureList =
+	         new ArrayList<>();
+
+	 if (dto.getControlPlanMachineFixtureDTO() != null
+	         && !dto.getControlPlanMachineFixtureDTO().isEmpty()) {
+
+	     for (ControlPlanMachineFixtureDTO machineFixtureDTO :
+	             dto.getControlPlanMachineFixtureDTO()) {
+
+	         ControlPlanMachineFixtureVO machineFixtureVO =
+	                 new ControlPlanMachineFixtureVO();
+
+	         if (machineFixtureDTO.getMachineFixture() != null
+	                 && machineFixtureDTO.getMachineFixture() != 0) {
+
+	             MachineMasterVO machineFixture =
+	                     machineMasterRepo.findById(
+	                             machineFixtureDTO.getMachineFixture())
+	                     .orElseThrow(() ->
+	                             new ApplicationException(
+	                                     "Machine Fixture Not Found"));
+
+	             machineFixtureVO.setMachineFixture(machineFixture);
+	         }
+
+	         machineFixtureVO.setMachineFixtureName(
+	                 machineFixtureDTO.getMachineFixtureName());
+
+	         machineFixtureVO.setControlPlanVO(controlPlanVO);
+
+	         machineFixtureList.add(machineFixtureVO);
+	     }
+	 }
+
+	 controlPlanVO.setControlPlanMachineFixtureVO(
+	         machineFixtureList);
+
+	 }
 }

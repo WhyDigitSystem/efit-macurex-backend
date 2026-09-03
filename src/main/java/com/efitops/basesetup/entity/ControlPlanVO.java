@@ -117,7 +117,12 @@ public class ControlPlanVO {
 		
 		@OneToMany(mappedBy = "controlPlanVO", cascade = CascadeType.ALL)
 		@JsonManagedReference
-		private List<ControlPlanSampleVO> controlPlansample = new ArrayList<>();
+		private List<ControlPlanSampleVO> controlPlansampleVO = new ArrayList<>();
+		
+		@OneToMany(mappedBy = "controlPlanVO", cascade = CascadeType.ALL)
+		@JsonManagedReference
+		private List<ControlPlanMachineFixtureVO> controlPlanMachineFixtureVO = new ArrayList<>();
+		
 		
 		
 		@JsonGetter("activeStatus")

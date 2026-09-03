@@ -17,24 +17,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "control_plan_sample")
+@Table(name = "control_plan_michinefixture")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class ControlPlanSampleVO {
+public class ControlPlanMachineFixtureVO {
+	
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "control_plan_samplegen")
-	@SequenceGenerator(name = "control_plan_samplegen", sequenceName = "control_plan_sampleseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "control_plan_sample_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "control_plan_michinefixturegen")
+	@SequenceGenerator(name = "control_plan_michinefixturegen", sequenceName = "control_plan_michinefixtureseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "control_plan_michinefixture_id")
 	private Long id;
 	
-	 @Column(name = "sample_frequency")
-	 private String sampleFrequency;
-	
-	 @Column(name = "size")
-	 private String size;
+	 @ManyToOne
+	 @JoinColumn(name = "machine_fixture")
+	 private MachineMasterVO machineFixture;
+	 
+	 @Column(name = "machine_fixture_name")
+	 private String machineFixtureName;
 	 
 	 @ManyToOne
 	 @JoinColumn(name = "control_plan_basic_id")

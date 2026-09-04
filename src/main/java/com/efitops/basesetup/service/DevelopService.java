@@ -1,5 +1,6 @@
 package com.efitops.basesetup.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
@@ -16,12 +18,14 @@ import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderAmendmentResponceDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
+import com.efitops.basesetup.dto.MachineMasterDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
 import com.efitops.basesetup.dto.ParameterMasterDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
@@ -32,6 +36,7 @@ import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
+import com.efitops.basesetup.dto.ToolCategoryDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -113,9 +118,7 @@ public interface DevelopService {
 	Integer getPurchaseOrderAmendmentRevisionNo(String purchaseOrderNumber, Long orgId, Long branch)
 			throws ApplicationException;
 
-	Map<String, Object> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
-			throws ApplicationException;
-
+	
 	List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(Long customer, Long orgId, Long branch)
 			throws ApplicationException;
 
@@ -159,6 +162,34 @@ public interface DevelopService {
 
 	List<ParameterMasterResponseDTO> getParameterMasterByOrgId(Long orgId) throws ApplicationException ;
 
+	String getIssuesDocId(Long orgId, String financialYear);
+
+
+	Map<String, Object> updateCreateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files) throws ApplicationException ;
+
+	String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear, String screenCode);
+
+
+	List<MachineMasterResponseDTO> getMachineMasterByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
+			throws ApplicationException;
+
+	
+
+	Map<String, Object> createUpdateToolCategory(ToolCategoryDTO toolCategoryDTO) throws ApplicationException;
+
+	ToolCategoryResponseDTO getToolCategoryById(Long id) throws ApplicationException;
+
+	List<ToolCategoryResponseDTO> getToolCategoryByOrgId(Long orgId) throws ApplicationException;
+
+	MachineMasterResponseDTO getMachineMasterById(Long id) throws ApplicationException;
+
+	
+	Map<String, Object> getToolCategoryforMachineMaster(Long orgId) throws ApplicationException;
+
+	
+	
 	
 	
 	

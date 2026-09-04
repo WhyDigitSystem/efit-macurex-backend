@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class IssuesDetailsDTO {
 
-    private Long id;
+//    private Long id;
 
     private Long item;
 
@@ -27,5 +27,5 @@ public class IssuesDetailsDTO {
 
     private BigDecimal rate;
 
-    private BigDecimal amount;
+//    private BigDecimal amount;
 }

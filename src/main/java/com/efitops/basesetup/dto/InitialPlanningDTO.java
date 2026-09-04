@@ -16,9 +16,9 @@ public class InitialPlanningDTO {
 	
 	private Long itemType;
 	
-	private String docId;
-	
-	private LocalDate docDate;
+//	private String docId;
+//	
+//	private LocalDate docDate;
 
 	private Long item;
 	

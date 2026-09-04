@@ -1,3 +1,4 @@
+
 package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;

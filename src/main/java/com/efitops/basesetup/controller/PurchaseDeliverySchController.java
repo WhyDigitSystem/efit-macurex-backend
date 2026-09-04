@@ -1216,4 +1216,68 @@ public class PurchaseDeliverySchController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
+//purchase order amendment dropdown
+	@GetMapping("/getPurchaseOrderDropdownForPurchaseOrderAmendment")
+	public ResponseEntity<ResponseDTO> getPurchaseOrderDropdownForPurchaseOrderAmendment(
+	        @RequestParam Long branch,
+	        @RequestParam Long customerId,
+	        @RequestParam Long orgId) {
+
+	    String methodName = "getPurchaseOrderDropdownForPurchaseOrderAmendment()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    List<Map<String, Object>> purchaseOrderList = new ArrayList<>();
+
+	    try {
+
+	        purchaseOrderList =
+	                purchaseDeliverySchService
+	                        .getPurchaseOrderDropdownForPurchaseOrderAmendment(
+	                                branch, customerId, orgId);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg
+	        );
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Purchase Order information retrieved successfully"
+	        );
+
+	        responseObjectsMap.put(
+	                "purchaseOrderDropdown",
+	                purchaseOrderList
+	        );
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to retrieve Purchase Order information",
+	                errorMsg
+	        );
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
 }

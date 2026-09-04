@@ -38,8 +38,8 @@ public interface GrnService {
 	List<Map<String, Object>> getScheduleDocIdDetails(Long orgId, String purchaseOrderNo, String date, String gatePass);
 
 	List<Map<String, Object>> getPoNmberBasedItemDetails(Long orgId, Long branch, String purchaseOrderNo);
-	
-	//Stcok transfer
+
+	// Stcok transfer
 
 	StockTransferGrnResponseDTO getStockTransferGrnById(Long id) throws ApplicationException;
 
@@ -53,5 +53,14 @@ public interface GrnService {
 	String getStockTransferGrnDocId(Long orgId, String financialYear);
 
 	List<Map<String, Object>> getGatePassDocIdDetailsForStockTransfer(Long orgId, Long branch, Long supplierCode);
+
+	List<Map<String, Object>> getPurchaseOrderNumberStockTransfer(Long orgId, Long branch, Long supplierCode);
+
+	List<Map<String, Object>> getScheduleDocIdStockTransfer(Long orgId, Long branch, Long supplierCode,
+			String purchaseOrderNo);
+
+	List<Map<String, Object>> getItemDetailsForStockTransfer(Long orgId, Long branch, String purchaseOrderNo);
+
+	List<Map<String, Object>> getLocationDetails(Long orgId, Long branch);
 
 }

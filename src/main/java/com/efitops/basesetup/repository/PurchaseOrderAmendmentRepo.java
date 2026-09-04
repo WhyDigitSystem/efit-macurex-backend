@@ -55,39 +55,36 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	
 	
 	@Query(value = """
-	        SELECT i.item_id AS id,
-	               i.item_code AS itemCode,
-	               i.HSN_CODE AS hsnSacCode
-	        FROM item i
-	        INNER JOIN purchase_order_local_details b
-	                ON i.item_id = b.item
-	        INNER JOIN
-	        N purchase_order_basic a
-	                ON a.purchase_order_basic_id = b.purchase_order_basic_id
-	        WHERE a.CANCEL = 0
-	          AND a.doc_id = :docId
-	          AND a.org_id = :orgId
-	          AND a.branch = :branch
+        SELECT
+           
+            b.item AS itemCode,
+            b.hsn_code AS hsnSacCode
+        FROM purchase_order_local_details b
+        INNER JOIN purchase_order_basic a
+            ON a.purchase_order_basic_id = b.purchase_order_basic_id
+        WHERE a.cancel = 0
+          AND a.doc_id = :docId
+          AND a.org_id = :orgId
+          AND a.branch = :branch
 
-	        UNION
+        UNION
 
-	        SELECT i.item_id AS id,
-	               i.item_code AS itemCode,
-	               i.HSN_CODE AS hsnSacCode
-	        FROM item i
-	        INNER JOIN purchase_order_import_details b
-	                ON i.item_id = b.item
-	        INNER JOIN purchase_order_basic a
-	                ON a.purchase_order_basic_id = b.purchase_order_basic_id
-	        WHERE a.CANCEL = 0
-	          AND a.doc_id = :docId
-	          AND a.org_id = :orgId
-	          AND a.branch = :branch
-	        """, nativeQuery = true)
-	List<Object[]> getPurchaseOrderAmendmentItemCodeDropdown(
-	        @Param("docId") String docId,
-	        @Param("branch") Long branch,
-	        @Param("orgId") Long orgId);
+        SELECT
+            
+            b.item AS itemCode,
+            b.hsn_code AS hsnSacCode
+        FROM purchase_order_import_details b
+        INNER JOIN purchase_order_basic a
+            ON a.purchase_order_basic_id = b.purchase_order_basic_id
+        WHERE a.cancel = 0
+          AND a.doc_id = :docId
+          AND a.org_id = :orgId
+          AND a.branch = :branch
+        """, nativeQuery = true)
+List<Object[]> getPurchaseOrderAmendmentItemCodeDropdown(
+        @Param("docId") String docId,
+        @Param("branch") Long branch,
+        @Param("orgId") Long orgId);
 	
 	
 	@Query(value = """
@@ -114,4 +111,15 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	        @Param("customer") Long customer,
 	        @Param("orgId") Long orgId,
 	        @Param("branch") Long branch);
+
+	@Query(
+		    nativeQuery = true,
+		    value = "select concat(prefix, lpad(last_no, 5, 0)) AS docid " +
+		            "from documenttypemapping_details " +
+		            "where org_id=?1 and fin_year=?2 and screen_code=?3"
+		)
+		String getPurchaseOrderAmendmentDocId(
+		        Long orgId,
+		        String financialYear,
+		        String screenCode);
 }

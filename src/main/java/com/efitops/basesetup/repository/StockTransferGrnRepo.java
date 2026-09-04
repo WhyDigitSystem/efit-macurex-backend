@@ -40,4 +40,32 @@ public interface StockTransferGrnRepo extends JpaRepository<StockTransferGrnVO, 
 			+ "			                AND active = 1                 AND gate_pass_no IS NOT NULL))")
 	Set<Object[]> getGatePassDocIdDetailsForStockTransfer(Long orgId, Long branch, Long supplierCode);
 
+	@Query(nativeQuery = true, value = "select p.doc_id,p.doc_date from purchase_order_basic p where p.org_id=?1\r\n"
+			+ "			and p.branch=?2 and p.active=1 and p.cancel=0 and p.supplier_code=?3 and p.po_type=1 group by p.doc_id,p.doc_date\r\n"
+			+ "            union\r\n"
+			+ "            select p.doc_id,p.doc_date from purchase_contract_basic p where\r\n"
+			+ "            p.org_id=?1\r\n"
+			+ "			and p.branch=?2 and p.active=1 and p.cancel=0 and p.supplier=?3\r\n"
+			+ "            group by p.doc_id,p.doc_date")
+	Set<Object[]> getPurchaseOrderNumberStockTransfer(Long orgId, Long branch, Long supplierCode);
+
+	@Query(nativeQuery = true, value = "select doc_id,doc_date,schedule_start_date,schedule_end_date,purchase_delivery_schedule_basic_id from purchase_delivery_schedule_basic\r\n"
+			+ "where org_id=?1 and branch=?2 and supplier=?3 and purchase_order_no=?4 and active=1 and cancel=0")
+	Set<Object[]> getScheduleDocIdStockTransfer(Long orgId, Long branch, Long supplierCode, String purchaseOrderNo);
+
+	@Query(nativeQuery = true, value = "select i.item_id,i.item_code,i.item_description,u.unitmaster_id,u.unit_id,i.inspection,l.value_description,p1.qty_in_primary_unit,p1.rate_in_inr from purchase_order_basic p join purchase_order_local_details p1 \r\n"
+			+ "			on p.purchase_order_basic_id=p1.purchase_order_basic_id left join item i on i.item_id=p1.item \r\n"
+			+ "			left join unitmaster u on u.unitmaster_id=i.primary_unit left join listofvaluesdetails l on l.listofvaluesdetails_id=i.inspection  where p.org_id=?1\r\n"
+			+ "			and p.branch=?2 and p.active=1 and p.cancel=0 and p.doc_id=?3\r\n" + "            union\r\n"
+			+ "            select i.item_id,i.item_code,i.item_description,u.unitmaster_id,u.unit_id,i.inspection,l.value_description,1 as qty ,p1.rate_in_currency from purchase_contract_basic p join purchase_contract_details p1 \r\n"
+			+ "			on p.purchase_contract_basic_id=p1.purchase_contract_basic_id left join item i on i.item_id=p1.item_id \r\n"
+			+ "			left join unitmaster u on u.unitmaster_id=p1.unit left join listofvaluesdetails l on l.listofvaluesdetails_id=i.inspection where p.org_id=?1\r\n"
+			+ "			and p.branch=?2 and p.active=1 and p.cancel=0 and p.doc_id=?3")
+	Set<Object[]> getItemDetailsForStockTransfer(Long orgId, Long branch, String purchaseOrderNo);
+
+	@Query(nativeQuery = true, value = "SELECT a.location_id, A.location_name, A.location_type,a.id,concat(A.location_name,' - ','MACUREX') as type FROM location A, branch B,listofvaluesdetails l1\r\n"
+			+ "WHERE A.CANCEL='F' AND\r\n" + "B.branch_id=A.branch and l1.listofvaluesdetails_id=a.location_type\r\n"
+			+ "AND B.org_id=?1 and B.branch_id=?2   \r\n" + "AND l1.value_description='Stores'")
+	Set<Object[]> getLocationDetails(Long orgId, Long branch);
+
 }

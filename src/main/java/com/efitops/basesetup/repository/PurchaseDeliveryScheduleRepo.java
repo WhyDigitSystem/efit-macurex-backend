@@ -82,5 +82,25 @@ public interface PurchaseDeliveryScheduleRepo extends JpaRepository<PurchaseDeli
 	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
 	String getPurchaseDeliveryScheduleDocId(Long orgId, String financialYear, String screenCode);
 	
+//	dropdown for purchase order amendment repo
+	
+	@Query(value = """
+	        SELECT
+	            pob.purchase_order_basic_id AS id,
+	            pob.doc_id AS docId
+	        FROM purchase_order_basic pob
+	        INNER JOIN customer_header ch
+	            ON ch.customer_id = pob.supplier_code
+	        WHERE pob.active = 1
+	          AND (pob.cancel = 0 OR pob.cancel IS NULL)
+	          AND ch.customer_id = :customerId
+	          AND pob.branch = :branch
+	          AND pob.org_id = :orgId
+	        ORDER BY pob.doc_date DESC
+	        """, nativeQuery = true)
+	List<Object[]> getPurchaseOrderDropdownForPurchaseOrderAmendment(
+	        @Param("customerId") Long customerId,
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId);
 
 }

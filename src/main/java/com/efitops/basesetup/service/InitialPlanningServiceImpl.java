@@ -210,7 +210,7 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 		// Basic Fields
 		// =========================
 
-		initialPlanningVO.setDocDate(dto.getDocDate());
+//		initialPlanningVO.setDocDate(dto.getDocDate());
 
 		initialPlanningVO.setDrawingNo(dto.getDrawingNo());
 

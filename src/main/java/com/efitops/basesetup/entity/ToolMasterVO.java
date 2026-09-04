@@ -67,7 +67,7 @@ public class ToolMasterVO {
 	
 	@ManyToOne
 	@JoinColumn(name = "location")
-	private LocationVO locatrion;
+	private LocationVO location;
 	
 	@Column(name = "drawing_no")
 	private String drawingNo;

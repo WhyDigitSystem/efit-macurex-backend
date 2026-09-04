@@ -58,6 +58,9 @@ import com.efitops.basesetup.dto.JobOrderAmendmentDetailsDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.JobOrderDetailsDTO;
 import com.efitops.basesetup.dto.JobOrderTaxDetailsDTO;
+import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
+import com.efitops.basesetup.dto.SubContractSupplyScheduleDetailsDTO;
+import com.efitops.basesetup.dto.SubContractSupplyScheduleItemDetailsDTO;
 import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.dto.SupplierRateContractItemDetailsDTO;
 import com.efitops.basesetup.dto.SupplierRateContractTaxDetailsDTO;
@@ -81,6 +84,9 @@ import com.efitops.basesetup.entity.JobOrderTaxDetailsVO;
 import com.efitops.basesetup.entity.JobOrderVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
+import com.efitops.basesetup.entity.SubContractSupplyScheduleDetailsVO;
+import com.efitops.basesetup.entity.SubContractSupplyScheduleItemDetailsVO;
+import com.efitops.basesetup.entity.SubContractSupplyScheduleVO;
 import com.efitops.basesetup.entity.SupplierRateContractItemDetailsVO;
 import com.efitops.basesetup.entity.SupplierRateContractTaxDetailsVO;
 import com.efitops.basesetup.entity.SupplierRateContractVO;
@@ -107,6 +113,7 @@ import com.efitops.basesetup.repository.JobOrderTaxDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.ServiceAccMasterRepo;
+import com.efitops.basesetup.repository.SubContractSupplyScheduleRepo;
 import com.efitops.basesetup.repository.SupplierRateContractItemDetailsRepo;
 import com.efitops.basesetup.repository.SupplierRateContractRepo;
 import com.efitops.basesetup.repository.SupplierRateContractTaxDetailsRepo;
@@ -200,6 +207,9 @@ public class SubContractServiceImpl implements SubContractService {
 	
 	@Autowired
 	TransportRepo transportRepo;
+	
+	@Autowired
+	SubContractSupplyScheduleRepo subContractSupplyScheduleRepo;
 	
 	@Override
 	@Transactional
@@ -3238,4 +3248,337 @@ public class SubContractServiceImpl implements SubContractService {
 
 	    return details1;
 	}
+	
+	
+//	@Override
+//	@Transactional
+//	public Map<String, Object> createUpdateSubContractSupplySchedule(
+//	        SubContractSupplyScheduleDTO dto) throws ApplicationException {
+//
+//	    String screenCode = "SCSS";
+//
+//	    Map<String, Object> response = new HashMap<>();
+//
+//	    String message;
+//
+//	    SubContractSupplyScheduleVO subContractSupplyScheduleVO;
+//
+//
+//	    // =========================================================
+//	    // CREATE
+//	    // =========================================================
+//
+//	    if (ObjectUtils.isEmpty(dto.getId())) {
+//
+//	        subContractSupplyScheduleVO = new SubContractSupplyScheduleVO();
+//
+//	        // Generate Document ID
+////	        String docId = subContractSupplyScheduleRepo.getSubContractSupplyScheduleDocId(
+////	                dto.getOrgId(),
+////	                dto.getFinancialYear(),
+////	                screenCode);
+////
+////	        subContractSupplyScheduleVO.setDocId(docId);
+////
+////
+////	        // Update Document Last Number
+////	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+////	                documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+////	                        dto.getOrgId(),
+////	                        dto.getFinancialYear(),
+////	                        screenCode);
+////
+////	        if (documentTypeMappingDetailsVO != null) {
+////
+////	            documentTypeMappingDetailsVO.setLastNo(
+////	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+////
+////	            documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+////	        }
+//
+//
+//	        subContractSupplyScheduleVO.setCreatedBy(dto.getCreatedBy());
+//	        subContractSupplyScheduleVO.setUpdatedBy(dto.getCreatedBy());
+//
+//	        message = "Sub Contract Supplier Schedule Created Successfully";
+//	    }
+//
+//
+//	    // =========================================================
+//	    // UPDATE
+//	    // =========================================================
+//
+//	    else {
+//
+//	        subContractSupplyScheduleVO =
+//	                subContractSupplyScheduleRepo.findById(dto.getId())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "Sub Contract Supplier Schedule Not Found"));
+//
+//
+//	        // Delete Old Item Details
+//	        if (subContractSupplyScheduleVO.getItemDetails() != null) {
+//
+//	            subContractSupplyScheduleVO.getItemDetails().clear();
+//	        }
+//
+//
+//	        subContractSupplyScheduleVO.setUpdatedBy(dto.getCreatedBy());
+//
+//	        message = "Sub Contract Supplier Schedule Updated Successfully";
+//	    }
+//
+//
+//	    // =========================================================
+//	    // HEADER MAPPING
+//	    // =========================================================
+//
+//	    getSubContractSupplyScheduleVOFromDTO(
+//	            dto,
+//	            subContractSupplyScheduleVO);
+//
+//
+//	    // =========================================================
+//	    // SAVE
+//	    // =========================================================
+//
+//	    subContractSupplyScheduleVO =
+//	            subContractSupplyScheduleRepo.saveAndFlush(
+//	                    subContractSupplyScheduleVO);
+//
+//
+//	    // =========================================================
+//	    // RESPONSE
+//	    // =========================================================
+//
+//	    response.put("message", message);
+//
+//	    response.put(
+//	            "subContractSupplyScheduleVO",
+//	            convertToSubContractSupplyScheduleResponse(subContractSupplyScheduleVO));
+//
+//	    return response;
+//	}
+//	
+//	private void getSubContractSupplyScheduleVOFromDTO(
+//	        SubContractSupplyScheduleDTO dto,
+//	        SubContractSupplyScheduleVO vo)
+//	        throws ApplicationException {
+//
+//
+//	    // =========================================================
+//	    // Branch
+//	    // =========================================================
+//
+//	    if (dto.getBranch() != null) {
+//
+//	        BranchVO branch =
+//	                branchRepo.findById(dto.getBranch())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "Branch Not Found"));
+//
+//	        vo.setBranch(branch);
+//	    }
+//
+//
+//	    // =========================================================
+//	    // Customer
+//	    // =========================================================
+//
+//	    if (dto.getCustomer() != null) {
+//
+//	        CustomerVO customer =
+//	                customerRepo.findById(dto.getCustomer())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "Customer Not Found"));
+//
+//	        vo.setCustomer(customer);
+//	    }
+//
+//
+//	    // =========================================================
+//	    // Prepared By
+//	    // =========================================================
+//
+//	    if (dto.getPreparedBy() != null) {
+//
+//	        EmployeeMasterVO preparedBy =
+//	                employeeMasterRepo.findById(dto.getPreparedBy())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "Prepared By Employee Not Found"));
+//
+//	        vo.setPreparedBy(preparedBy);
+//	    }
+//
+//
+//	    // =========================================================
+//	    // Authorised By
+//	    // =========================================================
+//
+//	    if (dto.getAuthorisedBy() != null) {
+//
+//	        EmployeeMasterVO authorisedBy =
+//	                employeeMasterRepo.findById(dto.getAuthorisedBy())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "Authorised By Employee Not Found"));
+//
+//	        vo.setAuthorisedBy(authorisedBy);
+//	    }
+//
+//
+//	    // =========================================================
+//	    // Header Fields
+//	    // =========================================================
+//
+//	    vo.setBelongsTo(dto.getBelongsTo());
+//
+//	    vo.setSchStartDate(dto.getSchStartDate());
+//
+//	    vo.setSchEndDate(dto.getSchEndDate());
+//
+//	    vo.setContractNo(dto.getContractNo());
+//
+//	    vo.setContractDate(dto.getContractDate());
+//
+//	    vo.setJobOrderNo(dto.getJobOrderNo());
+//
+//	    vo.setRemarks(dto.getRemarks());
+//
+//	    vo.setOrgId(dto.getOrgId());
+//
+//	    vo.setFinancialYear(dto.getFinancialYear());
+//
+//	    vo.setActive(dto.isActive());
+//
+//	    vo.setCancelRemarks(dto.getCancelRemarks());
+//
+//	    vo.setCreatedBy(dto.getCreatedBy());
+//
+//
+//	    // =========================================================
+//	    // Item Details
+//	    // =========================================================
+//
+//	    List<SubContractSupplyScheduleItemDetailsVO> itemDetailsList =
+//	            new ArrayList<>();
+//
+//
+//	    if (dto.getItemDetails() != null) {
+//
+//	        for (SubContractSupplyScheduleItemDetailsDTO itemDTO :
+//	                dto.getItemDetails()) {
+//
+//
+//	            SubContractSupplyScheduleItemDetailsVO itemDetails =
+//	                    new SubContractSupplyScheduleItemDetailsVO();
+//
+//
+//	            // =================================================
+//	            // Item
+//	            // =================================================
+//
+//	            if (itemDTO.getItemCode() != null) {
+//
+//	                ItemMasterVO itemCode =
+//	                        itemMasterRepo.findById(itemDTO.getItemCode())
+//	                                .orElseThrow(() ->
+//	                                        new ApplicationException(
+//	                                                "Item Not Found"));
+//
+//	                itemDetails.setItemCode(itemCode);
+//	            }
+//
+//
+//	            // =================================================
+//	            // Unit
+//	            // =================================================
+//
+//	            if (itemDTO.getUnit() != null) {
+//
+//	                UnitMasterVO unit =
+//	                        unitMasterRepo.findById(itemDTO.getUnit())
+//	                                .orElseThrow(() ->
+//	                                        new ApplicationException(
+//	                                                "Unit Not Found"));
+//
+//	                itemDetails.setUnit(unit);
+//	            }
+//
+//
+//	            // =================================================
+//	            // Item Fields
+//	            // =================================================
+//
+//	            itemDetails.setStock(itemDTO.getStock());
+//
+//	            itemDetails.setQty(itemDTO.getQty());
+//
+//	            itemDetails.setRate(itemDTO.getRate());
+//
+//
+//	            // =================================================
+//	            // Parent Mapping
+//	            // =================================================
+//
+//	            itemDetails.setSubContractSupplyScheduleVO(
+//	                    vo);
+//
+//
+//	            // =================================================
+//	            // Schedule Details
+//	            // =================================================
+//
+//	            List<SubContractSupplyScheduleDetailsVO> scheduleDetailsList =
+//	                    new ArrayList<>();
+//
+//
+//	            if (itemDTO.getScheduleDetails() != null) {
+//
+//	                for (SubContractSupplyScheduleDetailsDTO scheduleDTO :
+//	                        itemDTO.getScheduleDetails()) {
+//
+//
+//	                    SubContractSupplyScheduleDetailsVO scheduleDetails =
+//	                            new SubContractSupplyScheduleDetailsVO();
+//
+//
+//	                    scheduleDetails.setPlanDate(
+//	                            scheduleDTO.getPlanDate());
+//
+//	                    scheduleDetails.setScheduleQty(
+//	                            scheduleDTO.getScheduleQty());
+//
+//
+//	                    // Parent Item Mapping
+//	                    scheduleDetails.setItemDetails(
+//	                            itemDetails);
+//
+//
+//	                    scheduleDetailsList.add(
+//	                            scheduleDetails);
+//	                }
+//	            }
+//
+//
+//	            itemDetails.setScheduleDetails(
+//	                    scheduleDetailsList);
+//
+//
+//	            itemDetailsList.add(
+//	                    itemDetails);
+//	        }
+//	    }
+//
+//
+//	    // =========================================================
+//	    // Set Item Details to Header
+//	    // =========================================================
+//
+//	    vo.setItemDetails(itemDetailsList);
+//	}
 }

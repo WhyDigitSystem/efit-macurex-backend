@@ -12,6 +12,7 @@ import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
+import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
@@ -67,6 +68,10 @@ public interface SubContractService {
 
 	List<Map<String, Object>> getItemDetailsforDeliveryChallanSubContract(String jobOrderNo, Long branch, Long orgId,
 			Long vendor);
+
+	//SubContractSupplySchedule
+//	Map<String, Object> createUpdateSubContractSupplySchedule(
+//			SubContractSupplyScheduleDTO subContractSupplyScheduleDTO) throws ApplicationException;
 
 
 

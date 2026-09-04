@@ -29,6 +29,7 @@ import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
+import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.service.SubContractService;
 
@@ -848,4 +849,43 @@ public class SubContractController extends BaseController {
 
 	    return ResponseEntity.ok(responseDTO);
 	}
+	
+	//SubContractSupplySchedule
+	
+	
+//	@PutMapping(value = "/createUpdateSubContractSupplySchedule")
+//	public ResponseEntity<ResponseDTO> createUpdateSubContractSupplySchedule(
+//	        @RequestBody SubContractSupplyScheduleDTO subContractSupplyScheduleDTO) {
+//
+//	    Map<String, Object> responseObjectsMap = new HashMap<>();
+//	    ResponseDTO responseDTO;
+//
+//	    try {
+//
+//	        Map<String, Object> subContractSupplyScheduleMap =
+//	        		subContractService.createUpdateSubContractSupplySchedule(
+//	                        subContractSupplyScheduleDTO);
+//
+//	        responseObjectsMap.put(
+//	                CommonConstant.STRING_MESSAGE,
+//	                subContractSupplyScheduleMap.get("message"));
+//
+//	        responseObjectsMap.put(
+//	                "subContractSupplyScheduleVO",
+//	                subContractSupplyScheduleMap.get("subContractSupplyScheduleVO"));
+//
+//	        responseDTO = createServiceResponse(responseObjectsMap);
+//
+//	    } catch (Exception e) {
+//
+//	        e.printStackTrace();
+//
+//	        responseDTO = createServiceResponseError(
+//	                responseObjectsMap,
+//	                e.getMessage(),
+//	                e.getMessage());
+//	    }
+//
+//	    return ResponseEntity.ok(responseDTO);
+//	}
 }

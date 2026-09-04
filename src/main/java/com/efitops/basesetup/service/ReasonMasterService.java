@@ -16,6 +16,5 @@ public interface ReasonMasterService {
 
 	List<ReasonMasterResponseDTO> getReasonMasterByOrgId(Long orgId) throws ApplicationException;
 
-	Map<String, Object> updateCreateControlPlan(ControlPlanDTO controlPlanDTO) throws ApplicationException;
-
+	
 }

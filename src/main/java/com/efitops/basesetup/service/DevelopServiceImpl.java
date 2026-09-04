@@ -5406,6 +5406,13 @@ public class DevelopServiceImpl implements DevelopService {
 					.orElseThrow(() -> new ApplicationException("Tool Category Not Found"));
 
 			toolCategoryVO.setUpdatedBy(toolCategoryDTO.getCreatedBy());
+			
+			 List<ToolCategoryDetailVO> oldDetails =
+			            toolCategoryDetailRepo.findByToolCategoryVO(toolCategoryVO);
+
+			    if (oldDetails != null && !oldDetails.isEmpty()) {
+			        toolCategoryDetailRepo.deleteAll(oldDetails);
+			    }
 
 			message = "Tool Category Updated Successfully";
 

@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
@@ -70,8 +71,16 @@ public interface SubContractService {
 			Long vendor);
 
 	//SubContractSupplySchedule
-//	Map<String, Object> createUpdateSubContractSupplySchedule(
-//			SubContractSupplyScheduleDTO subContractSupplyScheduleDTO) throws ApplicationException;
+	Map<String, Object> createUpdateSubContractSupplySchedule(
+			SubContractSupplyScheduleDTO subContractSupplyScheduleDTO) throws ApplicationException;
+
+	List<Map<String, Object>> getJobOrderNoAndDateForSubContractSupplySch(Long branch, Long orgId, String contractNo);
+
+	SubContractSupplyScheduleResponseDTO getSubContractSupplyScheduleById(Long id) throws ApplicationException;
+
+	List<SubContractSupplyScheduleResponseDTO> getSubContractSupplyScheduleByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	String getSubContractSupplyScheduleDocId(Long orgId, String financialYear);
 
 
 

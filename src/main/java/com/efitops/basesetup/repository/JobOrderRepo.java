@@ -117,5 +117,25 @@ public interface JobOrderRepo extends JpaRepository<JobOrderVO, Long> {
 	        @Param("jobOrderNo") String jobOrderNo,
 	        @Param("branch") Long branch,
 	        @Param("orgId") Long orgId,
-	        @Param("vendor") Long vendor);	
+	        @Param("vendor") Long vendor);
+	
+	@Query(value = """
+	        SELECT
+	            jo.job_order_basic_id AS id,
+	            jo.doc_id AS jobOrderNo,
+	            jo.doc_date AS jobOrderDate
+	        FROM job_order_basic jo
+	        WHERE jo.branch = :branch
+	          AND jo.org_id = :orgId
+	          AND jo.contract_no = :contractNo
+	          AND jo.active = 1
+	          AND jo.cancel = 0
+	        ORDER BY jo.job_order_basic_id DESC
+	        """, nativeQuery = true)
+	Set<Object[]> getJobOrderNoAndDateForSubContractSupplySch(
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId,
+	        @Param("contractNo") String contractNo);
+
+
 }

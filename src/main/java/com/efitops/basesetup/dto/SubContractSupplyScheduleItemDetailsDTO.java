@@ -19,7 +19,7 @@ public class SubContractSupplyScheduleItemDetailsDTO {
     // Item Details
     // =========================
 
-    private Long itemCode;
+    private Long item;
 
     private Long unit;
 

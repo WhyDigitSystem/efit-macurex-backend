@@ -46,8 +46,8 @@ public class SubContractSupplyScheduleItemDetailsVO {
     // =========================
 
     @ManyToOne
-    @JoinColumn(name = "item_code")
-    private ItemMasterVO itemCode;
+    @JoinColumn(name = "item")
+    private ItemMasterVO item;
 
     @ManyToOne
     @JoinColumn(name = "unit")

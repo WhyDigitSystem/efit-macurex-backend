@@ -41,7 +41,7 @@ public class ToolCategoryVO {
 	  private String apllicableFor;
 	  
 	  @Column(name = "active")
-	   private boolean active;
+	  private boolean active;
 	   
 	   @Column(name = "org_id")
 		private Long orgId;

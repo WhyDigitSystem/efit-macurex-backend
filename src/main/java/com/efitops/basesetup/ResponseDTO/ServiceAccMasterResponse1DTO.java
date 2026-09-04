@@ -7,8 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GSTStateMasterResponseDTO {
-	private Long id;
-	private String gstState;
-	private String gstStateCode;
+public class ServiceAccMasterResponse1DTO {
+
+	  private Long id;
+
+	    private String serviceName;
+
+	    private String serviceDescription;
 }

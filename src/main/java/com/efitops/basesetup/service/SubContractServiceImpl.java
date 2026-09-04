@@ -1,12 +1,20 @@
 package com.efitops.basesetup.service;
 
+import java.io.File;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -14,52 +22,98 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.BomResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.HsnResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
+import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.JobOrderAttachmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.JobOrderDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.JobOrderTaxDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ServiceAccMasterResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractItemDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractTaxDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
+import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
+import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDetailsDTO;
+import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
+import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
+import com.efitops.basesetup.dto.JobOrderAmendmentDetailsDTO;
+import com.efitops.basesetup.dto.JobOrderDTO;
+import com.efitops.basesetup.dto.JobOrderDetailsDTO;
+import com.efitops.basesetup.dto.JobOrderTaxDetailsDTO;
 import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.dto.SupplierRateContractItemDetailsDTO;
 import com.efitops.basesetup.dto.SupplierRateContractTaxDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
+import com.efitops.basesetup.entity.BomVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.DeliveryChallanSubcontractingDetailsVO;
+import com.efitops.basesetup.entity.DeliveryChallanSubcontractingVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
-import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
+import com.efitops.basesetup.entity.JobOrderAmendmentDetailsVO;
+import com.efitops.basesetup.entity.JobOrderAmendmentVO;
+import com.efitops.basesetup.entity.JobOrderAttachmentVO;
+import com.efitops.basesetup.entity.JobOrderDetailsVO;
+import com.efitops.basesetup.entity.JobOrderTaxDetailsVO;
+import com.efitops.basesetup.entity.JobOrderVO;
+import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.entity.SupplierRateContractItemDetailsVO;
 import com.efitops.basesetup.entity.SupplierRateContractTaxDetailsVO;
 import com.efitops.basesetup.entity.SupplierRateContractVO;
+import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.BomRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
+import com.efitops.basesetup.repository.DeliveryChallanSubcontractingDetailsRepo;
+import com.efitops.basesetup.repository.DeliveryChallanSubcontractingRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.HsnRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.JobOrderAmendmentDetailsRepo;
+import com.efitops.basesetup.repository.JobOrderAmendmentRepo;
+import com.efitops.basesetup.repository.JobOrderAttachmentRepo;
+import com.efitops.basesetup.repository.JobOrderDetailsRepo;
+import com.efitops.basesetup.repository.JobOrderRepo;
+import com.efitops.basesetup.repository.JobOrderTaxDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
+import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.ServiceAccMasterRepo;
 import com.efitops.basesetup.repository.SupplierRateContractItemDetailsRepo;
 import com.efitops.basesetup.repository.SupplierRateContractRepo;
 import com.efitops.basesetup.repository.SupplierRateContractTaxDetailsRepo;
+import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
+import io.jsonwebtoken.io.IOException;
 @Service
 public class SubContractServiceImpl implements SubContractService {
 
@@ -106,6 +160,46 @@ public class SubContractServiceImpl implements SubContractService {
 
 	@Autowired
 	ServiceAccMasterRepo serviceAccMasterRepo;
+	
+    @Autowired
+    JobOrderRepo jobOrderRepo;
+    
+    @Autowired
+    JobOrderDetailsRepo jobOrderDetailsRepo;
+
+    @Autowired
+    JobOrderTaxDetailsRepo jobOrderTaxDetailsRepo;
+    
+    @Autowired
+    BomRepo bomRepo;
+    
+    @Autowired
+    JobOrderAttachmentRepo jobOrderAttachmentRepo;
+    
+    @Value("${server.base-url}")
+    private String serverBaseUrl;
+    
+
+	@Value("${joborder.upload.path}")
+	private String joborderUploadPath;
+	
+	@Autowired
+	JobOrderAmendmentRepo jobOrderAmendmentRepo;
+    
+	@Autowired
+	JobOrderAmendmentDetailsRepo jobOrderAmendmentDetailsRepo;
+	
+	@Autowired
+	DeliveryChallanSubcontractingRepo deliveryChallanSubcontractingRepo;
+	
+	@Autowired
+	DeliveryChallanSubcontractingDetailsRepo deliveryChallanSubcontractingDetailsRepo;
+	
+	@Autowired
+	LocationRepo locationRepo;
+	
+	@Autowired
+	TransportRepo transportRepo;
 	
 	@Override
 	@Transactional
@@ -226,17 +320,19 @@ public class SubContractServiceImpl implements SubContractService {
 		GSTStateMasterVO gstState = gstStateMasterRepo.findById(dto.getGstState())
 				.orElseThrow(() -> new ApplicationException("GST State Not Found"));
 
-		CustomerVO serviceName = customerRepo.findById(dto.getServiceName())
+		ServiceAccMasterVO serviceName = serviceAccMasterRepo.findById(dto.getServiceName())
 				.orElseThrow(() -> new ApplicationException("Service Name Not Found"));
 
-		HsnVO hsnSacCode = hsnRepo.findById(dto.getHsnSacCode())
-				.orElseThrow(() -> new ApplicationException("HSN/SAC Code Not Found"));
+		System.out.println("1. HSN ID = " + dto.getHsnSacCode());
 
-		ListOfValuesDetailsVO freightType = listOfValuesDetailsRepo.findById(dto.getFreightType())
-				.orElseThrow(() -> new ApplicationException("Freight Type Not Found"));
+		HsnVO hsnSacCode = hsnRepo.findByHsn_Id(dto.getHsnSacCode())
+		        .orElseThrow(() -> new ApplicationException("HSN/SAC Code Not Found"));
+		
+		System.out.println("2. HSN FOUND = " + hsnSacCode.getId());
 
-		ListOfValuesDetailsVO packingType = listOfValuesDetailsRepo.findById(dto.getPackingType())
-				.orElseThrow(() -> new ApplicationException("Packing Type Not Found"));
+		supplierRateContractVO.setHsnSacCode(hsnSacCode);
+
+		System.out.println("3. HSN SET SUCCESS");
 
 		EmployeeMasterVO preparedBy = employeeMasterRepo.findById(dto.getPreparedBy())
 				.orElseThrow(() -> new ApplicationException("Prepared By Employee Not Found"));
@@ -251,8 +347,6 @@ public class SubContractServiceImpl implements SubContractService {
 		supplierRateContractVO.setBranch(branch);
 
 		supplierRateContractVO.setDepartment(department);
-
-		supplierRateContractVO.setDocId(supplierRateContractVO.getDocId());
 
 		supplierRateContractVO.setBelongsTo(dto.getBelongsTo());
 
@@ -274,7 +368,7 @@ public class SubContractServiceImpl implements SubContractService {
 
 		supplierRateContractVO.setServiceName(serviceName);
 
-		supplierRateContractVO.setHsnSacCode(hsnSacCode);
+//		supplierRateContractVO.setHsnSacCode(hsnSacCode);
 
 		supplierRateContractVO.setScrap(dto.isScrap());
 
@@ -288,9 +382,9 @@ public class SubContractServiceImpl implements SubContractService {
 
 		supplierRateContractVO.setFreight(dto.getFreight());
 
-		supplierRateContractVO.setFreightType(freightType);
+		supplierRateContractVO.setFreightType(dto.getFreightType());
 
-		supplierRateContractVO.setPackingType(packingType);
+		supplierRateContractVO.setPackingType(dto.getPackingType());
 
 		supplierRateContractVO.setInsurance(dto.getInsurance());
 
@@ -303,6 +397,11 @@ public class SubContractServiceImpl implements SubContractService {
 		supplierRateContractVO.setAuthoriedBy(authoriedBy);
 
 		supplierRateContractVO.setNarration(dto.getNarration());
+		
+		supplierRateContractVO.setFreightType(dto.getFreightType());
+
+		supplierRateContractVO.setPackingType(dto.getPackingType());
+
 
 		// =========================================================
 		// COMMON FIELDS
@@ -565,7 +664,7 @@ public class SubContractServiceImpl implements SubContractService {
 
 			gstStateDTO.setId(vo.getGstState().getId());
 
-			gstStateDTO.setGstSate(vo.getGstState().getStateName());
+			gstStateDTO.setGstState(vo.getGstState().getStateName());
 
 			gstStateDTO.setGstStateCode(vo.getGstState().getStateCode());
 
@@ -576,23 +675,13 @@ public class SubContractServiceImpl implements SubContractService {
 
 		if (vo.getServiceName() != null) {
 
-			CustomerDropdownResponseDTO serviceDTO = new CustomerDropdownResponseDTO();
+			ServiceAccMasterResponse1DTO serviceDTO = new ServiceAccMasterResponse1DTO();
 
-			serviceDTO.setCustomerId(vo.getServiceName().getId());
+			serviceDTO.setId(vo.getServiceName().getId());
 
-			serviceDTO.setCustomerCode(vo.getServiceName().getCustomerCode());
+			serviceDTO.setServiceName(vo.getServiceName().getServiceName());
 
-			serviceDTO.setCustomerName(vo.getServiceName().getCustomerName());
-
-			serviceDTO.setAddress(vo.getServiceName().getAddress());
-
-			serviceDTO.setGstState(
-					vo.getCustomer().getGstState() != null ? vo.getCustomer().getGstState().getStateCode() : null);
-			serviceDTO.setGstNo(vo.getServiceName().getGstNo());
-
-			serviceDTO.setIgstApplicable(vo.getServiceName().isGstApplicable());
-
-			serviceDTO.setGstType(vo.getServiceName().getGstType());
+			serviceDTO.setServiceDescription(vo.getServiceName().getServiceDescription());
 
 			dto.setServiceName(serviceDTO);
 		}
@@ -614,33 +703,34 @@ public class SubContractServiceImpl implements SubContractService {
 
 		// ===================== FREIGHT TYPE MAPPING =====================
 
-		if (vo.getFreightType() != null) {
-
-			ListOfValuesDetailsResponseDTO freightTypeDTO = new ListOfValuesDetailsResponseDTO();
-
-			freightTypeDTO.setId(vo.getFreightType().getId());
-
-			freightTypeDTO.setCode(vo.getFreightType().getValueCode());
-
-			freightTypeDTO.setDescription(vo.getFreightType().getValueDescription());
-
-			dto.setFreightType(freightTypeDTO);
-		}
+//		if (vo.getFreightType() != null) {
+//
+//			ListOfValuesDetailsResponseDTO freightTypeDTO = new ListOfValuesDetailsResponseDTO();
+//
+//			freightTypeDTO.setId(vo.getFreightType().getId());
+//
+//			freightTypeDTO.setCode(vo.getFreightType().getValueCode());
+//
+//			freightTypeDTO.setDescription(vo.getFreightType().getValueDescription());
+//
+//			dto.setFreightType(freightTypeDTO);
+//		}
 
 		// ===================== PACKING TYPE MAPPING =====================
 
-		if (vo.getPackingType() != null) {
-
-			ListOfValuesDetailsResponseDTO packingTypeDTO = new ListOfValuesDetailsResponseDTO();
-
-			packingTypeDTO.setId(vo.getPackingType().getId());
-
-			packingTypeDTO.setCode(vo.getPackingType().getValueCode());
-
-			packingTypeDTO.setDescription(vo.getPackingType().getValueDescription());
-
-			dto.setPackingType(packingTypeDTO);
-		}
+//		if (vo.getPackingType() != null) {
+//
+//			ListOfValuesDetailsResponseDTO packingTypeDTO = new ListOfValuesDetailsResponseDTO();
+//
+//			packingTypeDTO.setId(vo.getPackingType().getId());
+//
+//			packingTypeDTO.setCode(vo.getPackingType().getValueCode());
+//
+//			packingTypeDTO.setDescription(vo.getPackingType().
+//());
+//
+//			dto.setPackingType(packingTypeDTO);
+//		}
 
 		// ===================== PREPARED BY MAPPING =====================
 
@@ -832,6 +922,9 @@ public class SubContractServiceImpl implements SubContractService {
 	        part.put("gstType",
 	                fs[7] != null ? fs[7].toString() : null);
 
+	        part.put("gstStateId",
+	                fs[8] != null ? ((Number) fs[8]).longValue() : null);
+	        
 	        details.add(part);
 	    }
 
@@ -897,6 +990,11 @@ public class SubContractServiceImpl implements SubContractService {
 	                fs[7] != null
 	                        ? new BigDecimal(fs[7].toString())
 	                        : BigDecimal.ZERO);
+	        
+	        part.put("hsnId",
+	                fs[8] != null
+	                        ? ((Number) fs[8]).longValue()
+	                        : null);
 
 	        details.add(part);
 	    }
@@ -942,8 +1040,7 @@ public class SubContractServiceImpl implements SubContractService {
 	@Override
 	public String getSupplierRateContractDocId(
 	        Long orgId,
-	        String financialYear,
-	        String screenCode) {
+	        String financialYear) {
 
 	    String screenCode1 = "SRC";
 
@@ -976,7 +1073,7 @@ public class SubContractServiceImpl implements SubContractService {
 
 	        Map<String, Object> part = new HashMap<>();
 
-	        part.put("idem", fs[0] != null ? fs[0].toString() : null);
+	        part.put("item", fs[0] != null ? fs[0].toString() : null);
 	        part.put("itemDesc", fs[1] != null ? fs[1].toString() : null);
 	        part.put("itemId", fs[2] != null ? ((Number) fs[2]).longValue() : null);
 
@@ -994,5 +1091,2151 @@ public class SubContractServiceImpl implements SubContractService {
 
 	    return details;
 	}
+	
+	//JobOrder
+	
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateJobOrder(JobOrderDTO jobOrderDTO, MultipartFile[] files)
+	        throws ApplicationException {
 
+	    String screenCode = "JO";
+
+	    JobOrderVO jobOrderVO;
+	    String message;
+
+	    if (ObjectUtils.isNotEmpty(jobOrderDTO.getId())) {
+
+	        jobOrderVO = jobOrderRepo.findById(jobOrderDTO.getId())
+	                .orElseThrow(() -> new ApplicationException("Job Order Not Found"));
+
+	        jobOrderVO.setUpdatedBy(jobOrderDTO.getCreatedBy());
+
+	        message = "Job Order Updated Successfully";
+	        
+
+	        
+	    } else {
+
+	        jobOrderVO = new JobOrderVO();
+
+	        String docId = jobOrderRepo.getJobOrderDocId(jobOrderDTO.getOrgId(), jobOrderDTO.getFinancialYear(),
+	                screenCode);
+
+	        jobOrderVO.setDocId(docId);
+
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+	                .findByOrgIdAndFinYearAndScreenCode(jobOrderDTO.getOrgId(), jobOrderDTO.getFinancialYear(),
+	                        screenCode);
+	        documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+	        documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+	        jobOrderVO.setCreatedBy(jobOrderDTO.getCreatedBy());
+	        jobOrderVO.setUpdatedBy(jobOrderDTO.getCreatedBy());
+
+	        message = "Job Order Created Successfully";
+	    }
+
+	    // Header + Child Mapping
+	    createUpdateJobOrderVOByJobOrderDTO(jobOrderDTO, jobOrderVO);
+
+	    // Save Header
+	    jobOrderVO = jobOrderRepo.save(jobOrderVO);
+
+	    // Save Attachments
+	    try {
+			saveJobOrderAttachments(files, jobOrderVO);
+		} catch (ApplicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (java.io.IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	    // Response
+	    JobOrderResponseDTO responseDTO = buildJobOrderResponse(jobOrderVO);
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("message", message);
+	    response.put("jobOrderVO", responseDTO);
+
+	    return response;
+	}
+
+	private void createUpdateJobOrderVOByJobOrderDTO(JobOrderDTO jobOrderDTO, JobOrderVO jobOrderVO)
+	        throws ApplicationException {
+
+	    // Branch
+	    if (jobOrderDTO.getBranch() != null && jobOrderDTO.getBranch() > 0) {
+	        BranchVO branch = branchRepo.findById(jobOrderDTO.getBranch())
+	                .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+	        jobOrderVO.setBranch(branch);
+	    }
+
+	    // Department
+	    if (jobOrderDTO.getDepartment() != null && jobOrderDTO.getDepartment() > 0) {
+	        DepartmentVO department = departmentRepo.findById(jobOrderDTO.getDepartment())
+	                .orElseThrow(() -> new ApplicationException("Department Not Found"));
+	        jobOrderVO.setDepartment(department);
+	    }
+
+	    jobOrderVO.setBelongsTo(jobOrderDTO.getBelongsTo());
+
+	    // Vendor
+	    if (jobOrderDTO.getVendor() != null && jobOrderDTO.getVendor() > 0) {
+	        CustomerVO vendor = customerRepo.findById(jobOrderDTO.getVendor())
+	                .orElseThrow(() -> new ApplicationException("Vendor Not Found"));
+	        jobOrderVO.setVendor(vendor);
+	    }
+
+	    // GST State
+	    if (jobOrderDTO.getGstState() != null && jobOrderDTO.getGstState() > 0) {
+	        GSTStateMasterVO gstState = gstStateMasterRepo.findById(jobOrderDTO.getGstState())
+	                .orElseThrow(() -> new ApplicationException("GST State Not Found"));
+	        jobOrderVO.setGstState(gstState);
+	    }
+
+	    jobOrderVO.setJobOrderFor(jobOrderDTO.getJobOrderFor());
+	    jobOrderVO.setIgstAppl(jobOrderDTO.isIgstAppl());
+	    jobOrderVO.setContractNo(jobOrderDTO.getContractNo());
+
+	    // Service Name
+	    if (jobOrderDTO.getServiceName() != null && jobOrderDTO.getServiceName() > 0) {
+	        ServiceAccMasterVO serviceName = serviceAccMasterRepo.findById(jobOrderDTO.getServiceName())
+	                .orElseThrow(() -> new ApplicationException("Service Not Found"));
+	        jobOrderVO.setServiceName(serviceName);
+	    }
+
+	    jobOrderVO.setIndentTime(jobOrderDTO.getIndentTime());
+
+	 // HSN/SAC
+	    if (jobOrderDTO.getHsnSacCode() != null && jobOrderDTO.getHsnSacCode() > 0) {
+	        HsnVO hsn = hsnRepo.findById(jobOrderDTO.getHsnSacCode())
+	                .orElseThrow(() -> new ApplicationException("HSN/SAC Not Found"));
+	        jobOrderVO.setHsnSacCode(hsn);
+	    }
+	    
+	    jobOrderVO.setTaxType(jobOrderDTO.getTaxType());
+	    jobOrderVO.setTaxPercentage(jobOrderDTO.getTaxPercentage());
+
+	    jobOrderVO.setPaymentTerms(jobOrderDTO.getPaymentTerms());
+	    jobOrderVO.setDeliveryDate(jobOrderDTO.getDeliveryDate());
+
+	    jobOrderVO.setNarration(jobOrderDTO.getNarration());
+	    jobOrderVO.setNote(jobOrderDTO.getNote());
+
+	    jobOrderVO.setOrgId(jobOrderDTO.getOrgId());
+	    jobOrderVO.setFinancialYear(jobOrderDTO.getFinancialYear());
+	    jobOrderVO.setActive(jobOrderDTO.isActive());
+	    jobOrderVO.setCancelRemarks(jobOrderDTO.getCancelRemarks());
+
+	    // Clear existing children on update
+	    if (ObjectUtils.isNotEmpty(jobOrderVO.getId())) {
+
+	        List<JobOrderDetailsVO> existingDetails = jobOrderDetailsRepo.findByJobOrder(jobOrderVO);
+	        jobOrderDetailsRepo.deleteAll(existingDetails);
+
+	        List<JobOrderTaxDetailsVO> existingTaxDetails = jobOrderTaxDetailsRepo.findByJobOrder(jobOrderVO);
+	        jobOrderTaxDetailsRepo.deleteAll(existingTaxDetails);
+	    }
+
+	    BigDecimal totalAmount = BigDecimal.ZERO;
+
+	    // Job Order Details (child items)
+	    List<JobOrderDetailsVO> detailsList = new ArrayList<>();
+
+	    if (jobOrderDTO.getJobOrderDetails() != null) {
+
+	        for (JobOrderDetailsDTO dto : jobOrderDTO.getJobOrderDetails()) {
+
+	            JobOrderDetailsVO detailVO = new JobOrderDetailsVO();
+
+	            if (dto.getIncomingItem() != null && dto.getIncomingItem() != 0) {
+	                ItemMasterVO item = itemMasterRepo.findById(dto.getIncomingItem())
+	                        .orElseThrow(() -> new ApplicationException("Item Not Found"));
+	                detailVO.setIncomingItem(item);
+	            }
+
+//	            if (dto.getBom() != null && dto.getBom() != 0) {
+//	                BomVO bom = bomRepo.findById(dto.getBom())
+//	                        .orElseThrow(() -> new ApplicationException("BOM Not Found"));
+//	                detailVO.setBom(bom);
+//	            }
+
+	            if (dto.getUnit() != null && dto.getUnit() != 0) {
+	                UnitMasterVO unit = unitMasterRepo.findById(dto.getUnit())
+	                        .orElseThrow(() -> new ApplicationException("Unit Not Found"));
+	                detailVO.setUnit(unit);
+	            }
+
+	            detailVO.setIncomingType(dto.getIncomingType());
+	           
+	            BigDecimal amount = BigDecimal.ZERO;
+
+	            if (dto.getOrderQty() != null && dto.getRate() != null) {
+	                amount = dto.getOrderQty().multiply(dto.getRate());
+	            }
+
+	            detailVO.setBom(dto.getBom());
+	            detailVO.setOrderQty(dto.getOrderQty());
+	            detailVO.setRate(dto.getRate());
+	            detailVO.setAmount(amount);
+
+
+	            // =========================
+	            // TAX CALCULATION
+	            // =========================
+
+	            if (jobOrderVO.isIgstAppl()) {
+
+	                // IGST
+	                BigDecimal igstAmount = amount
+	                        .multiply(dto.getIgstRate() != null ? dto.getIgstRate() : BigDecimal.ZERO)
+	                        .divide(BigDecimal.valueOf(100));
+
+	                detailVO.setIgstRate(
+	                        dto.getIgstRate() != null ? dto.getIgstRate() : BigDecimal.ZERO
+	                );
+
+	                detailVO.setCgstRate(BigDecimal.ZERO);
+	                detailVO.setSgstRate(BigDecimal.ZERO);
+
+	                detailVO.setIgstAmount(igstAmount);
+	                detailVO.setCgstAmount(BigDecimal.ZERO);
+	                detailVO.setSgstAmount(BigDecimal.ZERO);
+
+	            } else {
+
+	                // CGST
+	                BigDecimal cgstAmount = amount
+	                        .multiply(dto.getCgstRate() != null ? dto.getCgstRate() : BigDecimal.ZERO)
+	                        .divide(BigDecimal.valueOf(100));
+
+	                // SGST
+	                BigDecimal sgstAmount = amount
+	                        .multiply(dto.getSgstRate() != null ? dto.getSgstRate() : BigDecimal.ZERO)
+	                        .divide(BigDecimal.valueOf(100));
+
+	                detailVO.setCgstRate(
+	                        dto.getCgstRate() != null ? dto.getCgstRate() : BigDecimal.ZERO
+	                );
+
+	                detailVO.setSgstRate(
+	                        dto.getSgstRate() != null ? dto.getSgstRate() : BigDecimal.ZERO
+	                );
+
+	                detailVO.setIgstRate(BigDecimal.ZERO);
+
+	                detailVO.setCgstAmount(cgstAmount);
+	                detailVO.setSgstAmount(sgstAmount);
+	                detailVO.setIgstAmount(BigDecimal.ZERO);
+	            }
+	            detailVO.setSentFor(dto.getSentFor());
+
+	            detailVO.setJobOrder(jobOrderVO);
+
+	            if (dto.getAmount() != null) {
+	                totalAmount = totalAmount.add(dto.getAmount());
+	            }
+
+	            detailsList.add(detailVO);
+	        }
+	    }
+
+	    jobOrderVO.setJobOrderDetails(detailsList);
+
+	    // Job Order Tax Details
+	    List<JobOrderTaxDetailsVO> taxDetailsList = new ArrayList<>();
+
+	    if (jobOrderDTO.getJobOrderTaxDetails() != null) {
+
+	        for (JobOrderTaxDetailsDTO dto : jobOrderDTO.getJobOrderTaxDetails()) {
+
+	            JobOrderTaxDetailsVO taxVO = new JobOrderTaxDetailsVO();
+
+	            taxVO.setParticulars(dto.getParticulars());
+	            taxVO.setAmount(dto.getAmount());
+	            taxVO.setJobOrder(jobOrderVO);
+
+	            taxDetailsList.add(taxVO);
+	        }
+	    }
+
+	    jobOrderVO.setJobOrderTaxDetails(taxDetailsList);
+
+	    jobOrderVO.setAmount(totalAmount);
+	}
+
+
+	private void saveJobOrderAttachments(MultipartFile[] files, JobOrderVO jobOrderVO) throws ApplicationException, java.io.IOException {
+
+	    // Delete old attachments (DB rows + physical files) on update, same as jobOrderDetails/taxDetails
+	    List<JobOrderAttachmentVO> existingAttachments = jobOrderAttachmentRepo.findByJobOrderVO(jobOrderVO);
+
+	    if (existingAttachments != null && !existingAttachments.isEmpty()) {
+
+	        for (JobOrderAttachmentVO oldAttachment : existingAttachments) {
+
+	            try {
+	                Path oldPath = Paths.get(oldAttachment.getFilePath());
+	                Files.deleteIfExists(oldPath);
+	            } catch (IOException e) {
+	                // log and continue — don't block the update if a stray file is already missing
+	                System.err.println("Could not delete old file: " + oldAttachment.getFilePath() + " - " + e.getMessage());
+	            }
+	        }
+
+	        jobOrderAttachmentRepo.deleteAll(existingAttachments);
+	    }
+
+	    // If no new files were sent, we're done — old ones are already cleared above
+	    if (files == null || files.length == 0) {
+	        jobOrderVO.setAttachments(new ArrayList<>());
+	        return;
+	    }
+
+	    try {
+
+	        File folder = new File(joborderUploadPath);
+
+	        if (!folder.exists()) {
+	            folder.mkdirs();
+	        }
+
+	        List<JobOrderAttachmentVO> attachmentList = new ArrayList<>();
+
+	        for (MultipartFile file : files) {
+
+	            if (file == null || file.isEmpty()) {
+	                continue;
+	            }
+
+	            String originalFileName = file.getOriginalFilename();
+	            String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
+
+	            Path path = Paths.get(joborderUploadPath, uniqueFileName);
+
+	            try (InputStream inputStream = file.getInputStream()) {
+	                Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+	            }
+
+	            JobOrderAttachmentVO attachment = JobOrderAttachmentVO.builder()
+	                    .jobOrderVO(jobOrderVO)
+	                    .name(originalFileName)
+	                    .fileName(uniqueFileName)
+	                    .filePath(path.toString())
+	                    .fileSize(file.getSize())
+	                    .contentType(file.getContentType())
+	                    .uploadOn(LocalDateTime.now())
+	                    .build();
+
+	            attachmentList.add(attachment);
+	        }
+
+	        List<JobOrderAttachmentVO> savedAttachments = jobOrderAttachmentRepo.saveAll(attachmentList);
+
+	        jobOrderVO.setAttachments(savedAttachments);
+
+	    } catch (IOException e) {
+	        throw new ApplicationException("File Upload Failed : " + e.getMessage());
+	    }
+	}
+
+	private JobOrderResponseDTO buildJobOrderResponse(JobOrderVO jobOrderVO) {
+
+	    JobOrderResponseDTO responseDTO = new JobOrderResponseDTO();
+
+	    responseDTO.setId(jobOrderVO.getId());
+	    responseDTO.setDocId(jobOrderVO.getDocId());
+	    responseDTO.setDocDate(jobOrderVO.getDocDate());
+	    responseDTO.setBelongsTo(jobOrderVO.getBelongsTo());
+	    responseDTO.setJobOrderFor(jobOrderVO.getJobOrderFor());
+	    responseDTO.setIgstAppl(jobOrderVO.isIgstAppl());
+	    responseDTO.setContractNo(jobOrderVO.getContractNo());
+	    responseDTO.setIndentTime(jobOrderVO.getIndentTime());
+	    responseDTO.setTaxType(jobOrderVO.getTaxType());
+	    responseDTO.setTaxPercentage(jobOrderVO.getTaxPercentage());
+	    responseDTO.setPaymentTerms(jobOrderVO.getPaymentTerms());
+	    responseDTO.setDeliveryDate(jobOrderVO.getDeliveryDate());
+	    responseDTO.setAmount(jobOrderVO.getAmount());
+	    responseDTO.setNarration(jobOrderVO.getNarration());
+	    responseDTO.setNote(jobOrderVO.getNote());
+	    responseDTO.setOrgId(jobOrderVO.getOrgId());
+	    responseDTO.setFinancialYear(jobOrderVO.getFinancialYear());
+	    responseDTO.setCreatedBy(jobOrderVO.getCreatedBy());
+	    responseDTO.setUpdatedBy(jobOrderVO.getUpdatedBy());
+	    responseDTO.setActive(jobOrderVO.getActive());
+	    responseDTO.setCancel(jobOrderVO.getCancel());
+	    responseDTO.setCancelRemarks(jobOrderVO.getCancelRemarks());
+	    responseDTO.setScreenCode(jobOrderVO.getScreenCode());
+	    responseDTO.setScreenName(jobOrderVO.getScreenName());
+	    responseDTO.setJobOrderFor(jobOrderVO.getJobOrderFor());
+
+	    if (jobOrderVO.getBranch() != null) {
+	        BranchResponseDTO branchDTO = new BranchResponseDTO();
+	        branchDTO.setId(jobOrderVO.getBranch().getId());
+	        branchDTO.setBranchCode(jobOrderVO.getBranch().getBranchCode());
+	        branchDTO.setBranchName(jobOrderVO.getBranch().getBranchName());
+	        responseDTO.setBranch(branchDTO);
+	    }
+
+	    if (jobOrderVO.getVendor() != null) {
+
+	        CustomerDropdownResponseDTO vendorDTO = new CustomerDropdownResponseDTO();
+
+	        vendorDTO.setCustomerId(jobOrderVO.getVendor().getId());
+	        vendorDTO.setCustomerCode(jobOrderVO.getVendor().getCustomerCode());
+	        vendorDTO.setCustomerName(jobOrderVO.getVendor().getCustomerName());
+	        vendorDTO.setAddress(jobOrderVO.getVendor().getAddress());
+//	        vendorDTO.setGstState(jobOrderVO.getVendor().getGstState().);
+	        vendorDTO.setGstNo(jobOrderVO.getVendor().getGstNo());
+	        vendorDTO.setIgstApplicable(jobOrderVO.getVendor().isGstApplicable());
+	        vendorDTO.setGstType(jobOrderVO.getVendor().getGstType());
+
+	        responseDTO.setVendor(vendorDTO);
+	    }
+	    
+	    if (jobOrderVO.getHsnSacCode() != null) {
+	        HsnResponseDTO hsnDTO = new HsnResponseDTO();
+	        hsnDTO.setId(jobOrderVO.getHsnSacCode().getId());
+	        hsnDTO.setHsn(jobOrderVO.getHsnSacCode().getHsn());   // adjust to actual HsnVO field names
+	        hsnDTO.setDescription(jobOrderVO.getHsnSacCode().getDescription());
+	        responseDTO.setHsnSacCode(hsnDTO);
+	    }
+	    
+	    if (jobOrderVO.getDepartment() != null) {
+
+	        DepartmentResponseDTO departmentDTO = new DepartmentResponseDTO();
+
+	        departmentDTO.setId(jobOrderVO.getDepartment().getId());
+	        departmentDTO.setDepartmentCode(jobOrderVO.getDepartment().getDepartmentCode());
+	        departmentDTO.setDepartmentName(jobOrderVO.getDepartment().getDepartmentName());
+
+	        responseDTO.setDepartment(departmentDTO);
+	    }
+	    
+	    if (jobOrderVO.getServiceName() != null) {
+
+	        ServiceAccMasterResponse1DTO serviceDTO = new ServiceAccMasterResponse1DTO();
+
+	        serviceDTO.setId(jobOrderVO.getServiceName().getId());
+	        serviceDTO.setServiceDescription(jobOrderVO.getServiceName().getServiceDescription());
+	        serviceDTO.setServiceName(jobOrderVO.getServiceName().getServiceName());
+
+	        responseDTO.setServiceName(serviceDTO);
+	    }
+	    
+	    if (jobOrderVO.getGstState() != null) {
+
+	        GSTStateMasterResponseDTO gstStateDTO = new GSTStateMasterResponseDTO();
+
+	        gstStateDTO.setId(jobOrderVO.getGstState().getId());
+	        gstStateDTO.setGstState(jobOrderVO.getGstState().getStateName());
+	        gstStateDTO.setGstStateCode(jobOrderVO.getGstState().getStateCode());
+
+	        responseDTO.setGstState(gstStateDTO);
+	    }
+	    
+	    
+
+	    // Details
+	    List<JobOrderDetailsResponseDTO> detailsList = new ArrayList<>();
+
+	    if (jobOrderVO.getJobOrderDetails() != null) {
+
+	        for (JobOrderDetailsVO detailVO : jobOrderVO.getJobOrderDetails()) {
+
+	            JobOrderDetailsResponseDTO detailDTO = new JobOrderDetailsResponseDTO();
+
+	            detailDTO.setId(detailVO.getId());
+	            detailDTO.setIncomingType(detailVO.getIncomingType());
+	            detailDTO.setOrderQty(detailVO.getOrderQty());
+	            detailDTO.setRate(detailVO.getRate());
+	            detailDTO.setAmount(detailVO.getAmount());
+	            detailDTO.setSgstRate(detailVO.getSgstRate());
+	            detailDTO.setSgstAmount(detailVO.getSgstAmount());
+	            detailDTO.setCgstRate(detailVO.getCgstRate());
+	            detailDTO.setCgstAmount(detailVO.getCgstAmount());
+	            detailDTO.setIgstRate(detailVO.getIgstRate());
+	            detailDTO.setIgstAmount(detailVO.getIgstAmount());
+	            detailDTO.setSentFor(detailVO.getSentFor());
+	            detailDTO.setBom(detailVO.getBom());
+
+	            if (detailVO.getIncomingItem() != null) {
+	                ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
+	                itemDTO.setId(detailVO.getIncomingItem().getId());
+	                itemDTO.setItemCode(detailVO.getIncomingItem().getItemCode());
+	                itemDTO.setItemDescription(detailVO.getIncomingItem().getItemDescription());
+	                detailDTO.setIncomingItem(itemDTO);
+	            }
+//	            if (detailVO.getBom() != null) {
+//	                BomResponseDTO bomDTO = new BomResponseDTO();
+//	                bomDTO.setId(detailVO.getBom().getId());
+//	                bomDTO.setProductType(detailVO.getBom().getProductType());
+//	                bomDTO.setProductCode(detailVO.getBom().getProductCode());
+//	                bomDTO.setProductName(detailVO.getBom().getProductName());
+//	                bomDTO.setUom(detailVO.getBom().getUom());          // adjust getter name if BomVO stores it differently
+//	                bomDTO.setQty(detailVO.getBom().getQty());
+//	                detailDTO.setBom(bomDTO);
+//	            }
+
+	            if (detailVO.getUnit() != null) {
+	                UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+	                unitDTO.setId(detailVO.getUnit().getId());
+	                unitDTO.setUnitId(detailVO.getUnit().getUnitId());
+	                unitDTO.setUnitDescription(detailVO.getUnit().getDescription());
+	                detailDTO.setUnit(unitDTO);
+	            }
+
+	            detailsList.add(detailDTO);
+	        }
+	    }
+
+	    responseDTO.setJobOrderDetails(detailsList);
+
+	    // Tax Details
+	    List<JobOrderTaxDetailsResponseDTO> taxDetailsList = new ArrayList<>();
+
+	    if (jobOrderVO.getJobOrderTaxDetails() != null) {
+
+	        for (JobOrderTaxDetailsVO taxVO : jobOrderVO.getJobOrderTaxDetails()) {
+
+	            JobOrderTaxDetailsResponseDTO taxDTO = new JobOrderTaxDetailsResponseDTO();
+	            taxDTO.setId(taxVO.getId());
+	            taxDTO.setParticulars(taxVO.getParticulars());
+	            taxDTO.setAmount(taxVO.getAmount());
+
+	            taxDetailsList.add(taxDTO);
+	        }
+	    }
+
+	    responseDTO.setJobOrderTaxDetails(taxDetailsList);
+
+	    // Attachments
+	    List<JobOrderAttachmentResponseDTO> attachmentList = new ArrayList<>();
+
+	    if (jobOrderVO.getAttachments() != null) {
+
+	        for (JobOrderAttachmentVO fileVO : jobOrderVO.getAttachments()) {
+
+	            JobOrderAttachmentResponseDTO fileDTO = new JobOrderAttachmentResponseDTO();
+	            fileDTO.setId(fileVO.getId());
+	            fileDTO.setName(fileVO.getName());
+	            fileDTO.setFileName(fileVO.getFileName());
+	            fileDTO.setFileSize(fileVO.getFileSize());
+	            fileDTO.setContentType(fileVO.getContentType());
+	            fileDTO.setUploadOn(fileVO.getUploadOn());
+
+	            String urlPath = joborderUploadPath.replace("C:/", "/").replace("\\", "/");
+	            fileDTO.setFilePath(serverBaseUrl + urlPath + fileVO.getFileName());
+
+	            attachmentList.add(fileDTO);
+	        }
+	    }
+
+	    responseDTO.setAttachments(attachmentList);
+
+	    return responseDTO;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getSupplierRateContractDropdown(
+	        Long customer, Long orgId, Long branch) {
+
+	    Set<Object[]> result =
+	            supplierRateContractRepo.getSupplierRateContractDropdown(
+	                    customer, orgId, branch);
+
+	    return getSupplierRateContractDropdownDetails(result);
+	}
+
+	private List<Map<String, Object>> getSupplierRateContractDropdownDetails(
+	        Set<Object[]> result) {
+
+	    List<Map<String, Object>> details = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("jobOrderFor",
+	                fs[2] != null ? fs[2].toString() : null);
+
+	        part.put("docId",
+	                fs[0] != null ? fs[0].toString() : null);
+
+	        part.put("docDate",
+	                fs[1] != null ? fs[1] : null);
+
+	        part.put("taxPercentage",
+	                fs[8] != null
+	                        ? new BigDecimal(fs[8].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("igstRate",
+	                fs[9] != null
+	                        ? new BigDecimal(fs[9].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("cgstRate",
+	                fs[10] != null
+	                        ? new BigDecimal(fs[10].toString())
+	                        : BigDecimal.ZERO);
+
+	        part.put("sgstRate",
+	                fs[11] != null
+	                        ? new BigDecimal(fs[11].toString())
+	                        : BigDecimal.ZERO);
+
+	        // Service
+	        Map<String, Object> service = new HashMap<>();
+
+	        service.put("id",
+	                fs[3] != null
+	                        ? Long.valueOf(fs[3].toString())
+	                        : null);
+
+	        service.put("name",
+	                fs[4] != null
+	                        ? fs[4].toString()
+	                        : null);
+
+	        part.put("serviceName", service);
+
+	        // HSN
+	        Map<String, Object> hsn = new HashMap<>();
+
+	        hsn.put("id",
+	                fs[5] != null
+	                        ? Long.valueOf(fs[5].toString())
+	                        : null);
+
+	        hsn.put("code",
+	                fs[6] != null
+	                        ? fs[6].toString()
+	                        : null);
+
+	        hsn.put("description",
+	                fs[7] != null
+	                        ? fs[7].toString()
+	                        : null);
+
+	        part.put("hsnSacCode", hsn);
+
+	        details.add(part);
+	    }
+
+	    return details;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getSupplierRateContractItemDetailsForJobOrder(
+			String docId, Long orgId, Long branch) {
+
+		Set<Object[]> result = supplierRateContractRepo
+				.getSupplierRateContractItemDetails(docId, orgId, branch);
+
+		return getSupplierRateContractItemDetails(result);
+	}
+
+	private List<Map<String, Object>> getSupplierRateContractItemDetails(Set<Object[]> result) {
+
+		List<Map<String, Object>> details1 = new ArrayList<>();
+
+		for (Object[] fs : result) {
+
+			Map<String, Object> part = new HashMap<>();
+
+			part.put("id", fs[0] != null ? Long.valueOf(fs[0].toString()) : null);
+			part.put("incomingItemId", fs[1] != null ? Long.valueOf(fs[1].toString()) : null);
+			part.put("itemCode", fs[2] != null ? fs[2].toString() : null);
+			part.put("itemDescription", fs[3] != null ? fs[3].toString() : null);
+			part.put("unitId", fs[4] != null ? Long.valueOf(fs[4].toString()) : null);
+			part.put("unit", fs[5] != null ? fs[5].toString() : null);
+			part.put("unitDescription", fs[6] != null ? fs[6].toString() : null);
+			part.put("rate", fs[7] != null ? new BigDecimal(fs[7].toString()) : BigDecimal.ZERO);
+
+			details1.add(part);
+		}
+
+		return details1;
+	}
+	
+	@Override
+	public JobOrderResponseDTO getJobOrderById(
+	        Long id) throws ApplicationException {
+
+	    JobOrderVO jobOrderVO =
+	            jobOrderRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Job Order Not Found"));
+
+	    return buildJobOrderResponse(jobOrderVO);
+	}
+	
+	
+	@Override
+	public List<JobOrderResponseDTO> getJobOrderByOrgIdAndBranch(
+	        Long orgId,
+	        Long branch) throws ApplicationException {
+
+	    List<JobOrderVO> jobOrders =
+	            jobOrderRepo.findByOrgIdAndBranch(
+	                    orgId,
+	                    branch);
+
+	    List<JobOrderResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (JobOrderVO vo : jobOrders) {
+
+	        responseList.add(
+	        		buildJobOrderResponse(vo));
+	    }
+
+	    return responseList;
+	}
+	
+	@Override
+	public String getJobOrderDocId(
+	        Long orgId,
+	        String financialYear) {
+
+	    String screenCode1 = "JO";
+
+	    String result =
+	            jobOrderRepo.getJobOrderDocId(
+	                    orgId,
+	                    financialYear,
+	                    screenCode1);
+
+	    return result;
+	}
+	
+	
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateJobOrderAmendment(
+	        JobOrderAmendmentDTO jobOrderAmendmentDTO) throws ApplicationException {
+
+	    String screenCode = "JOA";
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    String message;
+
+	    JobOrderAmendmentVO jobOrderAmendmentVO;
+
+	    if (ObjectUtils.isEmpty(jobOrderAmendmentDTO.getId())) {
+
+	        jobOrderAmendmentVO = new JobOrderAmendmentVO();
+
+	        String docId = jobOrderAmendmentRepo.getJobOrderAmendmentDocId(
+	                jobOrderAmendmentDTO.getOrgId(),
+	                jobOrderAmendmentDTO.getFinancialYear(),
+	                screenCode);
+
+	        jobOrderAmendmentVO.setDocId(docId);
+
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo
+	                        .findByOrgIdAndFinYearAndScreenCode(
+	                                jobOrderAmendmentDTO.getOrgId(),
+	                                jobOrderAmendmentDTO.getFinancialYear(),
+	                                screenCode);
+
+	        documentTypeMappingDetailsVO.setLastNo(
+	                documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	        documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+	        jobOrderAmendmentVO.setCreatedBy(
+	                jobOrderAmendmentDTO.getCreatedBy());
+
+	        jobOrderAmendmentVO.setUpdatedBy(
+	                jobOrderAmendmentDTO.getCreatedBy());
+
+	        message = "Job Order Amendment Created Successfully";
+
+	    } else {
+
+	        jobOrderAmendmentVO = jobOrderAmendmentRepo
+	                .findById(jobOrderAmendmentDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Job Order Amendment Not Found"));
+
+	        jobOrderAmendmentVO.setUpdatedBy(
+	                jobOrderAmendmentDTO.getCreatedBy());
+
+	       
+
+	        message = "Job Order Amendment Updated Successfully";
+	    }
+
+	    createUpdateJobOrderAmendmentVOByDTO(
+	            jobOrderAmendmentDTO,
+	            jobOrderAmendmentVO);
+
+	    // Cascade saves everything
+	    jobOrderAmendmentVO =
+	            jobOrderAmendmentRepo.save(jobOrderAmendmentVO);
+
+	    JobOrderAmendmentResponseDTO responseDTO =
+	            buildJobOrderAmendmentResponse(jobOrderAmendmentVO);
+
+	    response.put("message", message);
+	    response.put("jobOrderAmendment", responseDTO);
+
+	    return response;
+	}
+	
+	private void createUpdateJobOrderAmendmentVOByDTO(
+	        JobOrderAmendmentDTO dto,
+	        JobOrderAmendmentVO jobOrderAmendmentVO) throws ApplicationException {
+
+	    jobOrderAmendmentVO.setJobOrderNo(dto.getJobOrderNo());
+
+	    jobOrderAmendmentVO.setJobOrderDate(dto.getJobOrderDate());
+
+	    jobOrderAmendmentVO.setRevisionNo(dto.getRevisionNo());
+
+	    jobOrderAmendmentVO.setOldDeliveryDate(dto.getOldDeliveryDate());
+
+	    jobOrderAmendmentVO.setNewDeliveryDate(dto.getNewDeliveryDate());
+
+	    jobOrderAmendmentVO.setRemarks(dto.getRemarks());
+
+	    jobOrderAmendmentVO.setOrgId(dto.getOrgId());
+
+	    jobOrderAmendmentVO.setFinancialYear(dto.getFinancialYear());
+
+	    jobOrderAmendmentVO.setActive(dto.isActive());
+
+	    jobOrderAmendmentVO.setCancelRemarks(dto.getCancelRemarks());
+
+	    if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+	        BranchVO branch = branchRepo.findById(dto.getBranch())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Branch Not Found"));
+
+	        jobOrderAmendmentVO.setBranch(branch);
+	    }
+
+	    // ----------------------------------------------------
+	    // Party / Customer
+	    // ----------------------------------------------------
+
+	    if (dto.getCustomer() != null && dto.getCustomer() != 0) {
+
+	        CustomerVO customer = customerRepo.findById(dto.getCustomer())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Customer Not Found"));
+
+	        jobOrderAmendmentVO.setCustomer(customer);
+	    }
+
+	    // ----------------------------------------------------
+	    // Delete old child records while updating
+	    // ----------------------------------------------------
+
+	    if (dto.getId() != null) {
+
+	        List<JobOrderAmendmentDetailsVO> oldList =
+	                jobOrderAmendmentDetailsRepo
+	                        .findByJobOrderAmendment(
+	                                jobOrderAmendmentVO);
+
+	        jobOrderAmendmentDetailsRepo.deleteAll(oldList);
+	    }
+
+	    // ----------------------------------------------------
+	    // Child Details
+	    // ----------------------------------------------------
+
+	    List<JobOrderAmendmentDetailsVO> detailList =
+	            new ArrayList<>();
+
+	    if (dto.getJobOrderAmendmentDetails() != null
+	            && !dto.getJobOrderAmendmentDetails().isEmpty()) {
+
+	        for (JobOrderAmendmentDetailsDTO detailDTO :
+	                dto.getJobOrderAmendmentDetails()) {
+
+	            JobOrderAmendmentDetailsVO detailVO =
+	                    new JobOrderAmendmentDetailsVO();
+
+	            // Item
+
+	            if (detailDTO.getItem() != null
+	                    && detailDTO.getItem() != 0) {
+
+	                ItemMasterVO item =
+	                        itemMasterRepo.findById(detailDTO.getItem())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Item Not Found"));
+
+	                detailVO.setItem(item);
+	            }
+
+	            // Unit
+
+	            if (detailDTO.getUnit() != null
+	                    && detailDTO.getUnit() != 0) {
+
+	                UnitMasterVO unit =
+	                        unitMasterRepo.findById(detailDTO.getUnit())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Unit Not Found"));
+
+	                detailVO.setUnit(unit);
+	            }
+
+	            detailVO.setOldQty(detailDTO.getOldQty());
+
+	            detailVO.setNewQty(detailDTO.getNewQty());
+
+	            // Parent Mapping
+
+	            detailVO.setJobOrderAmendment(
+	                    jobOrderAmendmentVO);
+
+	            detailList.add(detailVO);
+	        }
+
+	        // Set child list to parent
+
+	        jobOrderAmendmentVO.setJobOrderAmendmentDetails(
+	                detailList);
+	    }
+	}
+	
+	private JobOrderAmendmentResponseDTO buildJobOrderAmendmentResponse(
+	        JobOrderAmendmentVO vo) {
+
+	    JobOrderAmendmentResponseDTO response =
+	            new JobOrderAmendmentResponseDTO();
+
+	    // ================= Header =================
+
+	    response.setId(vo.getId());
+
+	    response.setDocId(vo.getDocId());
+
+	    response.setDocDate(vo.getDocDate());
+
+	    response.setJobOrderNo(vo.getJobOrderNo());
+
+	    response.setJobOrderDate(vo.getJobOrderDate());
+
+	    response.setRevisionNo(vo.getRevisionNo());
+
+	    response.setOldDeliveryDate(vo.getOldDeliveryDate());
+
+	    response.setNewDeliveryDate(vo.getNewDeliveryDate());
+
+	    response.setRemarks(vo.getRemarks());
+
+	    response.setOrgId(vo.getOrgId());
+
+	    response.setFinancialYear(vo.getFinancialYear());
+
+	    response.setCreatedBy(vo.getCreatedBy());
+
+	    response.setUpdatedBy(vo.getUpdatedBy());
+
+	    response.setCancelRemarks(vo.getCancelRemarks());
+
+	    response.setActive(vo.getActive());
+
+	    response.setCancel(vo.getCancel());
+
+	    response.setScreenCode(vo.getScreenCode());
+
+	    response.setScreenName(vo.getScreenName());
+
+	    // ================= Branch =================
+
+	    if (vo.getBranch() != null) {
+
+	        BranchResponseDTO branch = new BranchResponseDTO();
+
+	        branch.setId(vo.getBranch().getId());
+
+	        branch.setBranchCode(
+	                vo.getBranch().getBranchCode());
+
+	        branch.setBranchName(
+	                vo.getBranch().getBranchName());
+
+	        response.setBranch(branch);
+	    }
+
+	    // ================= Customer =================
+
+	    if (vo.getCustomer() != null) {
+
+	        CustomerDropdownResponseDTO customer =
+	                new CustomerDropdownResponseDTO();
+
+	        customer.setCustomerId(
+	                vo.getCustomer().getId());
+
+	        customer.setCustomerCode(
+	                vo.getCustomer().getCustomerCode());
+
+	        customer.setCustomerName(
+	                vo.getCustomer().getCustomerName());
+
+	        response.setCustomer(customer);
+	    }
+
+	    // ================= Details =================
+
+	    List<JobOrderAmendmentDetailsResponseDTO> detailsResponse =
+	            new ArrayList<>();
+
+	    if (vo.getJobOrderAmendmentDetails() != null) {
+
+	        for (JobOrderAmendmentDetailsVO detailVO :
+	                vo.getJobOrderAmendmentDetails()) {
+
+	            JobOrderAmendmentDetailsResponseDTO detailResponse =
+	                    new JobOrderAmendmentDetailsResponseDTO();
+
+	            detailResponse.setId(detailVO.getId());
+
+	            detailResponse.setOldQty(
+	                    detailVO.getOldQty());
+
+	            detailResponse.setNewQty(
+	                    detailVO.getNewQty());
+
+	            // ================= Item =================
+
+	            if (detailVO.getItem() != null) {
+
+	                ItemResponseDTO item = new ItemResponseDTO();
+
+	                item.setId(detailVO.getItem().getId());
+
+	                item.setItemCode(
+	                        detailVO.getItem().getItemCode());
+
+	                item.setItemDescription(
+	                        detailVO.getItem().getItemDescription());
+
+	                detailResponse.setItem(item);
+	            }
+
+	            // ================= Unit =================
+
+	            if (detailVO.getUnit() != null) {
+
+	                UnitResponseDTO unit = new UnitResponseDTO();
+
+	                unit.setId(detailVO.getUnit().getId());
+
+	                unit.setUnitId(
+	                        detailVO.getUnit().getDescription());
+
+	                detailResponse.setUnit(unit);
+	            }
+
+	            detailsResponse.add(detailResponse);
+	        }
+	    }
+
+	    response.setJobOrderAmendmentDetails(detailsResponse);
+
+	    return response;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getJobOrderNoAndDateForJobOrderAmd(
+	        Long branch, Long orgId, Long customer) {
+
+	    Set<Object[]> result =
+	            jobOrderRepo.getJobOrderNoAndDateForJobOrderAmd(branch, orgId, customer);
+
+	    return getJobOrderNoAndDate(result);
+	}
+
+	private List<Map<String, Object>> getJobOrderNoAndDate(
+	        Set<Object[]> result) {
+
+	    List<Map<String, Object>> details = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("id", fs[0] != null ? fs[0] : null);
+	        part.put("jobOrderNo", fs[1] != null ? fs[1] : null);
+	        part.put("jobOrderDate", fs[2] != null ? fs[2] : null);
+
+	        details.add(part);
+	    }
+
+	    return details;
+	}
+	
+	@Override
+	public Integer getNextRevisionNoForJobOrderAmd(
+	        String jobOrderNo,
+	        Long branch,
+	        Long orgId) {
+
+	    Integer revisionNo =
+	            jobOrderAmendmentRepo.getNextRevisionNoForJobOrderAmd(
+	                    jobOrderNo, branch, orgId);
+
+	    return revisionNo != null ? revisionNo : 1;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getJobOrderItemDetailsForJobOrderAmd(
+	        String jobOrderNo, Long branch, Long orgId, Long customer) {
+
+	    Set<Object[]> result =
+	            jobOrderRepo.getJobOrderItemDetailsForJobOrderAmd(
+	                    jobOrderNo, branch, orgId, customer);
+
+	    return getJobOrderItemDetailsForJobOrderAmd(result);
+	}
+
+	private List<Map<String, Object>> getJobOrderItemDetailsForJobOrderAmd(
+	        Set<Object[]> result) {
+
+	    List<Map<String, Object>> details1 = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("id", fs[0] != null ? fs[0] : null);
+	        part.put("item", fs[1] != null ? fs[1] : null);
+	        part.put("itemCode", fs[2] != null ? fs[2] : null);
+	        part.put("itemDescription", fs[3] != null ? fs[3] : null);
+	        part.put("unit", fs[4] != null ? fs[4] : null);
+	        part.put("unitDescription", fs[5] != null ? fs[5] : null);
+	        part.put("rate", fs[6] != null ? fs[6] : null);
+
+	        part.put("bom", fs[7] != null ? fs[7] : null);
+
+
+	        part.put("deliveryDate", fs[8] != null ? fs[8] : null);
+
+	        details1.add(part);
+	    }
+
+	    return details1;
+	}
+	
+	@Override
+	public JobOrderAmendmentResponseDTO getJobOrderAmendmentById(Long id)
+	        throws ApplicationException {
+
+	    JobOrderAmendmentVO jobOrderAmendmentVO =
+	            jobOrderAmendmentRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Job Order Amendment Not Found"));
+
+	    return buildJobOrderAmendmentResponse(jobOrderAmendmentVO);
+	}
+	
+	@Override
+	public List<JobOrderAmendmentResponseDTO> getJobOrderAmendmentByOrgIdAndBranch(
+	        Long orgId, Long branch) throws ApplicationException {
+
+	    List<JobOrderAmendmentVO> jobOrderAmendments =
+	            jobOrderAmendmentRepo.findByOrgIdAndBranch(
+	                    orgId, branch);
+
+	    List<JobOrderAmendmentResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (JobOrderAmendmentVO vo : jobOrderAmendments) {
+
+	        responseList.add(
+	                buildJobOrderAmendmentResponse(vo));
+	    }
+
+	    return responseList;
+	}
+	
+	@Override
+	public String getJobOrderAmendmentDocId(
+	        Long orgId,
+	        String financialYear) {
+
+	    String screenCode1 = "JOA";
+
+	    String result =
+	            jobOrderAmendmentRepo.getJobOrderAmendmentDocId(
+	                    orgId,
+	                    financialYear,
+	                    screenCode1);
+
+	    return result;
+	}
+	
+	//DeliveryChallanSubcontracting
+	
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateDeliveryChallanSubcontracting(
+	        DeliveryChallanSubcontractingDTO deliveryChallanSubcontractingDTO)
+	        throws ApplicationException {
+
+	    String screenCode = "SCDC";
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    String message;
+
+	    DeliveryChallanSubcontractingVO deliveryChallanSubcontractingVO;
+
+	    if (ObjectUtils.isEmpty(deliveryChallanSubcontractingDTO.getId())) {
+
+	        deliveryChallanSubcontractingVO =
+	                new DeliveryChallanSubcontractingVO();
+
+	        String docId =
+	                deliveryChallanSubcontractingRepo
+	                        .getDeliveryChallanSubcontractingDocId(
+	                                deliveryChallanSubcontractingDTO.getOrgId(),
+	                                deliveryChallanSubcontractingDTO.getFinancialYear(),
+	                                screenCode);
+
+	        deliveryChallanSubcontractingVO.setDocId(docId);
+
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo
+	                        .findByOrgIdAndFinYearAndScreenCode(
+	                                deliveryChallanSubcontractingDTO.getOrgId(),
+	                                deliveryChallanSubcontractingDTO.getFinancialYear(),
+	                                screenCode);
+
+	        documentTypeMappingDetailsVO.setLastNo(
+	                documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	        documentTypeMappingDetailsRepo.save(
+	                documentTypeMappingDetailsVO);
+
+	        deliveryChallanSubcontractingVO.setCreatedBy(
+	                deliveryChallanSubcontractingDTO.getCreatedBy());
+
+	        deliveryChallanSubcontractingVO.setUpdatedBy(
+	                deliveryChallanSubcontractingDTO.getCreatedBy());
+
+	        message =
+	                "Delivery Challan For Sub Contracting Created Successfully";
+
+	    } else {
+
+	        deliveryChallanSubcontractingVO =
+	                deliveryChallanSubcontractingRepo
+	                        .findById(
+	                                deliveryChallanSubcontractingDTO.getId())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Delivery Challan For Sub Contracting Not Found"));
+
+	        deliveryChallanSubcontractingVO.setUpdatedBy(
+	                deliveryChallanSubcontractingDTO.getCreatedBy());
+
+	        message =
+	                "Delivery Challan For Sub Contracting Updated Successfully";
+	    }
+
+	    createUpdateDeliveryChallanSubcontractingVOByDTO(
+	            deliveryChallanSubcontractingDTO,
+	            deliveryChallanSubcontractingVO);
+
+	    // Cascade saves everything
+	    deliveryChallanSubcontractingVO =
+	            deliveryChallanSubcontractingRepo.save(
+	                    deliveryChallanSubcontractingVO);
+
+	    DeliveryChallanSubcontractingResponseDTO responseDTO =
+	            buildDeliveryChallanSubcontractingResponse(
+	                    deliveryChallanSubcontractingVO);
+
+	    response.put("message", message);
+
+	    response.put(
+	            "deliveryChallanSubcontracting",
+	            responseDTO);
+
+	    return response;
+	}
+	
+	private void createUpdateDeliveryChallanSubcontractingVOByDTO(
+	        DeliveryChallanSubcontractingDTO dto,
+	        DeliveryChallanSubcontractingVO deliveryChallanSubcontractingVO)
+	        throws ApplicationException {
+
+	    // ============================================================
+	    // Header Fields
+	    // ============================================================
+
+	    deliveryChallanSubcontractingVO.setBelongsTo(
+	            dto.getBelongsTo());
+
+	    deliveryChallanSubcontractingVO.setJobOrderNo(
+	            dto.getJobOrderNo());
+
+	    deliveryChallanSubcontractingVO.setVehicleNo(
+	            dto.getVehicleNo());
+
+	    deliveryChallanSubcontractingVO.setQty(
+	            dto.getQty());
+
+	    deliveryChallanSubcontractingVO.setTimeOfIssue(
+	            dto.getTimeOfIssue());
+
+	    deliveryChallanSubcontractingVO.setDcType(
+	            dto.getDcType());
+
+	    deliveryChallanSubcontractingVO.setApprovalByStores(
+	            dto.getApprovalByStores());
+
+	    deliveryChallanSubcontractingVO.setRemarks(
+	            dto.getRemarks());
+
+	    deliveryChallanSubcontractingVO.setOrgId(
+	            dto.getOrgId());
+
+	    deliveryChallanSubcontractingVO.setFinancialYear(
+	            dto.getFinancialYear());
+
+	    deliveryChallanSubcontractingVO.setActive(
+	            dto.isActive());
+
+	    deliveryChallanSubcontractingVO.setCancelRemarks(
+	            dto.getCancelRemarks());
+
+
+	    // ============================================================
+	    // Branch
+	    // ============================================================
+
+	    if (dto.getBranch() != null
+	            && dto.getBranch() != 0) {
+
+	        BranchVO branch =
+	                branchRepo.findById(dto.getBranch())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Branch Not Found"));
+
+	        deliveryChallanSubcontractingVO.setBranch(branch);
+	    }
+
+
+	    // ============================================================
+	    // Department
+	    // ============================================================
+
+	    if (dto.getDepartment() != null
+	            && dto.getDepartment() != 0) {
+
+	        DepartmentVO department =
+	                departmentRepo.findById(dto.getDepartment())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Department Not Found"));
+
+	        deliveryChallanSubcontractingVO.setDepartment(
+	                department);
+	    }
+
+
+	    // ============================================================
+	    // Vendor
+	    // ============================================================
+
+	    if (dto.getVendor() != null
+	            && dto.getVendor() != 0) {
+
+	        CustomerVO vendor =
+	                customerRepo.findById(dto.getVendor())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Vendor Not Found"));
+
+	        deliveryChallanSubcontractingVO.setVendor(vendor);
+	    }
+
+
+	    // ============================================================
+	    // Party Location
+	    // ============================================================
+
+	    if (dto.getPartyLocation() != null
+	            && dto.getPartyLocation() != 0) {
+
+	        LocationVO partyLocation =
+	                locationRepo.findById(
+	                        dto.getPartyLocation())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Party Location Not Found"));
+
+	        deliveryChallanSubcontractingVO.setPartyLocation(
+	                partyLocation);
+	    }
+
+
+	    // ============================================================
+	    // Incoming Item
+	    // ============================================================
+
+	    if (dto.getIncomingItem() != null
+	            && dto.getIncomingItem() != 0) {
+
+	        ItemMasterVO incomingItem =
+	                itemMasterRepo.findById(
+	                        dto.getIncomingItem())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Incoming Item Not Found"));
+
+	        deliveryChallanSubcontractingVO.setIncomingItem(
+	                incomingItem);
+	    }
+
+
+	    // ============================================================
+	    // Transport
+	    // ============================================================
+
+	    if (dto.getTransportName() != null
+	            && dto.getTransportName() != 0) {
+
+	        TransportMasterVO transport =
+	                transportRepo.findById(
+	                        dto.getTransportName())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Transport Not Found"));
+
+	        deliveryChallanSubcontractingVO.setTransportName(
+	                transport);
+	    }
+
+
+	    // ============================================================
+	    // SFG BOM
+	    // ============================================================
+
+	    if (dto.getSfgBomId() != null
+	            && dto.getSfgBomId() != 0) {
+
+	        BomVO bom =
+	                bomRepo.findById(dto.getSfgBomId())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "BOM Not Found"));
+
+	        deliveryChallanSubcontractingVO.setSfgBomId(bom);
+	    }
+
+
+	    // ============================================================
+	    // Prepared By
+	    // ============================================================
+
+	    if (dto.getPreparedBy() != null
+	            && dto.getPreparedBy() != 0) {
+
+	        EmployeeMasterVO preparedBy =
+	                employeeMasterRepo.findById(
+	                        dto.getPreparedBy())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Prepared By Employee Not Found"));
+
+	        deliveryChallanSubcontractingVO.setPreparedBy(
+	                preparedBy);
+	    }
+
+
+	    // ============================================================
+	    // Approved By
+	    // ============================================================
+
+	    if (dto.getApprovedBy() != null
+	            && dto.getApprovedBy() != 0) {
+
+	        EmployeeMasterVO approvedBy =
+	                employeeMasterRepo.findById(
+	                        dto.getApprovedBy())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Approved By Employee Not Found"));
+
+	        deliveryChallanSubcontractingVO.setApprovedBy(
+	                approvedBy);
+	    }
+
+
+	    // ============================================================
+	    // Delete Old Details While Updating
+	    // ============================================================
+
+	    if (dto.getId() != null) {
+
+	        List<DeliveryChallanSubcontractingDetailsVO> oldList =
+	                deliveryChallanSubcontractingDetailsRepo
+	                        .findByDeliveryChallanSubcontracting(
+	                                deliveryChallanSubcontractingVO);
+
+	        deliveryChallanSubcontractingDetailsRepo.deleteAll(
+	                oldList);
+	    }
+
+
+	    // ============================================================
+	    // Child Details
+	    // ============================================================
+
+	    List<DeliveryChallanSubcontractingDetailsVO> detailList =
+	            new ArrayList<>();
+
+	    if (dto.getDetails() != null
+	            && !dto.getDetails().isEmpty()) {
+
+	        for (DeliveryChallanSubcontractingDetailsDTO detailDTO :
+	                dto.getDetails()) {
+
+	            DeliveryChallanSubcontractingDetailsVO detailVO =
+	                    new DeliveryChallanSubcontractingDetailsVO();
+
+
+	            // ====================================================
+	            // Outgoing Item
+	            // ====================================================
+
+	            if (detailDTO.getOutgoingItem() != null
+	                    && detailDTO.getOutgoingItem() != 0) {
+
+	                ItemMasterVO outgoingItem =
+	                        itemMasterRepo.findById(
+	                                detailDTO.getOutgoingItem())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Outgoing Item Not Found"));
+
+	                detailVO.setOutgoingItem(
+	                        outgoingItem);
+	            }
+
+
+	            // ====================================================
+	            // Unit
+	            // ====================================================
+
+	            if (detailDTO.getUnit() != null
+	                    && detailDTO.getUnit() != 0) {
+
+	                UnitMasterVO unit =
+	                        unitMasterRepo.findById(
+	                                detailDTO.getUnit())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Unit Not Found"));
+
+	                detailVO.setUnit(unit);
+	            }
+
+
+	            // ====================================================
+	            // From Location
+	            // ====================================================
+
+	            if (detailDTO.getFromLocation() != null
+	                    && detailDTO.getFromLocation() != 0) {
+
+	                LocationVO fromLocation =
+	                        locationRepo.findById(
+	                                detailDTO.getFromLocation())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "From Location Not Found"));
+
+	                detailVO.setFromLocation(
+	                        fromLocation);
+	            }
+
+
+	            // ====================================================
+	            // Other Detail Fields
+	            // ====================================================
+
+	            detailVO.setStock(
+	                    detailDTO.getStock());
+
+	            detailVO.setAvailableStock(
+	                    detailDTO.getAvailableStock());
+
+	            detailVO.setIssueQty(
+	                    detailDTO.getIssueQty());
+
+	            detailVO.setUnitRate(
+	                    detailDTO.getUnitRate());
+
+	            BigDecimal amount = BigDecimal.ZERO;
+
+	            if (detailDTO.getIssueQty() != null
+	                    && detailDTO.getUnitRate() != null) {
+
+	                amount = detailDTO.getIssueQty()
+	                        .multiply(detailDTO.getUnitRate());
+	            }
+
+	            detailVO.setAmount(amount);
+
+	            detailVO.setRemarks(
+	                    detailDTO.getRemarks());
+
+
+	            // ====================================================
+	            // Parent Mapping
+	            // ====================================================
+
+	            detailVO.setDeliveryChallanSubcontracting(
+	                    deliveryChallanSubcontractingVO);
+
+	            detailList.add(detailVO);
+	        }
+
+
+	        // Set child list to parent
+
+	        deliveryChallanSubcontractingVO.setDetails(
+	                detailList);
+	    }
+	}
+	
+	private DeliveryChallanSubcontractingResponseDTO
+	buildDeliveryChallanSubcontractingResponse(
+	        DeliveryChallanSubcontractingVO vo) {
+
+	    DeliveryChallanSubcontractingResponseDTO response =
+	            new DeliveryChallanSubcontractingResponseDTO();
+
+	    // ============================================================
+	    // Header
+	    // ============================================================
+
+	    response.setId(vo.getId());
+
+	    response.setDocId(vo.getDocId());
+
+	    response.setDocDate(vo.getDocDate());
+
+	    response.setBelongsTo(vo.getBelongsTo());
+
+	    response.setJobOrderNo(vo.getJobOrderNo());
+
+	    response.setVehicleNo(vo.getVehicleNo());
+
+	    response.setQty(vo.getQty());
+
+	    response.setTimeOfIssue(vo.getTimeOfIssue());
+
+	    response.setDcType(vo.getDcType());
+
+	    response.setApprovalByStores(
+	            vo.getApprovalByStores());
+
+	    response.setRemarks(vo.getRemarks());
+
+	    response.setOrgId(vo.getOrgId());
+
+	    response.setFinancialYear(
+	            vo.getFinancialYear());
+
+	    response.setCreatedBy(
+	            vo.getCreatedBy());
+
+	    response.setUpdatedBy(
+	            vo.getUpdatedBy());
+
+	    response.setCancelRemarks(
+	            vo.getCancelRemarks());
+
+	    response.setActive(
+	            vo.getActive());
+
+	    response.setCancel(
+	            vo.getCancel());
+
+	    response.setScreenCode(
+	            vo.getScreenCode());
+
+	    response.setScreenName(
+	            vo.getScreenName());
+
+
+	    // ============================================================
+	    // Branch
+	    // ============================================================
+
+	    if (vo.getBranch() != null) {
+
+	        BranchResponseDTO branch =
+	                new BranchResponseDTO();
+
+	        branch.setId(
+	                vo.getBranch().getId());
+
+	        branch.setBranchCode(
+	                vo.getBranch().getBranchCode());
+
+	        branch.setBranchName(
+	                vo.getBranch().getBranchName());
+
+	        response.setBranch(branch);
+	    }
+
+
+	    // ============================================================
+	    // Department
+	    // ============================================================
+
+	    if (vo.getDepartment() != null) {
+
+	        DepartmentResponseDTO department =
+	                new DepartmentResponseDTO();
+
+	        department.setId(
+	                vo.getDepartment().getId());
+
+	        department.setDepartmentCode(
+	                vo.getDepartment().getDepartmentCode());
+
+	        department.setDepartmentName(
+	                vo.getDepartment().getDepartmentName());
+
+	        response.setDepartment(department);
+	    }
+
+
+	    // ============================================================
+	    // Vendor
+	    // ============================================================
+
+	    if (vo.getVendor() != null) {
+
+	        CustomerDropdownResponseDTO vendor =
+	                new CustomerDropdownResponseDTO();
+
+	        vendor.setCustomerId(
+	                vo.getVendor().getId());
+
+	        vendor.setCustomerCode(
+	                vo.getVendor().getCustomerCode());
+
+	        vendor.setCustomerName(
+	                vo.getVendor().getCustomerName());
+
+	        response.setVendor(vendor);
+	    }
+
+
+	    // ============================================================
+	    // Party Location
+	    // ============================================================
+
+	    if (vo.getPartyLocation() != null) {
+
+	        LocationMasterResponseDTO location =
+	                new LocationMasterResponseDTO();
+
+	        location.setId(
+	                vo.getPartyLocation().getId());
+
+	        location.setLocationName(
+	                vo.getPartyLocation().getLocationName());
+
+	        response.setPartyLocation(location);
+	    }
+
+
+	    // ============================================================
+	    // Incoming Item
+	    // ============================================================
+
+	    if (vo.getIncomingItem() != null) {
+
+	        ItemResponseDTO item =
+	                new ItemResponseDTO();
+
+	        item.setId(
+	                vo.getIncomingItem().getId());
+
+	        item.setItemCode(
+	                vo.getIncomingItem().getItemCode());
+
+	        item.setItemDescription(
+	                vo.getIncomingItem().getItemDescription());
+
+	        // If ItemMasterVO has Unit
+	        if (vo.getIncomingItem().getPrimaryUnit() != null) {
+
+	            UnitResponseDTO unit =
+	                    new UnitResponseDTO();
+
+	            unit.setId(
+	                    vo.getIncomingItem().getPrimaryUnit().getId());
+
+	            unit.setUnitId(
+	                    vo.getIncomingItem().getPrimaryUnit().getDescription());
+
+	            item.setUnit(unit);
+	        }
+
+	        response.setIncomingItem(item);
+	    }
+
+
+	    // ============================================================
+	    // Transport
+	    // ============================================================
+
+	    if (vo.getTransportName() != null) {
+
+	        TransportResponseDTO transport =
+	                new TransportResponseDTO();
+
+	        transport.setId(
+	                vo.getTransportName().getId());
+
+	        transport.setTransportName(
+	                vo.getTransportName().getTransportName());
+
+	        response.setTransportName(transport);
+	    }
+
+
+	    // ============================================================
+	    // SFG BOM
+	    // ============================================================
+
+	    if (vo.getSfgBomId() != null) {
+
+	        BomResponseDTO bom =
+	                new BomResponseDTO();
+
+	        bom.setId(
+	                vo.getSfgBomId().getId());
+
+	        bom.setProductType(
+	                vo.getSfgBomId().getProductType());
+
+	        bom.setProductCode(
+	                vo.getSfgBomId().getProductCode());
+
+	        bom.setProductName(
+	                vo.getSfgBomId().getProductName());
+
+	        bom.setUom(
+	                vo.getSfgBomId().getUom());
+
+	        bom.setQty(
+	                vo.getSfgBomId().getQty());
+
+	        response.setSfgBomId(bom);
+	    }
+
+	    // ============================================================
+	    // Prepared By
+	    // ============================================================
+
+	    if (vo.getPreparedBy() != null) {
+
+	        EmployeeResponseDTO employee =
+	                new EmployeeResponseDTO();
+
+	        employee.setId(
+	                vo.getPreparedBy().getId());
+
+	        employee.setEmployeeName(
+	                vo.getPreparedBy().getEmployeeName());
+
+	        response.setPreparedBy(employee);
+	    }
+
+
+	    // ============================================================
+	    // Approved By
+	    // ============================================================
+
+	    if (vo.getApprovedBy() != null) {
+
+	        EmployeeResponseDTO employee =
+	                new EmployeeResponseDTO();
+
+	        employee.setId(
+	                vo.getApprovedBy().getId());
+
+	        employee.setEmployeeName(
+	                vo.getApprovedBy().getEmployeeName());
+
+	        response.setApprovedBy(employee);
+	    }
+
+
+	    // ============================================================
+	    // Details
+	    // ============================================================
+
+	    List<DeliveryChallanSubcontractingDetailsResponseDTO>
+	            detailsResponse = new ArrayList<>();
+
+	    if (vo.getDetails() != null) {
+
+	        for (DeliveryChallanSubcontractingDetailsVO detailVO :
+	                vo.getDetails()) {
+
+	            DeliveryChallanSubcontractingDetailsResponseDTO
+	                    detailResponse =
+	                    new DeliveryChallanSubcontractingDetailsResponseDTO();
+
+
+	            // ====================================================
+	            // Detail ID
+	            // ====================================================
+
+	            detailResponse.setId(
+	                    detailVO.getId());
+
+
+	            // ====================================================
+	            // Stock
+	            // ====================================================
+
+	            detailResponse.setStock(
+	                    detailVO.getStock());
+
+
+	            // ====================================================
+	            // Available Stock
+	            // ====================================================
+
+	            detailResponse.setAvailableStock(
+	                    detailVO.getAvailableStock());
+
+
+	            // ====================================================
+	            // Issue Qty
+	            // ====================================================
+
+	            detailResponse.setIssueQty(
+	                    detailVO.getIssueQty());
+
+
+	            // ====================================================
+	            // Unit Rate
+	            // ====================================================
+
+	            detailResponse.setUnitRate(
+	                    detailVO.getUnitRate());
+
+
+	            // ====================================================
+	            // Amount
+	            // ====================================================
+
+	            detailResponse.setAmount(
+	                    detailVO.getAmount());
+
+
+	            // ====================================================
+	            // Remarks
+	            // ====================================================
+
+	            detailResponse.setRemarks(
+	                    detailVO.getRemarks());
+
+
+	            // ====================================================
+	            // Outgoing Item
+	            // ====================================================
+
+	            if (detailVO.getOutgoingItem() != null) {
+
+	                ItemResponseDTO item =
+	                        new ItemResponseDTO();
+
+	                item.setId(
+	                        detailVO.getOutgoingItem().getId());
+
+	                item.setItemCode(
+	                        detailVO.getOutgoingItem().getItemCode());
+
+	                item.setItemDescription(
+	                        detailVO.getOutgoingItem()
+	                                .getItemDescription());
+
+	                // Item Unit
+	                if (detailVO.getOutgoingItem().getPrimaryUnit() != null) {
+
+	                    UnitResponseDTO itemUnit =
+	                            new UnitResponseDTO();
+
+	                    itemUnit.setId(
+	                            detailVO.getOutgoingItem()
+	                                    .getPrimaryUnit()
+	                                    .getId());
+
+	                    itemUnit.setUnitId(
+	                            detailVO.getOutgoingItem()
+	                                    .getPrimaryUnit()
+	                                    .getDescription());
+
+	                    item.setUnit(itemUnit);
+	                }
+
+	                detailResponse.setOutgoingItem(item);
+	            }
+
+
+	            // ====================================================
+	            // Unit
+	            // ====================================================
+
+	            if (detailVO.getUnit() != null) {
+
+	                UnitResponseDTO unit =
+	                        new UnitResponseDTO();
+
+	                unit.setId(
+	                        detailVO.getUnit().getId());
+
+	                unit.setUnitId(
+	                        detailVO.getUnit().getDescription());
+
+	                detailResponse.setUnit(unit);
+	            }
+
+
+	            // ====================================================
+	            // From Location
+	            // ====================================================
+
+	            if (detailVO.getFromLocation() != null) {
+
+	                LocationMasterResponseDTO location =
+	                        new LocationMasterResponseDTO();
+
+	                location.setId(
+	                        detailVO.getFromLocation().getId());
+
+	                location.setLocationName(
+	                        detailVO.getFromLocation()
+	                                .getLocationName());
+
+	                detailResponse.setFromLocation(
+	                        location);
+	            }
+
+
+	            detailsResponse.add(detailResponse);
+	        }
+	    }
+
+	    response.setDetails(detailsResponse);
+
+	    return response;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getLocationForDeliverChallanSubContract(
+	        Long orgId, Long branch) {
+
+	    Set<Object[]> result =
+	            locationRepo.getLocationForDeliverChallanSubContract(
+	                    orgId, branch);
+
+	    return getSubContractLocationDropdown(result);
+	}
+
+	private List<Map<String, Object>> getSubContractLocationDropdown(
+	        Set<Object[]> result) {
+
+	    List<Map<String, Object>> details1 =
+	            new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part =
+	                new HashMap<>();
+
+	        part.put("id",
+	                fs[0] != null ? fs[0] : null);
+
+	        part.put("locationId",
+	                fs[1] != null ? fs[1] : null);
+
+	        part.put("locationName",
+	                fs[2] != null ? fs[2] : null);
+
+	        details1.add(part);
+	    }
+
+	    return details1;
+	}
+	
+	
+	@Override
+	public List<Map<String, Object>> getItemDetailsforDeliveryChallanSubContract(
+	        String jobOrderNo,
+	        Long branch,
+	        Long orgId,
+	        Long vendor) {
+
+	    Set<Object[]> result =
+	            jobOrderRepo.getItemDetailsforDeliveryChallanSubContract(
+	                    jobOrderNo,
+	                    branch,
+	                    orgId,
+	                    vendor);
+
+	    return getItemDetailsforDeliveryChallanSubContract(result);
+	}
+
+	private List<Map<String, Object>> getItemDetailsforDeliveryChallanSubContract(
+	        Set<Object[]> result) {
+
+	    List<Map<String, Object>> details1 = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("id", fs[0] != null ? fs[0] : null);
+	        part.put("jobOrderFor", fs[1] != null ? fs[1] : null);
+	        part.put("contractNo", fs[2] != null ? fs[2] : null);
+	        part.put("outgoingItem", fs[3] != null ? fs[3] : null);
+	        part.put("itemCode", fs[4] != null ? fs[4] : null);
+	        part.put("itemDescription", fs[5] != null ? fs[5] : null);
+	        part.put("unit", fs[6] != null ? fs[6] : null);
+	        part.put("unitDescription", fs[7] != null ? fs[7] : null);
+	        part.put("rate", fs[8] != null ? fs[8] : null);
+
+	        details1.add(part);
+	    }
+
+	    return details1;
+	}
 }

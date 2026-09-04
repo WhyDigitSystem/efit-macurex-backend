@@ -2081,7 +2081,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		if (vo.getGstState() != null) {
 			GSTStateMasterResponseDTO gstStateDTO = new GSTStateMasterResponseDTO();
 			gstStateDTO.setId(vo.getGstState().getId());
-			gstStateDTO.setGstSate(vo.getGstState().getStateName());
+			gstStateDTO.setGstState(vo.getGstState().getStateName());
 			gstStateDTO.setGstStateCode(vo.getGstState().getStateCode());
 			responseDTO.setGstState(gstStateDTO);
 		}

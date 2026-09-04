@@ -1893,25 +1893,21 @@ public class DevelopController extends BaseController {
 	
 	@GetMapping("/getToolCategoryforMachineMaster")
 	public ResponseEntity<ResponseDTO> getToolCategoryforMachineMaster(
-	       
-	        @RequestParam Long orgId
-	       ) {
+	        @RequestParam Long orgId,
+	        @RequestParam String applicableFor) {
 
 	    String methodName = "getToolCategoryforMachineMaster()";
-
 	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 	    String errorMsg = null;
-
 	    Map<String, Object> responseObjectsMap = new HashMap<>();
-
 	    ResponseDTO responseDTO = null;
 
 	    try {
 
 	        responseObjectsMap =
 	                developService.getToolCategoryforMachineMaster(
-	                         orgId);
+	                        orgId, applicableFor);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
@@ -1938,7 +1934,6 @@ public class DevelopController extends BaseController {
 
 	    return ResponseEntity.ok(responseDTO);
 	}
-	
 	
 	// TOOL CATEGORY
 

@@ -185,9 +185,9 @@ public interface DevelopService {
 
 	MachineMasterResponseDTO getMachineMasterById(Long id) throws ApplicationException;
 
-	
-	Map<String, Object> getToolCategoryforMachineMaster(Long orgId) throws ApplicationException;
+	Map<String, Object> getToolCategoryforMachineMaster(Long orgId, String applicableFor) throws ApplicationException;
 
+	
 	
 	
 	

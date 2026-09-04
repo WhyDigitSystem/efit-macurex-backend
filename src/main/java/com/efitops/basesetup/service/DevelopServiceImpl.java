@@ -5357,36 +5357,38 @@ public class DevelopServiceImpl implements DevelopService {
 	// machine/instrumentcategory
 
 	@Override
-	public Map<String, Object> getToolCategoryforMachineMaster( Long orgId)
-			throws ApplicationException {
+	public Map<String, Object> getToolCategoryforMachineMaster(
+	        Long orgId, String applicableFor) throws ApplicationException {
 
-		List<Object[]> result = machineMasterRepo.getToolCategoryforMachineMaster( orgId);
+	    List<Object[]> result =
+	            machineMasterRepo.getToolCategoryforMachineMaster(orgId, applicableFor);
 
-		Map<String, Object> response = new HashMap<>();
+	    Map<String, Object> response = new HashMap<>();
 
-		response.put("toolCategoryList", getToolCategoryDetails(result));
+	    response.put("toolCategoryList", getToolCategoryDetails(result));
 
-		return response;
+	    return response;
 	}
 
 	private List<Map<String, Object>> getToolCategoryDetails(List<Object[]> result) {
 
-		List<Map<String, Object>> toolCategoryList = new ArrayList<>();
+	    List<Map<String, Object>> toolCategoryList = new ArrayList<>();
 
-		for (Object[] obj : result) {
+	    for (Object[] obj : result) {
 
-			Map<String, Object> toolCategory = new HashMap<>();
+	        Map<String, Object> toolCategory = new HashMap<>();
 
-			toolCategory.put("id", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+	        toolCategory.put("id",
+	                obj[0] != null ? ((Number) obj[0]).longValue() : null);
 
-			toolCategory.put("category", obj[1] != null ? obj[1].toString() : null);
+	        toolCategory.put("category",
+	                obj[1] != null ? obj[1].toString() : null);
 
-			toolCategoryList.add(toolCategory);
-		}
+	        toolCategoryList.add(toolCategory);
+	    }
 
-		return toolCategoryList;
+	    return toolCategoryList;
 	}
-
 //TOOL CATEGORY
 
 	@Override
@@ -5586,6 +5588,8 @@ public class DevelopServiceImpl implements DevelopService {
 
 		return responseList;
 	}
+
+	
 
 	
 }

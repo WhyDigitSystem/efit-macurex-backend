@@ -45,7 +45,7 @@ public class SupplierRateContractResponseDTO {
 
     private String taxType;
 
-    private CustomerDropdownResponseDTO serviceName;
+    private ServiceAccMasterResponse1DTO serviceName;
 
     private HsnResponseDTO hsnSacCode;
 

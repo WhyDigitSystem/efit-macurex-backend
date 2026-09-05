@@ -187,7 +187,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	SalesReturnTaxDetailsRepo salesReturnTaxDetailsRepo;
-	
+
 	@Autowired
 	DailyExchangeRateRepo dailyExchangeRateRepo;
 
@@ -1408,7 +1408,6 @@ public class TransactionServiceImpl implements TransactionService {
 		// BELONGS TO
 		// =========================================================
 
-
 		// =========================================================
 		// CUSTOMER
 		// =========================================================
@@ -1652,7 +1651,6 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 		// Belongs To
-
 
 		dto.setVehicle(vo.getVehicle());
 		dto.setDocType(vo.getDocType());
@@ -1958,6 +1956,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 			part.put("exchangeRate", fs[2] != null ? new BigDecimal(fs[2].toString()) : BigDecimal.ZERO);
 
+			part.put("exchangeRateId", fs[3] != null ? Long.valueOf(fs[3].toString()) : null);
+
 			details.add(part);
 		}
 
@@ -2135,7 +2135,8 @@ public class TransactionServiceImpl implements TransactionService {
 
 	// salesReturn
 
-	@Transactional
+	@Transactional(rollbackOn = Exception.class)
+	@Override
 	public Map<String, Object> createUpdateSalesReturn(SalesReturnDTO dto) throws ApplicationException {
 
 		String screenCode = "SR";
@@ -2154,19 +2155,19 @@ public class TransactionServiceImpl implements TransactionService {
 			salesReturnVO = new SalesReturnVO();
 
 			// Generate Document ID
-//			String docId = salesReturnRepo.getSalesReturnDocId(dto.getOrgId(), dto.getFinancialYear(), screenCode);
-//
-//			salesReturnVO.setDocId(docId);
-//
-//			// Update document last number
-//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-//					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
-//
-//			if (documentTypeMappingDetailsVO != null) {
-//				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-//
-//				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
-//			}
+			String docId = salesReturnRepo.getSalesReturnDocId(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+
+			salesReturnVO.setDocId(docId);
+
+			// Update document last number
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO != null) {
+				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			}
 
 			salesReturnVO.setCreatedBy(dto.getCreatedBy());
 			salesReturnVO.setUpdatedBy(dto.getCreatedBy());
@@ -2278,19 +2279,18 @@ public class TransactionServiceImpl implements TransactionService {
 
 		salesReturnVO.setApprovedByAccounts(dto.getApprovedByAccounts());
 		if (dto.getCurrency() != null) {
-		    CurrencyVO currency = currencyRepo.findById(dto.getCurrency())
-		            .orElseThrow(() -> new ApplicationException("Currency Not Found"));
+			CurrencyVO currency = currencyRepo.findById(dto.getCurrency())
+					.orElseThrow(() -> new ApplicationException("Currency Not Found"));
 
-		    salesReturnVO.setCurrency(currency);
+			salesReturnVO.setCurrency(currency);
 		}
 
 		if (dto.getExchangeRate() != null) {
-		    DailyExchangeRateVO exchangeRate = dailyExchangeRateRepo.findById(dto.getExchangeRate())
-		            .orElseThrow(() -> new ApplicationException("Exchange Rate Not Found"));
+			DailyExchangeRateVO exchangeRate = dailyExchangeRateRepo.findById(dto.getExchangeRate())
+					.orElseThrow(() -> new ApplicationException("Exchange Rate Not Found"));
 
-		    salesReturnVO.setExchangeRate(exchangeRate);
+			salesReturnVO.setExchangeRate(exchangeRate);
 		}
-
 
 		salesReturnVO.setInvoiceReferenceType(dto.getInvoiceReferenceType());
 
@@ -2327,7 +2327,7 @@ public class TransactionServiceImpl implements TransactionService {
 				}
 
 				// HSN / SAC
-				if (child.getHsnSacCode() != null ) {
+				if (child.getHsnSacCode() != null) {
 
 					HsnVO hsn = hsnRepo.findById(Long.valueOf(child.getHsnSacCode()))
 							.orElseThrow(() -> new ApplicationException("HSN/SAC Code Not Found"));
@@ -2357,21 +2357,18 @@ public class TransactionServiceImpl implements TransactionService {
 				BigDecimal amountInSelectedCurrency = BigDecimal.ZERO;
 
 				DailyExchangeRateVO exchangeRate = dailyExchangeRateRepo.findById(dto.getExchangeRate())
-				        .orElseThrow(() -> new ApplicationException("Exchange Rate Not Found"));
-				
+						.orElseThrow(() -> new ApplicationException("Exchange Rate Not Found"));
+
 				BigDecimal exchangeRateValue = BigDecimal.valueOf(exchangeRate.getBuyingExRate());
-				
-				if (exchangeRateValue != null
-				        && exchangeRateValue.compareTo(BigDecimal.ZERO) != 0
-				        && child.getRate() != null) {
 
-				    rateInSelectedCurrency = child.getRate()
-				            .divide(exchangeRateValue, 2, RoundingMode.HALF_UP);
+				if (exchangeRateValue != null && exchangeRateValue.compareTo(BigDecimal.ZERO) != 0
+						&& child.getRate() != null) {
 
-				    if (child.getReceivedQty() != null) {
-				        amountInSelectedCurrency = child.getReceivedQty()
-				                .multiply(rateInSelectedCurrency);
-				    }
+					rateInSelectedCurrency = child.getRate().divide(exchangeRateValue, 2, RoundingMode.HALF_UP);
+
+					if (child.getReceivedQty() != null) {
+						amountInSelectedCurrency = child.getReceivedQty().multiply(rateInSelectedCurrency);
+					}
 				}
 
 				detailVO.setRateInSelectedCurrency(rateInSelectedCurrency);
@@ -2465,7 +2462,6 @@ public class TransactionServiceImpl implements TransactionService {
 
 				SalesReturnTaxDetailsVO taxVO = new SalesReturnTaxDetailsVO();
 
-				
 				taxVO.setParticulars(taxDTO.getParticulars());
 
 				taxVO.setAmount(taxDTO.getAmount());
@@ -2568,29 +2564,25 @@ public class TransactionServiceImpl implements TransactionService {
 		// RETURN TYPE
 		// =========================================================
 
-
 		dto.setReturnType(vo.getReturnType());
 
 		dto.setApprovedByAccounts(vo.getApprovedByAccounts());
 
 		if (vo.getExchangeRate() != null) {
-		    dto.setExchangeRate(
-		        BigDecimal.valueOf(vo.getExchangeRate().getBuyingExRate())
-		    );
+			dto.setExchangeRate(BigDecimal.valueOf(vo.getExchangeRate().getBuyingExRate()));
 		} else {
-		    dto.setExchangeRate(BigDecimal.ZERO);
+			dto.setExchangeRate(BigDecimal.ZERO);
 		}
-		
+
 		if (vo.getCurrency() != null) {
 
-		    CurrencyResponseDTO currencyDTO = new CurrencyResponseDTO();
+			CurrencyResponseDTO currencyDTO = new CurrencyResponseDTO();
 
-		    currencyDTO.setId(vo.getCurrency().getId());
-		    currencyDTO.setCurrencyName(vo.getCurrency().getMainCurrency());
+			currencyDTO.setId(vo.getCurrency().getId());
+			currencyDTO.setCurrencyName(vo.getCurrency().getMainCurrency());
 
-		    dto.setCurrency(currencyDTO);
+			dto.setCurrency(currencyDTO);
 		}
-		
 
 		dto.setInvoiceReferenceType(vo.getInvoiceReferenceType());
 
@@ -2758,7 +2750,7 @@ public class TransactionServiceImpl implements TransactionService {
 				taxDTO.setId(tax.getId());
 
 				taxDTO.setParticulars(tax.getParticulars());
-	
+
 				taxDTO.setAmount(tax.getAmount());
 
 				taxDTO.setGlAccountName(tax.getGlAccountName());
@@ -2771,272 +2763,197 @@ public class TransactionServiceImpl implements TransactionService {
 
 		return dto;
 	}
-	
-	
+
 	@Override
-	public List<Map<String, Object>> getSalesRejectionInvoiceforSalesReturn(
-	        Long orgId, Long branch) {
+	public List<Map<String, Object>> getSalesRejectionInvoiceforSalesReturn(Long orgId, Long branch) {
 
-	    List<Object[]> result =
-	    		salesReturnRepo
-	                    .getSalesRejectionInvoiceforSalesReturn(orgId, branch);
+		List<Object[]> result = salesReturnRepo.getSalesRejectionInvoiceforSalesReturn(orgId, branch);
 
-	    return getSalesRejectionInvoiceDropdownDetails(result);
+		return getSalesRejectionInvoiceDropdownDetails(result);
 	}
 
-	private List<Map<String, Object>> getSalesRejectionInvoiceDropdownDetails(
-	        List<Object[]> result) {
+	private List<Map<String, Object>> getSalesRejectionInvoiceDropdownDetails(List<Object[]> result) {
 
-	    List<Map<String, Object>> details = new ArrayList<>();
+		List<Map<String, Object>> details = new ArrayList<>();
 
-	    for (Object[] fs : result) {
+		for (Object[] fs : result) {
 
-	        Map<String, Object> part = new HashMap<>();
+			Map<String, Object> part = new HashMap<>();
 
-	        part.put("docId",
-	                fs[0] != null ? fs[0].toString() : null);
+			part.put("docId", fs[0] != null ? fs[0].toString() : null);
 
-	        part.put("docDate",
-	                fs[1] != null ? fs[1].toString() : null);
+			part.put("docDate", fs[1] != null ? fs[1].toString() : null);
 
-	        part.put("docType",
-	                fs[2] != null ? fs[2].toString() : null);
+			part.put("docType", fs[2] != null ? fs[2].toString() : null);
 
-	        details.add(part);
-	    }
+			details.add(part);
+		}
 
-	    return details;
+		return details;
 	}
-	
+
 	@Override
-	public List<Map<String, Object>> getGateInwardForSalesReturn(
-	        Long custcode,
-	        String type,
-	        String invno,
-	        Long orgId,
-	        Long branch) {
+	public List<Map<String, Object>> getGateInwardForSalesReturn(Long custcode, String type, String invno, Long orgId,
+			Long branch) {
 
-	    List<Object[]> result = salesReturnRepo
-	            .getGateInwardForSalesReturn(
-	                    custcode,
-	                    type,
-	                    invno,
-	                    orgId,
-	                    branch);
+		List<Object[]> result = salesReturnRepo.getGateInwardForSalesReturn(custcode, type, invno, orgId, branch);
 
-	    return getGateInwardForSalesReturnDetails(result);
+		return getGateInwardForSalesReturnDetails(result);
 	}
-	
-	private List<Map<String, Object>> getGateInwardForSalesReturnDetails(
-	        List<Object[]> result) {
 
-	    List<Map<String, Object>> details = new ArrayList<>();
+	private List<Map<String, Object>> getGateInwardForSalesReturnDetails(List<Object[]> result) {
 
-	    for (Object[] fs : result) {
+		List<Map<String, Object>> details = new ArrayList<>();
 
-	        Map<String, Object> part = new HashMap<>();
+		for (Object[] fs : result) {
 
-	        part.put("gateInwardId", fs[0] != null
-	                ? ((Number) fs[0]).longValue()
-	                : null);
+			Map<String, Object> part = new HashMap<>();
 
-	        part.put("gateInwardDocId", fs[1] != null
-	                ? fs[1].toString()
-	                : null);
+			part.put("gateInwardId", fs[0] != null ? ((Number) fs[0]).longValue() : null);
 
-	        part.put("docDate", fs[2] != null
-	                ? fs[2]
-	                : null);
+			part.put("gateInwardDocId", fs[1] != null ? fs[1].toString() : null);
 
-	        part.put("supplierInvoiceNumber", fs[3] != null
-	                ? fs[3].toString()
-	                : null);
+			part.put("docDate", fs[2] != null ? fs[2] : null);
 
-	        part.put("supplierInvoiceDate", fs[4] != null
-	                ? fs[4]
-	                : null);
+			part.put("supplierInvoiceNumber", fs[3] != null ? fs[3].toString() : null);
 
-	        details.add(part);
-	    }
+			part.put("supplierInvoiceDate", fs[4] != null ? fs[4] : null);
 
-	    return details;
+			details.add(part);
+		}
+
+		return details;
 	}
-	
-	
+
 	@Override
-	public List<Map<String, Object>> getSalesRejectionInvoiceItemDetailsForSalesRetuen(
-	        String invoiceId,
-	        Long orgId,
-	        Long branch) throws ApplicationException {
+	public List<Map<String, Object>> getSalesRejectionInvoiceItemDetailsForSalesRetuen(String invoiceId, Long orgId,
+			Long branch) throws ApplicationException {
 
-	    Set<Object[]> result =
-	            salesReturnRepo
-	                    .getSalesRejectionInvoiceItemDetailsForSalesRetuen(
-	                            invoiceId,
-	                            orgId,
-	                            branch);
+		Set<Object[]> result = salesReturnRepo.getSalesRejectionInvoiceItemDetailsForSalesRetuen(invoiceId, orgId,
+				branch);
 
-	    return getSalesRejectionInvoiceItemDetailsResponse(result);
+		return getSalesRejectionInvoiceItemDetailsResponse(result);
 	}
-	
-	private List<Map<String, Object>> getSalesRejectionInvoiceItemDetailsResponse(
-	        Set<Object[]> result) {
 
-	    List<Map<String, Object>> details = new ArrayList<>();
+	private List<Map<String, Object>> getSalesRejectionInvoiceItemDetailsResponse(Set<Object[]> result) {
 
-	    for (Object[] fs : result) {
+		List<Map<String, Object>> details = new ArrayList<>();
 
-	        Map<String, Object> part = new HashMap<>();
+		for (Object[] fs : result) {
 
-	        part.put("itemId",
-	                fs[0] != null
-	                        ? Long.valueOf(fs[0].toString())
-	                        : null);
+			Map<String, Object> part = new HashMap<>();
 
-	        part.put("itemCode",
-	                fs[1] != null
-	                        ? fs[1].toString()
-	                        : null);
+			part.put("itemId", fs[0] != null ? Long.valueOf(fs[0].toString()) : null);
 
-	        part.put("itemDescription",
-	                fs[2] != null
-	                        ? fs[2].toString()
-	                        : null);
+			part.put("itemCode", fs[1] != null ? fs[1].toString() : null);
 
-	        part.put("hsnSacCode",
-	                fs[3] != null
-	                        ? fs[3].toString()
-	                        : null);
+			part.put("itemDescription", fs[2] != null ? fs[2].toString() : null);
 
-	        part.put("qtySold",
-	                fs[4] != null
-	                        ? new BigDecimal(fs[4].toString())
-	                        : BigDecimal.ZERO);
+			part.put("hsnSacCode", fs[3] != null ? fs[3].toString() : null);
 
-	        part.put("unitId",
-	                fs[5] != null
-	                        ? Long.valueOf(fs[5].toString())
-	                        : null);
+			part.put("qtySold", fs[4] != null ? new BigDecimal(fs[4].toString()) : BigDecimal.ZERO);
 
-	        part.put("unitCode",
-	                fs[6] != null
-	                        ? fs[6].toString()
-	                        : null);
+			part.put("unitId", fs[5] != null ? Long.valueOf(fs[5].toString()) : null);
 
-	        part.put("unitDescription",
-	                fs[7] != null
-	                        ? fs[7].toString()
-	                        : null);
+			part.put("unitCode", fs[6] != null ? fs[6].toString() : null);
 
-	        part.put("rate",
-	                fs[8] != null
-	                        ? new BigDecimal(fs[8].toString())
-	                        : BigDecimal.ZERO);
+			part.put("unitDescription", fs[7] != null ? fs[7].toString() : null);
 
-	        part.put("cgstRate",
-	                fs[9] != null
-	                        ? new BigDecimal(fs[9].toString())
-	                        : BigDecimal.ZERO);
+			part.put("rate", fs[8] != null ? new BigDecimal(fs[8].toString()) : BigDecimal.ZERO);
 
-	        part.put("sgstRate",
-	                fs[10] != null
-	                        ? new BigDecimal(fs[10].toString())
-	                        : BigDecimal.ZERO);
+			part.put("cgstRate", fs[9] != null ? new BigDecimal(fs[9].toString()) : BigDecimal.ZERO);
 
-	        part.put("igstRate",
-	                fs[11] != null
-	                        ? new BigDecimal(fs[11].toString())
-	                        : BigDecimal.ZERO);
+			part.put("sgstRate", fs[10] != null ? new BigDecimal(fs[10].toString()) : BigDecimal.ZERO);
 
-	        part.put("newRate",
-	                fs[12] != null
-	                        ? new BigDecimal(fs[12].toString())
-	                        : BigDecimal.ZERO);
-	        
-	        details.add(part);
-	    }
+			part.put("igstRate", fs[11] != null ? new BigDecimal(fs[11].toString()) : BigDecimal.ZERO);
 
-	    return details;
+			part.put("newRate", fs[12] != null ? new BigDecimal(fs[12].toString()) : BigDecimal.ZERO);
+			part.put("hsnId", fs[13] != null ? Long.valueOf(fs[13].toString()) : null);
+
+			details.add(part);
+		}
+
+		return details;
 	}
-	
+
 	@Override
-	public List<Map<String, Object>> getItemDetailsForSalesReturn(
-	        Long orgId, Long branch) throws ApplicationException {
+	public List<Map<String, Object>> getItemDetailsForSalesReturn(Long orgId, Long branch) throws ApplicationException {
 
-	    Set<Object[]> result =
-	    		salesReturnRepo.
-	                    getItemDetailsForSalesReturn(orgId, branch);
+		Set<Object[]> result = salesReturnRepo.getItemDetailsForSalesReturn(orgId, branch);
 
-	    return getItemDetailsForSalesReturnResponse(result);
+		return getItemDetailsForSalesReturnResponse(result);
 	}
-	
-	private List<Map<String, Object>> getItemDetailsForSalesReturnResponse(
-	        Set<Object[]> result) {
 
-	    List<Map<String, Object>> details = new ArrayList<>();
+	private List<Map<String, Object>> getItemDetailsForSalesReturnResponse(Set<Object[]> result) {
 
-	    for (Object[] fs : result) {
+		List<Map<String, Object>> details = new ArrayList<>();
 
-	        Map<String, Object> part = new HashMap<>();
-	        
-	        part.put("itemId",
-	                fs[0] != null
-	                        ? Long.valueOf(fs[0].toString())
-	                        : null);
+		for (Object[] fs : result) {
 
-	        part.put("itemCode",
-	                fs[1] != null
-	                        ? fs[1].toString()
-	                        : null);
+			Map<String, Object> part = new HashMap<>();
 
-	        part.put("itemDescription",
-	                fs[2] != null
-	                        ? fs[2].toString()
-	                        : null);
+			part.put("itemId", fs[0] != null ? Long.valueOf(fs[0].toString()) : null);
 
-	        part.put("hsnSacCode",
-	                fs[3] != null
-	                        ? fs[3].toString()
-	                        : null);
+			part.put("itemCode", fs[1] != null ? fs[1].toString() : null);
 
-	        part.put("unitId",
-	                fs[4] != null
-	                        ? Long.valueOf(fs[4].toString())
-	                        : null);
+			part.put("itemDescription", fs[2] != null ? fs[2].toString() : null);
 
-	        part.put("unitCode",
-	                fs[5] != null
-	                        ? fs[5].toString()
-	                        : null);
+			part.put("hsnSacCode", fs[3] != null ? fs[3].toString() : null);
 
-	        part.put("unitDescription",
-	                fs[6] != null
-	                        ? fs[6].toString()
-	                        : null);
+			part.put("unitId", fs[4] != null ? Long.valueOf(fs[4].toString()) : null);
 
-	        part.put("rate",
-	                fs[7] != null
-	                        ? new BigDecimal(fs[7].toString())
-	                        : BigDecimal.ZERO);
+			part.put("unitCode", fs[5] != null ? fs[5].toString() : null);
 
-	        part.put("cgstRate",
-	                fs[8] != null
-	                        ? new BigDecimal(fs[8].toString())
-	                        : BigDecimal.ZERO);
+			part.put("unitDescription", fs[6] != null ? fs[6].toString() : null);
 
-	        part.put("sgstRate",
-	                fs[9] != null
-	                        ? new BigDecimal(fs[9].toString())
-	                        : BigDecimal.ZERO);
+			part.put("rate", fs[7] != null ? new BigDecimal(fs[7].toString()) : BigDecimal.ZERO);
 
-	        part.put("igstRate",
-	                fs[10] != null
-	                        ? new BigDecimal(fs[10].toString())
-	                        : BigDecimal.ZERO);
+			part.put("cgstRate", fs[8] != null ? new BigDecimal(fs[8].toString()) : BigDecimal.ZERO);
 
-	        details.add(part);
-	    }
+			part.put("sgstRate", fs[9] != null ? new BigDecimal(fs[9].toString()) : BigDecimal.ZERO);
 
-	    return details;
+			part.put("igstRate", fs[10] != null ? new BigDecimal(fs[10].toString()) : BigDecimal.ZERO);
+
+			part.put("hsnId", fs[11] != null ? Long.valueOf(fs[11].toString()) : null);
+
+			details.add(part);
+		}
+
+		return details;
+	}
+
+	@Override
+	public SalesReturnResponseDTO getSalesReturnById(Long id) throws ApplicationException {
+
+		SalesReturnVO salesReturnVO = salesReturnRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Sales Return Not Found"));
+
+		return convertToResponse(salesReturnVO);
+	}
+
+	@Override
+	public List<SalesReturnResponseDTO> getSalesReturnByOrgIdAndBranch(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<SalesReturnVO> salesReturns = salesReturnRepo.findByOrgIdAndBranch(orgId, branch);
+
+		List<SalesReturnResponseDTO> responseList = new ArrayList<>();
+
+		for (SalesReturnVO vo : salesReturns) {
+
+			responseList.add(convertToResponse(vo));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public String getSalesReturnDocId(Long orgId, String financialYear) {
+
+		String screenCode = "SR";
+
+		String result = salesReturnRepo.getSalesReturnDocId(orgId, financialYear, screenCode);
+
+		return result;
 	}
 }

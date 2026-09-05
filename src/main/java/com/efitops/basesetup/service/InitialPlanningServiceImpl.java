@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -20,6 +21,13 @@ import com.efitops.basesetup.ResponseDTO.InitialPlanningInstrumentDetailsRespons
 import com.efitops.basesetup.ResponseDTO.InitialPlanningResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineInstrumentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMasterConsumablesDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMasterMachineDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMasterMachineResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMasterToolDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMasterToolResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProblemSolvingActionDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProblemSolvingEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProblemSolvingOtherDetailsResponseDTO;
@@ -30,10 +38,15 @@ import com.efitops.basesetup.dto.GradeMasterResponseDTO;
 import com.efitops.basesetup.dto.InitialPlanningDTO;
 import com.efitops.basesetup.dto.InitialPlanningDetailsDTO;
 import com.efitops.basesetup.dto.InitialPlanningInstrumentDetailsDTO;
+import com.efitops.basesetup.dto.OperationMasterConsumableDetailsDTO;
+import com.efitops.basesetup.dto.OperationMasterDTO;
+import com.efitops.basesetup.dto.OperationMasterMachineDetailsDTO;
+import com.efitops.basesetup.dto.OperationMasterToolDetailsDTO;
 import com.efitops.basesetup.dto.ProblemSolvingActionDetailsDTO;
 import com.efitops.basesetup.dto.ProblemSolvingEntryDTO;
 import com.efitops.basesetup.dto.ProblemSolvingOtherDetailsDTO;
 import com.efitops.basesetup.dto.ProblemSolvingRootDetailsDTO;
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
@@ -45,10 +58,16 @@ import com.efitops.basesetup.entity.InitialPlanningInstrumentDetailsVO;
 import com.efitops.basesetup.entity.InitialPlanningVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
+import com.efitops.basesetup.entity.MachineMasterVO;
+import com.efitops.basesetup.entity.OperationMasterConsumableDetailsVO;
+import com.efitops.basesetup.entity.OperationMasterMachineDetailsVO;
+import com.efitops.basesetup.entity.OperationMasterToolDetailsVO;
+import com.efitops.basesetup.entity.OperationMasterVO;
 import com.efitops.basesetup.entity.ProblemSolvingActionDetailsVO;
 import com.efitops.basesetup.entity.ProblemSolvingEntryVO;
 import com.efitops.basesetup.entity.ProblemSolvingOtherDetailsVO;
 import com.efitops.basesetup.entity.ProblemSolvingRootDetailsVO;
+import com.efitops.basesetup.entity.ToolMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -62,10 +81,16 @@ import com.efitops.basesetup.repository.InitialPlanningInstrumentDetailsRepo;
 import com.efitops.basesetup.repository.InitialPlanningRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
+import com.efitops.basesetup.repository.MachineMasterRepo;
+import com.efitops.basesetup.repository.OperationMasterConsumablesDetailsRepo;
+import com.efitops.basesetup.repository.OperationMasterMachineDetailsRepo;
+import com.efitops.basesetup.repository.OperationMasterRepo;
+import com.efitops.basesetup.repository.OperationMasterToolDetailsRepo;
 import com.efitops.basesetup.repository.ProblemSolvingActionDetailsRepo;
 import com.efitops.basesetup.repository.ProblemSolvingEntryRepo;
 import com.efitops.basesetup.repository.ProblemSolvingOtherDetailsRepo;
 import com.efitops.basesetup.repository.ProblemSolvingRootDetailsRepo;
+import com.efitops.basesetup.repository.ToolMasterRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
@@ -117,6 +142,27 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 
 	@Autowired
 	private DepartmentRepo departmentRepo;
+
+	@Autowired
+	private OperationMasterRepo operationMasterRepo;
+
+	@Autowired
+	private OperationMasterToolDetailsRepo operationMasterToolDetailsRepo;
+
+	@Autowired
+	private OperationMasterConsumablesDetailsRepo operationMasterConsumablesDetailsRepo;
+
+	@Autowired
+	private OperationMasterMachineDetailsRepo operationMasterMachineDetailsRepo;
+
+	@Autowired
+	private MachineMasterRepo machineMasterRepo;
+
+	@Autowired
+	private ToolMasterRepo toolMasterRepo;
+
+	@Autowired
+	private ItemMasterRepo itemMasterRepo;
 
 	@Override
 	@Transactional
@@ -394,10 +440,10 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 
 						InitialPlanningInstrumentDetailsVO instrumentVO = new InitialPlanningInstrumentDetailsVO();
 
-						instrumentVO.setInstrumentNo(instrumentDTO.getInstrumentNo());
-
-						instrumentVO.setInstrumentName(instrumentDTO.getInstrumentName());
-
+//						instrumentVO.setInstrumentNo(instrumentDTO.getInstrumentNo());
+//
+//						instrumentVO.setInstrumentName(instrumentDTO.getInstrumentName());
+//
 						instrumentVO.setRange(instrumentDTO.getRange());
 
 						// Parent mapping
@@ -604,9 +650,18 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 
 						InitialPlanningInstrumentDetailsResponseDTO instrumentResponseDTO = new InitialPlanningInstrumentDetailsResponseDTO();
 
-						instrumentResponseDTO.setInstrumentNo(instrumentVO.getInstrumentNo());
+						if (instrumentVO.getInstrumentNo() != null) {
 
-						instrumentResponseDTO.setInstrumentName(instrumentVO.getInstrumentName());
+							MachineInstrumentResponseDTO instrumentDTO = new MachineInstrumentResponseDTO();
+
+							instrumentDTO.setId(instrumentVO.getInstrumentNo().getId());
+							instrumentDTO
+									.setMachineInstrumentNo(instrumentVO.getInstrumentNo().getMachineInstrumentNo());
+							instrumentDTO.setMachineInstrumentName(
+									instrumentVO.getInstrumentNo().getMachineInstrumentName());
+
+							instrumentResponseDTO.setInstrumentNo(instrumentDTO);
+						}
 
 						instrumentResponseDTO.setRange(instrumentVO.getRange());
 
@@ -1392,5 +1447,351 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 		response.put("teamMemberList", responseList);
 
 		return response;
+	}
+
+//	dropdown for instruments
+	@Override
+	public List<Map<String, Object>> getMachineInstrumentDropdownForInitialPlanning(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> machineInstrumentList = initialPlanningRepo.getMachineInstrumentDropdownForInitialPlanning(orgId,
+				branch);
+
+		if (machineInstrumentList.isEmpty()) {
+			throw new ApplicationException("No Machine Instrument Details Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : machineInstrumentList) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("id", obj[0]);
+			map.put("machineInstrumentNo", obj[1]);
+			map.put("machineInstrumentName", obj[2]);
+
+			responseList.add(map);
+		}
+
+		return responseList;
+	}
+
+//	operation master
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateOperationMaster(OperationMasterDTO operationMasterDTO)
+			throws ApplicationException {
+
+		OperationMasterVO operationMasterVO = new OperationMasterVO();
+
+		String message;
+
+		if (ObjectUtils.isNotEmpty(operationMasterDTO.getId())) {
+
+			operationMasterVO = operationMasterRepo.findById(operationMasterDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Operation Master"));
+
+			operationMasterVO.setUpdatedBy(operationMasterDTO.getCreatedBy());
+
+			message = "Operation Master Updated Successfully";
+
+		} else {
+
+			operationMasterVO.setCreatedBy(operationMasterDTO.getCreatedBy());
+			operationMasterVO.setUpdatedBy(operationMasterDTO.getCreatedBy());
+
+			message = "Operation Master Created Successfully";
+		}
+
+		createUpdateOperationMasterVO(operationMasterDTO, operationMasterVO);
+
+		OperationMasterVO savedVO = operationMasterRepo.save(operationMasterVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+		response.put("operationMasterVO", operationMasterResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdateOperationMasterVO(OperationMasterDTO dto, OperationMasterVO vo)
+			throws ApplicationException {
+
+		vo.setOperationId(dto.getOperationId());
+		vo.setDescription(dto.getDescription());
+		vo.setActive(dto.isActive());
+		vo.setOrgId(dto.getOrgId());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+
+		// =========================
+		// Tool Details
+		// =========================
+
+		vo.getOperationMasterToolDetailsVO().clear();
+
+		if (dto.getOperationMasterToolDetailsDTO() != null) {
+
+			for (OperationMasterToolDetailsDTO detailDTO : dto.getOperationMasterToolDetailsDTO()) {
+
+				OperationMasterToolDetailsVO detailVO = new OperationMasterToolDetailsVO();
+
+				if (detailDTO.getToolId() != null) {
+
+					ToolMasterVO tool = toolMasterRepo.findById(detailDTO.getToolId())
+							.orElseThrow(() -> new ApplicationException("Tool Not Found"));
+
+					detailVO.setTool(tool);
+				}
+
+				detailVO.setOperationMasterVO(vo);
+
+				vo.getOperationMasterToolDetailsVO().add(detailVO);
+			}
+		}
+
+		// =========================
+		// Machine Details
+		// =========================
+
+		vo.getOperationMasterMachineDetailsVO().clear();
+
+		if (dto.getOperationMasterMachineDetailsDTO() != null) {
+
+			for (OperationMasterMachineDetailsDTO detailDTO : dto.getOperationMasterMachineDetailsDTO()) {
+
+				OperationMasterMachineDetailsVO detailVO = new OperationMasterMachineDetailsVO();
+
+				if (detailDTO.getMachine() != null) {
+
+					System.out.println("Machine ID = " + detailDTO.getMachine());
+
+					Optional<MachineMasterVO> machineOptional = machineMasterRepo
+							.findMachineById(detailDTO.getMachine());
+
+					System.out.println("Machine found = " + machineOptional.isPresent());
+
+					if (machineOptional.isEmpty()) {
+						throw new ApplicationException("Machine Not Found for ID: " + detailDTO.getMachine());
+					}
+
+					detailVO.setMachine(machineOptional.get());
+				}
+
+				detailVO.setOperationMasterVO(vo);
+
+				vo.getOperationMasterMachineDetailsVO().add(detailVO);
+			}
+		}
+
+		// =========================
+		// Consumable Details
+		// =========================
+
+		vo.getOperationMasterConsumableDetailsVO().clear();
+
+		if (dto.getOperationMasterConsumableDetailsDTO() != null) {
+
+			for (OperationMasterConsumableDetailsDTO detailDTO : dto.getOperationMasterConsumableDetailsDTO()) {
+
+				OperationMasterConsumableDetailsVO detailVO = new OperationMasterConsumableDetailsVO();
+
+				// Consumable Item
+				if (detailDTO.getConsumables() != null) {
+
+					ItemMasterVO item = itemMasterRepo.findById(detailDTO.getConsumables())
+							.orElseThrow(() -> new ApplicationException("Consumable Item Not Found"));
+
+					detailVO.setConsumables(item);
+				}
+
+				// Type
+				if (detailDTO.getType() != null) {
+
+					ListOfValuesDetailsVO type = listOfValuesDetailsRepo.findById(detailDTO.getType())
+							.orElseThrow(() -> new ApplicationException("Consumable Type Not Found"));
+
+					detailVO.setType(type);
+				}
+
+				detailVO.setQuantity(detailDTO.getQuantity());
+
+				detailVO.setOperationMasterVO(vo);
+
+				vo.getOperationMasterConsumableDetailsVO().add(detailVO);
+			}
+		}
+	}
+
+	private OperationMasterResponseDTO operationMasterResponse(OperationMasterVO vo) {
+
+		OperationMasterResponseDTO dto = new OperationMasterResponseDTO();
+
+		dto.setId(vo.getId());
+		dto.setOperationId(vo.getOperationId());
+		dto.setDescription(vo.getDescription());
+		dto.setActive(vo.getActiveStatus());
+		dto.setOrgId(vo.getOrgId());
+		dto.setCreatedBy(vo.getCreatedBy());
+		dto.setCancelRemarks(vo.getCancelRemarks());
+
+		// =========================
+		// Tool Details Response
+		// =========================
+
+		List<OperationMasterToolDetailsResponseDTO> toolResponseList = new ArrayList<>();
+
+		if (vo.getOperationMasterToolDetailsVO() != null && !vo.getOperationMasterToolDetailsVO().isEmpty()) {
+
+			for (OperationMasterToolDetailsVO toolVO : vo.getOperationMasterToolDetailsVO()) {
+
+				OperationMasterToolDetailsResponseDTO toolResponseDTO = new OperationMasterToolDetailsResponseDTO();
+
+				if (toolVO.getTool() != null) {
+
+					OperationMasterToolResponseDTO toolDTO = new OperationMasterToolResponseDTO();
+
+					toolDTO.setId(toolVO.getTool().getId());
+					toolDTO.setToolNo(toolVO.getTool().getToolNo());
+					toolDTO.setToolDescription(toolVO.getTool().getToolDescription());
+
+					toolResponseDTO.setToolId(toolDTO);
+				}
+
+				toolResponseList.add(toolResponseDTO);
+			}
+		}
+
+		dto.setOperationMasterToolDetailsResponseDTO(toolResponseList);
+
+		// =========================
+		// Machine Details Response
+		// =========================
+
+		List<OperationMasterMachineDetailsResponseDTO> machineResponseList = new ArrayList<>();
+
+		if (vo.getOperationMasterMachineDetailsVO() != null && !vo.getOperationMasterMachineDetailsVO().isEmpty()) {
+
+			for (OperationMasterMachineDetailsVO machineVO : vo.getOperationMasterMachineDetailsVO()) {
+
+				OperationMasterMachineDetailsResponseDTO machineResponseDTO = new OperationMasterMachineDetailsResponseDTO();
+
+				if (machineVO.getMachine() != null) {
+
+					OperationMasterMachineResponseDTO machineDTO = new OperationMasterMachineResponseDTO();
+
+					machineDTO.setId(machineVO.getMachine().getId());
+					machineDTO.setMachineNo(machineVO.getMachine().getMachineInstrumentNo());
+
+					machineDTO.setMachineName(machineVO.getMachine().getMachineInstrumentName());
+
+					machineResponseDTO.setMachine(machineDTO);
+				}
+
+				machineResponseList.add(machineResponseDTO);
+			}
+		}
+
+		dto.setOperationMasterMachineDetailsResponseDTO(machineResponseList);
+
+		// =========================
+		// Consumable Details Response
+		// =========================
+
+		List<OperationMasterConsumablesDetailsResponseDTO> consumableResponseList = new ArrayList<>();
+
+		if (vo.getOperationMasterConsumableDetailsVO() != null
+				&& !vo.getOperationMasterConsumableDetailsVO().isEmpty()) {
+
+			for (OperationMasterConsumableDetailsVO consumableVO : vo.getOperationMasterConsumableDetailsVO()) {
+
+				OperationMasterConsumablesDetailsResponseDTO consumableResponseDTO = new OperationMasterConsumablesDetailsResponseDTO();
+
+				// =========================
+				// Item Response
+				// =========================
+
+				if (consumableVO.getConsumables() != null) {
+
+				    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+
+				    itemDTO.setId(consumableVO.getConsumables().getId());
+				    itemDTO.setItemCode(consumableVO.getConsumables().getItemCode());
+				    itemDTO.setItemDescription(consumableVO.getConsumables().getItemDescription());
+
+				    if (consumableVO.getConsumables().getPricingUnit() != null) {
+
+				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+
+				        unitDTO.setId(consumableVO.getConsumables().getPricingUnit().getId());
+				        unitDTO.setUnitId(consumableVO.getConsumables().getPricingUnit().getUnitId());
+				        unitDTO.setUnitDescription(
+				                consumableVO.getConsumables().getPricingUnit().getDescription());
+
+				        itemDTO.setUnit(unitDTO);
+				    }
+
+				    consumableResponseDTO.setConsumables(itemDTO);
+				}
+				consumableResponseDTO.setQuantity(consumableVO.getQuantity());
+
+				// =========================
+				// Type Response
+				// =========================
+
+				if (consumableVO.getType() != null) {
+
+					ListOfValuesDetailsResponseDTO typeDTO = new ListOfValuesDetailsResponseDTO();
+
+					typeDTO.setId(consumableVO.getType().getId());
+					typeDTO.setCode(consumableVO.getType().getValueCode());
+					typeDTO.setDescription(consumableVO.getType().getValueDescription());
+
+					consumableResponseDTO.setType(typeDTO);
+				}
+
+				consumableResponseList.add(consumableResponseDTO);
+			}
+		}
+
+		dto.setOperationMasterConsumablesDetailsResponseDTO(consumableResponseList);
+
+		return dto;
+	}
+
+	@Override
+	public OperationMasterResponseDTO getOperationMasterById(Long id) throws ApplicationException {
+
+		if (ObjectUtils.isEmpty(id)) {
+
+			throw new ApplicationException("Invalid Id");
+		}
+
+		OperationMasterVO operationMasterVO = operationMasterRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Operation Master Not Found"));
+
+		return operationMasterResponse(operationMasterVO);
+	}
+
+	@Override
+	public List<OperationMasterResponseDTO> getOperationMasterByOrgId(Long orgId) throws ApplicationException {
+
+		List<OperationMasterVO> operationMasterList = operationMasterRepo.getOperationMasterByOrgId(orgId);
+
+		if (operationMasterList.isEmpty()) {
+
+			throw new ApplicationException("No Operation Master Details Found");
+		}
+
+		List<OperationMasterResponseDTO> responseList = new ArrayList<>();
+
+		for (OperationMasterVO operationMasterVO : operationMasterList) {
+
+			responseList.add(operationMasterResponse(operationMasterVO));
+		}
+
+		return responseList;
 	}
 }

@@ -55,36 +55,42 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	
 	
 	@Query(value = """
-        SELECT
-           
-            b.item AS itemCode,
-            b.hsn_code AS hsnSacCode
-        FROM purchase_order_local_details b
-        INNER JOIN purchase_order_basic a
-            ON a.purchase_order_basic_id = b.purchase_order_basic_id
-        WHERE a.cancel = 0
-          AND a.doc_id = :docId
-          AND a.org_id = :orgId
-          AND a.branch = :branch
+	        SELECT
+	            b.item AS id,
+	            i.item_code AS itemCode,
+	            i.item_description AS itemDescription,
+	            b.hsn_code AS hsnSacCode
+	        FROM purchase_order_local_details b
+	        INNER JOIN purchase_order_basic a
+	            ON a.purchase_order_basic_id = b.purchase_order_basic_id
+	        INNER JOIN item i
+	            ON i.item_id = b.item
+	        WHERE a.cancel = 0
+	          AND a.doc_id = :docId
+	          AND a.org_id = :orgId
+	          AND a.branch = :branch
 
-        UNION
+	        UNION
 
-        SELECT
-            
-            b.item AS itemCode,
-            b.hsn_code AS hsnSacCode
-        FROM purchase_order_import_details b
-        INNER JOIN purchase_order_basic a
-            ON a.purchase_order_basic_id = b.purchase_order_basic_id
-        WHERE a.cancel = 0
-          AND a.doc_id = :docId
-          AND a.org_id = :orgId
-          AND a.branch = :branch
-        """, nativeQuery = true)
-List<Object[]> getPurchaseOrderAmendmentItemCodeDropdown(
-        @Param("docId") String docId,
-        @Param("branch") Long branch,
-        @Param("orgId") Long orgId);
+	        SELECT
+	            b.item AS id,
+	            i.item_code AS itemCode,
+	            i.item_description AS itemDescription,
+	            b.hsn_code AS hsnSacCode
+	        FROM purchase_order_import_details b
+	        INNER JOIN purchase_order_basic a
+	            ON a.purchase_order_basic_id = b.purchase_order_basic_id
+	        INNER JOIN item i
+	            ON i.item_id = b.item
+	        WHERE a.cancel = 0
+	          AND a.doc_id = :docId
+	          AND a.org_id = :orgId
+	          AND a.branch = :branch
+	        """, nativeQuery = true)
+	List<Object[]> getPurchaseOrderAmendmentItemCodeDropdown(
+	        @Param("docId") String docId,
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId);
 	
 	
 	@Query(value = """
@@ -93,22 +99,43 @@ List<Object[]> getPurchaseOrderAmendmentItemCodeDropdown(
 	            c.currency AS currency,
 	            der.selling_ex_rate AS exchangeRate,
 	            der.buying_ex_rate AS buyingExRate
-	        FROM customer_header cust
-	        JOIN currency c
+	        FROM purchase_order_basic pob
+
+	        INNER JOIN customer_header cust
+	            ON cust.customer_id = pob.supplier_code
+
+	        INNER JOIN currency c
 	            ON c.currency_id = cust.primary_currency
-	        LEFT JOIN dailyexchangerate der
+
+	        INNER JOIN (
+	            SELECT
+	                d.org_id,
+	                d.branch,
+	                d.currency,
+	                d.selling_ex_rate,
+	                d.buying_ex_rate
+	            FROM dailyexchangerate d, currency c
+	            WHERE d.currency = c.currency_id
+	              AND d.effective_from = (
+	                  SELECT MAX(d1.effective_from)
+	                  FROM dailyexchangerate d1
+	                  WHERE d1.currency = c.currency_id
+	              )
+	        ) der
 	            ON der.currency = c.currency_id
 	            AND der.org_id = c.org_id
-	            AND der.branch = :branch
-	            AND der.active = 1
-	            AND der.cancel = 0
-	        WHERE cust.customer_id = :customer
-	            AND cust.org_id = :orgId
-	            AND c.active = 1
-	            AND c.cancel = 0
+	            AND der.branch = pob.branch
+
+	        WHERE pob.doc_id = :docId
+	          AND pob.org_id = :orgId
+	          AND pob.branch = :branch
+	          AND pob.cancel = 0
+	          AND cust.org_id = :orgId
+	          AND c.active = 1
+	          AND c.cancel = 0
 	        """, nativeQuery = true)
-	Set<Object[]> getCurrencyExchangeRateforPurchaseOrderAmendment(
-	        @Param("customer") Long customer,
+	List<Object[]> getCurrencyExchangeRateForPurchaseOrderAmendment(
+	        @Param("docId") String docId,
 	        @Param("orgId") Long orgId,
 	        @Param("branch") Long branch);
 

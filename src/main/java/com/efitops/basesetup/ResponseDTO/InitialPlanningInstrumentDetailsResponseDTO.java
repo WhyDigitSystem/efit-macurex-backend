@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InitialPlanningInstrumentDetailsResponseDTO {
-	private String instrumentNo;
+	
+	private MachineInstrumentResponseDTO instrumentNo;
 
-	private String instrumentName;
 
 	private String range;
 

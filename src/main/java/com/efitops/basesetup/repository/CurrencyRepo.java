@@ -38,7 +38,8 @@ public interface CurrencyRepo extends JpaRepository<CurrencyVO, Long> {
 			SELECT
 			    c.currency_id AS currencyId,
 			    c.currency AS currency,
-			    der.selling_ex_rate AS exchangeRate
+			    der.selling_ex_rate AS exchangeRate,
+			    der.dailyexchangerate_id AS exchangeId
 			FROM customer_header cust
 			JOIN currency c
 			    ON c.currency_id = cust.primary_currency
@@ -48,6 +49,15 @@ public interface CurrencyRepo extends JpaRepository<CurrencyVO, Long> {
 			    AND der.branch = :branch
 			    AND der.active = 1
 			    AND der.cancel = 0
+			    AND der.effective_from = (
+			     SELECT MAX(der1.effective_from)
+			     FROM dailyexchangerate der1
+			     WHERE der1.currency = c.currency_id
+			       AND der1.org_id = c.org_id
+			       AND der1.branch = :branch
+			       AND der1.active = 1
+			       AND der1.cancel = 0
+			 )
 			WHERE cust.customer_id = :customer
 			    AND cust.org_id = :orgId
 			    AND c.active = 1

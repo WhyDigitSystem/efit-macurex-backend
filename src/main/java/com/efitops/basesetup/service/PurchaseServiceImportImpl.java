@@ -87,7 +87,6 @@ import com.efitops.basesetup.entity.PurchaseOrderLocalDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalFileUploadDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalTaxDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderVO;
-import com.efitops.basesetup.entity.StockTransferGrnFileUploadDetailsVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -1801,8 +1800,9 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			List<DirectPurchaseTaxDetailsVO> oldTaxDetails = directPurchaseTaxDetailsRepo.findByDirectPurchaseVO(vo);
 
 			directPurchaseTaxDetailsRepo.deleteAll(oldTaxDetails);
-			
-			List<DirectPurchaseFileUploadDetailsVO> direct = directPurchaseFileUploadDetailsRepo.findByDirectPurchaseVO(vo);
+
+			List<DirectPurchaseFileUploadDetailsVO> direct = directPurchaseFileUploadDetailsRepo
+					.findByDirectPurchaseVO(vo);
 
 			directPurchaseFileUploadDetailsRepo.deleteAll(direct);
 
@@ -2201,7 +2201,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		if (vo.getGstState() != null) {
 			GSTStateMasterResponseDTO gstStateDTO = new GSTStateMasterResponseDTO();
 			gstStateDTO.setId(vo.getGstState().getId());
-			gstStateDTO.setGstSate(vo.getGstState().getStateName());
+			gstStateDTO.setGstState(vo.getGstState().getStateName());
 			gstStateDTO.setGstStateCode(vo.getGstState().getStateCode());
 			responseDTO.setGstState(gstStateDTO);
 		}

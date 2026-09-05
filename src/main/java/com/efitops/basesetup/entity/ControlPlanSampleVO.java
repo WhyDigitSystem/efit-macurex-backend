@@ -35,10 +35,11 @@ public class ControlPlanSampleVO {
 	
 	 @Column(name = "size")
 	 private String size;
-	 
+
 	 @ManyToOne
 	 @JoinColumn(name = "control_plan_basic_id")
 	 @JsonBackReference
 	 private ControlPlanVO controlPlanVO;
+
 
 }

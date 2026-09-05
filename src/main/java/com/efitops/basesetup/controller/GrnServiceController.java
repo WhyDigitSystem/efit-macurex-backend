@@ -93,7 +93,8 @@ public class GrnServiceController extends BaseController {
 	}
 
 	@PutMapping(value = "/createUpdateGrn", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ResponseDTO> createUpdateGrn(@RequestPart("grn") GrnDTO grnDTO,
+	public ResponseEntity<ResponseDTO> createUpdateGrn(
+			@RequestPart("grn") GrnDTO grnDTO,
 //			@RequestBody GrnDTO grnDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -565,8 +566,7 @@ public class GrnServiceController extends BaseController {
 	}
 
 	@GetMapping("/getLocationDetails")
-	public ResponseEntity<ResponseDTO> getLocationDetails(@RequestParam Long orgId,
-			@RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getLocationDetails(@RequestParam Long orgId, @RequestParam Long branch) {
 		String methodName = "getLocationDetails()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -586,7 +586,8 @@ public class GrnServiceController extends BaseController {
 			responseObjectsMap.put("mapp", mapp);
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Location Details", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Location Details",
+					errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

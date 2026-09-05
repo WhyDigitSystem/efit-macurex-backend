@@ -12,5 +12,7 @@ import com.efitops.basesetup.entity.InitialPlanningInstrumentDetailsVO;
 public interface InitialPlanningInstrumentDetailsRepo extends JpaRepository<InitialPlanningInstrumentDetailsVO, Long>{
 
 	List<InitialPlanningInstrumentDetailsVO> findByInitialPlanningDetailsVO(InitialPlanningDetailsVO oldDetail);
+	
+	
 
 }

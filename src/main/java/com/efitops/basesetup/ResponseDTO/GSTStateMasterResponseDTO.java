@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GSTStateMasterResponseDTO {
 	private Long id;
-	private String gstSate;
+	private String gstState;
 	private String gstStateCode;
 }

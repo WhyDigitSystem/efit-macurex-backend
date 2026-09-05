@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -68,15 +67,11 @@ import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.IssuesDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 import com.efitops.basesetup.dto.MachineHistoryDTO;
-import com.efitops.basesetup.dto.MachineMasterAttachmentDTO;
 import com.efitops.basesetup.dto.MachineMasterDTO;
 import com.efitops.basesetup.dto.MachineSpareDetailsDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
 import com.efitops.basesetup.dto.ParameterMasterDTO;
 import com.efitops.basesetup.dto.ProcessSheetCompRoutingDTO;
-import com.efitops.basesetup.dto.ProcessSheetCompRoutingDetailDTO;
-import com.efitops.basesetup.dto.ProcessSheetCompRoutingMachineDTO;
-import com.efitops.basesetup.dto.ProcessSheetToolFixtureDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDetailsDto;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
@@ -108,12 +103,7 @@ import com.efitops.basesetup.entity.MachineMasterAttachmentVO;
 import com.efitops.basesetup.entity.MachineMasterVO;
 import com.efitops.basesetup.entity.MachineSpareDetailsVO;
 import com.efitops.basesetup.entity.OpenStockEntryVO;
-import com.efitops.basesetup.entity.OperationMasterVO;
 import com.efitops.basesetup.entity.ParameterMasterVO;
-import com.efitops.basesetup.entity.ProcessSheetCompRoutingDetailVO;
-import com.efitops.basesetup.entity.ProcessSheetCompRoutingMachineVO;
-import com.efitops.basesetup.entity.ProcessSheetCompRoutingVO;
-import com.efitops.basesetup.entity.ProcessSheetToolFixtureDetailsVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentAttachmentVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentDetailsVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentVO;
@@ -124,7 +114,6 @@ import com.efitops.basesetup.entity.SalesOrderAmendmentDetailsVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentVO;
 import com.efitops.basesetup.entity.ToolCategoryDetailVO;
 import com.efitops.basesetup.entity.ToolCategoryVO;
-import com.efitops.basesetup.entity.ToolMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -158,6 +147,7 @@ import com.efitops.basesetup.repository.PurchaseContractAmendmentAttachmentRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentRepo;
 import com.efitops.basesetup.repository.PurchaseContractRepo;
+import com.efitops.basesetup.repository.PurchaseDeliveryScheduleRepo;
 import com.efitops.basesetup.repository.PurchaseOrderAmendmentAttachmentRepo;
 import com.efitops.basesetup.repository.PurchaseOrderAmendmentDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderAmendmentRepo;
@@ -333,6 +323,9 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
+	
+	@Autowired
+	PurchaseDeliveryScheduleRepo purchaseDeliveryScheduleRepo;
 
 //	@Override
 //	@Transactional
@@ -3159,7 +3152,7 @@ public class DevelopServiceImpl implements DevelopService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getCurrencyExchangeRateForPurchaseOrderAmendment(
+	public List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(
 	        String docId, Long orgId, Long branch) throws ApplicationException {
 
 	    List<Object[]> result =
@@ -6204,4 +6197,38 @@ public class DevelopServiceImpl implements DevelopService {
 //	    processSheetVO.setProcessSheetToolFixtureDetailsVO(
 //	            toolFixtureList);
 //	}
+	
+	
+	
+	// purchase order amendment dropdown for po no
+	
+		@Override
+		public List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(
+		        Long branch, Long customerId, Long orgId) throws ApplicationException {
+
+		    List<Object[]> purchaseOrderList =
+		            purchaseDeliveryScheduleRepo.getPurchaseOrderDropdownForPurchaseOrderAmendment(
+		                    customerId, branch, orgId);
+
+		    if (purchaseOrderList.isEmpty()) {
+		        throw new ApplicationException("No Purchase Order Details Found");
+		    }
+
+		    List<Map<String, Object>> responseList = new ArrayList<>();
+
+		    for (Object[] obj : purchaseOrderList) {
+
+		        Map<String, Object> map = new HashMap<>();
+
+		        map.put("id", obj[0]);
+		        map.put("docId", obj[1]);
+
+		        responseList.add(map);
+		    }
+
+		    return responseList;
+		}
+
+	
+
 }

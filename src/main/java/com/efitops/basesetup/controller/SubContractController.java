@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
@@ -31,6 +32,7 @@ import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
+import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
 import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.service.SubContractService;
 
@@ -1067,5 +1069,304 @@ public class SubContractController extends BaseController {
 	            methodName);
 
 	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@PutMapping("/createUpdateSupplierRateContractAmendment")
+	public ResponseEntity<ResponseDTO>
+	createUpdateSupplierRateContractAmendment(
+	        @RequestBody
+	        SupplierRateContractAmendmentDTO
+	                supplierRateContractAmendmentDTO) {
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object>
+	                supplierRateContractAmendmentMap =
+	                subContractService
+	                        .createUpdateSupplierRateContractAmendment(
+	                                supplierRateContractAmendmentDTO);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                supplierRateContractAmendmentMap
+	                        .get("message"));
+
+	        responseObjectsMap.put(
+	                "supplierRateContractAmendmentVO",
+	                supplierRateContractAmendmentMap
+	                        .get("supplierRateContractAmendmentVO"));
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getSupplierRateContractAmendmentById")
+	public ResponseEntity<ResponseDTO>
+	getSupplierRateContractAmendmentById(
+	        @RequestParam Long id) {
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        SupplierRateContractAmendmentResponseDTO
+	                supplierRateContractAmendment =
+	                subContractService
+	                        .getSupplierRateContractAmendmentById(id);
+
+	        responseObjectsMap.put(
+	                "supplierRateContractAmendment",
+	                supplierRateContractAmendment);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Supplier Rate Contract Amendment fetched successfully");
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getSupplierRateContractAmendmentByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO>
+	getSupplierRateContractAmendmentByOrgIdAndBranch(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<SupplierRateContractAmendmentResponseDTO>
+	                supplierRateContractAmendments =
+	                subContractService
+	                        .getSupplierRateContractAmendmentByOrgIdAndBranch(
+	                                orgId,
+	                                branch);
+
+	        responseObjectsMap.put(
+	                "supplierRateContractAmendment",
+	                supplierRateContractAmendments);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Supplier Rate Contract Amendment List fetched successfully");
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getSupplierRateContractAmendmentDocId")
+	public ResponseEntity<ResponseDTO>
+	getSupplierRateContractAmendmentDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName =
+	            "getSupplierRateContractAmendmentDocId()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String mapp = "";
+
+	    try {
+
+	        mapp =
+	                subContractService
+	                        .getSupplierRateContractAmendmentDocId(
+	                                orgId,
+	                                financialYear);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Supplier Rate Contract Amendment DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "supplierRateContractAmendmentDocId",
+	                mapp);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } else {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Supplier Rate Contract Amendment DocId",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getLatestSupplierRateContractAmendmentContractNoDetails")
+	public ResponseEntity<ResponseDTO>
+	getRevisionNoDetailsForSupplierRateContractAmd(
+	        @RequestParam String contractNo,
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<Map<String, Object>> details =
+	                subContractService
+	                        .getRevisionNoDetailsForSupplierRateContractAmd(
+	                                contractNo,
+	                                orgId,
+	                                branch);
+
+	        responseObjectsMap.put(
+	                "contractDetails",
+	                details);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Contract details fetched successfully");
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getSupplierRateContractItemDetailsForSRCAmd")
+	public ResponseEntity<ResponseDTO>
+	getSupplierRateContractAmendmentItemDetails(
+	        @RequestParam String contractNo,
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<Map<String, Object>> details =
+	                subContractService
+	                        .getSupplierRateContractItemDetailsForSRCAmd(
+	                        		contractNo,
+	                                orgId,
+	                                branch);
+
+	        responseObjectsMap.put(
+	                "supplierRateContractAmendmentItemDetails",
+	                details);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Supplier Rate Contract Amendment Item Details fetched successfully");
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
 	}
 }

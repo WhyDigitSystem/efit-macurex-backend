@@ -9,11 +9,13 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
+import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
 import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
@@ -81,6 +83,22 @@ public interface SubContractService {
 	List<SubContractSupplyScheduleResponseDTO> getSubContractSupplyScheduleByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
 
 	String getSubContractSupplyScheduleDocId(Long orgId, String financialYear);
+
+	//SupplierRateContractAmd
+	Map<String, Object> createUpdateSupplierRateContractAmendment(
+			SupplierRateContractAmendmentDTO supplierRateContractAmendmentDTO) throws ApplicationException;
+
+	String getSupplierRateContractAmendmentDocId(Long orgId, String financialYear);
+
+	SupplierRateContractAmendmentResponseDTO getSupplierRateContractAmendmentById(Long id) throws ApplicationException;
+
+	List<SupplierRateContractAmendmentResponseDTO> getSupplierRateContractAmendmentByOrgIdAndBranch(
+			Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getRevisionNoDetailsForSupplierRateContractAmd(String contractNo, Long orgId,
+			Long branch);
+
+	List<Map<String, Object>> getSupplierRateContractItemDetailsForSRCAmd(String contractNo, Long orgId, Long branch);
 
 
 

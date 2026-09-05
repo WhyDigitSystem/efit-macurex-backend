@@ -46,6 +46,8 @@ import com.efitops.basesetup.ResponseDTO.ServiceAccMasterResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleItemDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentItemDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractItemDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractTaxDetailsResponseDTO;
@@ -64,6 +66,8 @@ import com.efitops.basesetup.dto.JobOrderTaxDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleItemDetailsDTO;
+import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
+import com.efitops.basesetup.dto.SupplierRateContractAmendmentItemDetailsDTO;
 import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.dto.SupplierRateContractItemDetailsDTO;
 import com.efitops.basesetup.dto.SupplierRateContractTaxDetailsDTO;
@@ -90,6 +94,8 @@ import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleDetailsVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleItemDetailsVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleVO;
+import com.efitops.basesetup.entity.SupplierRateContractAmendmentItemDetailsVO;
+import com.efitops.basesetup.entity.SupplierRateContractAmendmentVO;
 import com.efitops.basesetup.entity.SupplierRateContractItemDetailsVO;
 import com.efitops.basesetup.entity.SupplierRateContractTaxDetailsVO;
 import com.efitops.basesetup.entity.SupplierRateContractVO;
@@ -119,6 +125,8 @@ import com.efitops.basesetup.repository.ServiceAccMasterRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleDetailsRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleItemDetailsRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleRepo;
+import com.efitops.basesetup.repository.SupplierRateContractAmendmentItemDetailsRepo;
+import com.efitops.basesetup.repository.SupplierRateContractAmendmentRepo;
 import com.efitops.basesetup.repository.SupplierRateContractItemDetailsRepo;
 import com.efitops.basesetup.repository.SupplierRateContractRepo;
 import com.efitops.basesetup.repository.SupplierRateContractTaxDetailsRepo;
@@ -221,6 +229,12 @@ public class SubContractServiceImpl implements SubContractService {
 	
 	@Autowired
 	SubContractSupplyScheduleDetailsRepo subContractSupplyScheduleDetailsRepo;
+	
+	@Autowired
+	SupplierRateContractAmendmentRepo supplierRateContractAmendmentRepo;
+	
+	@Autowired
+	SupplierRateContractAmendmentItemDetailsRepo supplierRateContractAmendmentItemDetailsRepo;
 	
 	@Override
 	@Transactional
@@ -4002,4 +4016,692 @@ public class SubContractServiceImpl implements SubContractService {
 
 	    return result;
 	}
+	
+	
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateSupplierRateContractAmendment(
+	        SupplierRateContractAmendmentDTO dto)
+	        throws ApplicationException {
+
+	    String screenCode = "SRCA";
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    String message;
+
+	    SupplierRateContractAmendmentVO
+	            supplierRateContractAmendmentVO;
+
+	    // ============================================================
+	    // Create
+	    // ============================================================
+
+	    if (ObjectUtils.isEmpty(dto.getId())) {
+
+	        supplierRateContractAmendmentVO =
+	                new SupplierRateContractAmendmentVO();
+
+	        // ========================================================
+	        // Generate Doc Id
+	        // ========================================================
+
+	        String docId =
+	                supplierRateContractAmendmentRepo
+	                        .getSupplierRateContractAmendmentDocId(
+	                                dto.getOrgId(),
+	                                dto.getFinancialYear(),
+	                                screenCode);
+
+	        supplierRateContractAmendmentVO.setDocId(docId);
+
+	        supplierRateContractAmendmentVO
+	                .setCreatedBy(dto.getCreatedBy());
+
+	        supplierRateContractAmendmentVO
+	                .setUpdatedBy(dto.getCreatedBy());
+
+	        message =
+	                "Supplier Rate Contract Amendment Created Successfully";
+
+	    } else {
+
+	        // ========================================================
+	        // Update
+	        // ========================================================
+
+	        supplierRateContractAmendmentVO =
+	                supplierRateContractAmendmentRepo
+	                        .findById(dto.getId())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Supplier Rate Contract Amendment Not Found"));
+
+	        // ========================================================
+	        // Delete Old Item Details
+	        // ========================================================
+
+	        if (supplierRateContractAmendmentVO.getItemDetails()
+	                != null) {
+
+	            supplierRateContractAmendmentItemDetailsRepo
+	                    .deleteAll(
+	                            supplierRateContractAmendmentVO
+	                                    .getItemDetails());
+
+	            supplierRateContractAmendmentVO
+	                    .getItemDetails()
+	                    .clear();
+	        }
+
+	        supplierRateContractAmendmentVO
+	                .setUpdatedBy(dto.getCreatedBy());
+
+	        message =
+	                "Supplier Rate Contract Amendment Updated Successfully";
+	    }
+
+	    // ============================================================
+	    // Set Header And Item Details
+	    // ============================================================
+
+	    getSupplierRateContractAmendmentVOFromDTO(
+	            dto,
+	            supplierRateContractAmendmentVO);
+
+	    // ============================================================
+	    // Save
+	    // ============================================================
+
+	    supplierRateContractAmendmentVO =
+	            supplierRateContractAmendmentRepo
+	                    .saveAndFlush(
+	                            supplierRateContractAmendmentVO);
+
+	    // ============================================================
+	    // Response
+	    // ============================================================
+
+	    response.put("message", message);
+
+	    response.put(
+	            "supplierRateContractAmendmentVO",
+	            convertToSupplierRateContractAmendmentResponse(
+	                    supplierRateContractAmendmentVO));
+
+	    return response;
+	}
+	
+	private void getSupplierRateContractAmendmentVOFromDTO(
+	        SupplierRateContractAmendmentDTO dto,
+	        SupplierRateContractAmendmentVO vo)
+	        throws ApplicationException {
+
+	    // ============================================================
+	    // Branch
+	    // ============================================================
+
+	    if (dto.getBranch() != null) {
+
+	        BranchVO branch =
+	                branchRepo.findById(dto.getBranch())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Branch Not Found"));
+
+	        vo.setBranch(branch);
+	    }
+
+	    // ============================================================
+	    // Customer
+	    // ============================================================
+
+	    if (dto.getCustomer() != null) {
+
+	        CustomerVO customer =
+	                customerRepo.findById(dto.getCustomer())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Customer Not Found"));
+
+	        vo.setCustomer(customer);
+	    }
+
+	    // ============================================================
+	    // Prepared By
+	    // ============================================================
+
+	    if (dto.getPreparedBy() != null) {
+
+	        EmployeeMasterVO preparedBy =
+	                employeeMasterRepo.findById(dto.getPreparedBy())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Prepared By Employee Not Found"));
+
+	        vo.setPreparedBy(preparedBy);
+	    }
+
+	    // ============================================================
+	    // Authorised By
+	    // ============================================================
+
+	    if (dto.getAuthorisedBy() != null) {
+
+	        EmployeeMasterVO authorisedBy =
+	                employeeMasterRepo.findById(dto.getAuthorisedBy())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Authorised By Employee Not Found"));
+
+	        vo.setAuthorisedBy(authorisedBy);
+	    }
+
+	    // ============================================================
+	    // Header Details
+	    // ============================================================
+
+
+	    vo.setBelongsTo(dto.getBelongsTo());
+
+	    vo.setContractDate(dto.getContractDate());
+
+	    vo.setContractNo(dto.getContractNo());
+
+	    vo.setValidFrom(dto.getValidFrom());
+
+	    vo.setNewValidFrom(dto.getNewValidFrom());
+
+	    vo.setValidTo(dto.getValidTo());
+
+	    vo.setNewValidTo(dto.getNewValidTo());
+
+	    vo.setRevisionNo(dto.getRevisionNo());
+
+	    vo.setFreightType(dto.getFreightType());
+
+	    vo.setPackingType(dto.getPackingType());
+
+	    vo.setInsuranceAmount(dto.getInsuranceAmount());
+
+	    vo.setModeOfDespatch(dto.getModeOfDespatch());
+
+	    vo.setTaxDescription(dto.getTaxDescription());
+
+	    vo.setRemarks(dto.getRemarks());
+
+	    vo.setOrgId(dto.getOrgId());
+
+	    vo.setFinancialYear(dto.getFinancialYear());
+
+	    vo.setActive(dto.isActive());
+
+	    vo.setCancelRemarks(dto.getCancelRemarks());
+
+	    // ============================================================
+	    // Item Details
+	    // ============================================================
+
+	    List<SupplierRateContractAmendmentItemDetailsVO>
+	            itemDetailsList = new ArrayList<>();
+
+	    if (dto.getItemDetails() != null) {
+
+	        for (SupplierRateContractAmendmentItemDetailsDTO itemDTO :
+	                dto.getItemDetails()) {
+
+	            SupplierRateContractAmendmentItemDetailsVO
+	                    itemDetails =
+	                    new SupplierRateContractAmendmentItemDetailsVO();
+
+	            // ====================================================
+	            // Item
+	            // ====================================================
+
+	            if (itemDTO.getItem() != null) {
+
+	                ItemMasterVO item =
+	                        itemMasterRepo
+	                                .findById(itemDTO.getItem())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Item Not Found"));
+
+	                itemDetails.setItem(item);
+	            }
+
+	            // ====================================================
+	            // Unit
+	            // ====================================================
+
+	            if (itemDTO.getUnit() != null) {
+
+	                UnitMasterVO unit =
+	                        unitMasterRepo
+	                                .findById(itemDTO.getUnit())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Unit Not Found"));
+
+	                itemDetails.setUnit(unit);
+	            }
+
+	            // ====================================================
+	            // Rate Details
+	            // ====================================================
+
+	            itemDetails.setOldRate(
+	                    itemDTO.getOldRate());
+
+	            itemDetails.setNewRate(
+	                    itemDTO.getNewRate());
+
+	            // ====================================================
+	            // Header Reference
+	            // ====================================================
+
+	            itemDetails.setSupplierRateContractAmendmentVO(vo);
+
+	            itemDetailsList.add(itemDetails);
+	        }
+	    }
+
+	    vo.setItemDetails(itemDetailsList);
+	}
+	
+	
+	
+	private SupplierRateContractAmendmentResponseDTO
+	convertToSupplierRateContractAmendmentResponse(
+	        SupplierRateContractAmendmentVO vo) {
+
+	    SupplierRateContractAmendmentResponseDTO response =
+	            new SupplierRateContractAmendmentResponseDTO();
+
+	    // ============================================================
+	    // Header Details
+	    // ============================================================
+
+	    response.setId(vo.getId());
+	    response.setDocId(vo.getDocId());
+	    response.setDocDate(vo.getDocDate());
+	    response.setBelongsTo(vo.getBelongsTo());
+	    response.setContractDate(vo.getContractDate());
+	    response.setContractNo(vo.getContractNo());
+	    response.setValidFrom(vo.getValidFrom());
+	    response.setNewValidFrom(vo.getNewValidFrom());
+	    response.setValidTo(vo.getValidTo());
+	    response.setNewValidTo(vo.getNewValidTo());
+	    response.setRevisionNo(vo.getRevisionNo());
+	    response.setFreightType(vo.getFreightType());
+	    response.setPackingType(vo.getPackingType());
+	    response.setInsuranceAmount(vo.getInsuranceAmount());
+	    response.setModeOfDespatch(vo.getModeOfDespatch());
+	    response.setTaxDescription(vo.getTaxDescription());
+	    response.setRemarks(vo.getRemarks());
+	    response.setOrgId(vo.getOrgId());
+	    response.setFinancialYear(vo.getFinancialYear());
+	    response.setCreatedBy(vo.getCreatedBy());
+	    response.setUpdatedBy(vo.getUpdatedBy());
+	    response.setCancelRemarks(vo.getCancelRemarks());
+	    response.setActive(vo.getActive());
+	    response.setCancel(vo.getCancel());
+	    response.setScreenCode(vo.getScreenCode());
+	    response.setScreenName(vo.getScreenName());
+
+	    // ============================================================
+	    // Branch
+	    // ============================================================
+
+	    if (vo.getBranch() != null) {
+
+	        BranchResponseDTO branch =
+	                new BranchResponseDTO();
+
+	        branch.setId(
+	                vo.getBranch().getId());
+
+	        branch.setBranchCode(
+	                vo.getBranch().getBranchCode());
+
+	        branch.setBranchName(
+	                vo.getBranch().getBranchName());
+
+	        response.setBranch(branch);
+	    }
+
+	    // ============================================================
+	    // Customer
+	    // ============================================================
+
+	    if (vo.getCustomer() != null) {
+
+	        CustomerDropdownResponseDTO customer =
+	                new CustomerDropdownResponseDTO();
+
+	        customer.setCustomerId(
+	                vo.getCustomer().getId());
+
+	        customer.setCustomerCode(
+	                vo.getCustomer().getCustomerCode());
+
+	        customer.setCustomerName(
+	                vo.getCustomer().getCustomerName());
+
+	        response.setCustomer(customer);
+	    }
+
+	    // ============================================================
+	    // Prepared By
+	    // ============================================================
+
+	    if (vo.getPreparedBy() != null) {
+
+	        EmployeeResponseDTO employee =
+	                new EmployeeResponseDTO();
+
+	        employee.setId(
+	                vo.getPreparedBy().getId());
+
+	        employee.setEmployeeName(
+	                vo.getPreparedBy().getEmployeeName());
+
+	        response.setPreparedBy(employee);
+	    }
+
+	    // ============================================================
+	    // Authorised By
+	    // ============================================================
+
+	    if (vo.getAuthorisedBy() != null) {
+
+	        EmployeeResponseDTO employee =
+	                new EmployeeResponseDTO();
+
+	        employee.setId(
+	                vo.getAuthorisedBy().getId());
+
+	        employee.setEmployeeName(
+	                vo.getAuthorisedBy().getEmployeeName());
+
+	        response.setAuthorisedBy(employee);
+	    }
+
+	    // ============================================================
+	    // Item Details
+	    // ============================================================
+
+	    List<SupplierRateContractAmendmentItemDetailsResponseDTO>
+	            itemDetailsResponse = new ArrayList<>();
+
+	    if (vo.getItemDetails() != null) {
+
+	        for (SupplierRateContractAmendmentItemDetailsVO itemVO :
+	                vo.getItemDetails()) {
+
+	            SupplierRateContractAmendmentItemDetailsResponseDTO
+	                    itemResponse =
+	                    new SupplierRateContractAmendmentItemDetailsResponseDTO();
+
+	            itemResponse.setId(
+	                    itemVO.getId());
+
+	            // ====================================================
+	            // Item
+	            // ====================================================
+
+	            if (itemVO.getItem() != null) {
+
+	                ItemMasterResponseDetailsDTO item =
+	                        new ItemMasterResponseDetailsDTO();
+
+	                item.setId(
+	                        itemVO.getItem().getId());
+
+	                item.setItemCode(
+	                        itemVO.getItem().getItemCode());
+
+	                item.setItemDescription(
+	                        itemVO.getItem().getItemDescription());
+
+	                // =================================================
+	                // Primary Unit
+	                // =================================================
+
+	                if (itemVO.getItem().getPrimaryUnit() != null) {
+
+	                    UnitMasterResponseDTO unit =
+	                            new UnitMasterResponseDTO();
+
+	                    unit.setId(
+	                            itemVO.getItem()
+	                                    .getPrimaryUnit()
+	                                    .getId());
+
+	                    unit.setUnitId(
+	                            itemVO.getItem()
+	                                    .getPrimaryUnit()
+	                                    .getDescription());
+
+	                    item.setUnit(unit);
+	                }
+
+	                itemResponse.setItemCode(item);
+	            }
+
+	            // ====================================================
+	            // Unit
+	            // ====================================================
+
+	            if (itemVO.getUnit() != null) {
+
+	                UnitMasterResponseDTO unit =
+	                        new UnitMasterResponseDTO();
+
+	                unit.setId(
+	                        itemVO.getUnit().getId());
+
+	                unit.setUnitId(
+	                        itemVO.getUnit().getDescription());
+
+	                itemResponse.setUnit(unit);
+	            }
+
+	            // ====================================================
+	            // Rate Details
+	            // ====================================================
+
+	            itemResponse.setOldRate(
+	                    itemVO.getOldRate());
+
+	            itemResponse.setNewRate(
+	                    itemVO.getNewRate());
+
+	            itemDetailsResponse.add(itemResponse);
+	        }
+	    }
+
+	    response.setItemDetails(itemDetailsResponse);
+
+	    return response;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@Override
+	public SupplierRateContractAmendmentResponseDTO
+	getSupplierRateContractAmendmentById(
+	        Long id) throws ApplicationException {
+
+	    SupplierRateContractAmendmentVO
+	            supplierRateContractAmendmentVO =
+	            supplierRateContractAmendmentRepo
+	                    .findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Supplier Rate Contract Amendment Not Found"));
+
+	    return convertToSupplierRateContractAmendmentResponse(
+	            supplierRateContractAmendmentVO);
+	}
+	
+	@Override
+	public List<SupplierRateContractAmendmentResponseDTO>
+	getSupplierRateContractAmendmentByOrgIdAndBranch(
+	        Long orgId,
+	        Long branch) throws ApplicationException {
+
+	    List<SupplierRateContractAmendmentVO>
+	            supplierRateContractAmendments =
+	            supplierRateContractAmendmentRepo
+	                    .findByOrgIdAndBranch(
+	                            orgId,
+	                            branch);
+
+	    List<SupplierRateContractAmendmentResponseDTO>
+	            responseList = new ArrayList<>();
+
+	    for (SupplierRateContractAmendmentVO vo :
+	            supplierRateContractAmendments) {
+
+	        responseList.add(
+	                convertToSupplierRateContractAmendmentResponse(vo));
+	    }
+
+	    return responseList;
+	}
+	
+	
+	@Override
+	public String getSupplierRateContractAmendmentDocId(
+	        Long orgId,
+	        String financialYear) {
+
+	    String screenCode1 = "SRCA";
+
+	    String result =
+	            supplierRateContractAmendmentRepo
+	                    .getSupplierRateContractAmendmentDocId(
+	                            orgId,
+	                            financialYear,
+	                            screenCode1);
+
+	    return result;
+	}
+	
+	
+	@Override
+	public List<Map<String, Object>> getRevisionNoDetailsForSupplierRateContractAmd(
+	        String contractNo,
+	        Long orgId,
+	        Long branch) {
+
+	    List<Object[]> result =
+	            supplierRateContractAmendmentRepo
+	                    .getRevisionNoDetailsForSupplierRateContractAmd(
+	                            contractNo,
+	                            orgId,
+	                            branch);
+
+	    List<Map<String, Object>> details =
+	            new ArrayList<>();
+
+	    if (result == null || result.isEmpty()) {
+
+	        Map<String, Object> part =
+	                new HashMap<>();
+
+	        part.put("newValidFrom", null);
+	        part.put("newValidTo", null);
+	        part.put("revisionNo", 1);
+
+	        details.add(part);
+
+	    } else {
+
+	        for (Object[] fs : result) {
+
+	            Map<String, Object> part =
+	                    new HashMap<>();
+
+	            part.put("newValidFrom",
+	                    fs[0] != null ? fs[0] : null);
+
+	            part.put("newValidTo",
+	                    fs[1] != null ? fs[1] : null);
+
+	            part.put("revisionNo",
+	                    fs[2] != null ? fs[2] : 1);
+
+	            details.add(part);
+	        }
+	    }
+
+	    return details;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getSupplierRateContractItemDetailsForSRCAmd(
+	        String docId,
+	        Long orgId,
+	        Long branch) {
+
+	    List<Object[]> result =
+	            supplierRateContractAmendmentRepo
+	                    .getSupplierRateContractItemDetailsForSRCAmd(
+	                            docId,
+	                            orgId,
+	                            branch);
+
+	    return getSupplierRateContractAmendmentItemDetails(result);
+	}
+	
+	private List<Map<String, Object>> getSupplierRateContractAmendmentItemDetails(
+	        List<Object[]> result) {
+
+	    List<Map<String, Object>> details =
+	            new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part =
+	                new HashMap<>();
+
+	        part.put("id",
+	                fs[0] != null ? fs[0] : null);
+
+	        part.put("incomingItem",
+	                fs[1] != null ? fs[1] : null);
+
+	        part.put("itemCode",
+	                fs[2] != null ? fs[2] : null);
+
+	        part.put("itemDescription",
+	                fs[3] != null ? fs[3] : null);
+
+	        part.put("unit",
+	                fs[4] != null ? fs[4] : null);
+
+	        part.put("unitId",
+	                fs[5] != null ? fs[5] : null);
+
+	        part.put("description",
+	                fs[6] != null ? fs[6] : null);
+
+	        part.put("oldRate",
+	                fs[7] != null ? fs[7] : null);
+
+	        details.add(part);
+	    }
+
+	    return details;
+	}
+	
 }

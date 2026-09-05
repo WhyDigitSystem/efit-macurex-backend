@@ -120,7 +120,7 @@ public interface DevelopService {
 			throws ApplicationException;
 
 	
-	List<Map<String, Object>> getCurrencyExchangeRateForPurchaseOrderAmendment(String docId, Long orgId, Long branch)
+	List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(String docId, Long orgId, Long branch)
 			throws ApplicationException;
 
 	Map<String, Object> getContractNoDropdownforPurchaseContractAmendment(Long orgId, Long branch, Long customerId)
@@ -176,9 +176,6 @@ public interface DevelopService {
 	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
 			throws ApplicationException;
 	
-	String getMachineMasterDocId(Long orgId, String financialYear);
-
-	
 
 	Map<String, Object> createUpdateToolCategory(ToolCategoryDTO toolCategoryDTO) throws ApplicationException;
 
@@ -192,6 +189,10 @@ public interface DevelopService {
 
 	Map<String, Object> updateCreateProcessSheet(ProcessSheetCompRoutingDTO processSheetDTO)
 			throws ApplicationException;
+
+	List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(Long branch, Long customerId,
+			Long orgId) throws ApplicationException;
+
 
 	
 	

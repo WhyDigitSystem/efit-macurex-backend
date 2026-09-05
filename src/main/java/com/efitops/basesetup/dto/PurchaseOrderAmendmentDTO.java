@@ -56,7 +56,7 @@ public class PurchaseOrderAmendmentDTO {
 	 
 	 private List<PurchaseOrderAmendmentDetailsDTO> details;
 	 
-	 private List<PurchaseOrderAmendmentAttachmentDTO> attachment;
+	
 
 	 
 

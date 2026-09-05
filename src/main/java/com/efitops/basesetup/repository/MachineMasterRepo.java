@@ -1,6 +1,7 @@
 package com.efitops.basesetup.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +15,12 @@ public interface MachineMasterRepo extends JpaRepository<MachineMasterVO, Long> 
 
 	List<MachineMasterVO> findByOrgIdAndBranch(Long orgId, BranchVO branchVO);
 	
-	@Query(value = """
+	@Query(value = "SELECT * FROM machine_equipments_master " +
+            "WHERE machine_equipments_master_id = ?1",
+    nativeQuery = true)
+Optional<MachineMasterVO> findMachineById(Long id);
+
+  @Query(value = """
 	        SELECT
 	            tcd.tool_category_detail_id AS toolCategoryId,
 	            tcd.category

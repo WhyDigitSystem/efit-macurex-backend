@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.efitops.basesetup.ResponseDTO.InitialPlanningResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMasterResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.InitialPlanningDTO;
+import com.efitops.basesetup.dto.OperationMasterDTO;
 import com.efitops.basesetup.dto.ProblemSolvingEntryDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.service.InitialPlanningService;
@@ -423,5 +425,128 @@ public class InitialPlanningController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMachineInstrumentDropdown")
+	public ResponseEntity<ResponseDTO> getMachineInstrumentDropdownForInitialPlanning(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getMachineInstrumentDropdownForInitialPlanning()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> machineInstrumentList = new ArrayList<>();
+
+		try {
+
+			machineInstrumentList = initialPlanningService.getMachineInstrumentDropdownForInitialPlanning(orgId,
+					branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Machine Instrument information retrieved successfully");
+
+			responseObjectsMap.put("machineInstrumentDropdown", machineInstrumentList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Machine Instrument information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	operation master 
+
+	@PutMapping("/updateCreateOperationMaster")
+	public ResponseEntity<ResponseDTO> updateCreateOperationMaster(@RequestBody OperationMasterDTO operationMasterDTO) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> response = initialPlanningService.updateCreateOperationMaster(operationMasterDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
+			responseObjectsMap.put("operationMasterVO", response.get("operationMasterVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getOperationMasterById")
+	public ResponseEntity<ResponseDTO> getOperationMasterById(@RequestParam Long id) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			OperationMasterResponseDTO response = initialPlanningService.getOperationMasterById(id);
+
+			responseObjectsMap.put("operationMasterVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getOperationMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getOperationMasterByOrgId(@RequestParam Long orgId) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<OperationMasterResponseDTO> response = initialPlanningService.getOperationMasterByOrgId(orgId);
+
+			responseObjectsMap.put("operationMasterVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
 	}
 }

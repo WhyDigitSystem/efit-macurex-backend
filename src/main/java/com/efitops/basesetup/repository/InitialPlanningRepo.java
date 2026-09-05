@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.efitops.basesetup.entity.InitialPlanningVO;
 
@@ -16,6 +17,7 @@ public interface InitialPlanningRepo extends JpaRepository<InitialPlanningVO, Lo
 			FROM initial_planning_basic
 			WHERE org_id = ?1
 			  AND cancel = FALSE
+			  AND active = True
 			ORDER BY initial_planning_basic_id DESC
 			""", nativeQuery = true)
 	List<InitialPlanningVO> getInitialPlanningByOrgId(Long orgId);
@@ -83,5 +85,23 @@ public interface InitialPlanningRepo extends JpaRepository<InitialPlanningVO, Lo
 			ORDER BY p.parameter_description
 			""", nativeQuery = true)
 	List<Object[]> getParameterDropdownForInitialPlanning(Long orgId);
+	
+	
+	@Query(value = """
+	        SELECT
+	            mem.machine_equipments_master_id AS id,
+	            mem.machine_instrument_no AS machineInstrumentNo,
+	            mem.machine_instrument_name AS machineInstrumentName
+	        FROM machine_equipments_master mem
+	        LEFT JOIN listofvaluesdetails lov
+	            ON lov.listofvaluesdetails_id = mem.type
+	        WHERE mem.active = 1
+	          AND (mem.cancel = 0 OR mem.cancel IS NULL)
+	          AND mem.org_id = :orgId
+	          AND mem.branch = :branch
+	        """, nativeQuery = true)
+	List<Object[]> getMachineInstrumentDropdownForInitialPlanning(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch);
 
 }

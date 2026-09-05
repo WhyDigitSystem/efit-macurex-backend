@@ -568,9 +568,9 @@ public class EfitMasterServiceImpl implements EfitMasterService {
 
 		} else {
 
-			String docId = bomRepo.getBomDocId(bomDTO.getOrgId(), bomDTO.getFinYear(), bomDTO.getBranchCode(),
-					screenCode);
-			bomVO.setDocid(docId);
+//			String docId = bomRepo.getBomDocId(bomDTO.getOrgId(), bomDTO.getFinYear(), bomDTO.getBranchCode(),
+//					screenCode);
+//			bomVO.setDocid(docId);
 
 //			// GETDOCID LASTNO +1
 //			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo

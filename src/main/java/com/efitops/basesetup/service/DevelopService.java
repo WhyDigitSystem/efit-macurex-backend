@@ -18,6 +18,7 @@ import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderAmendmentResponceDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
@@ -27,6 +28,7 @@ import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.MachineMasterDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
 import com.efitops.basesetup.dto.ParameterMasterDTO;
+import com.efitops.basesetup.dto.ProcessSheetCompRoutingDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
@@ -35,6 +37,7 @@ import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
+import com.efitops.basesetup.dto.ToolCategoryDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -167,7 +170,6 @@ public interface DevelopService {
 
 	String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear, String screenCode);
 
-	MachineMasterResponseDTO getMachineMasterById(Long id) throws ApplicationException;
 
 	List<MachineMasterResponseDTO> getMachineMasterByOrgId(Long orgId, Long branch) throws ApplicationException;
 
@@ -175,6 +177,23 @@ public interface DevelopService {
 			throws ApplicationException;
 	
 	String getMachineMasterDocId(Long orgId, String financialYear);
+
+	
+
+	Map<String, Object> createUpdateToolCategory(ToolCategoryDTO toolCategoryDTO) throws ApplicationException;
+
+	ToolCategoryResponseDTO getToolCategoryById(Long id) throws ApplicationException;
+
+	List<ToolCategoryResponseDTO> getToolCategoryByOrgId(Long orgId) throws ApplicationException;
+
+	MachineMasterResponseDTO getMachineMasterById(Long id) throws ApplicationException;
+
+	Map<String, Object> getToolCategoryforMachineMaster(Long orgId, String applicableFor) throws ApplicationException;
+
+	Map<String, Object> updateCreateProcessSheet(ProcessSheetCompRoutingDTO processSheetDTO)
+			throws ApplicationException;
+
+	
 	
 	
 	

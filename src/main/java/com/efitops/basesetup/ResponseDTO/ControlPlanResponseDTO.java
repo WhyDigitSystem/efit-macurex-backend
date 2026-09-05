@@ -59,6 +59,9 @@ public class ControlPlanResponseDTO {
 	    private List<ControlPlanDetailResponseDTO> ControlPlanDetailResponseDTO;
 	    
 	    private List<ParameterMasterResponseDTO> ParameterMasterResponseDTO;
+	    
+	    private List<ControlPlanSampleResponseDTO> controlPlanSampleResponseDTO;
+
 
 
 

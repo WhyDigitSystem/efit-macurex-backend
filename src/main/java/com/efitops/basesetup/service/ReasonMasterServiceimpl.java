@@ -1,5 +1,6 @@
 package com.efitops.basesetup.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,13 +16,40 @@ import org.springframework.transaction.annotation.Transactional;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ReasonMasterResponseDTO;
+import com.efitops.basesetup.dto.ControlPlanDTO;
+import com.efitops.basesetup.dto.ControlPlanDetailDTO;
+import com.efitops.basesetup.dto.ControlPlanMachineFixtureDTO;
+import com.efitops.basesetup.dto.ControlPlanParameterDTO;
+import com.efitops.basesetup.dto.ControlPlanSampleDTO;
 import com.efitops.basesetup.dto.ReasonMasterDTO;
+import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.ControlPlanDetailVO;
+import com.efitops.basesetup.entity.ControlPlanMachineFixtureVO;
+import com.efitops.basesetup.entity.ControlPlanParameterVO;
+import com.efitops.basesetup.entity.ControlPlanSampleVO;
+import com.efitops.basesetup.entity.ControlPlanVO;
 import com.efitops.basesetup.entity.DepartmentVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
+import com.efitops.basesetup.entity.GradeMasterVO;
+import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
+import com.efitops.basesetup.entity.MachineMasterVO;
+import com.efitops.basesetup.entity.ParameterMasterVO;
 import com.efitops.basesetup.entity.ReasonMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.ControlPlanDetailRepo;
+import com.efitops.basesetup.repository.ControlPlanMachineFixtureRepo;
+import com.efitops.basesetup.repository.ControlPlanParameterRepo;
+import com.efitops.basesetup.repository.ControlPlanRepo;
+import com.efitops.basesetup.repository.ControlPlanSampleRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
+import com.efitops.basesetup.repository.GradeMasterRepo;
+import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
+import com.efitops.basesetup.repository.MachineMasterRepo;
+import com.efitops.basesetup.repository.ParameterMasterRepo;
 import com.efitops.basesetup.repository.ReasonMasterRepo;
 
 
@@ -40,6 +68,39 @@ public class ReasonMasterServiceimpl implements ReasonMasterService {
 	@Autowired
 	private ListOfValuesDetailsRepo listOfValuesDetailsRepo;
 	
+	@Autowired
+	private ControlPlanRepo controlPlanRepo;
+	
+	@Autowired
+	private BranchRepo branchRepo;
+	
+	@Autowired
+	private ItemMasterRepo itemMasterRepo;
+	
+	@Autowired
+	private GradeMasterRepo gradeMasterRepo;
+	
+	@Autowired
+	private EmployeeMasterRepo employeeMasterRepo;
+	
+//	@Autowired
+//	private ControlPlanDetailRepo controlPlanDetailRepo;
+//	
+//	@Autowired
+//	private ControlPlanParameterRepo controlPlanParameterRepo;
+//	
+//	@Autowired
+//	private ControlPlanSampleRepo controlPlanSampleRepo;
+//	
+//	@Autowired
+//	private ControlPlanMachineFixtureRepo controlPlanMachineFixtureRepo;
+//	
+//	@Autowired
+//	private MachineMasterRepo machineMasterRepo;
+//	
+//	@Autowired
+//	private ParameterMasterRepo parameterMasterRepo;
+//		
 //Reasonmaster
 	
 	
@@ -324,6 +385,6 @@ public class ReasonMasterServiceimpl implements ReasonMasterService {
 
 	    return responseList;
 	}
-
-
+	
+	
 }

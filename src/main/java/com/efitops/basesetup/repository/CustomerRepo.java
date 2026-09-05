@@ -294,7 +294,8 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 			    g.state_name AS GSTState,
 			    c.gst_no,
 			    c.is_gst_applicable,
-			    c.gst_type
+			    c.gst_type,
+			    g.gststatemaster_id
 			FROM customer_header c
 			INNER JOIN gststatemaster g
 			    ON g.gststatemaster_id = c.gst_state

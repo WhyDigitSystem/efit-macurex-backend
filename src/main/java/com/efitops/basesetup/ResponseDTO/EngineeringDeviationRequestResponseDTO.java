@@ -84,7 +84,7 @@ public class EngineeringDeviationRequestResponseDTO {
 	private EmployeeDropdownResponseDTO productionMgr;
 	private String productionMgrDisposition;
 	private EmployeeDropdownResponseDTO qualityMgr;
-	private String qualityMgrDisposition;
+	private String qualityMgrDisposition; 
 	private EmployeeDropdownResponseDTO tDCMgr;
 	private String tdcMgrDisposition;
 	private EmployeeDropdownResponseDTO directorTechnical;

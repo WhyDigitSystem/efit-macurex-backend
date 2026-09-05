@@ -53,7 +53,7 @@ public class EngineeringDeviationRequestDTO {
 
     private String willTheNCAffectTheForm;
 
-    private String willTheNCAffectTheFunction;
+    private String willTheNCAffectTheFunction; 
 
     private String willTheNCAffectTheSafety;
 

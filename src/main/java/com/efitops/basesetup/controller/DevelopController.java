@@ -1061,7 +1061,7 @@ public class DevelopController extends BaseController {
 	}
 
 	@GetMapping("/getCurrencyExchangeRateforPurchaseOrderAmendment")
-	public ResponseEntity<ResponseDTO> getCurrencyExchangeRateforPurchaseOrderAmendment(@RequestParam Long customer,
+	public ResponseEntity<ResponseDTO> getCurrencyExchangeRateforPurchaseOrderAmendment(@RequestParam String docId,
 			@RequestParam Long orgId, @RequestParam Long branch) {
 
 		String methodName = "getCurrencyExchangeRateforPurchaseOrderAmendment()";
@@ -1078,7 +1078,7 @@ public class DevelopController extends BaseController {
 
 		try {
 
-			mov = developService.getCurrencyExchangeRateforPurchaseOrderAmendment(customer, orgId, branch);
+			mov = developService.getCurrencyExchangeRateforPurchaseOrderAmendment(docId, orgId, branch);
 
 			responseObjectsMap.put("currencyDetails", mov);
 
@@ -1749,7 +1749,7 @@ public class DevelopController extends BaseController {
 	public ResponseEntity<ResponseDTO> updateCreateMachineMaster(
 
 //        	@RequestPart("machineMasterVO") MachineMasterDTO machineMasterDTO,
-         @RequestBody() MachineMasterDTO machineMasterDTO,
+			@RequestBody() MachineMasterDTO machineMasterDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -1813,44 +1813,37 @@ public class DevelopController extends BaseController {
 //
 //		return ResponseEntity.ok(responseDTO);
 //	}
-	
+
 	@GetMapping("/getMachineMasterById")
 	public ResponseEntity<ResponseDTO> getMachineMasterById(@RequestParam Long id) {
 
-	    String methodName = "getMachineMasterById()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getMachineMasterById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    String errorMsg = null;
-	    ResponseDTO responseDTO = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
 
-	    try {
+		try {
 
-	        MachineMasterResponseDTO machineMasterResponseDTO =
-	                developService.getMachineMasterById(id);
+			MachineMasterResponseDTO machineMasterResponseDTO = developService.getMachineMasterById(id);
 
-	        responseObjectsMap.put("machineMasterVO", machineMasterResponseDTO);
+			responseObjectsMap.put("machineMasterVO", machineMasterResponseDTO);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
+			errorMsg = e.getMessage();
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                errorMsg,
-	                errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
 
 	@GetMapping("/getMachineMasterByOrgId")
@@ -1888,53 +1881,41 @@ public class DevelopController extends BaseController {
 		return ResponseEntity.ok(responseDTO);
 	}
 
-	//machine/instrumentcategory
-	
-	
+	// machine/instrumentcategory
+
 	@GetMapping("/getToolCategoryforMachineMaster")
-	public ResponseEntity<ResponseDTO> getToolCategoryforMachineMaster(
-	        @RequestParam Long orgId,
-	        @RequestParam String applicableFor) {
+	public ResponseEntity<ResponseDTO> getToolCategoryforMachineMaster(@RequestParam Long orgId,
+			@RequestParam String applicableFor) {
 
-	    String methodName = "getToolCategoryforMachineMaster()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getToolCategoryforMachineMaster()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    String errorMsg = null;
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO = null;
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
 
-	    try {
+		try {
 
-	        responseObjectsMap =
-	                developService.getToolCategoryforMachineMaster(
-	                        orgId, applicableFor);
+			responseObjectsMap = developService.getToolCategoryforMachineMaster(orgId, applicableFor);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Tool Category retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Tool Category retrieved successfully");
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
+			errorMsg = e.getMessage();
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Tool Category retrieval failed",
-	                errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Tool Category retrieval failed", errorMsg);
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	// TOOL CATEGORY
 
 	@PutMapping("/createUpdateToolCategory")
@@ -2034,5 +2015,53 @@ public class DevelopController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 		return ResponseEntity.ok(responseDTO);
+	}
+
+	// purchase order amendment dropdown
+	@GetMapping("/getPurchaseOrderDropdownForPurchaseOrderAmendment")
+	public ResponseEntity<ResponseDTO> getPurchaseOrderDropdownForPurchaseOrderAmendment(@RequestParam Long branch,
+			@RequestParam Long customerId, @RequestParam Long orgId) {
+
+		String methodName = "getPurchaseOrderDropdownForPurchaseOrderAmendment()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> purchaseOrderList = new ArrayList<>();
+
+		try {
+
+			purchaseOrderList = developService.getPurchaseOrderDropdownForPurchaseOrderAmendment(branch,
+					customerId, orgId);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Order information retrieved successfully");
+
+			responseObjectsMap.put("purchaseOrderDropdown", purchaseOrderList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Purchase Order information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
 	}
 }

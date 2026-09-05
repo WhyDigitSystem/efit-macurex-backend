@@ -73,6 +73,10 @@ import com.efitops.basesetup.dto.MachineMasterDTO;
 import com.efitops.basesetup.dto.MachineSpareDetailsDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
 import com.efitops.basesetup.dto.ParameterMasterDTO;
+import com.efitops.basesetup.dto.ProcessSheetCompRoutingDTO;
+import com.efitops.basesetup.dto.ProcessSheetCompRoutingDetailDTO;
+import com.efitops.basesetup.dto.ProcessSheetCompRoutingMachineDTO;
+import com.efitops.basesetup.dto.ProcessSheetToolFixtureDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDetailsDto;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
@@ -104,7 +108,12 @@ import com.efitops.basesetup.entity.MachineMasterAttachmentVO;
 import com.efitops.basesetup.entity.MachineMasterVO;
 import com.efitops.basesetup.entity.MachineSpareDetailsVO;
 import com.efitops.basesetup.entity.OpenStockEntryVO;
+import com.efitops.basesetup.entity.OperationMasterVO;
 import com.efitops.basesetup.entity.ParameterMasterVO;
+import com.efitops.basesetup.entity.ProcessSheetCompRoutingDetailVO;
+import com.efitops.basesetup.entity.ProcessSheetCompRoutingMachineVO;
+import com.efitops.basesetup.entity.ProcessSheetCompRoutingVO;
+import com.efitops.basesetup.entity.ProcessSheetToolFixtureDetailsVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentAttachmentVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentDetailsVO;
 import com.efitops.basesetup.entity.PurchaseContractAmendmentVO;
@@ -115,6 +124,7 @@ import com.efitops.basesetup.entity.SalesOrderAmendmentDetailsVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentVO;
 import com.efitops.basesetup.entity.ToolCategoryDetailVO;
 import com.efitops.basesetup.entity.ToolCategoryVO;
+import com.efitops.basesetup.entity.ToolMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -142,6 +152,8 @@ import com.efitops.basesetup.repository.MachineSpareDetailsRepo;
 import com.efitops.basesetup.repository.OpenStockEntryRepo;
 import com.efitops.basesetup.repository.OrderAcceptanceRepo;
 import com.efitops.basesetup.repository.ParameterMasterRepo;
+import com.efitops.basesetup.repository.ProcessSheetCompRoutingRepo;
+import com.efitops.basesetup.repository.ProcessSheetToolFixtureDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentAttachmentRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseContractAmendmentRepo;
@@ -159,6 +171,7 @@ import com.efitops.basesetup.repository.SalesOrderAmendmentDetailsRepo;
 import com.efitops.basesetup.repository.SalesOrderAmendmentRepo;
 import com.efitops.basesetup.repository.SalesReturnRepo;
 import com.efitops.basesetup.repository.ToolCategoryRepo;
+import com.efitops.basesetup.repository.ToolMasterRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
@@ -291,6 +304,20 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	private ToolCategoryDetailRepo toolCategoryDetailRepo;
+	
+	@Autowired
+	private ProcessSheetCompRoutingRepo processSheetCompRoutingRepo;
+	
+	@Autowired
+	private ToolMasterRepo toolMasterRepo;
+	
+	@Autowired
+	private ProcessSheetToolFixtureDetailsRepo processSheetToolFixtureDetailsRepo;
+	
+	@Autowired
+//	private OperationMasterRepo operationMasterRepo;
+	
+	
 
 	@Value("${purchase.contract.amendment.upload.path}")
 	private String uploadPath1;
@@ -5589,7 +5616,543 @@ public class DevelopServiceImpl implements DevelopService {
 		return responseList;
 	}
 
+	@Override
+	public Map<String, Object> updateCreateProcessSheet(ProcessSheetCompRoutingDTO processSheetDTO)
+			throws ApplicationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
-
 	
+	//process sheet comp routing 
+	
+//	@Override
+//	@Transactional
+//	public Map<String, Object> updateCreateProcessSheet(
+//	        ProcessSheetCompRoutingDTO processSheetDTO)
+//	        throws ApplicationException {
+//
+//	    String screenCode = "PSCR";
+//
+//	    ProcessSheetCompRoutingVO processSheetVO = new ProcessSheetCompRoutingVO();
+//
+//	    String message;
+//
+//	    // =========================
+//	    // Update
+//	    // =========================
+//
+//	    if (ObjectUtils.isNotEmpty(processSheetDTO.getId())) {
+//
+//	        processSheetVO = processSheetCompRoutingRepo
+//	                .findById(processSheetDTO.getId())
+//	                .orElseThrow(() ->
+//	                        new ApplicationException(
+//	                                "Invalid Process Sheet Details"));
+//
+//	        processSheetVO.setUpdatedBy(
+//	                processSheetDTO.getCreatedBy());
+//
+//	        message = "Process Sheet Updated Successfully";
+//
+//	    } else {
+//
+//	        // =========================
+//	        // Create
+//	        // =========================
+//
+//	        processSheetVO.setCreatedBy(
+//	                processSheetDTO.getCreatedBy());
+//
+//	        processSheetVO.setUpdatedBy(
+//	                processSheetDTO.getCreatedBy());
+//
+//	        message = "Process Sheet Created Successfully";
+//	    }
+//
+//	    // =========================
+//	    // Basic Mapping
+//	    // =========================
+//
+//	    createUpdateProcessSheetVO(
+//	            processSheetDTO,
+//	            processSheetVO);
+//
+//	    // =========================
+//	    // Save Basic
+//	    // =========================
+//
+//	    ProcessSheetCompRoutingVO savedVO =
+//	            processSheetCompRoutingRepo.save(processSheetVO);
+//
+//	    // =========================
+//	    // Response
+//	    // =========================
+//
+//	    Map<String, Object> response = new HashMap<>();
+//
+//	    response.put("message", message);
+//
+////	    response.put(
+////	            "processSheetCompRoutingVO",
+////      processSheetResponse(savedVO));
+//
+//	    return response;
+//	}
+//	
+//	private void createUpdateProcessSheetVO(
+//	        ProcessSheetCompRoutingDTO dto,
+//	        ProcessSheetCompRoutingVO processSheetVO)
+//	        throws ApplicationException {
+//
+//	    // =========================
+//	    // Basic Fields
+//	    // =========================
+//
+//	    processSheetVO.setItemDescription(dto.getItemDescription());
+//
+//	    processSheetVO.setBomId(dto.getBomId());
+//
+//	    processSheetVO.setActive(dto.isActive());
+//
+//	    processSheetVO.setTotalMcValue(dto.getTotalMcValue());
+//
+//	    processSheetVO.setTotalLabourValue(dto.getTotalLabourValue());
+//
+//	    processSheetVO.setTotalToolFixtureValue(
+//	            dto.getTotalToolFixtureValue());
+//
+//	    processSheetVO.setTotalConsumablesValue(
+//	            dto.getTotalConsumablesValue());
+//
+//	    processSheetVO.setTotalOperationValue(
+//	            dto.getTotalOperationValue());
+//
+//	    processSheetVO.setOrgId(dto.getOrgId());
+//
+//	    processSheetVO.setCancel(dto.isCancel());
+//
+//	    processSheetVO.setCancelRemarks(dto.getCancelRemarks());
+//
+//
+//	    // =========================
+//	    // Branch
+//	    // =========================
+//
+//	    if (dto.getBranch() != null && dto.getBranch() != 0) {
+//
+//	        BranchVO branch = branchRepo.findById(dto.getBranch())
+//	                .orElseThrow(() ->
+//	                        new ApplicationException("Branch Not Found"));
+//
+//	        processSheetVO.setBranch(branch);
+//	    }
+//
+//
+//	    // =========================
+//	    // FG/SFG Item Type
+//	    // =========================
+//
+//	    if (dto.getFgSfgItemType() != null
+//	            && dto.getFgSfgItemType() != 0) {
+//
+//	        ListOfValuesDetailsVO itemType =
+//	                listOfValuesDetailsRepo
+//	                        .findById(dto.getFgSfgItemType())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "FG/SFG Item Type Not Found"));
+//
+//	        processSheetVO.setFgSfgItemType(itemType);
+//	    }
+//
+//
+//	    // =========================
+//	    // FG/SFG Item Code
+//	    // =========================
+//
+//	    if (dto.getFgSfgItemCode() != null
+//	            && dto.getFgSfgItemCode() != 0) {
+//
+//	        ItemMasterVO item =
+//	                itemMasterRepo
+//	                        .findById(dto.getFgSfgItemCode())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "FG/SFG Item Code Not Found"));
+//
+//	        processSheetVO.setFgSfgItemCode(item);
+//	    }
+//
+//
+//	    // =========================
+//	    // Prepared By
+//	    // =========================
+//
+//	    if (dto.getPreparedBy() != null
+//	            && dto.getPreparedBy() != 0) {
+//
+//	        EmployeeMasterVO employee =
+//	                employeeMasterRepo
+//	                        .findById(dto.getPreparedBy())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "Prepared By Not Found"));
+//
+//	        processSheetVO.setPreparedBy(employee);
+//	    }
+//
+//
+//	    // =========================================
+//	    // Delete Existing Grid During Update
+//	    // =========================================
+//
+//	    if (dto.getId() != null) {
+//
+//	        // =========================
+//	        // Routing Details
+//	        // =========================
+//
+//	        List<ProcessSheetCompRoutingDetailVO> oldDetails =
+////	                processSheetCompRoutingDetailRepo
+////	                        .findByProcessSheetCompRoutingVO(
+////	                                processSheetVO);
+//
+//	        if (!oldDetails.isEmpty()) {
+//
+////	            processSheetCompRoutingDetailRepo
+////	                    .deleteAll(oldDetails);
+//	        }
+//
+//
+//	        // =========================
+//	        // Machine Details
+//	        // =========================
+//
+//	        List<ProcessSheetCompRoutingMachineVO> oldMachines =
+////	                processSheetCompRoutingMachineRepo
+////	                        .findByProcessSheetCompRoutingVO(
+////	                                processSheetVO);
+//
+//	        if (!oldMachines.isEmpty()) {
+//
+////	            processSheetCompRoutingMachineRepo
+////	                    .deleteAll(oldMachines);
+//	        }
+//
+//
+//	        // =========================
+//	        // Tool Fixture Details
+//	        // =========================
+//
+////	        List<ProcessSheetToolFixtureDetailsVO> oldToolFixtures =
+////	                processSheetToolFixtureDetailsRepo
+////	                        .findByProcessSheetCompRoutingVO(
+////	                                processSheetVO);
+//
+//	        if (!oldToolFixtures.isEmpty()) {
+//
+//	            processSheetToolFixtureDetailsRepo
+//	                    .deleteAll(oldToolFixtures);
+//	        }
+//	    }
+//
+//
+//	    // =========================
+//	    // Routing Details Grid
+//	    // =========================
+//
+//	    List<ProcessSheetCompRoutingDetailVO> detailsList =
+//	            new ArrayList<>();
+//
+//	    if (dto.getProcessSheetCompRoutingDetailDTO() != null
+//	            && !dto.getProcessSheetCompRoutingDetailDTO().isEmpty()) {
+//
+//	        for (ProcessSheetCompRoutingDetailDTO detailDTO :
+//	                dto.getProcessSheetCompRoutingDetailDTO()) {
+//
+//	            ProcessSheetCompRoutingDetailVO detailVO =
+//	                    new ProcessSheetCompRoutingDetailVO();
+//
+//
+//	            // =========================
+//	            // Location
+//	            // =========================
+//
+//	            if (detailDTO.getLocation() != null
+//	                    && detailDTO.getLocation() != 0) {
+//
+//	                LocationVO location =
+//	                        locationRepo.findById(
+//	                                detailDTO.getLocation())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "Location Not Found"));
+//
+//	                detailVO.setLocation(location);
+//	            }
+//
+//
+//	            // =========================
+//	            // Operation
+//	            // =========================
+//
+//	            if (detailDTO.getOperation() != null
+//	                    && detailDTO.getOperation() != 0) {
+//
+////	                OperationMasterVO operation =
+////	                        operationMasterRepo.findById(
+////	                                detailDTO.getOperation())
+////	                        .orElseThrow(() ->
+////	                                new ApplicationException(
+////	                                        "Operation Not Found"));
+//
+////	                detailVO.setOperation(operation);
+//	            }
+//
+//
+//	            // =========================
+//	            // Output Item
+//	            // =========================
+//
+//	            if (detailDTO.getOutputItemCode() != null
+//	                    && detailDTO.getOutputItemCode() != 0) {
+//
+//	                ItemMasterVO outputItem =
+//	                        itemMasterRepo.findById(
+//	                                detailDTO.getOutputItemCode())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "Output Item Not Found"));
+//
+//	                detailVO.setOutputItemCode(outputItem);
+//	            }
+//
+//
+//	            // =========================
+//	            // Detail Fields
+//	            // =========================
+//
+//	            detailVO.setDescription(
+//	                    detailDTO.getDescription());
+//
+//	            detailVO.setSpec(
+//	                    detailDTO.getSpec());
+//
+//	            detailVO.setNoOfToolsFixture(
+//	                    detailDTO.getNoOfToolsFixture());
+//
+//	            detailVO.setSequence(
+//	                    detailDTO.getSequence());
+//
+//	            detailVO.setActivityConsumCost(
+//	                    detailDTO.getActivityConsumCost());
+//
+//	            detailVO.setCumulativeConsumCost(
+//	                    detailDTO.getCumulativeConsumCost());
+//
+//	            detailVO.setSourceOfVariation(
+//	                    detailDTO.getSourceOfVariation());
+//
+//	            detailVO.setProductCharacteristics(
+//	                    detailDTO.getProductCharacteristics());
+//
+//	            detailVO.setProcessCharacteristics(
+//	                    detailDTO.getProcessCharacteristics());
+//
+//
+//	            // =========================
+//	            // Parent Mapping
+//	            // =========================
+//
+//	            detailVO.setProcessSheetCompRoutingVO(
+//	                    processSheetVO);
+//
+//	            detailsList.add(detailVO);
+//	        }
+//	    }
+//
+//	    processSheetVO.setProcessSheetCompRoutingDetailVO(
+//	            detailsList);
+//
+//
+//	    // =========================
+//	    // Machine Details Grid
+//	    // =========================
+//
+//	    List<ProcessSheetCompRoutingMachineVO> machineList =
+//	            new ArrayList<>();
+//
+//	    if (dto.getProcessSheetCompRoutingMachineDTO() != null
+//	            && !dto.getProcessSheetCompRoutingMachineDTO().isEmpty()) {
+//
+//	        for (ProcessSheetCompRoutingMachineDTO machineDTO :
+//	                dto.getProcessSheetCompRoutingMachineDTO()) {
+//
+//	            ProcessSheetCompRoutingMachineVO machineVO =
+//	                    new ProcessSheetCompRoutingMachineVO();
+//
+//
+//	            // =========================
+//	            // Usage
+//	            // =========================
+//
+//	            if (machineDTO.getUsage() != null
+//	                    && machineDTO.getUsage() != 0) {
+//
+//	                ListOfValuesDetailsVO usage =
+//	                        listOfValuesDetailsRepo
+//	                                .findById(machineDTO.getUsage())
+//	                                .orElseThrow(() ->
+//	                                        new ApplicationException(
+//	                                                "Usage Not Found"));
+//
+//	                machineVO.setUsage(usage);
+//	            }
+//
+//
+//	            // =========================
+//	            // Machine
+//	            // =========================
+//
+//	            if (machineDTO.getMachineNo() != null
+//	                    && machineDTO.getMachineNo() != 0) {
+//
+//	                MachineMasterVO machine =
+//	                        machineMasterRepo
+//	                                .findById(machineDTO.getMachineNo())
+//	                                .orElseThrow(() ->
+//	                                        new ApplicationException(
+//	                                                "Machine Not Found"));
+//
+//	                machineVO.setMachineNo(machine);
+//	            }
+//
+//
+//	            // =========================
+//	            // Machine Fields
+//	            // =========================
+//
+//	            machineVO.setMachineName(
+//	                    machineDTO.getMachineName());
+//
+//	            machineVO.setSetupTimeMinutes(
+//	                    machineDTO.getSetupTimeMinutes());
+//
+//	            machineVO.setOutputPerHour(
+//	                    machineDTO.getOutputPerHour());
+//
+//	            machineVO.setMachineHourRate(
+//	                    machineDTO.getMachineHourRate());
+//
+//	            machineVO.setActivityMcCost(
+//	                    machineDTO.getActivityMcCost());
+//
+//	            machineVO.setLabourHourMinutes(
+//	                    machineDTO.getLabourHourMinutes());
+//
+//	            machineVO.setLabourHourRate(
+//	                    machineDTO.getLabourHourRate());
+//
+//	            machineVO.setActivityLabourCost(
+//	                    machineDTO.getActivityLabourCost());
+//
+//	            machineVO.setTotal(
+//	                    machineDTO.getTotal());
+//
+//
+//	            // =========================
+//	            // Parent Mapping
+//	            // =========================
+//
+//	            machineVO.setProcessSheetCompRoutingVO(
+//	                    processSheetVO);
+//
+//	            machineList.add(machineVO);
+//	        }
+//	    }
+//
+//	    processSheetVO.setProcessSheetCompRoutingMachineVO(
+//	            machineList);
+//
+//
+//	    // =========================
+//	    // Tool Fixture Details Grid
+//	    // =========================
+//
+//	    List<ProcessSheetToolFixtureDetailsVO> toolFixtureList =
+//	            new ArrayList<>();
+//
+//	    if (dto.getProcessSheetToolFixtureDetailsDTO() != null
+//	            && !dto.getProcessSheetToolFixtureDetailsDTO().isEmpty()) {
+//
+//	        for (ProcessSheetToolFixtureDetailsDTO toolDTO :
+//	                dto.getProcessSheetToolFixtureDetailsDTO()) {
+//
+//	            ProcessSheetToolFixtureDetailsVO toolVO =
+//	                    new ProcessSheetToolFixtureDetailsVO();
+//
+//
+//	            // =========================
+//	            // Usage Type
+//	            // =========================
+//
+//	            if (toolDTO.getUsageType() != null
+//	                    && toolDTO.getUsageType() != 0) {
+//
+//	                ListOfValuesDetailsVO usageType =
+//	                        listOfValuesDetailsRepo
+//	                                .findById(toolDTO.getUsageType())
+//	                                .orElseThrow(() ->
+//	                                        new ApplicationException(
+//	                                                "Usage Type Not Found"));
+//
+//	                toolVO.setUsageType(usageType);
+//	            }
+//
+//
+//	            // =========================
+//	            // Tool Fixture
+//	            // =========================
+//
+//	            if (toolDTO.getToolFixtureNo() != null
+//	                    && toolDTO.getToolFixtureNo() != 0) {
+//
+//	                ToolMasterVO toolFixture =
+//	                        toolMasterRepo
+//	                                .findById(
+//	                                        toolDTO.getToolFixtureNo())
+//	                                .orElseThrow(() ->
+//	                                        new ApplicationException(
+//	                                                "Tool Fixture Not Found"));
+//
+//	                toolVO.setToolFixtureNo(toolFixture);
+//	            }
+//
+//
+//	            // =========================
+//	            // Tool Fixture Fields
+//	            // =========================
+//
+//	            toolVO.setToolFixtureName(
+//	                    toolDTO.getToolFixtureName());
+//
+//	            toolVO.setActivityToolFixtureCost(
+//	                    toolDTO.getActivityToolFixtureCost());
+//
+//
+//	            // =========================
+//	            // Parent Mapping
+//	            // =========================
+//
+//	            toolVO.setProcessSheetCompRoutingVO(
+//	                    processSheetVO);
+//
+//	            toolFixtureList.add(toolVO);
+//	        }
+//	    }
+//
+//	    processSheetVO.setProcessSheetToolFixtureDetailsVO(
+//	            toolFixtureList);
+//	}
 }

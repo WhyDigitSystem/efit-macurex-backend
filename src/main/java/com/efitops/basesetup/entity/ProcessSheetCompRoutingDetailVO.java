@@ -75,7 +75,6 @@ public class ProcessSheetCompRoutingDetailVO {
 	  @JoinColumn(name = "process_sheet_comp_routing_basic_id")
 	  @JsonBackReference
 	  private ProcessSheetCompRoutingVO processSheetCompRoutingVO;
-	    
 	  
 	  
 

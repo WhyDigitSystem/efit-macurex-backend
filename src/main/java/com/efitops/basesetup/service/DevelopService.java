@@ -28,6 +28,7 @@ import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.MachineMasterDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
 import com.efitops.basesetup.dto.ParameterMasterDTO;
+import com.efitops.basesetup.dto.ProcessSheetCompRoutingDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
@@ -186,6 +187,9 @@ public interface DevelopService {
 	MachineMasterResponseDTO getMachineMasterById(Long id) throws ApplicationException;
 
 	Map<String, Object> getToolCategoryforMachineMaster(Long orgId, String applicableFor) throws ApplicationException;
+
+	Map<String, Object> updateCreateProcessSheet(ProcessSheetCompRoutingDTO processSheetDTO)
+			throws ApplicationException;
 
 	
 	

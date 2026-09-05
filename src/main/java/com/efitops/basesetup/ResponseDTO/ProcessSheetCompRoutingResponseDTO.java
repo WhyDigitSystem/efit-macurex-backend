@@ -1,6 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
 
@@ -50,12 +51,12 @@ public class ProcessSheetCompRoutingResponseDTO {
 
     private String cancelRemarks;
 
-    private String screenName;
+    private List<ProcessSheetCompRoutingDetailResponseDTO> processSheetCompRoutingDetailResponseDTO;
+    
+    private List<ProcessSheetCompRoutingMachineResponseDTO> processSheetCompRoutingMachineResponseDTO;
+    
+    private List<ProcessSheetToolFixtureDetailsResponseDTO> processSheetToolFixtureDetailsResponseDTO;
 
-    private String screenCode;
-
-    private String activeStatus;
-
-    private String cancelStatus;
+    
 
 }

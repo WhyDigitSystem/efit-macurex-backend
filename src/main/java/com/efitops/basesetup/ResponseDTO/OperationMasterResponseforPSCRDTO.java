@@ -12,6 +12,10 @@ public class OperationMasterResponseforPSCRDTO {
 	
 	private Long id;
 	
+	private String operationId;
+	
+	private String description;
+	
 	
 
 }

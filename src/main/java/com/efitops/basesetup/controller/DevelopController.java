@@ -1748,8 +1748,8 @@ public class DevelopController extends BaseController {
 	@PostMapping(value = "/updateCreateMachineMaster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreateMachineMaster(
 
-        	@RequestPart("machineMasterVO") MachineMasterDTO machineMasterDTO,
-//          @RequestBody() MachineMasterDTO machineMasterDTO,
+//        	@RequestPart("machineMasterVO") MachineMasterDTO machineMasterDTO,
+         @RequestBody() MachineMasterDTO machineMasterDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();

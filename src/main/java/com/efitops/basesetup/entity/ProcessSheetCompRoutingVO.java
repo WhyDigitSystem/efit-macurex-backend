@@ -120,9 +120,19 @@ public class ProcessSheetCompRoutingVO {
 		private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 		
 		
-		@OneToMany(mappedBy = "purchaseOrderAmendmentVO", cascade = CascadeType.ALL)
+		@OneToMany(mappedBy = "processSheetCompRoutingVO", cascade = CascadeType.ALL)
 		@JsonManagedReference
-		private List<PurchaseOrderAmendmentDetailsVO> details = new ArrayList<>();
+		private List<ProcessSheetCompRoutingDetailVO> processSheetCompRoutingDetailVO = new ArrayList<>();
+		
+		@OneToMany(mappedBy = "processSheetCompRoutingVO", cascade = CascadeType.ALL)
+		@JsonManagedReference
+		private List<ProcessSheetToolFixtureDetailsVO> processSheetToolFixtureDetailsVO = new ArrayList<>();
+		
+
+		@OneToMany(mappedBy = "processSheetCompRoutingVO", cascade = CascadeType.ALL)
+		@JsonManagedReference
+		private List<ProcessSheetCompRoutingMachineVO>processSheetCompRoutingMachineVO = new ArrayList<>();
+
 
 		
 	 

@@ -1,6 +1,7 @@
 package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,6 +48,15 @@ public class ProcessSheetCompRoutingDTO {
 	    private boolean cancel;
 
 	    private String cancelRemarks;
+	    
+        private List<ProcessSheetCompRoutingDetailDTO> processSheetCompRoutingDetailDTO;
+	    
+	    private List<ProcessSheetCompRoutingMachineDTO> processSheetCompRoutingMachineDTO;
+	    
+	    private List<ProcessSheetToolFixtureDetailsDTO> processSheetToolFixtureDetailsDTO;
+		 
+		 
+	   
 	    
 	
 	

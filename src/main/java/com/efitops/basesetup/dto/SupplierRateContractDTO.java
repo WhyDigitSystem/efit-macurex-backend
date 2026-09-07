@@ -2,7 +2,6 @@ package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -56,9 +55,9 @@ public class SupplierRateContractDTO {
 
     private BigDecimal freight;
 
-    private Long freightType;
+    private String freightType;
 
-    private Long packingType;
+    private String packingType;
 
     private BigDecimal insurance;
 

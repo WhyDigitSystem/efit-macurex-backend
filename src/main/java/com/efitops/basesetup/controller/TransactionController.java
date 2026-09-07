@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesRejectionInvoiceResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesReturnResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.DocketInvoiceDTO;
@@ -994,23 +996,19 @@ public class TransactionController extends BaseController {
 	    try {
 
 	        Map<String, Object> salesReturnMap =
-	                transactionService.createUpdateSalesReturn(
-	                        salesReturnDTO
-	                );
+	                transactionService.createUpdateSalesReturn(salesReturnDTO);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
-	                salesReturnMap.get("message")
-	        );
+	                salesReturnMap.get("message"));
 
 	        responseObjectsMap.put(
 	                "salesReturnVO",
-	                salesReturnMap.get("salesReturnVO")
-	        );
+	                salesReturnMap.get("salesReturnVO"));
 
-	        responseDTO = createServiceResponse(
-	                responseObjectsMap
-	        );
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	        return ResponseEntity.ok(responseDTO);
 
 	    } catch (Exception e) {
 
@@ -1019,232 +1017,274 @@ public class TransactionController extends BaseController {
 	        responseDTO = createServiceResponseError(
 	                responseObjectsMap,
 	                e.getMessage(),
-	                e.getMessage()
-	        );
-	    }
+	                e.getMessage());
 
-	    return ResponseEntity.ok(responseDTO);
+	        return ResponseEntity
+	                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body(responseDTO);
+	    }
 	}
-	
+
 	@GetMapping("/getSalesRejectionInvoiceDocId")
-	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceDocId(
-	        @RequestParam Long orgId,
-	        @RequestParam String financialYear,
-	        @RequestParam String docType) {
+	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear, @RequestParam String docType) {
 
-	    String methodName = "getSalesRejectionInvoiceDocId()";
+		String methodName = "getSalesRejectionInvoiceDocId()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    String errorMsg = null;
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO = null;
-	    String docId = "";
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String docId = "";
 
-	    try {
+		try {
 
-	        docId = transactionService.getSalesRejectionInvoiceDocId(
-	                orgId,
-	                financialYear,
-	                docType);
+			docId = transactionService.getSalesRejectionInvoiceDocId(orgId, financialYear, docType);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
+			errorMsg = e.getMessage();
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-	    }
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
 
-	    if (StringUtils.isBlank(errorMsg)) {
+		if (StringUtils.isBlank(errorMsg)) {
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "DocId information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "DocId information retrieved successfully");
 
-	        responseObjectsMap.put("invoiceDocId", docId);
+			responseObjectsMap.put("invoiceDocId", docId);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } else {
+		} else {
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Failed to retrieve Sales Rejection Invoice docId",
-	                errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Sales Rejection Invoice docId", errorMsg);
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
 	@GetMapping("/getSalesRejectionInvoiceforSalesReturn")
-	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceDropdown(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceDropdown(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    String methodName = "getSalesRejectionInvoiceforSalesReturn()";
+		String methodName = "getSalesRejectionInvoiceforSalesReturn()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        List<Map<String, Object>> details =
-	        		transactionService.getSalesRejectionInvoiceforSalesReturn(
-	                        orgId, branch);
+			List<Map<String, Object>> details = transactionService.getSalesRejectionInvoiceforSalesReturn(orgId,
+					branch);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Sales Rejection Invoice Dropdown fetched successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Sales Rejection Invoice Dropdown fetched successfully");
 
-	        responseObjectsMap.put("salesRejectionInvoice", details);
+			responseObjectsMap.put("salesRejectionInvoice", details);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	@GetMapping("/getGateInwardForSalesReturn")
-	public ResponseEntity<ResponseDTO> getGateInwardForSalesReturn(
-	        @RequestParam Long customer,
-	        @RequestParam String type,
-	        @RequestParam(required = false) String invno,
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getGateInwardForSalesReturn(@RequestParam Long customer,
+			@RequestParam String type, @RequestParam(required = false) String invno, @RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    String methodName = "getGateInwardForSalesReturn()";
+		String methodName = "getGateInwardForSalesReturn()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO;
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        List<Map<String, Object>> gateInwardDetails =
-	        		transactionService.getGateInwardForSalesReturn(
-	                        customer,
-	                        type,
-	                        invno,
-	                        orgId,
-	                        branch);
+			List<Map<String, Object>> gateInwardDetails = transactionService.getGateInwardForSalesReturn(customer, type,
+					invno, orgId, branch);
 
-	        responseObjectsMap.put(
-	                "gateInwardDetails",
-	                gateInwardDetails);
+			responseObjectsMap.put("gateInwardDetails", gateInwardDetails);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Gate Inward details fetched successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Gate Inward details fetched successfully");
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
 	@GetMapping("/getSalesRejectionInvoiceItemDetailsForSalesRetuen")
-	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceItemDetailsForSalesretuen(
-	        @RequestParam String invoiceNo,
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getSalesRejectionInvoiceItemDetailsForSalesretuen(@RequestParam String invoiceNo,
+			@RequestParam Long orgId, @RequestParam Long branch) {
 
-	    String methodName = "getSalesRejectionInvoiceItemDetailsForSalesRetuen()";
+		String methodName = "getSalesRejectionInvoiceItemDetailsForSalesRetuen()";
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        List<Map<String, Object>> itemDetails =
-	        		transactionService.getSalesRejectionInvoiceItemDetailsForSalesRetuen(
-	                        invoiceNo, orgId, branch);
+			List<Map<String, Object>> itemDetails = transactionService
+					.getSalesRejectionInvoiceItemDetailsForSalesRetuen(invoiceNo, orgId, branch);
 
-	        responseObjectsMap.put("itemDetails", itemDetails);
+			responseObjectsMap.put("itemDetails", itemDetails);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Sales Rejection Invoice Item Details fetched successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Sales Rejection Invoice Item Details fetched successfully");
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	@GetMapping("/getItemDetailsForSalesReturn")
-	public ResponseEntity<ResponseDTO> getItemDetailsForSalesReturn(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getItemDetailsForSalesReturn(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        List<Map<String, Object>> itemDetails =
-	        		transactionService.getItemDetailsForSalesReturn(
-	                        orgId, branch);
+			List<Map<String, Object>> itemDetails = transactionService.getItemDetailsForSalesReturn(orgId, branch);
 
-	        responseObjectsMap.put("itemDetails", itemDetails);
+			responseObjectsMap.put("itemDetails", itemDetails);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Item Details fetched successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item Details fetched successfully");
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getSalesReturnById")
+	public ResponseEntity<ResponseDTO> getSalesReturnById(@RequestParam Long id) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			SalesReturnResponseDTO salesReturn = transactionService.getSalesReturnById(id);
+
+			responseObjectsMap.put("salesReturn", salesReturn);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales Return fetched successfully");
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getSalesReturnByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getSalesReturnByOrgIdAndBranch(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<SalesReturnResponseDTO> salesReturns = transactionService.getSalesReturnByOrgIdAndBranch(orgId,
+					branch);
+
+			responseObjectsMap.put("salesReturn", salesReturns);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Sales Return List fetched successfully");
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getSalesReturnDocId")
+	public ResponseEntity<ResponseDTO> getSalesReturnDocId(@RequestParam Long orgId, @RequestParam String financialYear) {
+
+		String methodName = "getSalesReturnDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = transactionService.getSalesReturnDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Sales Return DocId information retrieved successfully");
+
+			responseObjectsMap.put("salesReturnDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Sales Return DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
 	}
 }

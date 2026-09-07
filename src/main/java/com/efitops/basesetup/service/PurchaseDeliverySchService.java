@@ -112,7 +112,6 @@ public interface PurchaseDeliverySchService {
 //	purchase order amendment dropdown
 	
 
-	List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(Long customerId, Long branch,
-			Long orgId) throws ApplicationException;
+	
 
 }

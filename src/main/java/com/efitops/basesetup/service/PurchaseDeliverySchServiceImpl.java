@@ -3524,32 +3524,5 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		return result;
 	}
 
-// purchase order amendment dropdown for po no
-	
-	@Override
-	public List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(
-	        Long branch, Long customerId, Long orgId) throws ApplicationException {
 
-	    List<Object[]> purchaseOrderList =
-	            purchaseDeliveryScheduleRepo.getPurchaseOrderDropdownForPurchaseOrderAmendment(
-	                    customerId, branch, orgId);
-
-	    if (purchaseOrderList.isEmpty()) {
-	        throw new ApplicationException("No Purchase Order Details Found");
-	    }
-
-	    List<Map<String, Object>> responseList = new ArrayList<>();
-
-	    for (Object[] obj : purchaseOrderList) {
-
-	        Map<String, Object> map = new HashMap<>();
-
-	        map.put("id", obj[0]);
-	        map.put("docId", obj[1]);
-
-	        responseList.add(map);
-	    }
-
-	    return responseList;
-	}
 }

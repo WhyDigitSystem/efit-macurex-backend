@@ -17,7 +17,7 @@ public interface ToolMasterRepo extends JpaRepository<ToolMasterVO, Long>{
 		        @Param("branch") Long branch);
 	
 	@Query(value = """
-		    SELECT
+		    SELECT l.id as locationId,
 		        l.location_name AS locationName
 		    FROM location l
 		    WHERE l.branch = :branch

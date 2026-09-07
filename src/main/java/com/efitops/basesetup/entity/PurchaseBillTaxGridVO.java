@@ -52,7 +52,7 @@ public class PurchaseBillTaxGridVO {
     private Boolean postToFinanceAc;
 
     @ManyToOne
-    @JoinColumn(name = "purchasebill_id")
+    @JoinColumn(name = "purchase_bill_basic_id")
     @JsonBackReference
     private PurchaseBillVO purchaseBillVO;
 }

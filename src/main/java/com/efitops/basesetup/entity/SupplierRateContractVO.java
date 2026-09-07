@@ -99,7 +99,7 @@ public class SupplierRateContractVO {
 
     @ManyToOne
     @JoinColumn(name = "service_name")
-    private CustomerVO serviceName;
+    private ServiceAccMasterVO serviceName;
 
     @ManyToOne
     @JoinColumn(name = "hsn_sac_code")
@@ -123,13 +123,12 @@ public class SupplierRateContractVO {
     @Column(name = "freight")
     private BigDecimal freight;
 
-    @ManyToOne
-    @JoinColumn(name = "freight_type")
-    private ListOfValuesDetailsVO freightType;
+    @Column(name = "freight_type")
+    private String freightType;
 
-    @ManyToOne
-    @JoinColumn(name = "packing_type")
-    private ListOfValuesDetailsVO packingType;
+    
+    @Column(name = "packing_type")
+    private String packingType;
 
     @Column(name = "insurance")
     private BigDecimal insurance;

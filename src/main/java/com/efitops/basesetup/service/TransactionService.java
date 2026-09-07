@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesRejectionInvoiceResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesReturnResponseDTO;
 import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
@@ -99,6 +100,12 @@ public interface TransactionService {
 				Long branch) throws ApplicationException;
 
 		List<Map<String, Object>> getItemDetailsForSalesReturn(Long orgId, Long branch) throws ApplicationException;
+
+		SalesReturnResponseDTO getSalesReturnById(Long id) throws ApplicationException;
+
+		String getSalesReturnDocId(Long orgId, String financialYear);
+
+		List<SalesReturnResponseDTO> getSalesReturnByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
 		
 
 }

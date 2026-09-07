@@ -1,6 +1,7 @@
 package com.efitops.basesetup.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -8,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 
 import com.efitops.basesetup.entity.HsnVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
-import com.efitops.basesetup.entity.ListOfValuesVO;
 
 public interface HsnRepo extends JpaRepository<HsnVO, Long> {
 	
@@ -27,4 +27,10 @@ public interface HsnRepo extends JpaRepository<HsnVO, Long> {
             ListOfValuesDetailsVO category,
             String hsn);
 
+    @Query(value = """
+            SELECT *
+            FROM hsn
+            WHERE hsn_id = :hsnId
+            """, nativeQuery = true)
+    Optional<HsnVO> findByHsn_Id(@Param("hsnId") Long hsnId);
 }

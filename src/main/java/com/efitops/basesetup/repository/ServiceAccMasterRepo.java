@@ -31,7 +31,8 @@ public interface ServiceAccMasterRepo extends JpaRepository<ServiceAccMasterVO, 
 		        g.igst,
 		        g.cgst,
 		        g.sgst,
-		        g.rate
+		        g.rate,
+		        h.hsn_id
 		    FROM serviceaccmaster s
 		    LEFT JOIN hsn h
 		        ON h.hsn_id = s.hsn_code

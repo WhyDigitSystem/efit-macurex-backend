@@ -28,7 +28,7 @@ public class DeliveryChallanSubcontractingDTO {
 
     private Long incomingItem;
 
-    private Long transportName;
+    private String transportName;
 
     private String vehicleNo;
 

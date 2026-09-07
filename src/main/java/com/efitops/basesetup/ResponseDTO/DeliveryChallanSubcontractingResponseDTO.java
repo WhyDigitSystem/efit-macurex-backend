@@ -36,7 +36,7 @@ public class DeliveryChallanSubcontractingResponseDTO {
 
     private ItemResponseDTO incomingItem;
 
-    private TransportResponseDTO transportName;
+    private String transportName;
 
     private String vehicleNo;
 

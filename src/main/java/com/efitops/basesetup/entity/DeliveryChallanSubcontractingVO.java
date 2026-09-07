@@ -71,9 +71,8 @@ public class DeliveryChallanSubcontractingVO {
 	@JoinColumn(name = "incoming_item")
 	private ItemMasterVO incomingItem;
 
-	@ManyToOne
-	@JoinColumn(name = "transport_name")
-	private TransportMasterVO transportName;
+	@Column(name = "transport_name")
+	private String transportName;
 
 	@Column(name = "vehicle_no")
 	private String vehicleNo;

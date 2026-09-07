@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
@@ -31,6 +32,7 @@ import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
+import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
@@ -1466,6 +1468,141 @@ public class SubContractController extends BaseController {
 	        responseDTO =
 	                createServiceResponse(
 	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@PutMapping("/createUpdateProductionScheduleForNextThreeMonth")
+	public ResponseEntity<ResponseDTO> createUpdateProductionScheduleForNextThreeMonth(
+	        @RequestBody ProductionScheduleForNextThreeMonthDTO productionScheduleDTO) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object> productionScheduleMap =
+	        		subContractService
+	                        .createUpdateProductionScheduleForNextThreeMonth(
+	                                productionScheduleDTO);
+
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                productionScheduleMap.get("message"));
+
+
+	        responseObjectsMap.put(
+	                "productionScheduleForNextThreeMonth",
+	                productionScheduleMap.get(
+	                        "productionScheduleForNextThreeMonth"));
+
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getProductionScheduleForNextThreeMonthById")
+	public ResponseEntity<ResponseDTO> getProductionScheduleForNextThreeMonthById(
+	        @RequestParam Long id) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        ProductionScheduleForNextThreeMonthResponseDTO
+	                productionScheduleResponseDTO =
+	                		subContractService
+	                        .getProductionScheduleForNextThreeMonthById(id);
+
+
+	        responseObjectsMap.put(
+	                "productionScheduleForNextThreeMonth",
+	                productionScheduleResponseDTO);
+
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Production Schedule For Next Three Month Fetched Successfully");
+
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getAllProductionScheduleForNextThreeMonthByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO>
+	        getAllProductionScheduleForNextThreeMonthByOrgIdAndBranch(
+	                @RequestParam Long orgId,
+	                @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<ProductionScheduleForNextThreeMonthResponseDTO>
+	                productionScheduleList =
+	                		subContractService
+	                        .getAllProductionScheduleForNextThreeMonthByOrgIdAndBranch(
+	                                orgId,
+	                                branch);
+
+
+	        responseObjectsMap.put(
+	                "productionScheduleForNextThreeMonth",
+	                productionScheduleList);
+
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Production Schedule For Next Three Month Fetched Successfully");
+
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
 
 	    } catch (Exception e) {
 

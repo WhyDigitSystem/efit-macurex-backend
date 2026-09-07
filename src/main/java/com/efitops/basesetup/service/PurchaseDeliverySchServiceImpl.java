@@ -2362,6 +2362,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 			// Add remaining HSN fields if required
 
 			dto.setHsnCode(hsnDTO);
+			
 		}
 
 		// ======================================================

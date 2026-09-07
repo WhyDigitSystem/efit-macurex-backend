@@ -27,7 +27,13 @@ public interface PurchaseReturnRepo extends JpaRepository<PurchaseReturnVO, Long
 
 	@Query(nativeQuery = true, value = "select doc_id,doc_date from purchase_bill_basic where org_id=?1 and branch=?2 and supplier=?3  and grn_no=?4 and active=1 and cancel=0")
 	Set<Object[]> getPurchaseBill(Long orgId, Long branch, Long supplierCode, String grnNo);
+
+	@Query(nativeQuery = true, value = "select p1.item,i.item_code,i.item_description,p1.hsn as hsn_id,h.hsn as hsn_code,p1.challan_qty,p1.unit,u.unit_id,p1.grn_received_qty,p1.accepted_qty,p1.rejected_qty,p1.shortage_qty from purchase_bill_basic p join purchase_bill_details p1\r\n"
+			+ " on p.purchase_bill_basic_id=p1.purchase_bill_basic_id left join item i on i.item_id=p1.item left join hsn h on h.hsn_id=p1.hsn left join\r\n"
+			+ " unitmaster u on u.unitmaster_id=p1.unit\r\n"
+			+ " where p.org_id=?1 and p.branch=?2 and \r\n"
+			+ "p.supplier=?3 and p.grn_no=?4 and p.doc_id=?5 \r\n"
+			+ "and p.active=1 and p.cancel=0")
+	Set<Object[]> getPurchaseBillItemDetails(Long orgId, Long branch, Long supplierCode, String grnNo, String billNo);
 	
-//	select p1.item from purchase_bill_basic p join purchase_bill_details p1 on p.purchase_bill_basic_id=p1.purchase_bill_basic_id where p.org_id=1000000017 and p.branch=1000000016 and 
-//			p.supplier=1000000008    and p.grn_no='GNR101' and p.doc_id='' and p.active=1 and p.cancel=0;
 }

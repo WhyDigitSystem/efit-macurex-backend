@@ -562,10 +562,10 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 
 		return list;
 	}
-	
+
 	@Override
-	public List<Map<String, Object>> getPurchaseBill(Long orgId, Long branch, Long supplierCode,String grnNo) {
-		Set<Object[]> chType = purchaseReturnRepo.getPurchaseBill(orgId, branch, supplierCode,grnNo);
+	public List<Map<String, Object>> getPurchaseBill(Long orgId, Long branch, Long supplierCode, String grnNo) {
+		Set<Object[]> chType = purchaseReturnRepo.getPurchaseBill(orgId, branch, supplierCode, grnNo);
 		return getPurchaseBill(chType);
 	}
 
@@ -576,6 +576,52 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 			Map<String, Object> map = new HashMap<>();
 			map.put("docId", ch[0] != null ? ch[0].toString() : "");
 			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getPurchaseBillItemDetails(Long orgId, Long branch, Long supplierCode,
+			String grnNo, String billNo) {
+		Set<Object[]> chType = purchaseReturnRepo.getPurchaseBillItemDetails(orgId, branch, supplierCode, grnNo,
+				billNo);
+		return getPurchaseBillItemDetails(chType);
+	}
+
+	private List<Map<String, Object>> getPurchaseBillItemDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("item", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+
+			map.put("hsnId", ch[3] != null ? ((Number) ch[3]).longValue() : null);
+
+			map.put("hsn", ch[4] != null ? ch[4].toString() : "");
+
+			map.put("challanQty", ch[5] != null ? new BigDecimal(ch[5].toString()) : BigDecimal.ZERO);
+
+			map.put("unit", ch[6] != null ? ((Number) ch[6]).longValue() : null);
+
+			map.put("unitId", ch[7] != null ? ch[7].toString() : "");
+
+			map.put("grnReceivedQty", ch[8] != null ? new BigDecimal(ch[8].toString()) : BigDecimal.ZERO);
+
+			map.put("acceptedQty", ch[9] != null ? new BigDecimal(ch[9].toString()) : BigDecimal.ZERO);
+
+			map.put("rejectedQty", ch[10] != null ? new BigDecimal(ch[10].toString()) : BigDecimal.ZERO);
+
+			map.put("shortageQty", ch[11] != null ? new BigDecimal(ch[11].toString()) : BigDecimal.ZERO);
+
 			list.add(map);
 		}
 

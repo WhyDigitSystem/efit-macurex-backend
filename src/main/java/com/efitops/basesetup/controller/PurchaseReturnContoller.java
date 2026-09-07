@@ -213,10 +213,10 @@ public class PurchaseReturnContoller extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
 	@GetMapping("/getPurchaseBill")
 	public ResponseEntity<ResponseDTO> getPurchaseBill(@RequestParam Long orgId, @RequestParam Long branch,
-			@RequestParam Long supplierCode,@RequestParam String grnNo) {
+			@RequestParam Long supplierCode, @RequestParam String grnNo) {
 		String methodName = "getPurchaseBill()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -225,7 +225,7 @@ public class PurchaseReturnContoller extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = purchaseReturnService.getPurchaseBill(orgId, branch, supplierCode,grnNo);
+			mapp = purchaseReturnService.getPurchaseBill(orgId, branch, supplierCode, grnNo);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -237,6 +237,36 @@ public class PurchaseReturnContoller extends BaseController {
 			responseDTO = createServiceResponse(responseObjectsMap);
 		} else {
 			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve PurchaseBill", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getPurchaseBillItemDetails")
+	public ResponseEntity<ResponseDTO> getPurchaseBillItemDetails(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long supplierCode, @RequestParam String grnNo, @RequestParam String billNo) {
+		String methodName = "getPurchaseBill()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseReturnService.getPurchaseBillItemDetails(orgId, branch, supplierCode, grnNo, billNo);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "PurchaseBillDetails retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve PurchaseBillDetails",
+					errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

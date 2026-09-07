@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
@@ -71,6 +72,13 @@ public interface SubContractService {
 
 	List<Map<String, Object>> getItemDetailsforDeliveryChallanSubContract(String jobOrderNo, Long branch, Long orgId,
 			Long vendor);
+	
+	List<DeliveryChallanSubcontractingResponseDTO> getAllDeliveryChallanSubcontractingByOrgIdAndBranch(Long orgId,
+			Long branch) throws ApplicationException;
+
+	DeliveryChallanSubcontractingResponseDTO getDeliveryChallanSubcontractingById(Long id) throws ApplicationException;
+
+	String getDeliveryChallanSubcontractingDocId(Long orgId, String financialYear) throws ApplicationException;
 
 	//SubContractSupplySchedule
 	Map<String, Object> createUpdateSubContractSupplySchedule(
@@ -99,6 +107,8 @@ public interface SubContractService {
 			Long branch);
 
 	List<Map<String, Object>> getSupplierRateContractItemDetailsForSRCAmd(String contractNo, Long orgId, Long branch);
+
+	
 
 
 

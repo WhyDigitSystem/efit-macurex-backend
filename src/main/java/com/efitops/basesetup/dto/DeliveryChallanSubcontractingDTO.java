@@ -32,7 +32,7 @@ public class DeliveryChallanSubcontractingDTO {
 
     private String vehicleNo;
 
-    private Long sfgBomId;
+    private String sfgBom;
 
     private BigDecimal qty;
 

@@ -40,7 +40,7 @@ public class DeliveryChallanSubcontractingResponseDTO {
 
     private String vehicleNo;
 
-    private BomResponseDTO sfgBomId;
+    private String sfgBom;
 
     private BigDecimal qty;
 

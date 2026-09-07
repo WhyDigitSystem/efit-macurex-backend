@@ -2325,6 +2325,64 @@ public class SubContractServiceImpl implements SubContractService {
 	
 	@Override
 	@Transactional
+	public DeliveryChallanSubcontractingResponseDTO getDeliveryChallanSubcontractingById(
+	        Long id) throws ApplicationException {
+
+	    DeliveryChallanSubcontractingVO vo =
+	            deliveryChallanSubcontractingRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Delivery Challan For Sub Contracting Not Found"));
+
+	    return buildDeliveryChallanSubcontractingResponse(vo);
+	}
+	
+	@Override
+	@Transactional
+	public List<DeliveryChallanSubcontractingResponseDTO> getAllDeliveryChallanSubcontractingByOrgIdAndBranch(
+	        Long orgId, Long branch) throws ApplicationException {
+
+	    List<DeliveryChallanSubcontractingVO> list =
+	            deliveryChallanSubcontractingRepo
+	                    .findAllByOrgIdAndBranch(orgId, branch);
+
+	    List<DeliveryChallanSubcontractingResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (DeliveryChallanSubcontractingVO vo : list) {
+
+	        responseList.add(
+	                buildDeliveryChallanSubcontractingResponse(vo));
+	    }
+
+	    return responseList;
+	}
+	
+	@Override
+	@Transactional
+	public String getDeliveryChallanSubcontractingDocId(
+	        Long orgId, String financialYear) throws ApplicationException {
+
+	    String screenCode = "SCDC";
+
+	    String docId =
+	            deliveryChallanSubcontractingRepo
+	                    .getDeliveryChallanSubcontractingDocId(
+	                            orgId,
+	                            financialYear,
+	                            screenCode);
+
+	    if (docId == null || docId.isEmpty()) {
+	        throw new ApplicationException("Document ID Not Found");
+	    }
+
+	    return docId;
+	}
+	
+	
+	
+	@Override
+	@Transactional
 	public Map<String, Object> createUpdateDeliveryChallanSubcontracting(
 	        DeliveryChallanSubcontractingDTO deliveryChallanSubcontractingDTO)
 	        throws ApplicationException {
@@ -2457,7 +2515,8 @@ public class SubContractServiceImpl implements SubContractService {
 	    deliveryChallanSubcontractingVO.setCancelRemarks(
 	            dto.getCancelRemarks());
 
-
+	    deliveryChallanSubcontractingVO.setSfgBom(
+	            dto.getSfgBom());
 	    // ============================================================
 	    // Branch
 	    // ============================================================
@@ -2524,7 +2583,7 @@ public class SubContractServiceImpl implements SubContractService {
 	                                new ApplicationException(
 	                                        "Party Location Not Found"));
 
-	        deliveryChallanSubcontractingVO.setPartyLocation(
+	        deliveryChallanSubcontractingVO.setLocation(
 	                partyLocation);
 	    }
 
@@ -2571,17 +2630,17 @@ public class SubContractServiceImpl implements SubContractService {
 	    // SFG BOM
 	    // ============================================================
 
-	    if (dto.getSfgBomId() != null
-	            && dto.getSfgBomId() != 0) {
-
-	        BomVO bom =
-	                bomRepo.findById(dto.getSfgBomId())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "BOM Not Found"));
-
-	        deliveryChallanSubcontractingVO.setSfgBomId(bom);
-	    }
+//	    if (dto.getSfgBomId() != null
+//	            && dto.getSfgBomId() != 0) {
+//
+//	        BomVO bom =
+//	                bomRepo.findById(dto.getSfgBomId())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "BOM Not Found"));
+//
+//	        deliveryChallanSubcontractingVO.setSfgBomId(bom);
+//	    }
 
 
 	    // ============================================================
@@ -2742,6 +2801,10 @@ public class SubContractServiceImpl implements SubContractService {
 	                    detailDTO.getRemarks());
 
 
+	            detailVO.setContractNo(
+	                    detailDTO.getContractNo());
+	            detailVO.setJobOrderFor(
+	                    detailDTO.getJobOrderFor());
 	            // ====================================================
 	            // Parent Mapping
 	            // ====================================================
@@ -2820,6 +2883,8 @@ public class SubContractServiceImpl implements SubContractService {
 	    response.setScreenName(
 	            vo.getScreenName());
 
+	    response.setScreenName(
+	            vo.getSfgBom());
 
 	    // ============================================================
 	    // Branch
@@ -2891,16 +2956,16 @@ public class SubContractServiceImpl implements SubContractService {
 	    // Party Location
 	    // ============================================================
 
-	    if (vo.getPartyLocation() != null) {
+	    if (vo.getLocation() != null) {
 
 	        LocationMasterResponseDTO location =
 	                new LocationMasterResponseDTO();
 
 	        location.setId(
-	                vo.getPartyLocation().getId());
+	                vo.getLocation().getId());
 
 	        location.setLocationName(
-	                vo.getPartyLocation().getLocationName());
+	                vo.getLocation().getLocationName());
 
 	        response.setPartyLocation(location);
 	    }
@@ -2966,31 +3031,31 @@ public class SubContractServiceImpl implements SubContractService {
 	    // SFG BOM
 	    // ============================================================
 
-	    if (vo.getSfgBomId() != null) {
-
-	        BomResponseDTO bom =
-	                new BomResponseDTO();
-
-	        bom.setId(
-	                vo.getSfgBomId().getId());
-
-	        bom.setProductType(
-	                vo.getSfgBomId().getProductType());
-
-	        bom.setProductCode(
-	                vo.getSfgBomId().getProductCode());
-
-	        bom.setProductName(
-	                vo.getSfgBomId().getProductName());
-
-	        bom.setUom(
-	                vo.getSfgBomId().getUom());
-
-	        bom.setQty(
-	                vo.getSfgBomId().getQty());
-
-	        response.setSfgBomId(bom);
-	    }
+//	    if (vo.getSfgBomId() != null) {
+//
+//	        BomResponseDTO bom =
+//	                new BomResponseDTO();
+//
+//	        bom.setId(
+//	                vo.getSfgBomId().getId());
+//
+//	        bom.setProductType(
+//	                vo.getSfgBomId().getProductType());
+//
+//	        bom.setProductCode(
+//	                vo.getSfgBomId().getProductCode());
+//
+//	        bom.setProductName(
+//	                vo.getSfgBomId().getProductName());
+//
+//	        bom.setUom(
+//	                vo.getSfgBomId().getUom());
+//
+//	        bom.setQty(
+//	                vo.getSfgBomId().getQty());
+//
+//	        response.setSfgBomId(bom);
+//	    }
 
 	    // ============================================================
 	    // Prepared By
@@ -3101,6 +3166,11 @@ public class SubContractServiceImpl implements SubContractService {
 
 	            detailResponse.setRemarks(
 	                    detailVO.getRemarks());
+	            
+	            detailResponse.setContractNo(
+	                    detailVO.getContractNo());
+	            detailResponse.setJobOrderFor(
+	                    detailVO.getJobOrderFor());
 
 
 	            // ====================================================
@@ -3298,28 +3368,28 @@ public class SubContractServiceImpl implements SubContractService {
 	        subContractSupplyScheduleVO = new SubContractSupplyScheduleVO();
 
 	        // Generate Document ID
-//	        String docId = subContractSupplyScheduleRepo.getSubContractSupplyScheduleDocId(
-//	                dto.getOrgId(),
-//	                dto.getFinancialYear(),
-//	                screenCode);
-//
-//	        subContractSupplyScheduleVO.setDocId(docId);
-//
-//
-//	        // Update Document Last Number
-//	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
-//	                documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
-//	                        dto.getOrgId(),
-//	                        dto.getFinancialYear(),
-//	                        screenCode);
-//
-//	        if (documentTypeMappingDetailsVO != null) {
-//
-//	            documentTypeMappingDetailsVO.setLastNo(
-//	                    documentTypeMappingDetailsVO.getLastNo() + 1);
-//
-//	            documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
-//	        }
+	        String docId = subContractSupplyScheduleRepo.getSubContractSupplyScheduleDocId(
+	                dto.getOrgId(),
+	                dto.getFinancialYear(),
+	                screenCode);
+
+	        subContractSupplyScheduleVO.setDocId(docId);
+
+
+	        // Update Document Last Number
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+	                        dto.getOrgId(),
+	                        dto.getFinancialYear(),
+	                        screenCode);
+
+	        if (documentTypeMappingDetailsVO != null) {
+
+	            documentTypeMappingDetailsVO.setLastNo(
+	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	            documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+	        }
 
 
 	        subContractSupplyScheduleVO.setCreatedBy(dto.getCreatedBy());

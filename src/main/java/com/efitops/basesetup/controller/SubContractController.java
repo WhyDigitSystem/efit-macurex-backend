@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
@@ -720,6 +721,116 @@ public class SubContractController extends BaseController {
 	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+	@GetMapping("/getDeliveryChallanSubcontractingById")
+	public ResponseEntity<ResponseDTO> getDeliveryChallanSubcontractingById(
+	        @RequestParam Long id) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        DeliveryChallanSubcontractingResponseDTO response =
+	        		subContractService
+	                        .getDeliveryChallanSubcontractingById(id);
+
+	        responseObjectsMap.put(
+	                "deliveryChallanSubcontracting", response);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Delivery Challan For Sub Contracting Fetched Successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getAllDeliveryChallanSubcontractingByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getAllDeliveryChallanSubcontractingByOrgIdAndBranch(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<DeliveryChallanSubcontractingResponseDTO> response =
+	        		subContractService
+	                        .getAllDeliveryChallanSubcontractingByOrgIdAndBranch(
+	                                orgId, branch);
+
+	        responseObjectsMap.put(
+	                "deliveryChallanSubcontracting", response);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Delivery Challan For Sub Contracting Fetched Successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getDeliveryChallanSubcontractingDocId")
+	public ResponseEntity<ResponseDTO> getDeliveryChallanSubcontractingDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        String docId =
+	        		subContractService
+	                        .getDeliveryChallanSubcontractingDocId(
+	                                orgId,
+	                                financialYear);
+
+	        responseObjectsMap.put("docId", docId);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Document ID Fetched Successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
 	}
 	
 	

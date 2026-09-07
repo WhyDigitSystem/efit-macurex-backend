@@ -30,4 +30,9 @@ public class DeliveryChallanSubcontractingDetailsResponseDTO {
     private BigDecimal amount;
 
     private String remarks;
+    
+    private String contractNo;
+
+    private String jobOrderFor;
+
 }

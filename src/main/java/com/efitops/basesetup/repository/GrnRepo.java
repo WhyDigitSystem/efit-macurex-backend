@@ -494,25 +494,37 @@ public interface GrnRepo extends JpaRepository<GrnVO, Long> {
 			+ "and ?3 between p.schedule_start_date and p.schedule_end_date\r\n" + "and gp.doc_id = ?4\r\n"
 			+ "and  s.doc_id=p.purchase_order_no \r\n" + "and s.doc_id =?2  and p.org_id=?1")
 	Set<Object[]> getScheduleDocIdDetails(Long orgId, String purchaseOrderNo, String date, String gatePass);
-	
+
 	@Query(nativeQuery = true, value = "select i.item_id,i.item_code,i.item_description,p1.qty_in_primary_unit,h.hsn,u.unitmaster_id,p1.rate_in_inr from purchase_order_basic p join purchase_order_local_details p1 \r\n"
 			+ "on p.purchase_order_basic_id=p1.purchase_order_basic_id left join item i on i.item_id=p1.item left join hsn h on h.hsn_id=i.hsn_code\r\n"
 			+ "left join unitmaster u on u.unitmaster_id=i.purchase_unit where p.org_id=?1\r\n"
-			+ "and p.branch=?2 and p.active=1 and p.cancel=0 and p.doc_id=?3\r\n"
-			+ "union \r\n"
+			+ "and p.branch=?2 and p.active=1 and p.cancel=0 and p.doc_id=?3\r\n" + "union \r\n"
 			+ "select i.item_id,i.item_code,i.item_description,p1.po_qty,h.hsn,u.unitmaster_id,p1.order_rate from purchase_order_basic p join purchase_order_import_details p1 \r\n"
 			+ "on p.purchase_order_basic_id=p1.purchase_order_basic_id left join item i on i.item_id=p1.item left join hsn h on h.hsn_id=i.hsn_code\r\n"
 			+ "left join unitmaster u on u.unitmaster_id=i.purchase_unit where p.org_id=?1\r\n"
-			+ "and p.branch=?2 and p.active=1 and  p.cancel=0 and p.doc_id=?3\r\n"
-			+ "union\r\n"
+			+ "and p.branch=?2 and p.active=1 and  p.cancel=0 and p.doc_id=?3\r\n" + "union\r\n"
 			+ "select i.item_id,i.item_code,i.item_description,0 as po ,h.hsn,u.unitmaster_id,p1.rate_in_currency from purchase_contract_basic p join purchase_contract_details p1 \r\n"
 			+ "on p.purchase_contract_basic_id=p1.purchase_contract_basic_id left join item i on i.item_id=p1.item_id left join hsn h on h.hsn_id=i.hsn_code\r\n"
 			+ "left join unitmaster u on u.unitmaster_id=i.purchase_unit where p.org_id=?1\r\n"
 			+ "and p.branch=?2 and p.active=1 and p.cancel=0 and p.doc_id=?3")
-	Set<Object[]> getPoNmberBasedItemDetails(Long orgId,Long branch, String purchaseOrderNo);
+	Set<Object[]> getPoNmberBasedItemDetails(Long orgId, Long branch, String purchaseOrderNo);
 
-	
 	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
 	String getImportGrnDocId(Long orgId, String financialYear, String screenCode);
+
+	@Query(nativeQuery = true, value = "select doc_id,doc_date from purchase_order_basic where org_id=?1\r\n"
+			+ " and branch=?2 and active=1 and cancel=0 and po_type=0 and supplier_code=?3")
+	Set<Object[]> getPurchaseOrderNumberImportGrn(Long orgId, Long branch, Long supplierCode);
+
+	@Query(nativeQuery = true, value = "select p1.item,i.item_code,i.item_description,i.stock,i.inspection,l1.value_description,u.unitmaster_id,u.unit_id\r\n"
+			+ ",sum(p1.po_qty) poqty, sum(p1.po_qty-b1.challan_qty) as pending  from purchase_order_basic p join purchase_order_import_details p1 on \r\n"
+			+ "p.purchase_order_basic_id=p1.purchase_order_basic_id left join item i on i.item_id=p1.item left join listofvaluesdetails l1 on \r\n"
+			+ "l1.listofvaluesdetails_id=i.inspection left join unitmaster u on u.unitmaster_id=i.purchase_unit left join purchase_bill_basic b on\r\n"
+			+ "b.purchaseorder_number=p.doc_id  left join purchase_bill_details b1 on b.purchase_bill_basic_id=b1.purchase_bill_basic_id\r\n"
+			+ " where p.org_id=?1\r\n"
+			+ " and p.branch=?2 and p.active=1 and p.cancel=0 and p.po_type=0 and p.supplier_code=?3 and\r\n"
+			+ " p.doc_id=?4 group by\r\n"
+			+ " p1.item,i.item_code,i.item_description,i.stock,i.inspection,l1.value_description,u.unitmaster_id,u.unit_id")
+	Set<Object[]> getItemDetailsForImportGrn(Long orgId, Long branch, Long supplierCode, String purchaseOrderNo);
 
 }

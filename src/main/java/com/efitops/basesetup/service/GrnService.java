@@ -63,4 +63,9 @@ public interface GrnService {
 
 	List<Map<String, Object>> getLocationDetails(Long orgId, Long branch);
 
+	List<Map<String, Object>> getPurchaseOrderNumberImportGrn(Long orgId, Long branch, Long supplierCode);
+
+	List<Map<String, Object>> getItemDetailsForImportGrn(Long orgId, Long branch, Long supplierCode,
+			String purchaseOrderNo);
+
 }

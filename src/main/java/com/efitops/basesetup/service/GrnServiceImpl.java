@@ -1988,4 +1988,66 @@ public class GrnServiceImpl implements GrnService {
 		}
 		return list;
 	}
+
+	@Override
+	public List<Map<String, Object>> getPurchaseOrderNumberImportGrn(Long orgId, Long branch, Long supplierCode) {
+		Set<Object[]> supplierDetails = grnRepo.getPurchaseOrderNumberImportGrn(orgId, branch, supplierCode);
+		return getPurchaseOrderNumberImportGrn(supplierDetails);
+	}
+
+	private List<Map<String, Object>> getPurchaseOrderNumberImportGrn(Set<Object[]> supplierDetails) {
+		List<Map<String, Object>> list = new ArrayList<>();
+		for (Object[] ch : supplierDetails) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getItemDetailsForImportGrn(Long orgId, Long branch, Long supplierCode,
+			String purchaseOrderNo) {
+		Set<Object[]> supplierDetails = grnRepo.getItemDetailsForImportGrn(orgId, branch, supplierCode,
+				purchaseOrderNo);
+		return getItemDetailsForImportGrn(supplierDetails);
+	}
+
+	private List<Map<String, Object>> getItemDetailsForImportGrn(Set<Object[]> supplierDetails) {
+		List<Map<String, Object>> list = new ArrayList<>();
+		for (Object[] ch : supplierDetails) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("stock", ch[3] != null ? ch[3].toString() : "");
+			map.put("inspection", ch[4] != null ? ((Number) ch[4]).longValue() : null);
+
+			if ("100%".equalsIgnoreCase(ch[5] != null ? ch[5].toString() : "")) {
+
+				map.put("inspectionDescription", "Yes");
+
+			} else if ("Sample".equalsIgnoreCase(ch[5] != null ? ch[5].toString() : "")
+					|| "Not Required".equalsIgnoreCase(ch[5] != null ? ch[5].toString() : "")) {
+
+				map.put("inspectionDescription", "No");
+
+			} else {
+
+				map.put("inspectionDescription", "");
+			}
+
+			map.put("unitmasterId", ch[6] != null ? ((Number) ch[6]).longValue() : null);
+
+			map.put("unitId", ch[7] != null ? ch[7].toString() : "");
+
+			map.put("poQty", ch[8] != null ? new BigDecimal(ch[8].toString()) : null);
+
+			map.put("balanceQty", ch[9] != null ? new BigDecimal(ch[9].toString()) : null);
+
+			list.add(map);
+		}
+		return list;
+	}
 }

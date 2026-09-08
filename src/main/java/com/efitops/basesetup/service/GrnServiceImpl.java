@@ -36,6 +36,7 @@ import com.efitops.basesetup.ResponseDTO.GrnDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GrnFileUploadDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GrnResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GrnTaxDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ImportGrnDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseStockDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
@@ -43,12 +44,14 @@ import com.efitops.basesetup.ResponseDTO.StockTransferGrnDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferGrnFileUploadDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferGrnResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseDTO;
+import com.efitops.basesetup.ResponseDTO.TransportMasterDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.GrnDTO;
 import com.efitops.basesetup.dto.GrnDetailsDTO;
 import com.efitops.basesetup.dto.GrnTaxDetailsDTO;
+import com.efitops.basesetup.dto.ImportGrnDetailsDTO;
 import com.efitops.basesetup.dto.StockTransferGrnDTO;
 import com.efitops.basesetup.dto.StockTransferGrnDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
@@ -60,11 +63,13 @@ import com.efitops.basesetup.entity.GrnDetailsVO;
 import com.efitops.basesetup.entity.GrnFileUploadDetailsVO;
 import com.efitops.basesetup.entity.GrnTaxDetailsVO;
 import com.efitops.basesetup.entity.GrnVO;
+import com.efitops.basesetup.entity.ImportGrnDetailsVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.StockTransferGrnDetailsVO;
 import com.efitops.basesetup.entity.StockTransferGrnFileUploadDetailsVO;
 import com.efitops.basesetup.entity.StockTransferGrnVO;
+import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -75,11 +80,13 @@ import com.efitops.basesetup.repository.GrnDetailsRepo;
 import com.efitops.basesetup.repository.GrnFileUploadDetailsRepo;
 import com.efitops.basesetup.repository.GrnRepo;
 import com.efitops.basesetup.repository.GrnTaxDetailsRepo;
+import com.efitops.basesetup.repository.ImportGrnDetailsRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.StockTransferGrnDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferGrnFileUploadDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferGrnRepo;
+import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
@@ -132,6 +139,12 @@ public class GrnServiceImpl implements GrnService {
 	@Autowired
 	private StockTransferGrnFileUploadDetailsRepo stockTransferGrnFileUploadDetailsRepo;
 
+	@Autowired
+	TransportRepo transportMasterRepo;
+
+	@Autowired
+	ImportGrnDetailsRepo importGrnDetailsRepo;
+
 	@Override
 	public GrnResponseDTO getGrnById(Long id) throws ApplicationException {
 		GrnVO grnVO = grnRepo.getGrnById(id);
@@ -170,20 +183,46 @@ public class GrnServiceImpl implements GrnService {
 			grnVO.setUpdatedBy(grnDTO.getCreatedBy());
 			message = "GRN Updated Successfully";
 		} else {
+
 			grnVO = new GrnVO();
-			String screenCode = "GRN";
-			String docId = grnRepo.getGrnDocId(grnDTO.getOrgId(), grnDTO.getFinancialYear(), screenCode);
-			grnVO.setDocId(docId);
+			String screenCode;
 
-			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdAndFinYearAndScreenCode(grnDTO.getOrgId(), grnDTO.getFinancialYear(), screenCode);
+			if ("GRN".equalsIgnoreCase(grnDTO.getGrnType())) {
 
-			if (documentTypeMappingDetailsVO == null) {
-				throw new ApplicationException("Document Type Mapping Details Not Found");
+				screenCode = "GRN";
+
+				String docId = grnRepo.getGrnDocId(grnDTO.getOrgId(), grnDTO.getFinancialYear(), screenCode);
+				grnVO.setDocId(docId);
+
+				DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+						.findByOrgIdAndFinYearAndScreenCode(grnDTO.getOrgId(), grnDTO.getFinancialYear(), screenCode);
+				if (documentTypeMappingDetailsVO == null) {
+					throw new ApplicationException("Document Type Mapping Details Not Found");
+				}
+
+				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			} else if ("IMPORT".equalsIgnoreCase(grnDTO.getGrnType())) {
+
+				screenCode = "IGRN";
+
+				String docId = grnRepo.getImportGrnDocId(grnDTO.getOrgId(), grnDTO.getFinancialYear(), screenCode);
+				grnVO.setDocId(docId);
+
+				DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+						.findByOrgIdAndFinYearAndScreenCode(grnDTO.getOrgId(), grnDTO.getFinancialYear(), screenCode);
+				if (documentTypeMappingDetailsVO == null) {
+					throw new ApplicationException("Document Type Mapping Details Not Found");
+				}
+
+				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			} else {
+
+				throw new ApplicationException("Type must be either GRN or IMPORT");
 			}
-
-			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			grnVO.setCreatedBy(grnDTO.getCreatedBy());
 			grnVO.setUpdatedBy(grnDTO.getCreatedBy());
@@ -232,13 +271,46 @@ public class GrnServiceImpl implements GrnService {
 		vo.setInvoiceSentOn(dto.getInvoiceSentOn());
 		vo.setRemarks(dto.getRemarks());
 
+		vo.setShipmentNo(dto.getShipmentNo());
+		vo.setShipmentDate(dto.getShipmentDate());
+		vo.setBlNo(dto.getBlNo());
+		vo.setBlDate(dto.getBlDate());
+
+		if (dto.getTransporter() != null && dto.getTransporter() > 0) {
+
+			TransportMasterVO transporter = transportMasterRepo.findById(dto.getTransporter())
+					.orElseThrow(() -> new ApplicationException("Transporter Not Found"));
+
+			vo.setTransporter(transporter);
+		}
+
+		vo.setPoDate(dto.getPoDate());
+		vo.setVehicleNo(dto.getVehicleNo());
+		vo.setInvoiceNo(dto.getInvoiceNo());
+		vo.setInvoiceDate(dto.getInvoiceDate());
+		vo.setPoCurrency(dto.getPoCurrency());
+		vo.setLrNo(dto.getLrNo());
+		vo.setPoExchangeRate(dto.getPoExchangeRate());
+
+		if ("GRN".equalsIgnoreCase(dto.getGrnType()) || "IMPORT".equalsIgnoreCase(dto.getGrnType())) {
+
+			vo.setGrnType(dto.getGrnType());
+
+		} else {
+
+			throw new ApplicationException("Type must be either GRN or IMPORT");
+		}
+
+		vo.setReceivedBy(dto.getReceivedBy());
+		vo.setQualityCheckBy(dto.getQualityCheckBy());
+
 		if (dto.getBranch() != null && dto.getBranch() != 0) {
 			BranchVO branch = branchRepo.findById(dto.getBranch())
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 			vo.setBranch(branch);
 		}
 
-		if (dto.getLocation() != null && dto.getLocation() != 0) {
+		if (dto.getLocation() != null && dto.getLocation() > 0) {
 			LocationVO location = locationRepo.findById(dto.getLocation())
 					.orElseThrow(() -> new ApplicationException("Location Not Found"));
 			vo.setLocation(location);
@@ -266,6 +338,11 @@ public class GrnServiceImpl implements GrnService {
 
 			List<GrnFileUploadDetailsVO> oldFileDetails = grnFileUploadDetailsRepo.findByGrnVO(vo);
 			grnFileUploadDetailsRepo.deleteAll(oldFileDetails);
+		}
+
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+			List<ImportGrnDetailsVO> oldDetails = importGrnDetailsRepo.findByGrnVO(vo);
+			importGrnDetailsRepo.deleteAll(oldDetails);
 		}
 
 		BigDecimal netAmount = BigDecimal.ZERO;
@@ -466,6 +543,111 @@ public class GrnServiceImpl implements GrnService {
 		vo.setBasicAmount(basicAmount);
 		vo.setTotalAmountTax(totalTaxAmount);
 		vo.setNetAmount(netAmount);
+
+		BigDecimal totalFobValueFC = BigDecimal.ZERO;
+		BigDecimal totalFreightINR = BigDecimal.ZERO;
+		BigDecimal totalDutyAmtINR = BigDecimal.ZERO;
+		BigDecimal totalLandCostINR = BigDecimal.ZERO;
+		BigDecimal totalLandValueINR = BigDecimal.ZERO;
+
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+			List<ImportGrnDetailsVO> oldDetails = importGrnDetailsRepo.findByGrnVO(vo);
+			importGrnDetailsRepo.deleteAll(oldDetails);
+		}
+
+		List<ImportGrnDetailsVO> itemDetailsLists = new ArrayList<>();
+
+		if (dto.getImportGrnDetailsDTO() != null) {
+
+			for (ImportGrnDetailsDTO detailDTO : dto.getImportGrnDetailsDTO()) {
+
+				ImportGrnDetailsVO detailVO = new ImportGrnDetailsVO();
+
+				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
+
+					ItemMasterVO item = itemMasterRepo.findById(detailDTO.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+					detailVO.setItem(item);
+				}
+
+				if (detailDTO.getUom() != null && detailDTO.getUom() > 0) {
+
+					UnitMasterVO uom = unitMasterRepo.findById(detailDTO.getUom())
+							.orElseThrow(() -> new ApplicationException("UOM Not Found"));
+
+					detailVO.setUom(uom);
+				}
+
+				if (detailDTO.getPoUnit() != null && detailDTO.getPoUnit() > 0) {
+
+					UnitMasterVO poUnit = unitMasterRepo.findById(detailDTO.getPoUnit())
+							.orElseThrow(() -> new ApplicationException("PO Unit Not Found"));
+
+					detailVO.setPoUnit(poUnit);
+				}
+
+				detailVO.setStock(detailDTO.getStock());
+				detailVO.setInspectionable(detailDTO.getInspectionable());
+				detailVO.setPoQty(detailDTO.getPoQty());
+				detailVO.setBalancePoQty(detailDTO.getBalancePoQty());
+				detailVO.setChallanQty(detailDTO.getChallanQty());
+				detailVO.setReceivedQty(detailDTO.getReceivedQty());
+				detailVO.setShortQty(detailDTO.getBalancePoQty().subtract(detailDTO.getChallanQty()));
+				detailVO.setAcptQty(detailDTO.getAcptQty());
+				detailVO.setRejQty(detailDTO.getReceivedQty().subtract(detailDTO.getAcptQty()));
+				detailVO.setFobRateFC(detailDTO.getFobRateFC());
+				detailVO.setFobValueFC(detailDTO.getFobRateFC().multiply(detailDTO.getReceivedQty()));
+				BigDecimal exchange = dto.getExchangeRate();
+				detailVO.setFobValueINR(detailVO.getFobValueFC().multiply(exchange));
+				detailVO.setFreight(detailDTO.getFreight());
+				detailVO.setFreightInd(detailDTO.getFreightInd());
+				totalFreightINR = totalFreightINR.add(detailVO.getFreightInd());
+				detailVO.setBcdValueINR(detailDTO.getBcdValueINR());
+				detailVO.setCessAt10(
+						detailDTO.getBcdValueINR().multiply(BigDecimal.valueOf(10)).divide(BigDecimal.valueOf(100)));
+				detailVO.setExciseCvdIgst(detailDTO.getExciseCvdIgst());
+				detailVO.setAddDuty(detailDTO.getAddDuty());
+				totalDutyAmtINR = totalDutyAmtINR.add(detailVO.getAddDuty());
+				detailVO.setClearingCharge(detailDTO.getClearingCharge());
+				detailVO.setBankCharge(detailDTO.getBankCharge());
+				detailVO.setPackingCharge(detailDTO.getPackingCharge());
+				detailVO.setSurcharge(detailDTO.getSurcharge());
+				detailVO.setSpecialCost(detailDTO.getSpecialCost());
+				detailVO.setHandlingCharge(detailDTO.getHandlingCharge());
+				BigDecimal totalValue = BigDecimal.ZERO
+						.add(detailVO.getFobValueINR() != null ? detailVO.getFobValueINR() : BigDecimal.ZERO)
+						.add(detailVO.getFreight() != null ? detailVO.getFreight() : BigDecimal.ZERO)
+						.add(detailVO.getBcdValueINR() != null ? detailVO.getBcdValueINR() : BigDecimal.ZERO)
+						.add(detailVO.getCessAt10() != null ? detailVO.getCessAt10() : BigDecimal.ZERO)
+						.add(detailVO.getExciseCvdIgst() != null ? detailVO.getExciseCvdIgst() : BigDecimal.ZERO)
+						.add(detailVO.getAddDuty() != null ? detailVO.getAddDuty() : BigDecimal.ZERO)
+						.add(detailVO.getClearingCharge() != null ? detailVO.getClearingCharge() : BigDecimal.ZERO)
+						.add(detailVO.getBankCharge() != null ? detailVO.getBankCharge() : BigDecimal.ZERO)
+						.add(detailVO.getPackingCharge() != null ? detailVO.getPackingCharge() : BigDecimal.ZERO)
+						.add(detailVO.getSurcharge() != null ? detailVO.getSurcharge() : BigDecimal.ZERO)
+						.add(detailVO.getSpecialCost() != null ? detailVO.getSpecialCost() : BigDecimal.ZERO)
+						.add(detailVO.getHandlingCharge() != null ? detailVO.getHandlingCharge() : BigDecimal.ZERO);
+				detailVO.setTotalValueFC(detailVO.getFobValueFC().add(detailVO.getFreight()));
+				totalFobValueFC = totalFobValueFC.add(detailVO.getTotalValueFC());
+				detailVO.setTotalValueINR(detailVO.getFobValueINR().add(detailVO.getFreightInd()));
+				detailVO.setLandingValue(totalValue);
+				totalLandValueINR = totalLandValueINR.add(detailVO.getLandingValue());
+				detailVO.setLandingCostINR(detailVO.getLandingValue().divide(detailDTO.getReceivedQty()));
+				totalLandCostINR = totalLandCostINR.add(detailVO.getLandingCostINR());
+				detailVO.setGrnVO(vo);
+
+				itemDetailsLists.add(detailVO);
+			}
+		}
+
+		vo.setImportGrnDetailsVO(itemDetailsLists);
+		vo.setTotalFobValueFC(totalFobValueFC);
+		vo.setTotalFreightINR(totalFreightINR);
+		vo.setTotalDutyAmtINR(totalDutyAmtINR);
+		vo.setTotalLandCostINR(totalLandCostINR);
+		vo.setTotalLandValueINR(totalLandValueINR);
+
 	}
 
 	private GrnResponseDTO buildGrnResponse(GrnVO vo) {
@@ -506,6 +688,61 @@ public class GrnServiceImpl implements GrnService {
 		responseDTO.setCancelRemarks(vo.getCancelRemarks());
 		responseDTO.setScreenName(vo.getScreenName());
 		responseDTO.setScreenCode(vo.getScreenCode());
+
+		// Import
+
+		responseDTO.setGrnType(vo.getGrnType());
+
+		responseDTO.setShipmentNo(vo.getShipmentNo());
+
+		responseDTO.setShipmentDate(vo.getShipmentDate());
+
+		responseDTO.setBlNo(vo.getBlNo());
+
+		responseDTO.setBlDate(vo.getBlDate());
+
+//		responseDTO.setTransporter(vo.getTransporter());
+
+		responseDTO.setPoDate(vo.getPoDate());
+
+		responseDTO.setVehicleNo(vo.getVehicleNo());
+
+		responseDTO.setTotalPackages(vo.getTotalPackages());
+
+		responseDTO.setTotalGrossWeight(vo.getTotalGrossWeight());
+
+		responseDTO.setInvoiceNo(vo.getInvoiceNo());
+
+		responseDTO.setInvoiceDate(vo.getInvoiceDate());
+
+		responseDTO.setPoCurrency(vo.getPoCurrency());
+
+		responseDTO.setLrNo(vo.getLrNo());
+
+		responseDTO.setPoExchangeRate(vo.getPoExchangeRate());
+
+		responseDTO.setTotalFobValueFC(vo.getTotalFobValueFC());
+
+		responseDTO.setTotalFreightINR(vo.getTotalFreightINR());
+
+		responseDTO.setTotalDutyAmtINR(vo.getTotalDutyAmtINR());
+
+		responseDTO.setTotalLandCostINR(vo.getTotalLandCostINR());
+
+		responseDTO.setTotalGrnValueINR(vo.getTotalGrnValueINR());
+
+		responseDTO.setTotalLandValueINR(vo.getTotalLandValueINR());
+
+		responseDTO.setReceivedBy(vo.getReceivedBy());
+
+		responseDTO.setQualityCheckBy(vo.getQualityCheckBy());
+
+		if (vo.getTransporter() != null) {
+			TransportMasterDetailsDTO locationDTO = new TransportMasterDetailsDTO();
+			locationDTO.setId(vo.getTransporter().getId());
+			locationDTO.setTransportName(vo.getTransporter().getTransportName());
+			responseDTO.setTransporter(locationDTO);
+		}
 
 		if (vo.getBranch() != null) {
 			BranchResponseDTO branchDTO = new BranchResponseDTO();
@@ -621,20 +858,6 @@ public class GrnServiceImpl implements GrnService {
 					detailResponse.setItem(itemDTO);
 				}
 
-//				if (detailVO.getPurchaseUnit() != null) {
-//					UnitResponseDTO unitDTO = new UnitResponseDTO();
-//					unitDTO.setId(detailVO.getPurchaseUnit().getId());
-//					unitDTO.setUnitId(detailVO.getPurchaseUnit().getUnitId());
-//					detailResponse.setPurchaseUnit(unitDTO);
-//				}
-//
-//				if (detailVO.getPrimaryUnit() != null) {
-//					UnitResponseDTO unitDTO = new UnitResponseDTO();
-//					unitDTO.setId(detailVO.getPrimaryUnit().getId());
-//					unitDTO.setUnitId(detailVO.getPrimaryUnit().getUnitId());
-//					detailResponse.setPrimaryUnit(unitDTO);
-//				}
-
 				if (detailVO.getPoUnit() != null) {
 					UnitResponseDTO unitDTO = new UnitResponseDTO();
 					unitDTO.setId(detailVO.getPoUnit().getId());
@@ -695,6 +918,147 @@ public class GrnServiceImpl implements GrnService {
 		}
 
 		responseDTO.setGrnFileUploadDetailsResponseDTO(fileResponseList);
+
+		List<ImportGrnDetailsResponseDTO> importDetailsResponseList = new ArrayList<>();
+
+		if (vo.getImportGrnDetailsVO() != null && !vo.getImportGrnDetailsVO().isEmpty()) {
+
+			for (ImportGrnDetailsVO detailVO : vo.getImportGrnDetailsVO()) {
+
+				ImportGrnDetailsResponseDTO detailResponse = new ImportGrnDetailsResponseDTO();
+
+				detailResponse.setId(detailVO.getId());
+
+				detailResponse.setStock(detailVO.getStock());
+
+				detailResponse.setInspectionable(detailVO.getInspectionable());
+
+				detailResponse.setPoQty(detailVO.getPoQty());
+
+				detailResponse.setBalancePoQty(detailVO.getBalancePoQty());
+
+				detailResponse.setChallanQty(detailVO.getChallanQty());
+
+				detailResponse.setReceivedQty(detailVO.getReceivedQty());
+
+				detailResponse.setShortQty(detailVO.getShortQty());
+
+				detailResponse.setAcptQty(detailVO.getAcptQty());
+
+				detailResponse.setRejQty(detailVO.getRejQty());
+
+				detailResponse.setFobRateFC(detailVO.getFobRateFC());
+
+				detailResponse.setFobValueFC(detailVO.getFobValueFC());
+
+				detailResponse.setFobValueINR(detailVO.getFobValueINR());
+
+				detailResponse.setFreight(detailVO.getFreight());
+
+				detailResponse.setFreightInd(detailVO.getFreightInd());
+
+				detailResponse.setBcdValueINR(detailVO.getBcdValueINR());
+
+				detailResponse.setCessAt10(detailVO.getCessAt10());
+
+				detailResponse.setExciseCvdIgst(detailVO.getExciseCvdIgst());
+
+				detailResponse.setAddDuty(detailVO.getAddDuty());
+
+				detailResponse.setClearingCharge(detailVO.getClearingCharge());
+
+				detailResponse.setBankCharge(detailVO.getBankCharge());
+
+				detailResponse.setPackingCharge(detailVO.getPackingCharge());
+
+				detailResponse.setSurcharge(detailVO.getSurcharge());
+
+				detailResponse.setSpecialCost(detailVO.getSpecialCost());
+
+				detailResponse.setHandlingCharge(detailVO.getHandlingCharge());
+
+				detailResponse.setTotalValueFC(detailVO.getTotalValueFC());
+
+				detailResponse.setTotalValueINR(detailVO.getTotalValueINR());
+
+				detailResponse.setLandingValue(detailVO.getLandingValue());
+
+				detailResponse.setLandingCostINR(detailVO.getLandingCostINR());
+
+				// Item mapping
+				if (detailVO.getItem() != null) {
+
+					ItemMasterDetailsResponseDTO itemDTO = new ItemMasterDetailsResponseDTO();
+
+					itemDTO.setId(detailVO.getItem().getId());
+
+					itemDTO.setItemCode(detailVO.getItem().getItemCode());
+
+					itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
+
+					if (detailVO.getItem().getHsnCode() != null) {
+
+						itemDTO.setHsnCode(detailVO.getItem().getHsnCode().getHsn());
+					}
+
+					if (detailVO.getItem().getPurchaseUnit() != null) {
+
+						UnitMasterResponseDTO purchaseUnitDTO = new UnitMasterResponseDTO();
+
+						purchaseUnitDTO.setId(detailVO.getItem().getPurchaseUnit().getId());
+
+						purchaseUnitDTO.setUnitId(detailVO.getItem().getPurchaseUnit().getUnitId());
+
+						purchaseUnitDTO.setUnitDescription(detailVO.getItem().getPurchaseUnit().getDescription());
+
+						itemDTO.setPurchaseUnit(purchaseUnitDTO);
+					}
+
+					if (detailVO.getItem().getPrimaryUnit() != null) {
+
+						UnitMasterResponseDTO primaryUnitDTO = new UnitMasterResponseDTO();
+
+						primaryUnitDTO.setId(detailVO.getItem().getPrimaryUnit().getId());
+
+						primaryUnitDTO.setUnitId(detailVO.getItem().getPrimaryUnit().getUnitId());
+
+						primaryUnitDTO.setUnitDescription(detailVO.getItem().getPrimaryUnit().getDescription());
+
+						itemDTO.setPrimaryUnit(primaryUnitDTO);
+					}
+
+					detailResponse.setItem(itemDTO);
+				}
+
+				// UOM mapping
+				if (detailVO.getUom() != null) {
+
+					UnitResponseDTO unitDTO = new UnitResponseDTO();
+
+					unitDTO.setId(detailVO.getUom().getId());
+
+					unitDTO.setUnitId(detailVO.getUom().getUnitId());
+
+					detailResponse.setUom(unitDTO);
+				}
+
+				// PO Unit mapping
+				if (detailVO.getPoUnit() != null) {
+
+					UnitResponseDTO unitDTO = new UnitResponseDTO();
+
+					unitDTO.setId(detailVO.getPoUnit().getId());
+
+					unitDTO.setUnitId(detailVO.getPoUnit().getUnitId());
+
+					detailResponse.setPoUnit(unitDTO);
+				}
+
+				importDetailsResponseList.add(detailResponse);
+			}
+		}
+
+		responseDTO.setImportGrnDetailsResponseDTO(importDetailsResponseList);
 
 		return responseDTO;
 	}
@@ -845,9 +1209,18 @@ public class GrnServiceImpl implements GrnService {
 	}
 
 	@Override
-	public String getGrnDocId(Long orgId, String financialYear, String screenCode) {
-		String screenCode1 = "GRN";
-		return grnRepo.getGrnDocId(orgId, financialYear, screenCode1);
+	public String getGrnDocId(Long orgId, String financialYear, String type) throws ApplicationException {
+
+		if ("GRN".equalsIgnoreCase(type)) {
+			String screenCode = "GRN";
+			return grnRepo.getGrnDocId(orgId, financialYear, screenCode);
+		} else if ("IMPORT".equalsIgnoreCase(type)) {
+			String screenCode = "IGRN";
+			return grnRepo.getImportGrnDocId(orgId, financialYear, screenCode);
+		} else {
+			throw new ApplicationException("Type must be either GRN or IMPORT");
+		}
+
 	}
 
 	@Override
@@ -1596,8 +1969,6 @@ public class GrnServiceImpl implements GrnService {
 		return list;
 	}
 
-	
-	
 	@Override
 	public List<Map<String, Object>> getLocationDetails(Long orgId, Long branch) {
 		Set<Object[]> supplierDetails = stockTransferGrnRepo.getLocationDetails(orgId, branch);
@@ -1608,10 +1979,11 @@ public class GrnServiceImpl implements GrnService {
 		List<Map<String, Object>> list = new ArrayList<>();
 		for (Object[] ch : supplierDetails) {
 			Map<String, Object> map = new HashMap<>();
-			map.put("locationId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("locationId", ch[0] != null ? ch[0].toString() : "");
 			map.put("locationName", ch[1] != null ? ch[1].toString() : "");
-			map.put("locationType", ch[2] != null ? ch[2].toString() : "");
-			map.put("locationDetails", ch[3] != null ? ((Number) ch[3]).longValue() : null);
+			map.put("locationTypeId", ch[2] != null ? ((Number) ch[2]).longValue() : null);
+			map.put("locationMainId", ch[3] != null ? ((Number) ch[3]).longValue() : null);
+			map.put("locationDetails", ch[4] != null ? ch[4].toString() : "");
 			list.add(map);
 		}
 		return list;

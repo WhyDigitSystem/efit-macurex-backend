@@ -27,9 +27,9 @@ public interface GrnService {
 
 	ResponseEntity<byte[]> viewGrnFile(HttpServletRequest request) throws IOException;
 
-	List<Map<String, Object>> getSupplierDetailsForGrn(Long orgId, Long branch);
+	String getGrnDocId(Long orgId, String financialYear, String type) throws ApplicationException;
 
-	String getGrnDocId(Long orgId, String financialYear, String screenCode);
+	List<Map<String, Object>> getSupplierDetailsForGrn(Long orgId, Long branch);
 
 	List<Map<String, Object>> getGatePassDocIdDetails(Long orgId, Long branch, Long supplierCode);
 

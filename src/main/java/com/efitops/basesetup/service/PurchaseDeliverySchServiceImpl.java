@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -887,15 +888,12 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 	}
 
 	// Purchase Contract
-	@Override
-	@Transactional
 	public Map<String, Object> updateCreatePurchaseContract(PurchaseContractDTO purchaseContractDTO,
 			MultipartFile[] files) throws ApplicationException {
 
 		PurchaseContractVO purchaseContractVO = new PurchaseContractVO();
 
 		String screenCode = "PC";
-
 		String message;
 
 		if (ObjectUtils.isNotEmpty(purchaseContractDTO.getId())) {
@@ -908,6 +906,27 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 			message = "Purchase Contract Updated Successfully";
 
 		} else {
+
+			String docId = purchaseContractRepo.getPurchaseContractDocId(purchaseContractDTO.getOrgId(),
+					purchaseContractDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Purchase Contract DocId Not Found");
+			}
+
+			purchaseContractVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(purchaseContractDTO.getOrgId(),
+							purchaseContractDTO.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			purchaseContractVO.setCreatedBy(purchaseContractDTO.getCreatedBy());
 
@@ -1441,6 +1460,20 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		return responseList;
 	}
+	
+	@Override
+	public String getPurchaseContractDocId(Long orgId, String financialYear) {
+
+	    String screenCode = "PC";
+
+	    String result =
+	            purchaseContractRepo.getPurchaseContractDocId(
+	                    orgId,
+	                    financialYear,
+	                    screenCode);
+
+	    return result;
+	}
 
 //	supplier dropdown for Purchase contract
 	@Override
@@ -1459,11 +1492,25 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 			Map<String, Object> supplier = new HashMap<>();
 
+			// =========================
+			// Supplier Details
+			// =========================
+
 			supplier.put("supplierId", obj[0] != null ? ((Number) obj[0]).longValue() : null);
 
 			supplier.put("supplierCode", obj[1] != null ? obj[1].toString() : "");
 
 			supplier.put("supplierName", obj[2] != null ? obj[2].toString() : "");
+
+			// =========================
+			// GST Details
+			// =========================
+
+			supplier.put("gstState", obj[3] != null ? ((Number) obj[3]).longValue() : null);
+
+			supplier.put("isGstApplicable", obj[4] != null ? (Boolean) obj[4] : null);
+
+			supplier.put("gstNo", obj[5] != null ? obj[5].toString() : "");
 
 			details.add(supplier);
 		}
@@ -3524,6 +3571,5 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		return result;
 	}
-
 
 }

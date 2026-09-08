@@ -1715,25 +1715,24 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 
 				if (consumableVO.getConsumables() != null) {
 
-				    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
 
-				    itemDTO.setId(consumableVO.getConsumables().getId());
-				    itemDTO.setItemCode(consumableVO.getConsumables().getItemCode());
-				    itemDTO.setItemDescription(consumableVO.getConsumables().getItemDescription());
+					itemDTO.setId(consumableVO.getConsumables().getId());
+					itemDTO.setItemCode(consumableVO.getConsumables().getItemCode());
+					itemDTO.setItemDescription(consumableVO.getConsumables().getItemDescription());
 
-				    if (consumableVO.getConsumables().getPricingUnit() != null) {
+					if (consumableVO.getConsumables().getPricingUnit() != null) {
 
-				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
 
-				        unitDTO.setId(consumableVO.getConsumables().getPricingUnit().getId());
-				        unitDTO.setUnitId(consumableVO.getConsumables().getPricingUnit().getUnitId());
-				        unitDTO.setUnitDescription(
-				                consumableVO.getConsumables().getPricingUnit().getDescription());
+						unitDTO.setId(consumableVO.getConsumables().getPricingUnit().getId());
+						unitDTO.setUnitId(consumableVO.getConsumables().getPricingUnit().getUnitId());
+						unitDTO.setUnitDescription(consumableVO.getConsumables().getPricingUnit().getDescription());
 
-				        itemDTO.setUnit(unitDTO);
-				    }
+						itemDTO.setUnit(unitDTO);
+					}
 
-				    consumableResponseDTO.setConsumables(itemDTO);
+					consumableResponseDTO.setConsumables(itemDTO);
 				}
 				consumableResponseDTO.setQuantity(consumableVO.getQuantity());
 

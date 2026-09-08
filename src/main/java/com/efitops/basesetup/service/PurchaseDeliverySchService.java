@@ -109,6 +109,8 @@ public interface PurchaseDeliverySchService {
 
 	String getPhysicalStockReConcilationDocId(Long orgId, String financialYear);
 
+	String getPurchaseContractDocId(Long orgId, String financialYear);
+
 //	purchase order amendment dropdown
 	
 

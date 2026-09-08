@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
@@ -32,6 +33,7 @@ import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
+import com.efitops.basesetup.dto.StockTransferDTO;
 import com.efitops.basesetup.service.PurchaseServiceImport;
 
 @RestController
@@ -829,4 +831,126 @@ public class PurchaseServiceImportController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
+
+	// Stocktransfer
+
+	@GetMapping("/getStockTransferById")
+	public ResponseEntity<ResponseDTO> getStockTransferById(@RequestParam Long id) {
+
+		String methodName = "getStockTransferById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			StockTransferResponseDTO stockTransferResponseDTO = purchaseOrderService.getStockTransferById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Stock information retrieved successfully");
+
+			responseObjectsMap.put("stockTransferResponseVO", stockTransferResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Stock retrieval failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getStockTransferByOrgId")
+	public ResponseEntity<ResponseDTO> getStockTransferByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getStockTransferByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<StockTransferResponseDTO> stockTransferResponseDTO = purchaseOrderService
+					.getStockTransferByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Stock information retrieved successfully");
+
+			responseObjectsMap.put("stockTransferResponseVO", stockTransferResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Stock information retrieval failed",
+					e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@PutMapping("/createUpdateStockTransfer")
+	public ResponseEntity<ResponseDTO> createUpdateStockTransfer(@RequestBody StockTransferDTO stockTransferDTO) {
+		String methodName = "createUpdateStockTransfer()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		try {
+			Map<String, Object> stockTransferVO = purchaseOrderService.createUpdateStockTransfer(stockTransferDTO);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, stockTransferVO.get("message"));
+			responseObjectsMap.put("stockTransferVO", stockTransferVO.get("stockTransferVO"));
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getStockTransferDocId")
+	public ResponseEntity<ResponseDTO> getStockTransferDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getStockTransferDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+			mapp = purchaseOrderService.getStockTransferDocId(orgId, financialYear);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"StockTransferDocId information retrieved successfully");
+			responseObjectsMap.put("invoiceDocId", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve StockTransferDocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
 }

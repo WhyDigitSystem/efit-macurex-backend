@@ -13,10 +13,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
+import com.efitops.basesetup.dto.StockTransferDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -68,7 +70,6 @@ public interface PurchaseServiceImport {
 
 	String getPurchaseOrderDeliveryScheduleShortCloseDocId(Long orgId, String financialYear);
 
-	
 	// Direction
 
 	DirectPurchaseResponseDTO getDirectPurchaseById(Long id) throws ApplicationException;
@@ -85,5 +86,15 @@ public interface PurchaseServiceImport {
 	List<Map<String, Object>> getIssueTo(Long orgId, Long branch);
 
 	List<Map<String, Object>> getItemType(Long orgId, Long branch, Long itemType);
+
+	// Applic
+
+	StockTransferResponseDTO getStockTransferById(Long id) throws ApplicationException;
+
+	List<StockTransferResponseDTO> getStockTransferByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> createUpdateStockTransfer(StockTransferDTO stockTransferDTO) throws ApplicationException;
+
+	String getStockTransferDocId(Long orgId, String financialYear);
 
 }

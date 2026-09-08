@@ -43,7 +43,9 @@ import com.efitops.basesetup.ResponseDTO.GSTStateMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseCloseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseImportDTO;
 import com.efitops.basesetup.ResponseDTO.LmeResponseDTO;
+import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderImportDetailsResponseDTO;
@@ -51,6 +53,8 @@ import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalFileUploadDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
@@ -66,6 +70,8 @@ import com.efitops.basesetup.dto.PurchaseOrderImportDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalFileUploadDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalTaxDetailsDTO;
+import com.efitops.basesetup.dto.StockTransferDTO;
+import com.efitops.basesetup.dto.StockTransferDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
@@ -80,6 +86,7 @@ import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.LMEVO;
+import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.PurchaseOrderDeliveryScheduleShortCloseDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderDeliveryScheduleShortCloseVO;
 import com.efitops.basesetup.entity.PurchaseOrderImportDetailsVO;
@@ -87,6 +94,8 @@ import com.efitops.basesetup.entity.PurchaseOrderLocalDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalFileUploadDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalTaxDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderVO;
+import com.efitops.basesetup.entity.StockTransferDetailsVO;
+import com.efitops.basesetup.entity.StockTransferVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -102,6 +111,7 @@ import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.LMERepo;
+import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.PurchaseOrderDeliveryScheduleShortCloseDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderDeliveryScheduleShortCloseRepo;
 import com.efitops.basesetup.repository.PurchaseOrderImportDetailsRepo;
@@ -109,6 +119,8 @@ import com.efitops.basesetup.repository.PurchaseOrderLocalDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderLocalFileUploadDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderLocalTaxDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderRepo;
+import com.efitops.basesetup.repository.StockTransferDetailsRepo;
+import com.efitops.basesetup.repository.StockTransferRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
@@ -181,6 +193,15 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 	@Autowired
 	EmployeeMasterRepo employeeMasterRepo;
+
+	@Autowired
+	StockTransferRepo stockTransferRepo;
+
+	@Autowired
+	LocationRepo locationRepo;
+
+	@Autowired
+	StockTransferDetailsRepo stockTransferDetailsRepo;
 
 	@Override
 	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException {
@@ -2343,4 +2364,274 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		}
 		return list;
 	}
+
+	// StockTransferResponseDTO
+
+	@Override
+	public StockTransferResponseDTO getStockTransferById(Long id) throws ApplicationException {
+
+		StockTransferVO stockTransferVO = stockTransferRepo.getStockTransferById(id);
+
+		if (stockTransferVO == null) {
+			throw new ApplicationException("Stock Transfer Not Found");
+		}
+
+		return buildStockTransferResponse(stockTransferVO);
+	}
+
+	@Override
+	public List<StockTransferResponseDTO> getStockTransferByOrgId(Long orgId, Long branch) throws ApplicationException {
+
+		List<StockTransferVO> stockTransferList = stockTransferRepo.getStockTransferByOrgId(orgId, branch);
+
+		if (stockTransferList == null || stockTransferList.isEmpty()) {
+			throw new ApplicationException("Stock Transfer Not Found");
+		}
+
+		List<StockTransferResponseDTO> responseList = new ArrayList<>();
+
+		for (StockTransferVO stockTransferVO : stockTransferList) {
+			responseList.add(buildStockTransferResponse(stockTransferVO));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateStockTransfer(StockTransferDTO stockTransferDTO)
+			throws ApplicationException {
+		String screenCode = "ST";
+		StockTransferVO stockTransferVO = new StockTransferVO();
+		String message;
+
+		if (ObjectUtils.isNotEmpty(stockTransferDTO.getId())) {
+
+			stockTransferVO = stockTransferRepo.findById(stockTransferDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Stock Transfer Not Found"));
+
+			stockTransferVO.setUpdatedBy(stockTransferDTO.getCreatedBy());
+
+			message = "Stock Transfer Updated Successfully";
+
+		} else {
+
+			String docId = stockTransferRepo.getStockTransferDocId(stockTransferDTO.getOrgId(),
+					stockTransferDTO.getFinancialYear(), screenCode);
+
+			stockTransferVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(stockTransferDTO.getOrgId(),
+							stockTransferDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			stockTransferVO.setCreatedBy(stockTransferDTO.getCreatedBy());
+			stockTransferVO.setUpdatedBy(stockTransferDTO.getCreatedBy());
+
+			message = "Stock Transfer Created Successfully";
+		}
+
+		createUpdateStockTransferVOByStockTransferDTO(stockTransferDTO, stockTransferVO);
+
+		stockTransferVO = stockTransferRepo.save(stockTransferVO);
+
+		StockTransferResponseDTO responseDTO = buildStockTransferResponse(stockTransferVO);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("stockTransferVO", responseDTO);
+
+		return response;
+	}
+
+	private void createUpdateStockTransferVOByStockTransferDTO(StockTransferDTO stockTransferDTO,
+			StockTransferVO stockTransferVO) throws ApplicationException {
+
+		stockTransferVO.setBelongsTo(stockTransferDTO.getBelongsTo());
+		stockTransferVO.setReason(stockTransferDTO.getReason());
+		stockTransferVO.setActive(stockTransferDTO.isActive());
+		stockTransferVO.setCancelRemarks(stockTransferDTO.getCancelRemarks());
+		stockTransferVO.setOrgId(stockTransferDTO.getOrgId());
+		stockTransferVO.setFinancialYear(stockTransferDTO.getFinancialYear());
+		stockTransferVO.setNarration(stockTransferDTO.getNarration());
+
+		if (stockTransferDTO.getFromLocation() != null && stockTransferDTO.getFromLocation() != 0) {
+
+			LocationVO fromLocation = locationRepo.findById(stockTransferDTO.getFromLocation())
+					.orElseThrow(() -> new ApplicationException("From Location Not Found"));
+
+			stockTransferVO.setFromLocation(fromLocation);
+		}
+
+		if (stockTransferDTO.getToLocation() != null && stockTransferDTO.getToLocation() != 0) {
+
+			LocationVO toLocation = locationRepo.findById(stockTransferDTO.getToLocation())
+					.orElseThrow(() -> new ApplicationException("To Location Not Found"));
+
+			stockTransferVO.setToLocation(toLocation);
+		}
+
+		if (stockTransferDTO.getBranch() != null && stockTransferDTO.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(stockTransferDTO.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			stockTransferVO.setBranch(branch);
+		}
+
+		if (stockTransferDTO.getToBranch() != null && stockTransferDTO.getToBranch() != 0) {
+
+			BranchVO toBranch = branchRepo.findById(stockTransferDTO.getToBranch())
+					.orElseThrow(() -> new ApplicationException("To Branch Not Found"));
+
+			stockTransferVO.setToBranch(toBranch);
+		}
+
+		if (ObjectUtils.isNotEmpty(stockTransferVO.getId())) {
+
+			List<StockTransferDetailsVO> stockTransferDetailsVO = stockTransferDetailsRepo
+					.findByStockTransferVO(stockTransferVO);
+
+			stockTransferDetailsRepo.deleteAll(stockTransferDetailsVO);
+		}
+
+		List<StockTransferDetailsVO> itemDetailsList = new ArrayList<>();
+
+		if (stockTransferDTO.getStockTransferDetailsDTO() != null) {
+
+			for (StockTransferDetailsDTO dto : stockTransferDTO.getStockTransferDetailsDTO()) {
+
+				StockTransferDetailsVO detailsVO = new StockTransferDetailsVO();
+
+				if (dto.getItem() != null && dto.getItem() != 0) {
+
+					ItemMasterVO item = itemMasterRepo.findById(dto.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Code Not Found"));
+
+					detailsVO.setItem(item);
+				}
+
+				if (dto.getUnit() != null && dto.getUnit() != 0) {
+
+					UnitMasterVO item = unitMasterRepo.findById(dto.getUnit())
+							.orElseThrow(() -> new ApplicationException("Unit Code Not Found"));
+
+					detailsVO.setUnit(item);
+				}
+
+				detailsVO.setAvailableQty(dto.getAvailableQty());
+				detailsVO.setQty(dto.getQty());
+				detailsVO.setRate(dto.getRate());
+				detailsVO.setStockTransferVO(stockTransferVO);
+
+				itemDetailsList.add(detailsVO);
+			}
+		}
+
+		stockTransferVO.setStockTransferDetailsVO(itemDetailsList);
+	}
+
+	private StockTransferResponseDTO buildStockTransferResponse(StockTransferVO stockTransferVO) {
+
+		StockTransferResponseDTO responseDTO = new StockTransferResponseDTO();
+
+		responseDTO.setId(stockTransferVO.getId());
+		responseDTO.setDocId(stockTransferVO.getDocId());
+		responseDTO.setDocDate(stockTransferVO.getDocDate());
+		responseDTO.setBelongsTo(stockTransferVO.getBelongsTo());
+		responseDTO.setReason(stockTransferVO.getReason());
+		responseDTO.setActive(stockTransferVO.getActive());
+		responseDTO.setCancel(stockTransferVO.getCancel());
+		responseDTO.setUpdatedBy(stockTransferVO.getUpdatedBy());
+		responseDTO.setCancelRemarks(stockTransferVO.getCancelRemarks());
+		responseDTO.setOrgId(stockTransferVO.getOrgId());
+		responseDTO.setScreenName(stockTransferVO.getScreenName());
+		responseDTO.setScreenCode(stockTransferVO.getScreenCode());
+		responseDTO.setFinancialYear(stockTransferVO.getFinancialYear());
+		responseDTO.setNarration(stockTransferVO.getNarration());
+		responseDTO.setCreatedBy(stockTransferVO.getCreatedBy());
+		responseDTO.setDocDate(stockTransferVO.getDocDate());
+
+		if (stockTransferVO.getFromLocation() != null) {
+
+			LocationMasterResponseDTO fromLocationDTO = new LocationMasterResponseDTO();
+			fromLocationDTO.setId(stockTransferVO.getFromLocation().getId());
+			fromLocationDTO.setLocationName(stockTransferVO.getFromLocation().getLocationName());
+			responseDTO.setFromLocation(fromLocationDTO);
+		}
+
+		if (stockTransferVO.getToLocation() != null) {
+
+			LocationMasterResponseDTO toLocationDTO = new LocationMasterResponseDTO();
+			toLocationDTO.setId(stockTransferVO.getToLocation().getId());
+			toLocationDTO.setLocationName(stockTransferVO.getToLocation().getLocationName());
+			responseDTO.setToLocation(toLocationDTO);
+		}
+
+		if (stockTransferVO.getBranch() != null) {
+
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(stockTransferVO.getBranch().getId());
+			branchDTO.setBranchCode(stockTransferVO.getBranch().getBranchCode());
+			branchDTO.setBranchName(stockTransferVO.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
+
+		if (stockTransferVO.getToBranch() != null) {
+
+			BranchResponseDTO toBranchDTO = new BranchResponseDTO();
+			toBranchDTO.setId(stockTransferVO.getToBranch().getId());
+			toBranchDTO.setBranchCode(stockTransferVO.getToBranch().getBranchCode());
+			toBranchDTO.setBranchName(stockTransferVO.getToBranch().getBranchName());
+			responseDTO.setToBranch(toBranchDTO);
+		}
+
+		List<StockTransferDetailsResponseDTO> detailsList = new ArrayList<>();
+
+		if (stockTransferVO.getStockTransferDetailsVO() != null) {
+
+			for (StockTransferDetailsVO detailsVO : stockTransferVO.getStockTransferDetailsVO()) {
+
+				StockTransferDetailsResponseDTO detailsDTO = new StockTransferDetailsResponseDTO();
+
+				detailsDTO.setId(detailsVO.getId());
+				detailsDTO.setAvailableQty(detailsVO.getAvailableQty());
+				detailsDTO.setQty(detailsVO.getQty());
+				detailsDTO.setRate(detailsVO.getRate());
+
+				if (detailsVO.getUnit() != null) {
+					UnitMasterResponseDTO itemMasterDetailsResponseDTO = new UnitMasterResponseDTO();
+					itemMasterDetailsResponseDTO.setId(detailsVO.getUnit().getId());
+					itemMasterDetailsResponseDTO.setUnitId(detailsVO.getUnit().getUnitId());
+					itemMasterDetailsResponseDTO.setUnitDescription(detailsVO.getUnit().getDescription());
+					detailsDTO.setUnit(itemMasterDetailsResponseDTO);
+				}
+
+				if (detailsVO.getItem() != null) {
+					ItemMasterDetailsResponseImportDTO itemMasterDetailsResponseDTO = new ItemMasterDetailsResponseImportDTO();
+					itemMasterDetailsResponseDTO.setId(detailsVO.getItem().getId());
+					itemMasterDetailsResponseDTO.setItemCode(detailsVO.getItem().getItemCode());
+					itemMasterDetailsResponseDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+					detailsDTO.setItem(itemMasterDetailsResponseDTO);
+				}
+
+				detailsList.add(detailsDTO);
+			}
+		}
+
+		responseDTO.setStockTransferDetailsResponseDTO(detailsList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public String getStockTransferDocId(Long orgId, String financialYear) {
+
+		String screenCode = "ST";
+
+		return stockTransferRepo.getStockTransferDocId(orgId, financialYear, screenCode);
+	}
+
 }

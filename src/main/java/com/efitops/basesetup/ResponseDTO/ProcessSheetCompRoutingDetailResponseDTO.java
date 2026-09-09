@@ -25,7 +25,7 @@ public class ProcessSheetCompRoutingDetailResponseDTO {
 
     private String spec;
 
-    private Long noOfToolsFixture;
+    private BigDecimal noOfToolsFixture;
 
     private Long sequence;
 

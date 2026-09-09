@@ -223,4 +223,22 @@ public interface ItemMasterRepo extends JpaRepository<ItemMasterVO, Long> {
         		        """, nativeQuery = true)
         		    List<Object[]> getSupplierRateContractItemDropdown(
         		            @Param("orgId") Long orgId,
-        		            @Param("branch") Long branch);}
+        		            @Param("branch") Long branch);
+
+        		    @Query(value = """
+        		            SELECT item_id,
+        		                   item_code,
+        		                   item_description,
+        		                   drawing_no
+        		            FROM item
+        		            WHERE cancel = 0
+        		              AND item_type = :itemType
+        		              AND branch = :branch
+        		              AND org_id = :orgId
+        		            ORDER BY item_code
+        		            """, nativeQuery = true)
+        		    List<Object[]> getFgSfgItemCodeDropdownforProcessSheetCompRouting(
+        		            @Param("orgId") Long orgId,
+        		            @Param("branch") Long branch,
+        		            @Param("itemType") Long itemType);
+}

@@ -36,8 +36,8 @@ public class ProcessSheetCompRoutingMachineVO {
 	private Long id;
 	
 	 @ManyToOne
-	 @JoinColumn(name = "usage")
-	 private ListOfValuesDetailsVO usage;
+	 @JoinColumn(name = "usage_machine")
+	 private ListOfValuesDetailsVO usageMachine;
 	 
 	  @ManyToOne
 	  @JoinColumn(name = "machine_no")

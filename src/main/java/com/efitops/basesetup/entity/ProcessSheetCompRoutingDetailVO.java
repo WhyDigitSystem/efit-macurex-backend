@@ -51,7 +51,7 @@ public class ProcessSheetCompRoutingDetailVO {
 	  private String spec;
 
 	  @Column(name = "no_of_tools_fixture")
-	  private Long noOfToolsFixture;
+	  private BigDecimal noOfToolsFixture;
 	  
 	  @Column(name = "sequence")
 	  private Long sequence;

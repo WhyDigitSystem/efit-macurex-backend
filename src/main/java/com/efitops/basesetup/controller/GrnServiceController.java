@@ -167,7 +167,7 @@ public class GrnServiceController extends BaseController {
 
 	@GetMapping("/getGrnDocId")
 	public ResponseEntity<ResponseDTO> getGrnDocId(@RequestParam Long orgId, @RequestParam String financialYear,
-			@RequestParam String screenCode) {
+			@RequestParam String type) {
 
 		String methodName = "getGrnDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -177,7 +177,7 @@ public class GrnServiceController extends BaseController {
 		String mapp = "";
 
 		try {
-			mapp = grnService.getGrnDocId(orgId, financialYear, screenCode);
+			mapp = grnService.getGrnDocId(orgId, financialYear, type);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);

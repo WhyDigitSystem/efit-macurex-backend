@@ -187,7 +187,7 @@ public class GrnServiceImpl implements GrnService {
 			grnVO = new GrnVO();
 			String screenCode;
 
-			if ("GRN".equalsIgnoreCase(grnDTO.getGrnType())) {
+			if ("Local".equalsIgnoreCase(grnDTO.getGrnType())) {
 
 				screenCode = "GRN";
 
@@ -203,7 +203,7 @@ public class GrnServiceImpl implements GrnService {
 				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
 				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
-			} else if ("IMPORT".equalsIgnoreCase(grnDTO.getGrnType())) {
+			} else if ("Import".equalsIgnoreCase(grnDTO.getGrnType())) {
 
 				screenCode = "IGRN";
 
@@ -221,7 +221,7 @@ public class GrnServiceImpl implements GrnService {
 
 			} else {
 
-				throw new ApplicationException("Type must be either GRN or IMPORT");
+				throw new ApplicationException("Type must be either Local or Import");
 			}
 
 			grnVO.setCreatedBy(grnDTO.getCreatedBy());
@@ -292,13 +292,13 @@ public class GrnServiceImpl implements GrnService {
 		vo.setLrNo(dto.getLrNo());
 		vo.setPoExchangeRate(dto.getPoExchangeRate());
 
-		if ("GRN".equalsIgnoreCase(dto.getGrnType()) || "IMPORT".equalsIgnoreCase(dto.getGrnType())) {
+		if ("Local".equalsIgnoreCase(dto.getGrnType()) || "Import".equalsIgnoreCase(dto.getGrnType())) {
 
 			vo.setGrnType(dto.getGrnType());
 
 		} else {
 
-			throw new ApplicationException("Type must be either GRN or IMPORT");
+			throw new ApplicationException("Type must be either Local or Import");
 		}
 
 		vo.setReceivedBy(dto.getReceivedBy());
@@ -1211,14 +1211,14 @@ public class GrnServiceImpl implements GrnService {
 	@Override
 	public String getGrnDocId(Long orgId, String financialYear, String type) throws ApplicationException {
 
-		if ("GRN".equalsIgnoreCase(type)) {
+		if ("Local".equalsIgnoreCase(type)) {
 			String screenCode = "GRN";
 			return grnRepo.getGrnDocId(orgId, financialYear, screenCode);
-		} else if ("IMPORT".equalsIgnoreCase(type)) {
+		} else if ("Import".equalsIgnoreCase(type)) {
 			String screenCode = "IGRN";
 			return grnRepo.getImportGrnDocId(orgId, financialYear, screenCode);
 		} else {
-			throw new ApplicationException("Type must be either GRN or IMPORT");
+			throw new ApplicationException("Type must be either Local or Import");
 		}
 
 	}

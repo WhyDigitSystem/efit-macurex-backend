@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
@@ -24,6 +25,7 @@ import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
+import com.efitops.basesetup.dto.ControlPlanDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
@@ -221,6 +223,14 @@ public interface DevelopService {
 
 	Map<String, Object> getItemDropdownForRootCauseAnalysis(String compino, Long branch, Long orgId)
 			throws ApplicationException;
+
+	Map<String, Object> createUpdateControlPlan(ControlPlanDTO controlPlanDTO) throws ApplicationException;
+
+	List<ControlPlanResponseDTO> getControlPlanByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	ControlPlanResponseDTO getControlPlanById(Long id) throws ApplicationException;
+
+	String getRootCauseAnalysisDocId(Long orgId, String financialYear);
 
 
 	

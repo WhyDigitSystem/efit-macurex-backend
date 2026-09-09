@@ -1,9 +1,11 @@
-package com.efitops.basesetup.dto;
+package com.efitops.basesetup.ResponseDTO;
 
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+
+import com.efitops.basesetup.dto.BranchResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,10 +14,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EngineeringChangeNoteDTO {
+public class EngineeringChangeNoteResponseDTO {
 
     private Long id;
-    private Long branch;
+    private BranchResponseDTO branch;
     private String docId;
     private LocalDate docDate;
     private String fromDepartment;
@@ -81,18 +83,22 @@ public class EngineeringChangeNoteDTO {
     private String nonAcceptedStoreReason;
     
     // Common Fields
-    private boolean active;
+    private String activeStatus;
+    private String cancelStatus;
     private Long orgId;
     private String createdBy;
-    private boolean cancel;
+    private String updatedBy;
     private String cancelRemarks;
-    private String financialYear;
+    private String screenName;
+    private String screenCode;
     
-    // Child Collections
-    private List<RemarksDTO> remarksDTO;
-    private List<ChangeRequiredDTO> changeRequiredDTO;
-    private List<DocumentsChangesDTO> documentsChangesDTO;
-    private List<DocumentsDTO> documentsDTO;
-    private List<ProcessChangesDTO> processChangesDTO;
-    private List<InspectionTestingDTO> inspectionTestingDTO;
+    // Child Collections - Response DTOs
+    private List<RemarksResponseDTO> remarksResponseDTO;
+    private List<ChangeRequiredResponseDTO> changeRequiredResponseDTO;
+    private List<DocumentsChangesResponseDTO> documentsChangesResponseDTO;
+    private List<DocumentsResponseDTO> documentsResponseDTO;
+    private List<ProcessChangesResponseDTO> processChangesResponseDTO;
+    private List<InspectionTestingResponseDTO> inspectionTestingResponseDTO;
+    private List<PdfAttachmentDrawingResponseDTO> pdfAttachmentDrawingResponseDTO;
+    private List<PdfAttachmentBomResponseDTO> pdfAttachmentBomResponseDTO;
 }

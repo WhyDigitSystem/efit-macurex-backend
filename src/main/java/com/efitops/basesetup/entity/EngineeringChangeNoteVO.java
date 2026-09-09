@@ -166,8 +166,8 @@ public class EngineeringChangeNoteVO {
 	@Column(name = "conformation_on_implementation_by_qad")
 	private String conformationOnImplementationByQAD;
 
-	@Column(name = "customer_approval_required_or_ not_required")
-	private String customerApprovalRequiredOrNotRequired;
+	@Column(name = "customer_approval")
+	private String customerApproval;
 
 //	CFT Approval/concurrence
 
@@ -203,6 +203,9 @@ public class EngineeringChangeNoteVO {
 
 	@Column(name = "org_id")
 	private Long orgId;
+	
+	@Column(name = "financial_year")
+	private String financialYear;
 
 	@Column(name = "created_by")
 	private String createdBy;

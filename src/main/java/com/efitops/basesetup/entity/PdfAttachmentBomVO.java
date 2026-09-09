@@ -3,6 +3,7 @@ package com.efitops.basesetup.entity;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Table(name = "bom_attached_po_copy")
 @Data
 @NoArgsConstructor
@@ -50,5 +52,6 @@ public class PdfAttachmentBomVO {
 	@JsonBackReference
 	@JoinColumn(name = "engineering_change_note_basic_id")
 	EngineeringChangeNoteVO engineeringChangeNoteVO;
+
 
 }

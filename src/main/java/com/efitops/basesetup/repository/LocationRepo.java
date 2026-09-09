@@ -43,6 +43,24 @@ public interface LocationRepo extends JpaRepository<LocationVO, Long> {
 			ORDER BY lm.location_name
 			""", nativeQuery = true)
 	Set<Object[]> getLocationForDeliverChallanSubContract(@Param("orgId") Long orgId, @Param("branch") Long branch);
+	
+	
+	
+	
+	@Query(value = """
+	        SELECT l.id,
+	               l.location_id,
+	               l.location_name
+	        FROM location l
+	        WHERE l.cancel = 0
+	          AND l.active = 1
+	          AND l.branch = :branch
+	          AND l.org_id = :orgId
+	        ORDER BY l.location_id
+	        """, nativeQuery = true)
+	List<Object[]> getLocationDropdownforProcessSheetCompRouting(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch);
 
 
 }

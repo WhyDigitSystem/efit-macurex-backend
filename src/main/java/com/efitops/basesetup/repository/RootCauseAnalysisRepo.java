@@ -16,7 +16,15 @@ public interface RootCauseAnalysisRepo extends JpaRepository<RootCauseAnalysisVO
 		List<RootCauseAnalysisVO> findByOrgIdAndBranch(
 		        @Param("orgId") Long orgId,
 		        @Param("branch") Long branch);
-	
+
+	@Query(nativeQuery = true, value = """
+	        SELECT concat(prefix, lpad(last_no, 5, 0)) AS docid
+	        FROM documenttypemapping_details
+	        WHERE org_id = ?1
+	          AND fin_year = ?2
+	          AND screen_code = ?3
+	        """)
+	String getRootCauseAnalysisDocId(Long orgId, String financialYear, String screenCode);
 	
 	
 	

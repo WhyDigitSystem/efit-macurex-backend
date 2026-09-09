@@ -8195,7 +8195,7 @@ public class DevelopServiceImpl implements DevelopService {
 	        Long orgId, Long branch) throws ApplicationException {
 
 	    List<ControlPlanVO> controlPlanList =
-	            controlPlanRepo.findByOrgIdAndBranch(orgId, branch);
+	    		controlPlanRepo.findByOrgIdAndBranch_Id(orgId, branch);
 
 	    if (controlPlanList == null
 	            || controlPlanList.isEmpty()) {
@@ -8234,11 +8234,137 @@ public class DevelopServiceImpl implements DevelopService {
 
 	    return buildControlPlanResponse(controlPlanVO);
 	}
+	
+	
+	//control plan drop down
+	
+	
+	@Override
+	public Map<String, Object> getcontrolplandropdownforMachineFixtureDropdown(
+	        Long branch,
+	        Long orgId) throws ApplicationException {
+
+	    List<Object[]> result =
+	            controlPlanRepo.getcontrolplandropdownforMachineFixtureDropdown(
+	                    orgId,
+	                    branch);
+
+	    Map<String, Object> response =
+	            new HashMap<>();
+
+	    response.put(
+	            "machineFixtureList",
+	            getcontrolplandropdownforMachineFixtureDropdown(result));
+
+	    return response;
+	}
+	
+	
+	private List<Map<String, Object>> getcontrolplandropdownforMachineFixtureDropdown(
+	        List<Object[]> result) {
+
+	    List<Map<String, Object>> machineFixtureList =
+	            new ArrayList<>();
+
+	    for (Object[] obj : result) {
+
+	        Map<String, Object> machineFixture =
+	                new HashMap<>();
+
+	        machineFixture.put(
+	                "machineFixtureId",
+	                obj[0] != null
+	                        ? Long.valueOf(obj[0].toString())
+	                        : null);
+
+	        machineFixture.put(
+	                "machineFixtureNo",
+	                obj[1] != null
+	                        ? obj[1].toString()
+	                        : null);
+
+	        machineFixture.put(
+	                "machineFixtureName",
+	                obj[2] != null
+	                        ? obj[2].toString()
+	                        : null);
+
+	        machineFixtureList.add(machineFixture);
+	    }
+
+	    return machineFixtureList;
+	}
+	
+	@Override
+	public Map<String, Object> getControlPlanDropdownitemcode(
+	        Long itemId,
+	        Long branch,
+	        Long orgId) throws ApplicationException {
+
+	    System.out.println("========== CONTROL PLAN DROPDOWN ==========");
+	    System.out.println("itemId  = " + itemId);
+	    System.out.println("branch  = " + branch);
+	    System.out.println("orgId   = " + orgId);
+
+	    List<Object[]> result =
+	            controlPlanRepo.getControlPlanDropdownitemcode(
+	                    itemId,
+	                    branch,
+	                    orgId);
+
+	    System.out.println("result size = " + result.size());
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    response.put(
+	            "controlPlanList",
+	            getControlPlanDetails(result));
+
+	    return response;
+	
+	}
+
+	private List<Map<String, Object>> getControlPlanDetails(
+	        List<Object[]> result) {
+
+	    List<Map<String, Object>> controlPlanList =
+	            new ArrayList<>();
+
+	    for (Object[] obj : result) {
+
+	        Map<String, Object> controlPlan =
+	                new HashMap<>();
+
+	        controlPlan.put(
+	                "controlPlanId",
+	                obj[0] != null
+	                        ? Long.valueOf(obj[0].toString())
+	                        : null);
+
+	        controlPlan.put(
+	                "docNo",
+	                obj[1] != null
+	                        ? obj[1].toString()
+	                        : null);
+
+	        controlPlanList.add(controlPlan);
+	    }
+
+	    return controlPlanList;
+	}
+	
+	
+	@Override
+	public String getControlPlanDocId(Long orgId, String financialYear) {
+
+	    String screenCode = "CP";
+
+	    String result =
+	            controlPlanRepo.getControlPlanDocId(
+	                    orgId,
+	                    financialYear,
+	                    screenCode);
+
+	    return result;
+	}
 }
-	
-	
-	
-	
-	
-	
-	

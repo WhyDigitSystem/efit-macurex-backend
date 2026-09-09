@@ -220,12 +220,35 @@ public class EngineeringChangeNoteVO {
 	@OneToMany(mappedBy = "engineeringChangeNoteVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<RemarksVO> remarksVO;
-	
+
 	@OneToMany(mappedBy = "engineeringChangeNoteVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<ChangeRequiredVO> changeRequiredVO;	
+	private List<ChangeRequiredVO> changeRequiredVO;
 
-	
+	@OneToMany(mappedBy = "engineeringChangeNoteVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<DocumentsChangesVO> documentsChangesVO;
+
+	@OneToMany(mappedBy = "engineeringChangeNoteVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<DocumentsVO> documentsVO;
+
+	@OneToMany(mappedBy = "engineeringChangeNoteVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<ProcessChangesVO> processChangesVO;
+
+	@OneToMany(mappedBy = "engineeringChangeNoteVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<InspectionTestingVO> inspectionTestingVO;
+
+	@OneToMany(mappedBy = "engineeringChangeNoteVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<PdfAttachmentDrawingVO> pdfAttachmentDrawingVO;
+
+	@OneToMany(mappedBy = "engineeringChangeNoteVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<PdfAttachmentBomVO> pdfAttachmentBomVO;
+
 	@JsonGetter("activeStatus")
 	public String getActiveStatus() {
 		return active ? "Active" : "In-Active";

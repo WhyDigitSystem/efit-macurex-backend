@@ -20,7 +20,7 @@ public class RootCauseAnalysisResponseDTO {
 
 	    private BranchResponseDTO branch;
 
-	    private Long docId;
+	    private String docId;
 
 	    private LocalDate docDate;
 

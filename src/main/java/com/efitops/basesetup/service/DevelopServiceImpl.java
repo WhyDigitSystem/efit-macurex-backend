@@ -8297,18 +8297,18 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	@Override
 	public Map<String, Object> getControlPlanDropdownitemcode(
-	        Long itemId,
+	        
 	        Long branch,
 	        Long orgId) throws ApplicationException {
 
 	    System.out.println("========== CONTROL PLAN DROPDOWN ==========");
-	    System.out.println("itemId  = " + itemId);
+	  
 	    System.out.println("branch  = " + branch);
 	    System.out.println("orgId   = " + orgId);
 
 	    List<Object[]> result =
 	            controlPlanRepo.getControlPlanDropdownitemcode(
-	                    itemId,
+	                   
 	                    branch,
 	                    orgId);
 

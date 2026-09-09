@@ -2938,7 +2938,7 @@ public class DevelopController extends BaseController {
 	
 	@GetMapping("/getControlPlanDropdownitemcode")
 	public ResponseEntity<ResponseDTO> getControlPlanDropdownitemcode(
-	        @RequestParam Long itemId,
+	       
 	        @RequestParam Long branch,
 	        @RequestParam Long orgId) {
 
@@ -2957,7 +2957,7 @@ public class DevelopController extends BaseController {
 
 	        Map<String, Object> controlPlanResponse =
 	                developService.getControlPlanDropdownitemcode(
-	                        itemId,
+	                       
 	                        branch,
 	                        orgId);
 

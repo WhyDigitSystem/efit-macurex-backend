@@ -12,19 +12,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
+import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
+import com.efitops.basesetup.dto.SupplierResponseEntryDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.SupplierResponseEntryDetailsVO;
+import com.efitops.basesetup.entity.SupplierResponseEntryVO;
 import com.efitops.basesetup.entity.VendorComplaintDetailsVO;
 import com.efitops.basesetup.entity.VendorComplaintEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.SupplierResponseEntryDetailsRepo;
+import com.efitops.basesetup.repository.SupplierResponseEntryRepo;
 import com.efitops.basesetup.repository.VendorComplaintDetailsRepo;
 import com.efitops.basesetup.repository.VendorComplaintEntryRepo;
 
@@ -46,6 +54,12 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	ItemMasterRepo itemRepo;
+
+	@Autowired
+	SupplierResponseEntryRepo supplierResponseEntryRepo;
+
+	@Autowired
+	SupplierResponseEntryDetailsRepo supplierResponseEntryDetailsRepo;
 
 	@Override
 	@Transactional
@@ -351,5 +365,304 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		response.put("itemList", itemList);
 
 		return response;
+	}
+
+//	Supplier Compliant entry
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateSupplierResponseEntry(SupplierResponseEntryDTO supplierResponseEntryDTO)
+			throws ApplicationException {
+
+		SupplierResponseEntryVO supplierResponseEntryVO = new SupplierResponseEntryVO();
+
+		String screenCode = "SRE";
+		String message;
+
+		// ========================================================
+		// CREATE / UPDATE
+		// ========================================================
+
+		if (ObjectUtils.isNotEmpty(supplierResponseEntryDTO.getId())) {
+
+			supplierResponseEntryVO = supplierResponseEntryRepo.findById(supplierResponseEntryDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Supplier Response Entry Details"));
+
+			supplierResponseEntryVO.setUpdatedBy(supplierResponseEntryDTO.getCreatedBy());
+
+			message = "Supplier Response Entry Updated Successfully";
+
+		} else {
+
+			String docId = supplierResponseEntryRepo.getSupplierResponseEntryDocId(supplierResponseEntryDTO.getOrgId(),
+					supplierResponseEntryDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Supplier Response Entry DocId Not Found");
+			}
+
+			supplierResponseEntryVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(supplierResponseEntryDTO.getOrgId(),
+							supplierResponseEntryDTO.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			supplierResponseEntryVO.setCreatedBy(supplierResponseEntryDTO.getCreatedBy());
+
+			supplierResponseEntryVO.setUpdatedBy(supplierResponseEntryDTO.getCreatedBy());
+
+			message = "Supplier Response Entry Created Successfully";
+		}
+
+		// ========================================================
+		// DTO -> VO
+		// ========================================================
+
+		createUpdateSupplierResponseEntryVO(supplierResponseEntryDTO, supplierResponseEntryVO);
+
+		// ========================================================
+		// SAVE BASIC
+		// ========================================================
+
+		SupplierResponseEntryVO savedVO = supplierResponseEntryRepo.save(supplierResponseEntryVO);
+
+		// ========================================================
+		// RESPONSE
+		// ========================================================
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("supplierResponseEntryVO", supplierResponseEntryResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdateSupplierResponseEntryVO(SupplierResponseEntryDTO dto,
+			SupplierResponseEntryVO supplierResponseEntryVO) throws ApplicationException {
+
+		supplierResponseEntryVO.setComplaintNo(dto.getComplaintNo());
+
+		supplierResponseEntryVO.setComplaintDate(dto.getComplaintDate());
+
+		supplierResponseEntryVO.setProductNo(dto.getProductNo());
+
+		supplierResponseEntryVO.setProductName(dto.getProductName());
+
+		supplierResponseEntryVO.setSupplierNo(dto.getSupplierNo());
+
+		supplierResponseEntryVO.setSupplierName(dto.getSupplierName());
+
+		supplierResponseEntryVO.setActive(dto.isActive());
+
+		supplierResponseEntryVO.setOrgId(dto.getOrgId());
+
+		supplierResponseEntryVO.setFinancialYear(dto.getFinancialYear());
+
+		supplierResponseEntryVO.setCancelRemarks(dto.getCancelRemarks());
+
+		supplierResponseEntryVO.setRemarks(dto.getRemarks());
+
+		// ========================================================
+		// DELETE OLD DETAILS
+		// ========================================================
+
+		if (dto.getId() != null) {
+
+			List<SupplierResponseEntryDetailsVO> oldDetails = supplierResponseEntryDetailsRepo
+					.findBySupplierResponseEntryVO(supplierResponseEntryVO);
+
+			if (!oldDetails.isEmpty()) {
+				supplierResponseEntryDetailsRepo.deleteAll(oldDetails);
+			}
+		}
+
+		// ========================================================
+		// CREATE DETAILS
+		// ========================================================
+
+		List<SupplierResponseEntryDetailsVO> detailsList = new ArrayList<>();
+
+		if (dto.getSupplierResponseEntryDetailsDTO() != null && !dto.getSupplierResponseEntryDetailsDTO().isEmpty()) {
+
+			for (SupplierResponseEntryDetailsDTO detailDTO : dto.getSupplierResponseEntryDetailsDTO()) {
+
+				SupplierResponseEntryDetailsVO detailVO = new SupplierResponseEntryDetailsVO();
+
+				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
+
+					ItemMasterVO itemVO = itemRepo.findById(detailDTO.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+					detailVO.setItem(itemVO);
+				}
+
+				detailVO.setQty(detailDTO.getQty());
+
+				detailVO.setResponseQty(detailDTO.getResponseQty());
+
+				detailVO.setReason(detailDTO.getReason());
+
+				detailVO.setSupplierResponseEntryVO(supplierResponseEntryVO);
+
+				detailsList.add(detailVO);
+			}
+		}
+
+		supplierResponseEntryVO.setSupplierResponseEntryDetailsVO(detailsList);
+	}
+
+	private SupplierResponseEntryResponseDTO supplierResponseEntryResponse(
+			SupplierResponseEntryVO supplierResponseEntryVO) {
+
+		SupplierResponseEntryResponseDTO responseDTO = new SupplierResponseEntryResponseDTO();
+
+		responseDTO.setId(supplierResponseEntryVO.getId());
+
+		responseDTO.setComplaintNo(supplierResponseEntryVO.getComplaintNo());
+
+		responseDTO.setComplaintDate(supplierResponseEntryVO.getComplaintDate());
+
+		responseDTO.setProductNo(supplierResponseEntryVO.getProductNo());
+
+		responseDTO.setProductName(supplierResponseEntryVO.getProductName());
+
+		responseDTO.setSupplierNo(supplierResponseEntryVO.getSupplierNo());
+
+		responseDTO.setSupplierName(supplierResponseEntryVO.getSupplierName());
+
+		responseDTO.setActive(supplierResponseEntryVO.isActive() ? "Active" : "In-Active");
+
+		responseDTO.setOrgId(supplierResponseEntryVO.getOrgId());
+
+		responseDTO.setCreatedBy(supplierResponseEntryVO.getCreatedBy());
+
+		responseDTO.setFinancialYear(supplierResponseEntryVO.getFinancialYear());
+
+		responseDTO.setCancelRemarks(supplierResponseEntryVO.getCancelRemarks());
+
+		responseDTO.setRemarks(supplierResponseEntryVO.getRemarks());
+
+		// ========================================================
+		// DETAILS RESPONSE
+		// ========================================================
+
+		List<SupplierResponseEntryDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+
+		if (supplierResponseEntryVO.getSupplierResponseEntryDetailsVO() != null
+				&& !supplierResponseEntryVO.getSupplierResponseEntryDetailsVO().isEmpty()) {
+
+			for (SupplierResponseEntryDetailsVO detailVO : supplierResponseEntryVO
+					.getSupplierResponseEntryDetailsVO()) {
+
+				SupplierResponseEntryDetailsResponseDTO detailResponseDTO = new SupplierResponseEntryDetailsResponseDTO();
+
+				if (detailVO.getItem() != null) {
+
+					detailResponseDTO.setItem(detailVO.getItem().getId());
+				}
+
+				detailResponseDTO.setQty(detailVO.getQty());
+
+				detailResponseDTO.setResponseQty(detailVO.getResponseQty());
+
+				detailResponseDTO.setReason(detailVO.getReason());
+
+				detailsResponseList.add(detailResponseDTO);
+			}
+		}
+
+		responseDTO.setSupplierResponseEntryDetailsResponseDTO(detailsResponseList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public SupplierResponseEntryResponseDTO getSupplierResponseEntryById(Long id) throws ApplicationException {
+
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ApplicationException("Invalid Id");
+		}
+
+		SupplierResponseEntryVO supplierResponseEntryVO = supplierResponseEntryRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Supplier Response Entry Not Found"));
+
+		return supplierResponseEntryResponse(supplierResponseEntryVO);
+	}
+
+	@Override
+	public List<SupplierResponseEntryResponseDTO> getSupplierResponseEntryByOrgId(Long orgId)
+			throws ApplicationException {
+
+		List<SupplierResponseEntryVO> supplierResponseEntryList = supplierResponseEntryRepo
+				.getSupplierResponseEntryByOrgId(orgId);
+
+		if (supplierResponseEntryList.isEmpty()) {
+			throw new ApplicationException("No Supplier Response Entry Details Found");
+		}
+
+		List<SupplierResponseEntryResponseDTO> responseList = new ArrayList<>();
+
+		for (SupplierResponseEntryVO supplierResponseEntryVO : supplierResponseEntryList) {
+
+			responseList.add(supplierResponseEntryResponse(supplierResponseEntryVO));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getComplaintNoDropdownForSupplierResponseEntry(Long orgId) {
+
+		List<Object[]> result = supplierResponseEntryRepo.getComplaintNoDropdownForSupplierResponseEntry(orgId);
+
+		return getComplaintNoDropdownForSupplierResponseEntry(result);
+	}
+
+	private List<Map<String, Object>> getComplaintNoDropdownForSupplierResponseEntry(List<Object[]> result) {
+
+		List<Map<String, Object>> details = new ArrayList<>();
+
+		for (Object[] obj : result) {
+
+			Map<String, Object> complaint = new HashMap<>();
+
+			// =========================
+			// Complaint Details
+			// =========================
+
+			complaint.put("docId", obj[0] != null ? obj[0].toString() : "");
+
+			complaint.put("docDate", obj[1] != null ? obj[1].toString() : "");
+
+			// =========================
+			// Product Details
+			// =========================
+
+			complaint.put("productNo", obj[2] != null ? obj[2].toString() : "");
+
+			complaint.put("productName", obj[3] != null ? obj[3].toString() : "");
+
+			// =========================
+			// Supplier Details
+			// =========================
+
+			complaint.put("supplierNo", obj[4] != null ? obj[4].toString() : "");
+
+			complaint.put("supplierName", obj[5] != null ? obj[5].toString() : "");
+
+			details.add(complaint);
+		}
+
+		return details;
 	}
 }

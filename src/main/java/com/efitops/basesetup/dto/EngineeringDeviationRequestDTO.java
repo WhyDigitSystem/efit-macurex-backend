@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 public class EngineeringDeviationRequestDTO {
 	private Long id;
 
-    private String docId;
-
-    private LocalDate docDate;
+//    private String docId;
+//
+//    private LocalDate docDate;
     
     private String financialYear;
 

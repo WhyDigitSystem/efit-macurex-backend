@@ -19,6 +19,8 @@ public interface ProblemSolvingEntryRepo extends JpaRepository<ProblemSolvingEnt
 			  AND screen_code = ?3
 			""", nativeQuery = true)
 	String getProblemSolvingEntryDocId(Long orgId, String financialYear, String screenCode);
+	
+	
 
 //	dropdown for team member1 team member2, and preparedby and responsible
 	@Query(value = """
@@ -43,5 +45,17 @@ public interface ProblemSolvingEntryRepo extends JpaRepository<ProblemSolvingEnt
 			ORDER BY e.emp_name
 			""", nativeQuery = true)
 	List<Object[]> getTeamMemberDropdownForProblemSolvingEntry(Long branch, Long department, Long orgId);
+	
+	@Query(value = """
+	        SELECT *
+	        FROM problem_solving_entry_basic
+	        WHERE org_id = ?1
+	        AND branch = ?2
+	          AND cancel = FALSE
+	          AND active = TRUE
+	        ORDER BY problem_solving_entry_basic_id DESC
+	        """, nativeQuery = true)
+	List<ProblemSolvingEntryVO> getProblemSolvingEntryByOrgId(
+	        Long orgId,Long branch);
 
 }

@@ -7,21 +7,25 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.efitops.basesetup.entity.EngineeringDeviationRequestVO;
 
-public interface EngineeringDeviationRepo extends JpaRepository<EngineeringDeviationRequestVO, Long>{
-	
-	
+public interface EngineeringDeviationRepo extends JpaRepository<EngineeringDeviationRequestVO, Long> {
 
-	    @Query(value = """
+	@Query(value = """
 	        SELECT *
 	        FROM engineering_deviation_request_basic
 	        WHERE org_id = ?1
-	         
 	          AND cancel = FALSE
 	          AND active = TRUE
 	        ORDER BY engineering_deviation_request_basic_id DESC
 	        """, nativeQuery = true)
-	    List<EngineeringDeviationRequestVO> getEngineeringDeviationByOrgId(
-	            Long orgId);
-	}
+	List<EngineeringDeviationRequestVO> getEngineeringDeviationByOrgId(
+	        Long orgId);
 
-
+	@Query(nativeQuery = true, value = """
+			SELECT concat(prefix, lpad(last_no, 5, 0)) AS docid
+			FROM documenttypemapping_details
+			WHERE org_id = ?1
+			  AND fin_year = ?2
+			  AND screen_code = ?3
+			""")
+	String getEngineeringDeviationDocId(Long orgId, String financialYear, String screenCode);
+}

@@ -20,13 +20,13 @@ public interface PurchaseContractRepo extends JpaRepository<PurchaseContractVO, 
 
 	@Query(value = """
 			SELECT
-			    d.item_id,
+			    d.item,
 			    i.item_code,
 			    i.item_description
 			FROM purchase_contract_details d
 			INNER JOIN item i
-			        ON d.item_id = i.item_id
-			WHERE d.purchasecontract_id = :contractId
+			        ON d.item = i.item_id
+			WHERE d.purchase_contract_basic_id = :contractId
 			ORDER BY i.item_code
 			""", nativeQuery = true)
 	List<Object[]> getItemsByContractId(@Param("contractId") Long contractId);

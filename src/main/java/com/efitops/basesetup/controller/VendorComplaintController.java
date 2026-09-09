@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.ResponseDTO;
+import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.service.VendorComplaintService;
 
@@ -298,6 +300,182 @@ public class VendorComplaintController extends BaseController {
 		} else {
 
 			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Item information",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping("/updateCreateSupplierResponseEntry")
+	public ResponseEntity<ResponseDTO> updateCreateSupplierResponseEntry(
+			@RequestBody SupplierResponseEntryDTO supplierResponseEntryDTO) {
+
+		String methodName = "updateCreateSupplierResponseEntry()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> responseMap = vendorComplaintService
+					.updateCreateSupplierResponseEntry(supplierResponseEntryDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+
+			responseObjectsMap.put("supplierResponseEntryVO", responseMap.get("supplierResponseEntryVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSupplierResponseEntryById")
+	public ResponseEntity<ResponseDTO> getSupplierResponseEntryById(@RequestParam Long id) {
+
+		String methodName = "getSupplierResponseEntryById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		SupplierResponseEntryResponseDTO response = null;
+
+		try {
+
+			response = vendorComplaintService.getSupplierResponseEntryById(id);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Supplier Response Entry information retrieved successfully");
+
+			responseObjectsMap.put("supplierResponseEntryVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Supplier Response Entry information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSupplierResponseEntryByOrgId")
+	public ResponseEntity<ResponseDTO> getSupplierResponseEntryByOrgId(@RequestParam Long orgId) {
+
+		String methodName = "getSupplierResponseEntryByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<SupplierResponseEntryResponseDTO> responseList = new ArrayList<>();
+
+		try {
+
+			responseList = vendorComplaintService.getSupplierResponseEntryByOrgId(orgId);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Supplier Response Entry information retrieved successfully");
+
+			responseObjectsMap.put("supplierResponseEntryVO", responseList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Supplier Response Entry information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getComplaintNoDropdownForSupplierResponseEntry")
+	public ResponseEntity<ResponseDTO> getComplaintNoDropdownForSupplierResponseEntry(@RequestParam Long orgId) {
+
+		String methodName = "getComplaintNoDropdownForSupplierResponseEntry()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		try {
+
+			responseList = vendorComplaintService.getComplaintNoDropdownForSupplierResponseEntry(orgId);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Complaint No information retrieved successfully");
+
+			responseObjectsMap.put("complaintList", responseList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Complaint No information",
 					errorMsg);
 		}
 

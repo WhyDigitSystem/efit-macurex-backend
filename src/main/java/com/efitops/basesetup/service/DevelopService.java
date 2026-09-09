@@ -235,10 +235,10 @@ public interface DevelopService {
 	Map<String, Object> getcontrolplandropdownforMachineFixtureDropdown(Long branch, Long orgId)
 			throws ApplicationException;
 
-	Map<String, Object> getControlPlanDropdownitemcode(Long itemId, Long branch, Long orgId)
-			throws ApplicationException;
-
+	
 	String getControlPlanDocId(Long orgId, String financialYear);
+
+	Map<String, Object> getControlPlanDropdownitemcode(Long branch, Long orgId) throws ApplicationException;
 
 	
 

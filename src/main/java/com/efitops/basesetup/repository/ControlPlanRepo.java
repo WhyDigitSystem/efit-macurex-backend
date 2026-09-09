@@ -47,7 +47,6 @@ public interface ControlPlanRepo extends JpaRepository<ControlPlanVO, Long> {
 	            cp.control_plan_basic_id AS id,
 	            cp.plan_no AS docNo
 	        FROM control_plan_basic cp
-	        WHERE cp.fg_item_code = :itemId
 	          AND cp.branch = :branch
 	          AND cp.org_id = :orgId
 	          AND cp.active = TRUE
@@ -55,7 +54,6 @@ public interface ControlPlanRepo extends JpaRepository<ControlPlanVO, Long> {
 	        ORDER BY cp.plan_no
 	        """, nativeQuery = true)
 	List<Object[]> getControlPlanDropdownitemcode(
-	        @Param("itemId") Long itemId,
 	        @Param("branch") Long branch,
 	        @Param("orgId") Long orgId);
 

@@ -15,7 +15,7 @@ public class ProcessSheetCompRoutingMachineDTO {
 
     private Long id;
 
-    private Long usage;
+    private Long usageMachine;
 
     private Long machineNo;
 

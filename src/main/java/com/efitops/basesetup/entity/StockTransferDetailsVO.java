@@ -47,6 +47,9 @@ public class StockTransferDetailsVO {
 
 	@Column(name = "rate", precision = 10, scale = 2)
 	private BigDecimal rate;
+	
+	@Column(name = "amount", precision = 10, scale = 2)
+	private BigDecimal amount;
 
 	@ManyToOne
 	@JsonBackReference

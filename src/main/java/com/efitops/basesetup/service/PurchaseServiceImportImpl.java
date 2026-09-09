@@ -2401,7 +2401,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 	@Transactional
 	public Map<String, Object> createUpdateStockTransfer(StockTransferDTO stockTransferDTO)
 			throws ApplicationException {
-		String screenCode = "ST";
+		String screenCode = "STR";
 		StockTransferVO stockTransferVO = new StockTransferVO();
 		String message;
 
@@ -2524,6 +2524,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailsVO.setAvailableQty(dto.getAvailableQty());
 				detailsVO.setQty(dto.getQty());
 				detailsVO.setRate(dto.getRate());
+				detailsVO.setAmount(dto.getQty().multiply(dto.getRate()));
 				detailsVO.setStockTransferVO(stockTransferVO);
 
 				itemDetailsList.add(detailsVO);
@@ -2629,9 +2630,35 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 	@Override
 	public String getStockTransferDocId(Long orgId, String financialYear) {
 
-		String screenCode = "ST";
+		String screenCode = "STR";
 
 		return stockTransferRepo.getStockTransferDocId(orgId, financialYear, screenCode);
+	}
+
+	@Override
+	public List<Map<String, Object>> getStockTransferItemDetails(Long orgId, Long branch) {
+		Set<Object[]> chType = stockTransferRepo.getStockTransferItemDetails(orgId, branch);
+		return getStockTransferItemDetails(chType);
+	}
+
+	private List<Map<String, Object>> getStockTransferItemDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("unitId", ch[3] != null ? ch[3].toString() : "");
+			map.put("unitmasterId", ch[4] != null ? ((Number) ch[4]).longValue() : null);
+			map.put("locationId", ch[5] != null ? ((Number) ch[5]).longValue() : null);
+
+			list.add(map);
+		}
+
+		return list;
 	}
 
 }

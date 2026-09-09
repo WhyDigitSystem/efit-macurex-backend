@@ -77,7 +77,7 @@ public class StockTransferVO {
 	private String screenName = "StockTransfer";
 
 	@Column(name = "screen_code")
-	private String screenCode = "ST";
+	private String screenCode = "STR";
 
 	@Column(name = "org_id")
 	private Long orgId;

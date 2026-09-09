@@ -2,7 +2,9 @@ package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -11,11 +13,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -105,10 +109,10 @@ public class EngineeringChangeNoteVO {
 	@Column(name = "wip")
 	private String wIP;
 
-	@Column(name = "supplier_include_PO")
-	private String supplierIncludePO;
+	@Column(name = "supplier_include_po")
+	private String supplierIncludePo;
 
-	@Column(name = "cost_of_stock_plus_wip_")
+	@Column(name = "cost_of_stock_plus_wip")
 	private BigDecimal costOfStockPlusWIP;
 
 //	Document changes reuired 1
@@ -213,6 +217,15 @@ public class EngineeringChangeNoteVO {
 	@Column(name = "screen_code")
 	private String screenCode = "ECN";
 
+	@OneToMany(mappedBy = "engineeringChangeNoteVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<RemarksVO> remarksVO;
+	
+	@OneToMany(mappedBy = "engineeringChangeNoteVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<ChangeRequiredVO> changeRequiredVO;	
+
+	
 	@JsonGetter("activeStatus")
 	public String getActiveStatus() {
 		return active ? "Active" : "In-Active";

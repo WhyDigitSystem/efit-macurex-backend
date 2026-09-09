@@ -97,4 +97,6 @@ public interface PurchaseServiceImport {
 
 	String getStockTransferDocId(Long orgId, String financialYear);
 
+	List<Map<String, Object>> getStockTransferItemDetails(Long orgId, Long branch);
+
 }

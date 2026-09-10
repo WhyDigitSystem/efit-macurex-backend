@@ -753,6 +753,53 @@ public class PurchaseDeliverySchController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
+	
+	@GetMapping("/getImportItemDropDownForPurchaseBill")
+	public ResponseEntity<ResponseDTO> getImportItemDropDownForPurchaseBill(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch,
+	        @RequestParam Long supplier,
+	        @RequestParam String grnNo) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object> itemMap =
+	        		purchaseDeliverySchService.getImportItemDropDownForPurchaseBill(
+	                        orgId,
+	                        branch,
+	                        supplier,
+	                        grnNo);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Import Item Dropdown fetched successfully");
+
+	        responseObjectsMap.put(
+	                "data",
+	                itemMap.get("data"));
+
+	        responseObjectsMap.put(
+	                "count",
+	                itemMap.get("count"));
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
 
 //	internal indent
 	@PutMapping("/updateCreateInternalIndent")

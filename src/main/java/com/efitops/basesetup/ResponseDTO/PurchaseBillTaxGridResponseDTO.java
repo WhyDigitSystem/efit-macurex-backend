@@ -19,9 +19,9 @@ public class PurchaseBillTaxGridResponseDTO {
     private BigDecimal taxPercent;
     private BigDecimal acceptedQtyAmount;
     private BigDecimal revisedAmount;
-    private ListOfVlauesDetailsResponseDTO ledgerAccount;
+    private String ledgerAccount;
     private String debitCredit;
     private BigDecimal debitAmount;
     private BigDecimal creditAmount;
-    private Boolean postToFinanceAc;
+    private boolean postToFinanceAc;
 }

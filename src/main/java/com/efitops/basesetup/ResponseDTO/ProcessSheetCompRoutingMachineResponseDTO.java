@@ -16,7 +16,7 @@ public class ProcessSheetCompRoutingMachineResponseDTO {
 	
 	private Long id;
 
-    private ListOfValuesDetailsResponseDTO usage;
+    private ListOfValuesDetailsResponseDTO usageMachine;
 
     private MachineMasterResponse1DTO machineNo;
 

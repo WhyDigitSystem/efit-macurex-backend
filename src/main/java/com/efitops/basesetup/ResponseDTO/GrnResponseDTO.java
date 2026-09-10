@@ -65,7 +65,60 @@ public class GrnResponseDTO {
 	private LocalDate invoiceSentOn;
 	private String remarks;
 
+	//
+	private String grnType;
+
+	// grnImport
+
+	private String shipmentNo;
+
+	private LocalDate shipmentDate;
+
+	private String blNo;
+
+	private LocalDate blDate;
+
+	private TransportMasterDetailsDTO transporter;
+
+	private LocalDate poDate;
+
+	private String vehicleNo;
+
+	private BigDecimal totalPackages;
+
+	private BigDecimal totalGrossWeight;
+
+	private String invoiceNo;
+
+	private LocalDate invoiceDate;
+
+	private String poCurrency;
+
+	private String lrNo;
+
+	private BigDecimal poExchangeRate;
+
+	// grnimportsummary
+
+	private BigDecimal totalFobValueFC;
+
+	private BigDecimal totalFreightINR;
+
+	private BigDecimal totalDutyAmtINR;
+
+	private BigDecimal totalLandCostINR;
+
+	private BigDecimal totalGrnValueINR;
+
+	private BigDecimal totalLandValueINR;
+
+	private String receivedBy;
+
+	private String qualityCheckBy;
+
 	private List<GrnDetailsResponseDTO> grnDetailsResponseDTO;
 	private List<GrnTaxDetailsResponseDTO> grnTaxDetailsResponseDTO;
 	private List<GrnFileUploadDetailsResponseDTO> grnFileUploadDetailsResponseDTO;
+	private List<ImportGrnDetailsResponseDTO> importGrnDetailsResponseDTO;
+
 }

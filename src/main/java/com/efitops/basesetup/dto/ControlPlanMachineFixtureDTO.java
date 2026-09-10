@@ -15,7 +15,7 @@ public class ControlPlanMachineFixtureDTO {
 	
 	private Long id;
 	
-	private Long machineFixture;
+	private Long machineFixtureNo;
 	
 	 private String machineFixtureName;
 	 

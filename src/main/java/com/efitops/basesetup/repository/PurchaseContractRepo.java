@@ -31,25 +31,15 @@ public interface PurchaseContractRepo extends JpaRepository<PurchaseContractVO, 
 			""", nativeQuery = true)
 	List<Object[]> getItemsByContractId(@Param("contractId") Long contractId);
 
-	@Query(value = "SELECT\r\n"
-			+ "    c.customer_id,\r\n"
-			+ "    c.customer_code,\r\n"
-			+ "    c.customer_name\r\n"
-			+ "FROM customer_header c\r\n"
-			+ "LEFT JOIN listofvaluesdetails a\r\n"
-			+ "    ON c.customer_category = a.listofvaluesdetails_id\r\n"
-			+ "LEFT JOIN listofvaluesdetails b\r\n"
-			+ "    ON c.customer_category1 = b.listofvaluesdetails_id\r\n"
-			+ "LEFT JOIN listofvaluesdetails cc\r\n"
-			+ "    ON c.customer_category2 = cc.listofvaluesdetails_id\r\n"
-			+ "WHERE c.cancel = FALSE\r\n"
-			+ "  AND c.active = TRUE\r\n"
-			+ "  AND c.branch = :branch\r\n"
-			+ "  AND c.org_id = :orgId\r\n"
-			+ "  AND (a.value_description = 'Supplier'\r\n"
-			+ "        OR b.value_description = 'Supplier'\r\n"
-			+ "        OR cc.value_description = 'Supplier'\r\n"
-			+ "      )\r\n"
+	@Query(value = "SELECT\r\n" + "    c.customer_id,\r\n" + "    c.customer_code,\r\n" + "    c.customer_name,\r\n"
+			+ "    c.gst_state,\r\n" + "    c.is_gst_applicable,\r\n" + "    c.gst_no\r\n"
+			+ "FROM customer_header c\r\n" + "LEFT JOIN listofvaluesdetails a\r\n"
+			+ "    ON c.customer_category = a.listofvaluesdetails_id\r\n" + "LEFT JOIN listofvaluesdetails b\r\n"
+			+ "    ON c.customer_category1 = b.listofvaluesdetails_id\r\n" + "LEFT JOIN listofvaluesdetails cc\r\n"
+			+ "    ON c.customer_category2 = cc.listofvaluesdetails_id\r\n" + "WHERE c.cancel = FALSE\r\n"
+			+ "  AND c.active = TRUE\r\n" + "  AND c.branch = :branch\r\n" + "  AND c.org_id = :orgId\r\n"
+			+ "  AND (a.value_description = 'Supplier'\r\n" + "        OR b.value_description = 'Supplier'\r\n"
+			+ "        OR cc.value_description = 'Supplier'\r\n" + "      )\r\n"
 			+ "ORDER BY c.customer_code", nativeQuery = true)
 	List<Object[]> getSupplierDropdownForPurchaseContract(@Param("branch") Long branch, @Param("orgId") Long orgId);
 
@@ -72,7 +62,7 @@ public interface PurchaseContractRepo extends JpaRepository<PurchaseContractVO, 
 			ORDER BY e.emp_name
 			""", nativeQuery = true)
 	List<Object[]> getEmployeeDropdownPurchaseContract(@Param("branch") Long branch, @Param("orgId") Long orgId);
-	
+
 	@Query(value = """
 			SELECT
 			    i.item_id,
@@ -109,9 +99,15 @@ public interface PurchaseContractRepo extends JpaRepository<PurchaseContractVO, 
 			  AND l.value_code <> 'FG'
 			ORDER BY i.item_code
 			""", nativeQuery = true)
-			List<Object[]> getPurchaseContractItems(
-			        @Param("supplier") Long supplier,
-			        @Param("branch") Long branch,
-			        @Param("orgId") Long orgId);
+	List<Object[]> getPurchaseContractItems(@Param("supplier") Long supplier, @Param("branch") Long branch,
+			@Param("orgId") Long orgId);
 
+	@Query(nativeQuery = true, value = """
+			SELECT concat(prefix, lpad(last_no, 5, 0)) AS docid
+			FROM documenttypemapping_details
+			WHERE org_id = ?1
+			  AND fin_year = ?2
+			  AND screen_code = ?3
+			""")
+	String getPurchaseContractDocId(Long orgId, String financialYear, String screenCode);
 }

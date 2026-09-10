@@ -24,6 +24,7 @@ import com.efitops.basesetup.ResponseDTO.ToolMasterResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.EngineeringChangeRecordDTO;
+import com.efitops.basesetup.dto.EngineeringDeviationRequestDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.ToolMasterDTO;
 import com.efitops.basesetup.service.ToolMasterService;
@@ -283,4 +284,99 @@ public class ToolMasterController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
+	@PostMapping(value = "/updateCreateEngineeringDeviation", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseDTO updateCreateEngineeringDeviation(
+			@RequestPart("engineeringDeviationRequestDTO") EngineeringDeviationRequestDTO engineeringDeviationRequestDTO,
+//			@RequestBody EngineeringDeviationRequestDTO engineeringDeviationRequestDTO,
+			@RequestPart(value = "files", required = false) MultipartFile[] files) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> response = toolMasterService
+					.updateCreateEngineeringDeviation(engineeringDeviationRequestDTO, files);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
+
+			responseObjectsMap.put("engineeringDeviationRequestVO", response.get("engineeringDeviationRequestVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getEngineeringDeviationById")
+	public ResponseEntity<ResponseDTO> getEngineeringDeviationById(@RequestParam Long id) {
+
+		String methodName = "getEngineeringDeviationById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> response = toolMasterService.getEngineeringDeviationById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Engineering Deviation Request information retrieved successfully");
+
+			responseObjectsMap.put("engineeringDeviationRequestVO", response.get("engineeringDeviationRequestVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Engineering Deviation Request", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getEngineeringDeviationByOrgId")
+	public ResponseEntity<ResponseDTO> getEngineeringDeviationByOrgId(@RequestParam Long orgId) {
+
+		String methodName = "getEngineeringDeviationByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> response = toolMasterService.getEngineeringDeviationByOrgId(orgId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Engineering Deviation Request information retrieved successfully");
+
+			responseObjectsMap.put("engineeringDeviationRequestVO", response.get("engineeringDeviationRequestVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Engineering Deviation Request", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
 }

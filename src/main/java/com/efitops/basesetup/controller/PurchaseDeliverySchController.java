@@ -1263,5 +1263,50 @@ public class PurchaseDeliverySchController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
+	@GetMapping("/getPurchaseContractDocId")
+	public ResponseEntity<ResponseDTO> getPurchaseContractDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getPurchaseContractDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String response = null;
+
+		try {
+
+			response = purchaseDeliverySchService.getPurchaseContractDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Contract DocId retrieved successfully");
+
+			responseObjectsMap.put("docId", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Purchase Contract DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
 
 }

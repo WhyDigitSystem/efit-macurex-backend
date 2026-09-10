@@ -16,6 +16,8 @@ public class EngineeringDeviationRequestDTO {
     private String docId;
 
     private LocalDate docDate;
+    
+    private String financialYear;
 
     private Long toDepartment;
 
@@ -90,6 +92,14 @@ public class EngineeringDeviationRequestDTO {
     private String customerFeedBackModeAndReference;
 
     private String decision;
+    
+    private long orgId;
+    
+    private boolean active;
+    
+    private String createdBy;
+    
+    
 
 
 }

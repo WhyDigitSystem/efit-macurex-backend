@@ -7,21 +7,25 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderAmendmentResponceDTO;
+import com.efitops.basesetup.ResponseDTO.RootCauseAnalysisResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
+import com.efitops.basesetup.dto.ControlPlanDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
@@ -32,6 +36,7 @@ import com.efitops.basesetup.dto.ProcessSheetCompRoutingDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
+import com.efitops.basesetup.dto.RootCauseAnalysisDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 
@@ -166,7 +171,7 @@ public interface DevelopService {
 	String getIssuesDocId(Long orgId, String financialYear);
 
 
-	Map<String, Object> updateCreateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files) throws ApplicationException ;
+	Map<String, Object> updateCreateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files, MultipartFile[] images) throws ApplicationException ;
 
 	String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear, String screenCode);
 
@@ -187,11 +192,58 @@ public interface DevelopService {
 
 	Map<String, Object> getToolCategoryforMachineMaster(Long orgId, String applicableFor) throws ApplicationException;
 
-	Map<String, Object> updateCreateProcessSheet(ProcessSheetCompRoutingDTO processSheetDTO)
-			throws ApplicationException;
-
+	
 	List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(Long branch, Long customerId,
 			Long orgId) throws ApplicationException;
+
+	Map<String, Object> updateCreateProcessSheetCompRouting(ProcessSheetCompRoutingDTO processSheetCompRoutingDTO)
+			throws ApplicationException;
+	
+	List<ProcessSheetCompRoutingResponseDTO> getProcessSheetCompRoutingByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	ProcessSheetCompRoutingResponseDTO getProcessSheetCompRoutingById(Long id) throws ApplicationException;
+
+	Map<String, Object> getFgSfgItemCodeDropdownforProcessSheetCompRouting(Long orgId, Long branch, Long itemType) throws ApplicationException;
+
+	Map<String, Object> getLocationDropdownforProcessSheetCompRouting(Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> getOperationDropdownforProcessSheetCompRouting(Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> updateCreateRootCauseAnalysis(RootCauseAnalysisDTO rootCauseAnalysisDTO)
+			throws ApplicationException;
+
+	List<RootCauseAnalysisResponseDTO> getRootCauseAnalysisByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	RootCauseAnalysisResponseDTO getRootCauseAnalysisById(Long id) throws ApplicationException;
+
+	Map<String, Object> getCustomerComplaintDropDownForRootCauseAnalysis(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> getItemDropdownForRootCauseAnalysis(String compino, Long branch, Long orgId)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateControlPlan(ControlPlanDTO controlPlanDTO) throws ApplicationException;
+
+	List<ControlPlanResponseDTO> getControlPlanByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	ControlPlanResponseDTO getControlPlanById(Long id) throws ApplicationException;
+
+	String getRootCauseAnalysisDocId(Long orgId, String financialYear);
+
+	Map<String, Object> getcontrolplandropdownforMachineFixtureDropdown(Long branch, Long orgId)
+			throws ApplicationException;
+
+	
+	String getControlPlanDocId(Long orgId, String financialYear);
+
+	Map<String, Object> getFGItemDropdownforControlPlan(Long branch, Long orgId) throws ApplicationException;
+
+	
+	
+
+	
 
 
 	

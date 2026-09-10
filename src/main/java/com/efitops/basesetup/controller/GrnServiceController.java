@@ -256,8 +256,8 @@ public class GrnServiceController extends BaseController {
 	}
 
 	@GetMapping("/getScheduleDocIdDetails")
-	public ResponseEntity<ResponseDTO> getScheduleDocIdDetails(@RequestParam Long orgId,
-			@RequestParam String purchaseOrderNo, @RequestParam String date, @RequestParam String gatePass) {
+	public ResponseEntity<ResponseDTO> getScheduleDocIdDetails(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long supplier) {
 		String methodName = "getScheduleDocIdDetails()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -266,7 +266,7 @@ public class GrnServiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = grnService.getScheduleDocIdDetails(orgId, purchaseOrderNo, date, gatePass);
+			mapp = grnService.getScheduleDocIdDetails(orgId, branch, supplier);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);

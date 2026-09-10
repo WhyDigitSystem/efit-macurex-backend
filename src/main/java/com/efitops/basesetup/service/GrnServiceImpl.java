@@ -1266,9 +1266,8 @@ public class GrnServiceImpl implements GrnService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getScheduleDocIdDetails(Long orgId, String purchaseOrderNo, String date,
-			String gatePass) {
-		Set<Object[]> chType = grnRepo.getScheduleDocIdDetails(orgId, purchaseOrderNo, date, gatePass);
+	public List<Map<String, Object>> getScheduleDocIdDetails(Long orgId, Long branch, Long supplier) {
+		Set<Object[]> chType = grnRepo.getScheduleDocIdDetails(orgId, branch, supplier);
 		return getScheduleDocIdDetails(chType);
 	}
 
@@ -1306,6 +1305,7 @@ public class GrnServiceImpl implements GrnService {
 			map.put("hsn", ch[4] != null ? ch[4].toString() : "");
 			map.put("primaryUnit", ch[5] != null ? ((Number) ch[5]).longValue() : null);
 			map.put("rate", ch[6] != null ? ch[6].toString() : "");
+			map.put("primaryDescription", ch[7] != null ? ch[7].toString() : "");
 			list.add(map);
 		}
 
@@ -2001,6 +2001,8 @@ public class GrnServiceImpl implements GrnService {
 			Map<String, Object> map = new HashMap<>();
 			map.put("docId", ch[0] != null ? ch[0].toString() : "");
 			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			map.put("currency", ch[2] != null ? ch[2].toString() : "");
+			map.put("exChangeRate", ch[3] != null ? new BigDecimal(ch[3].toString()) : null);
 			list.add(map);
 		}
 		return list;
@@ -2045,6 +2047,8 @@ public class GrnServiceImpl implements GrnService {
 			map.put("poQty", ch[8] != null ? new BigDecimal(ch[8].toString()) : null);
 
 			map.put("balanceQty", ch[9] != null ? new BigDecimal(ch[9].toString()) : null);
+			
+			map.put("hsnCode", ch[10] != null ? ch[10].toString() : "");
 
 			list.add(map);
 		}

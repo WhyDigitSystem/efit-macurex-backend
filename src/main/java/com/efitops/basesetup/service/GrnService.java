@@ -35,7 +35,6 @@ public interface GrnService {
 
 	List<Map<String, Object>> getPurchaseOrderNoBasedDocId(Long orgId, Long branch, Long supplierCode, String gatePass);
 
-	List<Map<String, Object>> getScheduleDocIdDetails(Long orgId, String purchaseOrderNo, String date, String gatePass);
 
 	List<Map<String, Object>> getPoNmberBasedItemDetails(Long orgId, Long branch, String purchaseOrderNo);
 
@@ -67,5 +66,7 @@ public interface GrnService {
 
 	List<Map<String, Object>> getItemDetailsForImportGrn(Long orgId, Long branch, Long supplierCode,
 			String purchaseOrderNo);
+
+	List<Map<String, Object>> getScheduleDocIdDetails(Long orgId, Long branch, Long supplier);
 
 }

@@ -238,8 +238,9 @@ public interface DevelopService {
 	
 	String getControlPlanDocId(Long orgId, String financialYear);
 
-	Map<String, Object> getControlPlanDropdownitemcode(Long branch, Long orgId) throws ApplicationException;
+	Map<String, Object> getFGItemDropdownforControlPlan(Long branch, Long orgId) throws ApplicationException;
 
+	
 	
 
 	

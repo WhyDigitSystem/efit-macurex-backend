@@ -2936,13 +2936,12 @@ public class DevelopController extends BaseController {
 	}
 	
 	
-	@GetMapping("/getControlPlanDropdownitemcode")
-	public ResponseEntity<ResponseDTO> getControlPlanDropdownitemcode(
-	       
+	@GetMapping("/getFGItemDropdownforControlPlan")
+	public ResponseEntity<ResponseDTO> getFGItemDropdownforControlPlan(
 	        @RequestParam Long branch,
 	        @RequestParam Long orgId) {
 
-	    String methodName = "getControlPlanDropdownitemcode()";
+	    String methodName = "getFGItemDropdownforControlPlan()";
 
 	    LOGGER.debug(
 	            CommonConstant.STARTING_METHOD,
@@ -2955,19 +2954,18 @@ public class DevelopController extends BaseController {
 
 	    try {
 
-	        Map<String, Object> controlPlanResponse =
-	                developService.getControlPlanDropdownitemcode(
-	                       
+	        Map<String, Object> fgItemResponse =
+	                developService.getFGItemDropdownforControlPlan(
 	                        branch,
 	                        orgId);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
-	                "Control Plan information retrieved successfully");
+	                "FG Item information retrieved successfully");
 
 	        responseObjectsMap.put(
-	                "controlPlanList",
-	                controlPlanResponse.get("controlPlanList"));
+	                "fgItemList",
+	                fgItemResponse.get("fgItemList"));
 
 	        responseDTO =
 	                createServiceResponse(
@@ -2983,7 +2981,7 @@ public class DevelopController extends BaseController {
 	        responseDTO =
 	                createServiceResponseError(
 	                        responseObjectsMap,
-	                        "Control Plan information retrieval failed",
+	                        "FG Item information retrieval failed",
 	                        e.getMessage());
 	    }
 
@@ -2993,6 +2991,7 @@ public class DevelopController extends BaseController {
 
 	    return ResponseEntity.ok(responseDTO);
 	}
+	
 	
 	
 	@GetMapping("/getControlPlanDocId")

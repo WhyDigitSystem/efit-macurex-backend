@@ -41,22 +41,27 @@ public interface ControlPlanRepo extends JpaRepository<ControlPlanVO, Long> {
 	List<ControlPlanVO> findByOrgIdAndBranch_Id(Long orgId, Long branch);
 	
 	
-	
 	@Query(value = """
 	        SELECT
-	            cp.control_plan_basic_id AS id,
-	            cp.plan_no AS docNo
-	        FROM control_plan_basic cp
-	          AND cp.branch = :branch
-	          AND cp.org_id = :orgId
-	          AND cp.active = TRUE
-	          AND cp.cancel = FALSE
-	        ORDER BY cp.plan_no
+	            im.item_id AS itemId,
+	            im.item_code AS itemCode,
+	            im.item_description AS itemDescription,
+	            gm.grademaster_id AS gradeMasterId,
+	            gm.grade_code AS gradeCode,
+	            gm.grade_description AS gradeDescription
+	        FROM item im
+	        LEFT JOIN grademaster gm
+	            ON gm.grademaster_id = im.grade
+	        WHERE im.active = 1
+	          AND im.cancel = 0
+	          AND im.branch = :branch
+	          AND im.org_id = :orgId
+	        ORDER BY im.item_code
 	        """, nativeQuery = true)
-	List<Object[]> getControlPlanDropdownitemcode(
-	        @Param("branch") Long branch,
-	        @Param("orgId") Long orgId);
-
+	List<Object[]> getFGItemDropdownforControlPlan(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch);
+	
 	@Query(nativeQuery = true, value = """
 	        SELECT concat(prefix, lpad(last_no, 5, 0)) AS docid
 	        FROM documenttypemapping_details

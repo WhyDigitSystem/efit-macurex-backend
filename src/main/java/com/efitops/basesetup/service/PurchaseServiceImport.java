@@ -10,11 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
+import com.efitops.basesetup.dto.BillOfMaterialDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
@@ -100,8 +102,8 @@ public interface PurchaseServiceImport {
 	String getStockTransferDocId(Long orgId, String financialYear);
 
 	List<Map<String, Object>> getStockTransferItemDetails(Long orgId, Long branch);
-	
-	//Production
+
+	// Production
 
 	String getProductionScheduleOrderDocId(Long orgId, String financialYear);
 
@@ -112,5 +114,15 @@ public interface PurchaseServiceImport {
 
 	List<ProductionScheduleOrderResponseDTO> getProductionScheduleOrderByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
+
+	//BOM
+	
+	Map<String, Object> createUpdateBillOfMaterial(BillOfMaterialDTO billOfMaterialDTO) throws ApplicationException;
+
+	String getBillOfMaterialDocId(Long orgId, String financialYear);
+
+	BillOfMaterialResponseDTO getBillOfMaterialById(Long id) throws ApplicationException;
+
+	List<BillOfMaterialResponseDTO> getBillOfMaterialByOrgId(Long orgId, Long branch) throws ApplicationException;
 
 }

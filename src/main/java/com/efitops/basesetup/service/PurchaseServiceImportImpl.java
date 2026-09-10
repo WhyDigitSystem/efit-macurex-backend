@@ -33,6 +33,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.efitops.basesetup.ResponseDTO.BillOfMaterialDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseCashDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseFileUploadDetailsResponseDTO;
@@ -60,6 +62,8 @@ import com.efitops.basesetup.ResponseDTO.StockTransferDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
+import com.efitops.basesetup.dto.BillOfMaterialDTO;
+import com.efitops.basesetup.dto.BillOfMaterialDetailsDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.DirectPurchaseCashDetailsDTO;
@@ -79,6 +83,8 @@ import com.efitops.basesetup.dto.ScheduleDetailsDTO;
 import com.efitops.basesetup.dto.StockTransferDTO;
 import com.efitops.basesetup.dto.StockTransferDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
+import com.efitops.basesetup.entity.BillOfMaterialDetailsVO;
+import com.efitops.basesetup.entity.BillOfMaterialVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
@@ -107,6 +113,8 @@ import com.efitops.basesetup.entity.StockTransferDetailsVO;
 import com.efitops.basesetup.entity.StockTransferVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.BillOfMaterialDetailsRepo;
+import com.efitops.basesetup.repository.BillOfMaterialRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
@@ -217,10 +225,16 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 	@Autowired
 	private ProductionScheduleOrderRepo productionScheduleOrderRepo;
+
 	@Autowired
 	private ProductionScheduleOrderDetailsRepo productionScheduleOrderDetailsRepo;
 	@Autowired
 	private ScheduleDetailsRepo scheduleDetailsRepo;
+
+	@Autowired
+	private BillOfMaterialRepo billOfMaterialRepo;
+	@Autowired
+	private BillOfMaterialDetailsRepo billOfMaterialDetailsRepo;
 
 	@Override
 	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException {
@@ -2944,7 +2958,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 		return productionScheduleOrderRepo.getProductionScheduleOrderDocId(orgId, financialYear, screenCode);
 	}
-	
+
 	@Override
 	public ProductionScheduleOrderResponseDTO getProductionScheduleOrderById(Long id) throws ApplicationException {
 
@@ -2958,9 +2972,11 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 	}
 
 	@Override
-	public List<ProductionScheduleOrderResponseDTO> getProductionScheduleOrderByOrgId(Long orgId, Long branch) throws ApplicationException {
+	public List<ProductionScheduleOrderResponseDTO> getProductionScheduleOrderByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
 
-		List<ProductionScheduleOrderVO> stockTransferList = productionScheduleOrderRepo.getProductionScheduleOrderByOrgId(orgId, branch);
+		List<ProductionScheduleOrderVO> stockTransferList = productionScheduleOrderRepo
+				.getProductionScheduleOrderByOrgId(orgId, branch);
 
 		if (stockTransferList == null || stockTransferList.isEmpty()) {
 			throw new ApplicationException("Stock Transfer Not Found");
@@ -2975,5 +2991,301 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		return responseList;
 	}
 
+	// Bom
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateBillOfMaterial(BillOfMaterialDTO billOfMaterialDTO)
+			throws ApplicationException {
+
+		String screenCode = "BOM";
+		BillOfMaterialVO billOfMaterialVO = new BillOfMaterialVO();
+		String message;
+
+		if (ObjectUtils.isNotEmpty(billOfMaterialDTO.getId())) {
+
+			billOfMaterialVO = billOfMaterialRepo.findById(billOfMaterialDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Bill Of Material Not Found"));
+
+			billOfMaterialVO.setUpdatedBy(billOfMaterialDTO.getCreatedBy());
+
+			message = "Bill Of Material Updated Successfully";
+
+		} else {
+
+			String docId = billOfMaterialRepo.getBillOfMaterialDocId(billOfMaterialDTO.getOrgId(),
+					billOfMaterialDTO.getFinancialYear(), screenCode);
+
+			billOfMaterialVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(billOfMaterialDTO.getOrgId(),
+							billOfMaterialDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			billOfMaterialVO.setCreatedBy(billOfMaterialDTO.getCreatedBy());
+			billOfMaterialVO.setUpdatedBy(billOfMaterialDTO.getCreatedBy());
+
+			message = "Bill Of Material Created Successfully";
+		}
+
+		createUpdateBillOfMaterialVOByBillOfMaterialDTO(billOfMaterialDTO, billOfMaterialVO);
+
+		billOfMaterialVO = billOfMaterialRepo.save(billOfMaterialVO);
+
+		BillOfMaterialResponseDTO responseDTO = buildBillOfMaterialResponse(billOfMaterialVO);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("billOfMaterialVO", responseDTO);
+
+		return response;
+	}
+
+	private void createUpdateBillOfMaterialVOByBillOfMaterialDTO(BillOfMaterialDTO dto, BillOfMaterialVO vo)
+			throws ApplicationException {
+
+		vo.setDocDate(dto.getDocDate());
+		vo.setTypeOfBom(dto.getTypeOfBom());
+		vo.setTypeOfItem(dto.getTypeOfItem());
+		vo.setFgSfgItemCode(dto.getFgSfgItemCode());
+		vo.setFgSfgItemDescription(dto.getFgSfgItemDescription());
+		vo.setRevisionNo(dto.getRevisionNo());
+		vo.setSpecifications(dto.getSpecifications());
+		vo.setFillDetailsOf(dto.getFillDetailsOf());
+		vo.setFillDetailsOfItem(dto.getFillDetailsOfItem());
+		vo.setWef(dto.getWef());
+		vo.setFgReferenceToProfit(dto.getFgReferenceToProfit());
+		vo.setFmanbou(dto.getFmanbou());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branch);
+		}
+
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+
+			List<BillOfMaterialDetailsVO> existingDetails = billOfMaterialDetailsRepo.findByBillOfMaterialVO(vo);
+
+			billOfMaterialDetailsRepo.deleteAll(existingDetails);
+		}
+
+		List<BillOfMaterialDetailsVO> itemDetailsList = new ArrayList<>();
+
+		if (dto.getBillOfMaterialDetailsDTO() != null) {
+
+			for (BillOfMaterialDetailsDTO d : dto.getBillOfMaterialDetailsDTO()) {
+
+				BillOfMaterialDetailsVO detailsVO = new BillOfMaterialDetailsVO();
+
+				if (d.getItemCode() != null && d.getItemCode() != 0) {
+
+					ItemMasterVO item = itemMasterRepo.findById(d.getItemCode())
+							.orElseThrow(() -> new ApplicationException("Item Code Not Found"));
+
+					detailsVO.setItemCode(item);
+				}
+
+				if (d.getUom() != null && d.getUom() != 0) {
+
+					UnitMasterVO unit = unitMasterRepo.findById(d.getUom())
+							.orElseThrow(() -> new ApplicationException("UOM Not Found"));
+
+					detailsVO.setUom(unit);
+				}
+
+				if (d.getScrapItem() != null && d.getScrapItem() != 0) {
+
+					ItemMasterVO scrapItem = itemMasterRepo.findById(d.getScrapItem())
+							.orElseThrow(() -> new ApplicationException("Scrap Item Not Found"));
+
+					detailsVO.setScrapItem(scrapItem);
+				}
+
+				if (d.getScrapUnit() != null && d.getScrapUnit() != 0) {
+
+					UnitMasterVO scrapUnit = unitMasterRepo.findById(d.getScrapUnit())
+							.orElseThrow(() -> new ApplicationException("Scrap Unit Not Found"));
+
+					detailsVO.setScrapUnit(scrapUnit);
+				}
+
+				if (d.getSfgBomRefNo() != null && d.getSfgBomRefNo() != 0) {
+
+					BillOfMaterialVO sfgBom = billOfMaterialRepo.findById(d.getSfgBomRefNo())
+							.orElseThrow(() -> new ApplicationException("SFG BOM Ref Not Found"));
+
+					detailsVO.setSfgBomRefNo(sfgBom);
+				}
+
+				detailsVO.setSNo(d.getSNo());
+				detailsVO.setItemDescription(d.getItemDescription());
+				detailsVO.setItemType(d.getItemType());
+				detailsVO.setWeight(d.getWeight());
+				detailsVO.setQty(d.getQty());
+				detailsVO.setManbou(d.getManbou());
+				detailsVO.setSfgBomRefDate(d.getSfgBomRefDate());
+				detailsVO.setScrapQty(d.getScrapQty());
+				detailsVO.setIdisp(d.getIdisp());
+				detailsVO.setBillOfMaterialVO(vo);
+
+				itemDetailsList.add(detailsVO);
+			}
+		}
+
+		vo.setBillOfMaterialDetailsVO(itemDetailsList);
+	}
+
+	private BillOfMaterialResponseDTO buildBillOfMaterialResponse(BillOfMaterialVO vo) {
+
+		BillOfMaterialResponseDTO responseDTO = new BillOfMaterialResponseDTO();
+
+		responseDTO.setId(vo.getId());
+		responseDTO.setDocId(vo.getDocId());
+		responseDTO.setDocDate(vo.getDocDate());
+		responseDTO.setTypeOfBom(vo.getTypeOfBom());
+		responseDTO.setTypeOfItem(vo.getTypeOfItem());
+		responseDTO.setFgSfgItemCode(vo.getFgSfgItemCode());
+		responseDTO.setFgSfgItemDescription(vo.getFgSfgItemDescription());
+		responseDTO.setRevisionNo(vo.getRevisionNo());
+		responseDTO.setSpecifications(vo.getSpecifications());
+		responseDTO.setFillDetailsOf(vo.getFillDetailsOf());
+		responseDTO.setFillDetailsOfItem(vo.getFillDetailsOfItem());
+		responseDTO.setWef(vo.getWef());
+		responseDTO.setFgReferenceToProfit(vo.getFgReferenceToProfit());
+		responseDTO.setFmanbou(vo.getFmanbou());
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
+		responseDTO.setActive(vo.getActive());
+		responseDTO.setCancel(vo.getCancel());
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+		responseDTO.setScreenName(vo.getScreenName());
+		responseDTO.setScreenCode(vo.getScreenCode());
+		responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+
+		// ---------- Branch ----------
+		if (vo.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(vo.getBranch().getId());
+			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+			branchDTO.setBranchName(vo.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
+
+		// ---------- Material Details ----------
+		List<BillOfMaterialDetailsResponseDTO> detailsList = new ArrayList<>();
+
+		if (vo.getBillOfMaterialDetailsVO() != null) {
+
+			for (BillOfMaterialDetailsVO detailsVO : vo.getBillOfMaterialDetailsVO()) {
+
+				BillOfMaterialDetailsResponseDTO detailsDTO = new BillOfMaterialDetailsResponseDTO();
+
+				detailsDTO.setId(detailsVO.getId());
+				detailsDTO.setSNo(detailsVO.getSNo());
+				detailsDTO.setItemDescription(detailsVO.getItemDescription());
+				detailsDTO.setItemType(detailsVO.getItemType());
+				detailsDTO.setWeight(detailsVO.getWeight());
+				detailsDTO.setQty(detailsVO.getQty());
+				detailsDTO.setManbou(detailsVO.getManbou());
+				detailsDTO.setSfgBomRefDate(detailsVO.getSfgBomRefDate());
+				detailsDTO.setScrapQty(detailsVO.getScrapQty());
+				detailsDTO.setIdisp(detailsVO.getIdisp());
+
+				if (detailsVO.getItemCode() != null) {
+					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+					itemDTO.setId(detailsVO.getItemCode().getId());
+					itemDTO.setItemCode(detailsVO.getItemCode().getItemCode());
+					itemDTO.setItemDescription(detailsVO.getItemCode().getItemDescription());
+					detailsDTO.setItemCode(itemDTO);
+				}
+
+				if (detailsVO.getUom() != null) {
+					UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+					unitDTO.setId(detailsVO.getUom().getId());
+					unitDTO.setUnitId(detailsVO.getUom().getUnitId());
+					unitDTO.setUnitDescription(detailsVO.getUom().getDescription());
+					detailsDTO.setUom(unitDTO);
+				}
+
+				if (detailsVO.getScrapItem() != null) {
+					ItemMasterDetailsResponseImportDTO scrapItemDTO = new ItemMasterDetailsResponseImportDTO();
+					scrapItemDTO.setId(detailsVO.getScrapItem().getId());
+					scrapItemDTO.setItemCode(detailsVO.getScrapItem().getItemCode());
+					scrapItemDTO.setItemDescription(detailsVO.getScrapItem().getItemDescription());
+					detailsDTO.setScrapItem(scrapItemDTO);
+				}
+
+				if (detailsVO.getScrapUnit() != null) {
+					UnitMasterResponseDTO scrapUnitDTO = new UnitMasterResponseDTO();
+					scrapUnitDTO.setId(detailsVO.getScrapUnit().getId());
+					scrapUnitDTO.setUnitId(detailsVO.getScrapUnit().getUnitId());
+					scrapUnitDTO.setUnitDescription(detailsVO.getScrapUnit().getDescription());
+					detailsDTO.setScrapUnit(scrapUnitDTO);
+				}
+
+				if (detailsVO.getSfgBomRefNo() != null) {
+					BillOfMaterialResponseDTO sfgBomDTO = new BillOfMaterialResponseDTO();
+					sfgBomDTO.setId(detailsVO.getSfgBomRefNo().getId());
+					sfgBomDTO.setDocId(detailsVO.getSfgBomRefNo().getDocId());
+					detailsDTO.setSfgBomRefNo(sfgBomDTO);
+				}
+
+				detailsList.add(detailsDTO);
+			}
+		}
+
+		responseDTO.setBillOfMaterialDetailsResponseDTO(detailsList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public String getBillOfMaterialDocId(Long orgId, String financialYear) {
+
+		String screenCode = "BOM";
+
+		return billOfMaterialRepo.getBillOfMaterialDocId(orgId, financialYear, screenCode);
+	}
+
+	@Override
+	public BillOfMaterialResponseDTO getBillOfMaterialById(Long id) throws ApplicationException {
+
+		BillOfMaterialVO billOfMaterialVO = billOfMaterialRepo.getBillOfMaterialById(id);
+
+		if (billOfMaterialVO == null) {
+			throw new ApplicationException("Bill Of Material Not Found");
+		}
+
+		return buildBillOfMaterialResponse(billOfMaterialVO);
+	}
+
+	@Override
+	public List<BillOfMaterialResponseDTO> getBillOfMaterialByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<BillOfMaterialVO> billOfMaterialList = billOfMaterialRepo.getBillOfMaterialByOrgId(orgId, branch);
+
+		if (billOfMaterialList == null || billOfMaterialList.isEmpty()) {
+			throw new ApplicationException("Bill Of Material Not Found");
+		}
+
+		List<BillOfMaterialResponseDTO> responseList = new ArrayList<>();
+
+		for (BillOfMaterialVO billOfMaterialVO : billOfMaterialList) {
+			responseList.add(buildBillOfMaterialResponse(billOfMaterialVO));
+		}
+
+		return responseList;
+	}
 
 }

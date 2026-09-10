@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
@@ -29,6 +30,7 @@ import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.BillOfMaterialDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
@@ -1143,6 +1145,166 @@ public class PurchaseServiceImportController extends BaseController {
 
 			responseDTO = createServiceResponseError(responseObjectsMap,
 					"Failed to retrieve ProductionScheduleOrderDocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	//
+
+	@GetMapping("/getBillOfMaterialById")
+	public ResponseEntity<ResponseDTO> getBillOfMaterialById(@RequestParam Long id) {
+
+		String methodName = "getBillOfMaterialById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			BillOfMaterialResponseDTO billOfMaterialResponseDTO = purchaseOrderService.getBillOfMaterialById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Bill Of Material information retrieved successfully");
+
+			responseObjectsMap.put("billOfMaterialResponseVO", billOfMaterialResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Bill Of Material retrieval failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getBillOfMaterialByOrgId")
+	public ResponseEntity<ResponseDTO> getBillOfMaterialByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getBillOfMaterialByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<BillOfMaterialResponseDTO> billOfMaterialResponseDTO = purchaseOrderService
+					.getBillOfMaterialByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Bill Of Material information retrieved successfully");
+
+			responseObjectsMap.put("billOfMaterialResponseVO", billOfMaterialResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Bill Of Material information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@PutMapping("/createUpdateBillOfMaterial")
+	public ResponseEntity<ResponseDTO> createUpdateBillOfMaterial(@RequestBody BillOfMaterialDTO billOfMaterialDTO) {
+
+		String methodName = "createUpdateBillOfMaterial()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> billOfMaterialVO = purchaseOrderService.createUpdateBillOfMaterial(billOfMaterialDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, billOfMaterialVO.get("message"));
+
+			responseObjectsMap.put("billOfMaterialVO", billOfMaterialVO.get("billOfMaterialVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getBillOfMaterialDocId")
+	public ResponseEntity<ResponseDTO> getBillOfMaterialDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getBillOfMaterialDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = purchaseOrderService.getBillOfMaterialDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"BillOfMaterialDocId information retrieved successfully");
+
+			responseObjectsMap.put("billOfMaterialDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve BillOfMaterialDocId",
+					errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

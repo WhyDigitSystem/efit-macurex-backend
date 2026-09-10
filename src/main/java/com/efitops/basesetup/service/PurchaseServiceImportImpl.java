@@ -46,6 +46,8 @@ import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseImportDTO;
 import com.efitops.basesetup.ResponseDTO.LmeResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderImportDetailsResponseDTO;
@@ -53,6 +55,7 @@ import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalFileUploadDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ScheduleDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseDTO;
@@ -63,6 +66,8 @@ import com.efitops.basesetup.dto.DirectPurchaseCashDetailsDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.DirectPurchaseTaxDetailsDTO;
 import com.efitops.basesetup.dto.PoType;
+import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
+import com.efitops.basesetup.dto.ProductionScheduleOrderDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDetailsDTO;
@@ -70,6 +75,7 @@ import com.efitops.basesetup.dto.PurchaseOrderImportDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalFileUploadDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalTaxDetailsDTO;
+import com.efitops.basesetup.dto.ScheduleDetailsDTO;
 import com.efitops.basesetup.dto.StockTransferDTO;
 import com.efitops.basesetup.dto.StockTransferDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
@@ -87,6 +93,8 @@ import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.LMEVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.ProductionScheduleOrderDetailsVO;
+import com.efitops.basesetup.entity.ProductionScheduleOrderVO;
 import com.efitops.basesetup.entity.PurchaseOrderDeliveryScheduleShortCloseDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderDeliveryScheduleShortCloseVO;
 import com.efitops.basesetup.entity.PurchaseOrderImportDetailsVO;
@@ -94,6 +102,7 @@ import com.efitops.basesetup.entity.PurchaseOrderLocalDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalFileUploadDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalTaxDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderVO;
+import com.efitops.basesetup.entity.ScheduleDetailsVO;
 import com.efitops.basesetup.entity.StockTransferDetailsVO;
 import com.efitops.basesetup.entity.StockTransferVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
@@ -112,6 +121,8 @@ import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.LMERepo;
 import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.ProductionScheduleOrderDetailsRepo;
+import com.efitops.basesetup.repository.ProductionScheduleOrderRepo;
 import com.efitops.basesetup.repository.PurchaseOrderDeliveryScheduleShortCloseDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderDeliveryScheduleShortCloseRepo;
 import com.efitops.basesetup.repository.PurchaseOrderImportDetailsRepo;
@@ -119,6 +130,7 @@ import com.efitops.basesetup.repository.PurchaseOrderLocalDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderLocalFileUploadDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderLocalTaxDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderRepo;
+import com.efitops.basesetup.repository.ScheduleDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
@@ -202,6 +214,13 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 	@Autowired
 	StockTransferDetailsRepo stockTransferDetailsRepo;
+
+	@Autowired
+	private ProductionScheduleOrderRepo productionScheduleOrderRepo;
+	@Autowired
+	private ProductionScheduleOrderDetailsRepo productionScheduleOrderDetailsRepo;
+	@Autowired
+	private ScheduleDetailsRepo scheduleDetailsRepo;
 
 	@Override
 	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException {
@@ -2660,5 +2679,301 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 		return list;
 	}
+
+	// ProductionScheduleOrderVO
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateProductionScheduleOrder(
+			ProductionScheduleOrderDTO productionScheduleOrderDTO) throws ApplicationException {
+
+		String screenCode = "PSO";
+		ProductionScheduleOrderVO productionScheduleOrderVO = new ProductionScheduleOrderVO();
+		String message;
+
+		if (ObjectUtils.isNotEmpty(productionScheduleOrderDTO.getId())) {
+
+			productionScheduleOrderVO = productionScheduleOrderRepo.findById(productionScheduleOrderDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Production Schedule Order Not Found"));
+
+			productionScheduleOrderVO.setUpdatedBy(productionScheduleOrderDTO.getCreatedBy());
+
+			message = "Production Schedule Order Updated Successfully";
+
+		} else {
+
+			String docId = productionScheduleOrderRepo.getProductionScheduleOrderDocId(
+					productionScheduleOrderDTO.getOrgId(), productionScheduleOrderDTO.getFinancialYear(), screenCode);
+
+			productionScheduleOrderVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(productionScheduleOrderDTO.getOrgId(),
+							productionScheduleOrderDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			productionScheduleOrderVO.setCreatedBy(productionScheduleOrderDTO.getCreatedBy());
+			productionScheduleOrderVO.setUpdatedBy(productionScheduleOrderDTO.getCreatedBy());
+
+			message = "Production Schedule Order Created Successfully";
+		}
+
+		createUpdateProductionScheduleOrderVOByProductionScheduleOrderDTO(productionScheduleOrderDTO,
+				productionScheduleOrderVO);
+
+		productionScheduleOrderVO = productionScheduleOrderRepo.save(productionScheduleOrderVO);
+
+		ProductionScheduleOrderResponseDTO responseDTO = buildProductionScheduleOrderResponse(
+				productionScheduleOrderVO);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("productionScheduleOrderVO", responseDTO);
+
+		return response;
+	}
+
+	private void createUpdateProductionScheduleOrderVOByProductionScheduleOrderDTO(ProductionScheduleOrderDTO dto,
+			ProductionScheduleOrderVO vo) throws ApplicationException {
+
+		vo.setOrderType(dto.getOrderType());
+		vo.setLcPoNo(dto.getLcPoNo());
+		vo.setLcPoDate(dto.getLcPoDate());
+		vo.setFgSfgItemCode(dto.getFgSfgItemCode());
+		vo.setCompRouteNo(dto.getCompRouteNo());
+		vo.setBom(dto.getBom());
+		vo.setScheduleStartDate(dto.getScheduleStartDate());
+		vo.setScheduleEndDate(dto.getScheduleEndDate());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branch);
+		}
+
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+
+			List<ProductionScheduleOrderDetailsVO> existingDetails = productionScheduleOrderDetailsRepo
+					.findByProductionScheduleOrderVO(vo);
+
+			productionScheduleOrderDetailsRepo.deleteAll(existingDetails);
+
+			List<ScheduleDetailsVO> existingSchedules = scheduleDetailsRepo.findByProductionScheduleOrderVO(vo);
+
+			scheduleDetailsRepo.deleteAll(existingSchedules);
+		}
+
+		// ---------- Production Details ----------
+		List<ProductionScheduleOrderDetailsVO> itemDetailsList = new ArrayList<>();
+
+		if (dto.getProductionScheduleOrderDetailsDTO() != null) {
+
+			for (ProductionScheduleOrderDetailsDTO d : dto.getProductionScheduleOrderDetailsDTO()) {
+
+				ProductionScheduleOrderDetailsVO detailsVO = new ProductionScheduleOrderDetailsVO();
+
+				if (d.getItem() != null && d.getItem() != 0) {
+
+					ItemMasterVO item = itemMasterRepo.findById(d.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Code Not Found"));
+
+					detailsVO.setItem(item);
+				}
+
+				if (d.getUnit() != null && d.getUnit() != 0) {
+
+					UnitMasterVO unit = unitMasterRepo.findById(d.getUnit())
+							.orElseThrow(() -> new ApplicationException("Unit Code Not Found"));
+
+					detailsVO.setUnit(unit);
+				}
+
+				if (d.getScrapUnit() != null && d.getScrapUnit() != 0) {
+
+					UnitMasterVO scrapUnit = unitMasterRepo.findById(d.getScrapUnit())
+							.orElseThrow(() -> new ApplicationException("Scrap Unit Code Not Found"));
+
+					detailsVO.setScrapUnit(scrapUnit);
+				}
+
+				detailsVO.setBomQty(d.getBomQty());
+				detailsVO.setQtyRequired(d.getQtyRequired());
+				detailsVO.setScrapQty(d.getScrapQty());
+				detailsVO.setProductionScheduleOrderVO(vo);
+
+				itemDetailsList.add(detailsVO);
+			}
+		}
+
+		vo.setProductionScheduleOrderDetailsVO(itemDetailsList);
+
+		// ---------- Schedule Details ----------
+		List<ScheduleDetailsVO> scheduleList = new ArrayList<>();
+
+		if (dto.getScheduleDetailsDTO() != null) {
+
+			for (ScheduleDetailsDTO s : dto.getScheduleDetailsDTO()) {
+
+				ScheduleDetailsVO scheduleVO = new ScheduleDetailsVO();
+
+				scheduleVO.setScheduleDate(s.getScheduleDate());
+				scheduleVO.setQty(s.getQty());
+				scheduleVO.setQtyRequired(s.getRemarks());
+				scheduleVO.setProductionScheduleOrderVO(vo);
+
+				scheduleList.add(scheduleVO);
+			}
+		}
+
+		vo.setScheduleDetailsVO(scheduleList);
+	}
+
+	private ProductionScheduleOrderResponseDTO buildProductionScheduleOrderResponse(ProductionScheduleOrderVO vo) {
+
+		// ---------- Parent Response DTO ----------
+		ProductionScheduleOrderResponseDTO responseDTO = new ProductionScheduleOrderResponseDTO();
+
+		responseDTO.setId(vo.getId());
+		responseDTO.setDocId(vo.getDocId());
+		responseDTO.setDocDate(vo.getDocDate());
+		responseDTO.setOrderType(vo.getOrderType());
+		responseDTO.setLcPoNo(vo.getLcPoNo());
+		responseDTO.setLcPoDate(vo.getLcPoDate());
+		responseDTO.setFgSfgItemCode(vo.getFgSfgItemCode());
+		responseDTO.setCompRouteNo(vo.getCompRouteNo());
+		responseDTO.setBom(vo.getBom());
+		responseDTO.setScheduleStartDate(vo.getScheduleStartDate());
+		responseDTO.setScheduleEndDate(vo.getScheduleEndDate());
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
+		responseDTO.setActive(vo.getActive());
+		responseDTO.setCancel(vo.getCancel());
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+		responseDTO.setScreenName(vo.getScreenName());
+		responseDTO.setScreenCode(vo.getScreenCode());
+		responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+
+		// ---------- Branch ----------
+		if (vo.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(vo.getBranch().getId());
+			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+			branchDTO.setBranchName(vo.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
+
+		// ---------- Production Schedule Order Details ----------
+		List<ProductionScheduleOrderDetailsResponseDTO> detailsList = new ArrayList<>();
+
+		if (vo.getProductionScheduleOrderDetailsVO() != null) {
+
+			for (ProductionScheduleOrderDetailsVO detailsVO : vo.getProductionScheduleOrderDetailsVO()) {
+
+				ProductionScheduleOrderDetailsResponseDTO detailsDTO = new ProductionScheduleOrderDetailsResponseDTO();
+
+				detailsDTO.setId(detailsVO.getId());
+				detailsDTO.setBomQty(detailsVO.getBomQty());
+				detailsDTO.setQtyRequired(detailsVO.getQtyRequired());
+				detailsDTO.setScrapQty(detailsVO.getScrapQty());
+
+				if (detailsVO.getItem() != null) {
+					ItemMasterDetailsResponseImportDTO itemMasterDetailsResponseDTO = new ItemMasterDetailsResponseImportDTO();
+					itemMasterDetailsResponseDTO.setId(detailsVO.getItem().getId());
+					itemMasterDetailsResponseDTO.setItemCode(detailsVO.getItem().getItemCode());
+					itemMasterDetailsResponseDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+					detailsDTO.setItem(itemMasterDetailsResponseDTO);
+				}
+
+				if (detailsVO.getUnit() != null) {
+					UnitMasterResponseDTO unitMasterResponseDTO = new UnitMasterResponseDTO();
+					unitMasterResponseDTO.setId(detailsVO.getUnit().getId());
+					unitMasterResponseDTO.setUnitId(detailsVO.getUnit().getUnitId());
+					unitMasterResponseDTO.setUnitDescription(detailsVO.getUnit().getDescription());
+					detailsDTO.setUnit(unitMasterResponseDTO);
+				}
+
+				if (detailsVO.getScrapUnit() != null) {
+					UnitMasterResponseDTO scrapUnitResponseDTO = new UnitMasterResponseDTO();
+					scrapUnitResponseDTO.setId(detailsVO.getScrapUnit().getId());
+					scrapUnitResponseDTO.setUnitId(detailsVO.getScrapUnit().getUnitId());
+					scrapUnitResponseDTO.setUnitDescription(detailsVO.getScrapUnit().getDescription());
+					detailsDTO.setScrapUnit(scrapUnitResponseDTO);
+				}
+
+				detailsList.add(detailsDTO);
+			}
+		}
+
+		responseDTO.setProductionScheduleOrderDetailsResponseDTO(detailsList);
+
+		// ---------- Schedule Details ----------
+		List<ScheduleDetailsResponseDTO> scheduleList = new ArrayList<>();
+
+		if (vo.getScheduleDetailsVO() != null) {
+
+			for (ScheduleDetailsVO scheduleVO : vo.getScheduleDetailsVO()) {
+
+				ScheduleDetailsResponseDTO scheduleDTO = new ScheduleDetailsResponseDTO();
+
+				scheduleDTO.setId(scheduleVO.getId());
+				scheduleDTO.setScheduleDate(scheduleVO.getScheduleDate());
+				scheduleDTO.setQty(scheduleVO.getQty());
+				scheduleDTO.setRemarks(scheduleVO.getQtyRequired()); // see entity fix note below
+
+				scheduleList.add(scheduleDTO);
+			}
+		}
+
+		responseDTO.setScheduleDetailsResponseDTO(scheduleList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public String getProductionScheduleOrderDocId(Long orgId, String financialYear) {
+
+		String screenCode = "PSO";
+
+		return productionScheduleOrderRepo.getProductionScheduleOrderDocId(orgId, financialYear, screenCode);
+	}
+	
+	@Override
+	public ProductionScheduleOrderResponseDTO getProductionScheduleOrderById(Long id) throws ApplicationException {
+
+		ProductionScheduleOrderVO stockTransferVO = productionScheduleOrderRepo.getProductionScheduleOrderById(id);
+
+		if (stockTransferVO == null) {
+			throw new ApplicationException("Order Not Found");
+		}
+
+		return buildProductionScheduleOrderResponse(stockTransferVO);
+	}
+
+	@Override
+	public List<ProductionScheduleOrderResponseDTO> getProductionScheduleOrderByOrgId(Long orgId, Long branch) throws ApplicationException {
+
+		List<ProductionScheduleOrderVO> stockTransferList = productionScheduleOrderRepo.getProductionScheduleOrderByOrgId(orgId, branch);
+
+		if (stockTransferList == null || stockTransferList.isEmpty()) {
+			throw new ApplicationException("Stock Transfer Not Found");
+		}
+
+		List<ProductionScheduleOrderResponseDTO> responseList = new ArrayList<>();
+
+		for (ProductionScheduleOrderVO stockTransferVO : stockTransferList) {
+			responseList.add(buildProductionScheduleOrderResponse(stockTransferVO));
+		}
+
+		return responseList;
+	}
+
 
 }

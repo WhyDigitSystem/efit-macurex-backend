@@ -504,7 +504,7 @@ public interface GrnRepo extends JpaRepository<GrnVO, Long> {
 			+ "left join unitmaster u on u.unitmaster_id=i.purchase_unit where p.org_id=?1\r\n"
 			+ "and p.branch=?2 and p.active=1 and  p.cancel=0 and p.doc_id=?3\r\n" + "union\r\n"
 			+ "select i.item_id,i.item_code,i.item_description,0 as po ,h.hsn,u.unitmaster_id,p1.rate_in_currency,u.unit_id from purchase_contract_basic p join purchase_contract_details p1 \r\n"
-			+ "on p.purchase_contract_basic_id=p1.purchase_contract_basic_id left join item i on i.item_id=p1.item_id left join hsn h on h.hsn_id=i.hsn_code\r\n"
+			+ "on p.purchase_contract_basic_id=p1.purchase_contract_basic_id left join item i on i.item_id=p1.item left join hsn h on h.hsn_id=i.hsn_code\r\n"
 			+ "left join unitmaster u on u.unitmaster_id=i.purchase_unit where p.org_id=?1\r\n"
 			+ "and p.branch=?2 and p.active=1 and p.cancel=0 and p.doc_id=?3")
 	Set<Object[]> getPoNmberBasedItemDetails(Long orgId, Long branch, String purchaseOrderNo);

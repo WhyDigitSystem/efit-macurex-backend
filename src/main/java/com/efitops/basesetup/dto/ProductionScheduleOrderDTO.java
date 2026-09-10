@@ -1,6 +1,5 @@
 package com.efitops.basesetup.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -33,6 +32,6 @@ public class ProductionScheduleOrderDTO {
 
 	private Long branch;
 
-//	private List<ProductionScheduleOrderDetailsDTO> productionScheduleOrderDetailsDTO;
-//	private List<ScheduleDetailsDTO> scheduleDetailsDTO;
+	private List<ProductionScheduleOrderDetailsDTO> productionScheduleOrderDetailsDTO;
+	private List<ScheduleDetailsDTO> scheduleDetailsDTO;
 }

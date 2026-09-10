@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
@@ -30,6 +31,7 @@ import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.PoType;
+import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
@@ -952,11 +954,10 @@ public class PurchaseServiceImportController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
+
 	@GetMapping("/getStockTransferItemDetails")
-	public ResponseEntity<ResponseDTO> getStockTransferItemDetails(@RequestParam Long orgId, @RequestParam Long branch
-			) {
+	public ResponseEntity<ResponseDTO> getStockTransferItemDetails(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 		String methodName = "getStockTransferItemDetails()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -983,4 +984,169 @@ public class PurchaseServiceImportController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
+	// PurchaseOrde
+
+	@GetMapping("/getProductionScheduleOrderById")
+	public ResponseEntity<ResponseDTO> getProductionScheduleOrderById(@RequestParam Long id) {
+
+		String methodName = "getProductionScheduleOrderById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ProductionScheduleOrderResponseDTO productionScheduleOrderResponseDTO = purchaseOrderService
+					.getProductionScheduleOrderById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Schedule Order information retrieved successfully");
+
+			responseObjectsMap.put("productionScheduleOrderResponseVO", productionScheduleOrderResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Production Schedule Order retrieval failed",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getProductionScheduleOrderByOrgId")
+	public ResponseEntity<ResponseDTO> getProductionScheduleOrderByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getProductionScheduleOrderByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<ProductionScheduleOrderResponseDTO> productionScheduleOrderResponseDTO = purchaseOrderService
+					.getProductionScheduleOrderByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Schedule Order information retrieved successfully");
+
+			responseObjectsMap.put("productionScheduleOrderResponseVO", productionScheduleOrderResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Production Schedule Order information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@PutMapping("/createUpdateProductionScheduleOrder")
+	public ResponseEntity<ResponseDTO> createUpdateProductionScheduleOrder(
+			@RequestBody ProductionScheduleOrderDTO productionScheduleOrderDTO) {
+
+		String methodName = "createUpdateProductionScheduleOrder()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> productionScheduleOrderVO = purchaseOrderService
+					.createUpdateProductionScheduleOrder(productionScheduleOrderDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, productionScheduleOrderVO.get("message"));
+
+			responseObjectsMap.put("productionScheduleOrderVO",
+					productionScheduleOrderVO.get("productionScheduleOrderVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getProductionScheduleOrderDocId")
+	public ResponseEntity<ResponseDTO> getProductionScheduleOrderDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getProductionScheduleOrderDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = purchaseOrderService.getProductionScheduleOrderDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"ProductionScheduleOrderDocId information retrieved successfully");
+
+			responseObjectsMap.put("productionScheduleOrderDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve ProductionScheduleOrderDocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
 }

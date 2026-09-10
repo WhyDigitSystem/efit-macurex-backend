@@ -11,11 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.PoType;
+import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
 import com.efitops.basesetup.dto.StockTransferDTO;
@@ -98,5 +100,17 @@ public interface PurchaseServiceImport {
 	String getStockTransferDocId(Long orgId, String financialYear);
 
 	List<Map<String, Object>> getStockTransferItemDetails(Long orgId, Long branch);
+	
+	//Production
+
+	String getProductionScheduleOrderDocId(Long orgId, String financialYear);
+
+	Map<String, Object> createUpdateProductionScheduleOrder(ProductionScheduleOrderDTO productionScheduleOrderDTO)
+			throws ApplicationException;
+
+	ProductionScheduleOrderResponseDTO getProductionScheduleOrderById(Long id) throws ApplicationException;
+
+	List<ProductionScheduleOrderResponseDTO> getProductionScheduleOrderByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
 
 }

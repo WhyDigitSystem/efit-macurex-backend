@@ -34,7 +34,7 @@ public class ImportPurchaseBillDetailsVO {
     
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "item")
     private ItemMasterVO item;
 
     @Column(name = "challan_qty", precision = 18, scale = 3)

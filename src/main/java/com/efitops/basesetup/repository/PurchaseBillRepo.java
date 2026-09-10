@@ -19,9 +19,9 @@ public interface PurchaseBillRepo extends JpaRepository<PurchaseBillVO, Long> {
 	@Query(nativeQuery = true, value = "select * from purchase_bill_basic where org_id=?1 and branch=?2 and active=1 and cancel=0")
 	List<PurchaseBillVO> getPurchaseBillByOrgId(Long orgId, Long branch);
 
-	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,'0')) AS docid "
-			+ "from documenttypemapping_details where org_id=?1 and screen_code=?2")
-	String getPurchaseBillDocId(Long orgId, String screenCode);
+//	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,'0')) AS docid "
+//			+ "from documenttypemapping_details where org_id=?1 and screen_code=?2")
+//	String getPurchaseBillDocId(Long orgId, String screenCode);
 
 	@Query(value = """
 			            SELECT
@@ -300,6 +300,9 @@ public interface PurchaseBillRepo extends JpaRepository<PurchaseBillVO, Long> {
 	        @Param("branch") Long branch,
 	        @Param("supplier") Long supplier,
 	        @Param("grnNo") String grnNo);
+
+	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
+	String getPurchaseBillDocId(Long orgId, String financialYear, String screenCode);
 	
 
 }

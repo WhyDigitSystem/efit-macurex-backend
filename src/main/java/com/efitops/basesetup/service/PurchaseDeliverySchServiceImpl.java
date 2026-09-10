@@ -31,9 +31,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
-import com.efitops.basesetup.ResponseDTO.GSTRateMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GateInwardEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.HsnResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ImportPurchaseBillChargesSummaryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ImportPurchaseBillDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ImportPurchaseBillTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InternalIndentDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InternalIndentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
@@ -41,6 +44,7 @@ import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PhysicalStockReConcilationDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PhysicalStockReConcilationResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseBillChargesSummaryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseBillDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseBillResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseBillSupplierResponseDTO;
@@ -55,15 +59,18 @@ import com.efitops.basesetup.ResponseDTO.PurchaseDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.GateInwardEntryDTO;
-import com.efitops.basesetup.dto.HsnResponseImageDTO;
+import com.efitops.basesetup.dto.ImportPurchaseBillChargesSummaryDTO;
+import com.efitops.basesetup.dto.ImportPurchaseBillDetailsDTO;
+import com.efitops.basesetup.dto.ImportPurchaseBillTaxDetailsDTO;
 import com.efitops.basesetup.dto.InternalIndentDTO;
 import com.efitops.basesetup.dto.InternalIndentDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
-import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
 import com.efitops.basesetup.dto.PhysicalStockReConcilationDTO;
 import com.efitops.basesetup.dto.PhysicalStockReConcilationDetailsDTO;
 import com.efitops.basesetup.dto.PrimaryUnitImageDTO;
+import com.efitops.basesetup.dto.PurchaseBillChargesSummaryDTO;
 import com.efitops.basesetup.dto.PurchaseBillDTO;
 import com.efitops.basesetup.dto.PurchaseBillDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseBillTaxGridDTO;
@@ -73,7 +80,6 @@ import com.efitops.basesetup.dto.PurchaseContractTaxDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleLineDTO;
-import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
@@ -81,9 +87,12 @@ import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
-import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.GateInwardEntryVO;
+import com.efitops.basesetup.entity.HsnVO;
+import com.efitops.basesetup.entity.ImportPurchaseBillChargesSummaryVO;
+import com.efitops.basesetup.entity.ImportPurchaseBillDetailsVO;
+import com.efitops.basesetup.entity.ImportPurchaseBillTaxDetailsVO;
 import com.efitops.basesetup.entity.InternalIndentDetailsVO;
 import com.efitops.basesetup.entity.InternalIndentVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
@@ -91,6 +100,7 @@ import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.PhysicalStockReConcilationDetailsVO;
 import com.efitops.basesetup.entity.PhysicalStockReConcilationVO;
+import com.efitops.basesetup.entity.PurchaseBillChargesSummaryVO;
 import com.efitops.basesetup.entity.PurchaseBillDetailsVO;
 import com.efitops.basesetup.entity.PurchaseBillTaxGridVO;
 import com.efitops.basesetup.entity.PurchaseBillVO;
@@ -112,6 +122,10 @@ import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.GateInwardEntryRepo;
 import com.efitops.basesetup.repository.GstRateMasterRepo;
+import com.efitops.basesetup.repository.HsnRepo;
+import com.efitops.basesetup.repository.ImportPurchaseBillChargesSummaryRepo;
+import com.efitops.basesetup.repository.ImportPurchaseBillDetailsRepo;
+import com.efitops.basesetup.repository.ImportPurchaseBillTaxDetailsRepo;
 import com.efitops.basesetup.repository.InternalIndentDetailsRepo;
 import com.efitops.basesetup.repository.InternalIndentRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
@@ -119,6 +133,7 @@ import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.PhysicalStockReConcilationDetailsRepo;
 import com.efitops.basesetup.repository.PhysicalStockReConcilationRepo;
+import com.efitops.basesetup.repository.PurchaseBillChargesSummaryRepo;
 import com.efitops.basesetup.repository.PurchaseBillDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseBillRepo;
 import com.efitops.basesetup.repository.PurchaseBillTaxGridRepo;
@@ -205,7 +220,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 	@Autowired
 	LocationRepo locationRepo;
 
-  @Autowired
+	@Autowired
 	private GSTStateMasterRepo gstStateMasterRepo;
 
 	@Autowired
@@ -225,7 +240,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 	@Autowired
 	private ImportPurchaseBillChargesSummaryRepo importPurchaseBillChargesSummaryRepo;
-  
+
 	@Override
 	@Transactional
 	public Map<String, Object> updateCreatePurchaseDeliverySchedule(
@@ -1481,19 +1496,15 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		return responseList;
 	}
-	
+
 	@Override
 	public String getPurchaseContractDocId(Long orgId, String financialYear) {
 
-	    String screenCode = "PC";
+		String screenCode = "PC";
 
-	    String result =
-	            purchaseContractRepo.getPurchaseContractDocId(
-	                    orgId,
-	                    financialYear,
-	                    screenCode);
+		String result = purchaseContractRepo.getPurchaseContractDocId(orgId, financialYear, screenCode);
 
-	    return result;
+		return result;
 	}
 
 //	supplier dropdown for Purchase contract
@@ -1630,28 +1641,28 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 			purchaseBillVO = new PurchaseBillVO();
 
-//	        String docId = purchaseBillRepo.getPurchaseBillDocId(
-//	                purchaseBillDTO.getOrgId(),
-//	                purchaseBillDTO.getFinancialYear(),
-//	                screenCode);
-//
-//	        purchaseBillVO.setDocId(docId);
-//
-//	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
-//	                documentTypeMappingDetailsRepo
-//	                        .findByOrgIdAndFinYearAndScreenCode(
-//	                                purchaseBillDTO.getOrgId(),
-//	                                purchaseBillDTO.getFinancialYear(),
-//	                                screenCode);
+	        String docId = purchaseBillRepo.getPurchaseBillDocId(
+	                purchaseBillDTO.getOrgId(),
+	                purchaseBillDTO.getFinancialYear(),
+	                screenCode);
 
-//	        if (documentTypeMappingDetailsVO != null) {
-//
-//	            documentTypeMappingDetailsVO.setLastNo(
-//	                    documentTypeMappingDetailsVO.getLastNo() + 1);
-//
-//	            documentTypeMappingDetailsRepo.save(
-//	                    documentTypeMappingDetailsVO);
-//	        }
+	        purchaseBillVO.setDocId(docId);
+
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo
+	                        .findByOrgIdAndFinYearAndScreenCode(
+	                                purchaseBillDTO.getOrgId(),
+	                                purchaseBillDTO.getFinancialYear(),
+	                                screenCode);
+
+	        if (documentTypeMappingDetailsVO != null) {
+
+	            documentTypeMappingDetailsVO.setLastNo(
+	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	            documentTypeMappingDetailsRepo.save(
+	                    documentTypeMappingDetailsVO);
+	        }
 
 			purchaseBillVO.setCreatedBy(purchaseBillDTO.getCreatedBy());
 
@@ -1708,6 +1719,10 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		vo.setExchangeRate(dto.getExchangeRate());
 
 		vo.setPurchaseorderType(dto.getPurchaseorderType());
+		vo.setPurchaseorderNumber(dto.getPurchaseorderNumber());
+		vo.setPurchaseorderDate(dto.getPurchaseorderDate());
+
+		vo.setPurchaseorderType(dto.getPurchaseorderType());
 
 		vo.setReverseChrg(dto.isReverseChrg());
 
@@ -1756,7 +1771,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 			vo.setBranch(branch);
 		}
-		
+
 		if (dto.getCurrency() != null && dto.getCurrency() > 0) {
 
 			CurrencyVO currency = currencyRepo.findById(dto.getCurrency())
@@ -1781,10 +1796,10 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		// Purchase Order
 		// ======================================================
 
-		if (dto.getPurchaseorderId() != null) {
-
-			vo.setPurchaseorderNumber(dto.getPurchaseorderId().toString());
-		}
+//		if (dto.getPurchaseorderId() != null) {
+//
+//			vo.setPurchaseorderNumber(dto.getPurchaseorderId().toString());
+//		}
 
 		// ======================================================
 		// UPDATE - DELETE OLD CHILDREN
@@ -2107,9 +2122,10 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 				BigDecimal landCostInr = BigDecimal.ZERO;
 
-				if (detailsDTO.getAccptQty() != null && valueInr != null && valueInr.compareTo(BigDecimal.ZERO) != 0) {
+				if (detailsDTO.getAccptQty() != null && detailsDTO.getAccptQty().compareTo(BigDecimal.ZERO) != 0
+						&& valueInr != null) {
 
-					landCostInr = detailsDTO.getAccptQty().divide(valueInr, 2, RoundingMode.HALF_UP);
+					landCostInr = valueInr.divide(detailsDTO.getAccptQty(), 2, RoundingMode.HALF_UP);
 				}
 
 				detailsVO.setLandCostInr(landCostInr);
@@ -2268,12 +2284,12 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		if (purchaseBillVO.getCurrency() != null) {
 
-		    CurrencyResponseDTO currencyResponseDTO = new CurrencyResponseDTO();
+			CurrencyResponseDTO currencyResponseDTO = new CurrencyResponseDTO();
 
-		    currencyResponseDTO.setId(purchaseBillVO.getCurrency().getId());
-		    currencyResponseDTO.setCurrencyName(purchaseBillVO.getCurrency().getCurrency());
+			currencyResponseDTO.setId(purchaseBillVO.getCurrency().getId());
+			currencyResponseDTO.setCurrencyName(purchaseBillVO.getCurrency().getCurrency());
 
-		    response.setCurrency(currencyResponseDTO);
+			response.setCurrency(currencyResponseDTO);
 		}
 		response.setPurchaseorderType(purchaseBillVO.getPurchaseorderType());
 		response.setReverseChrg(purchaseBillVO.isReverseChrg());
@@ -2690,6 +2706,19 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		return result;
 	}
 
+	@Override
+	public String getPurchaseBillDocId(Long orgId, String financialYear) {
+
+	    String screenCode = "PB";
+
+	    String result = purchaseBillRepo.getPurchaseBillDocId(
+	            orgId,
+	            financialYear,
+	            screenCode
+	    );
+
+	    return result;
+	}
 //	 grnno dropdown
 	@Override
 	public Map<String, Object> getGrnNoDropdownforPurchaseBill(Long orgId, Long branch, Long supplier)

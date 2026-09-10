@@ -2,7 +2,6 @@
 package com.efitops.basesetup.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.efitops.basesetup.entity.PurchaseBillVO;
-import com.efitops.basesetup.entity.PurchaseDeliveryScheduleVO;
 
 @Repository
 public interface PurchaseBillRepo extends JpaRepository<PurchaseBillVO, Long> {
@@ -69,172 +67,239 @@ public interface PurchaseBillRepo extends JpaRepository<PurchaseBillVO, Long> {
 	// grn no number dropdown for purchase bill
 
 	@Query(value = """
-			SELECT
-			    gb.grn_basic_id,
-			    gb.doc_id AS grn_no,
-			    gb.doc_date AS grn_date,
-			    gb.currency,
-			    gb.exchange_rate,
-			    gb.po_no AS po_no,
-			    gb.party_dc_no AS vendor_dc_no,
-			    gb.doc_date AS vendor_dc_date,
-			    pcb.purchase_order_type AS po_type,
-			    gb.modvat_copy_received AS modvat,
-			    gb.party_dc_no AS supplier_dc_inv_no,
-			    STR_TO_DATE(
-			        gb.supplier_dc_date,
-			        '%Y-%m-%d'
-			    ) AS supplier_dc_inv_date
+	        SELECT
+	            gb.grn_basic_id,
+	            gb.doc_id AS grn_no,
+	            gb.doc_date AS grn_date,
+	            gb.currency,
+	            cm.currency AS currency_name,
+	            cm.currency_description,
+	            gb.exchange_rate,
+	            gb.po_no AS po_no,
+	            gb.party_dc_no AS vendor_dc_no,
+	            gb.doc_date AS vendor_dc_date,
+	            pcb.purchase_order_type AS po_type,
+	            gb.modvat_copy_received AS modvat,
+	            gb.party_dc_no AS supplier_dc_inv_no,
+	            STR_TO_DATE(
+	                gb.supplier_dc_date,
+	                '%Y-%m-%d'
+	            ) AS supplier_dc_inv_date
 
-			FROM grn_basic gb
+	        FROM grn_basic gb
 
-			LEFT JOIN purchase_contract_basic pcb
-			    ON pcb.doc_id = gb.po_no
-			    AND pcb.org_id = gb.org_id
-			    AND pcb.branch = gb.branch
+	        LEFT JOIN purchase_contract_basic pcb
+	            ON pcb.doc_id = gb.po_no
+	            AND pcb.org_id = gb.org_id
+	            AND pcb.branch = gb.branch
 
-			WHERE gb.org_id = :orgId
-			  AND gb.branch = :branch
-			  AND gb.supplier_code = :supplier
+	        LEFT JOIN currency cm
+	            ON cm.currency_id = gb.currency
+	            AND cm.active = TRUE
+	            AND cm.cancel = FALSE
 
-			  AND gb.active = TRUE
-			  AND gb.cancel = FALSE
+	        WHERE gb.org_id = :orgId
+	          AND gb.branch = :branch
+	          AND gb.supplier_code = :supplier
 
-			  AND gb.po_no IS NOT NULL
-			  AND gb.po_no <> ''
+	          AND gb.active = TRUE
+	          AND gb.cancel = FALSE
 
-			  AND NOT EXISTS (
-			      SELECT 1
-			      FROM purchase_bill_basic pbb
-			      WHERE pbb.grn_no = gb.doc_id
-			        AND pbb.org_id = gb.org_id
-			        AND pbb.branch = gb.branch
-			        AND pbb.active = TRUE
-			        AND pbb.cancel = FALSE
-			  )
+	          AND gb.po_no IS NOT NULL
+	          AND gb.po_no <> ''
 
-			UNION
+	          AND NOT EXISTS (
+	              SELECT 1
+	              FROM purchase_bill_basic pbb
+	              WHERE pbb.grn_no = gb.doc_id
+	                AND pbb.org_id = gb.org_id
+	                AND pbb.branch = gb.branch
+	                AND pbb.active = TRUE
+	                AND pbb.cancel = FALSE
+	          )
 
-			SELECT
-			    gb.grn_basic_id,
-			    gb.doc_id AS grn_no,
-			    gb.doc_date AS grn_date,
-			    gb.currency,
-			    gb.exchange_rate,
-			    pcb.doc_id AS po_no,
-			    gb.party_dc_no AS vendor_dc_no,
-			    gb.doc_date AS vendor_dc_date,
-			    pcb.purchase_order_type AS po_type,
-			    gb.modvat_copy_received AS modvat,
-			    gb.party_dc_no AS supplier_dc_inv_no,
-			    STR_TO_DATE(
-			        gb.supplier_dc_date,
-			        '%Y-%m-%d'
-			    ) AS supplier_dc_inv_date
+	        UNION
 
-			FROM grn_basic gb
+	        SELECT
+	            gb.grn_basic_id,
+	            gb.doc_id AS grn_no,
+	            gb.doc_date AS grn_date,
+	            gb.currency,
+	            cm.currency AS currency_name,
+	            cm.currency_description,
+	            gb.exchange_rate,
+	            pcb.doc_id AS po_no,
+	            gb.party_dc_no AS vendor_dc_no,
+	            gb.doc_date AS vendor_dc_date,
+	            pcb.purchase_order_type AS po_type,
+	            gb.modvat_copy_received AS modvat,
+	            gb.party_dc_no AS supplier_dc_inv_no,
+	            STR_TO_DATE(
+	                gb.supplier_dc_date,
+	                '%Y-%m-%d'
+	            ) AS supplier_dc_inv_date
 
-			INNER JOIN purchase_contract_basic pcb
-			    ON pcb.supplier = gb.supplier_code
-			    AND pcb.org_id = gb.org_id
-			    AND pcb.branch = gb.branch
-			    AND pcb.currency = gb.currency
+	        FROM grn_basic gb
 
-			WHERE gb.org_id = :orgId
-			  AND gb.branch = :branch
-			  AND gb.supplier_code = :supplier
+	        INNER JOIN purchase_contract_basic pcb
+	            ON pcb.supplier = gb.supplier_code
+	            AND pcb.org_id = gb.org_id
+	            AND pcb.branch = gb.branch
+	            AND pcb.currency = gb.currency
 
-			  AND gb.active = TRUE
-			  AND gb.cancel = FALSE
+	        LEFT JOIN currency cm
+	            ON cm.currency_id = gb.currency
+	            AND cm.active = TRUE
+	            AND cm.cancel = FALSE
 
-			  AND (
-			      gb.po_no IS NULL
-			      OR gb.po_no = ''
-			  )
+	        WHERE gb.org_id = :orgId
+	          AND gb.branch = :branch
+	          AND gb.supplier_code = :supplier
 
-			  AND pcb.active = TRUE
-			  AND pcb.cancel = FALSE
+	          AND gb.active = TRUE
+	          AND gb.cancel = FALSE
 
-			  AND NOT EXISTS (
-			      SELECT 1
-			      FROM purchase_bill_basic pbb
-			      WHERE pbb.grn_no = gb.doc_id
-			        AND pbb.org_id = gb.org_id
-			        AND pbb.branch = gb.branch
-			        AND pbb.active = TRUE
-			        AND pbb.cancel = FALSE
-			  )
-			""", nativeQuery = true)
-	List<Object[]> GrnNoDropdownforPurchaseBill(@Param("orgId") Long orgId, @Param("branch") Long branch,
-			@Param("supplier") Long supplier);
+	          AND (
+	              gb.po_no IS NULL
+	              OR gb.po_no = ''
+	          )
+
+	          AND pcb.active = TRUE
+	          AND pcb.cancel = FALSE
+
+	          AND NOT EXISTS (
+	              SELECT 1
+	              FROM purchase_bill_basic pbb
+	              WHERE pbb.grn_no = gb.doc_id
+	                AND pbb.org_id = gb.org_id
+	                AND pbb.branch = gb.branch
+	                AND pbb.active = TRUE
+	                AND pbb.cancel = FALSE
+	          )
+	        """,
+	        nativeQuery = true)
+	List<Object[]> GrnNoDropdownforPurchaseBill(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch,
+	        @Param("supplier") Long supplier);
 
 //    item dropdown for the purchasebill
 
 	@Query(value = """
-			SELECT
-			    i.item_id AS item,
-			    i.item_description AS itemdesc,
+	        SELECT
+	            i.item_id AS item,
+	            i.item_code AS itemCode,
+	            i.item_description AS itemdesc,
 
-			    h.hsn_id AS hsn_id,
-			    h.hsn AS hsn_value,
+	            h.hsn_id AS hsn_id,
+	            h.hsn AS hsn_value,
+	            gd.tax_percentage AS gst_rate,
 
-			    u.unitmaster_id AS unit_id,
-			    u.description AS unit_value,
+	            gd.challan_qty AS challan_qty,
 
-			    gd.challan_qty AS challan_qty,
-			    gd.received_qty AS received_qty,
-			    gd.accept_qty AS accepted_qty,
-			    gd.reject_qty AS rejected_qty,
+	            u.unitmaster_id AS unit_id,
+	            u.description AS unit_value,
 
-			    gd.po_rate AS po_rate,
+	            gd.received_qty AS received_qty,
+	            gd.accept_qty AS accepted_qty,
+	            gd.reject_qty AS rejected_qty,
 
-			    gd.tax_percentage AS gst_rate,
+	            gd.po_qty - gd.accept_qty AS shortage_qty,
+	            gd.po_qty AS po_qty,
 
-			    gd.cgst_rate AS cgst_rate,
-			    gd.cgst_amount AS cgst_amount,
+	            gd.po_rate AS po_rate,
+	            gd.accept_qty * gd.po_rate AS amount,
 
-			    gd.sgst_rate AS sgst_rate,
-			    gd.sgst_amount AS sgst_amount,
+	            gd.cgst_rate AS cgst_rate,
 
-			    gd.igst_rate AS igst_rate,
-			    gd.igst_amount AS igst_amount,
+	            gd.sgst_rate AS sgst_rate,
 
-			    gd.tax_type AS tax_type
+	            gd.igst_rate AS igst_rate,
 
-			FROM grn_basic gb
+	            gd.tax_type AS tax_type
 
-			INNER JOIN grn_details gd
-			    ON gd.grn_basic_id = gb.grn_basic_id
+	        FROM grn_basic gb
 
-			INNER JOIN item i
-			    ON i.item_id = gd.item
+	        INNER JOIN grn_details gd
+	            ON gd.grn_basic_id = gb.grn_basic_id
 
-			INNER JOIN listofvaluesdetails inspectionLov
-			    ON inspectionLov.listofvaluesdetails_id = i.inspection
+	        INNER JOIN item i
+	            ON i.item_id = gd.item
 
-			LEFT JOIN unitmaster u
-			    ON u.unitmaster_id = gd.received_unit
-			    AND u.active = TRUE
-			    AND u.cancel = FALSE
+	        INNER JOIN listofvaluesdetails inspectionLov
+	            ON inspectionLov.listofvaluesdetails_id = i.inspection
 
-			LEFT JOIN hsn h
-			    ON h.hsn_id = i.hsn_code
-			    AND h.active = TRUE
-			    AND h.cancel = FALSE
+	        LEFT JOIN unitmaster u
+	            ON u.unitmaster_id = gd.received_unit
+	            AND u.active = TRUE
+	            AND u.cancel = FALSE
+				AND LOWER(gb.grn_type) = 'import'
+	        LEFT JOIN hsn h
+	            ON h.hsn_id = i.hsn_code
+	            AND h.active = TRUE
+	            AND h.cancel = FALSE
 
-			WHERE gb.org_id = :orgId
-			  AND gb.branch = :branch
-			  AND gb.supplier_code = :supplier
-			  AND gb.doc_id = :grnNo
+	        WHERE gb.org_id = :orgId
+	          AND gb.branch = :branch
+	          AND gb.supplier_code = :supplier
+	          AND gb.doc_id = :grnNo
 
-			  AND gb.active = TRUE
-			  AND gb.cancel = FALSE
+	          AND gb.active = TRUE
+	          AND gb.cancel = FALSE
 
-			  AND i.active = TRUE
-			  AND i.cancel = FALSE
+	          AND i.active = TRUE
+	          AND i.cancel = FALSE
 
-			  AND LOWER(inspectionLov.value_description) = 'no'
-			""", nativeQuery = true)
-	List<Object[]> GetItemDropDownForPurchaseBill(@Param("orgId") Long orgId, @Param("branch") Long branch,
-			@Param("supplier") Long supplier, @Param("grnNo") String grnNo);
+	          AND LOWER(inspectionLov.value_description)
+	              IN ('sample', 'not required')
+	        """,
+	        nativeQuery = true)
+	List<Object[]> GetItemDropDownForPurchaseBill(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch,
+	        @Param("supplier") Long supplier,
+	        @Param("grnNo") String grnNo);
+
+	@Query(value = """
+	        SELECT
+	            i.item_id AS item,
+	            i.item_code AS item_code,
+	            i.item_description AS item_description,
+
+	            igd.challan_qty AS challan_qty,
+	            igd.received_qty AS grn_qty,
+	            igd.acpt_qty AS accepted_qty,
+	            igd.short_qty AS shortage_qty,
+
+	            igd.fob_rate_fc AS fob_rate_fc
+
+	        FROM import_grn_details igd
+
+	        INNER JOIN grn_basic gb
+	            ON gb.grn_basic_id = igd.grn_basic_id
+
+	        INNER JOIN item i
+	            ON i.item_id = igd.item
+
+	        WHERE gb.org_id = :orgId
+	          AND gb.branch = :branch
+	          AND gb.supplier_code = :supplier
+	          AND gb.doc_id = :grnNo
+
+	          AND LOWER(gb.grn_type) = 'import'
+
+	          AND gb.active = TRUE
+	          AND gb.cancel = FALSE
+
+	          AND i.active = TRUE
+	          AND i.cancel = FALSE
+	        """,
+	        nativeQuery = true)
+	List<Object[]> getImportItemDropDownForPurchaseBill(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch,
+	        @Param("supplier") Long supplier,
+	        @Param("grnNo") String grnNo);
+	
+
 }

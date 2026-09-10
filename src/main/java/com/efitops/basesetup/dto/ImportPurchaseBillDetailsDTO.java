@@ -19,20 +19,20 @@ public class ImportPurchaseBillDetailsDTO {
 
 	private BigDecimal accptQty;
 
-	private BigDecimal shortageQty;
+//	private BigDecimal shortageQty;
 
 	private BigDecimal fobRateFc;
 
-	private BigDecimal fobValueFc;
+//	private BigDecimal fobValueFc;
 
-	private BigDecimal fobValueInr;
+//	private BigDecimal fobValueInr;
 
 	private BigDecimal dutyAmtInr;
 
-	private BigDecimal valueFc;
+//	private BigDecimal valueFc;
 
-	private BigDecimal valueInr;
+//	private BigDecimal valueInr;
 
-	private BigDecimal landCostInr;
+//	private BigDecimal landCostInr;
 
 }

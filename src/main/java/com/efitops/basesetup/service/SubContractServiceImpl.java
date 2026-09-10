@@ -4987,6 +4987,9 @@ public class SubContractServiceImpl implements SubContractService {
 	                // JANUARY
 	                // =================================================
 
+	                detailVO.setDate(
+	                        detailDTO.getDate());
+	                
 	                detailVO.setJanuary(
 	                        detailDTO.getJanuary());
 
@@ -5222,6 +5225,9 @@ public class SubContractServiceImpl implements SubContractService {
 
 	                detailResponse.setId(
 	                        detailVO.getId());
+	                
+	                detailResponse.setDate(
+	                        detailVO.getDate());
 	                
 	                detailResponse.setJanuary(
 	                        detailVO.getJanuary());

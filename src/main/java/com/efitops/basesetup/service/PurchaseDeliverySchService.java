@@ -109,6 +109,8 @@ public interface PurchaseDeliverySchService {
 
 	String getPhysicalStockReConcilationDocId(Long orgId, String financialYear);
 
+	Map<String, Object> getImportItemDropDownForPurchaseBill(Long orgId, Long branch, Long supplier, String grnNo) throws ApplicationException;
+
 //	purchase order amendment dropdown
 	
 

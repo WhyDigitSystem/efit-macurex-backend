@@ -21,22 +21,22 @@ public class PurchaseBillResponseDTO {
     private BranchResponseDTO branch;
     private String docId;
     private String belongsTo;
+
     private LocalDate docDate;
     private PurchaseBillSupplierResponseDTO supplier;
     private String grnNo;
     private LocalDate grnDate;
-    private Boolean isIgstAppl;
-    private Boolean excisable;
+    private boolean isIgstAppl;
+    private boolean excisable;
     private String vendorDcNo;
     private BigDecimal exchangeRate;
     private CurrencyResponseDTO currency;   // small {id, code, name} DTO, mirroring BranchResponseDTO
 
 //    private ListOfVlauesDetailsResponseDTO dealerType;
     private String purchaseorderType;
-    private Long purchaseorderId;
     private String purchaseorderNo;
     private LocalDate purchaseorderDate;
-    private Boolean isReverseChrg;
+    private boolean isReverseChrg;
     private LocalDate voucherPostingDate;
     private LocalDate date;
     private BigDecimal dutyPerUnit;
@@ -48,7 +48,8 @@ public class PurchaseBillResponseDTO {
     
 //   purchase Import bill
     private String creditAcc;
-	private Long statutoryForms;
+	private String statutoryForms;
+
 	private String supplierInvValue;
     private String taxStructureName;
 

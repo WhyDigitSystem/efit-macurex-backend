@@ -1,6 +1,7 @@
 package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,8 @@ public class ProductionScheduleForNextThreeMonthDetailsDTO {
 
 
     private Long item;
+
+    private LocalDate date;
 
     private BigDecimal january;
 

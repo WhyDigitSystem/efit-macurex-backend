@@ -31,10 +31,10 @@ public class PurchaseBillDetailsResponseDTO {
     private BigDecimal acceptedQty;
     private BigDecimal rejectedQty;
     private BigDecimal shortageQty;
+    private BigDecimal purchaseorderQty;
     private BigDecimal purchaseorderRate;
     private BigDecimal rateInInr;
     private BigDecimal rateInSelectedCurrency;
-    private BigDecimal apportionedCost;
     private BigDecimal landedCostRate;
     private BigDecimal amount;
     private BigDecimal amountInSelectedCurrency;

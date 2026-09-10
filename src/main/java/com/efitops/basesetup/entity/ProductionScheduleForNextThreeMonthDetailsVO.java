@@ -1,6 +1,7 @@
 package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,6 +47,10 @@ public class ProductionScheduleForNextThreeMonthDetailsVO {
     @JoinColumn(name = "item")
     private ItemMasterVO item;
 
+    @Column(name = "date")
+    private LocalDate date;
+
+    
     @Column(name = "january", precision = 18, scale = 2)
     private BigDecimal january;
 

@@ -1,6 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 
@@ -16,6 +17,8 @@ public class ProductionScheduleForNextThreeMonthDetailsResponseDTO {
     private Long id;
 
     private ItemMasterResponseDetailsDTO item;
+
+    private LocalDate date;
 
     private BigDecimal january;
 

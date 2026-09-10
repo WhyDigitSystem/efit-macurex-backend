@@ -43,7 +43,7 @@ public class PurchaseBillVO {
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
-
+	
 	@Column(name = "doc_id")
 	private String docId;
 
@@ -67,11 +67,11 @@ public class PurchaseBillVO {
 	@Column(name = "grn_date")
 	private LocalDate grnDate;
 
-	@Column(name = "is_igst_appl")
-	private Boolean isIgstAppl;
+	@Column(name = "is_igst_applicable")
+	private boolean isIgstApplicable;
 
 	@Column(name = "excisable")
-	private Boolean excisable;
+	private boolean excisable;
 
 	@ManyToOne
 	@JoinColumn(name = "curreny")
@@ -93,7 +93,7 @@ public class PurchaseBillVO {
 	private LocalDate purchaseorderDate;
 
 	@Column(name = "is_reverse_chrg")
-	private Boolean isReverseChrg;
+	private boolean isReverseChrg;
 
 	@Column(name = "voucher_posting_date")
 	private LocalDate voucherPostingDate;

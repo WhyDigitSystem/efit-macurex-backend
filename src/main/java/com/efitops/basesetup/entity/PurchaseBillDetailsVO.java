@@ -74,6 +74,10 @@ public class PurchaseBillDetailsVO {
     @Column(name = "shortage_qty")
     private BigDecimal shortageQty;
 
+    @Column(name = "purchaseorder_qty")
+    private BigDecimal purchaseorderQty;
+   
+    
     @Column(name = "purchaseorder_rate")
     private BigDecimal purchaseorderRate;
 
@@ -83,8 +87,8 @@ public class PurchaseBillDetailsVO {
     @Column(name = "rate_in_selected_currency")
     private BigDecimal rateInSelectedCurrency;
 
-    @Column(name = "apportioned_cost")
-    private BigDecimal apportionedCost;
+//    @Column(name = "apportioned_cost")
+//    private BigDecimal apportionedCost;
 
     @Column(name = "landed_cost_rate")
     private BigDecimal landedCostRate;

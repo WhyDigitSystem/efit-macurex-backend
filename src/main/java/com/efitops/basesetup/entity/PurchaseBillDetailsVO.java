@@ -2,7 +2,15 @@ package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -27,12 +35,12 @@ public class PurchaseBillDetailsVO {
     @JoinColumn(name = "item")
     private ItemMasterVO item;
 
-    @ManyToOne
-    @JoinColumn(name = "gstrate")
-    private GSTRateMasterVO gstRate;
+//    @ManyToOne
+//    @JoinColumn(name = "gstrate")
+//    private GSTRateMasterVO gstRate;
     
     @ManyToOne
-    @JoinColumn(name = "hsn")
+    @JoinColumn(name = "hsn")	
     private HsnVO hsnCode;
 
     @Column(name = "tax_type")
@@ -41,11 +49,11 @@ public class PurchaseBillDetailsVO {
     @Column(name = "tax_percent")
     private BigDecimal taxPercent;
 
-//    @Column(name = "tariff_no")
-//    private String tariffNo;
+    @Column(name = "tariff_no")
+    private String tariffNo;
 
     @Column(name = "excise_to_post")
-    private Boolean exciseToPost;
+    private boolean exciseToPost;
 
     @Column(name = "challan_qty")
     private BigDecimal challanQty;

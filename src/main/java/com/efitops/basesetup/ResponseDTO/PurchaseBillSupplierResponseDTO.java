@@ -12,7 +12,7 @@ public class PurchaseBillSupplierResponseDTO {
 	private  String supplierName;
 	private String supplierCode;
 	private GSTStateResponseDTO gstState;
-	private String gstNNo;
+	private String gstNo;
 	private String eccType;
 	private Boolean dealerType;
 	

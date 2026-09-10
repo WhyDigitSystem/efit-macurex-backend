@@ -30,9 +30,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
-import com.efitops.basesetup.ResponseDTO.GSTRateMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GateInwardEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.HsnResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ImportPurchaseBillChargesSummaryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ImportPurchaseBillDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ImportPurchaseBillTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InternalIndentDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InternalIndentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
@@ -40,6 +43,7 @@ import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PhysicalStockReConcilationDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PhysicalStockReConcilationResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseBillChargesSummaryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseBillDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseBillResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseBillSupplierResponseDTO;
@@ -55,14 +59,16 @@ import com.efitops.basesetup.ResponseDTO.SupplierResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.GateInwardEntryDTO;
-import com.efitops.basesetup.dto.HsnResponseImageDTO;
+import com.efitops.basesetup.dto.ImportPurchaseBillChargesSummaryDTO;
+import com.efitops.basesetup.dto.ImportPurchaseBillDetailsDTO;
+import com.efitops.basesetup.dto.ImportPurchaseBillTaxDetailsDTO;
 import com.efitops.basesetup.dto.InternalIndentDTO;
 import com.efitops.basesetup.dto.InternalIndentDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
-import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
 import com.efitops.basesetup.dto.PhysicalStockReConcilationDTO;
 import com.efitops.basesetup.dto.PhysicalStockReConcilationDetailsDTO;
 import com.efitops.basesetup.dto.PrimaryUnitImageDTO;
+import com.efitops.basesetup.dto.PurchaseBillChargesSummaryDTO;
 import com.efitops.basesetup.dto.PurchaseBillDTO;
 import com.efitops.basesetup.dto.PurchaseBillDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseBillTaxGridDTO;
@@ -72,7 +78,6 @@ import com.efitops.basesetup.dto.PurchaseContractTaxDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseDeliveryScheduleLineDTO;
-import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
@@ -80,9 +85,12 @@ import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
-import com.efitops.basesetup.entity.GSTRateMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.GateInwardEntryVO;
+import com.efitops.basesetup.entity.HsnVO;
+import com.efitops.basesetup.entity.ImportPurchaseBillChargesSummaryVO;
+import com.efitops.basesetup.entity.ImportPurchaseBillDetailsVO;
+import com.efitops.basesetup.entity.ImportPurchaseBillTaxDetailsVO;
 import com.efitops.basesetup.entity.InternalIndentDetailsVO;
 import com.efitops.basesetup.entity.InternalIndentVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
@@ -90,6 +98,7 @@ import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.PhysicalStockReConcilationDetailsVO;
 import com.efitops.basesetup.entity.PhysicalStockReConcilationVO;
+import com.efitops.basesetup.entity.PurchaseBillChargesSummaryVO;
 import com.efitops.basesetup.entity.PurchaseBillDetailsVO;
 import com.efitops.basesetup.entity.PurchaseBillTaxGridVO;
 import com.efitops.basesetup.entity.PurchaseBillVO;
@@ -111,6 +120,10 @@ import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.GateInwardEntryRepo;
 import com.efitops.basesetup.repository.GstRateMasterRepo;
+import com.efitops.basesetup.repository.HsnRepo;
+import com.efitops.basesetup.repository.ImportPurchaseBillChargesSummaryRepo;
+import com.efitops.basesetup.repository.ImportPurchaseBillDetailsRepo;
+import com.efitops.basesetup.repository.ImportPurchaseBillTaxDetailsRepo;
 import com.efitops.basesetup.repository.InternalIndentDetailsRepo;
 import com.efitops.basesetup.repository.InternalIndentRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
@@ -118,6 +131,7 @@ import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.PhysicalStockReConcilationDetailsRepo;
 import com.efitops.basesetup.repository.PhysicalStockReConcilationRepo;
+import com.efitops.basesetup.repository.PurchaseBillChargesSummaryRepo;
 import com.efitops.basesetup.repository.PurchaseBillDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseBillRepo;
 import com.efitops.basesetup.repository.PurchaseBillTaxGridRepo;
@@ -204,6 +218,29 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 	@Autowired
 	LocationRepo locationRepo;
 
+	@Autowired
+	private GSTStateMasterRepo gstStateMasterRepo;
+
+
+
+	@Autowired
+	private ItemMasterRepo itemMasterRepo;
+
+	@Autowired
+	private HsnRepo hsnRepo;
+
+	@Autowired
+	private PurchaseBillChargesSummaryRepo purchaseBillChargesSummaryRepo;
+
+	@Autowired
+	private ImportPurchaseBillDetailsRepo importPurchaseBillDetailsRepo;
+
+	@Autowired
+	private ImportPurchaseBillTaxDetailsRepo importPurchaseBillTaxDetailsRepo;
+
+	@Autowired
+	private ImportPurchaseBillChargesSummaryRepo importPurchaseBillChargesSummaryRepo;
+	
 	@Override
 	@Transactional
 	public Map<String, Object> updateCreatePurchaseDeliverySchedule(
@@ -1540,881 +1577,1925 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 //	purchase bill 
 
+//	@Override
+//	@Transactional
+//	public Map<String, Object> createUpdatePurchaseBill(PurchaseBillDTO purchaseBillDTO) throws ApplicationException {
+//
+//		PurchaseBillVO purchaseBillVO = new PurchaseBillVO();
+//
+//		String message;
+//
+//		// ======================================================
+//		// Update
+//		// ======================================================
+//
+//		if (ObjectUtils.isNotEmpty(purchaseBillDTO.getId())) {
+//
+//			purchaseBillVO = purchaseBillRepo.findById(purchaseBillDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("Purchase Bill Not Found"));
+//
+//			purchaseBillVO.setUpdatedBy(purchaseBillDTO.getUpdatedBy() != null ? purchaseBillDTO.getUpdatedBy()
+//					: purchaseBillDTO.getCreatedBy());
+//
+//			message = "Purchase Bill Updated Successfully";
+//
+//		} else {
+//
+//			purchaseBillVO.setCreatedBy(purchaseBillDTO.getCreatedBy());
+//
+//			purchaseBillVO.setUpdatedBy(purchaseBillDTO.getUpdatedBy() != null ? purchaseBillDTO.getUpdatedBy()
+//					: purchaseBillDTO.getCreatedBy());
+//
+//			message = "Purchase Bill Created Successfully";
+//		}
+//
+//		// ======================================================
+//		// Header Mapping
+//		// ======================================================
+//
+//		createUpdatePurchaseBillVO(purchaseBillDTO, purchaseBillVO);
+//
+//		// ======================================================
+//		// Save Header
+//		// ======================================================
+//
+//		purchaseBillVO = purchaseBillRepo.save(purchaseBillVO);
+//
+//		// ======================================================
+//		// Purchase Bill Details
+//		// ======================================================
+//
+//		if (purchaseBillDTO.getPurchaseDetails() != null) {
+//
+//			createUpdatePurchaseBillDetails(purchaseBillDTO.getPurchaseDetails(), purchaseBillVO);
+//		}
+//
+//		// ======================================================
+//		// Purchase Bill Tax Details
+//		// ======================================================
+//
+//		if (purchaseBillDTO.getTaxGrid() != null) {
+//
+//			createUpdatePurchaseBillTaxDetails(purchaseBillDTO.getTaxGrid(), purchaseBillVO);
+//		}
+//		// ======================================================
+//		// Build Response
+//		// ======================================================
+//
+//		PurchaseBillResponseDTO responseDTO = purchaseBillResponse(purchaseBillVO);
+//
+//		Map<String, Object> response = new HashMap<>();
+//
+//		response.put("message", message);
+//		response.put("purchaseBillVO", responseDTO);
+//
+//		return response;
+//	}
+//
+//	private void createUpdatePurchaseBillVO(PurchaseBillDTO dto, PurchaseBillVO vo) throws ApplicationException {
+//
+//		// ======================================================
+//		// Basic Header
+//		// ======================================================
+//
+//		vo.setBelongsTo(dto.getBelongsTo());
+//
+//		vo.setDocDate(dto.getDocDate());
+//
+//		vo.setGrnNo(dto.getGrnNo());
+//
+//		vo.setGrnDate(dto.getGrnDate());
+//
+//		vo.setExcisable(dto.getExcisable());
+//
+//		vo.setVendorDcNo(dto.getVendorDcNo());
+//
+//		vo.setExchangeRate(dto.getExchangeRate());
+//
+//		vo.setPurchaseorderType(dto.getPurchaseorderType());
+//
+//		vo.setIsReverseChrg(dto.getIsReverseChrg());
+//
+//		vo.setVoucherPostingDate(dto.getVoucherPostingDate());
+//
+//		vo.setDate(dto.getDate());
+//
+//		vo.setDutyPerUnit(dto.getDutyPerUnit());
+//
+//		vo.setModvatCopyReceived(dto.getModvatCopyReceived());
+//
+//		vo.setSupplierDcInvNo(dto.getSupplierDcInvNo());
+//
+//		vo.setSupplierDcInvDate(dto.getSupplierDcInvDate());
+//
+//		// ======================================================
+//		// Organization
+//		// ======================================================
+//
+//		vo.setOrgId(dto.getOrgId());
+//
+//		vo.setFinancialYear(dto.getFinancialYear());
+//
+//		vo.setActive(dto.isActive());
+//
+//		vo.setCancelRemarks(dto.getCancelRemarks());
+//
+//		// ======================================================
+//		// Branch
+//		// ======================================================
+//
+//		if (dto.getBranch() != null && dto.getBranch() > 0) {
+//
+//			BranchVO branch = branchRepo.findById(dto.getBranch())
+//					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+//
+//			vo.setBranch(branch);
+//		}
+//
+//		// ======================================================
+//		// Supplier
+//		// ======================================================
+//
+//		if (dto.getSupplier() != null && dto.getSupplier() > 0) {
+//
+//			CustomerVO supplier = customerRepo.findById(dto.getSupplier())
+//					.orElseThrow(() -> new ApplicationException("Supplier Not Found"));
+//
+//			vo.setSupplier(supplier);
+//		}
+//
+//		// ======================================================
+//		// Dealer Type
+//		// ======================================================
+//
+//		// ======================================================
+//		// Posting Category
+//		// ======================================================
+//
+////		if (dto.getPostingCategory() != null && dto.getPostingCategory() > 0) {
+////
+////			ListOfValuesDetailsVO postingCategory = listOfValuesDetailsRepo.findById(dto.getPostingCategory())
+////					.orElseThrow(() -> new ApplicationException("Posting Category Not Found"));
+////
+////			vo.setPostingCategory(postingCategory);
+////		}
+//
+//		// ======================================================
+//		// ECC Type
+//		// ======================================================
+//
+////	    if (dto.getEccType() != null
+////	            && dto.getEccType() > 0) {
+////
+////	        CustomerVO eccType =
+////	                customerRepo
+////	                        .findById(dto.getEccType())
+////	                        .orElseThrow(() ->
+////	                                new ApplicationException(
+////	                                        "ECC Type Not Found"));
+////
+////	        vo.setEccType(eccType);
+////	    }
+//	}
+//
+//	private void createUpdatePurchaseBillDetails(List<PurchaseBillDetailsDTO> detailsDTOList,
+//			PurchaseBillVO purchaseBillVO) throws ApplicationException {
+//
+//		if (detailsDTOList == null || detailsDTOList.isEmpty()) {
+//			return;
+//		}
+//
+//		for (PurchaseBillDetailsDTO detailsDTO : detailsDTOList) {
+//
+//			PurchaseBillDetailsVO detailsVO;
+//
+//			// ======================================================
+//			// Update / Create
+//			// ======================================================
+//
+//			if (detailsDTO.getId() != null) {
+//
+//				detailsVO = purchaseBillDetailsRepo.findById(detailsDTO.getId())
+//						.orElseThrow(() -> new ApplicationException("Purchase Bill Details Not Found"));
+//
+//			} else {
+//
+//				detailsVO = new PurchaseBillDetailsVO();
+//			}
+//
+//			// ======================================================
+//			// Basic Details
+//			// ======================================================
+//
+//			detailsVO.setTaxType(detailsDTO.getTaxType());
+//			detailsVO.setTaxPercent(detailsDTO.getTaxPercent());
+//			detailsVO.setExciseToPost(detailsDTO.getExciseToPost());
+//
+//			detailsVO.setChallanQty(detailsDTO.getChallanQty());
+//			detailsVO.setGrnReceivedQty(detailsDTO.getGrnReceivedQty());
+//			detailsVO.setAcceptedQty(detailsDTO.getAcceptedQty());
+//			detailsVO.setRejectedQty(detailsDTO.getRejectedQty());
+//			detailsVO.setShortageQty(detailsDTO.getShortageQty());
+//
+//			detailsVO.setPurchaseorderRate(detailsDTO.getPurchaseorderRate());
+//
+//			// ======================================================
+//			// Rate In Selected Currency
+//			// ======================================================
+//
+//			BigDecimal rateInSelectedCurrency = detailsDTO.getRateInSelectedCurrency();
+//
+//			if (rateInSelectedCurrency == null) {
+//				rateInSelectedCurrency = BigDecimal.ZERO;
+//			}
+//
+//			detailsVO.setRateInSelectedCurrency(rateInSelectedCurrency);
+//
+//			// ======================================================
+//			// Rate In INR
+//			//
+//			// Rate In INR = Rate In Selected Currency
+//			// * Exchange Rate
+//			// ======================================================
+//
+//			BigDecimal exchangeRate = purchaseBillVO.getExchangeRate();
+//
+//			if (exchangeRate == null) {
+//				exchangeRate = BigDecimal.ONE;
+//			}
+//
+//			BigDecimal rateInInr = rateInSelectedCurrency.multiply(exchangeRate);
+//
+//			detailsVO.setRateInInr(rateInInr);
+//
+//			// ======================================================
+//			// Quantity
+//			// ======================================================
+//
+//			BigDecimal acceptedQty = detailsDTO.getAcceptedQty();
+//
+//			if (acceptedQty == null) {
+//				acceptedQty = BigDecimal.ZERO;
+//			}
+//
+//			BigDecimal receivedQty = detailsDTO.getGrnReceivedQty();
+//
+//			if (receivedQty == null) {
+//				receivedQty = BigDecimal.ZERO;
+//			}
+//
+//			// ======================================================
+//			// Amount In Selected Currency
+//			//
+//			// Amount In Selected Currency
+//			// = Rate In Selected Currency * Accepted Qty
+//			// ======================================================
+//
+//			BigDecimal amountInSelectedCurrency = rateInSelectedCurrency.multiply(acceptedQty);
+//
+//			detailsVO.setAmountInSelectedCurrency(amountInSelectedCurrency);
+//
+//			// ======================================================
+//			// Amount In INR
+//			//
+//			// Amount In INR
+//			// = Rate In INR * Accepted Qty
+//			// ======================================================
+//
+//			BigDecimal amountInInr = rateInInr.multiply(acceptedQty);
+//
+//			detailsVO.setAmountInInr(amountInInr);
+//
+//			// ======================================================
+//			// Amount
+//			// ======================================================
+//			//
+//			// If your "amount" field represents the item amount,
+//			// use the selected-currency amount here.
+//			//
+//			// If your business logic uses INR amount for "amount",
+//			// change this to amountInInr.
+//			// ======================================================
+//
+//			BigDecimal amount = detailsDTO.getAmount();
+//
+//			if (amount == null) {
+//				amount = amountInSelectedCurrency;
+//			}
+//
+//			detailsVO.setAmount(amount);
+//
+//			// ======================================================
+//			// Apportioned Cost
+//			//
+//			// Apportioned Cost =
+//			// (Total Freight * Item Amount) / Total Item Amount
+//			// ======================================================
+////
+////			BigDecimal totalFreight = purchaseBillVO.getTotalFreight();
+////
+////			BigDecimal totalItemAmount = purchaseBillVO.getBasicValue();
+////
+////			BigDecimal apportionedCost = BigDecimal.ZERO;
+////
+////			if (totalFreight != null && amount != null && totalItemAmount != null
+////					&& totalItemAmount.compareTo(BigDecimal.ZERO) > 0) {
+////
+////				apportionedCost = totalFreight.multiply(amount).divide(totalItemAmount, 2, RoundingMode.HALF_UP);
+////			}
+////
+////			detailsVO.setApportionedCost(apportionedCost);
+//
+//			// ======================================================
+//			// Landed Cost Rate
+//			//
+//			// Landed Cost Rate = Amount / Received Qty
+//			// ======================================================
+//
+//			BigDecimal landedCostRate = BigDecimal.ZERO;
+//
+//			if (amount != null && receivedQty.compareTo(BigDecimal.ZERO) > 0) {
+//
+//				landedCostRate = amount.divide(receivedQty, 2, RoundingMode.HALF_UP);
+//			}
+//
+//			detailsVO.setLandedCostRate(landedCostRate);
+//
+//			// ======================================================
+//			// Additional Duty
+//			// ======================================================
+//
+//			detailsVO.setAdditionalDuty(detailsDTO.getAdditionalDuty());
+//
+//			// ======================================================
+//			// SGST
+//			// ======================================================
+//
+//			detailsVO.setSgstRate(detailsDTO.getSgstRate());
+//
+//			detailsVO.setSgstAmount(detailsDTO.getSgstAmount());
+//
+//			// ======================================================
+//			// CGST
+//			// ======================================================
+//
+//			detailsVO.setCgstRate(detailsDTO.getCgstRate());
+//
+//			detailsVO.setCgstAmount(detailsDTO.getCgstAmount());
+//
+//			// ======================================================
+//			// IGST
+//			// ======================================================
+//
+//			detailsVO.setIgstRate(detailsDTO.getIgstRate());
+//
+//			detailsVO.setIgstAmount(detailsDTO.getIgstAmount());
+//
+//			// ======================================================
+//			// Item
+//			// ======================================================
+//
+//			if (detailsDTO.getItem() != null && detailsDTO.getItem() > 0) {
+//
+//				ItemMasterVO item = itemRepo.findById(detailsDTO.getItem())
+//						.orElseThrow(() -> new ApplicationException("Item Not Found"));
+//
+//				detailsVO.setItem(item);
+//			}
+//
+//			
+//
+//			// ======================================================
+//			// HSN
+//			// ======================================================
+//
+//			/*
+//			 * if (detailsDTO.getHsnCode() != null && detailsDTO.getHsnCode() > 0) {
+//			 * 
+//			 * HsnVO hsn = hsnRepo.findById(detailsDTO.getHsnCode()) .orElseThrow(() -> new
+//			 * ApplicationException( "HSN Code Not Found"));
+//			 * 
+//			 * detailsVO.setHsnCode(hsn); }
+//			 */
+//
+//			// ======================================================
+//			// Unit
+//			// ======================================================
+//
+//			if (detailsDTO.getUnit() != null && detailsDTO.getUnit() > 0) {
+//
+//				UnitMasterVO unit = unitMasterRepo.findById(detailsDTO.getUnit())
+//						.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+//
+//				detailsVO.setUnit(unit);
+//			}
+//
+//			// ======================================================
+//			// Parent
+//			// ======================================================
+//
+//			detailsVO.setPurchaseBillVO(purchaseBillVO);
+//
+//			// ======================================================
+//			// Add Details To Parent
+//			// ======================================================
+//
+//			if (!purchaseBillVO.getPurchaseBillDetailsVO().contains(detailsVO)) {
+//
+//				purchaseBillVO.getPurchaseBillDetailsVO().add(detailsVO);
+//			}
+//		}
+//	}
+//
+//	private void createUpdatePurchaseBillTaxDetails(List<PurchaseBillTaxGridDTO> taxDTOList,
+//			PurchaseBillVO purchaseBillVO) throws ApplicationException {
+//
+//		if (taxDTOList == null || taxDTOList.isEmpty()) {
+//			return;
+//		}
+//
+//		for (PurchaseBillTaxGridDTO taxDTO : taxDTOList) {
+//
+//			PurchaseBillTaxGridVO taxVO;
+//
+//			// ======================================================
+//			// Update
+//			// ======================================================
+//
+//			if (taxDTO.getId() != null) {
+//
+//				taxVO = purchaseBillTaxGridRepo.findById(taxDTO.getId())
+//						.orElseThrow(() -> new ApplicationException("Purchase Bill Tax Details Not Found"));
+//
+//			} else {
+//
+//				// ==================================================
+//				// Create
+//				// ==================================================
+//
+//				taxVO = new PurchaseBillTaxGridVO();
+//			}
+//
+//			// ======================================================
+//			// Basic Tax Details
+//			// ======================================================
+//
+//			taxVO.setParticulars(taxDTO.getParticulars());
+//			taxVO.setTaxPercent(taxDTO.getTaxPercent());
+//			taxVO.setAcceptedQtyAmount(taxDTO.getAcceptedQtyAmount());
+//			taxVO.setRevisedAmount(taxDTO.getRevisedAmount());
+//
+//			taxVO.setDebitbCredit(taxDTO.getDebitCredit());
+//
+//			taxVO.setDebitAmount(taxDTO.getDebitAmount());
+//			taxVO.setCreditAmount(taxDTO.getCreditAmount());
+//
+//			taxVO.setPostToFinanceAc(taxDTO.getPostToFinanceAc());
+//
+//			taxVO.setLedgerAccount(taxDTO.getLedgerAccount());
+//
+//
+//			// ======================================================
+//			// Parent
+//			// ======================================================
+//
+//			taxVO.setPurchaseBillVO(purchaseBillVO);
+//
+//			// ======================================================
+//			// Add to Parent
+//			// ======================================================
+//
+//			if (!purchaseBillVO.getPurchaseBillTaxGridVO().contains(taxVO)) {
+//
+//				purchaseBillVO.getPurchaseBillTaxGridVO().add(taxVO);
+//			}
+//		}
+//	}
+//
+//	private PurchaseBillResponseDTO purchaseBillResponse(PurchaseBillVO vo) {
+//
+//		PurchaseBillResponseDTO dto = new PurchaseBillResponseDTO();
+//
+//		// ======================================================
+//		// Basic Header
+//		// ======================================================
+//
+//		dto.setId(vo.getId());
+//
+////	    dto.setDocId(vo.getDocId());
+//
+//		dto.setBelongsTo(vo.getBelongsTo());
+//
+////	    dto.setDocDate(vo.getDocDate());
+//
+//		dto.setGrnNo(vo.getGrnNo());
+//
+//		dto.setGrnDate(vo.getGrnDate());
+//
+//		dto.setExcisable(vo.getExcisable());
+//
+//		dto.setVendorDcNo(vo.getVendorDcNo());
+//
+//		dto.setExchangeRate(vo.getExchangeRate());
+//
+//		dto.setPurchaseorderType(vo.getPurchaseorderType());
+//
+//		dto.setPurchaseorderNo(vo.getPurchaseorderNumber());
+//
+//		dto.setPurchaseorderDate(vo.getPurchaseorderDate());
+//
+//		dto.setIsReverseChrg(vo.getIsReverseChrg());
+//
+//		dto.setVoucherPostingDate(vo.getVoucherPostingDate());
+//
+//		dto.setDate(vo.getDate());
+//
+//		dto.setDutyPerUnit(vo.getDutyPerUnit());
+//
+//		dto.setModvatCopyReceived(vo.getModvatCopyReceived());
+//
+//		dto.setSupplierDcInvNo(vo.getSupplierDcInvNo());
+//
+//		dto.setSupplierDcInvDate(vo.getSupplierDcInvDate());
+//
+//
+//		// ======================================================
+//		// Organization / Audit
+//		// ======================================================
+//
+//		dto.setOrgId(vo.getOrgId());
+//
+//		dto.setFinancialYear(vo.getFinancialYear());
+//
+//		dto.setActive(vo.getActive());
+//
+//		dto.setCancelRemarks(vo.getCancelRemarks());
+//
+//		if (vo.getCreatedBy() != null) {
+//			dto.setCreatedBy(vo.getCreatedBy());
+//		}
+//
+//		if (vo.getUpdatedBy() != null) {
+//			dto.setUpdatedBy(vo.getUpdatedBy());
+//		}
+//
+//		// ======================================================
+//		// Branch
+//		// ======================================================
+//
+//		if (vo.getBranch() != null) {
+//
+//			BranchResponseDTO branchDTO = new BranchResponseDTO();
+//
+//			branchDTO.setId(vo.getBranch().getId());
+//
+//			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+//
+//			branchDTO.setBranchName(vo.getBranch().getBranchName());
+//
+//			dto.setBranch(branchDTO);
+//		}
+//
+//		// ======================================================
+//		// Supplier
+//		// ======================================================
+//		if (vo.getSupplier() != null) {
+//
+//			PurchaseBillSupplierResponseDTO supplierDTO = new PurchaseBillSupplierResponseDTO();
+//
+//			supplierDTO.setId(vo.getSupplier().getId());
+//
+//			supplierDTO.setSupplierCode(vo.getSupplier().getCustomerCode());
+//
+//			supplierDTO.setSupplierName(vo.getSupplier().getCustomerName());
+//
+//			supplierDTO.setDealerType(vo.getSupplier().isRegistered());
+//
+//			// GST State
+//			if (vo.getSupplier().getGstState() != null) {
+//
+//				GSTStateResponseDTO gstStateDTO = new GSTStateResponseDTO();
+//
+//				gstStateDTO.setId(vo.getSupplier().getGstState().getId());
+//
+//				gstStateDTO.setStateCode(vo.getSupplier().getGstState().getStateCode());
+//
+//				gstStateDTO.setStateName(vo.getSupplier().getGstState().getStateName());
+//
+//				supplierDTO.setGstState(gstStateDTO);
+//			}
+//
+//			// GST Number
+//			supplierDTO.setGstNNo(vo.getSupplier().getGstNo());
+//
+//			// ECC Type
+//			supplierDTO.setEccType(vo.getSupplier().getEccType());
+//
+//			dto.setSupplier(supplierDTO);
+//		}
+//
+////		if (vo.getPostingCategory() != null) {
+////
+////			ListOfVlauesDetailsResponseDTO postingCategoryDTO = new ListOfVlauesDetailsResponseDTO();
+////
+////			postingCategoryDTO.setId(vo.getPostingCategory().getId());
+////
+////			postingCategoryDTO.setValueCode(vo.getPostingCategory().getValueCode());
+////
+////			dto.setPostingCategory(postingCategoryDTO);
+////		}
+//
+//		// ======================================================
+//		// ECC Type
+//		// ======================================================
+//
+////	    if (vo.getEccType() != null) {
+////
+////	        ListOfVlauesDetailsResponseDTO eccTypeDTO =
+////	                new ListOfVlauesDetailsResponseDTO();
+////
+////	        eccTypeDTO.setId(
+////	                vo.getEccType().getId());
+////
+////	        eccTypeDTO.setValueCode(vo.getEccType().getValueCode());
+////	        dto.setEccType(eccTypeDTO);
+////	    }
+//		// ======================================================
+//		// Purchase Bill Details
+//		// ======================================================
+//
+//		if (vo.getPurchaseBillDetailsVO() != null) {
+//
+//			List<PurchaseBillDetailsResponseDTO> detailsList = new ArrayList<>();
+//
+//			for (PurchaseBillDetailsVO detailsVO : vo.getPurchaseBillDetailsVO()) {
+//
+//				PurchaseBillDetailsResponseDTO detailsDTO = purchaseBillDetailsResponse(detailsVO);
+//
+//				detailsList.add(detailsDTO);
+//			}
+//
+//			dto.setPurchaseDetails(detailsList);
+//		}
+//
+//		// ======================================================
+//		// Purchase Bill Tax Grid
+//		// ======================================================
+//
+//		if (vo.getPurchaseBillTaxGridVO() != null) {
+//
+//			List<PurchaseBillTaxGridResponseDTO> taxList = new ArrayList<>();
+//
+//			for (PurchaseBillTaxGridVO taxVO : vo.getPurchaseBillTaxGridVO()) {
+//
+//				PurchaseBillTaxGridResponseDTO taxDTO = purchaseBillTaxGridResponse(taxVO);
+//
+//				taxList.add(taxDTO);
+//			}
+//
+//			dto.setTaxGrid(taxList);
+//		}
+//
+//		return dto;
+//
+//	}
+//
+//	private PurchaseBillDetailsResponseDTO purchaseBillDetailsResponse(PurchaseBillDetailsVO vo) {
+//
+//		PurchaseBillDetailsResponseDTO dto = new PurchaseBillDetailsResponseDTO();
+//
+//		dto.setId(vo.getId());
+//
+//		dto.setTaxType(vo.getTaxType());
+//		dto.setTaxPercent(vo.getTaxPercent());
+////		dto.setTariffNo(vo.getTariffNo());
+//		dto.setExciseToPost(vo.isExciseToPost());
+//		dto.setChallanQty(vo.getChallanQty());
+//
+//		dto.setGrnReceivedQty(vo.getGrnReceivedQty());
+//		dto.setAcceptedQty(vo.getAcceptedQty());
+//		dto.setRejectedQty(vo.getRejectedQty());
+//		dto.setShortageQty(vo.getShortageQty());
+//
+//		dto.setPurchaseorderRate(vo.getPurchaseorderRate());
+//		dto.setRateInInr(vo.getRateInInr());
+//		dto.setRateInSelectedCurrency(vo.getRateInSelectedCurrency());
+//
+//		dto.setApportionedCost(vo.getApportionedCost());
+//		dto.setLandedCostRate(vo.getLandedCostRate());
+//
+//		dto.setAmount(vo.getAmount());
+//		dto.setAmountInSelectedCurrency(vo.getAmountInSelectedCurrency());
+//
+//		dto.setAdditionalDuty(vo.getAdditionalDuty());
+//		dto.setAmountInInr(vo.getAmountInInr());
+//
+//		dto.setSgstRate(vo.getSgstRate());
+//		dto.setSgstAmount(vo.getSgstAmount());
+//
+//		dto.setCgstRate(vo.getCgstRate());
+//		dto.setCgstAmount(vo.getCgstAmount());
+//
+//		dto.setIgstRate(vo.getIgstRate());
+//		dto.setIgstAmount(vo.getIgstAmount());
+//
+//		// ======================================================
+//		// Item
+//		// ======================================================
+//
+//		if (vo.getItem() != null) {
+//
+//			ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
+//
+//			itemDTO.setId(vo.getItem().getId());
+//			// Add the remaining Item fields based on your DTO
+//
+//			dto.setItem(itemDTO);
+//		}
+//
+//		// ======================================================
+//		// HSN
+//		// ======================================================
+//
+//		if (vo.getHsnCode() != null) {
+//
+//			HsnResponseImageDTO hsnDTO = new HsnResponseImageDTO();
+//
+//			hsnDTO.setId(vo.getHsnCode().getId());
+//
+//			// Add remaining HSN fields if required
+//
+//			dto.setHsnCode(hsnDTO);
+//		}
+//
+//		// ======================================================
+//		// Unit
+//		// ======================================================
+//
+//		if (vo.getUnit() != null) {
+//
+//			PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
+//
+//			unitDTO.setId(vo.getUnit().getId());
+//
+//			// Add remaining Unit fields if required
+//
+//			dto.setUnit(unitDTO);
+//		}
+//
+//		return dto;
+//	}
+//
+//	private PurchaseBillTaxGridResponseDTO purchaseBillTaxGridResponse(PurchaseBillTaxGridVO vo) {
+//
+//		PurchaseBillTaxGridResponseDTO dto = new PurchaseBillTaxGridResponseDTO();
+//
+//		dto.setId(vo.getId());
+//		dto.setParticulars(vo.getParticulars());
+//		dto.setTaxPercent(vo.getTaxPercent());
+//		dto.setAcceptedQtyAmount(vo.getAcceptedQtyAmount());
+//		dto.setRevisedAmount(vo.getRevisedAmount());
+//
+//		dto.setDebitCredit(vo.getDebitbCredit());
+//
+//		dto.setDebitAmount(vo.getDebitAmount());
+//		dto.setCreditAmount(vo.getCreditAmount());
+//		dto.setPostToFinanceAc(vo.isPostToFinanceAc());
+//		dto.setLedgerAccount(vo.getLedgerAccount());
+//
+//		
+//
+//		return dto;
+//	}
+	
+	
 	@Override
 	@Transactional
-	public Map<String, Object> createUpdatePurchaseBill(PurchaseBillDTO purchaseBillDTO) throws ApplicationException {
+	public Map<String, Object> createUpdatePurchaseBill(PurchaseBillDTO purchaseBillDTO)
+	        throws ApplicationException {
 
-		PurchaseBillVO purchaseBillVO = new PurchaseBillVO();
+	    String screenCode = "PB";
 
-		String message;
+	    PurchaseBillVO purchaseBillVO;
+	    String message;
 
-		// ======================================================
-		// Update
-		// ======================================================
+	    if (ObjectUtils.isNotEmpty(purchaseBillDTO.getId())) {
 
-		if (ObjectUtils.isNotEmpty(purchaseBillDTO.getId())) {
+	        purchaseBillVO = purchaseBillRepo.findById(purchaseBillDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Purchase Bill Not Found"));
 
-			purchaseBillVO = purchaseBillRepo.findById(purchaseBillDTO.getId())
-					.orElseThrow(() -> new ApplicationException("Purchase Bill Not Found"));
+	        purchaseBillVO.setUpdatedBy(purchaseBillDTO.getCreatedBy());
 
-			purchaseBillVO.setUpdatedBy(purchaseBillDTO.getUpdatedBy() != null ? purchaseBillDTO.getUpdatedBy()
-					: purchaseBillDTO.getCreatedBy());
+	        message = "Purchase Bill Updated Successfully";
 
-			message = "Purchase Bill Updated Successfully";
+	    } else {
 
-		} else {
+	        purchaseBillVO = new PurchaseBillVO();
 
-			purchaseBillVO.setCreatedBy(purchaseBillDTO.getCreatedBy());
+//	        String docId = purchaseBillRepo.getPurchaseBillDocId(
+//	                purchaseBillDTO.getOrgId(),
+//	                purchaseBillDTO.getFinancialYear(),
+//	                screenCode);
+//
+//	        purchaseBillVO.setDocId(docId);
+//
+//	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+//	                documentTypeMappingDetailsRepo
+//	                        .findByOrgIdAndFinYearAndScreenCode(
+//	                                purchaseBillDTO.getOrgId(),
+//	                                purchaseBillDTO.getFinancialYear(),
+//	                                screenCode);
 
-			purchaseBillVO.setUpdatedBy(purchaseBillDTO.getUpdatedBy() != null ? purchaseBillDTO.getUpdatedBy()
-					: purchaseBillDTO.getCreatedBy());
+//	        if (documentTypeMappingDetailsVO != null) {
+//
+//	            documentTypeMappingDetailsVO.setLastNo(
+//	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//	            documentTypeMappingDetailsRepo.save(
+//	                    documentTypeMappingDetailsVO);
+//	        }
 
-			message = "Purchase Bill Created Successfully";
-		}
+	        purchaseBillVO.setCreatedBy(
+	                purchaseBillDTO.getCreatedBy());
 
-		// ======================================================
-		// Header Mapping
-		// ======================================================
+	        purchaseBillVO.setUpdatedBy(
+	                purchaseBillDTO.getCreatedBy());
 
-		createUpdatePurchaseBillVO(purchaseBillDTO, purchaseBillVO);
+	        message = "Purchase Bill Created Successfully";
+	    }
 
-		// ======================================================
-		// Save Header
-		// ======================================================
+	    // ======================================================
+	    // Header + Child Mapping
+	    // ======================================================
 
-		purchaseBillVO = purchaseBillRepo.save(purchaseBillVO);
+	    createUpdatePurchaseBillVOByPurchaseBillDTO(
+	            purchaseBillDTO,
+	            purchaseBillVO);
 
-		// ======================================================
-		// Purchase Bill Details
-		// ======================================================
+	    // ======================================================
+	    // Save Header + Children
+	    // ======================================================
 
-		if (purchaseBillDTO.getPurchaseDetails() != null) {
+	    purchaseBillVO = purchaseBillRepo.save(purchaseBillVO);
 
-			createUpdatePurchaseBillDetails(purchaseBillDTO.getPurchaseDetails(), purchaseBillVO);
-		}
+	    // ======================================================
+	    // Response
+	    // ======================================================
 
-		// ======================================================
-		// Purchase Bill Tax Details
-		// ======================================================
+	    PurchaseBillResponseDTO responseDTO =
+	            purchaseBillResponse(purchaseBillVO);
 
-		if (purchaseBillDTO.getTaxGrid() != null) {
+	    Map<String, Object> response = new HashMap<>();
 
-			createUpdatePurchaseBillTaxDetails(purchaseBillDTO.getTaxGrid(), purchaseBillVO);
-		}
-		// ======================================================
-		// Build Response
-		// ======================================================
+	    response.put("message", message);
+	    response.put("purchaseBillVO", responseDTO);
 
-		PurchaseBillResponseDTO responseDTO = purchaseBillResponse(purchaseBillVO);
-
-		Map<String, Object> response = new HashMap<>();
-
-		response.put("message", message);
-		response.put("purchaseBillVO", responseDTO);
-
-		return response;
+	    return response;
 	}
+	
+	
+	private void createUpdatePurchaseBillVOByPurchaseBillDTO(
+	        PurchaseBillDTO dto,
+	        PurchaseBillVO vo)
+	        throws ApplicationException {
 
-	private void createUpdatePurchaseBillVO(PurchaseBillDTO dto, PurchaseBillVO vo) throws ApplicationException {
+	    // ======================================================
+	    // Basic Header
+	    // ======================================================
 
-		// ======================================================
-		// Basic Header
-		// ======================================================
+	    vo.setBelongsTo(dto.getBelongsTo());
 
-		vo.setBelongsTo(dto.getBelongsTo());
+	    vo.setDocDate(dto.getDocDate());
 
-		vo.setDocDate(dto.getDocDate());
+	    vo.setGrnNo(dto.getGrnNo());
 
-		vo.setGrnNo(dto.getGrnNo());
+	    vo.setGrnDate(dto.getGrnDate());
 
-		vo.setGrnDate(dto.getGrnDate());
+	    vo.setExcisable(dto.getExcisable());
 
-		vo.setExcisable(dto.getExcisable());
+	    vo.setVendorDcNo(dto.getVendorDcNo());
 
-		vo.setVendorDcNo(dto.getVendorDcNo());
+	    vo.setExchangeRate(dto.getExchangeRate());
 
-		vo.setExchangeRate(dto.getExchangeRate());
+	    vo.setPurchaseorderType(dto.getPurchaseorderType());
 
-		vo.setPurchaseorderType(dto.getPurchaseorderType());
+	    vo.setIsReverseChrg(dto.getIsReverseChrg());
 
-		vo.setIsReverseChrg(dto.getIsReverseChrg());
+	    vo.setVoucherPostingDate(dto.getVoucherPostingDate());
 
-		vo.setVoucherPostingDate(dto.getVoucherPostingDate());
+	    vo.setDate(dto.getDate());
 
-		vo.setDate(dto.getDate());
+	    vo.setDutyPerUnit(dto.getDutyPerUnit());
 
-		vo.setDutyPerUnit(dto.getDutyPerUnit());
+	    vo.setModvatCopyReceived(dto.getModvatCopyReceived());
 
-		vo.setModvatCopyReceived(dto.getModvatCopyReceived());
+	    vo.setSupplierDcInvNo(dto.getSupplierDcInvNo());
 
-		vo.setSupplierDcInvNo(dto.getSupplierDcInvNo());
+	    vo.setSupplierDcInvDate(dto.getSupplierDcInvDate());
 
-		vo.setSupplierDcInvDate(dto.getSupplierDcInvDate());
+	    // ======================================================
+	    // Import Purchase Bill
+	    // ======================================================
 
-		// ======================================================
-		// Charges Summary
-		// ======================================================
+	    vo.setCreditAcc(dto.getCreditAcc());
 
-		vo.setTotalFreight(dto.getTotalFreight());
+	    vo.setStatutoryForms(
+	            dto.getStatutoryForms() != null
+	                    ? dto.getStatutoryForms().toString()
+	                    : null);
 
-		vo.setTotalQty(dto.getTotalQty());
+	    vo.setSupplierInvValue(
+	            dto.getSupplierInvValue());
 
-		vo.setBasicValue(dto.getBasicValue());
+	    // ======================================================
+	    // Organization
+	    // ======================================================
 
-		vo.setTotalAmount(dto.getTotalAmount());
+	    vo.setOrgId(dto.getOrgId());
 
-		vo.setAmountInWords(dto.getAmountInWords());
+	    vo.setFinancialYear(
+	            dto.getFinancialYear());
 
-		vo.setEntryTaxApplicable(dto.getEntryTaxApplicable());
+	    vo.setActive(dto.isActive());
 
-		vo.setNarration(dto.getNarration());
+	    vo.setCancelRemarks(
+	            dto.getCancelRemarks());
 
-		vo.setPaymentTerms(dto.getPaymentTerms());
+	    // ======================================================
+	    // Branch
+	    // ======================================================
 
-		// ======================================================
-		// Organization
-		// ======================================================
+	    if (dto.getBranch() != null
+	            && dto.getBranch() > 0) {
 
-		vo.setOrgId(dto.getOrgId());
+	        BranchVO branch = branchRepo.findById(
+	                dto.getBranch())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Branch Not Found"));
 
-		vo.setFinancialYear(dto.getFinancialYear());
+	        vo.setBranch(branch);
+	    }
 
-		vo.setActive(dto.isActive());
+	    // ======================================================
+	    // Supplier
+	    // ======================================================
 
-		vo.setCancelRemarks(dto.getCancelRemarks());
+	    if (dto.getSupplier() != null
+	            && dto.getSupplier() > 0) {
 
-		// ======================================================
-		// Branch
-		// ======================================================
+	        CustomerVO supplier = customerRepo.findById(
+	                dto.getSupplier())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Supplier Not Found"));
 
-		if (dto.getBranch() != null && dto.getBranch() > 0) {
+	        vo.setSupplier(supplier);
+	    }
 
-			BranchVO branch = branchRepo.findById(dto.getBranch())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+	    // ======================================================
+	    // Purchase Order
+	    // ======================================================
 
-			vo.setBranch(branch);
-		}
+	    if (dto.getPurchaseorderId() != null) {
 
-		// ======================================================
-		// Supplier
-		// ======================================================
+	        vo.setPurchaseorderNumber(
+	                dto.getPurchaseorderId().toString());
+	    }
 
-		if (dto.getSupplier() != null && dto.getSupplier() > 0) {
+	    // ======================================================
+	    // UPDATE - DELETE OLD CHILDREN
+	    // ======================================================
 
-			CustomerVO supplier = customerRepo.findById(dto.getSupplier())
-					.orElseThrow(() -> new ApplicationException("Supplier Not Found"));
+	    if (ObjectUtils.isNotEmpty(vo.getId())) {
 
-			vo.setSupplier(supplier);
-		}
+	        List<PurchaseBillDetailsVO> oldDetails =
+	                purchaseBillDetailsRepo
+	                        .findByPurchaseBillVO(vo);
 
-		// ======================================================
-		// Dealer Type
-		// ======================================================
+	        purchaseBillDetailsRepo.deleteAll(oldDetails);
 
-		// ======================================================
-		// Posting Category
-		// ======================================================
+	        List<PurchaseBillTaxGridVO> oldTax =
+	                purchaseBillTaxGridRepo
+	                        .findByPurchaseBillVO(vo);
 
-//		if (dto.getPostingCategory() != null && dto.getPostingCategory() > 0) {
-//
-//			ListOfValuesDetailsVO postingCategory = listOfValuesDetailsRepo.findById(dto.getPostingCategory())
-//					.orElseThrow(() -> new ApplicationException("Posting Category Not Found"));
-//
-//			vo.setPostingCategory(postingCategory);
-//		}
+	        purchaseBillTaxGridRepo.deleteAll(oldTax);
 
-		// ======================================================
-		// ECC Type
-		// ======================================================
+	        List<PurchaseBillChargesSummaryVO> oldCharges =
+	                purchaseBillChargesSummaryRepo
+	                        .findByPurchaseBillVO(vo);
 
-//	    if (dto.getEccType() != null
-//	            && dto.getEccType() > 0) {
-//
-//	        CustomerVO eccType =
-//	                customerRepo
-//	                        .findById(dto.getEccType())
-//	                        .orElseThrow(() ->
-//	                                new ApplicationException(
-//	                                        "ECC Type Not Found"));
-//
-//	        vo.setEccType(eccType);
-//	    }
+	        purchaseBillChargesSummaryRepo.deleteAll(oldCharges);
+
+	        List<ImportPurchaseBillDetailsVO> oldImportDetails =
+	                importPurchaseBillDetailsRepo
+	                        .findByPurchaseBillVO(vo);
+
+	        importPurchaseBillDetailsRepo.deleteAll(
+	                oldImportDetails);
+
+	        List<ImportPurchaseBillTaxDetailsVO> oldImportTax =
+	                importPurchaseBillTaxDetailsRepo
+	                        .findByPurchaseBillVO(vo);
+
+	        importPurchaseBillTaxDetailsRepo.deleteAll(
+	                oldImportTax);
+
+	        List<ImportPurchaseBillChargesSummaryVO>
+	                oldImportCharges =
+	                importPurchaseBillChargesSummaryRepo
+	                        .findByPurchaseBillVO(vo);
+
+	        importPurchaseBillChargesSummaryRepo.deleteAll(
+	                oldImportCharges);
+	    }
+
+	    // Clear parent collections
+
+	    vo.getPurchaseBillDetailsVO().clear();
+
+	    vo.getPurchaseBillTaxGridVO().clear();
+
+	    vo.getPurchaseBillChargesSummaryVO().clear();
+
+	    vo.getImportPurchaseBillDetailsVO().clear();
+
+	    vo.getImportPurchaseBillTaxDetailsVO().clear();
+
+	    vo.getImportPurchaseBillChargesSummaryVO().clear();
+
+	    // ======================================================
+	    // PURCHASE BILL DETAILS
+	    // ======================================================
+
+	    if (dto.getPurchaseDetails() != null) {
+
+	        for (PurchaseBillDetailsDTO detailsDTO :
+	                dto.getPurchaseDetails()) {
+
+	            PurchaseBillDetailsVO detailsVO =
+	                    new PurchaseBillDetailsVO();
+
+	            detailsVO.setTaxType(
+	                    detailsDTO.getTaxType());
+
+	            detailsVO.setTaxPercent(
+	                    detailsDTO.getTaxPercent());
+
+	            detailsVO.setExciseToPost(
+	                    detailsDTO.getExciseToPost() != null
+	                            ? detailsDTO.getExciseToPost()
+	                            : false);
+
+	            detailsVO.setChallanQty(
+	                    detailsDTO.getChallanQty());
+
+	            detailsVO.setGrnReceivedQty(
+	                    detailsDTO.getGrnReceivedQty());
+
+	            detailsVO.setAcceptedQty(
+	                    detailsDTO.getAcceptedQty());
+
+	            detailsVO.setRejectedQty(
+	                    detailsDTO.getRejectedQty());
+
+	            detailsVO.setShortageQty(
+	                    detailsDTO.getShortageQty());
+
+	            detailsVO.setPurchaseorderRate(
+	                    detailsDTO.getPurchaseorderRate());
+
+	            detailsVO.setRateInInr(
+	                    detailsDTO.getRateInInr());
+
+	            detailsVO.setRateInSelectedCurrency(
+	                    detailsDTO.getRateInSelectedCurrency());
+
+	            detailsVO.setApportionedCost(
+	                    detailsDTO.getApportionedCost());
+
+	            detailsVO.setLandedCostRate(
+	                    detailsDTO.getLandedCostRate());
+
+	            detailsVO.setAmount(
+	                    detailsDTO.getAmount());
+
+	            detailsVO.setAmountInSelectedCurrency(
+	                    detailsDTO.getAmountInSelectedCurrency());
+
+	            detailsVO.setAdditionalDuty(
+	                    detailsDTO.getAdditionalDuty());
+
+	            detailsVO.setAmountInInr(
+	                    detailsDTO.getAmountInInr());
+
+	            detailsVO.setSgstRate(
+	                    detailsDTO.getSgstRate());
+
+	            detailsVO.setSgstAmount(
+	                    detailsDTO.getSgstAmount());
+
+	            detailsVO.setCgstRate(
+	                    detailsDTO.getCgstRate());
+
+	            detailsVO.setCgstAmount(
+	                    detailsDTO.getCgstAmount());
+
+	            detailsVO.setIgstRate(
+	                    detailsDTO.getIgstRate());
+
+	            detailsVO.setIgstAmount(
+	                    detailsDTO.getIgstAmount());
+
+	            // Item
+
+	            if (detailsDTO.getItem() != null
+	                    && detailsDTO.getItem() > 0) {
+
+	                ItemMasterVO item =
+	                        itemMasterRepo.findById(
+	                                detailsDTO.getItem())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Item Not Found"));
+
+	                detailsVO.setItem(item);
+	            }
+
+	            // HSN
+
+	            if (detailsDTO.getHsnCode() != null
+	                    && detailsDTO.getHsnCode() > 0) {
+
+	                HsnVO hsn =
+	                        hsnRepo.findById(
+	                                detailsDTO.getHsnCode())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "HSN Code Not Found"));
+
+	                detailsVO.setHsnCode(hsn);
+	            }
+
+	            // Unit
+
+	            if (detailsDTO.getUnit() != null
+	                    && detailsDTO.getUnit() > 0) {
+
+	                UnitMasterVO unit =
+	                        unitMasterRepo.findById(
+	                                detailsDTO.getUnit())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Unit Not Found"));
+
+	                detailsVO.setUnit(unit);
+	            }
+
+	            detailsVO.setPurchaseBillVO(vo);
+
+	            vo.getPurchaseBillDetailsVO()
+	                    .add(detailsVO);
+	        }
+	    }
+
+	    // ======================================================
+	    // PURCHASE BILL TAX GRID
+	    // ======================================================
+
+	    if (dto.getTaxGrid() != null) {
+
+	        for (PurchaseBillTaxGridDTO taxDTO :
+	                dto.getTaxGrid()) {
+
+	            PurchaseBillTaxGridVO taxVO =
+	                    new PurchaseBillTaxGridVO();
+
+	            taxVO.setParticulars(
+	                    taxDTO.getParticulars());
+
+	            taxVO.setTaxPercent(
+	                    taxDTO.getTaxPercent());
+
+	            taxVO.setAcceptedQtyAmount(
+	                    taxDTO.getAcceptedQtyAmount());
+
+	            taxVO.setRevisedAmount(
+	                    taxDTO.getRevisedAmount());
+
+	            taxVO.setLedgerAccount(
+	                    taxDTO.getLedgerAccount());
+
+	            taxVO.setDebitbCredit(
+	                    taxDTO.getDebitCredit());
+
+	            taxVO.setDebitAmount(
+	                    taxDTO.getDebitAmount());
+
+	            taxVO.setCreditAmount(
+	                    taxDTO.getCreditAmount());
+
+	            taxVO.setPostToFinanceAc(
+	                    taxDTO.getPostToFinanceAc() != null
+	                            ? taxDTO.getPostToFinanceAc()
+	                            : false);
+
+	            taxVO.setPurchaseBillVO(vo);
+
+	            vo.getPurchaseBillTaxGridVO()
+	                    .add(taxVO);
+	        }
+	    }
+
+	    // ======================================================
+	    // PURCHASE BILL CHARGES SUMMARY
+	    // ======================================================
+
+	    if (dto.getBillChargesSummaryDTO() != null) {
+
+	        for (PurchaseBillChargesSummaryDTO summaryDTO :
+	                dto.getBillChargesSummaryDTO()) {
+
+	            PurchaseBillChargesSummaryVO summaryVO =
+	                    new PurchaseBillChargesSummaryVO();
+
+	            summaryVO.setTotalFreight(
+	                    summaryDTO.getTotalFreight());
+
+	            summaryVO.setTotalQty(
+	                    summaryDTO.getTotalQty());
+
+	            summaryVO.setBasicValue(
+	                    summaryDTO.getBasicValue());
+
+	            summaryVO.setTotalAmount(
+	                    summaryDTO.getTotalAmount());
+
+	            summaryVO.setAmountInWords(
+	                    summaryDTO.getAmountInWords());
+
+	            summaryVO.setEntryTaxApplicable(
+	                    summaryDTO.getEntryTaxApplicable() != null
+	                            ? summaryDTO.getEntryTaxApplicable()
+	                            : false);
+
+	            summaryVO.setNarration(
+	                    summaryDTO.getNarration());
+
+	            summaryVO.setPaymentTerms(
+	                    summaryDTO.getPaymentTerms());
+
+	            summaryVO.setPurchaseBillVO(vo);
+
+	            vo.getPurchaseBillChargesSummaryVO()
+	                    .add(summaryVO);
+	        }
+	    }
+
+	    // ======================================================
+	    // IMPORT PURCHASE BILL DETAILS
+	    // ======================================================
+
+	    if (dto.getImportPurchaseDetails() != null) {
+
+	        for (ImportPurchaseBillDetailsDTO detailsDTO :
+	                dto.getImportPurchaseDetails()) {
+
+	            ImportPurchaseBillDetailsVO detailsVO =
+	                    new ImportPurchaseBillDetailsVO();
+
+	            detailsVO.setChallanQty(
+	                    detailsDTO.getChallanQty());
+
+	            detailsVO.setGrnQty(
+	                    detailsDTO.getGrnQty());
+
+	            detailsVO.setAccptQty(
+	                    detailsDTO.getAccptQty());
+
+	            detailsVO.setShortageQty(
+	                    detailsDTO.getShortageQty());
+
+	            detailsVO.setFobRateFc(
+	                    detailsDTO.getFobRateFc());
+
+	            detailsVO.setFobValueFc(
+	                    detailsDTO.getFobValueFc());
+
+	            detailsVO.setFobValueInr(
+	                    detailsDTO.getFobValueInr());
+
+	            detailsVO.setDutyAmtInr(
+	                    detailsDTO.getDutyAmtInr());
+
+	            detailsVO.setValueFc(
+	                    detailsDTO.getValueFc());
+
+	            detailsVO.setValueInr(
+	                    detailsDTO.getValueInr());
+
+	            detailsVO.setLandCostInr(
+	                    detailsDTO.getLandCostInr());
+
+	            // Item
+
+	            if (detailsDTO.getItem() != null
+	                    && detailsDTO.getItem() > 0) {
+
+	                ItemMasterVO item =
+	                        itemMasterRepo.findById(
+	                                detailsDTO.getItem())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Item Not Found"));
+
+	                detailsVO.setItem(item);
+	            }
+
+	            detailsVO.setPurchaseBillVO(vo);
+
+	            vo.getImportPurchaseBillDetailsVO()
+	                    .add(detailsVO);
+	        }
+	    }
+
+	    // ======================================================
+	    // IMPORT PURCHASE BILL TAX
+	    // ======================================================
+
+	    if (dto.getImportPurchaseTax() != null) {
+
+	        for (ImportPurchaseBillTaxDetailsDTO taxDTO :
+	                dto.getImportPurchaseTax()) {
+
+	            ImportPurchaseBillTaxDetailsVO taxVO =
+	                    new ImportPurchaseBillTaxDetailsVO();
+
+	            taxVO.setParticulars(
+	                    taxDTO.getParticulars());
+
+	            taxVO.setTax(
+	                    taxDTO.getTax());
+
+	            taxVO.setTaxval1(
+	                    taxDTO.getTaxval1());
+
+	            taxVO.setTaxAmount(
+	                    taxDTO.getTaxAmount());
+
+	            taxVO.setDbCr(
+	                    taxDTO.getDbCr());
+
+	            taxVO.setGlSubledger(
+	                    taxDTO.getGlSubledger());
+
+	            taxVO.setPurchaseBillVO(vo);
+
+	            vo.getImportPurchaseBillTaxDetailsVO()
+	                    .add(taxVO);
+	        }
+	    }
+
+	    // ======================================================
+	    // IMPORT PURCHASE BILL CHARGES SUMMARY
+	    // ======================================================
+
+	    if (dto.getImportBillChargesSummaryDTO() != null) {
+
+	        for (ImportPurchaseBillChargesSummaryDTO summaryDTO :
+	                dto.getImportBillChargesSummaryDTO()) {
+
+	            ImportPurchaseBillChargesSummaryVO summaryVO =
+	                    new ImportPurchaseBillChargesSummaryVO();
+
+	            summaryVO.setTotFobValueFc(
+	                    summaryDTO.getTotFobValueFc());
+
+	            summaryVO.setTotFobValueInr(
+	                    summaryDTO.getTotFobValueInr());
+
+	            summaryVO.setNetAmount(
+	                    summaryDTO.getNetAmount());
+
+	            summaryVO.setTotFriInsFc(
+	                    summaryDTO.getTotFriInsFc());
+
+	            summaryVO.setTotDutyInr(
+	                    summaryDTO.getTotDutyInr());
+
+	            summaryVO.setPostVoucher(
+	                    summaryDTO.getPostVoucher());
+
+	            summaryVO.setTotalValueFc(
+	                    summaryDTO.getTotalValueFc());
+
+	            summaryVO.setTotFreInsInr(
+	                    summaryDTO.getTotFreInsInr());
+
+	            summaryVO.setTotLandCost(
+	                    summaryDTO.getTotLandCost());
+
+	            summaryVO.setAmountInWords(
+	                    summaryDTO.getAmountInWords());
+
+	            summaryVO.setNarration(
+	                    summaryDTO.getNarration());
+
+	            summaryVO.setPurchaseBillVO(vo);
+
+	            vo.getImportPurchaseBillChargesSummaryVO()
+	                    .add(summaryVO);
+	        }
+	    }
 	}
+	
+	private PurchaseBillResponseDTO purchaseBillResponse(PurchaseBillVO purchaseBillVO) {
 
-	private void createUpdatePurchaseBillDetails(List<PurchaseBillDetailsDTO> detailsDTOList,
-			PurchaseBillVO purchaseBillVO) throws ApplicationException {
+	    PurchaseBillResponseDTO response = new PurchaseBillResponseDTO();
 
-		if (detailsDTOList == null || detailsDTOList.isEmpty()) {
-			return;
-		}
+	    // ================= HEADER =================
 
-		for (PurchaseBillDetailsDTO detailsDTO : detailsDTOList) {
+	    response.setId(purchaseBillVO.getId());
 
-			PurchaseBillDetailsVO detailsVO;
+	    if (purchaseBillVO.getBranch() != null) {
 
-			// ======================================================
-			// Update / Create
-			// ======================================================
+	        BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
 
-			if (detailsDTO.getId() != null) {
+	        branchResponseDTO.setId(purchaseBillVO.getBranch().getId());
+	        branchResponseDTO.setBranchCode(
+	                purchaseBillVO.getBranch().getBranchCode());
+	        branchResponseDTO.setBranchName(
+	                purchaseBillVO.getBranch().getBranchName());
 
-				detailsVO = purchaseBillDetailsRepo.findById(detailsDTO.getId())
-						.orElseThrow(() -> new ApplicationException("Purchase Bill Details Not Found"));
+	        response.setBranch(branchResponseDTO);
+	    }
 
-			} else {
+	    response.setBelongsTo(purchaseBillVO.getBelongsTo());
+	    response.setDocDate(purchaseBillVO.getDocDate());
 
-				detailsVO = new PurchaseBillDetailsVO();
-			}
+	    if (purchaseBillVO.getSupplier() != null) {
 
-			// ======================================================
-			// Basic Details
-			// ======================================================
+	        PurchaseBillSupplierResponseDTO supplierResponseDTO =
+	                new PurchaseBillSupplierResponseDTO();
 
-			detailsVO.setTaxType(detailsDTO.getTaxType());
-			detailsVO.setTaxPercent(detailsDTO.getTaxPercent());
-			detailsVO.setExciseToPost(detailsDTO.getExciseToPost());
+	        supplierResponseDTO.setId(
+	                purchaseBillVO.getSupplier().getId());
 
-			detailsVO.setChallanQty(detailsDTO.getChallanQty());
-			detailsVO.setGrnReceivedQty(detailsDTO.getGrnReceivedQty());
-			detailsVO.setAcceptedQty(detailsDTO.getAcceptedQty());
-			detailsVO.setRejectedQty(detailsDTO.getRejectedQty());
-			detailsVO.setShortageQty(detailsDTO.getShortageQty());
+	        supplierResponseDTO.setSupplierName(
+	                purchaseBillVO.getSupplier().getCustomerName());
 
-			detailsVO.setPurchaseorderRate(detailsDTO.getPurchaseorderRate());
+	        supplierResponseDTO.setSupplierCode(
+	                purchaseBillVO.getSupplier().getCustomerCode());
 
-			// ======================================================
-			// Rate In Selected Currency
-			// ======================================================
+	        supplierResponseDTO.setGstNo(
+	                purchaseBillVO.getSupplier().getGstNo());
 
-			BigDecimal rateInSelectedCurrency = detailsDTO.getRateInSelectedCurrency();
+	        supplierResponseDTO.setEccType(
+	                purchaseBillVO.getSupplier().getEccType());
 
-			if (rateInSelectedCurrency == null) {
-				rateInSelectedCurrency = BigDecimal.ZERO;
-			}
+//	        supplierResponseDTO.setDealerType(
+//	                purchaseBillVO.getSupplier().getDealerType());
 
-			detailsVO.setRateInSelectedCurrency(rateInSelectedCurrency);
 
-			// ======================================================
-			// Rate In INR
-			//
-			// Rate In INR = Rate In Selected Currency
-			// * Exchange Rate
-			// ======================================================
+	        // ================= GST STATE =================
 
-			BigDecimal exchangeRate = purchaseBillVO.getExchangeRate();
+	        if (purchaseBillVO.getSupplier().getGstState() != null) {
 
-			if (exchangeRate == null) {
-				exchangeRate = BigDecimal.ONE;
-			}
+	            GSTStateResponseDTO gstStateResponseDTO =
+	                    new GSTStateResponseDTO();
 
-			BigDecimal rateInInr = rateInSelectedCurrency.multiply(exchangeRate);
+	            gstStateResponseDTO.setId(
+	                    purchaseBillVO.getSupplier().getGstState().getId());
 
-			detailsVO.setRateInInr(rateInInr);
+	            gstStateResponseDTO.setStateCode(
+	                    purchaseBillVO.getSupplier().getGstState().getStateCode());
 
-			// ======================================================
-			// Quantity
-			// ======================================================
+	            gstStateResponseDTO.setStateName(
+	                    purchaseBillVO.getSupplier().getGstState().getStateName());
 
-			BigDecimal acceptedQty = detailsDTO.getAcceptedQty();
+	            gstStateResponseDTO.setGstStateId(
+	                    purchaseBillVO.getSupplier().getGstState().getGstStateId());
 
-			if (acceptedQty == null) {
-				acceptedQty = BigDecimal.ZERO;
-			}
+	            supplierResponseDTO.setGstState(gstStateResponseDTO);
+	        }
 
-			BigDecimal receivedQty = detailsDTO.getGrnReceivedQty();
+	        response.setSupplier(supplierResponseDTO);
+	    }
+	    response.setGrnNo(purchaseBillVO.getGrnNo());
+	    response.setGrnDate(purchaseBillVO.getGrnDate());
+	    response.setExcisable(purchaseBillVO.getExcisable());
+	    response.setVendorDcNo(purchaseBillVO.getVendorDcNo());
+	    response.setExchangeRate(purchaseBillVO.getExchangeRate());
 
-			if (receivedQty == null) {
-				receivedQty = BigDecimal.ZERO;
-			}
+	    response.setPurchaseorderType(purchaseBillVO.getPurchaseorderType());
+	    response.setIsReverseChrg(purchaseBillVO.getIsReverseChrg());
 
-			// ======================================================
-			// Amount In Selected Currency
-			//
-			// Amount In Selected Currency
-			// = Rate In Selected Currency * Accepted Qty
-			// ======================================================
+	    response.setVoucherPostingDate(purchaseBillVO.getVoucherPostingDate());
+	    response.setDate(purchaseBillVO.getDate());
+	    response.setDutyPerUnit(purchaseBillVO.getDutyPerUnit());
 
-			BigDecimal amountInSelectedCurrency = rateInSelectedCurrency.multiply(acceptedQty);
+	    response.setModvatCopyReceived(purchaseBillVO.getModvatCopyReceived());
 
-			detailsVO.setAmountInSelectedCurrency(amountInSelectedCurrency);
+	    response.setSupplierDcInvNo(purchaseBillVO.getSupplierDcInvNo());
+	    response.setSupplierDcInvDate(purchaseBillVO.getSupplierDcInvDate());
 
-			// ======================================================
-			// Amount In INR
-			//
-			// Amount In INR
-			// = Rate In INR * Accepted Qty
-			// ======================================================
+	    response.setCreditAcc(purchaseBillVO.getCreditAcc());
+	    response.setSupplierInvValue(purchaseBillVO.getSupplierInvValue());
 
-			BigDecimal amountInInr = rateInInr.multiply(acceptedQty);
+	    response.setOrgId(purchaseBillVO.getOrgId());
+	    response.setFinancialYear(purchaseBillVO.getFinancialYear());
 
-			detailsVO.setAmountInInr(amountInInr);
+	    response.setActive(purchaseBillVO.getActive());
+	    response.setCancelRemarks(purchaseBillVO.getCancelRemarks());
 
-			// ======================================================
-			// Amount
-			// ======================================================
-			//
-			// If your "amount" field represents the item amount,
-			// use the selected-currency amount here.
-			//
-			// If your business logic uses INR amount for "amount",
-			// change this to amountInInr.
-			// ======================================================
+	    response.setCreatedBy(purchaseBillVO.getCreatedBy());
+	    response.setUpdatedBy(purchaseBillVO.getUpdatedBy());
 
-			BigDecimal amount = detailsDTO.getAmount();
 
-			if (amount == null) {
-				amount = amountInSelectedCurrency;
-			}
+	    // ================= PURCHASE BILL DETAILS =================
 
-			detailsVO.setAmount(amount);
+	    List<PurchaseBillDetailsResponseDTO> purchaseDetails =
+	            new ArrayList<>();
 
-			// ======================================================
-			// Apportioned Cost
-			//
-			// Apportioned Cost =
-			// (Total Freight * Item Amount) / Total Item Amount
-			// ======================================================
+	    if (purchaseBillVO.getPurchaseBillDetailsVO() != null) {
 
-			BigDecimal totalFreight = purchaseBillVO.getTotalFreight();
+	        for (PurchaseBillDetailsVO detailsVO :
+	                purchaseBillVO.getPurchaseBillDetailsVO()) {
 
-			BigDecimal totalItemAmount = purchaseBillVO.getBasicValue();
+	            PurchaseBillDetailsResponseDTO detailsDTO =
+	                    new PurchaseBillDetailsResponseDTO();
 
-			BigDecimal apportionedCost = BigDecimal.ZERO;
+	            detailsDTO.setId(detailsVO.getId());
 
-			if (totalFreight != null && amount != null && totalItemAmount != null
-					&& totalItemAmount.compareTo(BigDecimal.ZERO) > 0) {
+	         // ================= ITEM =================
 
-				apportionedCost = totalFreight.multiply(amount).divide(totalItemAmount, 2, RoundingMode.HALF_UP);
-			}
+	            if (detailsVO.getItem() != null) {
 
-			detailsVO.setApportionedCost(apportionedCost);
+	                ItemMasterResponseDetailsDTO itemResponseDTO =
+	                        new ItemMasterResponseDetailsDTO();
 
-			// ======================================================
-			// Landed Cost Rate
-			//
-			// Landed Cost Rate = Amount / Received Qty
-			// ======================================================
+	                itemResponseDTO.setId(
+	                        detailsVO.getItem().getId());
 
-			BigDecimal landedCostRate = BigDecimal.ZERO;
+	                itemResponseDTO.setItemCode(
+	                        detailsVO.getItem().getItemCode());
 
-			if (amount != null && receivedQty.compareTo(BigDecimal.ZERO) > 0) {
+	                itemResponseDTO.setItemDescription(
+	                        detailsVO.getItem().getItemDescription());
 
-				landedCostRate = amount.divide(receivedQty, 2, RoundingMode.HALF_UP);
-			}
+	                // Item Unit
+	                if (detailsVO.getItem().getPrimaryUnit() != null) {
 
-			detailsVO.setLandedCostRate(landedCostRate);
+	                    UnitMasterResponseDTO unitResponseDTO =
+	                            new UnitMasterResponseDTO();
 
-			// ======================================================
-			// Additional Duty
-			// ======================================================
+	                    unitResponseDTO.setId(
+	                            detailsVO.getItem().getPrimaryUnit().getId());
 
-			detailsVO.setAdditionalDuty(detailsDTO.getAdditionalDuty());
+	                    unitResponseDTO.setUnitId(
+	                            detailsVO.getItem().getPrimaryUnit().getUnitId());
 
-			// ======================================================
-			// SGST
-			// ======================================================
+	                    unitResponseDTO.setUnitDescription(
+	                            detailsVO.getItem().getPrimaryUnit().getDescription());
 
-			detailsVO.setSgstRate(detailsDTO.getSgstRate());
+	                    itemResponseDTO.setUnit(unitResponseDTO);
+	                }
 
-			detailsVO.setSgstAmount(detailsDTO.getSgstAmount());
+	                // Item HSN
+	                if (detailsVO.getItem().getHsnCode() != null) {
 
-			// ======================================================
-			// CGST
-			// ======================================================
+	                    HsnResponseDTO hsnResponseDTO =
+	                            new HsnResponseDTO();
 
-			detailsVO.setCgstRate(detailsDTO.getCgstRate());
+	                    hsnResponseDTO.setId(
+	                            detailsVO.getItem().getHsnCode().getId());
 
-			detailsVO.setCgstAmount(detailsDTO.getCgstAmount());
+	                    hsnResponseDTO.setHsn(
+	                            detailsVO.getItem().getHsnCode().getHsn());
 
-			// ======================================================
-			// IGST
-			// ======================================================
+	                    hsnResponseDTO.setDescription(
+	                            detailsVO.getItem().getHsnCode().getDescription());
 
-			detailsVO.setIgstRate(detailsDTO.getIgstRate());
+	                    itemResponseDTO.setHsn(hsnResponseDTO);
+	                }
 
-			detailsVO.setIgstAmount(detailsDTO.getIgstAmount());
+	                detailsDTO.setItem(itemResponseDTO);
+	            }
 
-			// ======================================================
-			// Item
-			// ======================================================
+	            detailsDTO.setTaxType(detailsVO.getTaxType());
+	            detailsDTO.setTaxPercent(detailsVO.getTaxPercent());
 
-			if (detailsDTO.getItem() != null && detailsDTO.getItem() > 0) {
+	            detailsDTO.setExciseToPost(detailsVO.isExciseToPost());
+	            detailsDTO.setChallanQty(detailsVO.getChallanQty());
 
-				ItemMasterVO item = itemRepo.findById(detailsDTO.getItem())
-						.orElseThrow(() -> new ApplicationException("Item Not Found"));
+	           
 
-				detailsVO.setItem(item);
-			}
+	            detailsDTO.setGrnReceivedQty(detailsVO.getGrnReceivedQty());
+	            detailsDTO.setAcceptedQty(detailsVO.getAcceptedQty());
+	            detailsDTO.setRejectedQty(detailsVO.getRejectedQty());
+	            detailsDTO.setShortageQty(detailsVO.getShortageQty());
 
-			// ======================================================
-			// GST Rate
-			// ======================================================
+	            detailsDTO.setPurchaseorderRate(
+	                    detailsVO.getPurchaseorderRate());
 
-			if (detailsDTO.getGstRate() != null && detailsDTO.getGstRate() > 0) {
+	            detailsDTO.setRateInInr(detailsVO.getRateInInr());
 
-				GSTRateMasterVO gstRate = gstRateMasterRepo.findById(detailsDTO.getGstRate())
-						.orElseThrow(() -> new ApplicationException("GST Rate Not Found"));
+	            detailsDTO.setRateInSelectedCurrency(
+	                    detailsVO.getRateInSelectedCurrency());
 
-				detailsVO.setGstRate(gstRate);
-			}
+	            detailsDTO.setApportionedCost(
+	                    detailsVO.getApportionedCost());
 
-			// ======================================================
-			// HSN
-			// ======================================================
+	            detailsDTO.setLandedCostRate(
+	                    detailsVO.getLandedCostRate());
 
-			/*
-			 * if (detailsDTO.getHsnCode() != null && detailsDTO.getHsnCode() > 0) {
-			 * 
-			 * HsnVO hsn = hsnRepo.findById(detailsDTO.getHsnCode()) .orElseThrow(() -> new
-			 * ApplicationException( "HSN Code Not Found"));
-			 * 
-			 * detailsVO.setHsnCode(hsn); }
-			 */
+	            detailsDTO.setAmount(detailsVO.getAmount());
 
-			// ======================================================
-			// Unit
-			// ======================================================
+	            detailsDTO.setAmountInSelectedCurrency(
+	                    detailsVO.getAmountInSelectedCurrency());
 
-			if (detailsDTO.getUnit() != null && detailsDTO.getUnit() > 0) {
+	            detailsDTO.setAdditionalDuty(
+	                    detailsVO.getAdditionalDuty());
 
-				UnitMasterVO unit = unitMasterRepo.findById(detailsDTO.getUnit())
-						.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+	            detailsDTO.setAmountInInr(
+	                    detailsVO.getAmountInInr());
 
-				detailsVO.setUnit(unit);
-			}
+	            detailsDTO.setSgstRate(detailsVO.getSgstRate());
+	            detailsDTO.setSgstAmount(detailsVO.getSgstAmount());
 
-			// ======================================================
-			// Parent
-			// ======================================================
+	            detailsDTO.setCgstRate(detailsVO.getCgstRate());
+	            detailsDTO.setCgstAmount(detailsVO.getCgstAmount());
 
-			detailsVO.setPurchaseBillVO(purchaseBillVO);
+	            detailsDTO.setIgstRate(detailsVO.getIgstRate());
+	            detailsDTO.setIgstAmount(detailsVO.getIgstAmount());
 
-			// ======================================================
-			// Add Details To Parent
-			// ======================================================
+	            purchaseDetails.add(detailsDTO);
+	        }
+	    }
 
-			if (!purchaseBillVO.getPurchaseBillDetailsVO().contains(detailsVO)) {
+	    response.setPurchaseDetails(purchaseDetails);
 
-				purchaseBillVO.getPurchaseBillDetailsVO().add(detailsVO);
-			}
-		}
+
+	    // ================= TAX GRID =================
+
+	    List<PurchaseBillTaxGridResponseDTO> taxGrid =
+	            new ArrayList<>();
+
+	    if (purchaseBillVO.getPurchaseBillTaxGridVO() != null) {
+
+	        for (PurchaseBillTaxGridVO taxVO :
+	                purchaseBillVO.getPurchaseBillTaxGridVO()) {
+
+	            PurchaseBillTaxGridResponseDTO taxDTO =
+	                    new PurchaseBillTaxGridResponseDTO();
+
+	            taxDTO.setId(taxVO.getId());
+	            taxDTO.setParticulars(taxVO.getParticulars());
+	            taxDTO.setTaxPercent(taxVO.getTaxPercent());
+	            taxDTO.setAcceptedQtyAmount(
+	                    taxVO.getAcceptedQtyAmount());
+	            taxDTO.setRevisedAmount(taxVO.getRevisedAmount());
+
+	            taxDTO.setLedgerAccount(taxVO.getLedgerAccount());
+	            taxDTO.setDebitCredit(taxVO.getDebitbCredit());
+
+	            taxDTO.setDebitAmount(taxVO.getDebitAmount());
+	            taxDTO.setCreditAmount(taxVO.getCreditAmount());
+
+	            taxDTO.setPostToFinanceAc(
+	                    taxVO.isPostToFinanceAc());
+
+	            taxGrid.add(taxDTO);
+	        }
+	    }
+
+	    response.setTaxGrid(taxGrid);
+
+
+	    // ================= CHARGES SUMMARY =================
+
+	    List<PurchaseBillChargesSummaryResponseDTO> chargesSummary =
+	            new ArrayList<>();
+
+	    if (purchaseBillVO.getPurchaseBillChargesSummaryVO() != null) {
+
+	        for (PurchaseBillChargesSummaryVO chargesVO :
+	                purchaseBillVO.getPurchaseBillChargesSummaryVO()) {
+
+	            PurchaseBillChargesSummaryResponseDTO chargesDTO =
+	                    new PurchaseBillChargesSummaryResponseDTO();
+
+	            chargesDTO.setId(chargesVO.getId());
+	            chargesDTO.setTotalFreight(
+	                    chargesVO.getTotalFreight());
+
+	            chargesDTO.setTotalQty(
+	                    chargesVO.getTotalQty());
+
+	            chargesDTO.setBasicValue(
+	                    chargesVO.getBasicValue());
+
+	            chargesDTO.setTotalAmount(
+	                    chargesVO.getTotalAmount());
+
+	            chargesDTO.setAmountInWords(
+	                    chargesVO.getAmountInWords());
+
+	            chargesDTO.setEntryTaxApplicable(
+	                    chargesVO.isEntryTaxApplicable());
+
+	            chargesDTO.setNarration(
+	                    chargesVO.getNarration());
+
+	            chargesDTO.setPaymentTerms(
+	                    chargesVO.getPaymentTerms());
+
+	            chargesSummary.add(chargesDTO);
+	        }
+	    }
+
+	    response.setBillChargesSummaryDTO(chargesSummary);
+
+
+	    // ================= IMPORT PURCHASE DETAILS =================
+
+	    List<ImportPurchaseBillDetailsResponseDTO> importPurchaseDetails =
+	            new ArrayList<>();
+
+	    if (purchaseBillVO.getImportPurchaseBillDetailsVO() != null) {
+
+	        for (ImportPurchaseBillDetailsVO detailsVO :
+	                purchaseBillVO.getImportPurchaseBillDetailsVO()) {
+
+	            ImportPurchaseBillDetailsResponseDTO detailsDTO =
+	                    new ImportPurchaseBillDetailsResponseDTO();
+
+	            detailsDTO.setId(detailsVO.getId());
+
+	            if (detailsVO.getItem() != null) {
+
+	                ItemMasterResponseDetailsDTO itemResponseDTO =
+	                        new ItemMasterResponseDetailsDTO();
+
+	                itemResponseDTO.setId(
+	                        detailsVO.getItem().getId());
+
+	                itemResponseDTO.setItemCode(
+	                        detailsVO.getItem().getItemCode());
+
+	                itemResponseDTO.setItemDescription(
+	                        detailsVO.getItem().getItemDescription());
+
+
+	                // ================= UNIT =================
+
+	                if (detailsVO.getItem().getPrimaryUnit() != null) {
+
+	                    UnitMasterResponseDTO unitResponseDTO =
+	                            new UnitMasterResponseDTO();
+
+	                    unitResponseDTO.setId(
+	                            detailsVO.getItem().getPrimaryUnit().getId());
+
+	                    unitResponseDTO.setUnitId(
+	                            detailsVO.getItem().getPrimaryUnit().getUnitId());
+
+	                    unitResponseDTO.setUnitDescription(
+	                            detailsVO.getItem().getPrimaryUnit().getDescription());
+
+	                    itemResponseDTO.setUnit(unitResponseDTO);
+	                }
+
+
+	                // ================= HSN =================
+
+	                if (detailsVO.getItem().getHsnCode() != null) {
+
+	                    HsnResponseDTO hsnResponseDTO =
+	                            new HsnResponseDTO();
+
+	                    hsnResponseDTO.setId(
+	                            detailsVO.getItem().getHsnCode().getId());
+
+	                    hsnResponseDTO.setHsn(
+	                            detailsVO.getItem().getHsnCode().getHsn());
+
+	                    hsnResponseDTO.setDescription(
+	                            detailsVO.getItem().getHsnCode().getDescription());
+
+	                    itemResponseDTO.setHsn(hsnResponseDTO);
+	                }
+
+	                detailsDTO.setItem(itemResponseDTO);
+	            }
+	            detailsDTO.setChallanQty(detailsVO.getChallanQty());
+	            detailsDTO.setGrnQty(detailsVO.getGrnQty());
+	            detailsDTO.setAccptQty(detailsVO.getAccptQty());
+	            detailsDTO.setShortageQty(detailsVO.getShortageQty());
+
+	            detailsDTO.setFobRateFc(detailsVO.getFobRateFc());
+	            detailsDTO.setFobValueFc(detailsVO.getFobValueFc());
+	            detailsDTO.setFobValueInr(detailsVO.getFobValueInr());
+
+	            detailsDTO.setDutyAmtInr(detailsVO.getDutyAmtInr());
+
+	            detailsDTO.setValueFc(detailsVO.getValueFc());
+	            detailsDTO.setValueInr(detailsVO.getValueInr());
+	            detailsDTO.setLandCostInr(detailsVO.getLandCostInr());
+
+	            importPurchaseDetails.add(detailsDTO);
+	        }
+	    }
+
+	    response.setImportPurchaseDetails(importPurchaseDetails);
+
+
+	    // ================= IMPORT PURCHASE TAX =================
+
+	    List<ImportPurchaseBillTaxDetailsResponseDTO> importPurchaseTax =
+	            new ArrayList<>();
+
+	    if (purchaseBillVO.getImportPurchaseBillTaxDetailsVO() != null) {
+
+	        for (ImportPurchaseBillTaxDetailsVO taxVO :
+	                purchaseBillVO.getImportPurchaseBillTaxDetailsVO()) {
+
+	            ImportPurchaseBillTaxDetailsResponseDTO taxDTO =
+	                    new ImportPurchaseBillTaxDetailsResponseDTO();
+
+	            taxDTO.setId(taxVO.getId());
+	            taxDTO.setParticulars(taxVO.getParticulars());
+	            taxDTO.setTax(taxVO.getTax());
+	            taxDTO.setTaxval1(taxVO.getTaxval1());
+	            taxDTO.setTaxAmount(taxVO.getTaxAmount());
+	            taxDTO.setDbCr(taxVO.getDbCr());
+	            taxDTO.setGlSubledger(taxVO.getGlSubledger());
+
+	            importPurchaseTax.add(taxDTO);
+	        }
+	    }
+
+	    response.setImportPurchaseTax(importPurchaseTax);
+
+
+	    // ================= IMPORT CHARGES SUMMARY =================
+
+	    List<ImportPurchaseBillChargesSummaryResponseDTO> importChargesSummary =
+	            new ArrayList<>();
+
+	    if (purchaseBillVO.getImportPurchaseBillChargesSummaryVO() != null) {
+
+	        for (ImportPurchaseBillChargesSummaryVO chargesVO :
+	                purchaseBillVO.getImportPurchaseBillChargesSummaryVO()) {
+
+	            ImportPurchaseBillChargesSummaryResponseDTO chargesDTO =
+	                    new ImportPurchaseBillChargesSummaryResponseDTO();
+
+	            chargesDTO.setId(chargesVO.getId());
+
+	            chargesDTO.setTotFobValueFc(
+	                    chargesVO.getTotFobValueFc());
+
+	            chargesDTO.setTotFobValueInr(
+	                    chargesVO.getTotFobValueInr());
+
+	            chargesDTO.setNetAmount(
+	                    chargesVO.getNetAmount());
+
+	            chargesDTO.setTotFriInsFc(
+	                    chargesVO.getTotFriInsFc());
+
+	            chargesDTO.setTotDutyInr(
+	                    chargesVO.getTotDutyInr());
+
+	            chargesDTO.setPostVoucher(
+	                    chargesVO.getPostVoucher());
+
+	            chargesDTO.setTotalValueFc(
+	                    chargesVO.getTotalValueFc());
+
+	            chargesDTO.setTotFreInsInr(
+	                    chargesVO.getTotFreInsInr());
+
+	            chargesDTO.setTotLandCost(
+	                    chargesVO.getTotLandCost());
+
+	            chargesDTO.setAmountInWords(
+	                    chargesVO.getAmountInWords());
+
+	            chargesDTO.setNarration(
+	                    chargesVO.getNarration());
+
+	            importChargesSummary.add(chargesDTO);
+	        }
+	    }
+
+	    response.setImportBillChargesSummaryDTO(importChargesSummary);
+
+	    return response;
 	}
-
-	private void createUpdatePurchaseBillTaxDetails(List<PurchaseBillTaxGridDTO> taxDTOList,
-			PurchaseBillVO purchaseBillVO) throws ApplicationException {
-
-		if (taxDTOList == null || taxDTOList.isEmpty()) {
-			return;
-		}
-
-		for (PurchaseBillTaxGridDTO taxDTO : taxDTOList) {
-
-			PurchaseBillTaxGridVO taxVO;
-
-			// ======================================================
-			// Update
-			// ======================================================
-
-			if (taxDTO.getId() != null) {
-
-				taxVO = purchaseBillTaxGridRepo.findById(taxDTO.getId())
-						.orElseThrow(() -> new ApplicationException("Purchase Bill Tax Details Not Found"));
-
-			} else {
-
-				// ==================================================
-				// Create
-				// ==================================================
-
-				taxVO = new PurchaseBillTaxGridVO();
-			}
-
-			// ======================================================
-			// Basic Tax Details
-			// ======================================================
-
-			taxVO.setParticulars(taxDTO.getParticulars());
-			taxVO.setTaxPercent(taxDTO.getTaxPercent());
-			taxVO.setAcceptedQtyAmount(taxDTO.getAcceptedQtyAmount());
-			taxVO.setRevisedAmount(taxDTO.getRevisedAmount());
-
-			taxVO.setDebitbCredit(taxDTO.getDebitCredit());
-
-			taxVO.setDebitAmount(taxDTO.getDebitAmount());
-			taxVO.setCreditAmount(taxDTO.getCreditAmount());
-
-			taxVO.setPostToFinanceAc(taxDTO.getPostToFinanceAc());
-
-			// ======================================================
-			// Ledger Account
-			// ======================================================
-
-			if (taxDTO.getLedgerAccount() != null && taxDTO.getLedgerAccount() > 0) {
-
-				ListOfValuesDetailsVO ledgerAccount = listOfValuesDetailsRepo.findById(taxDTO.getLedgerAccount())
-						.orElseThrow(() -> new ApplicationException("Ledger Account Not Found"));
-
-				taxVO.setLedgerAccount(ledgerAccount);
-			}
-
-			// ======================================================
-			// Parent
-			// ======================================================
-
-			taxVO.setPurchaseBillVO(purchaseBillVO);
-
-			// ======================================================
-			// Add to Parent
-			// ======================================================
-
-			if (!purchaseBillVO.getPurchaseBillTaxGridVO().contains(taxVO)) {
-
-				purchaseBillVO.getPurchaseBillTaxGridVO().add(taxVO);
-			}
-		}
-	}
-
-	private PurchaseBillResponseDTO purchaseBillResponse(PurchaseBillVO vo) {
-
-		PurchaseBillResponseDTO dto = new PurchaseBillResponseDTO();
-
-		// ======================================================
-		// Basic Header
-		// ======================================================
-
-		dto.setId(vo.getId());
-
-//	    dto.setDocId(vo.getDocId());
-
-		dto.setBelongsTo(vo.getBelongsTo());
-
-//	    dto.setDocDate(vo.getDocDate());
-
-		dto.setGrnNo(vo.getGrnNo());
-
-		dto.setGrnDate(vo.getGrnDate());
-
-		dto.setExcisable(vo.getExcisable());
-
-		dto.setVendorDcNo(vo.getVendorDcNo());
-
-		dto.setExchangeRate(vo.getExchangeRate());
-
-		dto.setPurchaseorderType(vo.getPurchaseorderType());
-
-		dto.setPurchaseorderNo(vo.getPurchaseorderNumber());
-
-		dto.setPurchaseorderDate(vo.getPurchaseorderDate());
-
-		dto.setIsReverseChrg(vo.getIsReverseChrg());
-
-		dto.setVoucherPostingDate(vo.getVoucherPostingDate());
-
-		dto.setDate(vo.getDate());
-
-		dto.setDutyPerUnit(vo.getDutyPerUnit());
-
-		dto.setModvatCopyReceived(vo.getModvatCopyReceived());
-
-		dto.setSupplierDcInvNo(vo.getSupplierDcInvNo());
-
-		dto.setSupplierDcInvDate(vo.getSupplierDcInvDate());
-
-		// ======================================================
-		// Charges Summary
-		// ======================================================
-
-		dto.setTotalFreight(vo.getTotalFreight());
-
-		dto.setTotalQty(vo.getTotalQty());
-
-		dto.setBasicValue(vo.getBasicValue());
-
-		dto.setTotalAmount(vo.getTotalAmount());
-
-		dto.setAmountInWords(vo.getAmountInWords());
-
-		dto.setEntryTaxApplicable(vo.getEntryTaxApplicable());
-
-		dto.setNarration(vo.getNarration());
-
-		dto.setPaymentTerms(vo.getPaymentTerms());
-
-		// ======================================================
-		// Organization / Audit
-		// ======================================================
-
-		dto.setOrgId(vo.getOrgId());
-
-		dto.setFinancialYear(vo.getFinancialYear());
-
-		dto.setActive(vo.getActive());
-
-		dto.setCancelRemarks(vo.getCancelRemarks());
-
-		if (vo.getCreatedBy() != null) {
-			dto.setCreatedBy(vo.getCreatedBy());
-		}
-
-		if (vo.getUpdatedBy() != null) {
-			dto.setUpdatedBy(vo.getUpdatedBy());
-		}
-
-		// ======================================================
-		// Branch
-		// ======================================================
-
-		if (vo.getBranch() != null) {
-
-			BranchResponseDTO branchDTO = new BranchResponseDTO();
-
-			branchDTO.setId(vo.getBranch().getId());
-
-			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
-
-			branchDTO.setBranchName(vo.getBranch().getBranchName());
-
-			dto.setBranch(branchDTO);
-		}
-
-		// ======================================================
-		// Supplier
-		// ======================================================
-		if (vo.getSupplier() != null) {
-
-			PurchaseBillSupplierResponseDTO supplierDTO = new PurchaseBillSupplierResponseDTO();
-
-			supplierDTO.setId(vo.getSupplier().getId());
-
-			supplierDTO.setSupplierCode(vo.getSupplier().getCustomerCode());
-
-			supplierDTO.setSupplierName(vo.getSupplier().getCustomerName());
-
-			supplierDTO.setDealerType(vo.getSupplier().isRegistered());
-
-			// GST State
-			if (vo.getSupplier().getGstState() != null) {
-
-				GSTStateResponseDTO gstStateDTO = new GSTStateResponseDTO();
-
-				gstStateDTO.setId(vo.getSupplier().getGstState().getId());
-
-				gstStateDTO.setStateCode(vo.getSupplier().getGstState().getStateCode());
-
-				gstStateDTO.setStateName(vo.getSupplier().getGstState().getStateName());
-
-				supplierDTO.setGstState(gstStateDTO);
-			}
-
-			// GST Number
-			supplierDTO.setGstNNo(vo.getSupplier().getGstNo());
-
-			// ECC Type
-			supplierDTO.setEccType(vo.getSupplier().getEccType());
-
-			dto.setSupplier(supplierDTO);
-		}
-
-//		if (vo.getPostingCategory() != null) {
-//
-//			ListOfVlauesDetailsResponseDTO postingCategoryDTO = new ListOfVlauesDetailsResponseDTO();
-//
-//			postingCategoryDTO.setId(vo.getPostingCategory().getId());
-//
-//			postingCategoryDTO.setValueCode(vo.getPostingCategory().getValueCode());
-//
-//			dto.setPostingCategory(postingCategoryDTO);
-//		}
-
-		// ======================================================
-		// ECC Type
-		// ======================================================
-
-//	    if (vo.getEccType() != null) {
-//
-//	        ListOfVlauesDetailsResponseDTO eccTypeDTO =
-//	                new ListOfVlauesDetailsResponseDTO();
-//
-//	        eccTypeDTO.setId(
-//	                vo.getEccType().getId());
-//
-//	        eccTypeDTO.setValueCode(vo.getEccType().getValueCode());
-//	        dto.setEccType(eccTypeDTO);
-//	    }
-		// ======================================================
-		// Purchase Bill Details
-		// ======================================================
-
-		if (vo.getPurchaseBillDetailsVO() != null) {
-
-			List<PurchaseBillDetailsResponseDTO> detailsList = new ArrayList<>();
-
-			for (PurchaseBillDetailsVO detailsVO : vo.getPurchaseBillDetailsVO()) {
-
-				PurchaseBillDetailsResponseDTO detailsDTO = purchaseBillDetailsResponse(detailsVO);
-
-				detailsList.add(detailsDTO);
-			}
-
-			dto.setPurchaseDetails(detailsList);
-		}
-
-		// ======================================================
-		// Purchase Bill Tax Grid
-		// ======================================================
-
-		if (vo.getPurchaseBillTaxGridVO() != null) {
-
-			List<PurchaseBillTaxGridResponseDTO> taxList = new ArrayList<>();
-
-			for (PurchaseBillTaxGridVO taxVO : vo.getPurchaseBillTaxGridVO()) {
-
-				PurchaseBillTaxGridResponseDTO taxDTO = purchaseBillTaxGridResponse(taxVO);
-
-				taxList.add(taxDTO);
-			}
-
-			dto.setTaxGrid(taxList);
-		}
-
-		return dto;
-
-	}
-
-	private PurchaseBillDetailsResponseDTO purchaseBillDetailsResponse(PurchaseBillDetailsVO vo) {
-
-		PurchaseBillDetailsResponseDTO dto = new PurchaseBillDetailsResponseDTO();
-
-		dto.setId(vo.getId());
-
-		dto.setTaxType(vo.getTaxType());
-		dto.setTaxPercent(vo.getTaxPercent());
-//		dto.setTariffNo(vo.getTariffNo());
-		dto.setExciseToPost(vo.getExciseToPost());
-		dto.setChallanQty(vo.getChallanQty());
-
-		dto.setGrnReceivedQty(vo.getGrnReceivedQty());
-		dto.setAcceptedQty(vo.getAcceptedQty());
-		dto.setRejectedQty(vo.getRejectedQty());
-		dto.setShortageQty(vo.getShortageQty());
-
-		dto.setPurchaseorderRate(vo.getPurchaseorderRate());
-		dto.setRateInInr(vo.getRateInInr());
-		dto.setRateInSelectedCurrency(vo.getRateInSelectedCurrency());
-
-		dto.setApportionedCost(vo.getApportionedCost());
-		dto.setLandedCostRate(vo.getLandedCostRate());
-
-		dto.setAmount(vo.getAmount());
-		dto.setAmountInSelectedCurrency(vo.getAmountInSelectedCurrency());
-
-		dto.setAdditionalDuty(vo.getAdditionalDuty());
-		dto.setAmountInInr(vo.getAmountInInr());
-
-		dto.setSgstRate(vo.getSgstRate());
-		dto.setSgstAmount(vo.getSgstAmount());
-
-		dto.setCgstRate(vo.getCgstRate());
-		dto.setCgstAmount(vo.getCgstAmount());
-
-		dto.setIgstRate(vo.getIgstRate());
-		dto.setIgstAmount(vo.getIgstAmount());
-
-		// ======================================================
-		// Item
-		// ======================================================
-
-		if (vo.getItem() != null) {
-
-			ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
-
-			itemDTO.setId(vo.getItem().getId());
-			// Add the remaining Item fields based on your DTO
-
-			dto.setItem(itemDTO);
-		}
-
-		// ======================================================
-		// GST Rate
-		// ======================================================
-
-		if (vo.getGstRate() != null) {
-
-			GSTRateMasterResponseDTO gstDTO = new GSTRateMasterResponseDTO();
-
-			gstDTO.setId(vo.getGstRate().getId());
-
-			// Add remaining GST fields if required
-
-			dto.setGstRate(gstDTO);
-		}
-
-		// ======================================================
-		// HSN
-		// ======================================================
-
-		if (vo.getHsnCode() != null) {
-
-			HsnResponseImageDTO hsnDTO = new HsnResponseImageDTO();
-
-			hsnDTO.setId(vo.getHsnCode().getId());
-
-			// Add remaining HSN fields if required
-
-			dto.setHsnCode(hsnDTO);
-		}
-
-		// ======================================================
-		// Unit
-		// ======================================================
-
-		if (vo.getUnit() != null) {
-
-			PrimaryUnitImageDTO unitDTO = new PrimaryUnitImageDTO();
-
-			unitDTO.setId(vo.getUnit().getId());
-
-			// Add remaining Unit fields if required
-
-			dto.setUnit(unitDTO);
-		}
-
-		return dto;
-	}
-
-	private PurchaseBillTaxGridResponseDTO purchaseBillTaxGridResponse(PurchaseBillTaxGridVO vo) {
-
-		PurchaseBillTaxGridResponseDTO dto = new PurchaseBillTaxGridResponseDTO();
-
-		dto.setId(vo.getId());
-		dto.setParticulars(vo.getParticulars());
-		dto.setTaxPercent(vo.getTaxPercent());
-		dto.setAcceptedQtyAmount(vo.getAcceptedQtyAmount());
-		dto.setRevisedAmount(vo.getRevisedAmount());
-
-		dto.setDebitCredit(vo.getDebitbCredit());
-
-		dto.setDebitAmount(vo.getDebitAmount());
-		dto.setCreditAmount(vo.getCreditAmount());
-
-		dto.setPostToFinanceAc(vo.getPostToFinanceAc());
-
-		// ======================================================
-		// Ledger Account
-		// ======================================================
-
-		if (vo.getLedgerAccount() != null) {
-
-			ListOfVlauesDetailsResponseDTO ledgerDTO = new ListOfVlauesDetailsResponseDTO();
-
-			ledgerDTO.setId(vo.getLedgerAccount().getId());
-			ledgerDTO.setValueCode(vo.getLedgerAccount().getValueCode());
-
-			dto.setLedgerAccount(ledgerDTO);
-		}
-
-		return dto;
-	}
+	
 
 //	Supplier dropdown for purchase bill
 	@Override

@@ -24,7 +24,7 @@ public class PurchaseBillDetailsResponseDTO {
     private String taxType;
     private BigDecimal taxPercent;
 //    private String tariffNo;
-    private Boolean exciseToPost;
+    private boolean exciseToPost;
     private BigDecimal challanQty;
     private PrimaryUnitImageDTO unit;
     private BigDecimal grnReceivedQty;

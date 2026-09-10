@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
@@ -13,6 +14,7 @@ import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResp
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
+import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
@@ -122,5 +124,18 @@ public interface SubContractService {
 			Long orgId, Long branch) throws ApplicationException;
 
 	ProductionScheduleForNextThreeMonthResponseDTO getProductionScheduleForNextThreeMonthById(Long id) throws ApplicationException;
+
+	//DeliveryChallanCumGatePass
+	Map<String, Object> createUpdateDeliveryChallanCumGatePass(
+			DeliveryChallanCumGatePassDTO deliveryChallanCumGatePassDTO) throws ApplicationException;
+
+	List<Map<String, Object>> getDeliveryChallanCumGatePassDetails(String jobOrderNo, Long branch, Long orgId,
+			Long customer);
+
+	DeliveryChallanCumGatePassResponseDTO getDeliveryChallanCumGatePassById(Long id) throws ApplicationException;
+
+	List<DeliveryChallanCumGatePassResponseDTO> getDeliveryChallanCumGatePassByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	String getDeliveryChallanCumGatePassDocId(Long orgId, String financialYear);
 
 }

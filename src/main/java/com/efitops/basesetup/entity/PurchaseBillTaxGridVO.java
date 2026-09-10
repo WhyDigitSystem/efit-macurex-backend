@@ -2,7 +2,15 @@ package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -35,9 +43,8 @@ public class PurchaseBillTaxGridVO {
     @Column(name = "revised_amount")
     private BigDecimal revisedAmount;
 
-    @ManyToOne
-    @JoinColumn(name = "ledger_account")
-    private ListOfValuesDetailsVO ledgerAccount;
+    @Column(name = "ledger_account")
+    private String ledgerAccount;
 
     @Column(name = "debit_credit")
     private String debitbCredit;
@@ -49,7 +56,7 @@ public class PurchaseBillTaxGridVO {
     private BigDecimal creditAmount;
 
     @Column(name = "post_to_finance_ac")
-    private Boolean postToFinanceAc;
+    private boolean postToFinanceAc;
 
     @ManyToOne
     @JoinColumn(name = "purchasebill_id")

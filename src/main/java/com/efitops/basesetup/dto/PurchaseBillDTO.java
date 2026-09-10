@@ -47,16 +47,6 @@ public class PurchaseBillDTO {
 	private Long statutoryForms;
 	private String supplierInvValue;
 
-	// -------- 3. Charges Summary --------
-	private BigDecimal totalFreight;
-	private BigDecimal totalQty;
-	private BigDecimal basicValue;
-	private BigDecimal totalAmount;
-	private String amountInWords;
-	private Boolean entryTaxApplicable;
-	private String narration;
-	private String paymentTerms;
-
 	// -------- audit / org --------
 	private Long orgId;
 	private String financialYear;
@@ -68,4 +58,8 @@ public class PurchaseBillDTO {
 	// -------- children --------
 	private List<PurchaseBillDetailsDTO> purchaseDetails;
 	private List<PurchaseBillTaxGridDTO> taxGrid;
+	private List<PurchaseBillChargesSummaryDTO> billChargesSummaryDTO;
+	private List<ImportPurchaseBillDetailsDTO> importPurchaseDetails;
+	private List<ImportPurchaseBillTaxDetailsDTO> importPurchaseTax;
+	private List<ImportPurchaseBillChargesSummaryDTO> importBillChargesSummaryDTO;
 }

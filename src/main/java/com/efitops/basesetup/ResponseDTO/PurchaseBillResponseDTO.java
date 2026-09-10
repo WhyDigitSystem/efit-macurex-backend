@@ -6,8 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
-import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
-import com.efitops.basesetup.service.CustomerResponseDetailsDTO;
+import com.efitops.basesetup.dto.CurrencyResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +29,8 @@ public class PurchaseBillResponseDTO {
     private Boolean excisable;
     private String vendorDcNo;
     private BigDecimal exchangeRate;
+    private CurrencyResponseDTO currency;   // small {id, code, name} DTO, mirroring BranchResponseDTO
+
 //    private ListOfVlauesDetailsResponseDTO dealerType;
     private String purchaseorderType;
     private Long purchaseorderId;
@@ -44,20 +45,13 @@ public class PurchaseBillResponseDTO {
    
     private String supplierDcInvNo;
     private LocalDate supplierDcInvDate;
-
-    private BigDecimal totalFreight;
-    private BigDecimal totalQty;
-    private BigDecimal basicValue;
-    private BigDecimal totalAmount;
-    private String amountInWords;
-    private Boolean entryTaxApplicable;
-    private String narration;
-    private String paymentTerms;
     
 //   purchase Import bill
     private String creditAcc;
 	private Long statutoryForms;
 	private String supplierInvValue;
+    private String taxStructureName;
+
 	
     private Long orgId;
     private String financialYear;
@@ -68,6 +62,10 @@ public class PurchaseBillResponseDTO {
 
     private List<PurchaseBillDetailsResponseDTO> purchaseDetails;
     private List<PurchaseBillTaxGridResponseDTO> taxGrid;
+    private List<PurchaseBillChargesSummaryResponseDTO> billChargesSummaryDTO;
+    private List<ImportPurchaseBillDetailsResponseDTO> importPurchaseDetails;
+    private List<ImportPurchaseBillTaxDetailsResponseDTO> importPurchaseTax;
+    private List<ImportPurchaseBillChargesSummaryResponseDTO> importBillChargesSummaryDTO;
 
     
 }

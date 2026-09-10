@@ -52,6 +52,9 @@ public class ZeroKmFailureEntryVO {
 	@Column(name = "party_name")
 	private String partyName;
 	
+	@Column(name = "remarks")
+	private String remarks;
+	
 	@Column(name = "active")
 	private boolean active;
     

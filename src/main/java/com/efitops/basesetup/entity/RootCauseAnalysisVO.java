@@ -65,8 +65,9 @@ public class RootCauseAnalysisVO {
 	 @Column(name = "complaint_type")
 	 private String complaintType;
 	 
-	 @Column(name = "customer_id")
-	 private Long customerId;
+	 @ManyToOne
+	 @JoinColumn(name = "customer_id")
+	 private CustomerVO customerId;
 	 
 	 @Column(name = "customer_name")
 	 private String customerName;

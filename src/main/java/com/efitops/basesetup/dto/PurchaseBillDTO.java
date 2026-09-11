@@ -19,12 +19,13 @@ public class PurchaseBillDTO {
 	private String belongsTo;
 	private LocalDate docDate;
 
+
 	private Long supplier;
 
 	private String grnNo;
 	private LocalDate grnDate;
 
-	private Boolean excisable;
+	private boolean excisable;
 
 	private String vendorDcNo;
 	private BigDecimal exchangeRate;
@@ -32,7 +33,9 @@ public class PurchaseBillDTO {
 	private String purchaseorderType;
 	private Long purchaseorderId;
 
-	private Boolean isReverseChrg;
+	private boolean isIgstApplicable;
+
+	private boolean isReverseChrg;
 	private LocalDate voucherPostingDate;
 	private LocalDate date;
 	private BigDecimal dutyPerUnit;
@@ -42,20 +45,12 @@ public class PurchaseBillDTO {
 	private String supplierDcInvNo;
 	private LocalDate supplierDcInvDate;
 	
+	private Long currency;
+
 //	---------import purchase bill
 	private String creditAcc;
 	private Long statutoryForms;
 	private String supplierInvValue;
-
-	// -------- 3. Charges Summary --------
-	private BigDecimal totalFreight;
-	private BigDecimal totalQty;
-	private BigDecimal basicValue;
-	private BigDecimal totalAmount;
-	private String amountInWords;
-	private Boolean entryTaxApplicable;
-	private String narration;
-	private String paymentTerms;
 
 	// -------- audit / org --------
 	private Long orgId;
@@ -63,9 +58,12 @@ public class PurchaseBillDTO {
 	private boolean active;
 	private String cancelRemarks;
 	private String createdBy;
-	private String updatedBy;
 
 	// -------- children --------
 	private List<PurchaseBillDetailsDTO> purchaseDetails;
 	private List<PurchaseBillTaxGridDTO> taxGrid;
+	private List<PurchaseBillChargesSummaryDTO> billChargesSummaryDTO;
+	private List<ImportPurchaseBillDetailsDTO> importPurchaseDetails;
+	private List<ImportPurchaseBillTaxDetailsDTO> importPurchaseTax;
+	private List<ImportPurchaseBillChargesSummaryDTO> importBillChargesSummaryDTO;
 }

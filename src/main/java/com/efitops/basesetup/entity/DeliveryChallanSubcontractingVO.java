@@ -61,8 +61,8 @@ public class DeliveryChallanSubcontractingVO {
 	private CustomerVO vendor;
 
 	@ManyToOne
-	@JoinColumn(name = "party_location")
-	private LocationVO partyLocation;
+	@JoinColumn(name = "location")
+	private LocationVO location;
 
 	@Column(name = "job_order_no")
 	private String jobOrderNo;
@@ -71,16 +71,14 @@ public class DeliveryChallanSubcontractingVO {
 	@JoinColumn(name = "incoming_item")
 	private ItemMasterVO incomingItem;
 
-	@ManyToOne
-	@JoinColumn(name = "transport_name")
-	private TransportMasterVO transportName;
+	@Column(name = "transport_name")
+	private String transportName;
 
 	@Column(name = "vehicle_no")
 	private String vehicleNo;
 
-	@ManyToOne
-	@JoinColumn(name = "sfg_bom_id")
-	private BomVO sfgBomId;
+	@Column(name = "sfg_bom")
+	private String sfgBom;
 
 	@Column(name = "qty")
 	private BigDecimal qty;

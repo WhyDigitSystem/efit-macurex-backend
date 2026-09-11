@@ -59,12 +59,15 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	            b.item AS id,
 	            i.item_code AS itemCode,
 	            i.item_description AS itemDescription,
-	            b.hsn_code AS hsnSacCode
+	            b.hsn_code AS hsnSacCode,
+	            h.hsn_id AS hsnId
 	        FROM purchase_order_local_details b
 	        INNER JOIN purchase_order_basic a
 	            ON a.purchase_order_basic_id = b.purchase_order_basic_id
 	        INNER JOIN item i
 	            ON i.item_id = b.item
+	        LEFT JOIN hsn h
+	            ON h.hsn = b.hsn_code
 	        WHERE a.cancel = 0
 	          AND a.doc_id = :docId
 	          AND a.org_id = :orgId
@@ -76,12 +79,15 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	            b.item AS id,
 	            i.item_code AS itemCode,
 	            i.item_description AS itemDescription,
-	            b.hsn_code AS hsnSacCode
+	            b.hsn_code AS hsnSacCode,
+	            h.hsn_id AS hsnId
 	        FROM purchase_order_import_details b
 	        INNER JOIN purchase_order_basic a
 	            ON a.purchase_order_basic_id = b.purchase_order_basic_id
 	        INNER JOIN item i
 	            ON i.item_id = b.item
+	        LEFT JOIN hsn h
+	            ON h.hsn = b.hsn_code
 	        WHERE a.cancel = 0
 	          AND a.doc_id = :docId
 	          AND a.org_id = :orgId
@@ -91,6 +97,8 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	        @Param("docId") String docId,
 	        @Param("branch") Long branch,
 	        @Param("orgId") Long orgId);
+	
+	
 	
 	
 	@Query(value = """

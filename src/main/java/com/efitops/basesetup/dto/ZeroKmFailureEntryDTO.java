@@ -1,6 +1,7 @@
 package com.efitops.basesetup.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,15 +27,23 @@ public class ZeroKmFailureEntryDTO {
     private String remarks;
 
     private boolean active;
-
+    
     private Long orgId;
+    
+    private String financialYear;
+    
 
     private String createdBy;
-
-    private String updatedBy;
+	
+	private String updatedBy;
+	
 
     private boolean cancel;
 
     private String cancelRemarks;
+    
+    
+    private List<ZeroEntryDetailDTO>zeroEntryDetailDTO;
+
     
 }

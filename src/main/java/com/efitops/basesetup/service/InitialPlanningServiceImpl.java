@@ -1415,6 +1415,39 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 		return result;
 	}
 
+	@Override
+	public ProblemSolvingEntryResponseDTO getProblemSolvingEntryById(Long id) throws ApplicationException {
+
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ApplicationException("Invalid Id");
+		}
+
+		ProblemSolvingEntryVO problemSolvingEntryVO = problemSolvingEntryRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Problem Solving Entry Not Found"));
+
+		return problemSolvingEntryResponse(problemSolvingEntryVO);
+	}
+
+	@Override
+	public List<ProblemSolvingEntryResponseDTO> getProblemSolvingEntryByOrgId(Long orgId,Long branch) throws ApplicationException {
+
+		List<ProblemSolvingEntryVO> problemSolvingEntryList = problemSolvingEntryRepo
+				.getProblemSolvingEntryByOrgId(orgId,branch);
+
+		if (problemSolvingEntryList.isEmpty()) {
+			throw new ApplicationException("No Problem Solving Entry Details Found");
+		}
+
+		List<ProblemSolvingEntryResponseDTO> responseList = new ArrayList<>();
+
+		for (ProblemSolvingEntryVO problemSolvingEntryVO : problemSolvingEntryList) {
+
+			responseList.add(problemSolvingEntryResponse(problemSolvingEntryVO));
+		}
+
+		return responseList;
+	}
+
 //	dropdown for teammember1,teamember2 and prepared by and responsible
 	@Override
 	public Map<String, Object> getTeamMemberDropdownForProblemSolvingEntry(Long branch, Long department, Long orgId)
@@ -1715,25 +1748,24 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 
 				if (consumableVO.getConsumables() != null) {
 
-				    ItemResponse1DTO itemDTO = new ItemResponse1DTO();
+					ItemResponse1DTO itemDTO = new ItemResponse1DTO();
 
-				    itemDTO.setId(consumableVO.getConsumables().getId());
-				    itemDTO.setItemCode(consumableVO.getConsumables().getItemCode());
-				    itemDTO.setItemDescription(consumableVO.getConsumables().getItemDescription());
+					itemDTO.setId(consumableVO.getConsumables().getId());
+					itemDTO.setItemCode(consumableVO.getConsumables().getItemCode());
+					itemDTO.setItemDescription(consumableVO.getConsumables().getItemDescription());
 
-				    if (consumableVO.getConsumables().getPricingUnit() != null) {
+					if (consumableVO.getConsumables().getPricingUnit() != null) {
 
-				        UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
 
-				        unitDTO.setId(consumableVO.getConsumables().getPricingUnit().getId());
-				        unitDTO.setUnitId(consumableVO.getConsumables().getPricingUnit().getUnitId());
-				        unitDTO.setUnitDescription(
-				                consumableVO.getConsumables().getPricingUnit().getDescription());
+						unitDTO.setId(consumableVO.getConsumables().getPricingUnit().getId());
+						unitDTO.setUnitId(consumableVO.getConsumables().getPricingUnit().getUnitId());
+						unitDTO.setUnitDescription(consumableVO.getConsumables().getPricingUnit().getDescription());
 
-				        itemDTO.setUnit(unitDTO);
-				    }
+						itemDTO.setUnit(unitDTO);
+					}
 
-				    consumableResponseDTO.setConsumables(itemDTO);
+					consumableResponseDTO.setConsumables(itemDTO);
 				}
 				consumableResponseDTO.setQuantity(consumableVO.getQuantity());
 

@@ -30,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
-import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesDetailsResponseDTO;
@@ -416,11 +415,12 @@ public class DevelopServiceImpl implements DevelopService {
 	@Autowired
 	private GradeMasterRepo gradeMasterRepo;
 	
-	@Autowired
+  @Autowired
 	private ZeroKmFailureEntryRepo zeroKmFailureEntryRepo;
 	
 	@Autowired
 	private ZeroEntryDetailRepo zeroEntryDetailRepo;
+
 
 //	@Override
 //	@Transactional
@@ -6867,9 +6867,9 @@ public class DevelopServiceImpl implements DevelopService {
 		// Basic Fields
 		// =========================
 
-		rootCauseAnalysisVO.setDocId(rootCauseAnalysisDTO.getDocId());
-
-		rootCauseAnalysisVO.setDocDate(rootCauseAnalysisDTO.getDocDate());
+//		rootCauseAnalysisVO.setDocId(rootCauseAnalysisDTO.getDocId());
+//
+//		rootCauseAnalysisVO.setDocDate(rootCauseAnalysisDTO.getDocDate());
 
 		rootCauseAnalysisVO.setComplaintNo(rootCauseAnalysisDTO.getComplaintNo());
 

@@ -36,11 +36,11 @@ public class DeliveryChallanSubcontractingResponseDTO {
 
     private ItemResponseDTO incomingItem;
 
-    private TransportResponseDTO transportName;
+    private String transportName;
 
     private String vehicleNo;
 
-    private BomResponseDTO sfgBomId;
+    private String sfgBom;
 
     private BigDecimal qty;
 

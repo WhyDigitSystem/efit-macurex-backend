@@ -13,9 +13,11 @@ import lombok.NoArgsConstructor;
 public class EngineeringDeviationRequestDTO {
 	private Long id;
 
-    private String docId;
-
-    private LocalDate docDate;
+//    private String docId;
+//
+//    private LocalDate docDate;
+    
+    private String financialYear;
 
     private Long toDepartment;
 
@@ -90,6 +92,14 @@ public class EngineeringDeviationRequestDTO {
     private String customerFeedBackModeAndReference;
 
     private String decision;
+    
+    private long orgId;
+    
+    private boolean active;
+    
+    private String createdBy;
+    
+    
 
 
 }

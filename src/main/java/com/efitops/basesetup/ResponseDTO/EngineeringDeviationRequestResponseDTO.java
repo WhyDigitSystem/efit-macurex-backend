@@ -61,30 +61,30 @@ public class EngineeringDeviationRequestResponseDTO {
 	// PART NO
 	private String partNo;
 	private String partDescription;
-	
-    private String willTheNCAffectTheFit;
 
-    private String willTheNCAffectTheForm;
+	private String willTheNCAffectTheFit;
 
-    private String willTheNCAffectTheFunction;
+	private String willTheNCAffectTheForm;
 
-    private String willTheNCAffectTheSafety;
+	private String willTheNCAffectTheFunction;
 
-    private String natureOfTheDeviationRequest;
+	private String willTheNCAffectTheSafety;
 
-    private String toBeIntimatedToCustomerAndActionOnCustomerFeedBack;
+	private String natureOfTheDeviationRequest;
 
-    private String note;
+	private String toBeIntimatedToCustomerAndActionOnCustomerFeedBack;
+
+	private String note;
 
 	// FOR TDC DEPARTMENT
 	private String customerApproval;
 	private String drawingWhichRequiredChange;
 	private String documentWhichRequiredChange;
-	
+
 	private EmployeeDropdownResponseDTO productionMgr;
 	private String productionMgrDisposition;
 	private EmployeeDropdownResponseDTO qualityMgr;
-	private String qualityMgrDisposition; 
+	private String qualityMgrDisposition;
 	private EmployeeDropdownResponseDTO tDCMgr;
 	private String tdcMgrDisposition;
 	private EmployeeDropdownResponseDTO directorTechnical;
@@ -94,17 +94,17 @@ public class EngineeringDeviationRequestResponseDTO {
 	private String customerIntimationModeAndReference;
 	private String customerFeedBack;
 	private String customerFeedBackModeAndReference;
-	private String Decision; 
+	private String Decision;
 	
+
 	
 
 	// STATUS DETAILS
-	private String active;
+	private boolean active;
 	private Long orgId;
 	private String createdBy;
 	private String cancelRemarks;
-	
+
 	private List<EngineeringDeviationAttachmentDTO> engineeringDeviationAttachmentDTO;
-	
 
 }

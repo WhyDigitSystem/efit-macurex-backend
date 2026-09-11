@@ -1427,9 +1427,9 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 	}
 
 //	engineering deviation request
-	
+
 	@Value("${engineeringdeviation.upload.path}")
-	private String engineeringDeviationUploadPath; 
+	private String engineeringDeviationUploadPath;
 
 	@Override
 	@Transactional
@@ -1438,6 +1438,7 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 		EngineeringDeviationRequestVO engineeringDeviationRequestVO = new EngineeringDeviationRequestVO();
 
+		String screenCode = "EDR";
 		String message;
 
 		// ========================================================
@@ -1445,6 +1446,28 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 		// ========================================================
 
 		if (ObjectUtils.isEmpty(engineeringDeviationRequestDTO.getId())) {
+
+			String docId = engineeringDeviationRepo.getEngineeringDeviationDocId(
+					engineeringDeviationRequestDTO.getOrgId(), engineeringDeviationRequestDTO.getFinancialYear(),
+					screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new Exception("Engineering Deviation DocId Not Found");
+			}
+
+			engineeringDeviationRequestVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(engineeringDeviationRequestDTO.getOrgId(),
+							engineeringDeviationRequestDTO.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new Exception("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			engineeringDeviationRequestVO.setDocDate(LocalDateTime.now().toLocalDate());
 
@@ -1530,17 +1553,19 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 		// BASIC DETAILS
 		// ========================================================
 
-		vo.setDocId(dto.getDocId());
-
-		if (dto.getDocDate() != null) {
-			vo.setDocDate(dto.getDocDate());
-		}
+//		vo.setDocId(dto.getDocId());
+//
+//		if (dto.getDocDate() != null) {
+//			vo.setDocDate(dto.getDocDate());
+//		}
 
 		vo.setPartDescription(dto.getPartDescription());
 		vo.setCustomerId(dto.getCustomerId());
 		vo.setProductName(dto.getProductName());
 		vo.setQuantityReceived(dto.getQuantityReceived());
 		vo.setSupplier(dto.getSupplier());
+		vo.setOrgId(dto.getOrgId());
+		vo.setActive(dto.isActive());;
 
 		// ========================================================
 		// APPROVED BY
@@ -1756,7 +1781,7 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 			String uniqueFileName = UUID.randomUUID().toString() + extension;
 
-			Path filePath = Paths.get(engineeringDeviationUploadPath, uniqueFileName );
+			Path filePath = Paths.get(engineeringDeviationUploadPath.trim(), uniqueFileName);
 
 			Files.copy(file.getInputStream(), filePath);
 
@@ -1790,20 +1815,20 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 		dto.setId(vo.getId());
 		dto.setDocId(vo.getDocId());
 		dto.setDocDate(vo.getDocDate());
-
+//		dto.setOrgId(vo.getOrgId());
 		// ========================================================
 		// TO DEPARTMENT
 		// ========================================================
 
 		if (vo.getToDepartment() != null) {
 
-		    DepartmentResponseDTO departmentDTO = new DepartmentResponseDTO();
+			DepartmentResponseDTO departmentDTO = new DepartmentResponseDTO();
 
-		    departmentDTO.setId(vo.getToDepartment().getId());
-		    departmentDTO.setDepartmentCode(vo.getToDepartment().getDepartmentCode());
-		    departmentDTO.setDepartmentName(vo.getToDepartment().getDepartmentName());
+			departmentDTO.setId(vo.getToDepartment().getId());
+			departmentDTO.setDepartmentCode(vo.getToDepartment().getDepartmentCode());
+			departmentDTO.setDepartmentName(vo.getToDepartment().getDepartmentName());
 
-		    dto.setToDepartment(departmentDTO);
+			dto.setToDepartment(departmentDTO);
 		}
 
 		// ========================================================
@@ -1838,6 +1863,8 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 		dto.setQuantityReceived(vo.getQuantityReceived());
 
 		dto.setSupplier(vo.getSupplier());
+
+		dto.setOrgId(vo.getOrgId());
 
 		// ========================================================
 		// APPROVED BY
@@ -1894,13 +1921,13 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 		if (vo.getDepartment() != null) {
 
-		    DepartmentResponseDTO departmentDTO = new DepartmentResponseDTO();
+			DepartmentResponseDTO departmentDTO = new DepartmentResponseDTO();
 
-		    departmentDTO.setId(vo.getDepartment().getId());
-		    departmentDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode());
-		    departmentDTO.setDepartmentName(vo.getDepartment().getDepartmentName());
+			departmentDTO.setId(vo.getDepartment().getId());
+			departmentDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+			departmentDTO.setDepartmentName(vo.getDepartment().getDepartmentName());
 
-		    dto.setDepartment(departmentDTO);
+			dto.setDepartment(departmentDTO);
 		}
 
 		// ========================================================
@@ -2027,6 +2054,13 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 
 		dto.setDecision(vo.getDecision());
 
+		dto.setOrgId(vo.getOrgId());
+
+		dto.setCreatedBy(vo.getCreatedBy());
+
+		dto.setCancelRemarks(vo.getCancelRemarks());
+		
+		dto.setActive(vo.isActive());
 		// ========================================================
 		// ATTACHMENTS
 		// ========================================================
@@ -2062,6 +2096,59 @@ public class ToolMasterServiceImpl implements ToolMasterService {
 		dto.setEngineeringDeviationAttachmentDTO(attachmentList);
 
 		return dto;
+	}
+
+	@Override
+	public Map<String, Object> getEngineeringDeviationById(Long id) throws ApplicationException {
+
+		Map<String, Object> response = new HashMap<>();
+
+		EngineeringDeviationRequestVO engineeringDeviationRequestVO = engineeringDeviationRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Engineering Deviation Request not found"));
+
+		EngineeringDeviationRequestResponseDTO responseDTO = engineeringDeviationRequestResponse(
+				engineeringDeviationRequestVO);
+
+		response.put("engineeringDeviationRequestVO", responseDTO);
+
+		return response;
+	}
+
+	@Override
+	public Map<String, Object> getEngineeringDeviationByOrgId(Long orgId) throws ApplicationException {
+
+		Map<String, Object> response = new HashMap<>();
+
+		List<EngineeringDeviationRequestVO> engineeringDeviationRequestVOList = engineeringDeviationRepo
+				.getEngineeringDeviationByOrgId(orgId);
+
+		if (engineeringDeviationRequestVOList.isEmpty()) {
+			throw new ApplicationException("No Engineering Deviation Request Details Found");
+		}
+
+		List<EngineeringDeviationRequestResponseDTO> responseDTOList = new ArrayList<>();
+
+		for (EngineeringDeviationRequestVO engineeringDeviationRequestVO : engineeringDeviationRequestVOList) {
+
+			EngineeringDeviationRequestResponseDTO responseDTO = engineeringDeviationRequestResponse(
+					engineeringDeviationRequestVO);
+
+			responseDTOList.add(responseDTO);
+		}
+
+		response.put("engineeringDeviationRequestVO", responseDTOList);
+
+		return response;
+	}
+
+	@Override
+	public String getEngineeringDeviationDocId(Long orgId, String financialYear) {
+
+		String screenCode = "EDR";
+
+		String result = engineeringDeviationRepo.getEngineeringDeviationDocId(orgId, financialYear, screenCode);
+
+		return result;
 	}
 
 }

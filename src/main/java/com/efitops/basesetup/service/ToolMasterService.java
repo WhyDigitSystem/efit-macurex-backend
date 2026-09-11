@@ -39,4 +39,10 @@ public interface ToolMasterService {
 	Map<String, Object> updateCreateEngineeringDeviation(EngineeringDeviationRequestDTO engineeringDeviationRequestDTO,
 			MultipartFile[] files) throws Exception;
 
+	Map<String, Object> getEngineeringDeviationById(Long id) throws ApplicationException;
+
+	Map<String, Object> getEngineeringDeviationByOrgId(Long orgId) throws ApplicationException;
+
+	String getEngineeringDeviationDocId(Long orgId, String financialYear);
+
 }

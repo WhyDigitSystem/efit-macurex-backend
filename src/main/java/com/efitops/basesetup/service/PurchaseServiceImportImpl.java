@@ -2818,6 +2818,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			scheduleDetailsRepo.deleteAll(existingSchedules);
 		}
 
+		BigDecimal totalQty = BigDecimal.ZERO;
 		// ---------- Production Details ----------
 		List<ProductionScheduleOrderDetailsVO> itemDetailsList = new ArrayList<>();
 
@@ -2854,6 +2855,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailsVO.setBomQty(d.getBomQty());
 				BigDecimal batchQty = dto.getBatchQty();
 				detailsVO.setQtyRequired(d.getBomQty().multiply(batchQty));
+				totalQty = totalQty.add(detailsVO.getQtyRequired());
 				detailsVO.setScrapQty(d.getScrapQty());
 				detailsVO.setProductionScheduleOrderVO(vo);
 
@@ -2880,8 +2882,9 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				scheduleList.add(scheduleVO);
 			}
 		}
-
 		vo.setScheduleDetailsVO(scheduleList);
+
+		vo.setTotalQty(totalQty);
 	}
 
 	private ProductionScheduleOrderResponseDTO buildProductionScheduleOrderResponse(ProductionScheduleOrderVO vo) {

@@ -26,8 +26,6 @@ public class ProductionScheduleOrderDTO {
 
 	private BigDecimal batchQty;
 
-	private BigDecimal totalQty;
-
 	private String shortClose;
 
 	private Long bom;

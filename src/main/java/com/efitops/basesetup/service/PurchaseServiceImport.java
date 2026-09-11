@@ -12,12 +12,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.dto.BillOfMaterialDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
+import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
@@ -134,5 +136,21 @@ public interface PurchaseServiceImport {
 	List<Map<String, Object>> getFgAndSfgItemDetailsFromProduction(Long orgId, Long branch);
 
 	List<Map<String, Object>> getFgAndSfgItemDetailsFromProductionDetails(Long orgId, Long branch, Long bom);
+
+	// Material
+
+	Map<String, Object> createUpdateMaterialIndentForProduction(MaterialIndentForProductionDTO dto)
+			throws ApplicationException;
+
+	String getMaterialIndentForProductionDocId(Long orgId, String financialYear);
+
+	MaterialIndentForProductionResponseDTO getMaterialIndentForProductionById(Long id) throws ApplicationException;
+
+	List<MaterialIndentForProductionResponseDTO> getMaterialIndentForProductionByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsFromMaterial(Long orgId, Long branch);
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsFromMaterialDetails(Long orgId, Long branch, Long fgItem);
 
 }

@@ -27,8 +27,8 @@ public class ProductionScheduleOrderDetailsVO {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "production_schedule_order_detailsgen")
-	@SequenceGenerator(name = "production_schedule_order_detilsgen", sequenceName = "production_schedule_order_detilsseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "production_schedule_order_detils_id", columnDefinition = "BIGINT DEFAULT 0")
+	@SequenceGenerator(name = "production_schedule_order_detailsgen", sequenceName = "production_schedule_order_detailsseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "production_schedule_order_details_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@ManyToOne

@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
@@ -32,6 +33,7 @@ import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.BillOfMaterialDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
+import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
@@ -1439,6 +1441,230 @@ public class PurchaseServiceImportController extends BaseController {
 
 		try {
 			mapp = purchaseOrderService.getFgAndSfgItemDetailsFromProductionDetails(orgId, branch, bom);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item details retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Item details", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	//
+
+	@GetMapping("/getMaterialIndentForProductionById")
+	public ResponseEntity<ResponseDTO> getMaterialIndentForProductionById(@RequestParam Long id) {
+
+		String methodName = "getMaterialIndentForProductionById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			MaterialIndentForProductionResponseDTO materialIndentForProductionResponseDTO = purchaseOrderService
+					.getMaterialIndentForProductionById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Material Indent For Production information retrieved successfully");
+
+			responseObjectsMap.put("materialIndentForProductionResponseVO", materialIndentForProductionResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Material Indent For Production retrieval failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getMaterialIndentForProductionByOrgId")
+	public ResponseEntity<ResponseDTO> getMaterialIndentForProductionByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getMaterialIndentForProductionByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<MaterialIndentForProductionResponseDTO> materialIndentForProductionResponseDTO = purchaseOrderService
+					.getMaterialIndentForProductionByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Material Indent For Production information retrieved successfully");
+
+			responseObjectsMap.put("materialIndentForProductionResponseVO", materialIndentForProductionResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Material Indent For Production information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@PutMapping("/createUpdateMaterialIndentForProduction")
+	public ResponseEntity<ResponseDTO> createUpdateMaterialIndentForProduction(
+			@RequestBody MaterialIndentForProductionDTO materialIndentForProductionDTO) {
+
+		String methodName = "createUpdateMaterialIndentForProduction()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> materialIndentForProductionVO = purchaseOrderService
+					.createUpdateMaterialIndentForProduction(materialIndentForProductionDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, materialIndentForProductionVO.get("message"));
+
+			responseObjectsMap.put("materialIndentForProductionVO",
+					materialIndentForProductionVO.get("materialIndentForProductionVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMaterialIndentForProductionDocId")
+	public ResponseEntity<ResponseDTO> getMaterialIndentForProductionDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getMaterialIndentForProductionDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = purchaseOrderService.getMaterialIndentForProductionDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"MaterialIndentForProductionDocId information retrieved successfully");
+
+			responseObjectsMap.put("materialIndentForProductionDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve MaterialIndentForProductionDocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getFgAndSfgItemDetailsFromMaterial")
+	public ResponseEntity<ResponseDTO> getFgAndSfgItemDetailsFromMaterial(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+		String methodName = "getFgAndSfgItemDetailsFromMaterial()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getFgAndSfgItemDetailsFromMaterial(orgId, branch);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item details retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Item details", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getFgAndSfgItemDetailsFromMaterialDetails")
+	public ResponseEntity<ResponseDTO> getFgAndSfgItemDetailsFromMaterialDetails(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long fgItem) {
+		String methodName = "getFgAndSfgItemDetailsFromMaterialDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getFgAndSfgItemDetailsFromMaterialDetails(orgId, branch, fgItem);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);

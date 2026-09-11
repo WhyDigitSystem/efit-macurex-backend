@@ -51,6 +51,8 @@ import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseImportDTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LmeResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseDetailsResponseDTO;
@@ -72,6 +74,8 @@ import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.DirectPurchaseCashDetailsDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.DirectPurchaseTaxDetailsDTO;
+import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
+import com.efitops.basesetup.dto.MaterialIndentForProductionDetailsDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDetailsDTO;
@@ -103,6 +107,8 @@ import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.LMEVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.MaterialIndentForProductionDetailsVO;
+import com.efitops.basesetup.entity.MaterialIndentForProductionVO;
 import com.efitops.basesetup.entity.ProcessSheetCompRoutingVO;
 import com.efitops.basesetup.entity.ProductionScheduleOrderDetailsVO;
 import com.efitops.basesetup.entity.ProductionScheduleOrderVO;
@@ -135,6 +141,8 @@ import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.LMERepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.MaterialIndentForProductionDetailsRepo;
+import com.efitops.basesetup.repository.MaterialIndentForProductionRepo;
 import com.efitops.basesetup.repository.ProcessSheetCompRoutingRepo;
 import com.efitops.basesetup.repository.ProductionScheduleOrderDetailsRepo;
 import com.efitops.basesetup.repository.ProductionScheduleOrderRepo;
@@ -248,6 +256,12 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 	@Autowired
 	ProcessSheetCompRoutingRepo processSheetCompRoutingRepo;
+
+	@Autowired
+	private MaterialIndentForProductionRepo materialIndentForProductionRepo;
+
+	@Autowired
+	private MaterialIndentForProductionDetailsRepo materialIndentForProductionDetailsRepo;
 
 	@Override
 	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException {
@@ -2772,6 +2786,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setActive(dto.isActive());
 		vo.setCancelRemarks(dto.getCancelRemarks());
 		vo.setOrgId(dto.getOrgId());
+		vo.setBatchQty(dto.getBatchQty());
 		vo.setFinancialYear(dto.getFinancialYear());
 
 		if (dto.getFgItem() != null && dto.getFgItem() >= 0) {
@@ -2898,6 +2913,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setOrderType(vo.getOrderType());
 		responseDTO.setLcPoNo(vo.getLcPoNo());
 		responseDTO.setLcPoDate(vo.getLcPoDate());
+		responseDTO.setBatchQty(vo.getBatchQty());
 
 		if (vo.getFgItem() != null) {
 			ItemMasterDetailsResponseImportDTO fgItemDTO = new ItemMasterDetailsResponseImportDTO();
@@ -3514,6 +3530,327 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
 			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
 			map.put("itemType", ch[3] != null ? ch[3].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	//
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateMaterialIndentForProduction(MaterialIndentForProductionDTO dto)
+			throws ApplicationException {
+
+		String screenCode = "MIP";
+		MaterialIndentForProductionVO vo = new MaterialIndentForProductionVO();
+		String message;
+
+		if (ObjectUtils.isNotEmpty(dto.getId())) {
+
+			vo = materialIndentForProductionRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Material Indent For Production Not Found"));
+
+			vo.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Material Indent For Production Updated Successfully";
+
+		} else {
+
+			String docId = materialIndentForProductionRepo.getMaterialIndentForProductionDocId(dto.getOrgId(),
+					dto.getFinancialYear(), screenCode);
+
+			vo.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			vo.setCreatedBy(dto.getCreatedBy());
+			vo.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Material Indent For Production Created Successfully";
+		}
+
+		createUpdateMaterialIndentForProductionVOByDTO(dto, vo);
+
+		vo = materialIndentForProductionRepo.save(vo);
+
+		MaterialIndentForProductionResponseDTO responseDTO = buildMaterialIndentForProductionResponse(vo);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("materialIndentForProductionVO", responseDTO);
+
+		return response;
+	}
+
+	private void createUpdateMaterialIndentForProductionVOByDTO(MaterialIndentForProductionDTO dto,
+			MaterialIndentForProductionVO vo) throws ApplicationException {
+
+		vo.setSchOrderNo(dto.getSchOrderNo());
+		vo.setBelongsTo(dto.getBelongsTo());
+		vo.setSchQty(dto.getSchQty());
+		vo.setScheduledDate(dto.getScheduledDate());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+		vo.setCreatedBy(dto.getCreatedBy());
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		if (dto.getDepartment() != null && dto.getDepartment() != 0) {
+			DepartmentVO department = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Department Not Found"));
+			vo.setDepartment(department);
+		}
+
+		if (dto.getFgItem() != null && dto.getFgItem() != 0) {
+			ItemMasterVO fgItem = itemMasterRepo.findById(dto.getFgItem())
+					.orElseThrow(() -> new ApplicationException("FG Item Not Found"));
+			vo.setFgItem(fgItem);
+		}
+
+		if (dto.getToLocation() != null && dto.getToLocation() != 0) {
+			LocationVO toLocation = locationRepo.findById(dto.getToLocation())
+					.orElseThrow(() -> new ApplicationException("To Location Not Found"));
+			vo.setToLocation(toLocation);
+		}
+
+		if (dto.getFromLocation() != null && dto.getFromLocation() != 0) {
+			LocationVO fromLocation = locationRepo.findById(dto.getFromLocation())
+					.orElseThrow(() -> new ApplicationException("From Location Not Found"));
+			vo.setFromLocation(fromLocation);
+		}
+
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+			vo.setBranch(branch);
+		}
+
+		// Delete existing details if updating
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+			List<MaterialIndentForProductionDetailsVO> existingDetails = materialIndentForProductionDetailsRepo
+					.findByMaterialIndentForProductionVO(vo);
+			materialIndentForProductionDetailsRepo.deleteAll(existingDetails);
+		}
+
+		List<MaterialIndentForProductionDetailsVO> itemDetailsList = new ArrayList<>();
+
+		if (dto.getMaterialIndentForProductionDetailsDTO() != null) {
+
+			for (MaterialIndentForProductionDetailsDTO d : dto.getMaterialIndentForProductionDetailsDTO()) {
+
+				MaterialIndentForProductionDetailsVO detailsVO = new MaterialIndentForProductionDetailsVO();
+
+				detailsVO.setSchQty(d.getSchQty());
+				detailsVO.setStockAvailable(d.getStockAvailable());
+				detailsVO.setRequiredQty(d.getRequiredQty());
+
+				if (d.getItem() != null && d.getItem() != 0) {
+					ItemMasterVO item = itemMasterRepo.findById(d.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Code Not Found"));
+					detailsVO.setItem(item);
+				}
+
+				if (d.getUnit() != null && d.getUnit() != 0) {
+					UnitMasterVO item = unitMasterRepo.findById(d.getUnit())
+							.orElseThrow(() -> new ApplicationException("Unti Not Found"));
+					detailsVO.setUnit(item);
+				}
+
+				detailsVO.setMaterialIndentForProductionVO(vo);
+
+				itemDetailsList.add(detailsVO);
+			}
+		}
+
+		vo.setMaterialIndentForProductionDetailsVO(itemDetailsList);
+	}
+
+	private MaterialIndentForProductionResponseDTO buildMaterialIndentForProductionResponse(
+			MaterialIndentForProductionVO vo) {
+
+		MaterialIndentForProductionResponseDTO responseDTO = new MaterialIndentForProductionResponseDTO();
+
+		responseDTO.setId(vo.getId());
+		responseDTO.setDocId(vo.getDocId());
+		responseDTO.setDocDate(vo.getDocDate());
+		responseDTO.setSchOrderNo(vo.getSchOrderNo());
+		responseDTO.setBelongsTo(vo.getBelongsTo());
+		responseDTO.setSchQty(vo.getSchQty());
+		responseDTO.setScheduledDate(vo.getScheduledDate());
+		responseDTO.setIndentTime(vo.getIndentTime());
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
+		responseDTO.setActive(vo.getActive());
+		responseDTO.setCancel(vo.getCancel());
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+		responseDTO.setScreenName(vo.getScreenName());
+		responseDTO.setScreenCode(vo.getScreenCode());
+		responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+
+		// Department
+		if (vo.getDepartment() != null) {
+			DepartmentResponseDTO deptDTO = new DepartmentResponseDTO();
+			deptDTO.setId(vo.getDepartment().getId());
+			deptDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+			deptDTO.setDepartmentName(vo.getDepartment().getDepartmentName());
+			responseDTO.setDepartment(deptDTO);
+		}
+
+		// FG Item
+		if (vo.getFgItem() != null) {
+			ItemMasterDetailsResponseImportDTO fgItemDTO = new ItemMasterDetailsResponseImportDTO();
+			fgItemDTO.setId(vo.getFgItem().getId());
+			fgItemDTO.setItemCode(vo.getFgItem().getItemCode());
+			fgItemDTO.setItemDescription(vo.getFgItem().getItemDescription());
+			responseDTO.setFgItem(fgItemDTO);
+		}
+
+		// To Location
+		if (vo.getToLocation() != null) {
+			LocationMasterResponseDTO toLocationDTO = new LocationMasterResponseDTO();
+			toLocationDTO.setId(vo.getToLocation().getId());
+			toLocationDTO.setLocationName(vo.getToLocation().getLocationName());
+			responseDTO.setToLocation(toLocationDTO);
+		}
+
+		if (vo.getFromLocation() != null) {
+			LocationMasterResponseDTO fromLocationDTO = new LocationMasterResponseDTO();
+			fromLocationDTO.setId(vo.getFromLocation().getId());
+			fromLocationDTO.setLocationName(vo.getFromLocation().getLocationName());
+			responseDTO.setFromLocation(fromLocationDTO);
+		}
+
+		if (vo.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(vo.getBranch().getId());
+			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+			branchDTO.setBranchName(vo.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
+
+		List<MaterialIndentForProductionDetailsResponseDTO> detailsList = new ArrayList<>();
+
+		if (vo.getMaterialIndentForProductionDetailsVO() != null) {
+
+			for (MaterialIndentForProductionDetailsVO detailsVO : vo.getMaterialIndentForProductionDetailsVO()) {
+
+				MaterialIndentForProductionDetailsResponseDTO detailsDTO = new MaterialIndentForProductionDetailsResponseDTO();
+
+				detailsDTO.setId(detailsVO.getId());
+				detailsDTO.setSchQty(detailsVO.getSchQty());
+				detailsDTO.setStockAvailable(detailsVO.getStockAvailable());
+				detailsDTO.setRequiredQty(detailsVO.getRequiredQty());
+
+				if (detailsVO.getItem() != null) {
+					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+					itemDTO.setId(detailsVO.getItem().getId());
+					itemDTO.setItemCode(detailsVO.getItem().getItemCode());
+					itemDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+					detailsDTO.setItemCode(itemDTO);
+				}
+
+				if (detailsVO.getUnit() != null) {
+					UnitResponseDTO itemDTO = new UnitResponseDTO();
+					itemDTO.setId(detailsVO.getUnit().getId());
+					itemDTO.setUnitId(detailsVO.getUnit().getUnitId());
+					detailsDTO.setUnit(itemDTO);
+				}
+
+				detailsList.add(detailsDTO);
+			}
+		}
+
+		responseDTO.setMaterialIndentForProductionDetailsResponseDTO(detailsList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public String getMaterialIndentForProductionDocId(Long orgId, String financialYear) {
+		String screenCode = "MIP";
+		return materialIndentForProductionRepo.getMaterialIndentForProductionDocId(orgId, financialYear, screenCode);
+	}
+
+	@Override
+	public MaterialIndentForProductionResponseDTO getMaterialIndentForProductionById(Long id)
+			throws ApplicationException {
+		MaterialIndentForProductionVO vo = materialIndentForProductionRepo.getMaterialIndentForProductionById(id);
+
+		if (vo == null) {
+			throw new ApplicationException("Material Indent For Production Not Found");
+		}
+
+		return buildMaterialIndentForProductionResponse(vo);
+	}
+
+	@Override
+	public List<MaterialIndentForProductionResponseDTO> getMaterialIndentForProductionByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<MaterialIndentForProductionVO> list = materialIndentForProductionRepo
+				.getMaterialIndentForProductionByOrgId(orgId, branch);
+
+		if (list == null || list.isEmpty()) {
+			throw new ApplicationException("Material Indent For Production Not Found");
+		}
+
+		List<MaterialIndentForProductionResponseDTO> responseList = new ArrayList<>();
+
+		for (MaterialIndentForProductionVO vo : list) {
+			responseList.add(buildMaterialIndentForProductionResponse(vo));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getFgAndSfgItemDetailsFromMaterial(Long orgId, Long branch) {
+		Set<Object[]> chType = materialIndentForProductionRepo.getFgAndSfgItemDetailsFromMaterial(orgId, branch);
+		return getFgAndSfgItemDetailsFromMaterial(chType);
+	}
+
+	private List<Map<String, Object>> getFgAndSfgItemDetailsFromMaterial(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			map.put("fgItemId", ch[2] != null ? ((Number) ch[2]).longValue() : null);
+			map.put("itemCode", ch[3] != null ? ch[3].toString() : "");
+			map.put("itemDescription", ch[4] != null ? ch[4].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getFgAndSfgItemDetailsFromMaterialDetails(Long orgId, Long branch, Long fgItem) {
+		Set<Object[]> chType = materialIndentForProductionRepo.getFgAndSfgItemDetailsFromMaterialDetails(orgId, branch,
+				fgItem);
+		return getFgAndSfgItemDetailsFromMaterialDetails(chType);
+	}
+
+	private List<Map<String, Object>> getFgAndSfgItemDetailsFromMaterialDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("qty", ch[3] != null ? new BigDecimal(ch[3].toString()) : BigDecimal.ZERO);
 			list.add(map);
 		}
 

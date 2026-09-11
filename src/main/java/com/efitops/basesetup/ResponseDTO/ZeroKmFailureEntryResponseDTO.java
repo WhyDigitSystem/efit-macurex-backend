@@ -24,6 +24,8 @@ public class ZeroKmFailureEntryResponseDTO {
     private CustomerResponseDTO customer;
 
     private String partyName;
+    
+    private String remarks;
 
     private boolean active;
 

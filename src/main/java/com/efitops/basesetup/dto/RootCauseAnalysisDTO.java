@@ -29,9 +29,7 @@ public class RootCauseAnalysisDTO {
 
 	    private Long customerId;
 
-	    private String customerName;
-
-	    private String customerPartNo;
+	    
 
 	    private String detailsOfComplaint;
 

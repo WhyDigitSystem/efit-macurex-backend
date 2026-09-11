@@ -22,6 +22,8 @@ public class ZeroKmFailureEntryDTO {
     private Long customer;
 
     private String partyName;
+    
+    private String remarks;
 
     private boolean active;
 

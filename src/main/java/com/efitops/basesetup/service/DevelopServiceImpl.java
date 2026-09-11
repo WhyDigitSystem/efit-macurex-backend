@@ -30,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
-import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesDetailsResponseDTO;
@@ -67,8 +66,6 @@ import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ZeroEntryDetailResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.ControlPlanDTO;
 import com.efitops.basesetup.dto.ControlPlanDetailDTO;
@@ -109,8 +106,6 @@ import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.ToolCategoryDTO;
 import com.efitops.basesetup.dto.ToolCategoryDetailDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
-import com.efitops.basesetup.dto.ZeroEntryDetailDTO;
-import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.ControlPlanDetailVO;
 import com.efitops.basesetup.entity.ControlPlanMachineFixtureVO;
@@ -157,8 +152,6 @@ import com.efitops.basesetup.entity.ToolCategoryDetailVO;
 import com.efitops.basesetup.entity.ToolCategoryVO;
 import com.efitops.basesetup.entity.ToolMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
-import com.efitops.basesetup.entity.ZeroEntryDetailVO;
-import com.efitops.basesetup.entity.ZeroKmFailureEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.ControlPlanDetailRepo;
@@ -219,7 +212,6 @@ import com.efitops.basesetup.repository.SalesReturnRepo;
 import com.efitops.basesetup.repository.ToolCategoryRepo;
 import com.efitops.basesetup.repository.ToolMasterRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
-import com.efitops.basesetup.repository.ZeroEntryDetailRepo;
 import com.efitops.basesetup.repository.ZeroKmFailureEntryRepo;
 
 @Service
@@ -416,11 +408,11 @@ public class DevelopServiceImpl implements DevelopService {
 	@Autowired
 	private GradeMasterRepo gradeMasterRepo;
 	
-	@Autowired
-	private ZeroKmFailureEntryRepo zeroKmFailureEntryRepo;
-	
-	@Autowired
-	private ZeroEntryDetailRepo zeroEntryDetailRepo;
+//	@Autowired
+//	private ZeroKmFailureEntryRepo zeroKmFailureEntryRepo;
+//	
+//	@Autowired
+//	private ZeroEntryDetailRepo zeroEntryDetailRepo;
 
 //	@Override
 //	@Transactional
@@ -6860,9 +6852,9 @@ public class DevelopServiceImpl implements DevelopService {
 		// Basic Fields
 		// =========================
 
-		rootCauseAnalysisVO.setDocId(rootCauseAnalysisDTO.getDocId());
-
-		rootCauseAnalysisVO.setDocDate(rootCauseAnalysisDTO.getDocDate());
+//		rootCauseAnalysisVO.setDocId(rootCauseAnalysisDTO.getDocId());
+//
+//		rootCauseAnalysisVO.setDocDate(rootCauseAnalysisDTO.getDocDate());
 
 		rootCauseAnalysisVO.setComplaintNo(rootCauseAnalysisDTO.getComplaintNo());
 

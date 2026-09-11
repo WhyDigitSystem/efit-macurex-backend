@@ -2606,10 +2606,9 @@ public class DevelopController extends BaseController {
 	
 	@GetMapping("/getItemDropdownForRootCauseAnalysis")
 	public ResponseEntity<ResponseDTO> getItemDropdownForRootCauseAnalysis(
-	        @RequestParam String compino,
+	        @RequestParam Long complaintMasterId,
 	        @RequestParam Long branch,
 	        @RequestParam Long orgId) {
-
 	    String methodName =
 	            "getItemDropdownForRootCauseAnalysis()";
 
@@ -2627,7 +2626,7 @@ public class DevelopController extends BaseController {
 	        Map<String, Object> itemResponse =
 	                developService
 	                        .getItemDropdownForRootCauseAnalysis(
-	                                compino,
+	                        		complaintMasterId,
 	                                branch,
 	                                orgId);
 

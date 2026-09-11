@@ -11,16 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.SetUpApprovalDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SetUpApprovalParametersDetailsResponeDTO;
+import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ShiftResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintDetailsResponseDTO;
@@ -30,6 +36,9 @@ import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDetailsDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDetailsDTO;
+import com.efitops.basesetup.dto.SetUpApprovalDTO;
+import com.efitops.basesetup.dto.SetUpApprovalDetailsDTO;
+import com.efitops.basesetup.dto.SetUpApprovalParametersDetailsDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintDetailsDTO;
@@ -47,6 +56,10 @@ import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.MachineMasterVO;
+import com.efitops.basesetup.entity.SetUpApprovalDetailsVO;
+import com.efitops.basesetup.entity.SetUpApprovalParametersDetailsVO;
+import com.efitops.basesetup.entity.SetUpApprovalVO;
+import com.efitops.basesetup.entity.ShiftVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryDetailsVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryVO;
 import com.efitops.basesetup.entity.VendorComplaintDetailsVO;
@@ -65,6 +78,10 @@ import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.MachineMasterRepo;
+import com.efitops.basesetup.repository.SetUpApprovalDetailsRepo;
+import com.efitops.basesetup.repository.SetUpApprovalParametersDetailsRepo;
+import com.efitops.basesetup.repository.SetUpApprovalRepo;
+import com.efitops.basesetup.repository.ShiftRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryDetailsRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryRepo;
 import com.efitops.basesetup.repository.VendorComplaintDetailsRepo;
@@ -124,6 +141,18 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	DailyInspectionCumRejectionDetailsRepo dailyInspectionCumRejectionDetailsRepo;
+
+	@Autowired
+	private SetUpApprovalRepo setUpApprovalRepo;
+
+	@Autowired
+	private SetUpApprovalDetailsRepo setUpApprovalDetailsRepo;
+
+	@Autowired
+	private SetUpApprovalParametersDetailsRepo setUpApprovalParametersDetailsRepo;
+
+	@Autowired
+	private ShiftRepo shiftRepo;
 
 	@Override
 	@Transactional
@@ -1700,4 +1729,475 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		return docId;
 	}
 
+//	setupapproval
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateSetUpApproval(SetUpApprovalDTO setUpApprovalDTO)
+			throws ApplicationException {
+
+		SetUpApprovalVO setUpApprovalVO = new SetUpApprovalVO();
+
+		String screenCode = "SUA";
+		String message;
+
+		/*
+		 * UPDATE
+		 */
+		if (ObjectUtils.isNotEmpty(setUpApprovalDTO.getId())) {
+
+			setUpApprovalVO = setUpApprovalRepo.findById(setUpApprovalDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Set Up Approval Details"));
+
+			setUpApprovalVO.setUpdatedBy(setUpApprovalDTO.getCreatedBy());
+
+			message = "Set Up Approval Updated Successfully";
+
+		}
+
+		/*
+		 * CREATE
+		 */
+		else {
+
+			String docId = setUpApprovalRepo.getSetUpApprovalDocId(setUpApprovalDTO.getOrgId(),
+					setUpApprovalDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+
+				throw new ApplicationException("Set Up Approval DocId Not Found");
+			}
+
+			setUpApprovalVO.setDocId(docId);
+
+			/*
+			 * Document Type Mapping
+			 */
+			var documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+					setUpApprovalDTO.getOrgId(), setUpApprovalDTO.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			setUpApprovalVO.setCreatedBy(setUpApprovalDTO.getCreatedBy());
+
+			setUpApprovalVO.setUpdatedBy(setUpApprovalDTO.getCreatedBy());
+
+			message = "Set Up Approval Created Successfully";
+		}
+
+		/*
+		 * Basic Details Mapping
+		 */
+		createUpdateSetUpApprovalVO(setUpApprovalDTO, setUpApprovalVO);
+
+		/*
+		 * Save
+		 */
+		SetUpApprovalVO savedVO = setUpApprovalRepo.save(setUpApprovalVO);
+
+		/*
+		 * Response
+		 */
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("setUpApprovalVO", setUpApprovalResponse(savedVO));
+
+		return response;
+	}
+
+	/*
+	 * CREATE / UPDATE BASIC + DETAILS
+	 */
+	private void createUpdateSetUpApprovalVO(SetUpApprovalDTO dto, SetUpApprovalVO vo) throws ApplicationException {
+
+		/*
+		 * Branch
+		 */
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branchVO);
+		}
+
+		/*
+		 * Shift
+		 */
+		if (dto.getShift() != null) {
+
+			ShiftVO shiftVO = shiftRepo.findById(dto.getShift())
+					.orElseThrow(() -> new ApplicationException("Shift Not Found"));
+
+			vo.setShift(shiftVO);
+		}
+
+		/*
+		 * Item
+		 */
+		if (dto.getItem() != null) {
+
+			ItemMasterVO itemVO = itemRepo.findById(dto.getItem())
+					.orElseThrow(() -> new ApplicationException("Item Master Not Found"));
+
+			vo.setItem(itemVO);
+		}
+
+		/*
+		 * Customer
+		 */
+		if (dto.getCustomer() != null) {
+
+			CustomerVO customerVO = customerRepo.findById(dto.getCustomer())
+					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
+
+			vo.setCustomer(customerVO);
+		}
+
+		/*
+		 * Checked By
+		 */
+		if (dto.getCheckedBy() != null) {
+
+			EmployeeMasterVO checkedByVO = employeeMasterRepo.findById(dto.getCheckedBy())
+					.orElseThrow(() -> new ApplicationException("Checked By Employee Not Found"));
+
+			vo.setCheckedBy(checkedByVO);
+		}
+
+		/*
+		 * Approved By
+		 */
+		if (dto.getApprovedBy() != null) {
+
+			EmployeeMasterVO approvedByVO = employeeMasterRepo.findById(dto.getApprovedBy())
+					.orElseThrow(() -> new ApplicationException("Approved By Employee Not Found"));
+
+			vo.setApprovedBy(approvedByVO);
+		}
+
+		/*
+		 * Basic Fields
+		 */
+		vo.setProcessSheetNo(dto.getProcessSheetNo());
+		vo.setControlPlan(dto.getControlPlan());
+		vo.setRecommendedForProduction(dto.getRecommendedForProduction());
+
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+
+		/*
+		 * Set Up Approval Details
+		 */
+		if (dto.getSetUpApprovalDetailsDTO() != null) {
+
+			/*
+			 * Delete old details during update
+			 */
+			if (vo.getId() != null && vo.getSetUpApprovalDetailsVO() != null
+					&& !vo.getSetUpApprovalDetailsVO().isEmpty()) {
+
+				setUpApprovalDetailsRepo.deleteAll(vo.getSetUpApprovalDetailsVO());
+
+				vo.getSetUpApprovalDetailsVO().clear();
+			}
+
+			List<SetUpApprovalDetailsVO> detailsList = new ArrayList<>();
+
+			for (SetUpApprovalDetailsDTO detailsDTO : dto.getSetUpApprovalDetailsDTO()) {
+
+				SetUpApprovalDetailsVO detailsVO = new SetUpApprovalDetailsVO();
+
+				detailsVO.setOperationNo(detailsDTO.getOperationNo());
+
+				detailsVO.setDescription(detailsDTO.getDescription());
+
+				detailsVO.setSpecification(detailsDTO.getSpecification());
+
+				detailsVO.setDetails1(detailsDTO.getDetails1());
+
+				detailsVO.setDetails2(detailsDTO.getDetails2());
+
+				detailsVO.setDetails3(detailsDTO.getDetails3());
+
+				detailsVO.setDetails4(detailsDTO.getDetails4());
+
+				detailsVO.setDetails5(detailsDTO.getDetails5());
+
+				detailsVO.setDetails6(detailsDTO.getDetails6());
+
+				detailsVO.setDetails7(detailsDTO.getDetails7());
+
+				detailsVO.setDetails8(detailsDTO.getDetails8());
+
+				detailsVO.setDetails9(detailsDTO.getDetails9());
+
+				detailsVO.setDetails10(detailsDTO.getDetails10());
+
+				detailsVO.setTime(detailsDTO.getTime());
+
+				detailsVO.setRemarks(detailsDTO.getRemarks());
+
+				/*
+				 * Parent
+				 */
+				detailsVO.setSetUpApprovalVO(vo);
+
+				detailsList.add(detailsVO);
+			}
+
+			vo.setSetUpApprovalDetailsVO(detailsList);
+		}
+
+		/*
+		 * Set Up Approval Parameters Details
+		 */
+		if (dto.getSetUpApprovalParametersDetailsDTO() != null) {
+
+			/*
+			 * Delete old parameter details during update
+			 */
+			if (vo.getId() != null && vo.getSetUpApprovalParametersDetailsVO() != null
+					&& !vo.getSetUpApprovalParametersDetailsVO().isEmpty()) {
+
+				setUpApprovalParametersDetailsRepo.deleteAll(vo.getSetUpApprovalParametersDetailsVO());
+
+				vo.getSetUpApprovalParametersDetailsVO().clear();
+			}
+
+			List<SetUpApprovalParametersDetailsVO> parametersDetailsList = new ArrayList<>();
+
+			for (SetUpApprovalParametersDetailsDTO parametersDTO : dto.getSetUpApprovalParametersDetailsDTO()) {
+
+				SetUpApprovalParametersDetailsVO parametersVO = new SetUpApprovalParametersDetailsVO();
+
+				parametersVO.setParameters(parametersDTO.getParameters());
+
+				parametersVO.setParameterType(parametersDTO.getParameterType());
+
+				parametersVO.setTol(parametersDTO.getTol());
+
+				/*
+				 * Parent
+				 */
+				parametersVO.setSetUpApprovalVO(vo);
+
+				parametersDetailsList.add(parametersVO);
+			}
+
+			vo.setSetUpApprovalParametersDetailsVO(parametersDetailsList);
+		}
+	}
+
+	
+
+//	RESPONSE DTO*/
+
+	private SetUpApprovalResponseDTO setUpApprovalResponse(SetUpApprovalVO vo) {
+
+		SetUpApprovalResponseDTO responseDTO = new SetUpApprovalResponseDTO();
+
+		responseDTO.setId(vo.getId());
+
+		/*
+		 * Branch
+		 */
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+
+			branchResponseDTO.setId(vo.getBranch().getId());
+
+			branchResponseDTO.setBranchCode(vo.getBranch().getBranchCode());
+
+			branchResponseDTO.setBranchName(vo.getBranch().getBranchName());
+
+			responseDTO.setBranch(branchResponseDTO);
+		}
+
+		/*
+		 * Shift
+		 */
+		if (vo.getShift() != null) {
+
+			ShiftResponseDTO shiftResponseDTO = new ShiftResponseDTO();
+
+			shiftResponseDTO.setId(vo.getShift().getId());
+
+			shiftResponseDTO.setShiftCode(vo.getShift().getShiftCode());
+
+			shiftResponseDTO.setShiftName(vo.getShift().getShiftName());
+
+			responseDTO.setShift(shiftResponseDTO);
+		}
+
+		/*
+		 * Item
+		 */
+		if (vo.getItem() != null) {
+
+			ItemResponse1DTO itemResponseDTO = new ItemResponse1DTO();
+
+			itemResponseDTO.setId(vo.getItem().getId());
+
+			itemResponseDTO.setItemCode(vo.getItem().getItemCode());
+
+			itemResponseDTO.setItemDescription(vo.getItem().getItemDescription());
+
+			
+
+			responseDTO.setItem(itemResponseDTO);
+		}
+
+		/*
+		 * Customer
+		 */
+		if (vo.getCustomer() != null) {
+
+			CustomerResponse1DTO customerResponseDTO = new CustomerResponse1DTO();
+
+			customerResponseDTO.setId(vo.getCustomer().getId());
+
+		
+
+			customerResponseDTO.setCustomerName(vo.getCustomer().getCustomerName());
+
+			responseDTO.setCustomer(customerResponseDTO);
+		}
+
+		/*
+		 * Checked By
+		 */
+		if (vo.getCheckedBy() != null) {
+
+			EmployeeMasterResponseDetailsDTO checkedByResponseDTO = new EmployeeMasterResponseDetailsDTO();
+
+			checkedByResponseDTO.setId(vo.getCheckedBy().getId());
+
+			checkedByResponseDTO.setEmployeeCode(vo.getCheckedBy().getEmployeeId());
+
+			checkedByResponseDTO.setEmployeeName(vo.getCheckedBy().getEmployeeName());
+
+			responseDTO.setCheckedBy(checkedByResponseDTO);
+		}
+
+		/*
+		 * Approved By
+		 */
+		if (vo.getApprovedBy() != null) {
+
+			EmployeeMasterResponseDetailsDTO approvedByResponseDTO = new EmployeeMasterResponseDetailsDTO();
+
+			approvedByResponseDTO.setId(vo.getApprovedBy().getId());
+
+			approvedByResponseDTO.setEmployeeCode(vo.getApprovedBy().getEmployeeId());
+
+			approvedByResponseDTO.setEmployeeName(vo.getApprovedBy().getEmployeeName());
+
+			responseDTO.setApprovedBy(approvedByResponseDTO);
+		}
+
+		/*
+		 * Basic Fields
+		 */
+		responseDTO.setProcessSheetNo(vo.getProcessSheetNo());
+
+		responseDTO.setControlPlan(vo.getControlPlan());
+
+		responseDTO.setRecommendedForProduction(vo.getRecommendedForProduction());
+
+		responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+
+		responseDTO.setActive(vo.getActive() );
+
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+
+		/*
+		 * Details Response
+		 */
+		List<SetUpApprovalDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+
+		if (vo.getSetUpApprovalDetailsVO() != null) {
+
+			for (SetUpApprovalDetailsVO detailsVO : vo.getSetUpApprovalDetailsVO()) {
+
+				SetUpApprovalDetailsResponseDTO detailsResponseDTO = new SetUpApprovalDetailsResponseDTO();
+
+				detailsResponseDTO.setOperationNo(detailsVO.getOperationNo());
+
+				detailsResponseDTO.setDescription(detailsVO.getDescription());
+
+				detailsResponseDTO.setSpecification(detailsVO.getSpecification());
+
+				detailsResponseDTO.setDetails1(detailsVO.getDetails1());
+
+				detailsResponseDTO.setDetails2(detailsVO.getDetails2());
+
+				detailsResponseDTO.setDetails3(detailsVO.getDetails3());
+
+				detailsResponseDTO.setDetails4(detailsVO.getDetails4());
+
+				detailsResponseDTO.setDetails5(detailsVO.getDetails5());
+
+				detailsResponseDTO.setDetails6(detailsVO.getDetails6());
+
+				detailsResponseDTO.setDetails7(detailsVO.getDetails7());
+
+				detailsResponseDTO.setDetails8(detailsVO.getDetails8());
+
+				detailsResponseDTO.setDetails9(detailsVO.getDetails9());
+
+				detailsResponseDTO.setDetails10(detailsVO.getDetails10());
+
+				detailsResponseDTO.setTime(detailsVO.getTime());
+
+				detailsResponseDTO.setRemarks(detailsVO.getRemarks());
+
+				detailsResponseList.add(detailsResponseDTO);
+			}
+		}
+
+		responseDTO.setSetUpApprovalDetailsResponseDTO(detailsResponseList);
+
+		/*
+		 * Parameters Response
+		 */
+		List<SetUpApprovalParametersDetailsResponeDTO> parametersResponseList = new ArrayList<>();
+
+		if (vo.getSetUpApprovalParametersDetailsVO() != null) {
+
+			for (SetUpApprovalParametersDetailsVO parametersVO : vo.getSetUpApprovalParametersDetailsVO()) {
+
+				SetUpApprovalParametersDetailsResponeDTO parametersResponseDTO = new SetUpApprovalParametersDetailsResponeDTO();
+
+				parametersResponseDTO.setParameters(parametersVO.getParameters());
+
+				parametersResponseDTO.setParameterType(parametersVO.getParameterType());
+
+				parametersResponseDTO.setTol(parametersVO.getTol());
+
+				parametersResponseList.add(parametersResponseDTO);
+			}
+		}
+
+		responseDTO.setSetUpApprovalParametersDetailsResponeDTO(parametersResponseList);
+
+		return responseDTO;
+	}
 }
+
+

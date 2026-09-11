@@ -32,6 +32,7 @@ import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderAmendmentResponceDTO;
 import com.efitops.basesetup.ResponseDTO.RootCauseAnalysisResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.ControlPlanDTO;
@@ -50,6 +51,7 @@ import com.efitops.basesetup.dto.RootCauseAnalysisDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.ToolCategoryDTO;
+import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
 import com.efitops.basesetup.service.DevelopService;
 
 @CrossOrigin
@@ -846,8 +848,8 @@ public class DevelopController extends BaseController {
 	@PostMapping(value = "/updateCreatePurchaseOrderAmendment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreatePurchaseOrderAmendment(
 
-//			@RequestPart("purchaseOrderAmendment") PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
-			@RequestBody PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
+	    	@RequestPart("purchaseOrderAmendment") PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
+//			@RequestBody PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
 
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -1752,10 +1754,10 @@ public class DevelopController extends BaseController {
 	@PostMapping(value = "/updateCreateMachineMaster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreateMachineMaster(
 
-        	@RequestPart("machineMasterDTO") MachineMasterDTO machineMasterDTO,
+			@RequestPart("machineMasterDTO") MachineMasterDTO machineMasterDTO,
 //			@RequestBody() MachineMasterDTO machineMasterDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files,
-	        @RequestPart(value = "images", required = false) MultipartFile[] images) {
+			@RequestPart(value = "images", required = false) MultipartFile[] images) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 
@@ -1763,7 +1765,7 @@ public class DevelopController extends BaseController {
 
 		try {
 
-			Map<String, Object> response = developService.updateCreateMachineMaster(machineMasterDTO, files,images);
+			Map<String, Object> response = developService.updateCreateMachineMaster(machineMasterDTO, files, images);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
 
@@ -2041,8 +2043,8 @@ public class DevelopController extends BaseController {
 
 		try {
 
-			purchaseOrderList = developService.getPurchaseOrderDropdownForPurchaseOrderAmendment(branch,
-					customerId, orgId);
+			purchaseOrderList = developService.getPurchaseOrderDropdownForPurchaseOrderAmendment(branch, customerId,
+					orgId);
 
 		} catch (Exception e) {
 
@@ -2069,616 +2071,803 @@ public class DevelopController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
-	//process sheet comp routing
-	
-	
-	
+
+	// process sheet comp routing
+
 	@PutMapping("/updateCreateProcessSheetCompRouting")
 
 	public ResponseEntity<ResponseDTO> updateCreateProcessSheetCompRouting(
-	        @RequestBody ProcessSheetCompRoutingDTO processSheetCompRoutingDTO) {
+			@RequestBody ProcessSheetCompRoutingDTO processSheetCompRoutingDTO) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> processSheetCompRoutingMap =
-	                developService.updateCreateProcessSheetCompRouting(
-	                        processSheetCompRoutingDTO);
+			Map<String, Object> processSheetCompRoutingMap = developService
+					.updateCreateProcessSheetCompRouting(processSheetCompRoutingDTO);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                processSheetCompRoutingMap.get("message"));
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, processSheetCompRoutingMap.get("message"));
 
-	        responseObjectsMap.put(
-	                "processSheetCompRoutingVO",
-	                processSheetCompRoutingMap.get("processSheetCompRoutingVO"));
+			responseObjectsMap.put("processSheetCompRoutingVO",
+					processSheetCompRoutingMap.get("processSheetCompRoutingVO"));
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        e.printStackTrace();
+			e.printStackTrace();
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
-	//orgid
-	
-	
+
+	// orgid
+
 	@GetMapping("/getProcessSheetCompRoutingByOrgId")
-	public ResponseEntity<ResponseDTO> getProcessSheetCompRoutingByOrgId(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getProcessSheetCompRoutingByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    String methodName = "getProcessSheetCompRoutingByOrgId()";
+		String methodName = "getProcessSheetCompRoutingByOrgId()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        List<ProcessSheetCompRoutingResponseDTO>
-	                processSheetCompRoutingResponseDTO =
-	                developService.getProcessSheetCompRoutingByOrgId(
-	                        orgId, branch);
+			List<ProcessSheetCompRoutingResponseDTO> processSheetCompRoutingResponseDTO = developService
+					.getProcessSheetCompRoutingByOrgId(orgId, branch);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Process Sheet Comp Routing information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Process Sheet Comp Routing information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "processSheetCompRoutingResponseVO",
-	                processSheetCompRoutingResponseDTO);
+			responseObjectsMap.put("processSheetCompRoutingResponseVO", processSheetCompRoutingResponseDTO);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Process Sheet Comp Routing information retrieval failed",
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Process Sheet Comp Routing information retrieval failed", e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
-	
+
 	@GetMapping("/getProcessSheetCompRoutingById")
-	public ResponseEntity<ResponseDTO> getProcessSheetCompRoutingById(
-	        @RequestParam Long id) {
+	public ResponseEntity<ResponseDTO> getProcessSheetCompRoutingById(@RequestParam Long id) {
 
-	    String methodName = "getProcessSheetCompRoutingById()";
+		String methodName = "getProcessSheetCompRoutingById()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        ProcessSheetCompRoutingResponseDTO
-	                processSheetCompRoutingResponseDTO =
-	                developService.getProcessSheetCompRoutingById(id);
+			ProcessSheetCompRoutingResponseDTO processSheetCompRoutingResponseDTO = developService
+					.getProcessSheetCompRoutingById(id);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Process Sheet Comp Routing information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Process Sheet Comp Routing information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "processSheetCompRoutingResponseVO",
-	                processSheetCompRoutingResponseDTO);
+			responseObjectsMap.put("processSheetCompRoutingResponseVO", processSheetCompRoutingResponseDTO);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Process Sheet Comp Routing information retrieval failed",
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Process Sheet Comp Routing information retrieval failed", e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
-	
-	
+
 	// FG/SFG Item Code Dropdown
-	
-	
+
 	@GetMapping("/getFgSfgItemCodeDropdownforProcessSheetCompRouting")
-	public ResponseEntity<ResponseDTO> getFgSfgItemCodeDropdownforProcessSheetCompRouting(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch,
-	        @RequestParam Long itemType) {
+	public ResponseEntity<ResponseDTO> getFgSfgItemCodeDropdownforProcessSheetCompRouting(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long itemType) {
 
-	    String methodName = "getFgSfgItemCodeDropdown()";
+		String methodName = "getFgSfgItemCodeDropdown()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> fgSfgItemCodeResponse =
-	                developService.getFgSfgItemCodeDropdownforProcessSheetCompRouting(
-	                        orgId,
-	                        branch,
-	                        itemType);
+			Map<String, Object> fgSfgItemCodeResponse = developService
+					.getFgSfgItemCodeDropdownforProcessSheetCompRouting(orgId, branch, itemType);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "FG/SFG Item Code information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"FG/SFG Item Code information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "itemCodeList",
-	                fgSfgItemCodeResponse.get("itemCodeList"));
+			responseObjectsMap.put("itemCodeList", fgSfgItemCodeResponse.get("itemCodeList"));
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "FG/SFG Item Code information retrieval failed",
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"FG/SFG Item Code information retrieval failed", e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
-	
-	//LocationDropdownforProcessSheetCompRouting
-	
-	
+
+	// LocationDropdownforProcessSheetCompRouting
+
 	@GetMapping("/getLocationDropdownforProcessSheetCompRouting")
-	public ResponseEntity<ResponseDTO> getLocationDropdownforProcessSheetCompRouting(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getLocationDropdownforProcessSheetCompRouting(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    String methodName = "getLocationDropdownforProcessSheetCompRouting()";
+		String methodName = "getLocationDropdownforProcessSheetCompRouting()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> locationResponse =
-	                developService.getLocationDropdownforProcessSheetCompRouting(
-	                        orgId,
-	                        branch);
+			Map<String, Object> locationResponse = developService.getLocationDropdownforProcessSheetCompRouting(orgId,
+					branch);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Location information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Location information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "locationList",
-	                locationResponse.get("locationList"));
+			responseObjectsMap.put("locationList", locationResponse.get("locationList"));
 
-	        responseDTO =
-	                createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Location information retrieval failed",
-	                        e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Location information retrieval failed",
+					e.getMessage());
+		}
 
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
-	
-	//getOperationDropdownforProcessSheetCompRouting
-	
-	
+
+	// getOperationDropdownforProcessSheetCompRouting
+
 	@GetMapping("/getOperationDropdownforProcessSheetCompRouting")
-	public ResponseEntity<ResponseDTO> getOperationDropdownforProcessSheetCompRouting(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getOperationDropdownforProcessSheetCompRouting(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    String methodName =
-	            "getOperationDropdownforProcessSheetCompRouting()";
+		String methodName = "getOperationDropdownforProcessSheetCompRouting()";
 
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO;
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> operationResponse =
-	                developService
-	                        .getOperationDropdownforProcessSheetCompRouting(
-	                                orgId,
-	                                branch);
+			Map<String, Object> operationResponse = developService.getOperationDropdownforProcessSheetCompRouting(orgId,
+					branch);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Operation information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Operation information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "operationList",
-	                operationResponse.get("operationList"));
+			responseObjectsMap.put("operationList", operationResponse.get("operationList"));
 
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Operation information retrieval failed",
-	                        e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Operation information retrieval failed",
+					e.getMessage());
+		}
 
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
-	
-	//RootCauseAnalysis
-	
-	
+
+	// RootCauseAnalysis
+
 	@PutMapping("/updateCreateRootCauseAnalysis")
 
 	public ResponseEntity<ResponseDTO> updateCreateRootCauseAnalysis(
-	        @RequestBody RootCauseAnalysisDTO rootCauseAnalysisDTO) {
+			@RequestBody RootCauseAnalysisDTO rootCauseAnalysisDTO) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> rootCauseAnalysisMap =
-	                developService.updateCreateRootCauseAnalysis(
-	                        rootCauseAnalysisDTO);
+			Map<String, Object> rootCauseAnalysisMap = developService
+					.updateCreateRootCauseAnalysis(rootCauseAnalysisDTO);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                rootCauseAnalysisMap.get("message"));
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, rootCauseAnalysisMap.get("message"));
 
-	        responseObjectsMap.put(
-	                "rootCauseAnalysisVO",
-	                rootCauseAnalysisMap.get("rootCauseAnalysisVO"));
+			responseObjectsMap.put("rootCauseAnalysisVO", rootCauseAnalysisMap.get("rootCauseAnalysisVO"));
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        e.printStackTrace();
+			e.printStackTrace();
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
-	//orgid
-	
-	
-	
+
+	// orgid
+
 	@GetMapping("/getRootCauseAnalysisByOrgId")
-	public ResponseEntity<ResponseDTO> getRootCauseAnalysisByOrgId(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getRootCauseAnalysisByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    String methodName = "getRootCauseAnalysisByOrgId()";
+		String methodName = "getRootCauseAnalysisByOrgId()";
 
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO;
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        List<RootCauseAnalysisResponseDTO>
-	                rootCauseAnalysisResponseDTO =
-	                developService.getRootCauseAnalysisByOrgId(
-	                        orgId,
-	                        branch);
+			List<RootCauseAnalysisResponseDTO> rootCauseAnalysisResponseDTO = developService
+					.getRootCauseAnalysisByOrgId(orgId, branch);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Root Cause Analysis information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Root Cause Analysis information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "rootCauseAnalysisResponseVO",
-	                rootCauseAnalysisResponseDTO);
+			responseObjectsMap.put("rootCauseAnalysisResponseVO", rootCauseAnalysisResponseDTO);
 
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Root Cause Analysis information retrieval failed",
-	                        e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Root Cause Analysis information retrieval failed", e.getMessage());
+		}
 
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
-	//byid
-	
-	
+
+	// byid
+
 	@GetMapping("/getRootCauseAnalysisById")
-	public ResponseEntity<ResponseDTO> getRootCauseAnalysisById(
-	        @RequestParam Long id) {
+	public ResponseEntity<ResponseDTO> getRootCauseAnalysisById(@RequestParam Long id) {
 
-	    String methodName = "getRootCauseAnalysisById()";
+		String methodName = "getRootCauseAnalysisById()";
 
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO;
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        RootCauseAnalysisResponseDTO
-	                rootCauseAnalysisResponseDTO =
-	                developService.getRootCauseAnalysisById(id);
+			RootCauseAnalysisResponseDTO rootCauseAnalysisResponseDTO = developService.getRootCauseAnalysisById(id);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Root Cause Analysis information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Root Cause Analysis information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "rootCauseAnalysisResponseVO",
-	                rootCauseAnalysisResponseDTO);
+			responseObjectsMap.put("rootCauseAnalysisResponseVO", rootCauseAnalysisResponseDTO);
 
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Root Cause Analysis information retrieval failed",
-	                        e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Root Cause Analysis information retrieval failed", e.getMessage());
+		}
 
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 //DROP DOWN
-	
-	
+
 	@GetMapping("/getCustomerComplaintDropDownForRootCauseAnalysis")
-	public ResponseEntity<ResponseDTO> getCustomerComplaintDropDownForRootCauseAnalysis(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getCustomerComplaintDropDownForRootCauseAnalysis(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    String methodName =
-	            "getCustomerComplaintDropDownForRootCauseAnalysis()";
+		String methodName = "getCustomerComplaintDropDownForRootCauseAnalysis()";
 
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO;
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> complaintResponse =
-	                developService
-	                        .getCustomerComplaintDropDownForRootCauseAnalysis(
-	                                orgId,
-	                                branch);
+			Map<String, Object> complaintResponse = developService
+					.getCustomerComplaintDropDownForRootCauseAnalysis(orgId, branch);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Customer complaint information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Customer complaint information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "complaintList",
-	                complaintResponse.get("complaintList"));
+			responseObjectsMap.put("complaintList", complaintResponse.get("complaintList"));
 
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Customer complaint information retrieval failed",
-	                        e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Customer complaint information retrieval failed", e.getMessage());
+		}
 
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
-	//drop down
-	
-	
+
+	// drop down
+
 	@GetMapping("/getItemDropdownForRootCauseAnalysis")
-	public ResponseEntity<ResponseDTO> getItemDropdownForRootCauseAnalysis(
-	        @RequestParam Long complaintMasterId,
-	        @RequestParam Long branch,
-	        @RequestParam Long orgId) {
-	    String methodName =
-	            "getItemDropdownForRootCauseAnalysis()";
+	public ResponseEntity<ResponseDTO> getItemDropdownForRootCauseAnalysis(@RequestParam Long complaintMasterId,
+			@RequestParam Long branch, @RequestParam Long orgId) {
+		String methodName = "getItemDropdownForRootCauseAnalysis()";
 
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-	    ResponseDTO responseDTO;
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> itemResponse =
-	                developService
-	                        .getItemDropdownForRootCauseAnalysis(
-	                        		complaintMasterId,
-	                                branch,
-	                                orgId);
+			Map<String, Object> itemResponse = developService.getItemDropdownForRootCauseAnalysis(complaintMasterId,
+					branch, orgId);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Item information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "itemList",
-	                itemResponse.get("itemList"));
+			responseObjectsMap.put("itemList", itemResponse.get("itemList"));
 
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Item information retrieval failed",
-	                        e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Item information retrieval failed",
+					e.getMessage());
+		}
 
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	@GetMapping("/getRootCauseAnalysisDocId")
 
-	public ResponseEntity<ResponseDTO> getRootCauseAnalysisDocId(
+	public ResponseEntity<ResponseDTO> getRootCauseAnalysisDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getRootCauseAnalysisDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = developService.getRootCauseAnalysisDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Root Cause Analysis DocId information retrieved successfully");
+
+			responseObjectsMap.put("rootCauseAnalysisDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Root Cause Analysis DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// createupdatecontrolplan
+
+	@PutMapping("/createUpdateControlPlan")
+
+	public ResponseEntity<ResponseDTO> createUpdateControlPlan(@RequestBody ControlPlanDTO controlPlanDTO) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> controlPlanMap = developService.createUpdateControlPlan(controlPlanDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, controlPlanMap.get("message"));
+
+			responseObjectsMap.put("controlPlanVO", controlPlanMap.get("controlPlanVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getControlPlanByOrgId")
+
+	public ResponseEntity<ResponseDTO> getControlPlanByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getControlPlanByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<ControlPlanResponseDTO> controlPlanResponseDTO = developService.getControlPlanByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Control Plan information retrieved successfully");
+
+			responseObjectsMap.put("controlPlanResponseVO", controlPlanResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Control Plan information retrieval failed",
+					e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getControlPlanById")
+
+	public ResponseEntity<ResponseDTO> getControlPlanById(@RequestParam Long id) {
+
+		String methodName = "getControlPlanById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ControlPlanResponseDTO controlPlanResponseDTO = developService.getControlPlanById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Control Plan information retrieved successfully");
+
+			responseObjectsMap.put("controlPlanVO", controlPlanResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Control Plan information retrieval failed",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	// controlplan dropdown
+
+	@GetMapping("/getcontrolplandropdownforMachineFixtureDropdown")
+	public ResponseEntity<ResponseDTO> getcontrolplandropdownforMachineFixtureDropdown(@RequestParam Long branch,
+			@RequestParam Long orgId) {
+
+		String methodName = "getcontrolplandropdownforMachineFixtureDropdown()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> machineFixtureResponse = developService
+					.getcontrolplandropdownforMachineFixtureDropdown(branch, orgId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Machine Fixture information retrieved successfully");
+
+			responseObjectsMap.put("machineFixtureList", machineFixtureResponse.get("machineFixtureList"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Machine Fixture information retrieval failed",
+					e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getFGItemDropdownforControlPlan")
+	public ResponseEntity<ResponseDTO> getFGItemDropdownforControlPlan(@RequestParam Long branch,
+			@RequestParam Long orgId) {
+
+		String methodName = "getFGItemDropdownforControlPlan()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> fgItemResponse = developService.getFGItemDropdownforControlPlan(branch, orgId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "FG Item information retrieved successfully");
+
+			responseObjectsMap.put("fgItemList", fgItemResponse.get("fgItemList"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "FG Item information retrieval failed",
+					e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getControlPlanDocId")
+	public ResponseEntity<ResponseDTO> getControlPlanDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getControlPlanDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = developService.getControlPlanDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Control Plan DocId information retrieved successfully");
+
+			responseObjectsMap.put("controlPlanDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Control Plan DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// zero km failure entry
+
+	@PutMapping("/updateCreateZeroKmFailureEntry")
+	public ResponseEntity<ResponseDTO> updateCreateZeroKmFailureEntry(
+			@RequestBody ZeroKmFailureEntryDTO zeroKmFailureEntryDTO) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> zeroKmFailureEntryMap = developService
+					.updateCreateZeroKmFailureEntry(zeroKmFailureEntryDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, zeroKmFailureEntryMap.get("message"));
+
+			responseObjectsMap.put("zeroKmFailureEntryVO", zeroKmFailureEntryMap.get("zeroKmFailureEntryVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// orgid
+
+	@GetMapping("/getZeroKmFailureEntryByOrgId")
+
+	public ResponseEntity<ResponseDTO> getZeroKmFailureEntryByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getZeroKmFailureEntryByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<ZeroKmFailureEntryResponseDTO> zeroKmFailureEntryResponseDTO = developService
+					.getZeroKmFailureEntryByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Zero Km Failure Entry information retrieved successfully");
+
+			responseObjectsMap.put("zeroKmFailureEntryResponseVO", zeroKmFailureEntryResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Zero Km Failure Entry information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getZeroKmFailureEntryById")
+	public ResponseEntity<ResponseDTO> getZeroKmFailureEntryById(@RequestParam Long id) {
+
+		String methodName = "getZeroKmFailureEntryById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ZeroKmFailureEntryResponseDTO zeroKmFailureEntryResponseDTO = developService.getZeroKmFailureEntryById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Zero Km Failure Entry information retrieved successfully");
+
+			responseObjectsMap.put("zeroKmFailureEntryVO", zeroKmFailureEntryResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Zero Km Failure Entry information retrieval failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getZeroKmFailureEntryDocId")
+	public ResponseEntity<ResponseDTO> getZeroKmFailureEntryDocId(
 	        @RequestParam Long orgId,
 	        @RequestParam String financialYear) {
 
-	    String methodName = "getRootCauseAnalysisDocId()";
+	    String methodName = "getZeroKmFailureEntryDocId()";
 
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 	    String errorMsg = null;
 
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
 
 	    ResponseDTO responseDTO = null;
 
@@ -2686,10 +2875,9 @@ public class DevelopController extends BaseController {
 
 	    try {
 
-	        mapp = developService
-	                .getRootCauseAnalysisDocId(
-	                        orgId,
-	                        financialYear);
+	        mapp = developService.getZeroKmFailureEntryDocId(
+	                orgId,
+	                financialYear);
 
 	    } catch (Exception e) {
 
@@ -2705,368 +2893,25 @@ public class DevelopController extends BaseController {
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
-	                "Root Cause Analysis DocId information retrieved successfully");
+	                "Zero KM Failure Entry DocId information retrieved successfully");
 
 	        responseObjectsMap.put(
-	                "rootCauseAnalysisDocId",
+	                "zeroKmFailureEntryDocId",
 	                mapp);
-
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
-
-	    } else {
-
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Failed to retrieve Root Cause Analysis DocId",
-	                        errorMsg);
-	    }
-
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
-
-	    return ResponseEntity
-	            .ok()
-	            .body(responseDTO);
-	}
-	
-	
-	//createupdatecontrolplan
-	
-	
-	@PutMapping("/createUpdateControlPlan")
-
-	public ResponseEntity<ResponseDTO> createUpdateControlPlan(
-	        @RequestBody ControlPlanDTO controlPlanDTO) {
-
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-
-	    ResponseDTO responseDTO;
-
-	    try {
-
-	        Map<String, Object> controlPlanMap =
-	                developService.createUpdateControlPlan(controlPlanDTO);
-
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                controlPlanMap.get("message"));
-
-	        responseObjectsMap.put(
-	                "controlPlanVO",
-	                controlPlanMap.get("controlPlanVO"));
 
 	        responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
-
-	        e.printStackTrace();
+	    } else {
 
 	        responseDTO = createServiceResponseError(
 	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
+	                "Failed to retrieve Zero KM Failure Entry DocId",
+	                errorMsg);
 	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 	    return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	
-	@GetMapping("/getControlPlanByOrgId")
 
-	public ResponseEntity<ResponseDTO> getControlPlanByOrgId(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
-
-	    String methodName = "getControlPlanByOrgId()";
-
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-
-	    ResponseDTO responseDTO;
-
-	    try {
-
-	        List<ControlPlanResponseDTO> controlPlanResponseDTO =
-	                developService.getControlPlanByOrgId(
-	                        orgId,
-	                        branch);
-
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Control Plan information retrieved successfully");
-
-	        responseObjectsMap.put(
-	                "controlPlanResponseVO",
-	                controlPlanResponseDTO);
-
-	        responseDTO = createServiceResponse(responseObjectsMap);
-
-	    } catch (Exception e) {
-
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
-
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Control Plan information retrieval failed",
-	                e.getMessage());
-	    }
-
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	    return ResponseEntity.ok(responseDTO);
-	}
-	
-	
-	@GetMapping("/getControlPlanById")
-
-	public ResponseEntity<ResponseDTO> getControlPlanById(
-	        @RequestParam Long id) {
-
-	    String methodName = "getControlPlanById()";
-
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	    String errorMsg = null;
-
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-
-	    ResponseDTO responseDTO = null;
-
-	    try {
-
-	        ControlPlanResponseDTO controlPlanResponseDTO =
-	                developService.getControlPlanById(id);
-
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Control Plan information retrieved successfully");
-
-	        responseObjectsMap.put(
-	                "controlPlanVO",
-	                controlPlanResponseDTO);
-
-	        responseDTO = createServiceResponse(responseObjectsMap);
-
-	    } catch (Exception e) {
-
-	        errorMsg = e.getMessage();
-
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Control Plan information retrieval failed",
-	                errorMsg);
-	    }
-
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	    return ResponseEntity.ok(responseDTO);
-	}
-	
-	//controlplan dropdown
-	
-	
-	@GetMapping("/getcontrolplandropdownforMachineFixtureDropdown")
-	public ResponseEntity<ResponseDTO> getcontrolplandropdownforMachineFixtureDropdown(
-	        @RequestParam Long branch,
-	        @RequestParam Long orgId) {
-
-	    String methodName = "getcontrolplandropdownforMachineFixtureDropdown()";
-
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
-
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
-
-	    ResponseDTO responseDTO;
-
-	    try {
-
-	        Map<String, Object> machineFixtureResponse =
-	                developService.getcontrolplandropdownforMachineFixtureDropdown(
-	                        branch,
-	                        orgId);
-
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Machine Fixture information retrieved successfully");
-
-	        responseObjectsMap.put(
-	                "machineFixtureList",
-	                machineFixtureResponse.get("machineFixtureList"));
-
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
-
-	    } catch (Exception e) {
-
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
-
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Machine Fixture information retrieval failed",
-	                        e.getMessage());
-	    }
-
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
-
-	    return ResponseEntity.ok(responseDTO);
-	}
-	
-	
-	@GetMapping("/getFGItemDropdownforControlPlan")
-	public ResponseEntity<ResponseDTO> getFGItemDropdownforControlPlan(
-	        @RequestParam Long branch,
-	        @RequestParam Long orgId) {
-
-	    String methodName = "getFGItemDropdownforControlPlan()";
-
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
-
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
-
-	    ResponseDTO responseDTO;
-
-	    try {
-
-	        Map<String, Object> fgItemResponse =
-	                developService.getFGItemDropdownforControlPlan(
-	                        branch,
-	                        orgId);
-
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "FG Item information retrieved successfully");
-
-	        responseObjectsMap.put(
-	                "fgItemList",
-	                fgItemResponse.get("fgItemList"));
-
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
-
-	    } catch (Exception e) {
-
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage());
-
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "FG Item information retrieval failed",
-	                        e.getMessage());
-	    }
-
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
-
-	    return ResponseEntity.ok(responseDTO);
-	}
-	
-	
-	
-	@GetMapping("/getControlPlanDocId")
-	public ResponseEntity<ResponseDTO> getControlPlanDocId(
-	        @RequestParam Long orgId,
-	        @RequestParam String financialYear) {
-
-	    String methodName = "getControlPlanDocId()";
-
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
-
-	    String errorMsg = null;
-
-	    Map<String, Object> responseObjectsMap =
-	            new HashMap<>();
-
-	    ResponseDTO responseDTO = null;
-
-	    String mapp = "";
-
-	    try {
-
-	        mapp = developService
-	                .getControlPlanDocId(
-	                        orgId,
-	                        financialYear);
-
-	    } catch (Exception e) {
-
-	        errorMsg = e.getMessage();
-
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-	    }
-
-	    if (StringUtils.isBlank(errorMsg)) {
-
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Control Plan DocId information retrieved successfully");
-
-	        responseObjectsMap.put(
-	                "controlPlanDocId",
-	                mapp);
-
-	        responseDTO =
-	                createServiceResponse(
-	                        responseObjectsMap);
-
-	    } else {
-
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Failed to retrieve Control Plan DocId",
-	                        errorMsg);
-	    }
-
-	    LOGGER.debug(
-	            CommonConstant.ENDING_METHOD,
-	            methodName);
-
-	    return ResponseEntity
-	            .ok()
-	            .body(responseDTO);
-	}
-	
-	
-	
-	
-	
-	
-	
-	
 }

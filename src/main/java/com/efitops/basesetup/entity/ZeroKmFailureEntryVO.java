@@ -1,7 +1,10 @@
 package com.efitops.basesetup.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -10,11 +13,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -60,6 +65,9 @@ public class ZeroKmFailureEntryVO {
     
     @Column(name = "org_id")
 	private Long orgId;
+    
+    @Column(name = "financial_year")
+    private String financialYear;
 
 	@Column(name = "created_by")
 	private String createdBy;
@@ -73,6 +81,10 @@ public class ZeroKmFailureEntryVO {
 	private String screenName = "ZEROKMFAILUREENTRY";
 	@Column(name = "screen_code")
 	private String screenCode = "ZKMFE";
+	
+	@OneToMany(mappedBy = "zeroKmFailureEntryVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<ZeroEntryDetailVO> zeroEntryDetailVO = new ArrayList<>();
 	
 	
 	@JsonGetter("activeStatus")

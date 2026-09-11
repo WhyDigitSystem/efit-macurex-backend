@@ -22,6 +22,7 @@ import com.efitops.basesetup.ResponseDTO.RootCauseAnalysisResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
@@ -43,6 +44,7 @@ import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.ToolCategoryDTO;
+import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
@@ -240,6 +242,16 @@ public interface DevelopService {
 	Map<String, Object> getItemDropdownForRootCauseAnalysis(Long complaintMasterId, Long branch, Long orgId)
 			throws ApplicationException;
 
+	Map<String, Object> updateCreateZeroKmFailureEntry(ZeroKmFailureEntryDTO zeroKmFailureEntryDTO)
+			throws ApplicationException;
+
+	List<ZeroKmFailureEntryResponseDTO> getZeroKmFailureEntryByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	ZeroKmFailureEntryResponseDTO getZeroKmFailureEntryById(Long id)
+	        throws ApplicationException;
+
+	String getZeroKmFailureEntryDocId(Long orgId, String financialYear);
 	
 	
 

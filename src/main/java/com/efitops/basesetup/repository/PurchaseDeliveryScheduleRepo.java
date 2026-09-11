@@ -87,7 +87,8 @@ public interface PurchaseDeliveryScheduleRepo extends JpaRepository<PurchaseDeli
 	@Query(value = """
 	        SELECT
 	            pob.purchase_order_basic_id AS id,
-	            pob.doc_id AS docId
+	            pob.doc_id AS docId,
+	            pob.doc_date AS docDate
 	        FROM purchase_order_basic pob
 	        INNER JOIN customer_header ch
 	            ON ch.customer_id = pob.supplier_code
@@ -102,5 +103,6 @@ public interface PurchaseDeliveryScheduleRepo extends JpaRepository<PurchaseDeli
 	        @Param("customerId") Long customerId,
 	        @Param("branch") Long branch,
 	        @Param("orgId") Long orgId);
-
+	
+	
 }

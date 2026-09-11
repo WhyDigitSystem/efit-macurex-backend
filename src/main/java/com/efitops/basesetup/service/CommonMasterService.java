@@ -370,11 +370,11 @@ public interface CommonMasterService {
 
 	Map<String, Object> uploadExcelforExchangeRate(MultipartFile file) throws Exception;
 
-	List<ShiftVO> getShiftByOrgId(Long orgId);
-
 	Map<String, Object> updateCreateShift(ShiftDTO shiftdto) throws ApplicationException;
 
 	List<ShiftVO> getShiftById(Long id);
+
+	List<ShiftVO> getShiftByOrgId(Long orgId);
 
 
 }

@@ -1,5 +1,9 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import java.util.List;
+
+import com.efitops.basesetup.dto.BranchResponseDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +15,9 @@ public class InstrumentCalibrationResponseDTO {
 
 	private Long id;
 
-	private Long branch;
+	private BranchResponseDTO branch;
 
-	private Long department;
+	private DepartmentResponseDTO department;
 
 	private EmployeeDropdownResponseDTO checkedBy;
 
@@ -23,7 +27,7 @@ public class InstrumentCalibrationResponseDTO {
 
 	private LocationMasterResponseDTO location;
 
-	private String calibrationAgency;
+	private ListOfValuesDetailsResponseDTO calibrationAgency;
 
 	private String certificateNo;
 
@@ -33,9 +37,11 @@ public class InstrumentCalibrationResponseDTO {
 
 	private String financialYear;
 
-	private boolean active;
+	private String active;
 
 	private String cancelRemarks;
 
 	private String createdBy;
+	
+	private List<InstrumentCalibrationDetailsResponseDTO> instrumentCalibrationDetailsResponseDTO;
 }

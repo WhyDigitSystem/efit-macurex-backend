@@ -27,46 +27,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "instrument_calibration_basic")
+@Table(name = "daily_inspection_cum_rejection_date_basic")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InstrumentCalibrationVO {
+public class DailyInspectionCumRejectionDataVO {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "instrument_calibration_basicgen")
-	@SequenceGenerator(name = "instrument_calibration_basicgen", sequenceName = "instrument_calibration_basicseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "instrument_calibration_basic_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_inspection_cum_rejection_date_basicgen")
+	@SequenceGenerator(name = "daily_inspection_cum_rejection_date_basicgen", sequenceName = "daily_inspection_cum_rejection_date_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "daily_inspection_cum_rejection_date_basic_id")
 	private Long id;
 	
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
-	
-	@ManyToOne
-	@JoinColumn(name = "department")
-	private DepartmentVO department;
-	
-	@ManyToOne
-	@JoinColumn(name = "checked_by")
-	private EmployeeMasterVO checkedBy;
-	
-	@Column(name = "selectMachineInstNo")
-	private String selectMachineInstNo;
-	
-	@ManyToOne
-	@JoinColumn(name = "machine_inst_no")
-	private MachineMasterVO machineInstNo;
-	
-	@ManyToOne
-	@JoinColumn(name = "location")
-	private LocationVO location;
-	
-	@ManyToOne
-	@JoinColumn(name = "calibration_agency")
-	private ListOfValuesDetailsVO calibrationAgency;
-	
-	@Column(name = "certificate_no")
-	private String certificateNo;
 	
 	@Column(name = "doc_id")
 	private String docId;
@@ -75,9 +49,32 @@ public class InstrumentCalibrationVO {
 	private LocalDate docDate = LocalDate.now();
 	
 	@ManyToOne
-	@JoinColumn(name = "approved_by")
-	private EmployeeMasterVO approvedBy;
+	@JoinColumn(name = "belongs_to")
+	private ListOfValuesDetailsVO belongsTo;
 	
+	@ManyToOne
+	@JoinColumn(name = "prepared_by")
+	private EmployeeMasterVO preparedBy;
+	
+	@ManyToOne
+	@JoinColumn(name = "from_location")
+	private LocationVO fromLocation;
+	
+	@ManyToOne
+	@JoinColumn(name = "rework_location")
+	private LocationVO reworkLocation;
+	
+	@ManyToOne
+	@JoinColumn(name = "rejection_location")
+	private LocationVO rejectionLocation;
+	
+	@ManyToOne
+	@JoinColumn(name = "scrap_location")
+	private LocationVO scrapLocation;
+	
+	@ManyToOne
+	@JoinColumn(name = "to_location")
+	private LocationVO toLocation;
 	
 	@Column(name = "org_id")
 	private Long orgId;
@@ -101,10 +98,10 @@ public class InstrumentCalibrationVO {
 	private String updatedBy;
 
 	@Column(name = "screen_code")
-	private String screenCode = "IC";
+	private String screenCode = "DICRD";
 
 	@Column(name = "screen_name")
-	private String screenName = "INSTRUMENT CALIBRATION";
+	private String screenName = "DAILY INSPECTION CUM REJECTION DATA";
 	
 	@JsonGetter("active")
 	public String getActive() {
@@ -119,8 +116,10 @@ public class InstrumentCalibrationVO {
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 	
-	@OneToMany(mappedBy = "instrumentCalibrationVO", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "dailyInspectionCumRejectionDataVO", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonManagedReference
-	private List<InstrumentCalibrationDetailsVO> instrumentCalibrationDetailsVO = new ArrayList<>();
+	private List<DailyInspectionCumRejectionDetailsVO> dailyInspectionCumRejectionDetailsVO = new ArrayList<>();
+
+	
 
 }

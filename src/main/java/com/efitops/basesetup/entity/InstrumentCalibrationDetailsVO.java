@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,7 +40,10 @@ public class InstrumentCalibrationDetailsVO {
 	@Column(name = "next_schedule_date")
 	private LocalDate nextScheduleDate;
 	
-	
+	@ManyToOne
+	@JoinColumn(name = "instrument_calibration_basic_id")
+	@JsonBackReference
+	private InstrumentCalibrationVO instrumentCalibrationVO;
 	
 
 }

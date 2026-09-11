@@ -3,6 +3,8 @@ package com.efitops.basesetup.dto;
 
 
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +28,7 @@ public class InstrumentCalibrationDTO {
 
 	private Long location;
 
-	private String calibrationAgency;
+	private Long calibrationAgency;
 
 	private String certificateNo;
 
@@ -41,5 +43,7 @@ public class InstrumentCalibrationDTO {
 	private String cancelRemarks;
 
 	private String createdBy;
+	
+	private List<InstrumentCalibrationDetailsDTO> instrumentCalibrationDetailsDTO;
 
 }

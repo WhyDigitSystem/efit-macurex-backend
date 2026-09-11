@@ -3,8 +3,12 @@ package com.efitops.basesetup.service;
 import java.util.List;
 import java.util.Map;
 
+import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
+import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
+import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -33,5 +37,42 @@ public interface VendorComplaintService {
 	List<SupplierResponseEntryResponseDTO> getSupplierResponseEntryByOrgId(Long orgId) throws ApplicationException;
 
 	List<Map<String, Object>> getComplaintNoDropdownForSupplierResponseEntry(Long orgId);
+
+	String getSupplierResponseEntryDocId(Long orgId, String financialYear);
+
+	List<Map<String, Object>> getItemDropDownForSupplierResponseEntry(Long supplierId, Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> updateCreateInstrumentCalibration(InstrumentCalibrationDTO instrumentCalibrationDTO)
+			throws ApplicationException;
+
+
+	List<InstrumentCalibrationResponseDTO> getInstrumentCalibrationByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	InstrumentCalibrationResponseDTO getInstrumentCalibrationById(Long id) throws ApplicationException;
+
+	List<Map<String, Object>> getMachineNoForInstrumentCalibration(Long machineCategory, Long branch, Long orgId)
+			throws ApplicationException;
+
+	Map<String, Object> updateCreateDailyInspectionCumRejectionData(
+			DailyInspectionCumRejectionDataDTO dailyInspectionCumRejectionDataDTO) throws ApplicationException;
+
+	List<DailyInspectionCumRejectionDataResponseDTO> getDailyInspectionCumRejectionDataByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	DailyInspectionCumRejectionDataResponseDTO getDailyInspectionCumRejectionDataById(Long id)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getFromLocationDropdownForDailyInspectionCumRejection(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getReworkLocationDropdownForDailyInspectionCumRejection(Long branch, Long orgId);
+
+	List<Map<String, Object>> getRejectionLocationDropdownForDailyInspectionCumRejection(Long branch, Long orgId);
+
+	List<Map<String, Object>> getScrapLocationDropdownForDailyInspectionCumRejection(Long branch, Long orgId);
+
+	String getDailyInspectionCumRejectionDataDocId(Long orgId, String financialYear) throws ApplicationException;
 
 }

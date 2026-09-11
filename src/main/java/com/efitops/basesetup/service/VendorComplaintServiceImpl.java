@@ -11,26 +11,60 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineMasterResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
+import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
+import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDetailsDTO;
+import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
+import com.efitops.basesetup.dto.InstrumentCalibrationDetailsDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
+import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.DailyInspectionCumRejectionDataVO;
+import com.efitops.basesetup.entity.DailyInspectionCumRejectionDetailsVO;
+import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
+import com.efitops.basesetup.entity.EmployeeMasterVO;
+import com.efitops.basesetup.entity.InstrumentCalibrationDetailsVO;
+import com.efitops.basesetup.entity.InstrumentCalibrationVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
+import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.MachineMasterVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryDetailsVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryVO;
 import com.efitops.basesetup.entity.VendorComplaintDetailsVO;
 import com.efitops.basesetup.entity.VendorComplaintEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
+import com.efitops.basesetup.repository.DailyInspectionCumRejectionDataRepo;
+import com.efitops.basesetup.repository.DailyInspectionCumRejectionDetailsRepo;
+import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
+import com.efitops.basesetup.repository.EmployeeMasterRepo;
+import com.efitops.basesetup.repository.InstrumentCalibrationDetailsRepo;
+import com.efitops.basesetup.repository.InstrumentCalibrationRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
+import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.MachineMasterRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryDetailsRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryRepo;
 import com.efitops.basesetup.repository.VendorComplaintDetailsRepo;
@@ -60,6 +94,36 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	SupplierResponseEntryDetailsRepo supplierResponseEntryDetailsRepo;
+
+	@Autowired
+	InstrumentCalibrationRepo instrumentCalibrationRepo;
+
+	@Autowired
+	ListOfValuesDetailsRepo listOfValuesDetailsRepo;
+
+	@Autowired
+	InstrumentCalibrationDetailsRepo instrumentCalibrationDetailsRepo;
+
+	@Autowired
+	EmployeeMasterRepo employeeMasterRepo;
+
+	@Autowired
+	BranchRepo branchRepo;
+
+	@Autowired
+	DepartmentRepo departmentRepo;
+
+	@Autowired
+	MachineMasterRepo machineMasterRepo;
+
+	@Autowired
+	LocationRepo locationRepo;
+
+	@Autowired
+	DailyInspectionCumRejectionDataRepo dailyInspectionCumRejectionDataRepo;
+
+	@Autowired
+	DailyInspectionCumRejectionDetailsRepo dailyInspectionCumRejectionDetailsRepo;
 
 	@Override
 	@Transactional
@@ -636,33 +700,1004 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			Map<String, Object> complaint = new HashMap<>();
 
-			// =========================
-			// Complaint Details
-			// =========================
-
 			complaint.put("docId", obj[0] != null ? obj[0].toString() : "");
 
 			complaint.put("docDate", obj[1] != null ? obj[1].toString() : "");
-
-			// =========================
-			// Product Details
-			// =========================
 
 			complaint.put("productNo", obj[2] != null ? obj[2].toString() : "");
 
 			complaint.put("productName", obj[3] != null ? obj[3].toString() : "");
 
-			// =========================
-			// Supplier Details
-			// =========================
+			complaint.put("supplierId", obj[4] != null ? ((Number) obj[4]).longValue() : null);
 
-			complaint.put("supplierNo", obj[4] != null ? obj[4].toString() : "");
+			complaint.put("supplierNo", obj[5] != null ? obj[5].toString() : "");
 
-			complaint.put("supplierName", obj[5] != null ? obj[5].toString() : "");
+			complaint.put("supplierName", obj[6] != null ? obj[6].toString() : "");
 
 			details.add(complaint);
 		}
 
 		return details;
 	}
+
+	@Override
+	public String getSupplierResponseEntryDocId(Long orgId, String financialYear) {
+
+		String screenCode = "SRE";
+
+		String result = supplierResponseEntryRepo.getSupplierResponseEntryDocId(orgId, financialYear, screenCode);
+
+		return result;
+	}
+
+	@Override
+	public List<Map<String, Object>> getItemDropDownForSupplierResponseEntry(Long supplierId, Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> result = supplierResponseEntryRepo.getItemDropdownForSupplierResponseEntry(supplierId, orgId,
+				branch);
+
+		if (result == null || result.isEmpty()) {
+			throw new ApplicationException("No Items Found For Selected Supplier");
+		}
+
+		List<Map<String, Object>> response = new ArrayList<>();
+
+		for (Object[] obj : result) {
+
+			Map<String, Object> item = new HashMap<>();
+
+			item.put("id", obj[0]);
+			item.put("itemCode", obj[1]);
+			item.put("itemDescription", obj[2]);
+
+			response.add(item);
+		}
+
+		return response;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateInstrumentCalibration(InstrumentCalibrationDTO instrumentCalibrationDTO)
+			throws ApplicationException {
+
+		InstrumentCalibrationVO instrumentCalibrationVO = new InstrumentCalibrationVO();
+
+		String screenCode = "IC";
+		String message;
+
+		// ========================================================
+		// CREATE / UPDATE
+		// ========================================================
+
+		if (ObjectUtils.isNotEmpty(instrumentCalibrationDTO.getId())) {
+
+			instrumentCalibrationVO = instrumentCalibrationRepo.findById(instrumentCalibrationDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Instrument Calibration Details"));
+
+			instrumentCalibrationVO.setUpdatedBy(instrumentCalibrationDTO.getCreatedBy());
+
+			message = "Instrument Calibration Updated Successfully";
+
+		} else {
+
+			// ========================================================
+			// DOC ID GENERATION
+			// ========================================================
+
+			String docId = instrumentCalibrationRepo.getInstrumentCalibrationDocId(instrumentCalibrationDTO.getOrgId(),
+					instrumentCalibrationDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Instrument Calibration DocId Not Found");
+			}
+
+			instrumentCalibrationVO.setDocId(docId);
+
+			// ========================================================
+			// UPDATE LAST NUMBER
+			// ========================================================
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(instrumentCalibrationDTO.getOrgId(),
+							instrumentCalibrationDTO.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			// ========================================================
+			// CREATED / UPDATED BY
+			// ========================================================
+
+			instrumentCalibrationVO.setCreatedBy(instrumentCalibrationDTO.getCreatedBy());
+
+			instrumentCalibrationVO.setUpdatedBy(instrumentCalibrationDTO.getCreatedBy());
+
+			message = "Instrument Calibration Created Successfully";
+		}
+
+		// ========================================================
+		// DTO -> VO
+		// ========================================================
+
+		createUpdateInstrumentCalibrationVO(instrumentCalibrationDTO, instrumentCalibrationVO);
+
+		// ========================================================
+		// SAVE BASIC
+		// ========================================================
+
+		InstrumentCalibrationVO savedVO = instrumentCalibrationRepo.save(instrumentCalibrationVO);
+
+		// ========================================================
+		// RESPONSE
+		// ========================================================
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("instrumentCalibrationVO", instrumentCalibrationResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdateInstrumentCalibrationVO(InstrumentCalibrationDTO dto,
+			InstrumentCalibrationVO instrumentCalibrationVO) throws ApplicationException {
+
+		// ========================================================
+		// BASIC DETAILS
+		// ========================================================
+
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			instrumentCalibrationVO.setBranch(branchVO);
+		}
+
+		if (dto.getDepartment() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Department Not Found"));
+
+			instrumentCalibrationVO.setDepartment(departmentVO);
+		}
+		if (dto.getCheckedBy() != null) {
+
+			EmployeeMasterVO checkedByVO = employeeMasterRepo.findById(dto.getCheckedBy())
+					.orElseThrow(() -> new ApplicationException("Checked By Employee Not Found"));
+
+			instrumentCalibrationVO.setCheckedBy(checkedByVO);
+		}
+
+		instrumentCalibrationVO.setSelectMachineInstNo(dto.getSelectMachineInstNo());
+
+		if (dto.getMachineInstNo() != null) {
+
+			MachineMasterVO machineMasterVO = machineMasterRepo.findById(dto.getMachineInstNo())
+					.orElseThrow(() -> new ApplicationException("Machine Master Not Found"));
+
+			instrumentCalibrationVO.setMachineInstNo(machineMasterVO);
+		}
+
+		if (dto.getLocation() != null) {
+
+			LocationVO locationVO = locationRepo.findById(dto.getLocation())
+					.orElseThrow(() -> new ApplicationException("Location Master Not Found"));
+
+			instrumentCalibrationVO.setLocation(locationVO);
+		}
+
+		if (dto.getCalibrationAgency() != null) {
+
+			ListOfValuesDetailsVO listOfValuesDetailsVO = listOfValuesDetailsRepo.findById(dto.getCalibrationAgency())
+					.orElseThrow(() -> new ApplicationException("calibration agency  Not Found"));
+
+			instrumentCalibrationVO.setCalibrationAgency(listOfValuesDetailsVO);
+		}
+
+		instrumentCalibrationVO.setCertificateNo(dto.getCertificateNo());
+		if (dto.getApprovedBy() != null) {
+
+			EmployeeMasterVO approvedByVO = employeeMasterRepo.findById(dto.getApprovedBy())
+					.orElseThrow(() -> new ApplicationException("Approved By Employee Not Found"));
+
+			instrumentCalibrationVO.setApprovedBy(approvedByVO);
+		}
+
+		instrumentCalibrationVO.setOrgId(dto.getOrgId());
+
+		instrumentCalibrationVO.setFinancialYear(dto.getFinancialYear());
+
+		instrumentCalibrationVO.setActive(dto.isActive());
+
+		instrumentCalibrationVO.setCancelRemarks(dto.getCancelRemarks());
+
+		// ========================================================
+		// DELETE OLD DETAILS
+		// ========================================================
+
+		if (dto.getId() != null) {
+
+			List<InstrumentCalibrationDetailsVO> oldDetails = instrumentCalibrationDetailsRepo
+					.findByInstrumentCalibrationVO(instrumentCalibrationVO);
+
+			if (!oldDetails.isEmpty()) {
+				instrumentCalibrationDetailsRepo.deleteAll(oldDetails);
+			}
+		}
+
+		// ========================================================
+		// CREATE DETAILS
+		// ========================================================
+
+		List<InstrumentCalibrationDetailsVO> detailsList = new ArrayList<>();
+
+		if (dto.getInstrumentCalibrationDetailsDTO() != null && !dto.getInstrumentCalibrationDetailsDTO().isEmpty()) {
+
+			for (InstrumentCalibrationDetailsDTO detailDTO : dto.getInstrumentCalibrationDetailsDTO()) {
+
+				InstrumentCalibrationDetailsVO detailVO = new InstrumentCalibrationDetailsVO();
+
+				detailVO.setDateOfCalibration(detailDTO.getDateOfCalibration());
+
+				// ====================================================
+				// FREQUENCY
+				// ====================================================
+
+				if (detailDTO.getFrequency() != null && detailDTO.getFrequency() != 0) {
+
+					ListOfValuesDetailsVO frequencyVO = listOfValuesDetailsRepo.findById(detailDTO.getFrequency())
+							.orElseThrow(() -> new ApplicationException("Frequency Not Found"));
+
+					detailVO.setFrequency(frequencyVO);
+				}
+
+				detailVO.setNextScheduleDate(detailDTO.getNextScheduleDate());
+
+				detailVO.setInstrumentCalibrationVO(instrumentCalibrationVO);
+
+				detailsList.add(detailVO);
+			}
+		}
+
+		instrumentCalibrationVO.setInstrumentCalibrationDetailsVO(detailsList);
+	}
+
+	private InstrumentCalibrationResponseDTO instrumentCalibrationResponse(
+			InstrumentCalibrationVO instrumentCalibrationVO) {
+
+		InstrumentCalibrationResponseDTO responseDTO = new InstrumentCalibrationResponseDTO();
+
+		// ========================================================
+		// BASIC RESPONSE
+		// ========================================================
+
+		responseDTO.setId(instrumentCalibrationVO.getId());
+
+		if (instrumentCalibrationVO.getBranch() != null) {
+
+			BranchResponseDTO branch = new BranchResponseDTO();
+
+			branch.setId(instrumentCalibrationVO.getBranch().getId());
+
+			branch.setBranchName(instrumentCalibrationVO.getBranch().getBranchName());
+
+			responseDTO.setBranch(branch);
+		}
+		if (instrumentCalibrationVO.getDepartment() != null) {
+
+			DepartmentResponseDTO department = new DepartmentResponseDTO();
+
+			department.setId(instrumentCalibrationVO.getDepartment().getId());
+
+			department.setDepartmentName(instrumentCalibrationVO.getDepartment().getDepartmentName());
+
+			responseDTO.setDepartment(department);
+		}
+
+		// ========================================================
+		// CHECKED BY
+		// ========================================================
+
+		if (instrumentCalibrationVO.getCheckedBy() != null) {
+
+			EmployeeDropdownResponseDTO checkedBy = new EmployeeDropdownResponseDTO();
+
+			checkedBy.setEmployeeId(instrumentCalibrationVO.getCheckedBy().getId());
+
+			checkedBy.setEmployeeName(instrumentCalibrationVO.getCheckedBy().getEmployeeName());
+
+			responseDTO.setCheckedBy(checkedBy);
+		}
+
+		responseDTO.setSelectMachineInstNo(instrumentCalibrationVO.getSelectMachineInstNo());
+
+		// ========================================================
+		// MACHINE
+		// ========================================================
+
+		if (instrumentCalibrationVO.getMachineInstNo() != null) {
+
+			MachineMasterResponse1DTO machine = new MachineMasterResponse1DTO();
+
+			machine.setId(instrumentCalibrationVO.getMachineInstNo().getId());
+
+			machine.setMachineInstrumentNo(instrumentCalibrationVO.getMachineInstNo().getMachineInstrumentNo());
+
+			machine.setMachineInstrumentName(instrumentCalibrationVO.getMachineInstNo().getMachineInstrumentName());
+
+			responseDTO.setMachineInstNo(machine);
+		}
+
+		// ========================================================
+		// LOCATION
+		// ========================================================
+
+		if (instrumentCalibrationVO.getLocation() != null) {
+
+			LocationMasterResponseDTO location = new LocationMasterResponseDTO();
+
+			location.setId(instrumentCalibrationVO.getLocation().getId());
+
+			location.setLocationName(instrumentCalibrationVO.getLocation().getLocationName());
+
+			responseDTO.setLocation(location);
+		}
+		if (instrumentCalibrationVO.getCalibrationAgency() != null) {
+
+			ListOfValuesDetailsResponseDTO listOfValuesDetailsResponseDTO = new ListOfValuesDetailsResponseDTO();
+
+			listOfValuesDetailsResponseDTO.setId(instrumentCalibrationVO.getCalibrationAgency().getId());
+
+			listOfValuesDetailsResponseDTO.setCode(instrumentCalibrationVO.getCalibrationAgency().getValueCode());
+
+			listOfValuesDetailsResponseDTO
+					.setDescription(instrumentCalibrationVO.getCalibrationAgency().getValueDescription());
+
+			responseDTO.setCalibrationAgency(listOfValuesDetailsResponseDTO);
+		}
+		responseDTO.setCertificateNo(instrumentCalibrationVO.getCertificateNo());
+
+		// ========================================================
+		// APPROVED BY
+		// ========================================================
+
+		if (instrumentCalibrationVO.getApprovedBy() != null) {
+
+			EmployeeDropdownResponseDTO approvedBy = new EmployeeDropdownResponseDTO();
+
+			approvedBy.setEmployeeId(instrumentCalibrationVO.getApprovedBy().getId());
+
+			approvedBy.setEmployeeName(instrumentCalibrationVO.getApprovedBy().getEmployeeName());
+
+			responseDTO.setApprovedBy(approvedBy);
+		}
+
+		responseDTO.setOrgId(instrumentCalibrationVO.getOrgId());
+
+		responseDTO.setFinancialYear(instrumentCalibrationVO.getFinancialYear());
+
+		responseDTO.setActive(instrumentCalibrationVO.getActive());
+
+		responseDTO.setCancelRemarks(instrumentCalibrationVO.getCancelRemarks());
+
+		responseDTO.setCreatedBy(instrumentCalibrationVO.getCreatedBy());
+
+		// ========================================================
+		// DETAILS RESPONSE
+		// ========================================================
+
+		List<InstrumentCalibrationDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+
+		if (instrumentCalibrationVO.getInstrumentCalibrationDetailsVO() != null
+				&& !instrumentCalibrationVO.getInstrumentCalibrationDetailsVO().isEmpty()) {
+
+			for (InstrumentCalibrationDetailsVO detailVO : instrumentCalibrationVO
+					.getInstrumentCalibrationDetailsVO()) {
+
+				InstrumentCalibrationDetailsResponseDTO detailResponseDTO = new InstrumentCalibrationDetailsResponseDTO();
+
+				detailResponseDTO.setDateOfCalibration(detailVO.getDateOfCalibration());
+
+				// ====================================================
+				// FREQUENCY RESPONSE
+				// ====================================================
+
+				if (detailVO.getFrequency() != null) {
+
+					ListOfValuesDetailsResponseDTO frequency = new ListOfValuesDetailsResponseDTO();
+
+					frequency.setId(detailVO.getFrequency().getId());
+
+					frequency.setCode(detailVO.getFrequency().getValueCode());
+
+					frequency.setDescription(detailVO.getFrequency().getValueDescription());
+
+					detailResponseDTO.setFrequency(frequency);
+				}
+
+				detailResponseDTO.setNextScheduleDate(detailVO.getNextScheduleDate());
+
+				detailsResponseList.add(detailResponseDTO);
+			}
+		}
+
+		responseDTO.setInstrumentCalibrationDetailsResponseDTO(detailsResponseList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public List<InstrumentCalibrationResponseDTO> getInstrumentCalibrationByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<InstrumentCalibrationVO> instrumentCalibrationVOList = instrumentCalibrationRepo
+				.getInstrumentCalibrationByOrgId(orgId, branch);
+
+		if (instrumentCalibrationVOList == null || instrumentCalibrationVOList.isEmpty()) {
+
+			throw new ApplicationException("No Instrument Calibration Details Found");
+		}
+
+		List<InstrumentCalibrationResponseDTO> responseList = new ArrayList<>();
+
+		for (InstrumentCalibrationVO instrumentCalibrationVO : instrumentCalibrationVOList) {
+
+			responseList.add(instrumentCalibrationResponse(instrumentCalibrationVO));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public InstrumentCalibrationResponseDTO getInstrumentCalibrationById(Long id) throws ApplicationException {
+
+		InstrumentCalibrationVO instrumentCalibrationVO = instrumentCalibrationRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Instrument Calibration Details Not Found"));
+
+		return instrumentCalibrationResponse(instrumentCalibrationVO);
+	}
+//	machine no ddropdown
+
+	@Override
+	public List<Map<String, Object>> getMachineNoForInstrumentCalibration(Long machineId, Long branch, Long orgId) {
+
+		List<Object[]> result = instrumentCalibrationRepo.getMachineNoForInstrumentCalibration(machineId, branch,
+				orgId);
+
+		return getMachineNoForInstrumentCalibration(result);
+	}
+
+	private List<Map<String, Object>> getMachineNoForInstrumentCalibration(List<Object[]> result) {
+
+		List<Map<String, Object>> details = new ArrayList<>();
+
+		for (Object[] obj : result) {
+
+			Map<String, Object> machine = new HashMap<>();
+
+			machine.put("machineMasterId", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+
+			machine.put("machineInstrumentNo", obj[1] != null ? obj[1].toString() : "");
+
+			machine.put("locationId", obj[2] != null ? ((Number) obj[2]).longValue() : null);
+
+			machine.put("locationName", obj[3] != null ? obj[3].toString() : "");
+
+			details.add(machine);
+		}
+
+		return details;
+	}
+
+//	Daily Inspection cum 
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateDailyInspectionCumRejectionData(
+			DailyInspectionCumRejectionDataDTO dailyInspectionCumRejectionDataDTO) throws ApplicationException {
+
+		DailyInspectionCumRejectionDataVO dailyInspectionCumRejectionDataVO = new DailyInspectionCumRejectionDataVO();
+
+		String screenCode = "DICRD";
+		String message;
+
+		/*
+		 * UPDATE
+		 */
+		if (ObjectUtils.isNotEmpty(dailyInspectionCumRejectionDataDTO.getId())) {
+
+			dailyInspectionCumRejectionDataVO = dailyInspectionCumRejectionDataRepo
+					.findById(dailyInspectionCumRejectionDataDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Daily Inspection Cum Rejection Data Details"));
+
+			dailyInspectionCumRejectionDataVO.setUpdatedBy(dailyInspectionCumRejectionDataDTO.getCreatedBy());
+
+			message = "Daily Inspection Cum Rejection Data Updated Successfully";
+
+		}
+
+		/*
+		 * CREATE
+		 */
+		else {
+
+			String docId = dailyInspectionCumRejectionDataRepo.getDailyInspectionCumRejectionDataDocId(
+					dailyInspectionCumRejectionDataDTO.getOrgId(),
+					dailyInspectionCumRejectionDataDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Daily Inspection Cum Rejection Data DocId Not Found");
+			}
+
+			dailyInspectionCumRejectionDataVO.setDocId(docId);
+
+			/*
+			 * Document Type Mapping
+			 */
+			var documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+					dailyInspectionCumRejectionDataDTO.getOrgId(),
+					dailyInspectionCumRejectionDataDTO.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			dailyInspectionCumRejectionDataVO.setCreatedBy(dailyInspectionCumRejectionDataDTO.getCreatedBy());
+
+			dailyInspectionCumRejectionDataVO.setUpdatedBy(dailyInspectionCumRejectionDataDTO.getCreatedBy());
+
+			message = "Daily Inspection Cum Rejection Data Created Successfully";
+		}
+
+		/*
+		 * Set Basic Details
+		 */
+		createUpdateDailyInspectionCumRejectionDataVO(dailyInspectionCumRejectionDataDTO,
+				dailyInspectionCumRejectionDataVO);
+
+		/*
+		 * Save
+		 */
+		DailyInspectionCumRejectionDataVO savedVO = dailyInspectionCumRejectionDataRepo
+				.save(dailyInspectionCumRejectionDataVO);
+
+		/*
+		 * Response
+		 */
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("dailyInspectionCumRejectionDataVO", dailyInspectionCumRejectionDataResponse(savedVO));
+
+		return response;
+	}
+
+	/*
+	 * CREATE / UPDATE MAPPING
+	 */
+	private void createUpdateDailyInspectionCumRejectionDataVO(DailyInspectionCumRejectionDataDTO dto,
+			DailyInspectionCumRejectionDataVO vo) throws ApplicationException {
+
+		/*
+		 * Branch
+		 */
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branchVO);
+		}
+
+		/*
+		 * Belongs To
+		 */
+		if (dto.getBelongsTo() != null) {
+
+			ListOfValuesDetailsVO belongsToVO = listOfValuesDetailsRepo.findById(dto.getBelongsTo())
+					.orElseThrow(() -> new ApplicationException("Belongs To Details Not Found"));
+
+			vo.setBelongsTo(belongsToVO);
+		}
+
+		/*
+		 * Prepared By
+		 */
+		if (dto.getPreparedBy() != null) {
+
+			EmployeeMasterVO preparedByVO = employeeMasterRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Prepared By Employee Not Found"));
+
+			vo.setPreparedBy(preparedByVO);
+		}
+
+		/*
+		 * From Location
+		 */
+		if (dto.getFromLocation() != null) {
+
+			LocationVO fromLocationVO = locationRepo.findById(dto.getFromLocation())
+					.orElseThrow(() -> new ApplicationException("From Location Not Found"));
+
+			vo.setFromLocation(fromLocationVO);
+		}
+
+		/*
+		 * Rework Location
+		 */
+		if (dto.getReworkLocation() != null) {
+
+			LocationVO reworkLocationVO = locationRepo.findById(dto.getReworkLocation())
+					.orElseThrow(() -> new ApplicationException("Rework Location Not Found"));
+
+			vo.setReworkLocation(reworkLocationVO);
+		}
+
+		/*
+		 * Rejection Location
+		 */
+		if (dto.getRejectionLocation() != null) {
+
+			LocationVO rejectionLocationVO = locationRepo.findById(dto.getRejectionLocation())
+					.orElseThrow(() -> new ApplicationException("Rejection Location Not Found"));
+
+			vo.setRejectionLocation(rejectionLocationVO);
+		}
+
+		/*
+		 * Scrap Location
+		 */
+		if (dto.getScrapLocation() != null) {
+
+			LocationVO scrapLocationVO = locationRepo.findById(dto.getScrapLocation())
+					.orElseThrow(() -> new ApplicationException("Scrap Location Not Found"));
+
+			vo.setScrapLocation(scrapLocationVO);
+		}
+
+		/*
+		 * To Location
+		 */
+		if (dto.getToLocation() != null) {
+
+			LocationVO toLocationVO = locationRepo.findById(dto.getToLocation())
+					.orElseThrow(() -> new ApplicationException("To Location Not Found"));
+
+			vo.setToLocation(toLocationVO);
+		}
+
+		/*
+		 * Basic Fields
+		 */
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+
+		/*
+		 * Details
+		 */
+		if (dto.getDailyInspectionCumRejectionDataDetailsDTO() != null) {
+
+			/*
+			 * Delete old details during update
+			 */
+			if (vo.getId() != null && vo.getDailyInspectionCumRejectionDetailsVO() != null) {
+
+				dailyInspectionCumRejectionDetailsRepo.deleteAll(vo.getDailyInspectionCumRejectionDetailsVO());
+
+				vo.getDailyInspectionCumRejectionDetailsVO().clear();
+			}
+
+			List<DailyInspectionCumRejectionDetailsVO> detailsList = new ArrayList<>();
+
+			for (DailyInspectionCumRejectionDataDetailsDTO detailsDTO : dto
+					.getDailyInspectionCumRejectionDataDetailsDTO()) {
+
+				DailyInspectionCumRejectionDetailsVO detailsVO = new DailyInspectionCumRejectionDetailsVO();
+
+				/*
+				 * FG Item
+				 */
+				if (detailsDTO.getFgItem() != null) {
+
+					ItemMasterVO fgItemVO = itemRepo.findById(detailsDTO.getFgItem())
+							.orElseThrow(() -> new ApplicationException("FG Item Not Found"));
+
+					detailsVO.setFgItem(fgItemVO);
+				}
+
+				/*
+				 * Quantities
+				 */
+				detailsVO.setStock(detailsDTO.getStock());
+				detailsVO.setRate(detailsDTO.getRate());
+				detailsVO.setInspectionQty(detailsDTO.getInspectionQty());
+				detailsVO.setAcceptedQty(detailsDTO.getAcceptedQty());
+				detailsVO.setReworkQty(detailsDTO.getReworkQty());
+				detailsVO.setRejectionQty(detailsDTO.getRejectionQty());
+				detailsVO.setScrapQty(detailsDTO.getScrapQty());
+
+				/*
+				 * Parent
+				 */
+				detailsVO.setDailyInspectionCumRejectionDataVO(vo);
+
+				detailsList.add(detailsVO);
+			}
+
+			vo.setDailyInspectionCumRejectionDetailsVO(detailsList);
+		}
+	}
+
+	/*
+	 * RESPONSE DTO
+	 */
+	private DailyInspectionCumRejectionDataResponseDTO dailyInspectionCumRejectionDataResponse(
+			DailyInspectionCumRejectionDataVO vo) {
+
+		DailyInspectionCumRejectionDataResponseDTO responseDTO = new DailyInspectionCumRejectionDataResponseDTO();
+
+		responseDTO.setId(vo.getId());
+
+		/*
+		 * Branch
+		 */
+		if (vo.getBranch() != null) {
+			responseDTO.setBranch(vo.getBranch().getId());
+		}
+
+		/*
+		 * Belongs To
+		 */
+		if (vo.getBelongsTo() != null) {
+			responseDTO.setBelongsTo(vo.getBelongsTo().getId());
+		}
+
+		/*
+		 * Prepared By
+		 */
+		if (vo.getPreparedBy() != null) {
+			responseDTO.setPreparedBy(vo.getPreparedBy().getId());
+		}
+
+		/*
+		 * Locations
+		 */
+		if (vo.getFromLocation() != null) {
+			responseDTO.setFromLocation(vo.getFromLocation().getId());
+		}
+
+		if (vo.getReworkLocation() != null) {
+			responseDTO.setReworkLocation(vo.getReworkLocation().getId());
+		}
+
+		if (vo.getRejectionLocation() != null) {
+			responseDTO.setRejectionLocation(vo.getRejectionLocation().getId());
+		}
+
+		if (vo.getScrapLocation() != null) {
+			responseDTO.setScrapLocation(vo.getScrapLocation().getId());
+		}
+
+		if (vo.getToLocation() != null) {
+			responseDTO.setToLocation(vo.getToLocation().getId());
+		}
+
+		responseDTO.setActive(vo.getActive());
+
+		responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+
+		/*
+		 * Details Response
+		 */
+		List<DailyInspectionCumRejectionDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+
+		if (vo.getDailyInspectionCumRejectionDetailsVO() != null) {
+
+			for (DailyInspectionCumRejectionDetailsVO detailsVO : vo.getDailyInspectionCumRejectionDetailsVO()) {
+
+				DailyInspectionCumRejectionDetailsResponseDTO detailsResponseDTO = new DailyInspectionCumRejectionDetailsResponseDTO();
+
+				if (detailsVO.getFgItem() != null) {
+					detailsResponseDTO.setFgItem(detailsVO.getFgItem().getId());
+				}
+
+				detailsResponseDTO.setStock(detailsVO.getStock());
+				detailsResponseDTO.setRate(detailsVO.getRate());
+				detailsResponseDTO.setInspectionQty(detailsVO.getInspectionQty());
+				detailsResponseDTO.setAcceptedQty(detailsVO.getAcceptedQty());
+				detailsResponseDTO.setReworkQty(detailsVO.getReworkQty());
+				detailsResponseDTO.setRejectionQty(detailsVO.getRejectionQty());
+				detailsResponseDTO.setScrapQty(detailsVO.getScrapQty());
+
+				detailsResponseList.add(detailsResponseDTO);
+			}
+		}
+
+		responseDTO.setDailyInspectionCumRejectionDetailsResponseDTO(detailsResponseList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public List<DailyInspectionCumRejectionDataResponseDTO> getDailyInspectionCumRejectionDataByOrgId(Long orgId,
+			Long branch) throws ApplicationException {
+
+		List<DailyInspectionCumRejectionDataVO> dailyInspectionCumRejectionDataVOList = dailyInspectionCumRejectionDataRepo
+				.getDailyInspectionCumRejectionDataByOrgId(orgId, branch);
+
+		if (dailyInspectionCumRejectionDataVOList == null || dailyInspectionCumRejectionDataVOList.isEmpty()) {
+
+			throw new ApplicationException("No Daily Inspection Cum Rejection Data Details Found");
+		}
+
+		List<DailyInspectionCumRejectionDataResponseDTO> responseList = new ArrayList<>();
+
+		for (DailyInspectionCumRejectionDataVO dailyInspectionCumRejectionDataVO : dailyInspectionCumRejectionDataVOList) {
+
+			responseList.add(dailyInspectionCumRejectionDataResponse(dailyInspectionCumRejectionDataVO));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public DailyInspectionCumRejectionDataResponseDTO getDailyInspectionCumRejectionDataById(Long id)
+			throws ApplicationException {
+
+		DailyInspectionCumRejectionDataVO dailyInspectionCumRejectionDataVO = dailyInspectionCumRejectionDataRepo
+				.findById(id)
+				.orElseThrow(() -> new ApplicationException("Daily Inspection Cum Rejection Data Details Not Found"));
+
+		return dailyInspectionCumRejectionDataResponse(dailyInspectionCumRejectionDataVO);
+	}
+
+	@Override
+	public List<Map<String, Object>> getFromLocationDropdownForDailyInspectionCumRejection(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> locationList = dailyInspectionCumRejectionDataRepo
+				.getFromLocationDropdownForDailyInspectionCumRejection(orgId, branch);
+
+		if (locationList == null || locationList.isEmpty()) {
+			throw new ApplicationException("No From Location Details Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : locationList) {
+
+			Map<String, Object> locationMap = new HashMap<>();
+
+			locationMap.put("locationId", obj[0]);
+			locationMap.put("locationName", obj[1]);
+
+			responseList.add(locationMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getReworkLocationDropdownForDailyInspectionCumRejection(Long branch, Long orgId) {
+
+		List<Object[]> result = dailyInspectionCumRejectionDataRepo
+				.getReworkLocationDropdownForDailyInspectionCumRejection(branch, orgId);
+
+		return getReworkLocationDropdown(result);
+	}
+
+	private List<Map<String, Object>> getReworkLocationDropdown(List<Object[]> result) {
+
+		List<Map<String, Object>> details = new ArrayList<>();
+
+		for (Object[] obj : result) {
+
+			Map<String, Object> location = new HashMap<>();
+
+			location.put("id", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+
+			location.put("locationId", obj[1] != null ? obj[1].toString() : "");
+
+			location.put("locationName", obj[2] != null ? obj[2].toString() : "");
+
+			details.add(location);
+		}
+
+		return details;
+	}
+
+	@Override
+	public List<Map<String, Object>> getRejectionLocationDropdownForDailyInspectionCumRejection(Long branch,
+			Long orgId) {
+
+		List<Object[]> result = dailyInspectionCumRejectionDataRepo
+				.getRejectionLocationDropdownForDailyInspectionCumRejection(branch, orgId);
+
+		return getReworkLocationDropdown(result);
+	}
+
+	private List<Map<String, Object>> getRejectionLocationDropdown(List<Object[]> result) {
+
+		List<Map<String, Object>> details = new ArrayList<>();
+
+		for (Object[] obj : result) {
+
+			Map<String, Object> location = new HashMap<>();
+
+			location.put("id", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+
+			location.put("locationId", obj[1] != null ? obj[1].toString() : "");
+
+			location.put("locationName", obj[2] != null ? obj[2].toString() : "");
+
+			details.add(location);
+		}
+
+		return details;
+	}
+
+	@Override
+	public List<Map<String, Object>> getScrapLocationDropdownForDailyInspectionCumRejection(Long branch, Long orgId) {
+
+		List<Object[]> result = dailyInspectionCumRejectionDataRepo
+				.getScrapLocationDropdownForDailyInspectionCumRejection(branch, orgId);
+
+		return getReworkLocationDropdown(result);
+	}
+
+	private List<Map<String, Object>> getScrapLocationDropdown(List<Object[]> result) {
+
+		List<Map<String, Object>> details = new ArrayList<>();
+
+		for (Object[] obj : result) {
+
+			Map<String, Object> location = new HashMap<>();
+
+			location.put("id", obj[0] != null ? ((Number) obj[0]).longValue() : null);
+
+			location.put("locationId", obj[1] != null ? obj[1].toString() : "");
+
+			location.put("locationName", obj[2] != null ? obj[2].toString() : "");
+
+			details.add(location);
+		}
+
+		return details;
+	}
+//	getFgItemDropdownForVendorComplaintEntry --for fgitemfordailyinspectioncumrejectiondata
+
+	@Override
+	public String getDailyInspectionCumRejectionDataDocId(Long orgId, String financialYear)
+			throws ApplicationException {
+
+		String screenCode = "DICRD";
+
+		String docId = dailyInspectionCumRejectionDataRepo.getDailyInspectionCumRejectionDataDocId(orgId, financialYear,
+				screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("Daily Inspection Cum Rejection Data DocId Not Found");
+		}
+
+		return docId;
+	}
+
 }

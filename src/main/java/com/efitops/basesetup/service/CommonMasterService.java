@@ -39,6 +39,7 @@ import com.efitops.basesetup.dto.SalesZoneMasterDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
+import com.efitops.basesetup.dto.ShiftDTO;
 import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TSBankDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDTO;
@@ -67,6 +68,7 @@ import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
+import com.efitops.basesetup.entity.ShiftVO;
 import com.efitops.basesetup.entity.StateVO;
 import com.efitops.basesetup.entity.TSBankVO;
 import com.efitops.basesetup.entity.TaxDefinitionVO;
@@ -367,6 +369,12 @@ public interface CommonMasterService {
 
 
 	Map<String, Object> uploadExcelforExchangeRate(MultipartFile file) throws Exception;
+
+	Map<String, Object> updateCreateShift(ShiftDTO shiftdto) throws ApplicationException;
+
+	List<ShiftVO> getShiftById(Long id);
+
+	List<ShiftVO> getShiftByOrgId(Long orgId);
 
 
 }

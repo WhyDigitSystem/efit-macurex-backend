@@ -36,8 +36,13 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 			+ "ORDER BY customer_name ASC", nativeQuery = true)
 	Set<Object[]> getParty(Long category, Long orgId, Long branch);
 
-	@Query(value = "SELECT customer_id, customer_name " + "FROM customer_header " + "WHERE org_id = ?1 and branch=?2  "
-			+ "AND cancel = 0 and active=1", nativeQuery = true)
+	@Query(value = "SELECT customer_id, customer_code, customer_name, gst_no, is_gst_applicable " +
+	        "FROM customer_header " +
+	        "WHERE org_id = ?1 " +
+	        "AND branch = ?2 " +
+	        "AND cancel = 0 " +
+	        "AND active = 1",
+	        nativeQuery = true)
 	List<Object[]> getCustomerDetails(Long orgId, Long branch);
 
 //	@Query(value = """

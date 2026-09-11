@@ -49,6 +49,12 @@ public class DeliveryChallanSubcontractingDetailsVO {
     @ManyToOne
     @JoinColumn(name = "unit")
     private UnitMasterVO unit;
+    
+    @Column(name = "contract_no")
+    private String contractNo;
+    
+    @Column(name = "job_order_for")
+    private String jobOrderFor;
 
     @ManyToOne
     @JoinColumn(name = "from_location")

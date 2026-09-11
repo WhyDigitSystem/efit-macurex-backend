@@ -77,8 +77,43 @@ public class GrnDTO {
 
 	private String remarks;
 
+	private String grnType;
+
+	// import grn details
+
+	private String shipmentNo;
+
+	private LocalDate shipmentDate;
+
+	private String blNo;
+
+	private LocalDate blDate;
+
+	private Long transporter;
+
+	private LocalDate poDate;
+
+	private String vehicleNo;
+
+	private String invoiceNo;
+
+	private LocalDate invoiceDate;
+
+	private String poCurrency;
+
+	private String lrNo;
+
+	private BigDecimal poExchangeRate;
+
+	// grnimportsummary
+
+	private String receivedBy;
+
+	private String qualityCheckBy;
+
 	private List<GrnDetailsDTO> grnDetailsDTO;
 
 	private List<GrnTaxDetailsDTO> grnTaxDetailsDTO;
 
+	private List<ImportGrnDetailsDTO> importGrnDetailsDTO;
 }

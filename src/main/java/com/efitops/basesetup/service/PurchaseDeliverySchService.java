@@ -111,6 +111,10 @@ public interface PurchaseDeliverySchService {
 
 	String getPurchaseContractDocId(Long orgId, String financialYear);
 
+	Map<String, Object> getImportItemDropDownForPurchaseBill(Long orgId, Long branch, Long supplier, String grnNo) throws ApplicationException;
+
+	String getPurchaseBillDocId(Long orgId, String financialYear);
+
 //	purchase order amendment dropdown
 	
 

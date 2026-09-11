@@ -43,6 +43,7 @@ public class PurchaseBillDetailsDTO {
 
 	private BigDecimal acceptedQty;
 
+	private BigDecimal purchaseorderQty;
 	private BigDecimal rejectedQty;
 
 	private BigDecimal shortageQty;
@@ -51,29 +52,29 @@ public class PurchaseBillDetailsDTO {
 
 	private BigDecimal rateInInr;
 
-	private BigDecimal rateInSelectedCurrency;
+//	private BigDecimal rateInSelectedCurrency;
 
-	private BigDecimal apportionedCost;
+//	private BigDecimal apportionedCost;
 
 	private BigDecimal landedCostRate;
 
-	private BigDecimal amount;
+//	private BigDecimal amount;
 
-	private BigDecimal amountInSelectedCurrency;
+//	private BigDecimal amountInSelectedCurrency;
 
 	private BigDecimal additionalDuty;
 
-	private BigDecimal amountInInr;
+//	private BigDecimal amountInInr;
 
 	private BigDecimal sgstRate;
 
-	private BigDecimal sgstAmount;
+//	private BigDecimal sgstAmount;
 
 	private BigDecimal cgstRate;
 
-	private BigDecimal cgstAmount;
+//	private BigDecimal cgstAmount;
 
 	private BigDecimal igstRate;
 
-	private BigDecimal igstAmount;
+//	private BigDecimal igstAmount;
 }

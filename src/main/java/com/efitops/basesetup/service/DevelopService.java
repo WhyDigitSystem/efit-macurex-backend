@@ -221,9 +221,6 @@ public interface DevelopService {
 
 	Map<String, Object> getCustomerComplaintDropDownForRootCauseAnalysis(Long orgId, Long branch) throws ApplicationException;
 
-	Map<String, Object> getItemDropdownForRootCauseAnalysis(String compino, Long branch, Long orgId)
-			throws ApplicationException;
-
 	Map<String, Object> createUpdateControlPlan(ControlPlanDTO controlPlanDTO) throws ApplicationException;
 
 	List<ControlPlanResponseDTO> getControlPlanByOrgId(Long orgId, Long branch) throws ApplicationException;
@@ -239,6 +236,9 @@ public interface DevelopService {
 	String getControlPlanDocId(Long orgId, String financialYear);
 
 	Map<String, Object> getFGItemDropdownforControlPlan(Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getItemDropdownForRootCauseAnalysis(Long complaintMasterId, Long branch, Long orgId)
+			throws ApplicationException;
 
 	
 	

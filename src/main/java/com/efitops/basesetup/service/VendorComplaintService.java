@@ -9,6 +9,7 @@ import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
+import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -74,5 +75,8 @@ public interface VendorComplaintService {
 	List<Map<String, Object>> getScrapLocationDropdownForDailyInspectionCumRejection(Long branch, Long orgId);
 
 	String getDailyInspectionCumRejectionDataDocId(Long orgId, String financialYear) throws ApplicationException;
+
+//	setupapproval
+	Map<String, Object> updateCreateSetUpApproval(SetUpApprovalDTO setUpApprovalDTO) throws ApplicationException;
 
 }

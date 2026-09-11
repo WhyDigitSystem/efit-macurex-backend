@@ -1,6 +1,5 @@
 package com.efitops.basesetup.ResponseDTO;
 
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,36 +14,35 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BillOfMaterialResponseDTO {
 
-    // ---------- Header Fields ----------
-    private Long id;
-    private String docId;
-    private LocalDate docDate;
-    private String typeOfBom;
-    private String typeOfItem;
-    private Long fgSfgItemCode;
-    private String fgSfgItemDescription;
-    private Integer revisionNo;
-    private String specifications;
-    private String fillDetailsOf;
-    private String fillDetailsOfItem;
-    private LocalDate wef;
-    private String fgReferenceToProfit;
-    private String fmanbou;
+	// ---------- Header Fields ----------
+	private Long id;
+	private String docId;
+	private LocalDate docDate;
+	private String typeOfItem;
+	private Integer revisionNo;
+	private String specifications;
+	private String fillDetailsOf;
+	private LocalDate wef;
+	private String fgReferenceToProfit;
+	private String manufacturing;
+	private String remarks;
 
-    // ---------- Common / Audit Fields ----------
-    private String createdBy;
-    private String updatedBy;
-    private String active;
-    private String cancel;
-    private String cancelRemarks;
-    private String screenName;
-    private String screenCode;
-    private Long orgId;
-    private String financialYear;
+	private ItemMasterDetailsResponseImportDTO fgItem;
+	private ItemMasterDetailsResponseImportDTO fillDetailsOfItem;
 
-    // ---------- Branch ----------
-    private BranchResponseDTO branch;
+	private ListOfValuesResponseDTO typeOfBom;
 
-    // ---------- Child List: Material Details ----------
-    private List<BillOfMaterialDetailsResponseDTO> billOfMaterialDetailsResponseDTO;
+	private String createdBy;
+	private String updatedBy;
+	private String active;
+	private String cancel;
+	private String cancelRemarks;
+	private String screenName;
+	private String screenCode;
+	private Long orgId;
+	private String financialYear;
+
+	private BranchResponseDTO branch;
+
+	private List<BillOfMaterialDetailsResponseDTO> billOfMaterialDetailsResponseDTO;
 }

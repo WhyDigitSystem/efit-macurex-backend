@@ -15,11 +15,8 @@ import lombok.NoArgsConstructor;
 public class BillOfMaterialDetailsResponseDTO {
 
 	private Long id;
-	private Integer sNo;
 
-	private ItemMasterDetailsResponseImportDTO itemCode;
-
-	private String itemDescription;
+	private ItemMasterDetailsResponseImportDTO item;
 	private String itemType;
 
 	private UnitMasterResponseDTO uom;
@@ -28,14 +25,11 @@ public class BillOfMaterialDetailsResponseDTO {
 	private BigDecimal qty;
 	private String manbou;
 
-	private BillOfMaterialResponseDTO sfgBomRefNo;
-
+	private String sfgBomRefNo;
 	private LocalDate sfgBomRefDate;
 
-	private ItemMasterDetailsResponseImportDTO scrapItem;
+	private String scrapItem;
 
 	private UnitMasterResponseDTO scrapUnit;
-
 	private BigDecimal scrapQty;
-	private String idisp;
 }

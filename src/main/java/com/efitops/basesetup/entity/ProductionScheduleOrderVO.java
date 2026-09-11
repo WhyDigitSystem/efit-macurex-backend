@@ -1,5 +1,6 @@
 package com.efitops.basesetup.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -37,7 +38,6 @@ public class ProductionScheduleOrderVO {
 	@Column(name = "production_schedule_order_basic_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
-
 	@Column(name = "doc_id")
 	private String docId;
 
@@ -46,31 +46,39 @@ public class ProductionScheduleOrderVO {
 
 	@Column(name = "order_type")
 	private String orderType;
-	
+
 	@Column(name = "lc_po_no")
 	private String lcPoNo;
-
 
 	@Column(name = "lc_po_date")
 	private LocalDate lcPoDate;
 
-	@Column(name = "fg_sfg_item_code")
-	private Long fgSfgItemCode;
+	@ManyToOne
+	@JoinColumn(name = "fg_itme")
+	private ItemMasterVO fgItem;
 
+	@ManyToOne
+	@JoinColumn(name = "comp_route_no")
+	private ProcessSheetCompRoutingVO compRouteNo;
 
-	@Column(name = "comp_route_no")
-	private String compRouteNo;
+	@Column(name = "batch_qty", precision = 15, scale = 5)
+	private BigDecimal batchQty;
 
-	@Column(name = "bom")
-	private Long bom;
+	@Column(name = "total_qty", precision = 15, scale = 5)
+	private BigDecimal totalQty;
+
+	@Column(name = "short_close")
+	private String shortClose;
+
+	@ManyToOne
+	@JoinColumn(name = "bom")
+	private BillOfMaterialVO bom;
 
 	@Column(name = "schedule_start_date")
 	private LocalDate scheduleStartDate;
 
 	@Column(name = "schedule_end_date")
 	private LocalDate scheduleEndDate;
-	
-	
 
 	// Common fields
 
@@ -104,17 +112,15 @@ public class ProductionScheduleOrderVO {
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
-	
+
 	@OneToMany(mappedBy = "productionScheduleOrderVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<ProductionScheduleOrderDetailsVO> productionScheduleOrderDetailsVO;
 
-
 	@OneToMany(mappedBy = "productionScheduleOrderVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<ScheduleDetailsVO> scheduleDetailsVO;
-	
-	
+
 	@JsonGetter("active")
 	public String getActive() {
 		return active ? "Active" : "In-Active";
@@ -127,6 +133,5 @@ public class ProductionScheduleOrderVO {
 
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-
 
 }

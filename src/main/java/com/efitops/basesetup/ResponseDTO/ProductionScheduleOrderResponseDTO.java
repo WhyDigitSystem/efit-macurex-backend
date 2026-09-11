@@ -22,9 +22,9 @@ public class ProductionScheduleOrderResponseDTO {
     private String orderType;
     private String lcPoNo;
     private LocalDate lcPoDate;
-    private Long fgSfgItemCode;
-    private String compRouteNo;
-    private Long bom;
+    private ItemMasterDetailsResponseImportDTO fgItem;
+    private CompRouteNoResponseDetailsDTO  compRouteNo;
+    private BillOfMaterialResDTO bom;
     private LocalDate scheduleStartDate;
     private LocalDate scheduleEndDate;
 

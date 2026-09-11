@@ -12,20 +12,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BillOfMaterialDetailsDTO {
 
-	private Long id;
-	private Integer sNo;
+	private Long item;
 
-	private Long itemCode;
-	private String itemDescription;
 	private String itemType;
+
 	private Long uom;
+
 	private BigDecimal weight;
+
 	private BigDecimal qty;
+
 	private String manbou;
-	private Long sfgBomRefNo;
+
+	private String sfgBomRefNo;
+
 	private LocalDate sfgBomRefDate;
-	private Long scrapItem;
+
+	private String scrapItem;
+
 	private Long scrapUnit;
+
 	private BigDecimal scrapQty;
-	private String idisp;
+
 }

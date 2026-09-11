@@ -366,6 +366,7 @@ public class PurchaseDeliverySchController extends BaseController {
 	public ResponseEntity<ResponseDTO> updateCreatePurchaseContract(
 
 			@RequestPart("purchaseContractVO") PurchaseContractDTO purchaseContractDTO,
+//			@RequestBody PurchaseContractDTO purchaseContractDTO,
 
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 

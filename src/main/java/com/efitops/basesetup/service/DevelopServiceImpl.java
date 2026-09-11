@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesDetailsResponseDTO;
@@ -44,7 +45,6 @@ import com.efitops.basesetup.ResponseDTO.MachineMasterResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineSpareDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
-import com.efitops.basesetup.ResponseDTO.OperationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OperationMasterResponseforPSCRDTO;
 import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingDetailResponseDTO;
@@ -67,6 +67,8 @@ import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ZeroEntryDetailResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.ControlPlanDTO;
 import com.efitops.basesetup.dto.ControlPlanDetailDTO;
@@ -107,6 +109,8 @@ import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.ToolCategoryDTO;
 import com.efitops.basesetup.dto.ToolCategoryDetailDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
+import com.efitops.basesetup.dto.ZeroEntryDetailDTO;
+import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.ControlPlanDetailVO;
 import com.efitops.basesetup.entity.ControlPlanMachineFixtureVO;
@@ -153,6 +157,8 @@ import com.efitops.basesetup.entity.ToolCategoryDetailVO;
 import com.efitops.basesetup.entity.ToolCategoryVO;
 import com.efitops.basesetup.entity.ToolMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
+import com.efitops.basesetup.entity.ZeroEntryDetailVO;
+import com.efitops.basesetup.entity.ZeroKmFailureEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.ControlPlanDetailRepo;
@@ -213,6 +219,8 @@ import com.efitops.basesetup.repository.SalesReturnRepo;
 import com.efitops.basesetup.repository.ToolCategoryRepo;
 import com.efitops.basesetup.repository.ToolMasterRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
+import com.efitops.basesetup.repository.ZeroEntryDetailRepo;
+import com.efitops.basesetup.repository.ZeroKmFailureEntryRepo;
 
 @Service
 public class DevelopServiceImpl implements DevelopService {
@@ -407,6 +415,12 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	private GradeMasterRepo gradeMasterRepo;
+	
+	@Autowired
+	private ZeroKmFailureEntryRepo zeroKmFailureEntryRepo;
+	
+	@Autowired
+	private ZeroEntryDetailRepo zeroEntryDetailRepo;
 
 //	@Override
 //	@Transactional
@@ -6858,12 +6872,16 @@ public class DevelopServiceImpl implements DevelopService {
 
 		rootCauseAnalysisVO.setComplaintType(rootCauseAnalysisDTO.getComplaintType());
 
-		rootCauseAnalysisVO.setCustomerId(rootCauseAnalysisDTO.getCustomerId());
+		if (ObjectUtils.isNotEmpty(rootCauseAnalysisDTO.getCustomerId())) {
 
-		rootCauseAnalysisVO.setCustomerName(rootCauseAnalysisDTO.getCustomerName());
+		    CustomerVO customerVO = customerRepo
+		            .findById(rootCauseAnalysisDTO.getCustomerId())
+		            .orElseThrow(() ->
+		                    new ApplicationException("Customer Not Found"));
 
-		rootCauseAnalysisVO.setCustomerPartNo(rootCauseAnalysisDTO.getCustomerPartNo());
-
+		    rootCauseAnalysisVO.setCustomerId(customerVO);
+		}
+		
 		rootCauseAnalysisVO.setDetailsOfComplaint(rootCauseAnalysisDTO.getDetailsOfComplaint());
 
 		rootCauseAnalysisVO.setActive(rootCauseAnalysisDTO.isActive());
@@ -6912,20 +6930,37 @@ public class DevelopServiceImpl implements DevelopService {
 
 		if (ObjectUtils.isNotEmpty(rootCauseAnalysisDTO.getComplaintNo())) {
 
-			CustomerComplaintEntryVO complaintVO = customerComplaintRepo.findById(rootCauseAnalysisDTO.getComplaintNo())
-					.orElseThrow(() -> new ApplicationException("Complaint No Not Found"));
+		    CustomerComplaintEntryVO complaintVO =
+		            customerComplaintRepo.findById(
+		                    rootCauseAnalysisDTO.getComplaintNo())
+		            .orElseThrow(() ->
+		                    new ApplicationException("Complaint No Not Found"));
 
-			rootCauseAnalysisVO.setComplaintNo(rootCauseAnalysisDTO.getComplaintNo());
+		    rootCauseAnalysisVO.setComplaintNo(
+		            rootCauseAnalysisDTO.getComplaintNo());
 
-			rootCauseAnalysisVO.setComplaintDate(complaintVO.getComplaintDate());
+		    // Keep values coming from request
+		    rootCauseAnalysisVO.setComplaintDate(
+		            rootCauseAnalysisDTO.getComplaintDate());
 
-			rootCauseAnalysisVO.setComplaintType(complaintVO.getComplaintType());
+		    rootCauseAnalysisVO.setComplaintType(
+		            rootCauseAnalysisDTO.getComplaintType());
 
-			rootCauseAnalysisVO.setDetailsOfComplaint(complaintVO.getDetailsOfComplaint());
+		    rootCauseAnalysisVO.setDetailsOfComplaint(
+		            rootCauseAnalysisDTO.getDetailsOfComplaint());
 
-			rootCauseAnalysisVO.setCustomerId(complaintVO.getCustomer().getId());
+		 
 
-			rootCauseAnalysisVO.setCustomerName(complaintVO.getBuyerName());
+		    if (ObjectUtils.isNotEmpty(rootCauseAnalysisDTO.getCustomerId())) {
+
+		        CustomerVO customerVO =
+		                customerRepo.findById(
+		                        rootCauseAnalysisDTO.getCustomerId())
+		                .orElseThrow(() ->
+		                        new ApplicationException("Customer Not Found"));
+
+		        rootCauseAnalysisVO.setCustomerId(customerVO);
+		    }
 		}
 
 		// =========================
@@ -7003,29 +7038,29 @@ public class DevelopServiceImpl implements DevelopService {
 		// Basic Fields
 		// =========================
 
-		responseDTO.setId(rootCauseAnalysisVO.getId());
+		responseDTO.setComplaintType(
+		        rootCauseAnalysisVO.getComplaintType());
 
-		responseDTO.setDocId(rootCauseAnalysisVO.getDocId());
+		if (ObjectUtils.isNotEmpty(rootCauseAnalysisVO.getCustomerId())) {
 
-		responseDTO.setDocDate(rootCauseAnalysisVO.getDocDate());
+		    CustomerResponse1DTO customerResponse1DTO = new CustomerResponse1DTO();
 
-		responseDTO.setComplaintNo(rootCauseAnalysisVO.getComplaintNo());
+		    customerResponse1DTO.setId(
+		            rootCauseAnalysisVO.getCustomerId().getId());
 
-		responseDTO.setComplaintDate(rootCauseAnalysisVO.getComplaintDate());
+		    customerResponse1DTO.setCustomerName(
+		            rootCauseAnalysisVO.getCustomerId().getCustomerName());
 
-		responseDTO.setItemDescription(rootCauseAnalysisVO.getItemDescription());
+		    responseDTO.setCustomerId(customerResponse1DTO);
+		}
 
-		responseDTO.setComplaintType(rootCauseAnalysisVO.getComplaintType());
+		
 
-		responseDTO.setCustomerId(rootCauseAnalysisVO.getCustomerId());
+		responseDTO.setDetailsOfComplaint(
+		        rootCauseAnalysisVO.getDetailsOfComplaint());
 
-		responseDTO.setCustomerName(rootCauseAnalysisVO.getCustomerName());
-
-		responseDTO.setCustomerPartNo(rootCauseAnalysisVO.getCustomerPartNo());
-
-		responseDTO.setDetailsOfComplaint(rootCauseAnalysisVO.getDetailsOfComplaint());
-
-		responseDTO.setActive(rootCauseAnalysisVO.isActive());
+		responseDTO.setActive(
+		        rootCauseAnalysisVO.isActive());
 
 		// =========================
 		// Summary
@@ -7206,18 +7241,25 @@ public class DevelopServiceImpl implements DevelopService {
 	// dropdown
 
 	@Override
-	public Map<String, Object> getItemDropdownForRootCauseAnalysis(String compino, Long branch, Long orgId)
-			throws ApplicationException {
+	public Map<String, Object> getItemDropdownForRootCauseAnalysis(
+	        Long complaintMasterId, Long branch, Long orgId)
+	        throws ApplicationException {
 
-		List<Object[]> result = customerComplaintRepo.getItemDropdownForRootCauseAnalysis(compino, branch, orgId);
+	    List<Object[]> result =
+	            customerComplaintRepo
+	                    .getItemDropdownForRootCauseAnalysis(
+	                            complaintMasterId,
+	                            branch,
+	                            orgId);
 
-		Map<String, Object> response = new HashMap<>();
+	    Map<String, Object> response = new HashMap<>();
 
-		response.put("itemList", getItemDetails(result));
+	    response.put(
+	            "itemList",
+	            getItemDetails(result));
 
-		return response;
+	    return response;
 	}
-
 	private List<Map<String, Object>> getItemDetails(List<Object[]> result) {
 
 		List<Map<String, Object>> itemList = new ArrayList<>();

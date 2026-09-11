@@ -100,7 +100,7 @@ public class EngineeringDeviationRequestResponseDTO {
 	
 
 	// STATUS DETAILS
-	private String active;
+	private boolean active;
 	private Long orgId;
 	private String createdBy;
 	private String cancelRemarks;

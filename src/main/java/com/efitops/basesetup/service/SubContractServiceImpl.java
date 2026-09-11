@@ -26,6 +26,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.AdvForStoresDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.AdvForStoresResponseDTO;
+import com.efitops.basesetup.ResponseDTO.BomResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassResponseDTO;
@@ -57,6 +60,8 @@ import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.ResponseDTO.WorkOrderResponseDTO;
+import com.efitops.basesetup.dto.AdvForStoresDTO;
+import com.efitops.basesetup.dto.AdvForStoresDetailsDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDetailsDTO;
@@ -80,6 +85,9 @@ import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.dto.SupplierRateContractItemDetailsDTO;
 import com.efitops.basesetup.dto.SupplierRateContractTaxDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
+import com.efitops.basesetup.entity.AdvForStoresDetailsVO;
+import com.efitops.basesetup.entity.AdvForStoresVO;
+import com.efitops.basesetup.entity.BomVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DeliveryChallanCumGatePassDetailsVO;
@@ -112,6 +120,9 @@ import com.efitops.basesetup.entity.SupplierRateContractTaxDetailsVO;
 import com.efitops.basesetup.entity.SupplierRateContractVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.AdvForStoresDetailsRepo;
+import com.efitops.basesetup.repository.AdvForStoresRepo;
+import com.efitops.basesetup.repository.BillOfMaterialRepo;
 import com.efitops.basesetup.repository.BomRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
@@ -261,6 +272,16 @@ public class SubContractServiceImpl implements SubContractService {
 	
 	@Autowired
 	DeliveryChallanCumGatePassDetailsRepo deliveryChallanCumGatePassDetailsRepo;
+	
+	@Autowired
+	AdvForStoresRepo advForStoresRepo;
+	
+	
+	@Autowired
+	BillOfMaterialRepo billOfMaterialRepo;
+	
+	@Autowired
+	AdvForStoresDetailsRepo advForStoresDetailsRepo;
 	
 	@Override
 	@Transactional
@@ -6209,5 +6230,610 @@ public class SubContractServiceImpl implements SubContractService {
 	                                screenCode);
 
 	        return result;
+	    }
+	    
+	    @Override
+	    @Transactional
+	    public Map<String, Object> createUpdateAdvForStores(
+	            AdvForStoresDTO advForStoresDTO) throws ApplicationException {
+
+	        String screenCode = "ADV";
+
+	        Map<String, Object> response = new HashMap<>();
+
+	        String message;
+
+	        AdvForStoresVO advForStoresVO;
+
+	        // =========================================================
+	        // CREATE
+	        // =========================================================
+	        if (ObjectUtils.isEmpty(advForStoresDTO.getId())) {
+
+	            advForStoresVO = new AdvForStoresVO();
+
+	            String docId = advForStoresRepo.getAdvForStoresDocId(
+	                    advForStoresDTO.getOrgId(),
+	                    advForStoresDTO.getFinancialYear(),
+	                    screenCode);
+
+	            advForStoresVO.setDocId(docId);
+
+	            DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                    documentTypeMappingDetailsRepo
+	                            .findByOrgIdAndFinYearAndScreenCode(
+	                                    advForStoresDTO.getOrgId(),
+	                                    advForStoresDTO.getFinancialYear(),
+	                                    screenCode);
+
+	            if (documentTypeMappingDetailsVO != null) {
+
+	                documentTypeMappingDetailsVO.setLastNo(
+	                        documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	                documentTypeMappingDetailsRepo.save(
+	                        documentTypeMappingDetailsVO);
+	            }
+
+	            advForStoresVO.setCreatedBy(
+	                    advForStoresDTO.getCreatedBy());
+
+	            advForStoresVO.setUpdatedBy(
+	                    advForStoresDTO.getCreatedBy());
+
+	            message = "ADV For Stores Created Successfully";
+
+	        } else {
+
+	            // =====================================================
+	            // UPDATE
+	            // =====================================================
+
+	            advForStoresVO = advForStoresRepo
+	                    .findById(advForStoresDTO.getId())
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "ADV For Stores Not Found"));
+
+	            advForStoresVO.setUpdatedBy(
+	                    advForStoresDTO.getCreatedBy());
+
+	            message = "ADV For Stores Updated Successfully";
+	        }
+
+	        // =========================================================
+	        // HEADER + CHILD MAPPING
+	        // =========================================================
+
+	        createUpdateAdvForStoresVOByDTO(
+	                advForStoresDTO,
+	                advForStoresVO);
+
+	        // =========================================================
+	        // SAVE
+	        // =========================================================
+
+	        advForStoresVO = advForStoresRepo.save(advForStoresVO);
+
+	        // =========================================================
+	        // RESPONSE
+	        // =========================================================
+
+	        AdvForStoresResponseDTO responseDTO =
+	                buildAdvForStoresResponse(advForStoresVO);
+
+	        response.put("message", message);
+	        response.put("advForStores", responseDTO);
+
+	        return response;
+	    }
+	    
+	    private void createUpdateAdvForStoresVOByDTO(
+	            AdvForStoresDTO dto,
+	            AdvForStoresVO advForStoresVO) throws ApplicationException {
+
+	        // =========================================================
+	        // BASIC FIELDS
+	        // =========================================================
+
+	        advForStoresVO.setBelongsTo(dto.getBelongsTo());
+	        advForStoresVO.setTime(dto.getTime());
+
+	        advForStoresVO.setRemarks(dto.getRemarks());
+
+	        advForStoresVO.setOrgId(dto.getOrgId());
+	        advForStoresVO.setFinancialYear(dto.getFinancialYear());
+
+	        advForStoresVO.setActive(dto.isActive());
+
+	        advForStoresVO.setCancelRemarks(dto.getCancelRemarks());
+
+	        advForStoresVO.setScreenName("ADV FOR STORES");
+	        advForStoresVO.setScreenCode("ADV");
+
+	        // =========================================================
+	        // BRANCH
+	        // =========================================================
+
+	        if (dto.getBranch() != null && dto.getBranch() != 0) {
+
+	            BranchVO branch = branchRepo.findById(dto.getBranch())
+	                    .orElseThrow(() ->
+	                            new ApplicationException("Branch Not Found"));
+
+	            advForStoresVO.setBranch(branch);
+	        }
+
+	        // =========================================================
+	        // CUSTOMER
+	        // =========================================================
+
+	        if (dto.getCustomer() != null && dto.getCustomer() != 0) {
+
+	            CustomerVO customer = customerRepo.findById(dto.getCustomer())
+	                    .orElseThrow(() ->
+	                            new ApplicationException("Customer Not Found"));
+
+	            advForStoresVO.setCustomer(customer);
+	        }
+
+	        // =========================================================
+	        // INCOMING PART NO / ITEM
+	        // =========================================================
+
+	        if (dto.getIncomingPartNo() != null
+	                && dto.getIncomingPartNo() != 0) {
+
+	            ItemMasterVO item = itemMasterRepo
+	                    .findById(dto.getIncomingPartNo())
+	                    .orElseThrow(() ->
+	                            new ApplicationException("Incoming Part Not Found"));
+
+	            advForStoresVO.setIncomingPartNo(item);
+	        }
+
+	        // =========================================================
+	        // BOM
+	        // =========================================================
+
+	        if (dto.getBom() != null && dto.getBom() != 0) {
+
+	            BomVO bom = bomRepo.findById(dto.getBom())
+	                    .orElseThrow(() ->
+	                            new ApplicationException("BOM Not Found"));
+
+	            advForStoresVO.setBom(bom);
+	        }
+
+	        // =========================================================
+	        // PREPARED BY
+	        // =========================================================
+
+	        if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
+
+	            EmployeeMasterVO employee = employeeMasterRepo
+	                    .findById(dto.getPreparedBy())
+	                    .orElseThrow(() ->
+	                            new ApplicationException("Prepared By Not Found"));
+
+	            advForStoresVO.setPreparedBy(employee);
+	        }
+
+	        // =========================================================
+	        // DELETE OLD CHILDREN DURING UPDATE
+	        // =========================================================
+
+	        if (dto.getId() != null) {
+
+	            List<AdvForStoresDetailsVO> oldList =
+	                    advForStoresDetailsRepo
+	                            .findByAdvForStoresVO(advForStoresVO);
+
+	            if (oldList != null && !oldList.isEmpty()) {
+	                advForStoresDetailsRepo.deleteAll(oldList);
+	            }
+	        }
+
+	        // =========================================================
+	        // CHILD DETAILS
+	        // =========================================================
+
+	        List<AdvForStoresDetailsVO> detailList =
+	                new ArrayList<>();
+
+	        if (dto.getAdvForStoresDetails() != null
+	                && !dto.getAdvForStoresDetails().isEmpty()) {
+
+	            for (AdvForStoresDetailsDTO detailDTO :
+	                    dto.getAdvForStoresDetails()) {
+
+	                AdvForStoresDetailsVO detailVO =
+	                        new AdvForStoresDetailsVO();
+
+	                // -------------------------------------------------
+	                // ITEM
+	                // -------------------------------------------------
+
+	                if (detailDTO.getItem() != null
+	                        && detailDTO.getItem() != 0) {
+
+	                    ItemMasterVO item = itemMasterRepo
+	                            .findById(detailDTO.getItem())
+	                            .orElseThrow(() ->
+	                                    new ApplicationException(
+	                                            "Item Not Found"));
+
+	                    detailVO.setItem(item);
+	                }
+
+	                // -------------------------------------------------
+	                // UNIT
+	                // -------------------------------------------------
+
+	                if (detailDTO.getUnit() != null
+	                        && detailDTO.getUnit() != 0) {
+
+	                    UnitMasterVO unit = unitMasterRepo
+	                            .findById(detailDTO.getUnit())
+	                            .orElseThrow(() ->
+	                                    new ApplicationException(
+	                                            "Unit Not Found"));
+
+	                    detailVO.setUnit(unit);
+	                }
+
+	                // -------------------------------------------------
+	                // QUANTITY
+	                // -------------------------------------------------
+
+	                detailVO.setBomQty(detailDTO.getBomQty());
+
+	                detailVO.setIssueQty(detailDTO.getIssueQty());
+
+	                // -------------------------------------------------
+	                // PARENT MAPPING
+	                // -------------------------------------------------
+
+	                detailVO.setAdvForStoresVO(advForStoresVO);
+
+	                detailList.add(detailVO);
+	            }
+
+	            // -----------------------------------------------------
+	            // SET CHILD LIST
+	            // -----------------------------------------------------
+
+	            advForStoresVO.setAdvForStoresDetailsVO(detailList);
+	        }
+	    }
+	    
+	    
+	    
+	    private AdvForStoresResponseDTO buildAdvForStoresResponse(
+	            AdvForStoresVO vo) {
+
+	        AdvForStoresResponseDTO response =
+	                new AdvForStoresResponseDTO();
+
+	        // =========================================================
+	        // HEADER
+	        // =========================================================
+
+	        response.setId(vo.getId());
+
+	        response.setDocId(vo.getDocId());
+
+	        response.setDocDate(vo.getDocDate());
+
+	        response.setBelongsTo(vo.getBelongsTo());
+
+	        response.setDocNo(vo.getDocId());
+
+	        response.setTime(vo.getTime());
+
+	        response.setRemarks(vo.getRemarks());
+
+	        response.setCreatedBy(vo.getCreatedBy());
+
+	        response.setUpdatedBy(vo.getUpdatedBy());
+
+	        response.setCancelRemarks(vo.getCancelRemarks());
+
+	        response.setActive(vo.isActive());
+
+
+	        response.setScreenName(vo.getScreenName());
+
+	        response.setScreenCode(vo.getScreenCode());
+
+	        response.setOrgId(vo.getOrgId());
+
+	        response.setFinancialYear(vo.getFinancialYear());
+
+
+	        // =========================================================
+	        // BRANCH
+	        // =========================================================
+
+	        if (vo.getBranch() != null) {
+
+	            BranchResponseDTO branch =
+	                    new BranchResponseDTO();
+
+	            branch.setId(vo.getBranch().getId());
+
+	            branch.setBranchCode(
+	                    vo.getBranch().getBranchCode());
+
+	            branch.setBranchName(
+	                    vo.getBranch().getBranchName());
+
+	            response.setBranch(branch);
+	        }
+
+
+	        // =========================================================
+	        // CUSTOMER
+	        // =========================================================
+
+	        if (vo.getCustomer() != null) {
+
+	            CustomerDropdownResponseDTO customer =
+	                    new CustomerDropdownResponseDTO();
+
+	            customer.setCustomerId(
+	                    vo.getCustomer().getId());
+
+	            customer.setCustomerCode(
+	                    vo.getCustomer().getCustomerCode());
+
+	            customer.setCustomerName(
+	                    vo.getCustomer().getCustomerName());
+	            
+	            customer.setAddress(vo.getCustomer().getAddress());
+	            customer.setGstNo(vo.getCustomer().getGstNo());
+//	            customer.setGstState(vo.getCustomer().getGstState());
+
+	            response.setCustomer(customer);
+	        }
+
+
+	        // =========================================================
+	        // INCOMING PART NO
+	        // =========================================================
+
+	        if (vo.getIncomingPartNo() != null) {
+
+	            ItemResponseDTO item =
+	                    new ItemResponseDTO();
+
+	            item.setId(
+	                    vo.getIncomingPartNo().getId());
+
+	            item.setItemCode(
+	                    vo.getIncomingPartNo().getItemCode());
+
+	            item.setItemDescription(
+	                    vo.getIncomingPartNo().getItemDescription());
+
+	            response.setIncomingPartNo(item);
+	        }
+
+
+	        // =========================================================
+	        // BOM
+	        // =========================================================
+
+	        if (vo.getBom() != null) {
+
+	            BomResponseDTO bom = new BomResponseDTO();
+
+	            bom.setId(vo.getBom().getId());
+	            bom.setProductType(vo.getBom().getProductType());
+	            bom.setProductCode(vo.getBom().getProductCode());
+	            bom.setProductName(vo.getBom().getProductName());
+	            bom.setUom(vo.getBom().getUom());
+	            bom.setQty(vo.getBom().getQty());
+
+	            response.setBom(bom);
+	        }
+
+
+	        // =========================================================
+	        // PREPARED BY
+	        // =========================================================
+
+	        if (vo.getPreparedBy() != null) {
+
+	            EmployeeResponseDTO employee =
+	                    new EmployeeResponseDTO();
+
+	            employee.setId(vo.getPreparedBy().getId());
+	            employee.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+
+	            response.setPreparedBy(employee);
+	        }
+
+
+	        // =========================================================
+	        // CHILD DETAILS
+	        // =========================================================
+
+	        List<AdvForStoresDetailsResponseDTO> detailsResponse =
+	                new ArrayList<>();
+
+	        if (vo.getAdvForStoresDetailsVO() != null) {
+
+	            for (AdvForStoresDetailsVO detailVO :
+	                    vo.getAdvForStoresDetailsVO()) {
+
+	                AdvForStoresDetailsResponseDTO detailResponse =
+	                        new AdvForStoresDetailsResponseDTO();
+
+	                detailResponse.setId(detailVO.getId());
+
+	                detailResponse.setBomQty(
+	                        detailVO.getBomQty());
+
+	                detailResponse.setIssueQty(
+	                        detailVO.getIssueQty());
+
+
+	                // =================================================
+	                // ITEM
+	                // =================================================
+
+	                if (detailVO.getItem() != null) {
+
+	                    ItemResponseDTO item =
+	                            new ItemResponseDTO();
+
+	                    item.setId(
+	                            detailVO.getItem().getId());
+
+	                    item.setItemCode(
+	                            detailVO.getItem().getItemCode());
+
+	                    item.setItemDescription(
+	                            detailVO.getItem().getItemDescription());
+
+	                    detailResponse.setItem(item);
+	                }
+
+
+	                // =================================================
+	                // UNIT
+	                // =================================================
+
+	                if (detailVO.getUnit() != null) {
+
+	                    UnitMasterResponseDTO unit =
+	                            new UnitMasterResponseDTO();
+
+	                    unit.setId(
+	                            detailVO.getUnit().getId());
+
+	                    unit.setUnitId(
+	                            detailVO.getUnit().getUnitId());
+
+	                    unit.setUnitDescription(
+	                            detailVO.getUnit().getDescription());
+	                    
+	                    detailResponse.setUnit(unit);
+	                }
+
+	                detailsResponse.add(detailResponse);
+	            }
+	        }
+
+	        response.setAdvForStoresDetails(detailsResponse);
+
+	        return response;
+	    }
+	    
+	    @Override
+	    public List<Map<String, Object>> getLatestBomDropdown(
+	            Long itemId,
+	            Long orgId,
+	            Long branch) throws ApplicationException {
+
+	        List<Object[]> result =
+	                billOfMaterialRepo.getLatestBomDropdown(
+	                        itemId,
+	                        orgId,
+	                        branch);
+
+	        if (result == null || result.isEmpty()) {
+	            throw new ApplicationException("BOM Not Found");
+	        }
+
+	        List<Map<String, Object>> bomDetails = new ArrayList<>();
+
+	        for (Object[] obj : result) {
+
+	            Map<String, Object> bomMap = new HashMap<>();
+
+	            bomMap.put("id", obj[0]);
+	            bomMap.put("docId", obj[1]);
+	            bomMap.put("docDate", obj[2]);
+
+	            bomDetails.add(bomMap);
+	        }
+
+	        return bomDetails;
+	    }
+	    
+	    @Override
+	    public List<Map<String, Object>> getBomDetailsByDocId(
+	            String docId,
+	            Long orgId,
+	            Long branch) throws ApplicationException {
+
+	        List<Object[]> result =
+	        		billOfMaterialRepo.getBomDetailsByDocId(
+	                        docId,
+	                        orgId,
+	                        branch);
+
+	        if (result == null || result.isEmpty()) {
+	            throw new ApplicationException("BOM Details Not Found");
+	        }
+
+	        List<Map<String, Object>> details = new ArrayList<>();
+
+	        for (Object[] fs : result) {
+
+	            Map<String, Object> map = new HashMap<>();
+
+	            map.put("bomDetailsId", fs[0]);
+
+	            map.put("itemId", fs[1]);
+	            map.put("itemCode", fs[2]);
+	            map.put("itemDescription", fs[3]);
+
+	            map.put("itemType", fs[4]);
+	            map.put("manbou", fs[5]);
+	            map.put("qty", fs[6]);
+
+	            map.put("unitId", fs[7]);
+	            map.put("unitCode", fs[8]);
+	            map.put("unitDescription", fs[9]);
+
+	            map.put("bomId", fs[10]);
+
+	            details.add(map);
+	        }
+
+	        return details;
+	    }
+	    
+	    @Override
+	    public List<Map<String, Object>> getFGAndSFGItems(
+	            Long orgId, Long branch) throws ApplicationException {
+
+	        List<Object[]> result =
+	                itemMasterRepo.getFGAndSFGItems(orgId, branch);
+
+	        if (result == null || result.isEmpty()) {
+	            throw new ApplicationException("FG / SFG Items Not Found");
+	        }
+
+	        List<Map<String, Object>> details = new ArrayList<>();
+
+	        for (Object[] fs : result) {
+
+	            Map<String, Object> map = new HashMap<>();
+
+	            map.put("itemCode", fs[0]);
+	            map.put("itemDescription", fs[1]);
+	            map.put("itemId", fs[2]);
+	            map.put("unitmasterId", fs[3]);
+	            map.put("unitId", fs[4]);
+	            map.put("unitDescription", fs[5]);
+
+	            details.add(map);
+	        }
+
+	        return details;
 	    }
 }

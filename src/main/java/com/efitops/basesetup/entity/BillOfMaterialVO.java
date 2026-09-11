@@ -51,7 +51,7 @@ public class BillOfMaterialVO {
 	private String typeOfItem;
 
 	@ManyToOne
-	@JoinColumn(name = "fg_itme")
+	@JoinColumn(name = "fg_item")
 	private ItemMasterVO fgItem;
 	
 

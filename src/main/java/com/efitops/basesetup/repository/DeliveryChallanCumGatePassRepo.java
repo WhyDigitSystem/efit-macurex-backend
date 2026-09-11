@@ -71,5 +71,14 @@ public interface DeliveryChallanCumGatePassRepo  extends JpaRepository<DeliveryC
 	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
 	String getDeliveryChallanCumGatePassDocId(Long orgId, String financialYear, String screenCode);
 
+
+	@Query(value = """
+			SELECT *
+			FROM delivery_challan_cum_gate_pass
+			WHERE org_id = :orgId
+			  AND branch = :branch
+			  AND cancel = 0 and active=1
+			ORDER BY delivery_challan_cum_gate_pass_id DESC
+			""", nativeQuery = true)
 	List<DeliveryChallanCumGatePassVO> findByOrgIdAndBranch(Long orgId, Long branch);
 }

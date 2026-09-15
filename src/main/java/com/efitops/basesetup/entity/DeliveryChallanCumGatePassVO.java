@@ -82,9 +82,8 @@ public class DeliveryChallanCumGatePassVO {
     @Column(name = "vehicle_no")
     private String vehicleNo;
 
-    @ManyToOne
-    @JoinColumn(name = "work_order_no")
-    private JobOrderVO workOrderNo;
+    @Column(name = "work_order_no")
+    private String workOrderNo;
 
     @Column(name = "total_qty", precision = 10, scale = 2)
     private BigDecimal totalQty;

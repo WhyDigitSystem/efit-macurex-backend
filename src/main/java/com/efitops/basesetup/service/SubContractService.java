@@ -6,19 +6,24 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.AdvForStoresResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DeliveryChallanCapitalItemsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.JobOrderShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.dto.AdvForStoresDTO;
+import com.efitops.basesetup.dto.DeliveryChallanCapitalItemsDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
+import com.efitops.basesetup.dto.JobOrderShortCloseDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
@@ -148,5 +153,32 @@ public interface SubContractService {
 	List<Map<String, Object>> getFGAndSFGItems(Long orgId, Long branch) throws ApplicationException;
 
 	List<Map<String, Object>> getBomDetailsByDocId(String docId, Long orgId, Long branch) throws ApplicationException;
+
+	AdvForStoresResponseDTO getAdvForStoresById(Long id) throws ApplicationException;
+
+	List<AdvForStoresResponseDTO> getAdvForStoresByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	String getAdvForStoresDocId(Long orgId, String financialYear);
+
+	Map<String, Object> createUpdateJobOrderShortClose(JobOrderShortCloseDTO jobOrderShortCloseDTO) throws ApplicationException;
+
+	List<Map<String, Object>> getTotalSuppliedQtyforJobOrderClose(Long orgId, Long branch, String jobOrderNo,
+			Long item);
+
+	JobOrderShortCloseResponseDTO getJobOrderShortCloseById(Long id) throws ApplicationException;
+
+	List<JobOrderShortCloseResponseDTO> getJobOrderShortCloseByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	String getJobOrderShortCloseDocId(Long orgId, String financialYear);
+
+	Map<String, Object> createUpdateDeliveryChallanCapitalItems(DeliveryChallanCapitalItemsDTO dto)
+			throws ApplicationException;
+
+	DeliveryChallanCapitalItemsResponseDTO getDeliveryChallanCapitalItemsById(Long id) throws ApplicationException;
+
+	String getDeliveryChallanCapitalItemsDocId(Long orgId, String financialYear);
+
+	List<DeliveryChallanCapitalItemsResponseDTO> getDeliveryChallanCapitalItemsByOrgIdAndBranch(Long orgId,
+			Long branch) throws ApplicationException;
 
 }

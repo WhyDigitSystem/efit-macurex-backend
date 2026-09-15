@@ -6,6 +6,6 @@ import com.efitops.basesetup.entity.SetUpApprovalVO;
 
 public interface SetUpApprovalRepo extends JpaRepository<SetUpApprovalVO, Long>{
 
-	String getSetUpApprovalDocId(Long orgId, String financialYear, String screenCode);
+//	String getSetUpApprovalDocId(Long orgId, String financialYear, String screenCode);
 
 }

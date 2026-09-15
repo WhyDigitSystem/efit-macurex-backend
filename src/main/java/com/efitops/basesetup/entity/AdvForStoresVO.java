@@ -1,7 +1,6 @@
 package com.efitops.basesetup.entity;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -63,8 +62,8 @@ public class AdvForStoresVO {
     private ItemMasterVO incomingPartNo;
     
     @ManyToOne
-    @JoinColumn(name = "bom")
-    private BomVO bom;
+    @JoinColumn(name = "bill_of_material")
+    private BillOfMaterialVO bom;
 
     @Column(name = "time")
     private String time;

@@ -31,7 +31,8 @@ public class PurchaseBillDTO {
 	private BigDecimal exchangeRate;
 	private Long dealerType;
 	private String purchaseorderType;
-	private Long purchaseorderId;
+	private String purchaseorderNumber;
+	private LocalDate purchaseorderDate;
 
 	private boolean isIgstApplicable;
 

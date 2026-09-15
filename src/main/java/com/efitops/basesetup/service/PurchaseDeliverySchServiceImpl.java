@@ -220,7 +220,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 	@Autowired
 	LocationRepo locationRepo;
 
-  @Autowired
+	@Autowired
 	private GSTStateMasterRepo gstStateMasterRepo;
 
 	@Autowired
@@ -240,7 +240,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 	@Autowired
 	private ImportPurchaseBillChargesSummaryRepo importPurchaseBillChargesSummaryRepo;
-  
+
 	@Override
 	@Transactional
 	public Map<String, Object> updateCreatePurchaseDeliverySchedule(
@@ -1496,19 +1496,15 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		return responseList;
 	}
-	
+
 	@Override
 	public String getPurchaseContractDocId(Long orgId, String financialYear) {
 
-	    String screenCode = "PC";
+		String screenCode = "PC";
 
-	    String result =
-	            purchaseContractRepo.getPurchaseContractDocId(
-	                    orgId,
-	                    financialYear,
-	                    screenCode);
+		String result = purchaseContractRepo.getPurchaseContractDocId(orgId, financialYear, screenCode);
 
-	    return result;
+		return result;
 	}
 
 //	supplier dropdown for Purchase contract
@@ -1645,28 +1641,28 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 			purchaseBillVO = new PurchaseBillVO();
 
-//	        String docId = purchaseBillRepo.getPurchaseBillDocId(
-//	                purchaseBillDTO.getOrgId(),
-//	                purchaseBillDTO.getFinancialYear(),
-//	                screenCode);
-//
-//	        purchaseBillVO.setDocId(docId);
-//
-//	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
-//	                documentTypeMappingDetailsRepo
-//	                        .findByOrgIdAndFinYearAndScreenCode(
-//	                                purchaseBillDTO.getOrgId(),
-//	                                purchaseBillDTO.getFinancialYear(),
-//	                                screenCode);
+	        String docId = purchaseBillRepo.getPurchaseBillDocId(
+	                purchaseBillDTO.getOrgId(),
+	                purchaseBillDTO.getFinancialYear(),
+	                screenCode);
 
-//	        if (documentTypeMappingDetailsVO != null) {
-//
-//	            documentTypeMappingDetailsVO.setLastNo(
-//	                    documentTypeMappingDetailsVO.getLastNo() + 1);
-//
-//	            documentTypeMappingDetailsRepo.save(
-//	                    documentTypeMappingDetailsVO);
-//	        }
+	        purchaseBillVO.setDocId(docId);
+
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo
+	                        .findByOrgIdAndFinYearAndScreenCode(
+	                                purchaseBillDTO.getOrgId(),
+	                                purchaseBillDTO.getFinancialYear(),
+	                                screenCode);
+
+	        if (documentTypeMappingDetailsVO != null) {
+
+	            documentTypeMappingDetailsVO.setLastNo(
+	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	            documentTypeMappingDetailsRepo.save(
+	                    documentTypeMappingDetailsVO);
+	        }
 
 			purchaseBillVO.setCreatedBy(purchaseBillDTO.getCreatedBy());
 
@@ -1723,6 +1719,10 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		vo.setExchangeRate(dto.getExchangeRate());
 
 		vo.setPurchaseorderType(dto.getPurchaseorderType());
+		vo.setPurchaseorderNumber(dto.getPurchaseorderNumber());
+		vo.setPurchaseorderDate(dto.getPurchaseorderDate());
+
+		vo.setPurchaseorderType(dto.getPurchaseorderType());
 
 		vo.setReverseChrg(dto.isReverseChrg());
 
@@ -1771,7 +1771,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 			vo.setBranch(branch);
 		}
-		
+
 		if (dto.getCurrency() != null && dto.getCurrency() > 0) {
 
 			CurrencyVO currency = currencyRepo.findById(dto.getCurrency())
@@ -1796,10 +1796,10 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		// Purchase Order
 		// ======================================================
 
-		if (dto.getPurchaseorderId() != null) {
-
-			vo.setPurchaseorderNumber(dto.getPurchaseorderId().toString());
-		}
+//		if (dto.getPurchaseorderId() != null) {
+//
+//			vo.setPurchaseorderNumber(dto.getPurchaseorderId().toString());
+//		}
 
 		// ======================================================
 		// UPDATE - DELETE OLD CHILDREN
@@ -2122,9 +2122,10 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 				BigDecimal landCostInr = BigDecimal.ZERO;
 
-				if (detailsDTO.getAccptQty() != null && valueInr != null && valueInr.compareTo(BigDecimal.ZERO) != 0) {
+				if (detailsDTO.getAccptQty() != null && detailsDTO.getAccptQty().compareTo(BigDecimal.ZERO) != 0
+						&& valueInr != null) {
 
-					landCostInr = detailsDTO.getAccptQty().divide(valueInr, 2, RoundingMode.HALF_UP);
+					landCostInr = valueInr.divide(detailsDTO.getAccptQty(), 2, RoundingMode.HALF_UP);
 				}
 
 				detailsVO.setLandCostInr(landCostInr);
@@ -2283,12 +2284,12 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		if (purchaseBillVO.getCurrency() != null) {
 
-		    CurrencyResponseDTO currencyResponseDTO = new CurrencyResponseDTO();
+			CurrencyResponseDTO currencyResponseDTO = new CurrencyResponseDTO();
 
-		    currencyResponseDTO.setId(purchaseBillVO.getCurrency().getId());
-		    currencyResponseDTO.setCurrencyName(purchaseBillVO.getCurrency().getCurrency());
+			currencyResponseDTO.setId(purchaseBillVO.getCurrency().getId());
+			currencyResponseDTO.setCurrencyName(purchaseBillVO.getCurrency().getCurrency());
 
-		    response.setCurrency(currencyResponseDTO);
+			response.setCurrency(currencyResponseDTO);
 		}
 		response.setPurchaseorderType(purchaseBillVO.getPurchaseorderType());
 		response.setReverseChrg(purchaseBillVO.isReverseChrg());
@@ -2705,6 +2706,19 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		return result;
 	}
 
+	@Override
+	public String getPurchaseBillDocId(Long orgId, String financialYear) {
+
+	    String screenCode = "PB";
+
+	    String result = purchaseBillRepo.getPurchaseBillDocId(
+	            orgId,
+	            financialYear,
+	            screenCode
+	    );
+
+	    return result;
+	}
 //	 grnno dropdown
 	@Override
 	public Map<String, Object> getGrnNoDropdownforPurchaseBill(Long orgId, Long branch, Long supplier)

@@ -366,6 +366,7 @@ public class PurchaseDeliverySchController extends BaseController {
 	public ResponseEntity<ResponseDTO> updateCreatePurchaseContract(
 
 			@RequestPart("purchaseContractVO") PurchaseContractDTO purchaseContractDTO,
+//			@RequestBody PurchaseContractDTO purchaseContractDTO,
 
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -694,6 +695,66 @@ public class PurchaseDeliverySchController extends BaseController {
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getPurchaseBillDocId")
+	public ResponseEntity<ResponseDTO> getPurchaseBillDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName = "getPurchaseBillDocId()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String mapp = "";
+
+	    try {
+
+	        mapp = purchaseDeliverySchService.getPurchaseBillDocId(
+	                orgId,
+	                financialYear
+	        );
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg
+	        );
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Purchase Bill DocId information retrieved successfully"
+	        );
+
+	        responseObjectsMap.put("purchaseBillDocId", mapp);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to retrieve Purchase Bill DocId",
+	                errorMsg
+	        );
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
 	}
 
 //	grn no dropdown for the purchase bill

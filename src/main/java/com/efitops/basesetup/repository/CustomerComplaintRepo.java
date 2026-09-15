@@ -30,16 +30,7 @@ public interface CustomerComplaintRepo extends JpaRepository<CustomerComplaintEn
 
 	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
 	String getCustomerComplaintDocId(Long orgId, String financialYear, String screenCode);
-
-	
-	
-	
-
-
-
-
-
-
+		
 //	Optional<CustomerComplaintEntryVO> findBycustomercomplaintmasteid(
 //	        String complaintNo);
 
@@ -73,22 +64,22 @@ public interface CustomerComplaintRepo extends JpaRepository<CustomerComplaintEn
 		        @Param("branch") Long branch);
 		
 		@Query(value = """
-			    SELECT
-			        I.item_id AS itemMasterId,
-			        I.item_code AS itemId,
-			        I.item_description AS itemDesc,
-			        I.customer_part_no AS cpartno
-			    FROM customercomplaintmaster CM
-			    JOIN item I
-			        ON I.item_id = CM.item
-			    WHERE CM.complaint_no = :compino
-			      AND CM.branch = :branch
-			      AND CM.org_id = :orgId
-			    """, nativeQuery = true)
-			List<Object[]> getItemDropdownForRootCauseAnalysis(
-			        @Param("compino") String compino,
-			        @Param("branch") Long branch,
-			        @Param("orgId") Long orgId);
+		        SELECT
+		            I.item_id AS itemMasterId,
+		            I.item_code AS itemId,
+		            I.item_description AS itemDesc,
+		            I.customer_part_no AS cpartno
+		        FROM customercomplaintmaster CM
+		        JOIN item I
+		            ON I.item_id = CM.item
+		        WHERE CM.customercomplaintmaster_id = :complaintMasterId
+		          AND CM.branch = :branch
+		          AND CM.org_id = :orgId
+		        """, nativeQuery = true)
+		List<Object[]> getItemDropdownForRootCauseAnalysis(
+		        @Param("complaintMasterId") Long complaintMasterId,
+		        @Param("branch") Long branch,
+		        @Param("orgId") Long orgId);
 		
 		
 		

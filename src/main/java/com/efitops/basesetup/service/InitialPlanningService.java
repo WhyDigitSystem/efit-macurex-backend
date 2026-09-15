@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.efitops.basesetup.ResponseDTO.InitialPlanningResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OperationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProblemSolvingEntryResponseDTO;
 import com.efitops.basesetup.dto.InitialPlanningDTO;
 import com.efitops.basesetup.dto.OperationMasterDTO;
 import com.efitops.basesetup.dto.ProblemSolvingEntryDTO;
@@ -41,5 +42,11 @@ public interface InitialPlanningService {
 	OperationMasterResponseDTO getOperationMasterById(Long id) throws ApplicationException;
 
 	List<OperationMasterResponseDTO> getOperationMasterByOrgId(Long orgId) throws ApplicationException;
+
+	ProblemSolvingEntryResponseDTO getProblemSolvingEntryById(Long id) throws ApplicationException;
+
+
+	List<ProblemSolvingEntryResponseDTO> getProblemSolvingEntryByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
 
 }

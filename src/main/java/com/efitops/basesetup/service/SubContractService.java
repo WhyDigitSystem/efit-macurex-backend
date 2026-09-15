@@ -14,6 +14,7 @@ import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResp
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
+import com.efitops.basesetup.dto.AdvForStoresDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
@@ -137,5 +138,15 @@ public interface SubContractService {
 	List<DeliveryChallanCumGatePassResponseDTO> getDeliveryChallanCumGatePassByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
 
 	String getDeliveryChallanCumGatePassDocId(Long orgId, String financialYear);
+
+	Map<String, Object> createUpdateAdvForStores(AdvForStoresDTO advForStoresDTO) throws ApplicationException;
+
+	List<Map<String, Object>> getLatestBomDropdown(Long itemId, Long orgId, Long branch) throws ApplicationException;
+
+//	List<Map<String, Object>> getLatestBomDetailsByProductCode(String productCode, Long orgId, String branch) throws ApplicationException;
+
+	List<Map<String, Object>> getFGAndSFGItems(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getBomDetailsByDocId(String docId, Long orgId, Long branch) throws ApplicationException;
 
 }

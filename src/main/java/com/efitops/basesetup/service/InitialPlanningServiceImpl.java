@@ -1415,6 +1415,39 @@ public class InitialPlanningServiceImpl implements InitialPlanningService {
 		return result;
 	}
 
+	@Override
+	public ProblemSolvingEntryResponseDTO getProblemSolvingEntryById(Long id) throws ApplicationException {
+
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ApplicationException("Invalid Id");
+		}
+
+		ProblemSolvingEntryVO problemSolvingEntryVO = problemSolvingEntryRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Problem Solving Entry Not Found"));
+
+		return problemSolvingEntryResponse(problemSolvingEntryVO);
+	}
+
+	@Override
+	public List<ProblemSolvingEntryResponseDTO> getProblemSolvingEntryByOrgId(Long orgId,Long branch) throws ApplicationException {
+
+		List<ProblemSolvingEntryVO> problemSolvingEntryList = problemSolvingEntryRepo
+				.getProblemSolvingEntryByOrgId(orgId,branch);
+
+		if (problemSolvingEntryList.isEmpty()) {
+			throw new ApplicationException("No Problem Solving Entry Details Found");
+		}
+
+		List<ProblemSolvingEntryResponseDTO> responseList = new ArrayList<>();
+
+		for (ProblemSolvingEntryVO problemSolvingEntryVO : problemSolvingEntryList) {
+
+			responseList.add(problemSolvingEntryResponse(problemSolvingEntryVO));
+		}
+
+		return responseList;
+	}
+
 //	dropdown for teammember1,teamember2 and prepared by and responsible
 	@Override
 	public Map<String, Object> getTeamMemberDropdownForProblemSolvingEntry(Long branch, Long department, Long orgId)

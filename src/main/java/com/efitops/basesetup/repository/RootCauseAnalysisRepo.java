@@ -17,6 +17,7 @@ public interface RootCauseAnalysisRepo extends JpaRepository<RootCauseAnalysisVO
 		        @Param("orgId") Long orgId,
 		        @Param("branch") Long branch);
 
+
 	@Query(nativeQuery = true, value = """
 	        SELECT concat(prefix, lpad(last_no, 5, 0)) AS docid
 	        FROM documenttypemapping_details

@@ -44,8 +44,7 @@ public class RootCauseAnalysisVO {
 	private BranchVO branch;
 	
 	@Column(name = "doc_id")
-    private String docId;
-	
+    private String docId;	
 	 @Column(name = "doc_date")
 	 private LocalDate docDate;
 	 
@@ -65,8 +64,9 @@ public class RootCauseAnalysisVO {
 	 @Column(name = "complaint_type")
 	 private String complaintType;
 	 
-	 @Column(name = "customer_id")
-	 private Long customerId;
+	 @ManyToOne
+	 @JoinColumn(name = "customer_id")
+	 private CustomerVO customerId;
 	 
 	 @Column(name = "customer_name")
 	 private String customerName;

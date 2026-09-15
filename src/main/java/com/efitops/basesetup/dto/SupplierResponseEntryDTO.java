@@ -1,8 +1,6 @@
 package com.efitops.basesetup.dto;
 
-import java.time.LocalDate;
-
-import javax.persistence.Column;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,5 +36,7 @@ public class SupplierResponseEntryDTO {
 	private String cancelRemarks;
 	
 	private String remarks;
+	
+	private List<SupplierResponseEntryDetailsDTO> supplierResponseEntryDetailsDTO;
 
 }

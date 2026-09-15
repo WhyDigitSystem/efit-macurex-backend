@@ -57,6 +57,7 @@ import com.efitops.basesetup.dto.SalesZoneMasterDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
+import com.efitops.basesetup.dto.ShiftDTO;
 import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TSBankDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDTO;
@@ -82,6 +83,7 @@ import com.efitops.basesetup.entity.ListOfValuesVO;
 import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
+import com.efitops.basesetup.entity.ShiftVO;
 import com.efitops.basesetup.entity.StateVO;
 import com.efitops.basesetup.entity.TSBankVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
@@ -3209,4 +3211,83 @@ public class CommonMasterController extends BaseController {
 
 	    return ResponseEntity.ok().body(responseDTO);
 	}
+	
+	
+	// Shiftmaster-
+
+		@GetMapping("/getShiftByOrgId")
+		public ResponseEntity<ResponseDTO> getShiftByOrgId(@RequestParam(required = false) Long orgId) {
+			String methodName = "getShiftByOrgId()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+			String errorMsg = null;
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			ResponseDTO responseDTO = null;
+			List<ShiftVO> shiftVO = new ArrayList<>();
+			try {
+				shiftVO = commonMasterService.getShiftByOrgId(orgId);
+			} catch (Exception e) {
+				errorMsg = e.getMessage();
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			}
+			if (StringUtils.isBlank(errorMsg)) {
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Shift information get successfully By OrgId");
+				responseObjectsMap.put("shiftVO", shiftVO);
+				responseDTO = createServiceResponse(responseObjectsMap);
+			} else {
+				responseDTO = createServiceResponseError(responseObjectsMap, "shiftVO information receive failed By OrgId",
+						errorMsg);
+			}
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			return ResponseEntity.ok().body(responseDTO);
+
+		}
+
+		@GetMapping("/getShiftById")
+		public ResponseEntity<ResponseDTO> getShiftById(@RequestParam Long id) {
+			String methodName = "getShiftById()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+			String errorMsg = null;
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			ResponseDTO responseDTO = null;
+			List<ShiftVO> shiftVO = new ArrayList<>();
+			try {
+				shiftVO = commonMasterService.getShiftById(id);
+			} catch (Exception e) {
+				errorMsg = e.getMessage();
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			}
+			if (StringUtils.isBlank(errorMsg)) {
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Shift information get successfully By Id");
+				responseObjectsMap.put("shiftVO", shiftVO);
+				responseDTO = createServiceResponse(responseObjectsMap);
+			} else {
+				responseDTO = createServiceResponseError(responseObjectsMap, "UomVO information receive failed By Id",
+						errorMsg);
+			}
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			return ResponseEntity.ok().body(responseDTO);
+
+		}
+
+		@PutMapping("/updateCreateShift")
+		public ResponseEntity<ResponseDTO> updateCreateShift(@RequestBody ShiftDTO shiftdto) {
+			String methodName = "updateCreateTaxInvoice()";
+			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+			String errorMsg = null;
+			Map<String, Object> responseObjectsMap = new HashMap<>();
+			ResponseDTO responseDTO = null;
+			try {
+				Map<String, Object> shiftVO = commonMasterService.updateCreateShift(shiftdto);
+				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, shiftVO.get("message"));
+				responseObjectsMap.put("shiftVO", shiftVO.get("shiftVO"));
+				responseDTO = createServiceResponse(responseObjectsMap);
+			} catch (Exception e) {
+				errorMsg = e.getMessage();
+				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+			}
+			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			return ResponseEntity.ok().body(responseDTO);
+		}
+
 }

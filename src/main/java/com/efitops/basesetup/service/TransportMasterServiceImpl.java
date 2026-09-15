@@ -557,25 +557,32 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	@Override
 	public Map<String, Object> getCustomerDetails(Long orgId, Long branch) throws ApplicationException {
 
-		List<Object[]> list = customerRepo.getCustomerDetails(orgId, branch);
+	    List<Object[]> list = customerRepo.getCustomerDetails(orgId, branch);
 
-		if (list.isEmpty()) {
-			throw new ApplicationException("Customer Not Found");
-		}
+	    if (list.isEmpty()) {
+	        throw new ApplicationException("Customer Not Found");
+	    }
 
-		Object[] obj = list.get(0);
+	    List<Map<String, Object>> customerDetails = new ArrayList<>();
 
-		Map<String, Object> customerMap = new HashMap<>();
+	    for (Object[] obj : list) {
 
-		customerMap.put("customerId", obj[0]);
-		customerMap.put("customerName", obj[1]);
+	        Map<String, Object> customerMap = new HashMap<>();
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("customerDetails", customerMap);
+	        customerMap.put("customerId", obj[0]);
+	        customerMap.put("customerCode", obj[1]);
+	        customerMap.put("customerName", obj[2]);
+	        customerMap.put("gstNo", obj[3]);
+	        customerMap.put("isGstApplicable", obj[4]);
 
-		return response;
+	        customerDetails.add(customerMap);
+	    }
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("customerDetails", customerDetails);
+
+	    return response;
 	}
-
 	// Sales Contract amendment
 
 //	@Override

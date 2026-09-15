@@ -1,5 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,5 +36,7 @@ public class SupplierResponseEntryResponseDTO {
 	private String cancelRemarks;
 
 	private String remarks;
+	
+	private List<SupplierResponseEntryDetailsResponseDTO> supplierResponseEntryDetailsResponseDTO;
 
 }

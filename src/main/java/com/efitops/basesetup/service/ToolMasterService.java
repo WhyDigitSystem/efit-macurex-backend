@@ -43,4 +43,6 @@ public interface ToolMasterService {
 
 	Map<String, Object> getEngineeringDeviationByOrgId(Long orgId) throws ApplicationException;
 
+	String getEngineeringDeviationDocId(Long orgId, String financialYear);
+
 }

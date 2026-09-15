@@ -36,6 +36,10 @@ public class MaterialIndentForProductionResponseDTO {
 	private Long orgId;
 	private String financialYear;
 	private BranchResponseDTO branch;
+	private String approvedBy;
+	private String remarks;
+	private EmployeeMasterResponseDetailsDTO preparedBy;
+	private EmployeeMasterResponseDetailsDTO authorisedBy;
 
 	private List<MaterialIndentForProductionDetailsResponseDTO> materialIndentForProductionDetailsResponseDTO;
 }

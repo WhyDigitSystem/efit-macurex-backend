@@ -74,6 +74,7 @@ import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.DirectPurchaseCashDetailsDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.DirectPurchaseTaxDetailsDTO;
+import com.efitops.basesetup.dto.EmployeeMasterResponseDTO;
 import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
 import com.efitops.basesetup.dto.MaterialIndentForProductionDetailsDTO;
 import com.efitops.basesetup.dto.PoType;
@@ -3630,6 +3631,18 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			vo.setBranch(branch);
 		}
 
+		if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
+			EmployeeMasterVO branch = employeeMasterRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("PreparedBy Not Found"));
+			vo.setPreparedBy(branch);
+		}
+
+		if (dto.getAuthorisedBy() != null && dto.getAuthorisedBy() != 0) {
+			EmployeeMasterVO branch = employeeMasterRepo.findById(dto.getAuthorisedBy())
+					.orElseThrow(() -> new ApplicationException("AuthorisedBy Not Found"));
+			vo.setAuthorisedBy(branch);
+		}
+
 		// Delete existing details if updating
 		if (ObjectUtils.isNotEmpty(vo.getId())) {
 			List<MaterialIndentForProductionDetailsVO> existingDetails = materialIndentForProductionDetailsRepo
@@ -3692,6 +3705,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setScreenCode(vo.getScreenCode());
 		responseDTO.setOrgId(vo.getOrgId());
 		responseDTO.setFinancialYear(vo.getFinancialYear());
+		responseDTO.setRemarks(vo.getRemarks());
+		responseDTO.setApprovedBy(vo.getApprovedBy());
 
 		// Department
 		if (vo.getDepartment() != null) {
@@ -3732,6 +3747,21 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
 			branchDTO.setBranchName(vo.getBranch().getBranchName());
 			responseDTO.setBranch(branchDTO);
+		}
+		if (vo.getPreparedBy() != null) {
+			EmployeeMasterResponseDetailsDTO branchDTO = new EmployeeMasterResponseDetailsDTO();
+			branchDTO.setId(vo.getPreparedBy().getId());
+			branchDTO.setEmployeeCode(vo.getPreparedBy().getEmployeeId());
+			branchDTO.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+			responseDTO.setPreparedBy(branchDTO);
+		}
+
+		if (vo.getAuthorisedBy() != null) {
+			EmployeeMasterResponseDetailsDTO branchDTO = new EmployeeMasterResponseDetailsDTO();
+			branchDTO.setId(vo.getAuthorisedBy().getId());
+			branchDTO.setEmployeeCode(vo.getAuthorisedBy().getEmployeeId());
+			branchDTO.setEmployeeName(vo.getAuthorisedBy().getEmployeeName());
+			responseDTO.setAuthorisedBy(branchDTO);
 		}
 
 		List<MaterialIndentForProductionDetailsResponseDTO> detailsList = new ArrayList<>();

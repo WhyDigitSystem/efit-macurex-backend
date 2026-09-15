@@ -106,6 +106,24 @@ public class MaterialIndentForProductionVO {
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
+	
+	@Column(name = "approved_by")
+	private String approvedBy;
+	
+
+	@Column(name = "remarks")
+	private String remarks;
+	
+	@ManyToOne
+	@JoinColumn(name = "prepared_by")
+	private EmployeeMasterVO preparedBy;
+
+	
+	@ManyToOne
+	@JoinColumn(name = "authorised_by")
+	private EmployeeMasterVO authorisedBy;
+
+	
 
 	@OneToMany(mappedBy = "materialIndentForProductionVO", cascade = CascadeType.ALL)
 	@JsonManagedReference

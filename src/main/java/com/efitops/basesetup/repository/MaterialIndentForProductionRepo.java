@@ -21,7 +21,7 @@ public interface MaterialIndentForProductionRepo extends JpaRepository<MaterialI
 	@Query(nativeQuery = true, value = "select * from material_indent_for_production where org_id=?1 and branch=?2 and active=1 and cancel=0")
 	List<MaterialIndentForProductionVO> getMaterialIndentForProductionByOrgId(Long orgId, Long branch);
 
-	@Query(nativeQuery = true, value = "select p.doc_id,p.doc_date,p.fg_itme,i.item_code,i.item_description from production_schedule_order_basic p left join item i on p.fg_itme=i.item_id\r\n"
+	@Query(nativeQuery = true, value = "select p.doc_id,p.doc_date,p.fg_item,i.item_code,i.item_description from production_schedule_order_basic p left join item i on p.fg_itme=i.item_id\r\n"
 			+ "  where p.org_id=?1 \r\n"
 			+ "    and p.branch=?2 and p.active=1 and p.cancel=0")
 	Set<Object[]> getFgAndSfgItemDetailsFromMaterial(Long orgId, Long branch);

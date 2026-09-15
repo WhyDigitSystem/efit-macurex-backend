@@ -26,16 +26,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "production_schedule_order_basic")
+@Table(name = "fg_transfer_slip_basic")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductionScheduleOrderVO {
+public class FgTransferSlipVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "production_schedule_order_basicgen")
-	@SequenceGenerator(name = "production_schedule_order_basicgen", sequenceName = "production_schedule_order_basicseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "production_schedule_order_basic_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "fg_transfer_slip_basicgen")
+	@SequenceGenerator(name = "fg_transfer_slip_basicgen", sequenceName = "fg_transfer_slip_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "fg_transfer_slip_basic_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "doc_id")
@@ -44,46 +44,68 @@ public class ProductionScheduleOrderVO {
 	@Column(name = "doc_date")
 	private LocalDate docDate = LocalDate.now();
 
-	@Column(name = "order_type")
-	private String orderType;
+	@Column(name = "belongs_to")
+	private String belongsTo;
 
-	@Column(name = "lc_po_no")
-	private String lcPoNo;
+	@ManyToOne
+	@JoinColumn(name = "from_location")
+	private LocationVO fromLocation;
 
-	@Column(name = "lc_po_date")
-	private LocalDate lcPoDate;
+	@ManyToOne
+	@JoinColumn(name = "to_location")
+	private LocationVO toLocation;
+
+	@ManyToOne
+	@JoinColumn(name = "scrap_location")
+	private LocationVO scrapLocation;
+
+	@Column(name = "transfer_no")
+	private String transferNo;
+
+	@Column(name = "transfer_date")
+	private LocalDate transferDate;
 
 	@ManyToOne
 	@JoinColumn(name = "fg_item")
 	private ItemMasterVO fgItem;
 
+//	@ManyToOne
+//	@JoinColumn(name = "bom")
+//	private BillOfMaterialVO bom;
+
+	@Column(name = "bom")
+	private String bom;
+
+	@Column(name = "schedule_no")
+	private String scheduleNo;
+
+	@Column(name = "schedule_date")
+	private LocalDate scheduleDate;
+
+	@Column(name = "scheduled_qty", precision = 10, scale = 2)
+	private BigDecimal scheduledQty;
+
+	@Column(name = "qty_for_inspection", precision = 10, scale = 2)
+	private BigDecimal qtyForInspection;
+
 	@ManyToOne
-	@JoinColumn(name = "comp_route_no")
-	private ProcessSheetCompRoutingVO compRouteNo;
+	@JoinColumn(name = "customer")
+	private CustomerVO customer; 
 
-	@Column(name = "batch_qty", precision = 15, scale = 5)
-	private BigDecimal batchQty;
+	@Column(name = "rate", precision = 10, scale = 2)
+	private BigDecimal rate;
 
-	@Column(name = "total_qty", precision = 15, scale = 5)
+	@Column(name = "total_qty", precision = 10, scale = 2)
 	private BigDecimal totalQty;
 
-	@Column(name = "short_close")
-	private String shortClose;
-
-	@ManyToOne
-	@JoinColumn(name = "bom")
-	private BillOfMaterialVO bom;
-
-	@Column(name = "schedule_start_date")
-	private LocalDate scheduleStartDate;
-
-	@Column(name = "schedule_end_date")
-	private LocalDate scheduleEndDate;
-
-	// Common fields
+	@Column(name = "remarks")
+	private String remarks;
 
 	@Column(name = "created_by")
 	private String createdBy;
+
+	@Column(name = "modified_by")
+	private String updatedBy;
 
 	@Column(name = "active")
 	private boolean active;
@@ -91,17 +113,14 @@ public class ProductionScheduleOrderVO {
 	@Column(name = "cancel")
 	private boolean cancel = false;
 
-	@Column(name = "modified_by")
-	private String updatedBy;
-
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 
 	@Column(name = "screen_name")
-	private String screenName = "ProductionScheduleOrder";
+	private String screenName = "FGTransferSlip";
 
 	@Column(name = "screen_code")
-	private String screenCode = "PSO";
+	private String screenCode = "FGTS";
 
 	@Column(name = "org_id")
 	private Long orgId;
@@ -113,13 +132,9 @@ public class ProductionScheduleOrderVO {
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 
-	@OneToMany(mappedBy = "productionScheduleOrderVO", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "fgTransferSlipVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<ProductionScheduleOrderDetailsVO> productionScheduleOrderDetailsVO;
-
-	@OneToMany(mappedBy = "productionScheduleOrderVO", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	private List<ScheduleDetailsVO> scheduleDetailsVO;
+	private List<FGTransferSlipDetailsVO> fgTransferSlipDetailsVO;
 
 	@JsonGetter("active")
 	public String getActive() {
@@ -133,5 +148,4 @@ public class ProductionScheduleOrderVO {
 
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-
 }

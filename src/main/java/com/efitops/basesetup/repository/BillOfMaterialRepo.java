@@ -34,9 +34,17 @@ public interface BillOfMaterialRepo extends JpaRepository<BillOfMaterialVO, Long
 
 	@Query(nativeQuery = true, value = "select i.item_id,i.item_code,i.item_description,l1.value_description from item i left join listofvaluesdetails l1\r\n"
 			+ "                        on l1.listofvaluesdetails_id=i.item_type where i.org_id=?1 and \r\n"
-			+ "                        i.branch=?1 and l1.value_description not in ('FG')")
+			+ "                        i.branch=?2 and l1.value_description not in ('FG')")
 	Set<Object[]> getGridDetailsFromBom(Long orgId, Long branch);
+	
+	@Query(nativeQuery = true, value = "select i.item_id,i.item_code,i.item_description,unitmaster_id,u.unit_id from item i left join listofvaluesdetails l1\r\n"
+			+ "			                        on l1.listofvaluesdetails_id=i.item_type left join unitmaster u on u.unitmaster_id=i.primary_unit where i.org_id=?1 and \r\n"
+			+ "			                       i.branch=?2 and l1.value_description  in ('SCRAP')")
+	Set<Object[]> getScrapDetailsItem(Long orgId, Long branch);
 
+	@Query(nativeQuery = true, value = "select b.doc_id,b.doc_date from bill_of_material b join bill_of_material_details b1 on\r\n"
+			+ " b.bill_of_material_id=b1.bill_of_material_id and b.type_of_item=b1.item_type where b.org_id=?1 and b.branch=?2")
+	Set<Object[]> getSfGDocIdAndDetails(Long orgId, Long branch);
 	
 	@Query(nativeQuery = true, value = "select  doc_id from  bill_of_material where org_id =?1 and branch = ?2  and fg_itme = ?3\r\n"
 			+ "order by  created_on desc limit 1")

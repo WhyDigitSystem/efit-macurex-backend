@@ -2053,7 +2053,7 @@ public class PurchaseServiceImportController extends BaseController {
 
 	@GetMapping("/getSchNoFromTransferSlip")
 	public ResponseEntity<ResponseDTO> getSchNoFromTransferSlip(@RequestParam Long orgId, @RequestParam Long branch,
-			@RequestParam Long fgItem, @RequestParam Long sfgItem) {
+			@RequestParam(required = false) Long fgItem, @RequestParam(required = false) Long sfgItem) {
 		String methodName = "getFgAndSfgItemDetailsFromMaterial()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -2082,7 +2082,7 @@ public class PurchaseServiceImportController extends BaseController {
 
 	@GetMapping("/getBomNoFromTransferSlip")
 	public ResponseEntity<ResponseDTO> getBomNoFromTransferSlip(@RequestParam Long orgId, @RequestParam Long branch,
-			@RequestParam Long fgItem, @RequestParam Long sfgItem) {
+			@RequestParam(required = false) Long fgItem, @RequestParam(required = false) Long sfgItem) {
 		String methodName = "getBomNoFromTransferSlip()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -2136,6 +2136,194 @@ public class PurchaseServiceImportController extends BaseController {
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getBomFromFgTransferSlip")
+	public ResponseEntity<ResponseDTO> getBomFromFgTransferSlip(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long fgItem) {
+
+		String methodName = "getBomFromFgTransferSlip()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getBomFromFgTransferSlip(orgId, branch, fgItem);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Bom details retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Bom details", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+
+	}
+
+	@GetMapping("/getSchNoFromFgTransferSlip")
+	public ResponseEntity<ResponseDTO> getSchNoFromFgTransferSlip(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getSchNoFromFgTransferSlip()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getSchNoFromFgTransferSlip(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "SchNo details retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve SchNo details", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+
+	}
+
+	@GetMapping("/getCustomersDetailsFromTransferSlip")
+	public ResponseEntity<ResponseDTO> getCustomersDetailsFromTransferSlip(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getCustomersDetailsFromTransferSlip()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getCustomersDetailsFromTransferSlip(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Customer details retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Customer details",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+
+	}
+
+	@GetMapping("/getBomDetailsFromFgTransferSlip")
+	public ResponseEntity<ResponseDTO> getBomDetailsFromFgTransferSlip(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long bom) {
+
+		String methodName = "getBomDetailsFromFgTransferSlip()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getBomDetailsFromFgTransferSlip(orgId, branch, bom);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Bom details retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Bom details", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+
 	}
 
 }

@@ -36,8 +36,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialResDTO;
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
+import com.efitops.basesetup.ResponseDTO.BomFgResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CompRouteNoResponseDetailsDTO;
-import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseCashDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseFileUploadDetailsResponseDTO;
@@ -76,6 +76,7 @@ import com.efitops.basesetup.dto.BillOfMaterialDTO;
 import com.efitops.basesetup.dto.BillOfMaterialDetailsDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
+import com.efitops.basesetup.dto.CustomerResponseGstDetailsDTO;
 import com.efitops.basesetup.dto.DirectPurchaseCashDetailsDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.DirectPurchaseTaxDetailsDTO;
@@ -4008,7 +4009,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setBelongsTo(dto.getBelongsTo());
 		vo.setSfgDescription(dto.getSfgDescription());
 		vo.setSchOrderNo(dto.getSchOrderNo());
-		vo.setBom(dto.getBom());
 		vo.setSchDates(dto.getSchDates());
 		vo.setAlterInputItem(dto.getAlterInputItem());
 		vo.setItemType(dto.getItemType());
@@ -4057,6 +4057,12 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			BranchVO branch = branchRepo.findById(dto.getBranch())
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 			vo.setBranch(branch);
+		}
+		
+		if (dto.getBom() != null && dto.getBom() != 0) {
+			BillOfMaterialVO branch = billOfMaterialRepo.findById(dto.getBom())
+					.orElseThrow(() -> new ApplicationException("Bom Not Found"));
+			vo.setBom(branch);
 		}
 
 		if (ObjectUtils.isNotEmpty(vo.getId())) {
@@ -4120,7 +4126,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setBelongsTo(vo.getBelongsTo());
 		responseDTO.setSfgDescription(vo.getSfgDescription());
 		responseDTO.setSchOrderNo(vo.getSchOrderNo());
-		responseDTO.setBom(vo.getBom());
 		responseDTO.setSchDates(vo.getSchDates());
 		responseDTO.setAlterInputItem(vo.getAlterInputItem());
 		responseDTO.setItemType(vo.getItemType());
@@ -4145,6 +4150,14 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			locDto.setId(vo.getFromLocation().getId());
 			locDto.setLocationName(vo.getFromLocation().getLocationName());
 			responseDTO.setFromLocation(locDto);
+		}
+		
+		if (vo.getBom() != null) {
+			BomFgResponseDTO locDto = new BomFgResponseDTO();
+			locDto.setId(vo.getBom().getId());
+			locDto.setDocId(vo.getBom().getDocId());
+			locDto.setDocDate(vo.getBom().getDocDate());
+			responseDTO.setBom(locDto);
 		}
 
 		if (vo.getToLocation() != null) {
@@ -4339,6 +4352,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			Map<String, Object> map = new HashMap<>();
 			map.put("docId", ch[0] != null ? ch[0].toString() : "");
 			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			map.put("bomId", ch[2] != null ? ((Number) ch[2]).longValue() : null);
 			list.add(map);
 		}
 
@@ -4416,7 +4430,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setBelongsTo(dto.getBelongsTo());
 		vo.setTransferNo(dto.getTransferNo());
 		vo.setTransferDate(dto.getTransferDate());
-		vo.setBom(dto.getBom());
 		vo.setScheduleNo(dto.getScheduleNo());
 		vo.setScheduleDate(dto.getScheduleDate());
 		vo.setScheduledQty(dto.getScheduledQty());
@@ -4427,6 +4440,12 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setCancelRemarks(dto.getCancelRemarks());
 		vo.setOrgId(dto.getOrgId());
 		vo.setFinancialYear(dto.getFinancialYear());
+		
+		if (dto.getBom() != null && dto.getBom() != 0) {
+			BillOfMaterialVO branch = billOfMaterialRepo.findById(dto.getBom())
+					.orElseThrow(() -> new ApplicationException("Bom Not Found"));
+			vo.setBom(branch);
+		}
 
 		if (dto.getFromLocation() != null && dto.getFromLocation() != 0) {
 			LocationVO fromLocation = locationRepo.findById(dto.getFromLocation())
@@ -4469,6 +4488,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			fgTransferSlipDetailsRepo.deleteAll(existingDetails);
 		}
 
+		BigDecimal totalQty = BigDecimal.ZERO;
+
 		List<FGTransferSlipDetailsVO> itemDetailsList = new ArrayList<>();
 
 		if (dto.getFgTransferSlipDetailsDTO() != null) {
@@ -4476,14 +4497,16 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				FGTransferSlipDetailsVO detailsVO = new FGTransferSlipDetailsVO();
 				detailsVO.setBomQty(d.getBomQty());
 				detailsVO.setAvailableStock(d.getAvailableStock());
-				detailsVO.setConsumptionAsPerBom(d.getConsumptionAsPerBom());
+				BigDecimal qty = dto.getScheduledQty();
+				detailsVO.setConsumptionAsPerBom(qty.multiply(d.getBomQty()));
 				detailsVO.setWastageQty(d.getWastageQty());
-				detailsVO.setConsumedQty(d.getConsumedQty());
+				detailsVO.setConsumedQty(detailsVO.getConsumptionAsPerBom());
+				totalQty = totalQty.add(detailsVO.getConsumedQty());
 				detailsVO.setRate(d.getRate());
-				detailsVO.setValue(d.getValue());
-				detailsVO.setScrapId(d.getScrapId());
+				detailsVO.setValue(d.getRate().multiply(detailsVO.getConsumedQty()));
+
 				detailsVO.setScrapQty(d.getScrapQty());
-				detailsVO.setScrapTotal(d.getScrapTotal());
+				detailsVO.setScrapTotal(d.getScrapQty());
 
 				if (d.getItem() != null && d.getItem() != 0) {
 					ItemMasterVO item = itemMasterRepo.findById(d.getItem())
@@ -4503,11 +4526,18 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 					detailsVO.setScrapUnit(scrapUnit);
 				}
 
+				if (d.getScrap() != null && d.getScrap() != 0) {
+					ListOfValuesDetailsVO item = listOfValuesDetailsRepo.findById(d.getScrap())
+							.orElseThrow(() -> new ApplicationException("Scrap Not Found"));
+					detailsVO.setScrap(item);
+				}
+
 				detailsVO.setFgTransferSlipVO(vo);
 				itemDetailsList.add(detailsVO);
 			}
 		}
 		vo.setFgTransferSlipDetailsVO(itemDetailsList);
+		vo.setTotalQty(totalQty);
 	}
 
 	private FgTransferSlipResponseDTO buildFgTransferSlipResponse(FgTransferSlipVO vo) {
@@ -4519,7 +4549,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setBelongsTo(vo.getBelongsTo());
 		responseDTO.setTransferNo(vo.getTransferNo());
 		responseDTO.setTransferDate(vo.getTransferDate());
-		responseDTO.setBom(vo.getBom());
 		responseDTO.setScheduleNo(vo.getScheduleNo());
 		responseDTO.setScheduleDate(vo.getScheduleDate());
 		responseDTO.setScheduledQty(vo.getScheduledQty());
@@ -4536,6 +4565,14 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setScreenCode(vo.getScreenCode());
 		responseDTO.setOrgId(vo.getOrgId());
 		responseDTO.setFinancialYear(vo.getFinancialYear());
+		
+		if (vo.getBom() != null) {
+			BomFgResponseDTO locDto = new BomFgResponseDTO();
+			locDto.setId(vo.getBom().getId());
+			locDto.setDocId(vo.getBom().getDocId());
+			locDto.setDocDate(vo.getBom().getDocDate());
+			responseDTO.setBom(locDto);
+		}
 
 		if (vo.getFromLocation() != null) {
 			LocationMasterResponseDTO locDto = new LocationMasterResponseDTO();
@@ -4567,7 +4604,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		}
 
 		if (vo.getCustomer() != null) {
-			CustomerResponseDTO customerDTO = new CustomerResponseDTO();
+			CustomerResponseGstDetailsDTO customerDTO = new CustomerResponseGstDetailsDTO();
 			customerDTO.setId(vo.getCustomer().getId());
 			customerDTO.setCustomerCode(vo.getCustomer().getCustomerCode());
 			customerDTO.setCustomerName(vo.getCustomer().getCustomerName());
@@ -4594,9 +4631,16 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailsDTO.setConsumedQty(detailsVO.getConsumedQty());
 				detailsDTO.setRate(detailsVO.getRate());
 				detailsDTO.setValue(detailsVO.getValue());
-				detailsDTO.setScrapId(detailsVO.getScrapId());
 				detailsDTO.setScrapQty(detailsVO.getScrapQty());
 				detailsDTO.setScrapTotal(detailsVO.getScrapTotal());
+
+				if (detailsVO.getScrap() != null) {
+					ListOfValuesResponseDTO fgItemDTO = new ListOfValuesResponseDTO();
+					fgItemDTO.setId(detailsVO.getScrap().getId());
+					fgItemDTO.setListCode(detailsVO.getScrap().getValueCode());
+					fgItemDTO.setListDescription(detailsVO.getScrap().getValueDescription());
+					detailsDTO.setScrap(fgItemDTO);
+				}
 
 				if (detailsVO.getItem() != null) {
 					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
@@ -4654,6 +4698,97 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			responseList.add(buildFgTransferSlipResponse(vo));
 		}
 		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getBomFromFgTransferSlip(Long orgId, Long branch, Long fgItem) {
+		Set<Object[]> chType = fgTransferSlipRepo.getBomFromFgTransferSlip(orgId, branch, fgItem);
+		return getBomFromFgTransferSlip(chType);
+	}
+
+	private List<Map<String, Object>> getBomFromFgTransferSlip(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("bomId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("docId", ch[1] != null ? ch[1].toString() : "");
+			map.put("docDate", ch[2] != null ? ch[2].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getSchNoFromFgTransferSlip(Long orgId, Long branch) {
+		Set<Object[]> chType = fgTransferSlipRepo.getSchNoFromFgTransferSlip(orgId, branch);
+		return getSchNoFromFgTransferSlip(chType);
+	}
+
+	private List<Map<String, Object>> getSchNoFromFgTransferSlip(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			map.put("scheduledQty", ch[3] != null ? new BigDecimal(ch[3].toString()) : BigDecimal.ZERO);
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getCustomersDetailsFromTransferSlip(Long orgId, Long branch) {
+		Set<Object[]> chType = fgTransferSlipRepo.getCustomersDetailsFromTransferSlip(orgId, branch);
+		return getCustomersDetailsFromTransferSlip(chType);
+	}
+
+	private List<Map<String, Object>> getCustomersDetailsFromTransferSlip(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("customerId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("customerName", ch[1] != null ? ch[1].toString() : "");
+			map.put("customerCode", ch[2] != null ? ch[2].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getBomDetailsFromFgTransferSlip(Long orgId, Long branch, Long bom) {
+		Set<Object[]> chType = fgTransferSlipRepo.getBomDetailsFromFgTransferSlip(orgId, branch, bom);
+		return getBomDetailsFromFgTransferSlip(chType);
+	}
+
+	private List<Map<String, Object>> getBomDetailsFromFgTransferSlip(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("qty", ch[3] != null ? new BigDecimal(ch[3].toString()) : BigDecimal.ZERO);
+			map.put("unitId", ch[4] != null ? ((Number) ch[4]).longValue() : null);
+			map.put("unitDescription", ch[5] != null ? ch[5].toString() : "");
+			list.add(map);
+		}
+
+		return list;
 	}
 
 }

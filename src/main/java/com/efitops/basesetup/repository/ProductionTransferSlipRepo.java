@@ -37,15 +37,15 @@ public interface ProductionTransferSlipRepo extends JpaRepository<ProductionTran
 			+ "group by doc_id,doc_date")
 	Set<Object[]> getSchNoFromTransferSlip(Long orgId, Long branch,Long fgItem,Long sfgItem);
 	
-	@Query(nativeQuery = true, value = "select doc_id,doc_date from bill_of_material where org_id=?1 and branch=?2 and fg_item=?3 group by doc_id,doc_date\r\n"
+	@Query(nativeQuery = true, value = "select doc_id,doc_date,bill_of_material_id from bill_of_material where org_id=?1 and branch=?2 and fg_item=?3 group by doc_id,doc_date,bill_of_material_id\r\n"
 			+ "union \r\n"
-			+ "select doc_id,doc_date from bill_of_material where org_id=?1 and branch=?2 and fg_item=?3 \r\n"
-			+ "group by doc_id,doc_date")
+			+ "select doc_id,doc_date,bill_of_material_id from bill_of_material where org_id=?1 and branch=?2 and fg_item=?3 \r\n"
+			+ "group by doc_id,doc_date,bill_of_material_id")
 	Set<Object[]> getBomNoFromTransferSlip(Long orgId, Long branch,Long fgItem,Long sfgItem);
 	
 	@Query(nativeQuery = true, value = "select b1.item,i.item_code,i.item_description,l.value_description,b1.qty from bill_of_material b join bill_of_material_details b1 on b.bill_of_material_id=b1.bill_of_material_id\r\n"
 			+ " left join item i on i.item_id=b1.item left join listofvaluesdetails l on l.listofvaluesdetails_id=i.item_type where \r\n"
-			+ " b.org_id=?1 and b.branch=?2 and b.fg_item=?3 \r\n"
+			+ " b.org_id=?1 and b.branch=?2 and b.bill_of_material_id=?3 \r\n"
 			+ " group by b1.item,i.item_code,i.item_description,l.value_description,b1.qty")
 	Set<Object[]> getBomNoFromTransferSlipDetails(Long orgId, Long branch,Long bom);
 

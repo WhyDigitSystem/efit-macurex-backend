@@ -192,5 +192,13 @@ public interface PurchaseServiceImport {
 
 	List<Map<String, Object>> getBomNoFromTransferSlipDetails(Long orgId, Long branch, Long bom);
 
+	List<Map<String, Object>> getBomFromFgTransferSlip(Long orgId, Long branch, Long fgItem);
+
+	List<Map<String, Object>> getSchNoFromFgTransferSlip(Long orgId, Long branch);
+
+	List<Map<String, Object>> getCustomersDetailsFromTransferSlip(Long orgId, Long branch);
+
+	List<Map<String, Object>> getBomDetailsFromFgTransferSlip(Long orgId, Long branch, Long bom);
+
 
 }

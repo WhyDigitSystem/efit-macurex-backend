@@ -26,7 +26,7 @@ public class ProductionTransferSlipDTO {
 	private String sfgDescription;
 
 	private String schOrderNo;
-	private String bom;
+	private Long bom;
 	private LocalDate schDates;
 	private String alterInputItem;
 	private String itemType;

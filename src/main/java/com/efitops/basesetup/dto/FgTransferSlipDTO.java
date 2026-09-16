@@ -25,7 +25,7 @@ public class FgTransferSlipDTO {
 
 	private Long fgItem;
 
-	private String bom;
+	private Long bom;
 	private String scheduleNo;
 	private LocalDate scheduleDate;
 	private BigDecimal scheduledQty;

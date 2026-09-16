@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.CustomerResponseGstDetailsDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +23,7 @@ public class FgTransferSlipResponseDTO {
 	private String belongsTo;
 	private String transferNo;
 	private LocalDate transferDate;
-	private String bom;
+	private BomFgResponseDTO bom;
 	private String scheduleNo;
 	private LocalDate scheduleDate;
 	private BigDecimal scheduledQty;
@@ -45,7 +46,7 @@ public class FgTransferSlipResponseDTO {
 	private LocationMasterResponseDTO toLocation;
 	private LocationMasterResponseDTO scrapLocation;
 	private ItemMasterDetailsResponseImportDTO fgItem;
-	private CustomerResponseDTO customer;
+	private CustomerResponseGstDetailsDTO customer;
 	private BranchResponseDTO branch;
 
 	private List<FGTransferSlipDetailsResponseDTO> fgTransferSlipDetailsResponseDTO;

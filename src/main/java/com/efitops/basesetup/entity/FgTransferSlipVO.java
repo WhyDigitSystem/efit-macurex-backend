@@ -69,12 +69,9 @@ public class FgTransferSlipVO {
 	@JoinColumn(name = "fg_item")
 	private ItemMasterVO fgItem;
 
-//	@ManyToOne
-//	@JoinColumn(name = "bom")
-//	private BillOfMaterialVO bom;
-
-	@Column(name = "bom")
-	private String bom;
+	@ManyToOne
+	@JoinColumn(name = "bom")
+	private BillOfMaterialVO bom;
 
 	@Column(name = "schedule_no")
 	private String scheduleNo;

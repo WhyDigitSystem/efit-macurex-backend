@@ -60,8 +60,10 @@ public class FGTransferSlipDetailsVO {
 	@Column(name = "value", precision = 10, scale = 2)
 	private BigDecimal value;
 
-	@Column(name = "scrap_id")
-	private String scrapId;
+	@ManyToOne
+	@JoinColumn(name = "scrap")
+	private ListOfValuesDetailsVO scrap;
+	
 
 	@Column(name = "scrap_qty", precision = 10, scale = 2)
 	private BigDecimal scrapQty;

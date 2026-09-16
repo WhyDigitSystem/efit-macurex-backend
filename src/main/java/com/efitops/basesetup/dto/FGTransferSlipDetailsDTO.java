@@ -15,13 +15,9 @@ public class FGTransferSlipDetailsDTO {
 	private Long unit;
 	private BigDecimal bomQty;
 	private BigDecimal availableStock;
-	private BigDecimal consumptionAsPerBom;
 	private BigDecimal wastageQty;
-	private BigDecimal consumedQty;
 	private BigDecimal rate;
-	private BigDecimal value;
-	private String scrapId;
+	private Long scrap;
 	private BigDecimal scrapQty;
 	private Long scrapUnit;
-	private BigDecimal scrapTotal;
 }

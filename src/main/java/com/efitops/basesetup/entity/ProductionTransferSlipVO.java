@@ -73,8 +73,9 @@ public class ProductionTransferSlipVO {
 	@Column(name = "sch_order_no")
 	private String schOrderNo;
 
-	@Column(name = "bom")
-	private String bom;
+	@ManyToOne
+	@JoinColumn(name = "bom")
+	private BillOfMaterialVO bom;
 
 	@Column(name = "sch_dates")
 	private LocalDate schDates;

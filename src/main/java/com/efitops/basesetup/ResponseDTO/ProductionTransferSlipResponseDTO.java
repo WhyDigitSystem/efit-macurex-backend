@@ -21,7 +21,7 @@ public class ProductionTransferSlipResponseDTO {
     private String belongsTo;
     private LocalDate schDates;
     private String schOrderNo;
-    private String bom;
+    private BomFgResponseDTO bom;
     private String alterInputItem;
     private String itemType;
     private BigDecimal issueQty;

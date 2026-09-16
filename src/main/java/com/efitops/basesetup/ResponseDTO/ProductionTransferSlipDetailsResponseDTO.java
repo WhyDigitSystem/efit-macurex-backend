@@ -19,7 +19,7 @@ public class ProductionTransferSlipDetailsResponseDTO {
 	private BigDecimal rate;
 	private BigDecimal value;
 	private UnitResponseDTO primaryUnit;
-	private String scrapId;
+	private ListOfValuesResponseDTO scrap;
 	private BigDecimal scrapQty;
 	private BigDecimal scrapTotal;
 

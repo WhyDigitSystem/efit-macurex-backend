@@ -4080,7 +4080,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailsVO.setRate(d.getRate());
 				detailsVO.setValue(d.getRate().multiply(d.getBomQty()));
 				totalQty = totalQty.add(detailsVO.getValue());
-					
+
 				detailsVO.setScrapQty(d.getScrapQty());
 				detailsVO.setScrapTotal(d.getScrapQty());
 
@@ -4095,11 +4095,11 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 							.orElseThrow(() -> new ApplicationException("Unit Not Found"));
 					detailsVO.setPrimaryUnit(unit);
 				}
-				
-				if (d.getItem() != null && d.getItem() != 0) {
-					ItemMasterVO item = itemMasterRepo.findById(d.getItem())
-							.orElseThrow(() -> new ApplicationException("Input Item Code Not Found"));
-					detailsVO.setItem(item);
+
+				if (d.getScrap() != null && d.getScrap() != 0) {
+					ListOfValuesDetailsVO item = listOfValuesDetailsRepo.findById(d.getScrap())
+							.orElseThrow(() -> new ApplicationException("Scrap Not Found"));
+					detailsVO.setScrap(item);
 				}
 
 				detailsVO.setProductionTransferSlipVO(vo);
@@ -4195,7 +4195,15 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailsDTO.setInputQty(detailsVO.getInputQty());
 				detailsDTO.setRate(detailsVO.getRate());
 				detailsDTO.setValue(detailsVO.getValue());
-				detailsDTO.setScrapId(detailsVO.getScrapId());
+
+				if (detailsVO.getScrap() != null) {
+					ListOfValuesResponseDTO fgItemDTO = new ListOfValuesResponseDTO();
+					fgItemDTO.setId(detailsVO.getScrap().getId());
+					fgItemDTO.setListCode(detailsVO.getScrap().getValueCode());
+					fgItemDTO.setListDescription(detailsVO.getScrap().getValueDescription());
+					detailsDTO.setScrap(fgItemDTO);
+				}
+
 				detailsDTO.setScrapQty(detailsVO.getScrapQty());
 				detailsDTO.setScrapTotal(detailsVO.getScrapTotal());
 

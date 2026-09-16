@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ConsumptionEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FgTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
@@ -20,6 +21,7 @@ import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortClose
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.dto.BillOfMaterialDTO;
+import com.efitops.basesetup.dto.ConsumptionEntryDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.FgTransferSlipDTO;
 import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
@@ -171,8 +173,8 @@ public interface PurchaseServiceImport {
 	List<Map<String, Object>> getScrapDetailsItem(Long orgId, Long branch);
 
 	List<Map<String, Object>> getSfGDocIdAndDetails(Long orgId, Long branch);
-	
-	//slip
+
+	// slip
 
 	Map<String, Object> createUpdateFgTransferSlip(FgTransferSlipDTO dto) throws ApplicationException;
 
@@ -200,5 +202,18 @@ public interface PurchaseServiceImport {
 
 	List<Map<String, Object>> getBomDetailsFromFgTransferSlip(Long orgId, Long branch, Long bom);
 
+	// Consum
+
+	Map<String, Object> createUpdateConsumptionEntry(ConsumptionEntryDTO dto) throws ApplicationException;
+
+	String getConsumptionEntryDocId(Long orgId, String financialYear);
+
+	ConsumptionEntryResponseDTO getConsumptionEntryById(Long id) throws ApplicationException;
+
+	List<ConsumptionEntryResponseDTO> getConsumptionEntryByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsConsumptionEntry(Long orgId, Long branch);
+
+	List<Map<String, Object>> getRawMaterialConsumptionEntry(Long orgId, Long branch, Long fgItem);
 
 }

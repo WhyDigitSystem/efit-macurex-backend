@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ConsumptionEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FgTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
@@ -34,6 +35,7 @@ import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.BillOfMaterialDTO;
+import com.efitops.basesetup.dto.ConsumptionEntryDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.FgTransferSlipDTO;
 import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
@@ -2324,6 +2326,239 @@ public class PurchaseServiceImportController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 
+	}
+
+	/// ConsumptionEntry
+
+	@GetMapping("/getConsumptionEntryById")
+
+	public ResponseEntity<ResponseDTO> getConsumptionEntryById(@RequestParam Long id) {
+
+		String methodName = "getConsumptionEntryById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ConsumptionEntryResponseDTO consumptionEntryResponseDTO = purchaseOrderService.getConsumptionEntryById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Consumption Entry information retrieved successfully");
+
+			responseObjectsMap.put("consumptionEntryResponseVO", consumptionEntryResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Consumption Entry retrieval failed",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+
+	}
+
+	@GetMapping("/getConsumptionEntryDocId")
+	public ResponseEntity<ResponseDTO> getConsumptionEntryDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getConsumptionEntryDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = purchaseOrderService.getConsumptionEntryDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"ConsumptionEntryDocId information retrieved successfully");
+
+			responseObjectsMap.put("consumptionEntryDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve ConsumptionEntryDocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+
+	}
+
+	@PutMapping("/createUpdateConsumptionEntry")
+	public ResponseEntity<ResponseDTO> createUpdateConsumptionEntry(
+			@RequestBody ConsumptionEntryDTO consumptionEntryDTO) {
+
+		String methodName = "createUpdateConsumptionEntry()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> consumptionEntryVO = purchaseOrderService
+					.createUpdateConsumptionEntry(consumptionEntryDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, consumptionEntryVO.get("message"));
+
+			responseObjectsMap.put("consumptionEntryVO", consumptionEntryVO.get("consumptionEntryVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+
+	}
+
+	@GetMapping("/getConsumptionEntryByOrgId")
+	public ResponseEntity<ResponseDTO> getConsumptionEntryByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getConsumptionEntryByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<ConsumptionEntryResponseDTO> consumptionEntryResponseDTO = purchaseOrderService
+					.getConsumptionEntryByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Consumption Entry information retrieved successfully");
+
+			responseObjectsMap.put("consumptionEntryResponseVO", consumptionEntryResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Consumption Entry information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+
+	}
+
+	@GetMapping("/getFgAndSfgItemDetailsConsumptionEntry")
+	public ResponseEntity<ResponseDTO> getFgAndSfgItemDetailsConsumptionEntry(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getFgAndSfgItemDetailsConsumptionEntry()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getFgAndSfgItemDetailsConsumptionEntry(orgId, branch);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "FG and SFG item details retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve FG and SFG item details",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getRawMaterialConsumptionEntry")
+	public ResponseEntity<ResponseDTO> getRawMaterialConsumptionEntry(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long fgItem) {
+
+		String methodName = "getRawMaterialConsumptionEntry()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getRawMaterialConsumptionEntry(orgId, branch, fgItem);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "ROL material details retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve ROL material details",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
 	}
 
 }

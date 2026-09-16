@@ -38,6 +38,8 @@ import com.efitops.basesetup.ResponseDTO.BillOfMaterialResDTO;
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
 import com.efitops.basesetup.ResponseDTO.BomFgResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CompRouteNoResponseDetailsDTO;
+import com.efitops.basesetup.ResponseDTO.ConsumptionEntryDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ConsumptionEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseCashDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseFileUploadDetailsResponseDTO;
@@ -67,6 +69,7 @@ import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalFileUploadDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.RmConsumptionEntryDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ScheduleDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
@@ -75,6 +78,8 @@ import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BillOfMaterialDTO;
 import com.efitops.basesetup.dto.BillOfMaterialDetailsDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.ConsumptionEntryDTO;
+import com.efitops.basesetup.dto.ConsumptionEntryDetailsDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.CustomerResponseGstDetailsDTO;
 import com.efitops.basesetup.dto.DirectPurchaseCashDetailsDTO;
@@ -96,6 +101,7 @@ import com.efitops.basesetup.dto.PurchaseOrderImportDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalFileUploadDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalTaxDetailsDTO;
+import com.efitops.basesetup.dto.RmConsumptionEntryDetailsDTO;
 import com.efitops.basesetup.dto.ScheduleDetailsDTO;
 import com.efitops.basesetup.dto.StockTransferDTO;
 import com.efitops.basesetup.dto.StockTransferDetailsDTO;
@@ -103,6 +109,8 @@ import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BillOfMaterialDetailsVO;
 import com.efitops.basesetup.entity.BillOfMaterialVO;
 import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.ConsumptionEntryDetailsVO;
+import com.efitops.basesetup.entity.ConsumptionEntryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
@@ -133,6 +141,7 @@ import com.efitops.basesetup.entity.PurchaseOrderLocalDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalFileUploadDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderLocalTaxDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderVO;
+import com.efitops.basesetup.entity.RmConsumptionEntryDetailsVO;
 import com.efitops.basesetup.entity.ScheduleDetailsVO;
 import com.efitops.basesetup.entity.StockTransferDetailsVO;
 import com.efitops.basesetup.entity.StockTransferVO;
@@ -141,6 +150,8 @@ import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BillOfMaterialDetailsRepo;
 import com.efitops.basesetup.repository.BillOfMaterialRepo;
 import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.ConsumptionEntryDetailsRepo;
+import com.efitops.basesetup.repository.ConsumptionEntryRepo;
 import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
@@ -171,6 +182,7 @@ import com.efitops.basesetup.repository.PurchaseOrderLocalDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderLocalFileUploadDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderLocalTaxDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderRepo;
+import com.efitops.basesetup.repository.RmConsumptionEntryDetailsRepo;
 import com.efitops.basesetup.repository.ScheduleDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferRepo;
@@ -292,6 +304,15 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 	@Autowired
 	private FGTransferSlipDetailsRepo fgTransferSlipDetailsRepo;
+
+	@Autowired
+	private ConsumptionEntryRepo consumptionEntryRepo;
+
+	@Autowired
+	private ConsumptionEntryDetailsRepo consumptionEntryDetailsRepo;
+
+	@Autowired
+	private RmConsumptionEntryDetailsRepo rmConsumptionEntryDetailsRepo;
 
 	@Override
 	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException {
@@ -4058,7 +4079,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 			vo.setBranch(branch);
 		}
-		
+
 		if (dto.getBom() != null && dto.getBom() != 0) {
 			BillOfMaterialVO branch = billOfMaterialRepo.findById(dto.getBom())
 					.orElseThrow(() -> new ApplicationException("Bom Not Found"));
@@ -4151,7 +4172,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			locDto.setLocationName(vo.getFromLocation().getLocationName());
 			responseDTO.setFromLocation(locDto);
 		}
-		
+
 		if (vo.getBom() != null) {
 			BomFgResponseDTO locDto = new BomFgResponseDTO();
 			locDto.setId(vo.getBom().getId());
@@ -4440,7 +4461,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setCancelRemarks(dto.getCancelRemarks());
 		vo.setOrgId(dto.getOrgId());
 		vo.setFinancialYear(dto.getFinancialYear());
-		
+
 		if (dto.getBom() != null && dto.getBom() != 0) {
 			BillOfMaterialVO branch = billOfMaterialRepo.findById(dto.getBom())
 					.orElseThrow(() -> new ApplicationException("Bom Not Found"));
@@ -4565,7 +4586,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setScreenCode(vo.getScreenCode());
 		responseDTO.setOrgId(vo.getOrgId());
 		responseDTO.setFinancialYear(vo.getFinancialYear());
-		
+
 		if (vo.getBom() != null) {
 			BomFgResponseDTO locDto = new BomFgResponseDTO();
 			locDto.setId(vo.getBom().getId());
@@ -4785,6 +4806,337 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			map.put("qty", ch[3] != null ? new BigDecimal(ch[3].toString()) : BigDecimal.ZERO);
 			map.put("unitId", ch[4] != null ? ((Number) ch[4]).longValue() : null);
 			map.put("unitDescription", ch[5] != null ? ch[5].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	// cons
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateConsumptionEntry(ConsumptionEntryDTO dto) throws ApplicationException {
+		String screenCode = "CE";
+		ConsumptionEntryVO vo = new ConsumptionEntryVO();
+		String message;
+
+		if (ObjectUtils.isNotEmpty(dto.getId())) {
+			vo = consumptionEntryRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Consumption Entry Not Found"));
+			vo.setUpdatedBy(dto.getCreatedBy());
+			message = "Consumption Entry Updated Successfully";
+		} else {
+			String docId = consumptionEntryRepo.getConsumptionEntryDocId(dto.getOrgId(), dto.getFinancialYear(),
+					screenCode);
+			vo.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			vo.setCreatedBy(dto.getCreatedBy());
+			vo.setUpdatedBy(dto.getCreatedBy());
+			message = "Consumption Entry Created Successfully";
+		}
+
+		createUpdateConsumptionEntryVOByDTO(dto, vo);
+		vo = consumptionEntryRepo.save(vo);
+
+		ConsumptionEntryResponseDTO responseDTO = buildConsumptionEntryResponse(vo);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("consumptionEntryVO", responseDTO);
+
+		return response;
+	}
+
+	private void createUpdateConsumptionEntryVOByDTO(ConsumptionEntryDTO dto, ConsumptionEntryVO vo)
+			throws ApplicationException {
+
+		vo.setType(dto.getType());
+		vo.setFromDate(dto.getFromDate());
+		vo.setToDate(dto.getToDate());
+		vo.setConsumption(dto.getConsumption());
+		vo.setNarration(dto.getNarration());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		if (dto.getEntryType() != null && dto.getEntryType() != 0) {
+			ListOfValuesDetailsVO location = listOfValuesDetailsRepo.findById(dto.getEntryType())
+					.orElseThrow(() -> new ApplicationException("List Pf Values Not Found"));
+			vo.setEntryType(location);
+		}
+
+		if (dto.getLocation() != null && dto.getLocation() != 0) {
+			LocationVO location = locationRepo.findById(dto.getLocation())
+					.orElseThrow(() -> new ApplicationException("Location Not Found"));
+			vo.setLocation(location);
+		}
+
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+			vo.setBranch(branch);
+		}
+
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+			List<ConsumptionEntryDetailsVO> existingDetails = consumptionEntryDetailsRepo.findByConsumptionEntryVO(vo);
+			consumptionEntryDetailsRepo.deleteAll(existingDetails);
+
+			List<RmConsumptionEntryDetailsVO> existingRmDetails = rmConsumptionEntryDetailsRepo
+					.findByConsumptionEntryVO(vo);
+			rmConsumptionEntryDetailsRepo.deleteAll(existingRmDetails);
+		}
+
+		List<ConsumptionEntryDetailsVO> itemDetailsList = new ArrayList<>();
+		if (dto.getConsumptionEntryDetailsDTO() != null) {
+			for (ConsumptionEntryDetailsDTO d : dto.getConsumptionEntryDetailsDTO()) {
+				ConsumptionEntryDetailsVO detailsVO = new ConsumptionEntryDetailsVO();
+				detailsVO.setConsumedQty(d.getConsumedQty());
+
+				if (d.getItem() != null && d.getItem() != 0) {
+					ItemMasterVO item = itemMasterRepo.findById(d.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Not Found"));
+					detailsVO.setItem(item);
+				}
+
+				if (d.getUnit() != null && d.getUnit() != 0) {
+					UnitMasterVO unit = unitMasterRepo.findById(d.getUnit())
+							.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+					detailsVO.setUnit(unit);
+				}
+
+				detailsVO.setConsumptionEntryVO(vo);
+				itemDetailsList.add(detailsVO);
+			}
+		}
+		vo.setConsumptionEntryDetailsVO(itemDetailsList);
+
+		List<RmConsumptionEntryDetailsVO> rmItemDetailsList = new ArrayList<>();
+		if (dto.getRmConsumptionEntryDetailsDTO() != null) {
+			for (RmConsumptionEntryDetailsDTO d : dto.getRmConsumptionEntryDetailsDTO()) {
+				RmConsumptionEntryDetailsVO detailsVO = new RmConsumptionEntryDetailsVO();
+				detailsVO.setConsumptionAsPerBomQty(d.getConsumptionAsPerBomQty());
+				detailsVO.setAvailableStock(d.getAvailableStock());
+
+				BigDecimal consumedQty = d.getConsumedQty() != null ? d.getConsumedQty() : BigDecimal.ZERO;
+				detailsVO.setActualConsumedQty(d.getConsumptionAsPerBomQty().multiply(consumedQty));
+				detailsVO.setWastageQty(d.getWastageQty());
+				detailsVO.setScrapQty(d.getScrapQty());
+				BigDecimal total = d.getScrapQty().add(d.getWastageQty()).add(detailsVO.getActualConsumedQty());
+
+				detailsVO.setTotalConsumedQty(total);
+				detailsVO.setRate(d.getRate());
+
+				detailsVO.setAmount(d.getRate().multiply(detailsVO.getTotalConsumedQty()));
+
+				if (d.getItem() != null && d.getItem() != 0) {
+					ItemMasterVO item = itemMasterRepo.findById(d.getItem())
+							.orElseThrow(() -> new ApplicationException("RM Item Not Found"));
+					detailsVO.setItem(item);
+				}
+
+				if (d.getUnit() != null && d.getUnit() != 0) {
+					UnitMasterVO unit = unitMasterRepo.findById(d.getUnit())
+							.orElseThrow(() -> new ApplicationException("RM Unit Not Found"));
+					detailsVO.setUnit(unit);
+				}
+
+				detailsVO.setConsumptionEntryVO(vo);
+				rmItemDetailsList.add(detailsVO);
+			}
+		}
+		vo.setRmConsumptionEntryDetailsVO(rmItemDetailsList);
+	}
+
+	private ConsumptionEntryResponseDTO buildConsumptionEntryResponse(ConsumptionEntryVO vo) {
+		ConsumptionEntryResponseDTO responseDTO = new ConsumptionEntryResponseDTO();
+
+		responseDTO.setId(vo.getId());
+		responseDTO.setDocId(vo.getDocId());
+		responseDTO.setDocDate(vo.getDocDate());
+		responseDTO.setType(vo.getType());
+		responseDTO.setFromDate(vo.getFromDate());
+		responseDTO.setToDate(vo.getToDate());
+		responseDTO.setConsumption(vo.getConsumption());
+		responseDTO.setNarration(vo.getNarration());
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
+		responseDTO.setActive(vo.getActive());
+		responseDTO.setCancel(vo.getCancel());
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+		responseDTO.setScreenName(vo.getScreenName());
+		responseDTO.setScreenCode(vo.getScreenCode());
+		responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+
+		if (vo.getEntryType() != null) {
+			ListOfValuesResponseDTO fgItemDTO = new ListOfValuesResponseDTO();
+			fgItemDTO.setId(vo.getEntryType().getId());
+			fgItemDTO.setListCode(vo.getEntryType().getValueCode());
+			fgItemDTO.setListDescription(vo.getEntryType().getValueDescription());
+			responseDTO.setEntryType(fgItemDTO);
+		}
+
+		if (vo.getLocation() != null) {
+			LocationMasterResponseDTO locDto = new LocationMasterResponseDTO();
+			locDto.setId(vo.getLocation().getId());
+			locDto.setLocationName(vo.getLocation().getLocationName());
+			responseDTO.setLocation(locDto);
+		}
+
+		if (vo.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(vo.getBranch().getId());
+			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+			branchDTO.setBranchName(vo.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
+
+		
+		List<ConsumptionEntryDetailsResponseDTO> detailsList = new ArrayList<>();
+		if (vo.getConsumptionEntryDetailsVO() != null) {
+			for (ConsumptionEntryDetailsVO detailsVO : vo.getConsumptionEntryDetailsVO()) {
+				ConsumptionEntryDetailsResponseDTO detailsDTO = new ConsumptionEntryDetailsResponseDTO();
+				detailsDTO.setId(detailsVO.getId());
+				detailsDTO.setConsumedQty(detailsVO.getConsumedQty());
+
+				if (detailsVO.getItem() != null) {
+					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+					itemDTO.setId(detailsVO.getItem().getId());
+					itemDTO.setItemCode(detailsVO.getItem().getItemCode());
+					itemDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+					detailsDTO.setItem(itemDTO);
+				}
+
+				if (detailsVO.getUnit() != null) {
+					UnitResponseDTO unitDTO = new UnitResponseDTO();
+					unitDTO.setId(detailsVO.getUnit().getId());
+					unitDTO.setUnitId(detailsVO.getUnit().getUnitId());
+					detailsDTO.setUnit(unitDTO);
+				}
+
+				detailsList.add(detailsDTO);
+			}
+		}
+		responseDTO.setConsumptionEntryDetailsResponseDTO(detailsList);
+
+
+		List<RmConsumptionEntryDetailsResponseDTO> rmDetailsList = new ArrayList<>();
+		if (vo.getRmConsumptionEntryDetailsVO() != null) {
+			for (RmConsumptionEntryDetailsVO detailsVO : vo.getRmConsumptionEntryDetailsVO()) {
+				RmConsumptionEntryDetailsResponseDTO detailsDTO = new RmConsumptionEntryDetailsResponseDTO();
+				detailsDTO.setId(detailsVO.getId());
+				detailsDTO.setConsumptionAsPerBomQty(detailsVO.getConsumptionAsPerBomQty());
+				detailsDTO.setAvailableStock(detailsVO.getAvailableStock());
+				detailsDTO.setActualConsumedQty(detailsVO.getActualConsumedQty());
+				detailsDTO.setWastageQty(detailsVO.getWastageQty());
+				detailsDTO.setScrapQty(detailsVO.getScrapQty());
+				detailsDTO.setTotalConsumedQty(detailsVO.getTotalConsumedQty());
+				detailsDTO.setRate(detailsVO.getRate());
+				detailsDTO.setAmount(detailsVO.getAmount());
+
+				if (detailsVO.getItem() != null) {
+					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+					itemDTO.setId(detailsVO.getItem().getId());
+					itemDTO.setItemCode(detailsVO.getItem().getItemCode());
+					itemDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+					detailsDTO.setItem(itemDTO);
+				}
+
+				if (detailsVO.getUnit() != null) {
+					UnitResponseDTO unitDTO = new UnitResponseDTO();
+					unitDTO.setId(detailsVO.getUnit().getId());
+					unitDTO.setUnitId(detailsVO.getUnit().getUnitId());
+					detailsDTO.setUnit(unitDTO);
+				}
+
+				rmDetailsList.add(detailsDTO);
+			}
+		}
+		responseDTO.setRmConsumptionEntryDetailsResponseDTO(rmDetailsList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public String getConsumptionEntryDocId(Long orgId, String financialYear) {
+		String screenCode = "CE";
+		return consumptionEntryRepo.getConsumptionEntryDocId(orgId, financialYear, screenCode);
+	}
+
+	@Override
+	public ConsumptionEntryResponseDTO getConsumptionEntryById(Long id) throws ApplicationException {
+		ConsumptionEntryVO vo = consumptionEntryRepo.getConsumptionEntryById(id);
+		if (vo == null) {
+			throw new ApplicationException("Consumption Entry Not Found");
+		}
+		return buildConsumptionEntryResponse(vo);
+	}
+
+	@Override
+	public List<ConsumptionEntryResponseDTO> getConsumptionEntryByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+		List<ConsumptionEntryVO> list = consumptionEntryRepo.getConsumptionEntryByOrgId(orgId, branch);
+		if (list == null || list.isEmpty()) {
+			throw new ApplicationException("Consumption Entry Not Found");
+		}
+		List<ConsumptionEntryResponseDTO> responseList = new ArrayList<>();
+		for (ConsumptionEntryVO vo : list) {
+			responseList.add(buildConsumptionEntryResponse(vo));
+		}
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getFgAndSfgItemDetailsConsumptionEntry(Long orgId, Long branch) {
+		Set<Object[]> chType = consumptionEntryRepo.getFgAndSfgItemDetailsConsumptionEntry(orgId, branch);
+		return getFgAndSfgItemDetailsConsumptionEntry(chType);
+	}
+
+	private List<Map<String, Object>> getFgAndSfgItemDetailsConsumptionEntry(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("unitId", ch[3] != null ? ((Number) ch[3]).longValue() : null);
+			map.put("unitDescription", ch[4] != null ? ch[4].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getRawMaterialConsumptionEntry(Long orgId, Long branch, Long fgItem) {
+		Set<Object[]> chType = consumptionEntryRepo.getRawMaterialConsumptionEntry(orgId, branch, fgItem);
+		return getRawMaterialConsumptionEntry(chType);
+	}
+
+	private List<Map<String, Object>> getRawMaterialConsumptionEntry(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("bomQty", ch[3] != null ? new BigDecimal(ch[3].toString()) : BigDecimal.ZERO);
+			map.put("scrapQty", ch[4] != null ? new BigDecimal(ch[4].toString()) : BigDecimal.ZERO);
+			map.put("unitId", ch[5] != null ? ((Number) ch[5]).longValue() : null);
+			map.put("unitDescription", ch[6] != null ? ch[6].toString() : "");
 			list.add(map);
 		}
 

@@ -1,5 +1,6 @@
 package com.efitops.basesetup.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,10 @@ import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDT
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderShortCloseResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaterialPlanningResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SubContractingGRNResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
@@ -40,9 +43,11 @@ import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.JobOrderShortCloseDTO;
+import com.efitops.basesetup.dto.MaterialPlanningDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
+import com.efitops.basesetup.dto.SubContractingGRNDTO;
 import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
 import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.service.SubContractService;
@@ -1718,145 +1723,488 @@ public class SubContractController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	@GetMapping("/getTotalSuppliedQtyforJobOrderClose")
-	public ResponseEntity<ResponseDTO> getTotalSuppliedQtyforJobOrderClose(
+	public ResponseEntity<ResponseDTO> getTotalSuppliedQtyforJobOrderClose(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam String jobOrderNo, @RequestParam Long item) {
+
+		String methodName = "getTotalSuppliedQtyforJobOrderClose()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> issueQty = subContractService.getTotalSuppliedQtyforJobOrderClose(orgId, branch,
+					jobOrderNo, item);
+
+			responseObjectsMap.put("issueQty", issueQty);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Issue Qty retrieved successfully");
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Issue Qty", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getJobOrderShortCloseById")
+	public ResponseEntity<ResponseDTO> getJobOrderShortCloseById(@RequestParam Long id) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			JobOrderShortCloseResponseDTO jobOrderShortClose = subContractService.getJobOrderShortCloseById(id);
+
+			responseObjectsMap.put("jobOrderShortClose", jobOrderShortClose);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Job Order Short Close fetched successfully");
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getJobOrderShortCloseByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getJobOrderShortCloseByOrgIdAndBranch(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<JobOrderShortCloseResponseDTO> jobOrderShortClose = subContractService
+					.getJobOrderShortCloseByOrgIdAndBranch(orgId, branch);
+
+			responseObjectsMap.put("jobOrderShortClose", jobOrderShortClose);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Job Order Short Close List fetched successfully");
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getJobOrderShortCloseDocId")
+	public ResponseEntity<ResponseDTO> getJobOrderShortCloseDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getJobOrderShortCloseDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = subContractService.getJobOrderShortCloseDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Job Order Short Close DocId information retrieved successfully");
+
+			responseObjectsMap.put("jobOrderShortCloseDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Job Order Short Close DocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getDeliveryChallanCapitalItemsById")
+	public ResponseEntity<ResponseDTO> getDeliveryChallanCapitalItemsById(@RequestParam Long id) {
+
+		String methodName = "getDeliveryChallanCapitalItemsById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			DeliveryChallanCapitalItemsResponseDTO deliveryChallanCapitalItems = subContractService
+					.getDeliveryChallanCapitalItemsById(id);
+
+			responseObjectsMap.put("deliveryChallanCapitalItems", deliveryChallanCapitalItems);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Delivery Challan Capital Items fetched successfully");
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to fetch Delivery Challan Capital Items", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getDeliveryChallanCapitalItemsByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getDeliveryChallanCapitalItemsByOrgIdAndBranch(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getDeliveryChallanCapitalItemsByOrgIdAndBranch()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<DeliveryChallanCapitalItemsResponseDTO> deliveryChallanCapitalItems = subContractService
+					.getDeliveryChallanCapitalItemsByOrgIdAndBranch(orgId, branch);
+
+			responseObjectsMap.put("deliveryChallanCapitalItems", deliveryChallanCapitalItems);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Delivery Challan Capital Items List fetched successfully");
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to fetch Delivery Challan Capital Items List", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getDeliveryChallanCapitalItemsDocId")
+	public ResponseEntity<ResponseDTO> getDeliveryChallanCapitalItemsDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getDeliveryChallanCapitalItemsDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		String docId = "";
+
+		try {
+
+			docId = subContractService.getDeliveryChallanCapitalItemsDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Delivery Challan Capital Items DocId information retrieved successfully");
+
+			responseObjectsMap.put("deliveryChallanCapitalItemsDocId", docId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Delivery Challan Capital Items DocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping(value = "/createUpdateDeliveryChallanCapitalItems")
+	public ResponseEntity<ResponseDTO> createUpdateDeliveryChallanCapitalItems(
+			@RequestBody DeliveryChallanCapitalItemsDTO dto) {
+
+		String methodName = "createUpdateDeliveryChallanCapitalItems()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> responseMap = subContractService.createUpdateDeliveryChallanCapitalItems(dto);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+
+			responseObjectsMap.put("deliveryChallanCapitalItemsVO", responseMap.get("deliveryChallanCapitalItemsVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to create/update Delivery Challan Capital Items", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping(value = "/createUpdateSubContractingGRN")
+	public ResponseEntity<ResponseDTO> createUpdateSubContractingGRN(@RequestBody SubContractingGRNDTO dto) {
+
+		String methodName = "createUpdateSubContractingGRN()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> responseMap = subContractService.createUpdateSubContractingGRN(dto);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+
+			responseObjectsMap.put("subContractingGRNVO", responseMap.get("subContractingGRNVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to create/update Sub Contracting GRN",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getGateInwardEntryforSubContractingGRN")
+	public ResponseEntity<ResponseDTO> getGateInwardEntryDropdown(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long customer) {
+
+		String methodName = "getGateInwardEntryforSubContractingGRN()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mov = new ArrayList<>();
+
+		try {
+
+			mov = subContractService.getGateInwardEntryDropdown(orgId, branch, customer);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Gate Inward Entry information retrieved successfully");
+
+			responseObjectsMap.put("GateInwardEntryVO", mov);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Gate Inward Entry information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSubcontractSupplyScheduleforSubContractingGRN")
+	public ResponseEntity<ResponseDTO> getSubcontractSupplyScheduleforSubContractingGRN(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long customer) {
+
+		String methodName = "getSubcontractSupplyScheduleforSubContractingGRN()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mov = new ArrayList<>();
+
+		try {
+
+			mov = subContractService.getSubcontractSupplyScheduleforSubContractingGRN(orgId, branch, customer);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Subcontract Supply Schedule information retrieved successfully");
+
+			responseObjectsMap.put("SubcontractSupplyScheduleVO", mov);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Subcontract Supply Schedule information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getItemDetailsForSubContractingGRN")
+	public ResponseEntity<ResponseDTO> getItemDetailsForSubContractingGRN(@RequestParam String scheduleNo,
+			@RequestParam Long orgId, @RequestParam Long branch, @RequestParam Long customer) {
+
+		String methodName = "getItemDetailsForSubContractingGRN()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mov = new ArrayList<>();
+
+		try {
+
+			mov = subContractService.getItemDetailsForSubContractingGRN(scheduleNo, orgId, branch, customer);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Subcontract Supply Schedule Item information retrieved successfully");
+
+			responseObjectsMap.put("SubcontractSupplyScheduleItemVO", mov);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Subcontract Supply Schedule Item information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getBomItemDetailsforSubContractingGRN")
+	public ResponseEntity<ResponseDTO> getBomItemDetails(
 	        @RequestParam Long orgId,
 	        @RequestParam Long branch,
-	        @RequestParam String jobOrderNo,
-	        @RequestParam Long item) {
+	        @RequestParam Long itemId) {
 
-	    String methodName = "getTotalSuppliedQtyforJobOrderClose()";
+	    String methodName = "getBomItemDetailsforSubContractingGRN()";
+
 	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	    String errorMsg = null;
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO = null;
-
-	    try {
-
-	        List<Map<String, Object>> issueQty =
-	                subContractService.getTotalSuppliedQtyforJobOrderClose(
-	                        orgId,
-	                        branch,
-	                        jobOrderNo,
-	                        item);
-
-	        responseObjectsMap.put("issueQty", issueQty);
-
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Issue Qty retrieved successfully");
-
-	        responseDTO =
-	                createServiceResponse(responseObjectsMap);
-
-	    } catch (Exception e) {
-
-	        errorMsg = e.getMessage();
-
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        "Failed to retrieve Issue Qty",
-	                        errorMsg);
-	    }
-
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	    return ResponseEntity.ok().body(responseDTO);
-	}
-	
-	
-	@GetMapping("/getJobOrderShortCloseById")
-	public ResponseEntity<ResponseDTO> getJobOrderShortCloseById(
-	        @RequestParam Long id) {
-
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
-
-	    try {
-
-	        JobOrderShortCloseResponseDTO jobOrderShortClose =
-	                subContractService.getJobOrderShortCloseById(id);
-
-	        responseObjectsMap.put(
-	                "jobOrderShortClose",
-	                jobOrderShortClose);
-
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Job Order Short Close fetched successfully");
-
-	        responseDTO =
-	                createServiceResponse(responseObjectsMap);
-
-	    } catch (Exception e) {
-
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        e.getMessage(),
-	                        e.getMessage());
-	    }
-
-	    return ResponseEntity.ok(responseDTO);
-	}
-	
-	@GetMapping("/getJobOrderShortCloseByOrgIdAndBranch")
-	public ResponseEntity<ResponseDTO> getJobOrderShortCloseByOrgIdAndBranch(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
-
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
-
-	    try {
-
-	        List<JobOrderShortCloseResponseDTO> jobOrderShortClose =
-	                subContractService
-	                        .getJobOrderShortCloseByOrgIdAndBranch(
-	                                orgId,
-	                                branch);
-
-	        responseObjectsMap.put(
-	                "jobOrderShortClose",
-	                jobOrderShortClose);
-
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Job Order Short Close List fetched successfully");
-
-	        responseDTO =
-	                createServiceResponse(responseObjectsMap);
-
-	    } catch (Exception e) {
-
-	        responseDTO =
-	                createServiceResponseError(
-	                        responseObjectsMap,
-	                        e.getMessage(),
-	                        e.getMessage());
-	    }
-
-	    return ResponseEntity.ok(responseDTO);
-	}
-	
-	@GetMapping("/getJobOrderShortCloseDocId")
-	public ResponseEntity<ResponseDTO> getJobOrderShortCloseDocId(
-	        @RequestParam Long orgId,
-	        @RequestParam String financialYear) {
-
-	    String methodName = "getJobOrderShortCloseDocId()";
-
-	    LOGGER.debug(
-	            CommonConstant.STARTING_METHOD,
-	            methodName);
 
 	    String errorMsg = null;
 
@@ -1865,15 +2213,15 @@ public class SubContractController extends BaseController {
 
 	    ResponseDTO responseDTO = null;
 
-	    String mapp = "";
+	    List<Map<String, Object>> mov =
+	            new ArrayList<>();
 
 	    try {
 
-	        mapp =
-	                subContractService
-	                        .getJobOrderShortCloseDocId(
-	                                orgId,
-	                                financialYear);
+	        mov = subContractService.getBomItemDetailsforSubContractingGRN(
+	                orgId,
+	                branch,
+	                itemId);
 
 	    } catch (Exception e) {
 
@@ -1889,11 +2237,11 @@ public class SubContractController extends BaseController {
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
-	                "Job Order Short Close DocId information retrieved successfully");
+	                "BOM Item Details information retrieved successfully");
 
 	        responseObjectsMap.put(
-	                "jobOrderShortCloseDocId",
-	                mapp);
+	                "BomItemDetailsVO",
+	                mov);
 
 	        responseDTO =
 	                createServiceResponse(
@@ -1904,7 +2252,7 @@ public class SubContractController extends BaseController {
 	        responseDTO =
 	                createServiceResponseError(
 	                        responseObjectsMap,
-	                        "Failed to retrieve Job Order Short Close DocId",
+	                        "Failed to retrieve BOM Item Details information",
 	                        errorMsg);
 	    }
 
@@ -1915,125 +2263,103 @@ public class SubContractController extends BaseController {
 	    return ResponseEntity.ok().body(responseDTO);
 	}
 	
-	@GetMapping("/getDeliveryChallanCapitalItemsById")
-	public ResponseEntity<ResponseDTO> getDeliveryChallanCapitalItemsById(
+	@GetMapping("/getSubContractingGRNById")
+	public ResponseEntity<ResponseDTO> getSubContractingGRNById(
 	        @RequestParam Long id) {
 
-	    String methodName = "getDeliveryChallanCapitalItemsById()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	    String errorMsg = null;
 	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO = null;
+	    ResponseDTO responseDTO;
 
 	    try {
 
-	        DeliveryChallanCapitalItemsResponseDTO deliveryChallanCapitalItems =
-	                subContractService.getDeliveryChallanCapitalItemsById(id);
+	        SubContractingGRNResponseDTO subContractingGRN =
+	                subContractService.getSubContractingGRNById(id);
 
 	        responseObjectsMap.put(
-	                "deliveryChallanCapitalItems",
-	                deliveryChallanCapitalItems);
+	                "subContractingGRN",
+	                subContractingGRN);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
-	                "Delivery Challan Capital Items fetched successfully");
+	                "Sub Contracting GRN fetched successfully");
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
 
 	    } catch (Exception e) {
 
-	        errorMsg = e.getMessage();
-
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Failed to fetch Delivery Challan Capital Items",
-	                errorMsg);
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
 	    }
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	    return ResponseEntity.ok().body(responseDTO);
+	    return ResponseEntity.ok(responseDTO);
 	}
 	
-	@GetMapping("/getDeliveryChallanCapitalItemsByOrgIdAndBranch")
-	public ResponseEntity<ResponseDTO> getDeliveryChallanCapitalItemsByOrgIdAndBranch(
+	@GetMapping("/getSubContractingGRNByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getSubContractingGRNByOrgIdAndBranch(
 	        @RequestParam Long orgId,
 	        @RequestParam Long branch) {
 
-	    String methodName =
-	            "getDeliveryChallanCapitalItemsByOrgIdAndBranch()";
-
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-	    String errorMsg = null;
 	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO = null;
+	    ResponseDTO responseDTO;
 
 	    try {
 
-	        List<DeliveryChallanCapitalItemsResponseDTO>
-	                deliveryChallanCapitalItems =
-	                subContractService
-	                        .getDeliveryChallanCapitalItemsByOrgIdAndBranch(
-	                                orgId,
-	                                branch);
+	        List<SubContractingGRNResponseDTO> subContractingGRNList =
+	                subContractService.getSubContractingGRNByOrgIdAndBranch(
+	                        orgId,
+	                        branch);
 
 	        responseObjectsMap.put(
-	                "deliveryChallanCapitalItems",
-	                deliveryChallanCapitalItems);
+	                "subContractingGRN",
+	                subContractingGRNList);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
-	                "Delivery Challan Capital Items List fetched successfully");
+	                "Sub Contracting GRN List fetched successfully");
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
 
 	    } catch (Exception e) {
 
-	        errorMsg = e.getMessage();
-
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Failed to fetch Delivery Challan Capital Items List",
-	                errorMsg);
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
 	    }
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-	    return ResponseEntity.ok().body(responseDTO);
+	    return ResponseEntity.ok(responseDTO);
 	}
 	
-	@GetMapping("/getDeliveryChallanCapitalItemsDocId")
-	public ResponseEntity<ResponseDTO> getDeliveryChallanCapitalItemsDocId(
+	@GetMapping("/getSubContractingGRNDocId")
+	public ResponseEntity<ResponseDTO> getSubContractingGRNDocId(
 	        @RequestParam Long orgId,
 	        @RequestParam String financialYear) {
 
-	    String methodName =
-	            "getDeliveryChallanCapitalItemsDocId()";
+	    String methodName = "getSubContractingGRNDocId()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
 
 	    String errorMsg = null;
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
 	    ResponseDTO responseDTO = null;
 
 	    String docId = "";
 
 	    try {
 
-	        docId = subContractService
-	                .getDeliveryChallanCapitalItemsDocId(
+	        docId =
+	                subContractService.getSubContractingGRNDocId(
 	                        orgId,
 	                        financialYear);
 
@@ -2051,32 +2377,38 @@ public class SubContractController extends BaseController {
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
-	                "Delivery Challan Capital Items DocId information retrieved successfully");
+	                "Sub Contracting GRN DocId information retrieved successfully");
 
 	        responseObjectsMap.put(
-	                "deliveryChallanCapitalItemsDocId",
+	                "subContractingGRNDocId",
 	                docId);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
 
 	    } else {
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Failed to retrieve Delivery Challan Capital Items DocId",
-	                errorMsg);
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Sub Contracting GRN DocId",
+	                        errorMsg);
 	    }
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
 
 	    return ResponseEntity.ok().body(responseDTO);
 	}
-	
-	@PutMapping(value = "/createUpdateDeliveryChallanCapitalItems")
-	public ResponseEntity<ResponseDTO> createUpdateDeliveryChallanCapitalItems(
-	        @RequestBody DeliveryChallanCapitalItemsDTO dto) {
 
-	    String methodName = "createUpdateDeliveryChallanCapitalItems()";
+	
+	@PutMapping(value = "/createUpdateMaterialPlanning")
+	public ResponseEntity<ResponseDTO> createUpdateMaterialPlanning(
+	        @RequestBody MaterialPlanningDTO materialPlanningDTO) {
+
+	    String methodName = "createUpdateMaterialPlanning()";
 
 	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
@@ -2089,15 +2421,16 @@ public class SubContractController extends BaseController {
 	    try {
 
 	        Map<String, Object> responseMap =
-	                subContractService.createUpdateDeliveryChallanCapitalItems(dto);
+	        		subContractService.createUpdateMaterialPlanning(
+	                        materialPlanningDTO);
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
 	                responseMap.get("message"));
 
 	        responseObjectsMap.put(
-	                "deliveryChallanCapitalItemsVO",
-	                responseMap.get("deliveryChallanCapitalItemsVO"));
+	                "materialPlanningVO",
+	                responseMap.get("materialPlanningVO"));
 
 	        responseDTO = createServiceResponse(responseObjectsMap);
 
@@ -2112,7 +2445,139 @@ public class SubContractController extends BaseController {
 
 	        responseDTO = createServiceResponseError(
 	                responseObjectsMap,
-	                "Failed to create/update Delivery Challan Capital Items",
+	                "Failed to create/update Material Planning",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+
+	
+	@GetMapping("/getMaterialPlanningById")
+	public ResponseEntity<ResponseDTO> getMaterialPlanningById(
+	        @RequestParam Long id) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        MaterialPlanningResponseDTO materialPlanning =
+	        		subContractService.getMaterialPlanningById(id);
+
+	        responseObjectsMap.put(
+	                "materialPlanning",
+	                materialPlanning);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Material Planning fetched successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getMaterialPlanningByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getMaterialPlanningByOrgIdAndBranch(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<MaterialPlanningResponseDTO> materialPlanningList =
+	        		subContractService
+	                        .getMaterialPlanningByOrgIdAndBranch(
+	                                orgId,
+	                                branch);
+
+	        responseObjectsMap.put(
+	                "materialPlanning",
+	                materialPlanningList);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Material Planning List fetched successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getMaterialPlanningDocId")
+	public ResponseEntity<ResponseDTO> getMaterialPlanningDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName = "getMaterialPlanningDocId()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String docId = "";
+
+	    try {
+
+	        docId = subContractService
+	                .getMaterialPlanningDocId(
+	                        orgId,
+	                        financialYear);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Material Planning DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "materialPlanningDocId",
+	                docId);
+
+	        responseDTO = createServiceResponse(
+	                responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to retrieve Material Planning DocId",
 	                errorMsg);
 	    }
 

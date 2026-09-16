@@ -54,12 +54,17 @@ import com.efitops.basesetup.ResponseDTO.JobOrderShortCloseDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaterialPlanningResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ServiceAccMasterResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleItemDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SubContractingGRNConsumptionResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SubContractingGRNDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SubContractingGRNResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SubContractingGRNTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentItemDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractItemDetailsResponseDTO;
@@ -84,11 +89,16 @@ import com.efitops.basesetup.dto.JobOrderDetailsDTO;
 import com.efitops.basesetup.dto.JobOrderShortCloseDTO;
 import com.efitops.basesetup.dto.JobOrderShortCloseDetailsDTO;
 import com.efitops.basesetup.dto.JobOrderTaxDetailsDTO;
+import com.efitops.basesetup.dto.MaterialPlanningDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleItemDetailsDTO;
+import com.efitops.basesetup.dto.SubContractingGRNConsumptionDTO;
+import com.efitops.basesetup.dto.SubContractingGRNDTO;
+import com.efitops.basesetup.dto.SubContractingGRNDetailsDTO;
+import com.efitops.basesetup.dto.SubContractingGRNTaxDetailsDTO;
 import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
 import com.efitops.basesetup.dto.SupplierRateContractAmendmentItemDetailsDTO;
 import com.efitops.basesetup.dto.SupplierRateContractDTO;
@@ -121,12 +131,17 @@ import com.efitops.basesetup.entity.JobOrderShortCloseVO;
 import com.efitops.basesetup.entity.JobOrderTaxDetailsVO;
 import com.efitops.basesetup.entity.JobOrderVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.MaterialPlanningVO;
 import com.efitops.basesetup.entity.ProductionScheduleForNextThreeMonthDetailsVO;
 import com.efitops.basesetup.entity.ProductionScheduleForNextThreeMonthVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleDetailsVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleItemDetailsVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleVO;
+import com.efitops.basesetup.entity.SubContractingGRNConsumptionVO;
+import com.efitops.basesetup.entity.SubContractingGRNDetailsVO;
+import com.efitops.basesetup.entity.SubContractingGRNTaxDetailsVO;
+import com.efitops.basesetup.entity.SubContractingGRNVO;
 import com.efitops.basesetup.entity.SupplierRateContractAmendmentItemDetailsVO;
 import com.efitops.basesetup.entity.SupplierRateContractAmendmentVO;
 import com.efitops.basesetup.entity.SupplierRateContractItemDetailsVO;
@@ -150,6 +165,7 @@ import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
+import com.efitops.basesetup.repository.GateInwardEntryRepo;
 import com.efitops.basesetup.repository.HsnRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.JobOrderAmendmentDetailsRepo;
@@ -162,12 +178,17 @@ import com.efitops.basesetup.repository.JobOrderShortCloseRepo;
 import com.efitops.basesetup.repository.JobOrderTaxDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.MaterialPlanningRepo;
 import com.efitops.basesetup.repository.ProductionScheduleForNextThreeMonthDetailsRepo;
 import com.efitops.basesetup.repository.ProductionScheduleForNextThreeMonthRepo;
 import com.efitops.basesetup.repository.ServiceAccMasterRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleDetailsRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleItemDetailsRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleRepo;
+import com.efitops.basesetup.repository.SubContractingGRNConsumptionRepo;
+import com.efitops.basesetup.repository.SubContractingGRNDetailsRepo;
+import com.efitops.basesetup.repository.SubContractingGRNRepo;
+import com.efitops.basesetup.repository.SubContractingGRNTaxDetailsRepo;
 import com.efitops.basesetup.repository.SupplierRateContractAmendmentItemDetailsRepo;
 import com.efitops.basesetup.repository.SupplierRateContractAmendmentRepo;
 import com.efitops.basesetup.repository.SupplierRateContractItemDetailsRepo;
@@ -312,6 +333,28 @@ public class SubContractServiceImpl implements SubContractService {
 	@Autowired
 	DeliveryChallanCapitalItemsDetailsRepo deliveryChallanCapitalItemsDetailsRepo;
 
+	@Autowired
+	SubContractingGRNTaxDetailsRepo subContractingGRNTaxDetailsRepo;
+
+	@Autowired
+	SubContractingGRNDetailsRepo subContractingGRNDetailsRepo;
+
+	@Autowired
+	SubContractingGRNRepo subContractingGRNRepo;
+
+	@Autowired
+	SubContractingGRNConsumptionRepo subContractingGRNConsumptionRepo;
+
+	@Autowired
+	GateInwardEntryRepo gateInwardEntryRepo;
+	
+	@Autowired
+	SubContractSupplyScheduleRepo subcontractSupplyScheduleRepo;
+
+	@Autowired
+	MaterialPlanningRepo materialPlanningRepo;
+	
+	
 	@Override
 	@Transactional
 	public Map<String, Object> createUpdateSupplierRateContract(SupplierRateContractDTO dto)
@@ -4472,14 +4515,13 @@ public class SubContractServiceImpl implements SubContractService {
 			// DELETE OLD DETAILS
 			// =====================================================
 
-			List<DeliveryChallanCumGatePassDetailsVO> oldDetails =
-			        deliveryChallanCumGatePassDetailsRepo
-			                .findByDeliveryChallanCumGatePassVO(deliveryChallanVO);
+			List<DeliveryChallanCumGatePassDetailsVO> oldDetails = deliveryChallanCumGatePassDetailsRepo
+					.findByDeliveryChallanCumGatePassVO(deliveryChallanVO);
 
 			if (oldDetails != null && !oldDetails.isEmpty()) {
-			    deliveryChallanCumGatePassDetailsRepo.deleteAll(oldDetails);
+				deliveryChallanCumGatePassDetailsRepo.deleteAll(oldDetails);
 			}
-			
+
 			deliveryChallanVO.setUpdatedBy(dto.getCreatedBy());
 
 			message = "Delivery Challan Cum Gate Pass Updated Successfully";
@@ -5625,41 +5667,29 @@ public class SubContractServiceImpl implements SubContractService {
 			// GENERATE DOCUMENT ID
 			// =====================================================
 
-	            String docId =
-	                    jobOrderShortCloseRepo
-	                            .getJobOrderShortCloseDocId(
-	                                    dto.getOrgId(),
-	                                    dto.getFinancialYear(),
-	                                    screenCode);
+			String docId = jobOrderShortCloseRepo.getJobOrderShortCloseDocId(dto.getOrgId(), dto.getFinancialYear(),
+					screenCode);
 
-	            if (docId == null || docId.isBlank()) {
+			if (docId == null || docId.isBlank()) {
 
-	                throw new ApplicationException(
-	                        "Job Order Short Close DocId Generation Failed");
-	            }
+				throw new ApplicationException("Job Order Short Close DocId Generation Failed");
+			}
 
-	            jobOrderShortCloseVO.setDocId(docId);
+			jobOrderShortCloseVO.setDocId(docId);
 
 			// =====================================================
 			// UPDATE DOCUMENT LAST NUMBER
 			// =====================================================
 
-	            DocumentTypeMappingDetailsVO
-	                    documentTypeMappingDetailsVO =
-	                    documentTypeMappingDetailsRepo
-	                            .findByOrgIdAndFinYearAndScreenCode(
-	                                    dto.getOrgId(),
-	                                    dto.getFinancialYear(),
-	                                    screenCode);
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
 
-	            if (documentTypeMappingDetailsVO != null) {
+			if (documentTypeMappingDetailsVO != null) {
 
-	                documentTypeMappingDetailsVO.setLastNo(
-	                        documentTypeMappingDetailsVO.getLastNo() + 1);
+				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
 
-	                documentTypeMappingDetailsRepo.save(
-	                        documentTypeMappingDetailsVO);
-	            }
+				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			}
 
 			// =====================================================
 			// CREATED BY
@@ -5805,16 +5835,14 @@ public class SubContractServiceImpl implements SubContractService {
 
 				detailVO.setSuppliedQty(detailDTO.getSuppliedQty());
 
-				BigDecimal pendingQty = BigDecimal.ZERO;	
+				BigDecimal pendingQty = BigDecimal.ZERO;
 
 				if (detailDTO.getOrderQty() != null) {
 
-				    BigDecimal suppliedQty = detailDTO.getSuppliedQty() != null
-				            ? detailDTO.getSuppliedQty()
-				            : BigDecimal.ZERO;
+					BigDecimal suppliedQty = detailDTO.getSuppliedQty() != null ? detailDTO.getSuppliedQty()
+							: BigDecimal.ZERO;
 
-				    pendingQty = detailDTO.getOrderQty()
-				            .subtract(suppliedQty);
+					pendingQty = detailDTO.getOrderQty().subtract(suppliedQty);
 				}
 
 				detailVO.setPendingQty(pendingQty);
@@ -5825,11 +5853,10 @@ public class SubContractServiceImpl implements SubContractService {
 
 				if (pendingQty != null) {
 
-				    BigDecimal requiredQty = detailDTO.getRequiredQty() != null
-				            ? detailDTO.getRequiredQty()
-				            : BigDecimal.ZERO;
+					BigDecimal requiredQty = detailDTO.getRequiredQty() != null ? detailDTO.getRequiredQty()
+							: BigDecimal.ZERO;
 
-				    shortCloseQty = pendingQty.subtract(requiredQty);
+					shortCloseQty = pendingQty.subtract(requiredQty);
 				}
 
 				detailVO.setShortCloseQty(shortCloseQty);
@@ -6271,12 +6298,10 @@ public class SubContractServiceImpl implements SubContractService {
 
 				BigDecimal amount = BigDecimal.ZERO;
 
-				if (detailsDTO.getIssueQty() != null
-				        && detailsDTO.getUnitRate() != null) {
+				if (detailsDTO.getIssueQty() != null && detailsDTO.getUnitRate() != null) {
 
-				    amount = detailsDTO.getIssueQty()
-				            .multiply(detailsDTO.getUnitRate())
-				            .setScale(2, RoundingMode.HALF_UP);
+					amount = detailsDTO.getIssueQty().multiply(detailsDTO.getUnitRate()).setScale(2,
+							RoundingMode.HALF_UP);
 				}
 
 				detailsVO.setAmount(amount);
@@ -6293,239 +6318,1516 @@ public class SubContractServiceImpl implements SubContractService {
 
 		vo.getDetails().addAll(detailList);
 	}
+
+	private DeliveryChallanCapitalItemsResponseDTO convertToResponse(DeliveryChallanCapitalItemsVO vo) {
+
+		DeliveryChallanCapitalItemsResponseDTO response = new DeliveryChallanCapitalItemsResponseDTO();
+
+		response.setId(vo.getId());
+		response.setDocId(vo.getDocId());
+		response.setDocDate(vo.getDocDate());
+		response.setBelongsTo(vo.getBelongsTo());
+		response.setIndentNo(vo.getIndentNo());
+		response.setTransportName(vo.getTransportName());
+		response.setVehicleNo(vo.getVehicleNo());
+		response.setDcType(vo.getDcType());
+		response.setApprovalByStores(vo.getApprovalByStores());
+		response.setRemarks(vo.getRemarks());
+		response.setCreatedBy(vo.getCreatedBy());
+		response.setActive(vo.isActive());
+		response.setCancel(vo.isCancel());
+		response.setUpdatedBy(vo.getUpdatedBy());
+		response.setCancelRemarks(vo.getCancelRemarks());
+		response.setScreenName(vo.getScreenName());
+		response.setScreenCode(vo.getScreenCode());
+		response.setOrgId(vo.getOrgId());
+		response.setFinancialYear(vo.getFinancialYear());
+
+		// Branch
+		if (vo.getBranch() != null) {
+			BranchResponseDTO branchResponse = new BranchResponseDTO();
+
+			branchResponse.setId(vo.getBranch().getId());
+			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+			branchResponse.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponse);
+		}
+
+		// Department
+		if (vo.getDepartment() != null) {
+			DepartmentResponseDTO departmentResponse = new DepartmentResponseDTO();
+
+			departmentResponse.setId(vo.getDepartment().getId());
+			departmentResponse.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+			departmentResponse.setDepartmentName(vo.getDepartment().getDepartmentName());
+
+			response.setDepartment(departmentResponse);
+		}
+
+		// Vendor
+		if (vo.getVendor() != null) {
+			CustomerResponseDetailsDTO vendorResponse = new CustomerResponseDetailsDTO();
+
+			vendorResponse.setId(vo.getVendor().getId());
+			vendorResponse.setCustomerName(vo.getVendor().getCustomerName());
+			vendorResponse.setCustomerCode(vo.getVendor().getCustomerCode());
+
+			response.setVendor(vendorResponse);
+		}
+
+		// Customer Location
+		if (vo.getCustomerLocation() != null) {
+			LocationMasterResponseDTO locationResponse = new LocationMasterResponseDTO();
+
+			locationResponse.setId(vo.getCustomerLocation().getId());
+			locationResponse.setLocationName(vo.getCustomerLocation().getLocationName());
+
+			response.setCustomerLocation(locationResponse);
+		}
+
+		// Prepared By
+		if (vo.getPreparedBy() != null) {
+			EmployeeDropdownResponseDTO preparedByResponse = new EmployeeDropdownResponseDTO();
+
+			preparedByResponse.setEmployeeId(vo.getPreparedBy().getId());
+			preparedByResponse.setEmployeeCode(vo.getPreparedBy().getEmployeeId());
+			preparedByResponse.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+			preparedByResponse.setEmail(vo.getPreparedBy().getEmail());
+
+			response.setPreparedBy(preparedByResponse);
+		}
+
+		// Approved By
+		if (vo.getApprovedBy() != null) {
+			EmployeeDropdownResponseDTO approvedByResponse = new EmployeeDropdownResponseDTO();
+
+			approvedByResponse.setEmployeeId(vo.getApprovedBy().getId());
+			approvedByResponse.setEmployeeCode(vo.getApprovedBy().getEmployeeId());
+			approvedByResponse.setEmployeeName(vo.getApprovedBy().getEmployeeName());
+			approvedByResponse.setEmail(vo.getApprovedBy().getEmail());
+
+			response.setApprovedBy(approvedByResponse);
+		}
+
+		// Details
+		List<DeliveryChallanCapitalItemsDetailsResponseDTO> detailResponseList = new ArrayList<>();
+
+		if (vo.getDetails() != null) {
+
+			for (DeliveryChallanCapitalItemsDetailsVO detailsVO : vo.getDetails()) {
+
+				DeliveryChallanCapitalItemsDetailsResponseDTO detailsResponse = new DeliveryChallanCapitalItemsDetailsResponseDTO();
+
+				detailsResponse.setId(detailsVO.getId());
+				detailsResponse.setStock(detailsVO.getStock());
+				detailsResponse.setAvailableStock(detailsVO.getAvailableStock());
+				detailsResponse.setIssueQty(detailsVO.getIssueQty());
+				detailsResponse.setUnitRate(detailsVO.getUnitRate());
+				detailsResponse.setAmount(detailsVO.getAmount());
+				detailsResponse.setRemarks(detailsVO.getRemarks());
+
+				// Outgoing Item
+				if (detailsVO.getOutgoingItem() != null) {
+
+					ItemResponse1DTO itemResponse = new ItemResponse1DTO();
+
+					itemResponse.setId(detailsVO.getOutgoingItem().getId());
+
+					itemResponse.setItemCode(detailsVO.getOutgoingItem().getItemCode());
+
+					itemResponse.setItemDescription(detailsVO.getOutgoingItem().getItemDescription());
+
+					// Item Unit
+					if (detailsVO.getOutgoingItem().getPrimaryUnit() != null) {
+
+						UnitMasterResponseDTO itemUnitResponse = new UnitMasterResponseDTO();
+
+						itemUnitResponse.setId(detailsVO.getOutgoingItem().getPrimaryUnit().getId());
+
+						itemUnitResponse.setUnitId(detailsVO.getOutgoingItem().getPrimaryUnit().getUnitId());
+
+						itemUnitResponse
+								.setUnitDescription(detailsVO.getOutgoingItem().getPrimaryUnit().getDescription());
+
+						itemResponse.setUnit(itemUnitResponse);
+					}
+
+					detailsResponse.setOutgoingItem(itemResponse);
+				}
+
+				// Unit
+				if (detailsVO.getUnit() != null) {
+
+					UnitMasterResponseDTO unitResponse = new UnitMasterResponseDTO();
+
+					unitResponse.setId(detailsVO.getUnit().getId());
+					unitResponse.setUnitId(detailsVO.getUnit().getUnitId());
+					unitResponse.setUnitDescription(detailsVO.getUnit().getDescription());
+
+					detailsResponse.setUnit(unitResponse);
+				}
+
+				// From Location
+				if (detailsVO.getFromLocation() != null) {
+
+					LocationMasterResponseDTO locationResponse = new LocationMasterResponseDTO();
+
+					locationResponse.setId(detailsVO.getFromLocation().getId());
+
+					locationResponse.setLocationName(detailsVO.getFromLocation().getLocationName());
+
+					detailsResponse.setFromLocation(locationResponse);
+				}
+
+				detailResponseList.add(detailsResponse);
+			}
+		}
+
+		response.setDetails(detailResponseList);
+
+		return response;
+	}
+
+	@Override
+	public DeliveryChallanCapitalItemsResponseDTO getDeliveryChallanCapitalItemsById(Long id)
+			throws ApplicationException {
+
+		DeliveryChallanCapitalItemsVO deliveryChallanVO = deliveryChallanCapitalItemsRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Delivery Challan Capital Items Not Found"));
+
+		return convertToResponse(deliveryChallanVO);
+	}
+
+	@Override
+	public List<DeliveryChallanCapitalItemsResponseDTO> getDeliveryChallanCapitalItemsByOrgIdAndBranch(Long orgId,
+			Long branch) throws ApplicationException {
+
+		List<DeliveryChallanCapitalItemsVO> deliveryChallanList = deliveryChallanCapitalItemsRepo
+				.findByOrgIdAndBranch(orgId, branch);
+
+		List<DeliveryChallanCapitalItemsResponseDTO> responseList = new ArrayList<>();
+
+		for (DeliveryChallanCapitalItemsVO vo : deliveryChallanList) {
+
+			responseList.add(convertToResponse(vo));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public String getDeliveryChallanCapitalItemsDocId(Long orgId, String financialYear) {
+
+		String screenCode = "DCCI";
+
+		String result = deliveryChallanCapitalItemsRepo.getDeliveryChallanCapitalItemsDocId(orgId, financialYear,
+				screenCode);
+
+		return result;
+	}
+
+	@Transactional(rollbackOn = Exception.class)
+	@Override
+	public Map<String, Object> createUpdateSubContractingGRN(SubContractingGRNDTO dto) throws ApplicationException {
+
+		Map<String, Object> response = new HashMap<>();
+
+		String screenCode = "SCGRN";
+
+		SubContractingGRNVO subContractingGRNVO;
+
+		String message;
+
+		// =========================================================
+		// CREATE
+		// =========================================================
+
+		if (ObjectUtils.isEmpty(dto.getId())) {
+
+			subContractingGRNVO = new SubContractingGRNVO();
+
+			// =====================================================
+			// GENERATE DOCUMENT ID
+			// =====================================================
+
+//			String docId = subContractingGRNRepo.getSubContractingGRNDocId(dto.getOrgId(), dto.getFinancialYear(),
+//					screenCode);
+//
+//			if (docId == null || docId.isBlank()) {
+//
+//				throw new ApplicationException("Sub Contracting GRN DocId Generation Failed");
+//			}
+//
+//			subContractingGRNVO.setDocId(docId);
+
+			// =====================================================
+			// UPDATE DOCUMENT LAST NUMBER
+			// =====================================================
+
+//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+//					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+//
+//			if (documentTypeMappingDetailsVO != null) {
+//
+//				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//			}
+
+			// =====================================================
+			// CREATED BY
+			// =====================================================
+
+			subContractingGRNVO.setCreatedBy(dto.getCreatedBy());
+
+			subContractingGRNVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Sub Contracting GRN Created Successfully";
+
+		} else {
+
+			// =========================================================
+			// UPDATE
+			// =========================================================
+
+			subContractingGRNVO = subContractingGRNRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Sub Contracting GRN Not Found"));
+
+			// =========================================================
+			// GET OLD DETAILS
+			// =========================================================
+
+			List<SubContractingGRNDetailsVO> oldDetails = subContractingGRNDetailsRepo
+					.findBySubContractingGRNVO(subContractingGRNVO);
+
+			// =========================================================
+			// DELETE OLD CONSUMPTION
+			// =========================================================
+
+			if (oldDetails != null && !oldDetails.isEmpty()) {
+
+				for (SubContractingGRNDetailsVO oldDetail : oldDetails) {
+
+					subContractingGRNConsumptionRepo.deleteByDetailsId(oldDetail.getId());
+				}
+
+				subContractingGRNConsumptionRepo.flush();
+			}
+
+			// =========================================================
+			// DELETE OLD DETAILS
+			// =========================================================
+
+			if (oldDetails != null && !oldDetails.isEmpty()) {
+
+				subContractingGRNDetailsRepo.deleteAll(oldDetails);
+
+				subContractingGRNDetailsRepo.flush();
+			}
+
+			// =========================================================
+			// DELETE OLD TAX DETAILS
+			// =========================================================
+
+			List<SubContractingGRNTaxDetailsVO> oldTaxDetails = subContractingGRNTaxDetailsRepo
+					.findBySubContractingGRNVO(subContractingGRNVO);
+
+			if (oldTaxDetails != null && !oldTaxDetails.isEmpty()) {
+
+				subContractingGRNTaxDetailsRepo.deleteAll(oldTaxDetails);
+
+				subContractingGRNTaxDetailsRepo.flush();
+			}
+
+			// =========================================================
+			// CLEAR OLD JAVA COLLECTIONS
+			// =========================================================
+
+			subContractingGRNVO.getDetails().clear();
+			subContractingGRNVO.getTaxDetails().clear();
+
+			// =========================================================
+			// UPDATE USER
+			// =========================================================
+
+			subContractingGRNVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Sub Contracting GRN Updated Successfully";
+		}
+		// =========================================================
+		// DTO TO VO
+		// =========================================================
+
+		getSubContractingGRNVOFromDTO(dto, subContractingGRNVO);
+
+		// =========================================================
+		// SAVE
+		// =========================================================
+
+		subContractingGRNVO = subContractingGRNRepo.save(subContractingGRNVO);
+
+		// =========================================================
+		// RESPONSE
+		// =========================================================
+
+		SubContractingGRNResponseDTO responseDTO = convertToResponse(subContractingGRNVO);
+
+		response.put("message", message);
+
+		response.put("subContractingGRNVO", responseDTO);
+
+		return response;
+	}
+
+	private void getSubContractingGRNVOFromDTO(SubContractingGRNDTO dto, SubContractingGRNVO vo)
+			throws ApplicationException {
+
+		// =========================================================
+		// BRANCH
+		// =========================================================
+
+		if (dto.getBranch() != null) {
+
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branch);
+		}
+
+		// =========================================================
+		// DEPARTMENT
+		// =========================================================
+
+		if (dto.getDepartment() != null) {
+
+			DepartmentVO department = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Department Not Found"));
+
+			vo.setDepartment(department);
+		}
+
+		// =========================================================
+		// VENDOR
+		// =========================================================
+
+		if (dto.getVendor() != null) {
+
+			CustomerVO vendor = customerRepo.findById(dto.getVendor())
+					.orElseThrow(() -> new ApplicationException("Vendor Not Found"));
+
+			vo.setVendor(vendor);
+		}
+
+		// =========================================================
+		// VENDOR LOCATION
+		// =========================================================
+
+		if (dto.getVendorLocation() != null) {
+
+			LocationVO vendorLocation = locationRepo.findById(dto.getVendorLocation())
+					.orElseThrow(() -> new ApplicationException("Vendor Location Not Found"));
+
+			vo.setVendorLocation(vendorLocation);
+		}
+
+		// =========================================================
+		// HEADER
+		// =========================================================
+
+		vo.setBelongsTo(dto.getBelongsTo());
+		vo.setGstState(dto.getGstState());
+		vo.setGatePassNo(dto.getGatePassNo());
+		vo.setIsIGSTAppl(dto.getIsIGSTAppl());
+		vo.setScheduleNo(dto.getScheduleNo());
+		vo.setGstnNo(dto.getGstnNo());
+		vo.setRework(dto.getRework());
+		vo.setGstType(dto.getGstType());
+		vo.setRevsChrg(dto.isRevsChrg());
+
+		vo.setSchStartDate(dto.getSchStartDate());
+		vo.setSchEndDate(dto.getSchEndDate());
+		if (dto.getServiceName() != null) {
+
+		    ServiceAccMasterVO serviceAccMasterVO =
+		            serviceAccMasterRepo.findById(dto.getServiceName())
+		                    .orElseThrow(() ->
+		                            new ApplicationException("Service Account Master Not Found"));
+
+		    vo.setServiceName(serviceAccMasterVO);
+		}
+
+		vo.setSchEndDate(dto.getSchEndDate());
+
+		if (dto.getSacCode() != null) {
+
+		    HsnVO hsnVO =
+		            hsnRepo.findById(dto.getSacCode())
+		                    .orElseThrow(() ->
+		                            new ApplicationException("HSN Not Found"));
+
+		    vo.setSacCode(hsnVO);
+		}
+		vo.setContractNo(dto.getContractNo());
+		vo.setTaxType(dto.getTaxType());
+		vo.setSupplierDcNo(dto.getSupplierDcNo());
+		vo.setTaxPercentage(dto.getTaxPercentage());
+		vo.setSupplierDcDate(dto.getSupplierDcDate());
+		vo.setGrnClearTime(dto.getGrnClearTime());
+		vo.setBasicAmount(dto.getBasicAmount());
+		vo.setRemarks(dto.getRemarks());
+		vo.setTotalTax(dto.getTotalTax());
+		vo.setTotalAmount(dto.getTotalAmount());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		// =========================================================
+		// DETAILS
+		// =========================================================
+
+		List<SubContractingGRNDetailsVO> detailList = new ArrayList<>();
+
+		if (dto.getDetails() != null) {
+
+			for (SubContractingGRNDetailsDTO detailsDTO : dto.getDetails()) {
+
+				SubContractingGRNDetailsVO detailsVO = new SubContractingGRNDetailsVO();
+
+				// =================================================
+				// INCOMING ITEM
+				// =================================================
+
+				if (detailsDTO.getIncomingItem() != null) {
+
+					ItemMasterVO incomingItem = itemMasterRepo.findById(detailsDTO.getIncomingItem())
+							.orElseThrow(() -> new ApplicationException("Incoming Item Not Found"));
+
+					detailsVO.setIncomingItem(incomingItem);
+				}
+
+				// =================================================
+				// PRIMARY UNIT
+				// =================================================
+
+				if (detailsDTO.getPrimaryUnit() != null) {
+
+					UnitMasterVO primaryUnit = unitMasterRepo.findById(detailsDTO.getPrimaryUnit())
+							.orElseThrow(() -> new ApplicationException("Primary Unit Not Found"));
+
+					detailsVO.setPrimaryUnit(primaryUnit);
+				}
+
+				// =================================================
+				// LOCATION
+				// =================================================
+
+				if (detailsDTO.getLocation() != null) {
+
+					LocationVO location = locationRepo.findById(detailsDTO.getLocation())
+							.orElseThrow(() -> new ApplicationException("Location Not Found"));
+
+					detailsVO.setLocation(location);
+				}
+
+				// =================================================
+				// DETAILS VALUES
+				// =================================================
+
+				detailsVO.setStock(detailsDTO.getStock());
+				detailsVO.setTolerance(detailsDTO.getTolerance());
+				detailsVO.setJobOrderNo(detailsDTO.getJobOrderNo());
+				detailsVO.setJobOrderQty(detailsDTO.getJobOrderQty());
+				detailsVO.setJobOrderRate(detailsDTO.getJobOrderRate());
+				detailsVO.setGatePassQty(detailsDTO.getGatePassQty());
+				detailsVO.setInspectionable(detailsDTO.getInspectionable());
+
+				BigDecimal pendingQty = BigDecimal.ZERO;
+
+				if (detailsDTO.getJobOrderQty() != null) {
+
+				    BigDecimal gatePassQty = detailsDTO.getGatePassQty() != null
+				            ? detailsDTO.getGatePassQty()
+				            : BigDecimal.ZERO;
+
+				    pendingQty = detailsDTO.getJobOrderQty()
+				            .subtract(gatePassQty);
+				}
+
+				detailsVO.setPendingQty(pendingQty);				
+				detailsVO.setReceivedQty( detailsDTO.getReceivedQty());
+
+				BigDecimal excessQty = BigDecimal.ZERO;
+
+				if (detailsDTO.getReceivedQty() != null
+				        && detailsDTO.getGatePassQty() != null
+				        && detailsDTO.getReceivedQty()
+				                .compareTo(detailsDTO.getGatePassQty()) > 0) {
+
+				    excessQty = detailsDTO.getReceivedQty()
+				            .subtract(detailsDTO.getGatePassQty());
+				}
+
+				detailsVO.setExcessQty(excessQty);
+				detailsVO.setQtyInPrimaryUnit( detailsDTO.getQtyInPrimaryUnit());
+				detailsVO.setAcceptedQty(detailsDTO.getAcceptedQty());
+				detailsVO.setAccQtyInPrimaryUnit(detailsDTO.getAccQtyInPrimaryUnit());
+				detailsVO.setRejectedQty(detailsDTO.getRejectedQty());
+				detailsVO.setRejQtyInPrimaryUnit(detailsDTO.getRejQtyInPrimaryUnit());
+				BigDecimal amount = BigDecimal.ZERO;
+
+				if (detailsDTO.getJobOrderRate() != null
+				        && detailsDTO.getAcceptedQty() != null) {
+
+				    amount = detailsDTO.getJobOrderRate()
+				            .multiply(detailsDTO.getAcceptedQty())
+				            .setScale(2, RoundingMode.HALF_UP);
+				}
+
+				detailsVO.setAmount(amount);		
+				
+				//gst calculation
+				
+				BigDecimal sgstRate = detailsDTO.getSgstRate();
+				BigDecimal cgstRate = detailsDTO.getCgstRate();
+				BigDecimal igstRate = detailsDTO.getIgstRate();
+				
+				BigDecimal sgstAmount = BigDecimal.ZERO;
+				BigDecimal cgstAmount = BigDecimal.ZERO;
+				BigDecimal igstAmount = BigDecimal.ZERO;
+				
+		
+				if (Boolean.TRUE.equals(vo.getIsIGSTAppl())) {
+
+				     igstAmount = amount
+				            .multiply(igstRate)
+				            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+				    detailsVO.setIgstRate(igstRate);
+				    detailsVO.setCgstRate(BigDecimal.ZERO);
+				    detailsVO.setSgstRate(BigDecimal.ZERO);
+
+				    detailsVO.setIgstAmount(igstAmount);
+				    detailsVO.setCgstAmount(BigDecimal.ZERO);
+				    detailsVO.setSgstAmount(BigDecimal.ZERO);
+
+				} else {
+
+				     cgstAmount = amount
+				            .multiply(cgstRate)
+				            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+				     sgstAmount = amount
+				            .multiply(sgstRate)
+				            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+				    detailsVO.setCgstRate(cgstRate);
+				    detailsVO.setSgstRate(sgstRate);
+				    detailsVO.setIgstRate(BigDecimal.ZERO);
+
+				    detailsVO.setCgstAmount(cgstAmount);
+				    detailsVO.setSgstAmount(sgstAmount);
+				    detailsVO.setIgstAmount(BigDecimal.ZERO);
+				}
+
+				// =================================================
+				// CONSUMPTION
+				// =================================================
+
+				List<SubContractingGRNConsumptionVO> consumptionList = new ArrayList<>();
+
+				if (detailsDTO.getConsumption() != null) {
+
+					for (SubContractingGRNConsumptionDTO consumptionDTO : detailsDTO.getConsumption()) {
+
+						SubContractingGRNConsumptionVO consumptionVO = new SubContractingGRNConsumptionVO();
+
+						// OUTGOING ITEM
+						if (consumptionDTO.getOutgoingItem() != null) {
+
+							ItemMasterVO outgoingItem = itemMasterRepo.findById(consumptionDTO.getOutgoingItem())
+									.orElseThrow(() -> new ApplicationException("Outgoing Item Not Found"));
+
+							consumptionVO.setOutgoingItem(outgoingItem);
+						}
+
+						// UNIT
+						if (consumptionDTO.getUnit() != null) {
+
+							UnitMasterVO unit = unitMasterRepo.findById(consumptionDTO.getUnit())
+									.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+
+							consumptionVO.setUnit(unit);
+						}
+
+						consumptionVO.setItemType(consumptionDTO.getItemType());
+
+						consumptionVO.setBomQty(consumptionDTO.getBomQty());
+
+						consumptionVO.setAvailableStock(consumptionDTO.getAvailableStock());
+
+						BigDecimal bomQty = consumptionDTO.getBomQty() != null
+						        ? consumptionDTO.getBomQty()
+						        : BigDecimal.ZERO;
+
+						BigDecimal jobOrderQty = detailsDTO.getJobOrderQty() != null
+						        ? detailsDTO.getJobOrderQty()
+						        : BigDecimal.ZERO;
+
+						BigDecimal consumeQty = bomQty.multiply(jobOrderQty);
+
+						consumptionVO.setConsumedQty(consumeQty);
+
+						
+						consumptionVO.setScrapItem(consumptionDTO.getScrapItem());
+
+						consumptionVO.setBomScrap(consumptionDTO.getBomScrap());
+
+						consumptionVO.setScrapQty(consumptionDTO.getScrapQty());
+
+						BigDecimal rate = consumptionDTO.getRate() != null
+						        ? consumptionDTO.getRate()
+						        : BigDecimal.ZERO;
+
+						BigDecimal amounts = consumeQty.multiply(rate);
+
+						consumptionVO.setRate(rate);
+						consumptionVO.setAmount(amounts);
+
+						// PARENT
+						consumptionVO.setSubContractingGRNDetailsVO(detailsVO);
+
+						consumptionList.add(consumptionVO);
+					}
+				}
+
+				detailsVO.getConsumption().addAll(consumptionList);
+
+				// =================================================
+				// PARENT
+				// =================================================
+
+				detailsVO.setSubContractingGRNVO(vo);
+
+				detailList.add(detailsVO);
+			}
+		}
+
+		vo.getDetails().addAll(detailList);
+
+		// =========================================================
+		// TAX DETAILS
+		// =========================================================
+
+		List<SubContractingGRNTaxDetailsVO> taxDetailList = new ArrayList<>();
+
+		if (dto.getTaxDetails() != null) {
+
+			for (SubContractingGRNTaxDetailsDTO taxDTO : dto.getTaxDetails()) {
+
+				SubContractingGRNTaxDetailsVO taxVO = new SubContractingGRNTaxDetailsVO();
+
+				taxVO.setParticulars(taxDTO.getParticulars());
+
+				taxVO.setTaxAmount(taxDTO.getTaxAmount());
+
+				taxVO.setSubContractingGRNVO(vo);
+
+				taxDetailList.add(taxVO);
+			}
+		}
+
+		vo.getTaxDetails().addAll(taxDetailList);
+	}
+
+	private SubContractingGRNResponseDTO convertToResponse(SubContractingGRNVO vo) {
+
+		SubContractingGRNResponseDTO response = new SubContractingGRNResponseDTO();
+
+		// =========================
+		// Header Details
+		// =========================
+
+		response.setId(vo.getId());
+		response.setDocId(vo.getDocId());
+		response.setDocDate(vo.getDocDate());
+		response.setBelongsTo(vo.getBelongsTo());
+		response.setGstState(vo.getGstState());
+		response.setGatePassNo(vo.getGatePassNo());
+		response.setIsIGSTAppl(vo.getIsIGSTAppl());
+		response.setScheduleNo(vo.getScheduleNo());
+		response.setGstnNo(vo.getGstnNo());
+		response.setRework(vo.getRework());
+		response.setGstType(vo.getGstType());
+		response.setRevsChrg(vo.isRevsChrg());
+		response.setSchStartDate(vo.getSchStartDate());
+		// Service Account Master
+		if (vo.getServiceName() != null) {
+
+		    ServiceAccMasterResponse1DTO service =
+		            new ServiceAccMasterResponse1DTO();
+
+		    service.setId(vo.getServiceName().getId());
+		    service.setServiceName(vo.getServiceName().getServiceName());
+		    service.setServiceDescription(
+		            vo.getServiceName().getServiceDescription());
+
+		    response.setServiceName(service);
+		}
+
+		// Schedule End Date
+		response.setSchEndDate(vo.getSchEndDate());
+
+		// HSN / SAC Code
+		if (vo.getSacCode() != null) {
+
+		    HsnResponseDTO hsn =
+		            new HsnResponseDTO();
+
+		    hsn.setId(vo.getSacCode().getId());
+		    hsn.setHsn(vo.getSacCode().getHsn());
+		    hsn.setDescription(vo.getSacCode().getDescription());
+
+		    response.setSacCode(hsn);
+		}
+		response.setContractNo(vo.getContractNo());
+		response.setTaxType(vo.getTaxType());
+		response.setSupplierDcNo(vo.getSupplierDcNo());
+		response.setTaxPercentage(vo.getTaxPercentage());
+		response.setSupplierDcDate(vo.getSupplierDcDate());
+		response.setGrnClearTime(vo.getGrnClearTime());
+		response.setBasicAmount(vo.getBasicAmount());
+		response.setRemarks(vo.getRemarks());
+		response.setTotalTax(vo.getTotalTax());
+		response.setTotalAmount(vo.getTotalAmount());
+
+		response.setCreatedBy(vo.getCreatedBy());
+		response.setActive(vo.isActive());
+		response.setCancel(vo.isCancel());
+		response.setUpdatedBy(vo.getUpdatedBy());
+		response.setCancelRemarks(vo.getCancelRemarks());
+
+		response.setScreenName(vo.getScreenName());
+		response.setScreenCode(vo.getScreenCode());
+		response.setOrgId(vo.getOrgId());
+		response.setFinancialYear(vo.getFinancialYear());
+
+		// =========================
+		// Branch
+		// =========================
+
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branch = new BranchResponseDTO();
+
+			branch.setId(vo.getBranch().getId());
+			branch.setBranchCode(vo.getBranch().getBranchCode());
+			branch.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branch);
+		}
+
+		// =========================
+		// Department
+		// =========================
+
+		if (vo.getDepartment() != null) {
+
+			DepartmentResponseDTO department = new DepartmentResponseDTO();
+
+			department.setId(vo.getDepartment().getId());
+			department.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+			department.setDepartmentName(vo.getDepartment().getDepartmentName());
+
+			response.setDepartment(department);
+		}
+
+		// =========================
+		// Vendor
+		// =========================
+
+		if (vo.getVendor() != null) {
+
+			CustomerDropdownResponseDTO vendor = new CustomerDropdownResponseDTO();
+
+			vendor.setCustomerId(vo.getVendor().getId());
+			vendor.setCustomerCode(vo.getVendor().getCustomerCode());
+			vendor.setCustomerName(vo.getVendor().getCustomerName());
+			vendor.setAddress(vo.getVendor().getAddress());
+			vendor.setGstState(vo.getVendor().getGstState().getStateName());
+			vendor.setGstNo(vo.getVendor().getGstNo());
+			vendor.setIgstApplicable(vo.getVendor().isGstApplicable());
+			vendor.setGstType(vo.getVendor().getGstType());
+
+			response.setVendor(vendor);
+		}
+
+		// =========================
+		// Vendor Location
+		// =========================
+
+		if (vo.getVendorLocation() != null) {
+
+			LocationMasterResponseDTO location = new LocationMasterResponseDTO();
+
+			location.setId(vo.getVendorLocation().getId());
+			location.setLocationName(vo.getVendorLocation().getLocationName());
+
+			response.setVendorLocation(location);
+		}
+
+		// =========================
+		// Details
+		// =========================
+
+		List<SubContractingGRNDetailsResponseDTO> detailResponseList = new ArrayList<>();
+
+		if (vo.getDetails() != null) {
+
+			for (SubContractingGRNDetailsVO detailsVO : vo.getDetails()) {
+
+				SubContractingGRNDetailsResponseDTO detailsResponse = new SubContractingGRNDetailsResponseDTO();
+
+				detailsResponse.setId(detailsVO.getId());
+
+				// Incoming Item
+				if (detailsVO.getIncomingItem() != null) {
+
+					ItemResponse1DTO item = new ItemResponse1DTO();
+
+					item.setId(detailsVO.getIncomingItem().getId());
+
+					item.setItemCode(detailsVO.getIncomingItem().getItemCode());
+
+					item.setItemDescription(detailsVO.getIncomingItem().getItemDescription());
+
+					if (detailsVO.getIncomingItem().getPrimaryUnit() != null) {
+
+						UnitMasterResponseDTO unit = new UnitMasterResponseDTO();
+
+						unit.setId(detailsVO.getIncomingItem().getPrimaryUnit().getId());
+
+						unit.setUnitId(detailsVO.getIncomingItem().getPrimaryUnit().getUnitId());
+
+						unit.setUnitDescription(detailsVO.getIncomingItem().getPrimaryUnit().getDescription());
+
+						item.setUnit(unit);
+					}
+
+					detailsResponse.setIncomingItem(item);
+				}
+
+				detailsResponse.setStock(detailsVO.getStock());
+				detailsResponse.setTolerance(detailsVO.getTolerance());
+
+				// Primary Unit
+				if (detailsVO.getPrimaryUnit() != null) {
+
+					UnitMasterResponseDTO unit = new UnitMasterResponseDTO();
+
+					unit.setId(detailsVO.getPrimaryUnit().getId());
+
+					unit.setUnitId(detailsVO.getPrimaryUnit().getUnitId());
+
+					unit.setUnitDescription(detailsVO.getPrimaryUnit().getDescription());
+
+					detailsResponse.setPrimaryUnit(unit);
+				}
+
+				detailsResponse.setJobOrderNo(detailsVO.getJobOrderNo());
+
+				detailsResponse.setJobOrderQty(detailsVO.getJobOrderQty());
+
+				detailsResponse.setJoRate(detailsVO.getJobOrderRate());
+
+				detailsResponse.setGatePassQty(detailsVO.getGatePassQty());
+
+				detailsResponse.setInspectionable(detailsVO.getInspectionable());
+
+				detailsResponse.setPendingQty(detailsVO.getPendingQty());
+
+				detailsResponse.setReceivedQty(detailsVO.getReceivedQty());
+
+				detailsResponse.setExcessQty(detailsVO.getExcessQty());
+
+				detailsResponse.setQtyInPrimaryUnit(detailsVO.getQtyInPrimaryUnit());
+
+				// Location
+				if (detailsVO.getLocation() != null) {
+
+					LocationMasterResponseDTO location = new LocationMasterResponseDTO();
+
+					location.setId(detailsVO.getLocation().getId());
+
+					location.setLocationName(detailsVO.getLocation().getLocationName());
+
+					detailsResponse.setLocation(location);
+				}
+
+				detailsResponse.setAcceptedQty(detailsVO.getAcceptedQty());
+
+				detailsResponse.setAccQtyInPrimaryUnit(detailsVO.getAccQtyInPrimaryUnit());
+
+				detailsResponse.setRejectedQty(detailsVO.getRejectedQty());
+
+				detailsResponse.setRejQtyInPrimaryUnit(detailsVO.getRejQtyInPrimaryUnit());
+
+				detailsResponse.setAmount(detailsVO.getAmount());
+
+				detailsResponse.setSgstRate(detailsVO.getSgstRate());
+
+				detailsResponse.setCgstRate(detailsVO.getCgstRate());
+
+				detailsResponse.setIgstRate(detailsVO.getIgstRate());
+				
+				detailsResponse.setSgstRate(detailsVO.getSgstRate());
+
+				detailsResponse.setCgstRate(detailsVO.getCgstRate());
+
+				detailsResponse.setIgstRate(detailsVO.getIgstRate());
+
+				// =========================
+				// Consumption
+				// =========================
+
+				List<SubContractingGRNConsumptionResponseDTO> consumptionResponseList = new ArrayList<>();
+
+				if (detailsVO.getConsumption() != null) {
+
+					for (SubContractingGRNConsumptionVO consumptionVO : detailsVO.getConsumption()) {
+
+						SubContractingGRNConsumptionResponseDTO consumptionResponse = new SubContractingGRNConsumptionResponseDTO();
+
+						consumptionResponse.setId(consumptionVO.getId());
+
+						// Outgoing Item
+						if (consumptionVO.getOutgoingItem() != null) {
+
+							ItemResponse1DTO item = new ItemResponse1DTO();
+
+							item.setId(consumptionVO.getOutgoingItem().getId());
+
+							item.setItemCode(consumptionVO.getOutgoingItem().getItemCode());
+
+							item.setItemDescription(consumptionVO.getOutgoingItem().getItemDescription());
+
+							if (consumptionVO.getOutgoingItem().getPrimaryUnit() != null) {
+
+								UnitMasterResponseDTO unit = new UnitMasterResponseDTO();
+
+								unit.setId(consumptionVO.getOutgoingItem().getPrimaryUnit().getId());
+
+								unit.setUnitId(consumptionVO.getOutgoingItem().getPrimaryUnit().getUnitId());
+
+								unit.setUnitDescription(
+										consumptionVO.getOutgoingItem().getPrimaryUnit().getDescription());
+
+								item.setUnit(unit);
+							}
+
+							consumptionResponse.setOutgoingItem(item);
+						}
+
+						// Unit
+						if (consumptionVO.getUnit() != null) {
+
+							UnitMasterResponseDTO unit = new UnitMasterResponseDTO();
+
+							unit.setId(consumptionVO.getUnit().getId());
+
+							unit.setUnitId(consumptionVO.getUnit().getUnitId());
+
+							unit.setUnitDescription(consumptionVO.getUnit().getDescription());
+
+							consumptionResponse.setUnit(unit);
+						}
+
+						consumptionResponse.setItemType(consumptionVO.getItemType());
+
+						consumptionResponse.setBomQty(consumptionVO.getBomQty());
+
+						consumptionResponse.setAvailableStock(consumptionVO.getAvailableStock());
+
+						consumptionResponse.setConsumedQty(consumptionVO.getConsumedQty());
+
+						consumptionResponse.setScrapItem(consumptionVO.getScrapItem());
+
+						consumptionResponse.setBomScrap(consumptionVO.getBomScrap());
+
+						consumptionResponse.setScrapQty(consumptionVO.getScrapQty());
+
+						consumptionResponse.setRate(consumptionVO.getRate());
+
+						consumptionResponse.setAmount(consumptionVO.getAmount());
+
+						consumptionResponseList.add(consumptionResponse);
+					}
+				}
+
+				detailsResponse.setConsumption(consumptionResponseList);
+
+				detailResponseList.add(detailsResponse);
+			}
+		}
+
+		response.setDetails(detailResponseList);
+
+		// =========================
+		// Tax Details
+		// =========================
+
+		List<SubContractingGRNTaxDetailsResponseDTO> taxResponseList = new ArrayList<>();
+
+		if (vo.getTaxDetails() != null) {
+
+			for (SubContractingGRNTaxDetailsVO taxVO : vo.getTaxDetails()) {
+
+				SubContractingGRNTaxDetailsResponseDTO taxResponse = new SubContractingGRNTaxDetailsResponseDTO();
+
+				taxResponse.setId(taxVO.getId());
+
+				taxResponse.setParticulars(taxVO.getParticulars());
+
+				taxResponse.setTaxAmount(taxVO.getTaxAmount());
+
+				taxResponseList.add(taxResponse);
+			}
+		}
+
+		response.setTaxDetails(taxResponseList);
+
+		return response;
+	}
+
+	@Override
+	public List<Map<String, Object>> getGateInwardEntryDropdown(Long orgId, Long branch, Long customer) {
+
+		Set<Object[]> result = gateInwardEntryRepo.getGateInwardEntryDropdown(orgId, branch, customer);
+
+		return getGateInwardEntryDropdownDetails(result);
+	}
+
+	private List<Map<String, Object>> getGateInwardEntryDropdownDetails(Set<Object[]> result) {
+
+		List<Map<String, Object>> details = new ArrayList<>();
+
+		for (Object[] fs : result) {
+
+			Map<String, Object> part = new HashMap<>();
+
+			part.put("GatePassNo", fs[0] != null ? fs[0].toString() : null);
+
+			part.put("GatePassDate", fs[1] != null ? fs[1] : null);
+
+			part.put("supplierDCNumber", fs[2] != null ? fs[2].toString() : null);
+
+			part.put("supplierDcDate", fs[3] != null ? fs[3] : null);
+
+			details.add(part);
+		}
+
+		return details;
+	}
 	
-	private DeliveryChallanCapitalItemsResponseDTO convertToResponse(
-	        DeliveryChallanCapitalItemsVO vo) {
+	
+	@Override
+	public List<Map<String, Object>> getSubcontractSupplyScheduleforSubContractingGRN(
+	        Long orgId, Long branch, Long customer) {
 
-	    DeliveryChallanCapitalItemsResponseDTO response =
-	            new DeliveryChallanCapitalItemsResponseDTO();
+	    Set<Object[]> result =
+	            subcontractSupplyScheduleRepo.getSubcontractSupplyScheduleforSubContractingGRN(
+	                    orgId, branch, customer);
 
-	    response.setId(vo.getId());
-	    response.setDocId(vo.getDocId());
-	    response.setDocDate(vo.getDocDate());
-	    response.setBelongsTo(vo.getBelongsTo());
-	    response.setIndentNo(vo.getIndentNo());
-	    response.setTransportName(vo.getTransportName());
-	    response.setVehicleNo(vo.getVehicleNo());
-	    response.setDcType(vo.getDcType());
-	    response.setApprovalByStores(vo.getApprovalByStores());
-	    response.setRemarks(vo.getRemarks());
-	    response.setCreatedBy(vo.getCreatedBy());
-	    response.setActive(vo.isActive());
-	    response.setCancel(vo.isCancel());
-	    response.setUpdatedBy(vo.getUpdatedBy());
-	    response.setCancelRemarks(vo.getCancelRemarks());
-	    response.setScreenName(vo.getScreenName());
-	    response.setScreenCode(vo.getScreenCode());
-	    response.setOrgId(vo.getOrgId());
-	    response.setFinancialYear(vo.getFinancialYear());
+	    return getSubcontractSupplyScheduleDropdownDetails(result);
+	}
 
-	    // Branch
-	    if (vo.getBranch() != null) {
-	        BranchResponseDTO branchResponse = new BranchResponseDTO();
+	private List<Map<String, Object>> getSubcontractSupplyScheduleDropdownDetails(
+	        Set<Object[]> result) {
 
-	        branchResponse.setId(vo.getBranch().getId());
-	        branchResponse.setBranchCode(vo.getBranch().getBranchCode());
-	        branchResponse.setBranchName(vo.getBranch().getBranchName());
+	    List<Map<String, Object>> details = new ArrayList<>();
 
-	        response.setBranch(branchResponse);
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("scheduleNo",
+	                fs[0] != null ? fs[0].toString() : null);
+
+	        part.put("scheduleDate",
+	                fs[1] != null ? fs[1] : null);
+
+	        part.put("schStartDate",
+	                fs[2] != null ? fs[2] : null);
+
+	        part.put("schEndDate",
+	                fs[3] != null ? fs[3] : null);
+
+	        part.put("contractNo",
+	                fs[4] != null ? fs[4].toString() : null);
+
+	        part.put("hsnId",
+	                fs[5] != null ? fs[5] : null);
+
+	        part.put("hsnCode",
+	                fs[6] != null ? fs[6].toString() : null);
+
+	        part.put("hsnDescription",
+	                fs[7] != null ? fs[7].toString() : null);
+
+	        part.put("serviceId",
+	                fs[8] != null ? fs[8] : null);
+
+	        part.put("serviceName",
+	                fs[9] != null ? fs[9].toString() : null);
+
+	        // GST Rate Master
+	        part.put("gstRateMasterId",
+	                fs[10] != null ? fs[10] : null);
+
+	        part.put("gstRate",
+	                fs[11] != null ? fs[11] : null);
+
+	        part.put("igstRate",
+	                fs[12] != null ? fs[12] : null);
+
+	        part.put("cgstRate",
+	                fs[13] != null ? fs[13] : null);
+
+	        part.put("sgstRate",
+	                fs[14] != null ? fs[14] : null);
+
+	        details.add(part);
 	    }
 
-	    // Department
-	    if (vo.getDepartment() != null) {
-	        DepartmentResponseDTO departmentResponse =
-	                new DepartmentResponseDTO();
+	    return details;
+	}
+	
+	
+	@Override
+	public List<Map<String, Object>> getItemDetailsForSubContractingGRN(
+	        String scheduleNo,
+	        Long orgId,
+	        Long branch,
+	        Long customer) {
 
-	        departmentResponse.setId(vo.getDepartment().getId());
-	        departmentResponse.setDepartmentCode(
-	                vo.getDepartment().getDepartmentCode());
-	        departmentResponse.setDepartmentName(
-	                vo.getDepartment().getDepartmentName());
+	    Set<Object[]> result =
+	            subcontractSupplyScheduleRepo.getItemDetailsForSubContractingGRN(
+	                    scheduleNo, orgId, branch, customer);
 
-	        response.setDepartment(departmentResponse);
+	    return getSubcontractSupplyScheduleItemDropdownDetails(result);
+	}
+
+	private List<Map<String, Object>> getSubcontractSupplyScheduleItemDropdownDetails(
+	        Set<Object[]> result) {
+
+	    List<Map<String, Object>> details = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("itemId",
+	                fs[0] != null ? fs[0] : null);
+
+	        part.put("itemCode",
+	                fs[1] != null ? fs[1].toString() : null);
+
+	        part.put("itemDescription",
+	                fs[2] != null ? fs[2].toString() : null);
+
+	        part.put("unitId",
+	                fs[3] != null ? fs[3] : null);
+
+	        part.put("unitCode",
+	                fs[4] != null ? fs[4].toString() : null);
+
+	        part.put("unitDescription",
+	                fs[5] != null ? fs[5].toString() : null);
+
+	        part.put("jobOrderNo",
+	                fs[6] != null ? fs[6].toString() : null);
+
+	        part.put("jobOrderQty",
+	                fs[7] != null ? fs[7] : null);
+
+	        part.put("jobOrderRate",
+	                fs[8] != null ? fs[8] : null);
+
+	        details.add(part);
 	    }
 
-	    // Vendor
-	    if (vo.getVendor() != null) {
-	        CustomerResponseDetailsDTO vendorResponse =
-	                new CustomerResponseDetailsDTO();
+	    return details;
+	}
+	
+	
+	@Override
+	public List<Map<String, Object>> getBomItemDetailsforSubContractingGRN(
+	        Long orgId,
+	        Long branch,
+	        Long itemId) {
 
-	        vendorResponse.setId(vo.getVendor().getId());
-	        vendorResponse.setCustomerName(
-	                vo.getVendor().getCustomerName());
-	        vendorResponse.setCustomerCode(
-	                vo.getVendor().getCustomerCode());
+	    Set<Object[]> result =
+	            billOfMaterialRepo.getBomItemDetailsforSubContractingGRN(
+	                    orgId,
+	                    branch,
+	                    itemId);
 
-	        response.setVendor(vendorResponse);
+	    return getBomItemDetailsResponse(result);
+	}
+
+	private List<Map<String, Object>> getBomItemDetailsResponse(
+	        Set<Object[]> result) {
+
+	    List<Map<String, Object>> details = new ArrayList<>();
+
+	    for (Object[] fs : result) {
+
+	        Map<String, Object> part = new HashMap<>();
+
+	        part.put("bomId",
+	                fs[0] != null ? fs[0] : null);
+
+	        part.put("itemId",
+	                fs[1] != null ? fs[1] : null);
+
+	        part.put("itemCode",
+	                fs[2] != null ? fs[2].toString() : null);
+
+	        part.put("itemDescription",
+	                fs[3] != null ? fs[3].toString() : null);
+
+	        part.put("unitId",
+	                fs[4] != null ? fs[4] : null);
+
+	        part.put("unitCode",
+	                fs[5] != null ? fs[5].toString() : null);
+
+	        part.put("unitDescription",
+	                fs[6] != null ? fs[6].toString() : null);
+
+	        part.put("bomQty",
+	                fs[7] != null ? fs[7] : null);
+
+	        part.put("scrapItem",
+	                fs[8] != null ? fs[8].toString() : null);
+
+	        part.put("scrapQty",
+	                fs[9] != null ? fs[9] : null);
+
+	        details.add(part);
 	    }
 
-	    // Customer Location
-	    if (vo.getCustomerLocation() != null) {
-	        LocationMasterResponseDTO locationResponse =
-	                new LocationMasterResponseDTO();
+	    return details;
+	}
 
-	        locationResponse.setId(vo.getCustomerLocation().getId());
-	        locationResponse.setLocationName(
-	                vo.getCustomerLocation().getLocationName());
+	
+	@Override
+	public SubContractingGRNResponseDTO getSubContractingGRNById(
+	        Long id) throws ApplicationException {
 
-	        response.setCustomerLocation(locationResponse);
-	    }
+	    SubContractingGRNVO vo =
+	            subContractingGRNRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Sub Contracting GRN Not Found"));
 
-	    // Prepared By
-	    if (vo.getPreparedBy() != null) {
-	        EmployeeDropdownResponseDTO preparedByResponse =
-	                new EmployeeDropdownResponseDTO();
+	    return convertToResponse(vo);
+	}
+	
+	@Override
+	public List<SubContractingGRNResponseDTO>
+	        getSubContractingGRNByOrgIdAndBranch(
+	                Long orgId,
+	                Long branch) throws ApplicationException {
 
-	        preparedByResponse.setEmployeeId(
-	                vo.getPreparedBy().getId());
-	        preparedByResponse.setEmployeeCode(
-	                vo.getPreparedBy().getEmployeeId());
-	        preparedByResponse.setEmployeeName(
-	                vo.getPreparedBy().getEmployeeName());
-	        preparedByResponse.setEmail(
-	                vo.getPreparedBy().getEmail());
+	    List<SubContractingGRNVO> grnList =
+	            subContractingGRNRepo.findByOrgIdAndBranch(
+	                    orgId,
+	                    branch);
 
-	        response.setPreparedBy(preparedByResponse);
-	    }
-
-	    // Approved By
-	    if (vo.getApprovedBy() != null) {
-	        EmployeeDropdownResponseDTO approvedByResponse =
-	                new EmployeeDropdownResponseDTO();
-
-	        approvedByResponse.setEmployeeId(
-	                vo.getApprovedBy().getId());
-	        approvedByResponse.setEmployeeCode(
-	                vo.getApprovedBy().getEmployeeId());
-	        approvedByResponse.setEmployeeName(
-	                vo.getApprovedBy().getEmployeeName());
-	        approvedByResponse.setEmail(
-	                vo.getApprovedBy().getEmail());
-
-	        response.setApprovedBy(approvedByResponse);
-	    }
-
-	    // Details
-	    List<DeliveryChallanCapitalItemsDetailsResponseDTO> detailResponseList =
+	    List<SubContractingGRNResponseDTO> responseList =
 	            new ArrayList<>();
 
-	    if (vo.getDetails() != null) {
+	    for (SubContractingGRNVO vo : grnList) {
 
-	        for (DeliveryChallanCapitalItemsDetailsVO detailsVO
-	                : vo.getDetails()) {
-
-	            DeliveryChallanCapitalItemsDetailsResponseDTO detailsResponse =
-	                    new DeliveryChallanCapitalItemsDetailsResponseDTO();
-
-	            detailsResponse.setId(detailsVO.getId());
-	            detailsResponse.setStock(detailsVO.getStock());
-	            detailsResponse.setAvailableStock(
-	                    detailsVO.getAvailableStock());
-	            detailsResponse.setIssueQty(detailsVO.getIssueQty());
-	            detailsResponse.setUnitRate(detailsVO.getUnitRate());
-	            detailsResponse.setAmount(detailsVO.getAmount());
-	            detailsResponse.setRemarks(detailsVO.getRemarks());
-
-	            // Outgoing Item
-	            if (detailsVO.getOutgoingItem() != null) {
-
-	                ItemResponse1DTO itemResponse =
-	                        new ItemResponse1DTO();
-
-	                itemResponse.setId(
-	                        detailsVO.getOutgoingItem().getId());
-
-	                itemResponse.setItemCode(
-	                        detailsVO.getOutgoingItem().getItemCode());
-
-	                itemResponse.setItemDescription(
-	                        detailsVO.getOutgoingItem().getItemDescription());
-
-	                // Item Unit
-	                if (detailsVO.getOutgoingItem().getPrimaryUnit() != null) {
-
-	                    UnitMasterResponseDTO itemUnitResponse =
-	                            new UnitMasterResponseDTO();
-
-	                    itemUnitResponse.setId(
-	                            detailsVO.getOutgoingItem().getPrimaryUnit().getId());
-
-	                    itemUnitResponse.setUnitId(
-	                            detailsVO.getOutgoingItem().getPrimaryUnit().getUnitId());
-
-	                    itemUnitResponse.setUnitDescription(
-	                            detailsVO.getOutgoingItem().getPrimaryUnit()
-	                                    .getDescription());
-
-	                    itemResponse.setUnit(itemUnitResponse);
-	                }
-
-	                detailsResponse.setOutgoingItem(itemResponse);
-	            }
-
-	            // Unit
-	            if (detailsVO.getUnit() != null) {
-
-	                UnitMasterResponseDTO unitResponse =
-	                        new UnitMasterResponseDTO();
-
-	                unitResponse.setId(detailsVO.getUnit().getId());
-	                unitResponse.setUnitId(detailsVO.getUnit().getUnitId());
-	                unitResponse.setUnitDescription(
-	                        detailsVO.getUnit().getDescription());
-
-	                detailsResponse.setUnit(unitResponse);
-	            }
-
-	            // From Location
-	            if (detailsVO.getFromLocation() != null) {
-
-	                LocationMasterResponseDTO locationResponse =
-	                        new LocationMasterResponseDTO();
-
-	                locationResponse.setId(
-	                        detailsVO.getFromLocation().getId());
-
-	                locationResponse.setLocationName(
-	                        detailsVO.getFromLocation().getLocationName());
-
-	                detailsResponse.setFromLocation(locationResponse);
-	            }
-
-	            detailResponseList.add(detailsResponse);
-	        }
+	        responseList.add(
+	                convertToResponse(vo));
 	    }
 
-	    response.setDetails(detailResponseList);
+	    return responseList;
+	}
+	
+	@Override
+	public String getSubContractingGRNDocId(
+	        Long orgId,
+	        String financialYear) {
+
+	    String screenCode = "SCGRN";
+
+	    return subContractingGRNRepo
+	            .getSubContractingGRNDocId(
+	                    orgId,
+	                    financialYear,
+	                    screenCode);
+	}
+
+
+	
+	@Transactional(rollbackOn = Exception.class)
+	@Override
+	public Map<String, Object> createUpdateMaterialPlanning(
+	        MaterialPlanningDTO dto) throws ApplicationException {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    String screenCode = "MRP";
+
+	    MaterialPlanningVO materialPlanningVO;
+
+	    String message;
+
+	    if (ObjectUtils.isEmpty(dto.getId())) {
+
+	        // CREATE
+	        materialPlanningVO = new MaterialPlanningVO();
+
+//	        String docId = materialPlanningRepo.getMaterialPlanningDocId(
+//	                dto.getOrgId(),
+//	                dto.getFinancialYear(),
+//	                screenCode);
+//
+//	        if (docId == null || docId.isBlank()) {
+//	            throw new ApplicationException(
+//	                    "Material Planning DocId Generation Failed");
+//	        }
+//
+//	        materialPlanningVO.setDocId(docId);
+
+	        // Update document last number
+//	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+//	                documentTypeMappingDetailsRepo
+//	                        .findByOrgIdAndFinYearAndScreenCode(
+//	                                dto.getOrgId(),
+//	                                dto.getFinancialYear(),
+//	                                screenCode);
+//
+//	        if (documentTypeMappingDetailsVO != null) {
+//
+//	            documentTypeMappingDetailsVO.setLastNo(
+//	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//	            documentTypeMappingDetailsRepo.save(
+//	                    documentTypeMappingDetailsVO);
+//	        }
+
+	        materialPlanningVO.setCreatedBy(dto.getCreatedBy());
+	        materialPlanningVO.setUpdatedBy(dto.getCreatedBy());
+
+	        message = "Material Planning Created Successfully";
+
+	    } else {
+
+	        // UPDATE
+	        materialPlanningVO = materialPlanningRepo.findById(dto.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Material Planning Not Found"));
+
+	        materialPlanningVO.setUpdatedBy(dto.getCreatedBy());
+
+	        message = "Material Planning Updated Successfully";
+	    }
+
+	    // Map DTO → VO
+	    materialPlanningVO.setFromDate(dto.getFromDate());
+	    materialPlanningVO.setDocDate(dto.getDocDate());
+	    materialPlanningVO.setMrpType(dto.getMrpType());
+	    materialPlanningVO.setActive(dto.isActive());
+	    if (dto.getBranch() != null) {
+
+	        BranchVO branchVO = branchRepo.findById(dto.getBranch())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Branch Not Found"));
+
+	        materialPlanningVO.setBranch(branchVO);
+	    }
+	    materialPlanningVO.setCancelRemarks(dto.getCancelRemarks());
+	    materialPlanningVO.setOrgId(dto.getOrgId());
+	    materialPlanningVO.setFinancialYear(dto.getFinancialYear());
+
+	    materialPlanningVO =
+	            materialPlanningRepo.saveAndFlush(materialPlanningVO);
+
+	    // VO → Response DTO
+	    MaterialPlanningResponseDTO responseDTO =
+	            convertToResponse(materialPlanningVO);
+
+	    response.put("message", message);
+	    response.put("materialPlanningVO", responseDTO);
 
 	    return response;
 	}
 	
-	@Override
-	public DeliveryChallanCapitalItemsResponseDTO getDeliveryChallanCapitalItemsById(
-	        Long id) throws ApplicationException {
+	private MaterialPlanningResponseDTO convertToResponse(
+	        MaterialPlanningVO vo) {
 
-	    DeliveryChallanCapitalItemsVO deliveryChallanVO =
-	            deliveryChallanCapitalItemsRepo.findById(id)
-	                    .orElseThrow(() -> new ApplicationException(
-	                            "Delivery Challan Capital Items Not Found"));
+	    MaterialPlanningResponseDTO response =
+	            new MaterialPlanningResponseDTO();
 
-	    return convertToResponse(deliveryChallanVO);
+	    response.setId(vo.getId());
+	    response.setFromDate(vo.getFromDate());
+	    response.setDocId(vo.getDocId());
+	    response.setDocDate(vo.getDocDate());
+	    response.setMrpType(vo.getMrpType());
+	    response.setCreatedBy(vo.getCreatedBy());
+	    response.setActive(vo.isActive());
+	    response.setUpdatedBy(vo.getUpdatedBy());
+	    response.setCancel(vo.isCancel());
+	    response.setCancelRemarks(vo.getCancelRemarks());
+	    response.setOrgId(vo.getOrgId());
+	    response.setFinancialYear(vo.getFinancialYear());
+
+	    if (vo.getBranch() != null) {
+
+	        BranchResponseDTO branchResponseDTO =
+	                new BranchResponseDTO();
+
+	        branchResponseDTO.setId(vo.getBranch().getId());
+	        branchResponseDTO.setBranchCode(
+	                vo.getBranch().getBranchCode());
+	        branchResponseDTO.setBranchName(
+	                vo.getBranch().getBranchName());
+
+	        response.setBranch(branchResponseDTO);
+	    }
+	    return response;
 	}
 	
 	@Override
-	public List<DeliveryChallanCapitalItemsResponseDTO>
-	        getDeliveryChallanCapitalItemsByOrgIdAndBranch(
-	                Long orgId, Long branch) throws ApplicationException {
+	public MaterialPlanningResponseDTO getMaterialPlanningById(Long id)
+	        throws ApplicationException {
 
-	    List<DeliveryChallanCapitalItemsVO> deliveryChallanList =
-	            deliveryChallanCapitalItemsRepo
-	                    .findByOrgIdAndBranch(orgId, branch);
+	    MaterialPlanningVO materialPlanningVO =
+	            materialPlanningRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Material Planning Not Found"));
 
-	    List<DeliveryChallanCapitalItemsResponseDTO> responseList =
+	    return convertToResponse(materialPlanningVO);
+	}
+	
+	@Override
+	public List<MaterialPlanningResponseDTO> getMaterialPlanningByOrgIdAndBranch(
+	        Long orgId, Long branch) throws ApplicationException {
+
+	    List<MaterialPlanningVO> materialPlanningList =
+	            materialPlanningRepo.findByOrgIdAndBranch(orgId, branch);
+
+	    List<MaterialPlanningResponseDTO> responseList =
 	            new ArrayList<>();
 
-	    for (DeliveryChallanCapitalItemsVO vo : deliveryChallanList) {
+	    for (MaterialPlanningVO vo : materialPlanningList) {
 
 	        responseList.add(convertToResponse(vo));
 	    }
@@ -6534,19 +7836,15 @@ public class SubContractServiceImpl implements SubContractService {
 	}
 	
 	@Override
-	public String getDeliveryChallanCapitalItemsDocId(
+	public String getMaterialPlanningDocId(
 	        Long orgId, String financialYear) {
 
-	    String screenCode = "DCCI";
+	    String screenCode = "MRP";
 
-	    String result =
-	            deliveryChallanCapitalItemsRepo
-	                    .getDeliveryChallanCapitalItemsDocId(
-	                            orgId,
-	                            financialYear,
-	                            screenCode);
-
-	    return result;
+	    return materialPlanningRepo.getMaterialPlanningDocId(
+	            orgId,
+	            financialYear,
+	            screenCode);
 	}
 	
 	

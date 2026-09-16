@@ -13,8 +13,10 @@ import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDT
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderShortCloseResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaterialPlanningResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SubContractingGRNResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.dto.AdvForStoresDTO;
@@ -24,8 +26,10 @@ import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.JobOrderShortCloseDTO;
+import com.efitops.basesetup.dto.MaterialPlanningDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
+import com.efitops.basesetup.dto.SubContractingGRNDTO;
 import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
 import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -180,5 +184,30 @@ public interface SubContractService {
 
 	List<DeliveryChallanCapitalItemsResponseDTO> getDeliveryChallanCapitalItemsByOrgIdAndBranch(Long orgId,
 			Long branch) throws ApplicationException;
+
+	Map<String, Object> createUpdateSubContractingGRN(SubContractingGRNDTO dto) throws ApplicationException;
+
+	List<Map<String, Object>> getGateInwardEntryDropdown(Long orgId, Long branch, Long customer);
+
+	List<Map<String, Object>> getSubcontractSupplyScheduleforSubContractingGRN(Long orgId, Long branch, Long customer);
+
+	List<Map<String, Object>> getItemDetailsForSubContractingGRN(String scheduleNo, Long orgId, Long branch,
+			Long customer);
+
+	List<Map<String, Object>> getBomItemDetailsforSubContractingGRN(Long orgId, Long branch, Long itemId);
+
+	SubContractingGRNResponseDTO getSubContractingGRNById(Long id) throws ApplicationException;
+
+	List<SubContractingGRNResponseDTO> getSubContractingGRNByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	String getSubContractingGRNDocId(Long orgId, String financialYear);
+
+	Map<String, Object> createUpdateMaterialPlanning(MaterialPlanningDTO materialPlanningDTO) throws ApplicationException;
+
+	MaterialPlanningResponseDTO getMaterialPlanningById(Long id) throws ApplicationException;
+
+	List<MaterialPlanningResponseDTO> getMaterialPlanningByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	String getMaterialPlanningDocId(Long orgId, String financialYear);
 
 }

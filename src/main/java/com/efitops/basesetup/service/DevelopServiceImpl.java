@@ -34,6 +34,7 @@ import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseImportDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationIssuesResponseDTO;
@@ -414,13 +415,12 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	private GradeMasterRepo gradeMasterRepo;
-	
-  @Autowired
+
+	@Autowired
 	private ZeroKmFailureEntryRepo zeroKmFailureEntryRepo;
-	
+
 	@Autowired
 	private ZeroEntryDetailRepo zeroEntryDetailRepo;
-
 
 //	@Override
 //	@Transactional
@@ -3220,35 +3220,32 @@ public class DevelopServiceImpl implements DevelopService {
 	// purchaseorderamendmentitemdropdown
 
 	@Override
-	public List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(
-	        String docId, Long branch, Long orgId)
-	        throws ApplicationException {
+	public List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
+			throws ApplicationException {
 
-	    List<Object[]> itemList =
-	            purchaseOrderAmendmentRepo
-	                    .getPurchaseOrderAmendmentItemCodeDropdown(
-	                            docId, branch, orgId);
+		List<Object[]> itemList = purchaseOrderAmendmentRepo.getPurchaseOrderAmendmentItemCodeDropdown(docId, branch,
+				orgId);
 
-	    if (itemList.isEmpty()) {
-	        throw new ApplicationException("No Item Details Found");
-	    }
+		if (itemList.isEmpty()) {
+			throw new ApplicationException("No Item Details Found");
+		}
 
-	    List<Map<String, Object>> responseList = new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : itemList) {
+		for (Object[] obj : itemList) {
 
-	        Map<String, Object> map = new HashMap<>();
+			Map<String, Object> map = new HashMap<>();
 
-	        map.put("id", obj[0]);
-	        map.put("itemCode", obj[1]);
-	        map.put("itemDescription", obj[2]);
-	        map.put("hsnSacCode", obj[3]);
-	        map.put("hsnId", obj[4]);
+			map.put("id", obj[0]);
+			map.put("itemCode", obj[1]);
+			map.put("itemDescription", obj[2]);
+			map.put("hsnSacCode", obj[3]);
+			map.put("hsnId", obj[4]);
 
-	        responseList.add(map);
-	    }
+			responseList.add(map);
+		}
 
-	    return responseList;
+		return responseList;
 	}
 
 	@Override
@@ -3294,32 +3291,30 @@ public class DevelopServiceImpl implements DevelopService {
 
 	// purchase order amendment dropdown for po no
 	@Override
-	public List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(
-	        Long branch, Long customerId, Long orgId) throws ApplicationException {
+	public List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(Long branch, Long customerId,
+			Long orgId) throws ApplicationException {
 
-	    List<Object[]> purchaseOrderList =
-	            purchaseDeliveryScheduleRepo
-	                    .getPurchaseOrderDropdownForPurchaseOrderAmendment(
-	                            customerId, branch, orgId);
+		List<Object[]> purchaseOrderList = purchaseDeliveryScheduleRepo
+				.getPurchaseOrderDropdownForPurchaseOrderAmendment(customerId, branch, orgId);
 
-	    if (purchaseOrderList.isEmpty()) {
-	        throw new ApplicationException("No Purchase Order Details Found");
-	    }
+		if (purchaseOrderList.isEmpty()) {
+			throw new ApplicationException("No Purchase Order Details Found");
+		}
 
-	    List<Map<String, Object>> responseList = new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : purchaseOrderList) {
+		for (Object[] obj : purchaseOrderList) {
 
-	        Map<String, Object> map = new HashMap<>();
+			Map<String, Object> map = new HashMap<>();
 
-	        map.put("id", obj[0]);
-	        map.put("docId", obj[1]);
-	        map.put("docDate", obj[2]);
+			map.put("id", obj[0]);
+			map.put("docId", obj[1]);
+			map.put("docDate", obj[2]);
 
-	        responseList.add(map);
-	    }
+			responseList.add(map);
+		}
 
-	    return responseList;
+		return responseList;
 	}
 
 	// openstockentry
@@ -6881,14 +6876,12 @@ public class DevelopServiceImpl implements DevelopService {
 
 		if (ObjectUtils.isNotEmpty(rootCauseAnalysisDTO.getCustomerId())) {
 
-		    CustomerVO customerVO = customerRepo
-		            .findById(rootCauseAnalysisDTO.getCustomerId())
-		            .orElseThrow(() ->
-		                    new ApplicationException("Customer Not Found"));
+			CustomerVO customerVO = customerRepo.findById(rootCauseAnalysisDTO.getCustomerId())
+					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
-		    rootCauseAnalysisVO.setCustomerId(customerVO);
+			rootCauseAnalysisVO.setCustomerId(customerVO);
 		}
-		
+
 		rootCauseAnalysisVO.setDetailsOfComplaint(rootCauseAnalysisDTO.getDetailsOfComplaint());
 
 		rootCauseAnalysisVO.setActive(rootCauseAnalysisDTO.isActive());
@@ -6937,37 +6930,25 @@ public class DevelopServiceImpl implements DevelopService {
 
 		if (ObjectUtils.isNotEmpty(rootCauseAnalysisDTO.getComplaintNo())) {
 
-		    CustomerComplaintEntryVO complaintVO =
-		            customerComplaintRepo.findById(
-		                    rootCauseAnalysisDTO.getComplaintNo())
-		            .orElseThrow(() ->
-		                    new ApplicationException("Complaint No Not Found"));
+			CustomerComplaintEntryVO complaintVO = customerComplaintRepo.findById(rootCauseAnalysisDTO.getComplaintNo())
+					.orElseThrow(() -> new ApplicationException("Complaint No Not Found"));
 
-		    rootCauseAnalysisVO.setComplaintNo(
-		            rootCauseAnalysisDTO.getComplaintNo());
+			rootCauseAnalysisVO.setComplaintNo(rootCauseAnalysisDTO.getComplaintNo());
 
-		    // Keep values coming from request
-		    rootCauseAnalysisVO.setComplaintDate(
-		            rootCauseAnalysisDTO.getComplaintDate());
+			// Keep values coming from request
+			rootCauseAnalysisVO.setComplaintDate(rootCauseAnalysisDTO.getComplaintDate());
 
-		    rootCauseAnalysisVO.setComplaintType(
-		            rootCauseAnalysisDTO.getComplaintType());
+			rootCauseAnalysisVO.setComplaintType(rootCauseAnalysisDTO.getComplaintType());
 
-		    rootCauseAnalysisVO.setDetailsOfComplaint(
-		            rootCauseAnalysisDTO.getDetailsOfComplaint());
+			rootCauseAnalysisVO.setDetailsOfComplaint(rootCauseAnalysisDTO.getDetailsOfComplaint());
 
-		 
+			if (ObjectUtils.isNotEmpty(rootCauseAnalysisDTO.getCustomerId())) {
 
-		    if (ObjectUtils.isNotEmpty(rootCauseAnalysisDTO.getCustomerId())) {
+				CustomerVO customerVO = customerRepo.findById(rootCauseAnalysisDTO.getCustomerId())
+						.orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
-		        CustomerVO customerVO =
-		                customerRepo.findById(
-		                        rootCauseAnalysisDTO.getCustomerId())
-		                .orElseThrow(() ->
-		                        new ApplicationException("Customer Not Found"));
-
-		        rootCauseAnalysisVO.setCustomerId(customerVO);
-		    }
+				rootCauseAnalysisVO.setCustomerId(customerVO);
+			}
 		}
 
 		// =========================
@@ -7045,29 +7026,22 @@ public class DevelopServiceImpl implements DevelopService {
 		// Basic Fields
 		// =========================
 
-		responseDTO.setComplaintType(
-		        rootCauseAnalysisVO.getComplaintType());
+		responseDTO.setComplaintType(rootCauseAnalysisVO.getComplaintType());
 
 		if (ObjectUtils.isNotEmpty(rootCauseAnalysisVO.getCustomerId())) {
 
-		    CustomerResponse1DTO customerResponse1DTO = new CustomerResponse1DTO();
+			CustomerResponse1DTO customerResponse1DTO = new CustomerResponse1DTO();
 
-		    customerResponse1DTO.setId(
-		            rootCauseAnalysisVO.getCustomerId().getId());
+			customerResponse1DTO.setId(rootCauseAnalysisVO.getCustomerId().getId());
 
-		    customerResponse1DTO.setCustomerName(
-		            rootCauseAnalysisVO.getCustomerId().getCustomerName());
+			customerResponse1DTO.setCustomerName(rootCauseAnalysisVO.getCustomerId().getCustomerName());
 
-		    responseDTO.setCustomerId(customerResponse1DTO);
+			responseDTO.setCustomerId(customerResponse1DTO);
 		}
 
-		
+		responseDTO.setDetailsOfComplaint(rootCauseAnalysisVO.getDetailsOfComplaint());
 
-		responseDTO.setDetailsOfComplaint(
-		        rootCauseAnalysisVO.getDetailsOfComplaint());
-
-		responseDTO.setActive(
-		        rootCauseAnalysisVO.isActive());
+		responseDTO.setActive(rootCauseAnalysisVO.isActive());
 
 		// =========================
 		// Summary
@@ -7248,25 +7222,19 @@ public class DevelopServiceImpl implements DevelopService {
 	// dropdown
 
 	@Override
-	public Map<String, Object> getItemDropdownForRootCauseAnalysis(
-	        Long complaintMasterId, Long branch, Long orgId)
-	        throws ApplicationException {
+	public Map<String, Object> getItemDropdownForRootCauseAnalysis(Long complaintMasterId, Long branch, Long orgId)
+			throws ApplicationException {
 
-	    List<Object[]> result =
-	            customerComplaintRepo
-	                    .getItemDropdownForRootCauseAnalysis(
-	                            complaintMasterId,
-	                            branch,
-	                            orgId);
+		List<Object[]> result = customerComplaintRepo.getItemDropdownForRootCauseAnalysis(complaintMasterId, branch,
+				orgId);
 
-	    Map<String, Object> response = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 
-	    response.put(
-	            "itemList",
-	            getItemDetails(result));
+		response.put("itemList", getItemDetails(result));
 
-	    return response;
+		return response;
 	}
+
 	private List<Map<String, Object>> getItemDetails(List<Object[]> result) {
 
 		List<Map<String, Object>> itemList = new ArrayList<>();
@@ -7810,76 +7778,43 @@ public class DevelopServiceImpl implements DevelopService {
 	}
 
 	@Override
-	public Map<String, Object> getFGItemDropdownforControlPlan(Long branch, Long orgId)
-	        throws ApplicationException {
+	public Map<String, Object> getFGItemDropdownforControlPlan(Long branch, Long orgId) throws ApplicationException {
 
-	    List<Object[]> result =
-	            controlPlanRepo.getFGItemDropdownforControlPlan(orgId, branch);
+		List<Object[]> result = controlPlanRepo.getFGItemDropdownforControlPlan(orgId, branch);
 
-	    Map<String, Object> response = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 
-	    response.put(
-	            "fgItemList",
-	            getFGItemDropdownforControlPlan(result));
+		response.put("fgItemList", getFGItemDropdownforControlPlan(result));
 
-	    return response;
+		return response;
 	}
 
-	private List<Map<String, Object>> getFGItemDropdownforControlPlan(
-	        List<Object[]> result) {
+	private List<Map<String, Object>> getFGItemDropdownforControlPlan(List<Object[]> result) {
 
-	    List<Map<String, Object>> fgItemList =
-	            new ArrayList<>();
+		List<Map<String, Object>> fgItemList = new ArrayList<>();
 
-	    for (Object[] obj : result) {
+		for (Object[] obj : result) {
 
-	        Map<String, Object> fgItem =
-	                new HashMap<>();
+			Map<String, Object> fgItem = new HashMap<>();
 
-	        fgItem.put(
-	                "itemId",
-	                obj[0] != null
-	                        ? Long.valueOf(obj[0].toString())
-	                        : null);
+			fgItem.put("itemId", obj[0] != null ? Long.valueOf(obj[0].toString()) : null);
 
-	        fgItem.put(
-	                "itemCode",
-	                obj[1] != null
-	                        ? obj[1].toString()
-	                        : null);
+			fgItem.put("itemCode", obj[1] != null ? obj[1].toString() : null);
 
-	        fgItem.put(
-	                "itemDescription",
-	                obj[2] != null
-	                        ? obj[2].toString()
-	                        : null);
+			fgItem.put("itemDescription", obj[2] != null ? obj[2].toString() : null);
 
-	        fgItem.put(
-	                "gradeMasterId",
-	                obj[3] != null
-	                        ? Long.valueOf(obj[3].toString())
-	                        : null);
+			fgItem.put("gradeMasterId", obj[3] != null ? Long.valueOf(obj[3].toString()) : null);
 
-	        fgItem.put(
-	                "gradeCode",
-	                obj[4] != null
-	                        ? obj[4].toString()
-	                        : null);
+			fgItem.put("gradeCode", obj[4] != null ? obj[4].toString() : null);
 
-	        fgItem.put(
-	                "gradeDescription",
-	                obj[5] != null
-	                        ? obj[5].toString()
-	                        : null);
+			fgItem.put("gradeDescription", obj[5] != null ? obj[5].toString() : null);
 
-	        fgItemList.add(fgItem);
-	    }
+			fgItemList.add(fgItem);
+		}
 
-	    return fgItemList;
+		return fgItemList;
 	}
-	
-	
-	
+
 	@Override
 	public String getControlPlanDocId(Long orgId, String financialYear) {
 
@@ -7889,439 +7824,324 @@ public class DevelopServiceImpl implements DevelopService {
 
 		return result;
 	}
-	
-	
-	//zero km failure entry
-	
-	
+
+	// zero km failure entry
+
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateZeroKmFailureEntry(
-	        ZeroKmFailureEntryDTO zeroKmFailureEntryDTO)
-	        throws ApplicationException {
+	public Map<String, Object> updateCreateZeroKmFailureEntry(ZeroKmFailureEntryDTO zeroKmFailureEntryDTO)
+			throws ApplicationException {
 
-	    ZeroKmFailureEntryVO zeroKmFailureEntryVO;
-	    String message;
+		ZeroKmFailureEntryVO zeroKmFailureEntryVO;
+		String message;
 
-	    // ============================================================
-	    // CREATE / UPDATE
-	    // ============================================================
+		// ============================================================
+		// CREATE / UPDATE
+		// ============================================================
 
-	    if (ObjectUtils.isNotEmpty(zeroKmFailureEntryDTO.getId())) {
+		if (ObjectUtils.isNotEmpty(zeroKmFailureEntryDTO.getId())) {
 
-	        // UPDATE
+			// UPDATE
 
-	        zeroKmFailureEntryVO =
-	                zeroKmFailureEntryRepo
-	                        .findById(zeroKmFailureEntryDTO.getId())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Zero Km Failure Entry Not Found"));
+			zeroKmFailureEntryVO = zeroKmFailureEntryRepo.findById(zeroKmFailureEntryDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Zero Km Failure Entry Not Found"));
 
-	        zeroKmFailureEntryVO.setUpdatedBy(
-	                zeroKmFailureEntryDTO.getCreatedBy());
+			zeroKmFailureEntryVO.setUpdatedBy(zeroKmFailureEntryDTO.getCreatedBy());
 
-	        message =
-	                "Zero Km Failure Entry Updated Successfully";
+			message = "Zero Km Failure Entry Updated Successfully";
 
-	    } else {
+		} else {
 
-	        // CREATE
+			// CREATE
 
-	        zeroKmFailureEntryVO =
-	                new ZeroKmFailureEntryVO();
+			zeroKmFailureEntryVO = new ZeroKmFailureEntryVO();
 
-	        String screenCode = "ZKMFE";
+			String screenCode = "ZKMFE";
 
-	        String docId =
-	                zeroKmFailureEntryRepo.getZeroKmFailureEntryDocId(
-	                        zeroKmFailureEntryDTO.getOrgId(),
-	                        
-	                        zeroKmFailureEntryDTO.getFinancialYear(),
-	                        screenCode);
+			String docId = zeroKmFailureEntryRepo.getZeroKmFailureEntryDocId(zeroKmFailureEntryDTO.getOrgId(),
 
-	        if (docId == null || docId.trim().isEmpty()) {
-	            throw new ApplicationException(
-	                    "Zero Km Failure Entry DocId Not Found");
-	        }
+					zeroKmFailureEntryDTO.getFinancialYear(), screenCode);
 
-	        zeroKmFailureEntryVO.setDocId(docId);
-	        
-	        // ========================================================
-	        // DOCUMENT MAPPING
-	        // ========================================================
+			if (docId == null || docId.trim().isEmpty()) {
+				throw new ApplicationException("Zero Km Failure Entry DocId Not Found");
+			}
 
-	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
-	                documentTypeMappingDetailsRepo
-	                        .findByOrgIdAndFinYearIdentifierAndScreenCode(
-	                                zeroKmFailureEntryDTO.getOrgId(),
-	                                zeroKmFailureEntryDTO.getFinancialYear(),
-	                                screenCode);
+			zeroKmFailureEntryVO.setDocId(docId);
 
-	        if (documentTypeMappingDetailsVO == null) {
+			// ========================================================
+			// DOCUMENT MAPPING
+			// ========================================================
 
-	            throw new ApplicationException(
-	                    "Document Type Mapping Details Not Found");
-	        }
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(zeroKmFailureEntryDTO.getOrgId(),
+							zeroKmFailureEntryDTO.getFinancialYear(), screenCode);
 
-	        documentTypeMappingDetailsVO.setLastNo(
-	                documentTypeMappingDetailsVO.getLastNo() + 1);
+			if (documentTypeMappingDetailsVO == null) {
 
-	        documentTypeMappingDetailsRepo.save(
-	                documentTypeMappingDetailsVO);
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
 
-	        zeroKmFailureEntryVO.setCreatedBy(
-	                zeroKmFailureEntryDTO.getCreatedBy());
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
 
-	        zeroKmFailureEntryVO.setUpdatedBy(
-	                zeroKmFailureEntryDTO.getCreatedBy());
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
-	        message =
-	                "Zero Km Failure Entry Created Successfully";
-	    }
+			zeroKmFailureEntryVO.setCreatedBy(zeroKmFailureEntryDTO.getCreatedBy());
 
-	    // ============================================================
-	    // HEADER MAPPING
-	    // ============================================================
+			zeroKmFailureEntryVO.setUpdatedBy(zeroKmFailureEntryDTO.getCreatedBy());
 
-	    createUpdateZeroKmFailureEntryVO(
-	            zeroKmFailureEntryDTO,
-	            zeroKmFailureEntryVO);
+			message = "Zero Km Failure Entry Created Successfully";
+		}
 
-	    // ============================================================
-	    // SAVE
-	    // ============================================================
+		// ============================================================
+		// HEADER MAPPING
+		// ============================================================
 
-	    zeroKmFailureEntryVO =
-	            zeroKmFailureEntryRepo.save(
-	                    zeroKmFailureEntryVO);
+		createUpdateZeroKmFailureEntryVO(zeroKmFailureEntryDTO, zeroKmFailureEntryVO);
 
-	    // ============================================================
-	    // RESPONSE
-	    // ============================================================
+		// ============================================================
+		// SAVE
+		// ============================================================
 
-	    ZeroKmFailureEntryResponseDTO responseDTO =
-	            zeroKmFailureEntryResponse(
-	                    zeroKmFailureEntryVO);
+		zeroKmFailureEntryVO = zeroKmFailureEntryRepo.save(zeroKmFailureEntryVO);
 
-	    Map<String, Object> response =
-	            new HashMap<>();
+		// ============================================================
+		// RESPONSE
+		// ============================================================
 
-	    response.put(
-	            "message",
-	            message);
+		ZeroKmFailureEntryResponseDTO responseDTO = zeroKmFailureEntryResponse(zeroKmFailureEntryVO);
 
-	    response.put(
-	            "zeroKmFailureEntryVO",
-	            responseDTO);
+		Map<String, Object> response = new HashMap<>();
 
-	    return response;
+		response.put("message", message);
+
+		response.put("zeroKmFailureEntryVO", responseDTO);
+
+		return response;
 	}
-	
-	private void createUpdateZeroKmFailureEntryVO(
-	        ZeroKmFailureEntryDTO dto,
-	        ZeroKmFailureEntryVO zeroKmFailureEntryVO)
-	        throws ApplicationException {
 
-	    // Basic Fields
-	    zeroKmFailureEntryVO.setDocDate(dto.getDocDate());
+	private void createUpdateZeroKmFailureEntryVO(ZeroKmFailureEntryDTO dto, ZeroKmFailureEntryVO zeroKmFailureEntryVO)
+			throws ApplicationException {
 
-	    zeroKmFailureEntryVO.setPartyName(dto.getPartyName());
+		// Basic Fields
+		zeroKmFailureEntryVO.setDocDate(dto.getDocDate());
 
-	    zeroKmFailureEntryVO.setRemarks(dto.getRemarks());
+		zeroKmFailureEntryVO.setPartyName(dto.getPartyName());
 
-	    zeroKmFailureEntryVO.setOrgId(dto.getOrgId());
+		zeroKmFailureEntryVO.setRemarks(dto.getRemarks());
 
-	    zeroKmFailureEntryVO.setFinancialYear(
-	            dto.getFinancialYear());
+		zeroKmFailureEntryVO.setOrgId(dto.getOrgId());
 
-	    zeroKmFailureEntryVO.setCreatedBy(
-	            dto.getCreatedBy());
+		zeroKmFailureEntryVO.setFinancialYear(dto.getFinancialYear());
 
-	    zeroKmFailureEntryVO.setUpdatedBy(
-	            dto.getUpdatedBy());
+		zeroKmFailureEntryVO.setCreatedBy(dto.getCreatedBy());
 
-	    zeroKmFailureEntryVO.setActive(dto.isActive());
+		zeroKmFailureEntryVO.setUpdatedBy(dto.getUpdatedBy());
 
-	    zeroKmFailureEntryVO.setCancelRemarks(
-	            dto.getCancelRemarks());
+		zeroKmFailureEntryVO.setActive(dto.isActive());
 
-	    zeroKmFailureEntryVO.setCancel(
-	            dto.isCancel());
+		zeroKmFailureEntryVO.setCancelRemarks(dto.getCancelRemarks());
 
+		zeroKmFailureEntryVO.setCancel(dto.isCancel());
 
-	    // Branch
-	    if (dto.getBranch() != null && dto.getBranch() != 0) {
+		// Branch
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
-	        BranchVO branch =
-	                branchRepo.findById(dto.getBranch())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Branch Not Found"));
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
-	        zeroKmFailureEntryVO.setBranch(branch);
-	    }
+			zeroKmFailureEntryVO.setBranch(branch);
+		}
 
+		// Customer
+		if (dto.getCustomer() != null && dto.getCustomer() != 0) {
 
-	    // Customer
-	    if (dto.getCustomer() != null && dto.getCustomer() != 0) {
+			CustomerVO customer = customerRepo.findById(dto.getCustomer())
+					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
-	        CustomerVO customer =
-	                customerRepo.findById(dto.getCustomer())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Customer Not Found"));
+			zeroKmFailureEntryVO.setCustomer(customer);
 
-	        zeroKmFailureEntryVO.setCustomer(customer);
+			zeroKmFailureEntryVO.setPartyName(customer.getCustomerName());
+		}
 
-	        zeroKmFailureEntryVO.setPartyName(
-	                customer.getCustomerName());
-	    }
+		// Delete Existing Grid During Update
+		if (dto.getId() != null) {
 
+			List<ZeroEntryDetailVO> oldDetails = zeroEntryDetailRepo.findByZeroKmFailureEntryVO(zeroKmFailureEntryVO);
 
-	    // Delete Existing Grid During Update
-	    if (dto.getId() != null) {
+			if (!oldDetails.isEmpty()) {
 
-	        List<ZeroEntryDetailVO> oldDetails =
-	                zeroEntryDetailRepo
-	                        .findByZeroKmFailureEntryVO(
-	                                zeroKmFailureEntryVO);
+				zeroEntryDetailRepo.deleteAll(oldDetails);
+			}
+		}
 
-	        if (!oldDetails.isEmpty()) {
+		// Details Grid
+		List<ZeroEntryDetailVO> detailsList = new ArrayList<>();
 
-	            zeroEntryDetailRepo.deleteAll(oldDetails);
-	        }
-	    }
+		if (dto.getZeroEntryDetailDTO() != null && !dto.getZeroEntryDetailDTO().isEmpty()) {
 
+			for (ZeroEntryDetailDTO detailDTO : dto.getZeroEntryDetailDTO()) {
 
-	    // Details Grid
-	    List<ZeroEntryDetailVO> detailsList =
-	            new ArrayList<>();
+				ZeroEntryDetailVO detailVO = new ZeroEntryDetailVO();
 
-	    if (dto.getZeroEntryDetailDTO() != null
-	            && !dto.getZeroEntryDetailDTO().isEmpty()) {
+				if (detailDTO.getPartNo() != null && detailDTO.getPartNo() != 0) {
 
-	        for (ZeroEntryDetailDTO detailDTO :
-	                dto.getZeroEntryDetailDTO()) {
+					ItemMasterVO branch = itemMasterRepo.findById(detailDTO.getPartNo())
+							.orElseThrow(() -> new ApplicationException("PartNo Not Found"));
 
-	            ZeroEntryDetailVO detailVO =
-	                    new ZeroEntryDetailVO();
+					detailVO.setPartNo(branch);
+				}
 
-	            detailVO.setPartNo(
-	                    detailDTO.getPartNo());
+				detailVO.setPartName(detailDTO.getPartName());
 
-	            detailVO.setPartName(
-	                    detailDTO.getPartName());
+				detailVO.setFailureQty(detailDTO.getFailureQty());
 
-	            detailVO.setFailureQty(
-	                    detailDTO.getFailureQty());
+				detailVO.setReason(detailDTO.getReason());
 
-	            detailVO.setReason(
-	                    detailDTO.getReason());
+				detailVO.setZeroKmFailureEntryVO(zeroKmFailureEntryVO);
 
-	            detailVO.setZeroKmFailureEntryVO(
-	                    zeroKmFailureEntryVO);
+				detailsList.add(detailVO);
+			}
+		}
 
-	            detailsList.add(detailVO);
-	        }
-	    }
-
-	    zeroKmFailureEntryVO.setZeroEntryDetailVO(
-	            detailsList);
+		zeroKmFailureEntryVO.setZeroEntryDetailVO(detailsList);
 	}
-	
-	private ZeroKmFailureEntryResponseDTO zeroKmFailureEntryResponse(
-	        ZeroKmFailureEntryVO zeroKmFailureEntryVO) {
 
-	    ZeroKmFailureEntryResponseDTO responseDTO =
-	            new ZeroKmFailureEntryResponseDTO();
+	private ZeroKmFailureEntryResponseDTO zeroKmFailureEntryResponse(ZeroKmFailureEntryVO zeroKmFailureEntryVO) {
 
-	    responseDTO.setId(zeroKmFailureEntryVO.getId());
+		ZeroKmFailureEntryResponseDTO responseDTO = new ZeroKmFailureEntryResponseDTO();
 
-	    responseDTO.setDocId(zeroKmFailureEntryVO.getDocId());
+		responseDTO.setId(zeroKmFailureEntryVO.getId());
 
-	    responseDTO.setDocDate(zeroKmFailureEntryVO.getDocDate());
+		responseDTO.setDocId(zeroKmFailureEntryVO.getDocId());
 
-	    responseDTO.setPartyName(
-	            zeroKmFailureEntryVO.getPartyName());
+		responseDTO.setDocDate(zeroKmFailureEntryVO.getDocDate());
 
-	    responseDTO.setRemarks(
-	            zeroKmFailureEntryVO.getRemarks());
+		responseDTO.setPartyName(zeroKmFailureEntryVO.getPartyName());
 
-	    responseDTO.setOrgId(
-	            zeroKmFailureEntryVO.getOrgId());
+		responseDTO.setRemarks(zeroKmFailureEntryVO.getRemarks());
 
-	    responseDTO.setActive(
-	            zeroKmFailureEntryVO.isActive());
+		responseDTO.setOrgId(zeroKmFailureEntryVO.getOrgId());
 
-	    responseDTO.setCancel(
-	            zeroKmFailureEntryVO.isCancel());
+		responseDTO.setActive(zeroKmFailureEntryVO.isActive());
 
-	    responseDTO.setCancelRemarks(
-	            zeroKmFailureEntryVO.getCancelRemarks());
-	    
-	    
-	    responseDTO.setFinancialYear(
-	            zeroKmFailureEntryVO.getFinancialYear());
+		responseDTO.setCancel(zeroKmFailureEntryVO.isCancel());
 
-	    responseDTO.setCreatedBy(
-	            zeroKmFailureEntryVO.getCreatedBy());
+		responseDTO.setCancelRemarks(zeroKmFailureEntryVO.getCancelRemarks());
 
-	    responseDTO.setUpdatedBy(
-	            zeroKmFailureEntryVO.getUpdatedBy());
+		responseDTO.setFinancialYear(zeroKmFailureEntryVO.getFinancialYear());
 
+		responseDTO.setCreatedBy(zeroKmFailureEntryVO.getCreatedBy());
 
-	    // =========================
-	    // Branch
-	    // =========================
+		responseDTO.setUpdatedBy(zeroKmFailureEntryVO.getUpdatedBy());
 
-	    if (ObjectUtils.isNotEmpty(
-	            zeroKmFailureEntryVO.getBranch())) {
+		// =========================
+		// Branch
+		// =========================
 
-	        BranchResponseDTO branchResponseDTO =
-	                new BranchResponseDTO();
+		if (ObjectUtils.isNotEmpty(zeroKmFailureEntryVO.getBranch())) {
 
-	        branchResponseDTO.setId(
-	                zeroKmFailureEntryVO
-	                        .getBranch()
-	                        .getId());
+			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
 
-	        branchResponseDTO.setBranchCode(
-	                zeroKmFailureEntryVO
-	                        .getBranch()
-	                        .getBranchCode());
+			branchResponseDTO.setId(zeroKmFailureEntryVO.getBranch().getId());
 
-	        branchResponseDTO.setBranchName(
-	                zeroKmFailureEntryVO
-	                        .getBranch()
-	                        .getBranchName());
+			branchResponseDTO.setBranchCode(zeroKmFailureEntryVO.getBranch().getBranchCode());
 
-	        responseDTO.setBranch(
-	                branchResponseDTO);
-	    }
+			branchResponseDTO.setBranchName(zeroKmFailureEntryVO.getBranch().getBranchName());
 
+			responseDTO.setBranch(branchResponseDTO);
+		}
 
-	    // =========================
-	    // Customer
-	    // =========================
+		// =========================
+		// Customer
+		// =========================
 
-	    if (ObjectUtils.isNotEmpty(zeroKmFailureEntryVO.getCustomer())) {
+		if (ObjectUtils.isNotEmpty(zeroKmFailureEntryVO.getCustomer())) {
 
-	        CustomerResponse1DTO customerResponse1DTO =
-	                new CustomerResponse1DTO();
+			CustomerResponse1DTO customerResponse1DTO = new CustomerResponse1DTO();
 
-	        customerResponse1DTO.setId(
-	                zeroKmFailureEntryVO
-	                        .getCustomer()
-	                        .getId());
+			customerResponse1DTO.setId(zeroKmFailureEntryVO.getCustomer().getId());
 
-	        responseDTO.setCustomer(customerResponse1DTO);
-	    }
-	    
-	    
-	    
-	    // =========================
-	    // Child Details
-	    // =========================
+			responseDTO.setCustomer(customerResponse1DTO);
+		}
 
-	    List<ZeroEntryDetailResponseDTO> detailResponseList =
-	            new ArrayList<>();
+		// =========================
+		// Child Details
+		// =========================
 
-	    if (zeroKmFailureEntryVO.getZeroEntryDetailVO() != null) {
+		List<ZeroEntryDetailResponseDTO> detailResponseList = new ArrayList<>();
 
-	        for (ZeroEntryDetailVO detailVO :
-	                zeroKmFailureEntryVO.getZeroEntryDetailVO()) {
+		if (zeroKmFailureEntryVO.getZeroEntryDetailVO() != null) {
 
-	            ZeroEntryDetailResponseDTO detailResponseDTO =
-	                    new ZeroEntryDetailResponseDTO();
+			for (ZeroEntryDetailVO detailVO : zeroKmFailureEntryVO.getZeroEntryDetailVO()) {
 
-	            detailResponseDTO.setId(
-	                    detailVO.getId());
+				ZeroEntryDetailResponseDTO detailResponseDTO = new ZeroEntryDetailResponseDTO();
 
-	            detailResponseDTO.setPartNo(
-	                    detailVO.getPartNo());
+				detailResponseDTO.setId(detailVO.getId());
 
-	            detailResponseDTO.setPartName(
-	                    detailVO.getPartName());
+				if (detailVO.getPartNo() != null) {
+					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+					itemDTO.setId(detailVO.getPartNo().getId());
+					itemDTO.setItemCode(detailVO.getPartNo().getItemCode());
+					itemDTO.setItemDescription(detailVO.getPartNo().getItemDescription());
+					detailResponseDTO.setPartNo(itemDTO);
+				}
 
-	            detailResponseDTO.setFailureQty(
-	                    detailVO.getFailureQty());
+				detailResponseDTO.setPartName(detailVO.getPartName());
 
-	            detailResponseDTO.setReason(
-	                    detailVO.getReason());
+				detailResponseDTO.setFailureQty(detailVO.getFailureQty());
 
-	            detailResponseList.add(
-	                    detailResponseDTO);
-	        }
-	    }
+				detailResponseDTO.setReason(detailVO.getReason());
 
-	    responseDTO.setZeroEntryDetailResponseDTO(
-	            detailResponseList);
+				detailResponseList.add(detailResponseDTO);
+			}
+		}
 
-	    return responseDTO;
+		responseDTO.setZeroEntryDetailResponseDTO(detailResponseList);
+
+		return responseDTO;
 	}
-													
-	
-	//orgid
-	
-	
+
+	// orgid
+
 	@Override
-	public List<ZeroKmFailureEntryResponseDTO> getZeroKmFailureEntryByOrgId(
-	        Long orgId, Long branch) throws ApplicationException {
+	public List<ZeroKmFailureEntryResponseDTO> getZeroKmFailureEntryByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
 
-	    List<ZeroKmFailureEntryVO> zeroKmFailureEntryList =
-	            zeroKmFailureEntryRepo.findByOrgIdAndBranch_Id(
-	                    orgId, branch);
+		List<ZeroKmFailureEntryVO> zeroKmFailureEntryList = zeroKmFailureEntryRepo.findByOrgIdAndBranch_Id(orgId,
+				branch);
 
-	    if (zeroKmFailureEntryList == null
-	            || zeroKmFailureEntryList.isEmpty()) {
+		if (zeroKmFailureEntryList == null || zeroKmFailureEntryList.isEmpty()) {
 
-	        throw new ApplicationException(
-	                "Zero Km Failure Entry Not Found");
-	    }
+			throw new ApplicationException("Zero Km Failure Entry Not Found");
+		}
 
-	    List<ZeroKmFailureEntryResponseDTO> responseList =
-	            new ArrayList<>();
+		List<ZeroKmFailureEntryResponseDTO> responseList = new ArrayList<>();
 
-	    for (ZeroKmFailureEntryVO zeroKmFailureEntryVO :
-	            zeroKmFailureEntryList) {
+		for (ZeroKmFailureEntryVO zeroKmFailureEntryVO : zeroKmFailureEntryList) {
 
-	        responseList.add(
-	                zeroKmFailureEntryResponse(
-	                        zeroKmFailureEntryVO));
-	    }
+			responseList.add(zeroKmFailureEntryResponse(zeroKmFailureEntryVO));
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	
+
 	@Override
-	public ZeroKmFailureEntryResponseDTO getZeroKmFailureEntryById(Long id)
-	        throws ApplicationException {
+	public ZeroKmFailureEntryResponseDTO getZeroKmFailureEntryById(Long id) throws ApplicationException {
 
-	    ZeroKmFailureEntryVO zeroKmFailureEntryVO =
-	            zeroKmFailureEntryRepo.findById(id)
-	                    .orElseThrow(() ->
-	                            new ApplicationException(
-	                                    "Zero Km Failure Entry Not Found"));
+		ZeroKmFailureEntryVO zeroKmFailureEntryVO = zeroKmFailureEntryRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Zero Km Failure Entry Not Found"));
 
-	    return zeroKmFailureEntryResponse(zeroKmFailureEntryVO);
+		return zeroKmFailureEntryResponse(zeroKmFailureEntryVO);
 	}
-	
-	
+
 	@Override
 	public String getZeroKmFailureEntryDocId(Long orgId, String financialYear) {
 
-	    String screenCode = "ZKMFE";
+		String screenCode = "ZKMFE";
 
-	    String result = zeroKmFailureEntryRepo.getZeroKmFailureEntryDocId(
-	            orgId,
-	            financialYear,
-	            screenCode);
+		String result = zeroKmFailureEntryRepo.getZeroKmFailureEntryDocId(orgId, financialYear, screenCode);
 
-	    return result;
+		return result;
 	}
-	
-	
-	
+
 }

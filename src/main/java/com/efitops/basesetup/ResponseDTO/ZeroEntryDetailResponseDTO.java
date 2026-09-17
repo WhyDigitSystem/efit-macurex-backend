@@ -12,7 +12,7 @@ public class ZeroEntryDetailResponseDTO {
 	
 	    private Long id;
 
-	    private String partNo;
+	    private ItemMasterDetailsResponseImportDTO partNo;
 
 	    private String partName;
 

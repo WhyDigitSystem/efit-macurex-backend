@@ -2,6 +2,7 @@ package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -26,16 +27,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "production_schedule_order_basic")
+@Table(name = "material_indent_for_production")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductionScheduleOrderVO {
+public class MaterialIndentForProductionVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "production_schedule_order_basicgen")
-	@SequenceGenerator(name = "production_schedule_order_basicgen", sequenceName = "production_schedule_order_basicseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "production_schedule_order_basic_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "material_indent_for_productiongen")
+	@SequenceGenerator(name = "material_indent_for_productiongen", sequenceName = "material_indent_for_productionseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "material_indent_for_production_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "doc_id")
@@ -44,64 +45,57 @@ public class ProductionScheduleOrderVO {
 	@Column(name = "doc_date")
 	private LocalDate docDate = LocalDate.now();
 
-	@Column(name = "order_type")
-	private String orderType;
+	@ManyToOne
+	@JoinColumn(name = "department")
+	private DepartmentVO department;
 
-	@Column(name = "lc_po_no")
-	private String lcPoNo;
+	@Column(name = "sch_order_no")
+	private String schOrderNo;
 
-	@Column(name = "lc_po_date")
-	private LocalDate lcPoDate;
+	@Column(name = "belongs_to")
+	private String belongsTo;
 
 	@ManyToOne
 	@JoinColumn(name = "fg_item")
 	private ItemMasterVO fgItem;
 
-	@ManyToOne
-	@JoinColumn(name = "comp_route_no")
-	private ProcessSheetCompRoutingVO compRouteNo;
+	@Column(name = "sch_qty", precision = 10, scale = 2)
+	private BigDecimal schQty;
 
-	@Column(name = "batch_qty", precision = 15, scale = 5)
-	private BigDecimal batchQty;
+	@Column(name = "scheduled_date")
+	private LocalDate scheduledDate;
 
-	@Column(name = "total_qty", precision = 15, scale = 5)
-	private BigDecimal totalQty;
-
-	@Column(name = "short_close")
-	private String shortClose;
+	@Column(name = "indent_time")
+	private LocalTime indentTime = LocalTime.now();
 
 	@ManyToOne
-	@JoinColumn(name = "bom")
-	private BillOfMaterialVO bom;
+	@JoinColumn(name = "to_location")
+	private LocationVO toLocation;
 
-	@Column(name = "schedule_start_date")
-	private LocalDate scheduleStartDate;
-
-	@Column(name = "schedule_end_date")
-	private LocalDate scheduleEndDate;
-
-	// Common fields
+	@ManyToOne
+	@JoinColumn(name = "from_location")
+	private LocationVO fromLocation;
 
 	@Column(name = "created_by")
 	private String createdBy;
 
+	@Column(name = "modified_by")
+	private String updatedBy;
+
 	@Column(name = "active")
-	private boolean active;
+	private boolean active ;
 
 	@Column(name = "cancel")
 	private boolean cancel = false;
-
-	@Column(name = "modified_by")
-	private String updatedBy;
 
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 
 	@Column(name = "screen_name")
-	private String screenName = "ProductionScheduleOrder";
+	private String screenName = "MaterialIndentForProduction";
 
 	@Column(name = "screen_code")
-	private String screenCode = "PSO";
+	private String screenCode = "MIP";
 
 	@Column(name = "org_id")
 	private Long orgId;
@@ -112,14 +106,28 @@ public class ProductionScheduleOrderVO {
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
+	
+	@Column(name = "approved_by")
+	private String approvedBy;
+	
 
-	@OneToMany(mappedBy = "productionScheduleOrderVO", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	private List<ProductionScheduleOrderDetailsVO> productionScheduleOrderDetailsVO;
+	@Column(name = "remarks")
+	private String remarks;
+	
+	@ManyToOne
+	@JoinColumn(name = "prepared_by")
+	private EmployeeMasterVO preparedBy;
 
-	@OneToMany(mappedBy = "productionScheduleOrderVO", cascade = CascadeType.ALL)
+	
+	@ManyToOne
+	@JoinColumn(name = "authorised_by")
+	private EmployeeMasterVO authorisedBy;
+
+	
+
+	@OneToMany(mappedBy = "materialIndentForProductionVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<ScheduleDetailsVO> scheduleDetailsVO;
+	private List<MaterialIndentForProductionDetailsVO> materialIndentForProductionDetailsVO;
 
 	@JsonGetter("active")
 	public String getActive() {
@@ -133,5 +141,4 @@ public class ProductionScheduleOrderVO {
 
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-
 }

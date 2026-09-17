@@ -13,7 +13,7 @@ public class ZeroEntryDetailDTO {
 	
 	  private Long id;
 
-	    private String partNo;
+	    private Long partNo;
 
 	    private String partName;
 

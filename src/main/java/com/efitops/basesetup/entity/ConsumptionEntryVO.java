@@ -1,6 +1,5 @@
 package com.efitops.basesetup.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,16 +25,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "production_schedule_order_basic")
+@Table(name = "consumption_entry_basic")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductionScheduleOrderVO {
+public class ConsumptionEntryVO {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "production_schedule_order_basicgen")
-	@SequenceGenerator(name = "production_schedule_order_basicgen", sequenceName = "production_schedule_order_basicseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "production_schedule_order_basic_id", columnDefinition = "BIGINT DEFAULT 0")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "consumption_entry_basicgen")
+	@SequenceGenerator(name = "consumption_entry_basicgen", sequenceName = "consumption_entry_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "consumption_entry_basic_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 
 	@Column(name = "doc_id")
@@ -44,46 +43,31 @@ public class ProductionScheduleOrderVO {
 	@Column(name = "doc_date")
 	private LocalDate docDate = LocalDate.now();
 
-	@Column(name = "order_type")
-	private String orderType;
+	@Column(name = "type")
+	private String type;
 
-	@Column(name = "lc_po_no")
-	private String lcPoNo;
+	@Column(name = "from_date")
+	private LocalDate fromDate;
 
-	@Column(name = "lc_po_date")
-	private LocalDate lcPoDate;
+	@Column(name = "to_date")
+	private LocalDate toDate;
 
-	@ManyToOne
-	@JoinColumn(name = "fg_item")
-	private ItemMasterVO fgItem;
-
-	@ManyToOne
-	@JoinColumn(name = "comp_route_no")
-	private ProcessSheetCompRoutingVO compRouteNo;
-
-	@Column(name = "batch_qty", precision = 15, scale = 5)
-	private BigDecimal batchQty;
-
-	@Column(name = "total_qty", precision = 15, scale = 5)
-	private BigDecimal totalQty;
-
-	@Column(name = "short_close")
-	private String shortClose;
+	@Column(name = "consumption")
+	private String consumption;
 
 	@ManyToOne
-	@JoinColumn(name = "bom")
-	private BillOfMaterialVO bom;
+	@JoinColumn(name = "location")
+	private LocationVO location;
 
-	@Column(name = "schedule_start_date")
-	private LocalDate scheduleStartDate;
-
-	@Column(name = "schedule_end_date")
-	private LocalDate scheduleEndDate;
-
-	// Common fields
+	@ManyToOne
+	@JoinColumn(name = "entry_type")
+	private ListOfValuesDetailsVO entryType;
 
 	@Column(name = "created_by")
 	private String createdBy;
+
+	@Column(name = "modified_by")
+	private String updatedBy;
 
 	@Column(name = "active")
 	private boolean active;
@@ -91,17 +75,14 @@ public class ProductionScheduleOrderVO {
 	@Column(name = "cancel")
 	private boolean cancel = false;
 
-	@Column(name = "modified_by")
-	private String updatedBy;
-
 	@Column(name = "cancel_remarks")
 	private String cancelRemarks;
 
 	@Column(name = "screen_name")
-	private String screenName = "ProductionScheduleOrder";
+	private String screenName = "ConsumptionEntry";
 
 	@Column(name = "screen_code")
-	private String screenCode = "PSO";
+	private String screenCode = "CE";
 
 	@Column(name = "org_id")
 	private Long orgId;
@@ -109,17 +90,20 @@ public class ProductionScheduleOrderVO {
 	@Column(name = "financial_year")
 	private String financialYear;
 
+	@Column(name = "narration")
+	private String narration;
+
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
 
-	@OneToMany(mappedBy = "productionScheduleOrderVO", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "consumptionEntryVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<ProductionScheduleOrderDetailsVO> productionScheduleOrderDetailsVO;
-
-	@OneToMany(mappedBy = "productionScheduleOrderVO", cascade = CascadeType.ALL)
+	private List<ConsumptionEntryDetailsVO> consumptionEntryDetailsVO;
+	
+	@OneToMany(mappedBy = "consumptionEntryVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<ScheduleDetailsVO> scheduleDetailsVO;
+	private List<RmConsumptionEntryDetailsVO> rmConsumptionEntryDetailsVO;
 
 	@JsonGetter("active")
 	public String getActive() {
@@ -133,5 +117,4 @@ public class ProductionScheduleOrderVO {
 
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-
 }

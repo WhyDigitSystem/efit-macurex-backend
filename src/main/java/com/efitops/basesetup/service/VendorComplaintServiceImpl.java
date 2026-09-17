@@ -17,6 +17,7 @@ import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDetailsRespo
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
+import com.efitops.basesetup.ResponseDTO.FlashNCReportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
@@ -34,6 +35,8 @@ import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDetailsDTO;
+import com.efitops.basesetup.dto.FlashNCReportAttachmentDTO;
+import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDetailsDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
@@ -50,6 +53,8 @@ import com.efitops.basesetup.entity.DailyInspectionCumRejectionDetailsVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
+import com.efitops.basesetup.entity.FlashNCReportAttachmentVO;
+import com.efitops.basesetup.entity.FlashNCReportVO;
 import com.efitops.basesetup.entity.InstrumentCalibrationDetailsVO;
 import com.efitops.basesetup.entity.InstrumentCalibrationVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
@@ -72,6 +77,7 @@ import com.efitops.basesetup.repository.DailyInspectionCumRejectionDetailsRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
+import com.efitops.basesetup.repository.FlashNCReportRepo;
 import com.efitops.basesetup.repository.InstrumentCalibrationDetailsRepo;
 import com.efitops.basesetup.repository.InstrumentCalibrationRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
@@ -153,6 +159,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private ShiftRepo shiftRepo;
+
+	@Autowired
+	private FlashNCReportRepo flashNCReportRepo;
 
 	@Override
 	@Transactional
@@ -1760,30 +1769,30 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		 */
 		else {
 
-			String docId = setUpApprovalRepo.getSetUpApprovalDocId(setUpApprovalDTO.getOrgId(),
-					setUpApprovalDTO.getFinancialYear(), screenCode);
-
-			if (StringUtils.isBlank(docId)) {
-
-				throw new ApplicationException("Set Up Approval DocId Not Found");
-			}
-
-			setUpApprovalVO.setDocId(docId);
+//			String docId = setUpApprovalRepo.getSetUpApprovalDocId(setUpApprovalDTO.getOrgId(),
+//					setUpApprovalDTO.getFinancialYear(), screenCode);
+//
+//			if (StringUtils.isBlank(docId)) {
+//
+//				throw new ApplicationException("Set Up Approval DocId Not Found");
+//			}
+//
+//			setUpApprovalVO.setDocId(docId);
 
 			/*
 			 * Document Type Mapping
 			 */
-			var documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
-					setUpApprovalDTO.getOrgId(), setUpApprovalDTO.getFinancialYear(), screenCode);
-
-			if (documentTypeMappingDetailsVO == null) {
-
-				throw new ApplicationException("Document Type Mapping Details Not Found");
-			}
-
-			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//			var documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+//					setUpApprovalDTO.getOrgId(), setUpApprovalDTO.getFinancialYear(), screenCode);
+//
+//			if (documentTypeMappingDetailsVO == null) {
+//
+//				throw new ApplicationException("Document Type Mapping Details Not Found");
+//			}
+//
+//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			setUpApprovalVO.setCreatedBy(setUpApprovalDTO.getCreatedBy());
 
@@ -2000,8 +2009,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 	}
 
-	
-
 //	RESPONSE DTO*/
 
 	private SetUpApprovalResponseDTO setUpApprovalResponse(SetUpApprovalVO vo) {
@@ -2055,8 +2062,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			itemResponseDTO.setItemDescription(vo.getItem().getItemDescription());
 
-			
-
 			responseDTO.setItem(itemResponseDTO);
 		}
 
@@ -2068,8 +2073,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			CustomerResponse1DTO customerResponseDTO = new CustomerResponse1DTO();
 
 			customerResponseDTO.setId(vo.getCustomer().getId());
-
-		
 
 			customerResponseDTO.setCustomerName(vo.getCustomer().getCustomerName());
 
@@ -2120,7 +2123,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		responseDTO.setOrgId(vo.getOrgId());
 		responseDTO.setFinancialYear(vo.getFinancialYear());
 
-		responseDTO.setActive(vo.getActive() );
+		responseDTO.setActive(vo.getActive());
 
 		responseDTO.setCancelRemarks(vo.getCancelRemarks());
 
@@ -2198,6 +2201,634 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		return responseDTO;
 	}
+
+	@Override
+	public SetUpApprovalResponseDTO getSetUpApprovalById(Long id) throws ApplicationException {
+
+		SetUpApprovalVO setUpApprovalVO = setUpApprovalRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Set Up Approval Details Not Found"));
+
+		return setUpApprovalResponse(setUpApprovalVO);
+	}
+
+	@Override
+	public List<SetUpApprovalResponseDTO> getSetUpApprovalByOrgId(Long orgId, Long branch) throws ApplicationException {
+
+		List<SetUpApprovalVO> setUpApprovalVOList = setUpApprovalRepo.getSetUpApprovalByOrgId(orgId, branch);
+
+		if (setUpApprovalVOList == null || setUpApprovalVOList.isEmpty()) {
+
+			throw new ApplicationException("No Set Up Approval Details Found");
+		}
+
+		List<SetUpApprovalResponseDTO> responseList = new ArrayList<>();
+
+		for (SetUpApprovalVO setUpApprovalVO : setUpApprovalVOList) {
+
+			responseList.add(setUpApprovalResponse(setUpApprovalVO));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getFgSfgItemDropdownForSetUpApproval(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> itemList = setUpApprovalRepo.getFgSfgItemDropdownForSetUpApproval(orgId, branch);
+
+		if (itemList == null || itemList.isEmpty()) {
+			throw new ApplicationException("No FG or SFG Item Details Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : itemList) {
+
+			Map<String, Object> itemMap = new HashMap<>();
+
+			itemMap.put("itemId", obj[0]);
+			itemMap.put("itemCode", obj[1]);
+			itemMap.put("itemDescription", obj[2]);
+			itemMap.put("customerPartNo", obj[3]);
+			itemMap.put("itemType", obj[4]);
+			itemMap.put("drawingNo", obj[5]);
+
+			responseList.add(itemMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getProcessSheetNoForSetUpApproval(Long item, Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> processSheetList = setUpApprovalRepo.getProcessSheetNoForSetUpApproval(item, orgId, branch);
+
+		if (processSheetList == null || processSheetList.isEmpty()) {
+			throw new ApplicationException("No Process Sheet Details Found For Selected Item");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : processSheetList) {
+
+			Map<String, Object> processSheetMap = new HashMap<>();
+
+			processSheetMap.put("id", obj[0]);
+			processSheetMap.put("processSheetNo", obj[1]);
+
+			responseList.add(processSheetMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getControlPlanDetailsForSetUpApproval(Long item, String processSheetNo, Long orgId,
+			Long branch) throws ApplicationException {
+
+		List<Object[]> controlPlanList = setUpApprovalRepo.getControlPlanDetailsForSetUpApproval(item, processSheetNo,
+				orgId, branch);
+
+		if (controlPlanList == null || controlPlanList.isEmpty()) {
+			throw new ApplicationException("No Control Plan Details Found For Selected Item And Process Sheet No");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : controlPlanList) {
+
+			Map<String, Object> controlPlanMap = new HashMap<>();
+
+			controlPlanMap.put("controlPlanId", obj[0]);
+			controlPlanMap.put("controlPlanNo", obj[1]);
+			controlPlanMap.put("controlPlanDetailId", obj[2]);
+			controlPlanMap.put("operationNo", obj[3]);
+			controlPlanMap.put("description", obj[4]);
+			controlPlanMap.put("specification", obj[5]);
+
+			responseList.add(controlPlanMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public String getSetUpApprovalDocId(Long orgId, String financialYear) throws ApplicationException {
+
+		String screenCode = "SUA";
+
+		String docId = setUpApprovalRepo.getSetUpApprovalDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("Set Up Approval DocId Not Found");
+		}
+
+		return docId;
+	}
+
+//FlashNC Report
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateFlashNCReport(FlashNCReportDTO flashNCReportDTO)
+			throws ApplicationException {
+
+		FlashNCReportVO flashNCReportVO = new FlashNCReportVO();
+
+		String screenCode = "FNR";
+		String message;
+
+		if (ObjectUtils.isEmpty(flashNCReportDTO.getId())) {
+
+		    
+
+		    String docId = flashNCReportRepo.getFlashNCReportDocId(
+		            flashNCReportDTO.getOrgId(),
+		            flashNCReportDTO.getFinancialYear(),
+		            screenCode);
+
+		    if (StringUtils.isBlank(docId)) {
+		        throw new ApplicationException(
+		                "Flash NC Report DocId Not Found");
+		    }
+
+		    flashNCReportVO.setDocId(docId);
+
+		    DocumentTypeMappingDetailsVO mapping =
+		            documentTypeMappingDetailsRepo
+		                    .findByOrgIdAndFinYearAndScreenCode(
+		                            flashNCReportDTO.getOrgId(),
+		                            flashNCReportDTO.getFinancialYear(),
+		                            screenCode);
+
+		    if (mapping == null) {
+		        throw new ApplicationException(
+		                "Document Type Mapping Details Not Found");
+		    }
+
+		    mapping.setLastNo(mapping.getLastNo() + 1);
+
+		    documentTypeMappingDetailsRepo.save(mapping);
+
+		    flashNCReportVO.setCreatedBy(
+		            flashNCReportDTO.getCreatedBy());
+
+		    flashNCReportVO.setUpdatedBy(
+		            flashNCReportDTO.getCreatedBy());
+
+		    message = "Flash NC Report Created Successfully";
+
+		} else {
+
+			flashNCReportVO = flashNCReportRepo.findById(flashNCReportDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Flash NC Report"));
+
+			flashNCReportVO.setUpdatedBy(flashNCReportDTO.getCreatedBy());
+
+			message = "Flash NC Report Updated Successfully";
+		}
+
+		createUpdateFlashNCReportVO(flashNCReportDTO, flashNCReportVO);
+
+		FlashNCReportVO savedVO = flashNCReportRepo.save(flashNCReportVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+		response.put("flashNCReportVO", flashNCReportResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdateFlashNCReportVO(FlashNCReportDTO dto, FlashNCReportVO vo) throws ApplicationException {
+
+		/*
+		 * Branch
+		 */
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branchVO);
+		}
+
+		/*
+		 * Belongs To
+		 */
+		if (dto.getBelongsTo() != null) {
+
+			ListOfValuesDetailsVO belongsTo = listOfValuesDetailsRepo.findById(dto.getBelongsTo())
+					.orElseThrow(() -> new ApplicationException("Belongs To Not Found"));
+
+			vo.setBelongsTo(belongsTo);
+		}
+
+		/*
+		 * Reference
+		 */
+		if (dto.getReference() != null) {
+
+			ListOfValuesDetailsVO reference = listOfValuesDetailsRepo.findById(dto.getReference())
+					.orElseThrow(() -> new ApplicationException("Reference Not Found"));
+
+			vo.setReference(reference);
+		}
+
+		/*
+		 * From Department
+		 */
+		if (dto.getFromDept() != null) {
+
+			ListOfValuesDetailsVO fromDept = listOfValuesDetailsRepo.findById(dto.getFromDept())
+					.orElseThrow(() -> new ApplicationException("From Department Not Found"));
+
+			vo.setFromDept(fromDept);
+		}
+
+		/*
+		 * To Department
+		 */
+		if (dto.getToDept() != null) {
+
+			ListOfValuesDetailsVO toDept = listOfValuesDetailsRepo.findById(dto.getToDept())
+					.orElseThrow(() -> new ApplicationException("To Department Not Found"));
+
+			vo.setToDept(toDept);
+		}
+
+		/*
+		 * Supplier
+		 */
+		if (dto.getSupplier() != null) {
+
+			CustomerVO supplier = customerRepo.findById(dto.getSupplier())
+					.orElseThrow(() -> new ApplicationException("Supplier Not Found"));
+
+			vo.setSupplier(supplier);
+		}
+
+		/*
+		 * Item
+		 */
+		if (dto.getItem() != null) {
+
+			ItemMasterVO item = itemRepo.findById(dto.getItem())
+					.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+			vo.setItem(item);
+		}
+
+		/*
+		 * Disposal
+		 */
+		if (dto.getDisposal() != null) {
+
+			ListOfValuesDetailsVO disposal = listOfValuesDetailsRepo.findById(dto.getDisposal())
+					.orElseThrow(() -> new ApplicationException("Disposal Not Found"));
+
+			vo.setDisposal(disposal);
+		}
+
+		/*
+		 * Inspected By
+		 */
+		if (dto.getInspectedBy() != null) {
+
+			EmployeeMasterVO inspectedBy = employeeMasterRepo.findById(dto.getInspectedBy())
+					.orElseThrow(() -> new ApplicationException("Inspected By Employee Not Found"));
+
+			vo.setInspectedBy(inspectedBy);
+		}
+
+		/*
+		 * Status
+		 */
+		if (dto.getStatus() != null) {
+
+			ListOfValuesDetailsVO status = listOfValuesDetailsRepo.findById(dto.getStatus())
+					.orElseThrow(() -> new ApplicationException("Status Not Found"));
+
+			vo.setStatus(status);
+		}
+
+		/*
+		 * Normal fields
+		 */
+		vo.setDescription(dto.getDescription());
+		vo.setDrawingNo(dto.getDrawingNo());
+		vo.setMrinSCGRNNO(dto.getMrinSCGRNNO());
+		vo.setMrinDate(dto.getMrinDate());
+		vo.setOccPercentage(dto.getOccPercentage());
+		vo.setInvoiceNo(dto.getInvoiceNo());
+		vo.setPoNo(dto.getPoNo());
+		vo.setOperationNo(dto.getOperationNo());
+		vo.setLotQty(dto.getLotQty());
+		vo.setSampleQty(dto.getSampleQty());
+		vo.setNcQty(dto.getNcQty());
+		vo.setDefectSeen(dto.getDefectSeen());
+		vo.setProblemStatus(dto.getProblemStatus());
+		vo.setActionOnDefectiveLot(dto.getActionOnDefectiveLot());
+		vo.setNarration(dto.getNarration());
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+
+		/*
+		 * Attachments
+		 */
+		vo.getFlashNCReportAttachmentVO().clear();
+
+		if (dto.getFlashNCReportAttachmentDTO() != null) {
+
+			for (FlashNCReportAttachmentDTO attachmentDTO : dto.getFlashNCReportAttachmentDTO()) {
+
+				FlashNCReportAttachmentVO attachmentVO = new FlashNCReportAttachmentVO();
+
+				if (attachmentDTO.getId() != null) {
+					attachmentVO.setId(attachmentDTO.getId());
+				}
+
+				attachmentVO.setName(attachmentDTO.getName());
+				attachmentVO.setFileName(attachmentDTO.getFileName());
+				attachmentVO.setFilePath(attachmentDTO.getFilePath());
+				attachmentVO.setFileSize(attachmentDTO.getFileSize());
+				attachmentVO.setContentType(attachmentDTO.getContentType());
+				attachmentVO.setUploadOn(attachmentDTO.getUploadOn());
+
+				attachmentVO.setFlashNCReportVO(vo);
+
+				vo.getFlashNCReportAttachmentVO().add(attachmentVO);
+			}
+		}
+	}
+
+	private FlashNCReportResponseDTO flashNCReportResponse(FlashNCReportVO vo) {
+
+		FlashNCReportResponseDTO response = new FlashNCReportResponseDTO();
+
+		response.setId(vo.getId());
+
+		/*
+		 * Branch Response
+		 */
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponse = new BranchResponseDTO();
+
+			branchResponse.setId(vo.getBranch().getId());
+
+			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+
+			branchResponse.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponse);
+		}
+
+		/*
+		 * Belongs To
+		 */
+		if (vo.getBelongsTo() != null) {
+
+			ListOfValuesDetailsResponseDTO belongsTo = new ListOfValuesDetailsResponseDTO();
+
+			belongsTo.setId(vo.getBelongsTo().getId());
+
+			belongsTo.setCode(vo.getBelongsTo().getValueCode());
+
+			belongsTo.setDescription(vo.getBelongsTo().getValueDescription());
+
+			response.setBelongsTo(belongsTo);
+		}
+
+		/*
+		 * Reference
+		 */
+		if (vo.getReference() != null) {
+
+			ListOfValuesDetailsResponseDTO reference = new ListOfValuesDetailsResponseDTO();
+
+			reference.setId(vo.getReference().getId());
+
+			reference.setCode(vo.getReference().getValueCode());
+
+			reference.setDescription(vo.getReference().getValueDescription());
+
+			response.setReference(reference);
+		}
+
+		/*
+		 * From Department
+		 */
+		if (vo.getFromDept() != null) {
+
+			ListOfValuesDetailsResponseDTO fromDept = new ListOfValuesDetailsResponseDTO();
+
+			fromDept.setId(vo.getFromDept().getId());
+
+			fromDept.setCode(vo.getFromDept().getValueCode());
+
+			fromDept.setDescription(vo.getFromDept().getValueDescription());
+
+			response.setFromDept(fromDept);
+		}
+
+		/*
+		 * To Department
+		 */
+		if (vo.getToDept() != null) {
+
+			ListOfValuesDetailsResponseDTO toDept = new ListOfValuesDetailsResponseDTO();
+
+			toDept.setId(vo.getToDept().getId());
+
+			toDept.setCode(vo.getToDept().getValueCode());
+
+			toDept.setDescription(vo.getToDept().getValueDescription());
+
+			response.setToDept(toDept);
+		}
+
+		/*
+		 * Normal fields
+		 */
+		response.setDescription(vo.getDescription());
+		response.setDrawingNo(vo.getDrawingNo());
+		response.setMrinSCGRNNO(vo.getMrinSCGRNNO());
+		response.setMrinDate(vo.getMrinDate());
+		response.setOccPercentage(vo.getOccPercentage());
+		response.setInvoiceNo(vo.getInvoiceNo());
+		response.setPoNo(vo.getPoNo());
+		response.setOperationNo(vo.getOperationNo());
+		response.setLotQty(vo.getLotQty());
+		response.setSampleQty(vo.getSampleQty());
+		response.setNcQty(vo.getNcQty());
+		response.setDefectSeen(vo.getDefectSeen());
+		response.setProblemStatus(vo.getProblemStatus());
+		response.setActionOnDefectiveLot(vo.getActionOnDefectiveLot());
+		response.setNarration(vo.getNarration());
+		response.setOrgId(vo.getOrgId());
+		response.setFinancialYear(vo.getFinancialYear());
+		response.setActive(vo.getActive());
+		response.setCancelRemarks(vo.getCancelRemarks());
+		response.setCreatedBy(vo.getCreatedBy());
+
+		/*
+		 * Supplier Response
+		 */
+		if (vo.getSupplier() != null) {
+
+			CustomerResponse1DTO supplier = new CustomerResponse1DTO();
+
+			supplier.setId(vo.getSupplier().getId());
+
+			supplier.setCustomerName(vo.getSupplier().getCustomerName());
+
+			response.setSupplier(supplier);
+		}
+
+		/*
+		 * Item Response
+		 */
+		if (vo.getItem() != null) {
+
+			ItemResponse1DTO item = new ItemResponse1DTO();
+
+			item.setId(vo.getItem().getId());
+
+			item.setItemCode(vo.getItem().getItemCode());
+
+			item.setItemDescription(vo.getItem().getItemDescription());
+
+			response.setItem(item);
+		}
+
+		/*
+		 * Disposal Response
+		 */
+		if (vo.getDisposal() != null) {
+
+			ListOfValuesDetailsResponseDTO disposal = new ListOfValuesDetailsResponseDTO();
+
+			disposal.setId(vo.getDisposal().getId());
+
+			disposal.setCode(vo.getDisposal().getValueCode());
+
+			disposal.setDescription(vo.getDisposal().getValueDescription());
+
+			response.setDisposal(disposal);
+		}
+
+		/*
+		 * Inspected By Response
+		 */
+		if (vo.getInspectedBy() != null) {
+
+			EmployeeDropdownResponseDTO inspectedBy = new EmployeeDropdownResponseDTO();
+
+			inspectedBy.setEmployeeId(vo.getInspectedBy().getId());
+
+			inspectedBy.setEmployeeName(vo.getInspectedBy().getEmployeeName());
+
+			response.setInspectedBy(inspectedBy);
+		}
+
+		/*
+		 * Status Response
+		 */
+		if (vo.getStatus() != null) {
+
+			ListOfValuesDetailsResponseDTO status = new ListOfValuesDetailsResponseDTO();
+
+			status.setId(vo.getStatus().getId());
+
+			status.setCode(vo.getStatus().getValueCode());
+
+			status.setDescription(vo.getStatus().getValueDescription());
+
+			response.setStatus(status);
+		}
+
+		return response;
+	}
+
+	@Override
+	public FlashNCReportResponseDTO getFlashNCReportById(Long id) throws ApplicationException {
+
+		FlashNCReportVO flashNCReportVO = flashNCReportRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Flash NC Report Details Not Found"));
+
+		return flashNCReportResponse(flashNCReportVO);
+	}
+
+	@Override
+	public List<FlashNCReportResponseDTO> getFlashNCReportByOrgId(Long orgId, Long branch) throws ApplicationException {
+
+		List<FlashNCReportVO> flashNCReportVOList = flashNCReportRepo.getFlashNCReportByOrgId(orgId, branch);
+
+		if (flashNCReportVOList == null || flashNCReportVOList.isEmpty()) {
+
+			throw new ApplicationException("No Flash NC Report Details Found");
+		}
+
+		List<FlashNCReportResponseDTO> responseList = new ArrayList<>();
+
+		for (FlashNCReportVO flashNCReportVO : flashNCReportVOList) {
+
+			responseList.add(flashNCReportResponse(flashNCReportVO));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public String getFlashNCReportDocId(Long orgId, String financialYear) throws ApplicationException {
+
+		String screenCode = "FNR";
+
+		String docId = flashNCReportRepo.getFlashNCReportDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("Flash NC Report DocId Not Found");
+		}
+
+		return docId;
+	}
+	
+	@Override
+	public List<Map<String, Object>> getQualityEmployeesForFlashNCReport(
+	        Long orgId,
+	        Long branch) throws ApplicationException {
+
+	    List<Object[]> employeeList =
+	            flashNCReportRepo.getQualityEmployeesForFlashNCReport(
+	                    orgId,
+	                    branch);
+
+	    if (employeeList == null || employeeList.isEmpty()) {
+	        throw new ApplicationException(
+	                "No Quality Department Employees Found");
+	    }
+
+	    List<Map<String, Object>> responseList =
+	            new ArrayList<>();
+
+	    for (Object[] obj : employeeList) {
+
+	        Map<String, Object> employeeMap =
+	                new HashMap<>();
+
+	        employeeMap.put("employeeId", obj[0]);
+	        employeeMap.put("employeeCode", obj[1]);
+	        employeeMap.put("employeeName", obj[2]);
+
+	        responseList.add(employeeMap);
+	    }
+
+	    return responseList;
+	}
 }
-
-

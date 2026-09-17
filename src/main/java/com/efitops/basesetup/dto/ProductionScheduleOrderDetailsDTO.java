@@ -9,12 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductionScheduleOrderDetailsDTO {
-
-	private Long id;
-
 	private Long item;
 	private BigDecimal bomQty;
-	private BigDecimal qtyRequired;
 	private Long unit;
 	private Long scrapUnit;
 	private BigDecimal scrapQty;

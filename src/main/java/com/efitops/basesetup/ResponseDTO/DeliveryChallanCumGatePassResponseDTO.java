@@ -42,7 +42,7 @@ public class DeliveryChallanCumGatePassResponseDTO {
 
     private String vehicleNo;
 
-    private WorkOrderResponseDTO workOrderNo;
+    private String workOrderNo;
     private EmployeeMasterResponseDetailsDTO preparedBy;
 
 

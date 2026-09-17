@@ -11,7 +11,7 @@ import com.efitops.basesetup.entity.EngineeringChangeNoteVO;
 @Repository
 public interface EngineeringChangeNoteRepo extends JpaRepository<EngineeringChangeNoteVO, Long> {
 
-	@Query(nativeQuery = true, value = "select * from engineering_change_note_basic whereengineering_change_note_basic_id=?1 and active=1 and cancel=0")
+	@Query(nativeQuery = true, value = "select * from engineering_change_note_basic where engineering_change_note_basic_id=?1 and active=1 and cancel=0")
 	EngineeringChangeNoteVO getEngineeringChangeNoteById(Long id);
 
 	@Query(nativeQuery = true, value = "select * from engineering_change_note_basic where org_id=?1 and branch=?2 and active=1 and cancel=0")

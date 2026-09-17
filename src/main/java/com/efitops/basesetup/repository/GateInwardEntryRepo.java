@@ -1,6 +1,7 @@
 package com.efitops.basesetup.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,4 +31,22 @@ public interface GateInwardEntryRepo extends JpaRepository<GateInwardEntryVO, Lo
 	List<Object[]> getCustomerNameDropdownForGateInwardEntry(
 	        @Param("branch") Long branch,
 	        @Param("orgId") Long orgId);
+
+	@Query(value = """
+	        SELECT
+	            doc_id,
+	            doc_date,
+	            supplier_invoice_number,
+	            supplier_invoice_date
+	        FROM gate_inward_entry_basic
+	        WHERE org_id = :orgId
+	          AND branch = :branch
+	          AND customer = :customer and active=1 and cancel=0
+	        """, nativeQuery = true)
+	Set<Object[]> getGateInwardEntryDropdown(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch,
+	        @Param("customer") Long customer);
+	
+
 }

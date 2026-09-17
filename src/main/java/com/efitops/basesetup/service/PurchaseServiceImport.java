@@ -11,15 +11,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ConsumptionEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
+import com.efitops.basesetup.ResponseDTO.FgTransferSlipResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.dto.BillOfMaterialDTO;
+import com.efitops.basesetup.dto.ConsumptionEntryDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
+import com.efitops.basesetup.dto.FgTransferSlipDTO;
+import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
+import com.efitops.basesetup.dto.ProductionTransferSlipDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
 import com.efitops.basesetup.dto.StockTransferDTO;
@@ -115,8 +123,8 @@ public interface PurchaseServiceImport {
 	List<ProductionScheduleOrderResponseDTO> getProductionScheduleOrderByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
 
-	//BOM
-	
+	// BOM
+
 	Map<String, Object> createUpdateBillOfMaterial(BillOfMaterialDTO billOfMaterialDTO) throws ApplicationException;
 
 	String getBillOfMaterialDocId(Long orgId, String financialYear);
@@ -124,5 +132,88 @@ public interface PurchaseServiceImport {
 	BillOfMaterialResponseDTO getBillOfMaterialById(Long id) throws ApplicationException;
 
 	List<BillOfMaterialResponseDTO> getBillOfMaterialByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getFgAndSfgItemDetails(Long orgId, Long branch, String type);
+
+	List<Map<String, Object>> getGridDetailsFromBom(Long orgId, Long branch);
+
+	List<Map<String, Object>> getFillDetailsOf(Long orgId, Long branch, Long fgItem);
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsFromProduction(Long orgId, Long branch);
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsFromProductionDetails(Long orgId, Long branch, Long bom);
+
+	// Material
+
+	Map<String, Object> createUpdateMaterialIndentForProduction(MaterialIndentForProductionDTO dto)
+			throws ApplicationException;
+
+	String getMaterialIndentForProductionDocId(Long orgId, String financialYear);
+
+	MaterialIndentForProductionResponseDTO getMaterialIndentForProductionById(Long id) throws ApplicationException;
+
+	List<MaterialIndentForProductionResponseDTO> getMaterialIndentForProductionByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsFromMaterial(Long orgId, Long branch);
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsFromMaterialDetails(Long orgId, Long branch, Long fgItem);
+
+	// Production
+
+	Map<String, Object> createUpdateProductionTransferSlip(ProductionTransferSlipDTO dto) throws ApplicationException;
+
+	String getProductionTransferSlipDocId(Long orgId, String financialYear);
+
+	ProductionTransferSlipResponseDTO getProductionTransferSlipById(Long id) throws ApplicationException;
+
+	List<ProductionTransferSlipResponseDTO> getProductionTransferSlipByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getScrapDetailsItem(Long orgId, Long branch);
+
+	List<Map<String, Object>> getSfGDocIdAndDetails(Long orgId, Long branch);
+
+	// slip
+
+	Map<String, Object> createUpdateFgTransferSlip(FgTransferSlipDTO dto) throws ApplicationException;
+
+	String getFgTransferSlipDocId(Long orgId, String financialYear);
+
+	FgTransferSlipResponseDTO getFgTransferSlipById(Long id) throws ApplicationException;
+
+	List<FgTransferSlipResponseDTO> getFgTransferSlipByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getFgPartNoDetails(Long orgId, Long branch);
+
+	List<Map<String, Object>> getSfgPartNoDetails(Long orgId, Long branch);
+
+	List<Map<String, Object>> getSchNoFromTransferSlip(Long orgId, Long branch, Long fgItem, Long sfgItem);
+
+	List<Map<String, Object>> getBomNoFromTransferSlip(Long orgId, Long branch, Long fgItem, Long sfgItem);
+
+	List<Map<String, Object>> getBomNoFromTransferSlipDetails(Long orgId, Long branch, Long bom);
+
+	List<Map<String, Object>> getBomFromFgTransferSlip(Long orgId, Long branch, Long fgItem);
+
+	List<Map<String, Object>> getSchNoFromFgTransferSlip(Long orgId, Long branch);
+
+	List<Map<String, Object>> getCustomersDetailsFromTransferSlip(Long orgId, Long branch);
+
+	List<Map<String, Object>> getBomDetailsFromFgTransferSlip(Long orgId, Long branch, Long bom);
+
+	// Consum
+
+	Map<String, Object> createUpdateConsumptionEntry(ConsumptionEntryDTO dto) throws ApplicationException;
+
+	String getConsumptionEntryDocId(Long orgId, String financialYear);
+
+	ConsumptionEntryResponseDTO getConsumptionEntryById(Long id) throws ApplicationException;
+
+	List<ConsumptionEntryResponseDTO> getConsumptionEntryByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsConsumptionEntry(Long orgId, Long branch);
+
+	List<Map<String, Object>> getRawMaterialConsumptionEntry(Long orgId, Long branch, Long fgItem);
 
 }

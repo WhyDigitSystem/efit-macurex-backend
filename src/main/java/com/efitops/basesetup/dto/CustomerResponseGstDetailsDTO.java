@@ -14,5 +14,6 @@ public class CustomerResponseGstDetailsDTO {
 	private String customerGstNo;
 	private String CustomerType;
 	private String gstApproval;
+	private String customerCode;
 
 }

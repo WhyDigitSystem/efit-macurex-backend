@@ -11,30 +11,25 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductionScheduleOrderDTO {
+public class MaterialIndentForProductionDTO {
+
 	private Long id;
 
-	private String orderType;
+	private Long department;
 
-	private String lcPoNo;
+	private String schOrderNo;
 
-	private LocalDate lcPoDate;
+	private String belongsTo;
 
 	private Long fgItem;
 
-	private Long compRouteNo;
+	private BigDecimal schQty;
 
-	private BigDecimal batchQty;
+	private LocalDate scheduledDate;
 
-	private String shortClose;
+	private Long toLocation;
 
-	private Long bom;
-
-	private LocalDate scheduleStartDate;
-
-	private LocalDate scheduleEndDate;
-
-	// Common fields
+	private Long fromLocation;
 
 	private String createdBy;
 
@@ -48,6 +43,14 @@ public class ProductionScheduleOrderDTO {
 
 	private Long branch;
 
-	private List<ProductionScheduleOrderDetailsDTO> productionScheduleOrderDetailsDTO;
-	private List<ScheduleDetailsDTO> scheduleDetailsDTO;
+	private String approvedBy;
+
+	private String remarks;
+
+	private Long preparedBy;
+
+	private Long authorisedBy;
+
+	private List<MaterialIndentForProductionDetailsDTO> materialIndentForProductionDetailsDTO;
+
 }

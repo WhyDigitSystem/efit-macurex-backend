@@ -115,8 +115,8 @@ public interface PurchaseServiceImport {
 	List<ProductionScheduleOrderResponseDTO> getProductionScheduleOrderByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
 
-	//BOM
-	
+	// BOM
+
 	Map<String, Object> createUpdateBillOfMaterial(BillOfMaterialDTO billOfMaterialDTO) throws ApplicationException;
 
 	String getBillOfMaterialDocId(Long orgId, String financialYear);
@@ -124,5 +124,15 @@ public interface PurchaseServiceImport {
 	BillOfMaterialResponseDTO getBillOfMaterialById(Long id) throws ApplicationException;
 
 	List<BillOfMaterialResponseDTO> getBillOfMaterialByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getFgAndSfgItemDetails(Long orgId, Long branch, String type);
+
+	List<Map<String, Object>> getGridDetailsFromBom(Long orgId, Long branch);
+
+	List<Map<String, Object>> getFillDetailsOf(Long orgId, Long branch, Long fgItem);
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsFromProduction(Long orgId, Long branch);
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsFromProductionDetails(Long orgId, Long branch, Long bom);
 
 }

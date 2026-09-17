@@ -1769,30 +1769,30 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		 */
 		else {
 
-			String docId = setUpApprovalRepo.getSetUpApprovalDocId(setUpApprovalDTO.getOrgId(),
-					setUpApprovalDTO.getFinancialYear(), screenCode);
-
-			if (StringUtils.isBlank(docId)) {
-
-				throw new ApplicationException("Set Up Approval DocId Not Found");
-			}
-
-			setUpApprovalVO.setDocId(docId);
+//			String docId = setUpApprovalRepo.getSetUpApprovalDocId(setUpApprovalDTO.getOrgId(),
+//					setUpApprovalDTO.getFinancialYear(), screenCode);
+//
+//			if (StringUtils.isBlank(docId)) {
+//
+//				throw new ApplicationException("Set Up Approval DocId Not Found");
+//			}
+//
+//			setUpApprovalVO.setDocId(docId);
 
 			/*
 			 * Document Type Mapping
 			 */
-			var documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
-					setUpApprovalDTO.getOrgId(), setUpApprovalDTO.getFinancialYear(), screenCode);
-
-			if (documentTypeMappingDetailsVO == null) {
-
-				throw new ApplicationException("Document Type Mapping Details Not Found");
-			}
-
-			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//			var documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+//					setUpApprovalDTO.getOrgId(), setUpApprovalDTO.getFinancialYear(), screenCode);
+//
+//			if (documentTypeMappingDetailsVO == null) {
+//
+//				throw new ApplicationException("Document Type Mapping Details Not Found");
+//			}
+//
+//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			setUpApprovalVO.setCreatedBy(setUpApprovalDTO.getCreatedBy());
 

@@ -14,20 +14,25 @@ public class BillOfMaterialDTO {
 
 	private Long id;
 
-	// Header Fields
-	private String docId;
-	private LocalDate docDate;
-	private String typeOfBom;
+	private Long typeOfBom;
+
 	private String typeOfItem;
-	private Long fgSfgItemCode;
-	private String fgSfgItemDescription;
-	private Integer revisionNo;
+
+	private Long fgItem;
+
 	private String specifications;
+
 	private String fillDetailsOf;
-	private String fillDetailsOfItem;
+
+	private Long fillDetailsOfItem;
+
 	private LocalDate wef;
+
 	private String fgReferenceToProfit;
-	private String fmanbou;
+
+	private String manufacturing;
+
+	private String remarks;
 
 	// Common Fields
 	private String createdBy;

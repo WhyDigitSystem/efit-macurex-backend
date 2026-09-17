@@ -19,6 +19,7 @@ public interface SetUpApprovalRepo extends JpaRepository<SetUpApprovalVO, Long> 
 			""", nativeQuery = true)
 	String getSetUpApprovalDocId(Long orgId, String financialYear, String screenCode);
 
+
 	@Query(value = """
 			SELECT *
 			FROM set_up_approval_basic

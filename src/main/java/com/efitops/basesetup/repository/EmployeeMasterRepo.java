@@ -1,6 +1,7 @@
 package com.efitops.basesetup.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -114,6 +115,27 @@ boolean existsByAccountHeadAndIdNot(String accountHead, Long id);
 boolean existsByPanNoAndIdNot(String panNo, Long id);
 
 boolean existsByPassportNoAndIdNot(String passportNo, Long id);
+
+
+@Query(value = """
+SELECT
+    e.employeemaster_id AS employeeId,
+    e.employee_id AS employeeCode,
+    e.emp_name AS employeeName
+FROM employeemaster e
+INNER JOIN department d
+    ON d.departmentid = e.department
+WHERE e.org_id = :orgId
+  AND e.branch = :branch
+  AND UPPER(d.department_name) LIKE UPPER(CONCAT('%', :department, '%'))
+  AND e.active = 1
+  AND e.cancel = 0
+ORDER BY e.employee_id
+""", nativeQuery = true)
+Set<Object[]> getEmployeesByDepartmentforBOMCorrectionRequestNote(
+@Param("orgId") Long orgId,
+@Param("branch") Long branch,
+@Param("department") String department);
 
 
 }

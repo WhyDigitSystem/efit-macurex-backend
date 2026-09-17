@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.AdvForStoresResponseDTO;
+import com.efitops.basesetup.ResponseDTO.BomCorrectionRequestNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCapitalItemsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InspectionRequisitionNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderShortCloseResponseDTO;
@@ -20,9 +22,11 @@ import com.efitops.basesetup.ResponseDTO.SubContractingGRNResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.dto.AdvForStoresDTO;
+import com.efitops.basesetup.dto.BomCorrectionRequestNoteDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCapitalItemsDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
+import com.efitops.basesetup.dto.InspectionRequisitionNoteDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.JobOrderShortCloseDTO;
@@ -209,5 +213,27 @@ public interface SubContractService {
 	List<MaterialPlanningResponseDTO> getMaterialPlanningByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
 
 	String getMaterialPlanningDocId(Long orgId, String financialYear);
+
+	Map<String, Object> createUpdateBomCorrectionRequestNote(BomCorrectionRequestNoteDTO dto) throws ApplicationException;
+
+	BomCorrectionRequestNoteResponseDTO getBomCorrectionRequestNoteById(Long id) throws ApplicationException;
+
+	List<BomCorrectionRequestNoteResponseDTO> getBomCorrectionRequestNoteByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	String getBomCorrectionRequestNoteDocId(Long orgId, String financialYear);
+
+	List<Map<String, Object>> getFGItemsforBOMCorrectionRequestNote(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getAllItemsNotFGforBOMCorrectionRequestNote(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getEmployeesByDepartmentforBOMCorrectionRequestNote(Long orgId, Long branch,
+			String department);
+
+	Map<String, Object> createUpdateInspectionRequisitionNote(
+			InspectionRequisitionNoteDTO inspectionRequisitionNoteDTO) throws ApplicationException;
+
+	InspectionRequisitionNoteResponseDTO getInspectionRequisitionNoteById(Long id) throws ApplicationException;
+
+	List<InspectionRequisitionNoteResponseDTO> getInspectionRequisitionNoteByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
 
 }

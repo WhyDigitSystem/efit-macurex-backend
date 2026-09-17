@@ -22,9 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.AdvForStoresResponseDTO;
+import com.efitops.basesetup.ResponseDTO.BomCorrectionRequestNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCapitalItemsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InspectionRequisitionNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderShortCloseResponseDTO;
@@ -37,9 +39,11 @@ import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.AdvForStoresDTO;
+import com.efitops.basesetup.dto.BomCorrectionRequestNoteDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCapitalItemsDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
+import com.efitops.basesetup.dto.InspectionRequisitionNoteDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.JobOrderShortCloseDTO;
@@ -2584,5 +2588,446 @@ public class SubContractController extends BaseController {
 	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+	@PutMapping(value = "/createUpdateBomCorrectionRequestNote")
+	public ResponseEntity<ResponseDTO> createUpdateBomCorrectionRequestNote(
+	        @RequestBody BomCorrectionRequestNoteDTO dto) {
+
+	    String methodName = "createUpdateBomCorrectionRequestNote()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        Map<String, Object> responseMap =
+	        		subContractService
+	                        .createUpdateBomCorrectionRequestNote(dto);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                responseMap.get("message"));
+
+	        responseObjectsMap.put(
+	                "bomCorrectionRequestNoteVO",
+	                responseMap.get("bomCorrectionRequestNoteVO"));
+
+	        responseDTO = createServiceResponse(
+	                responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to create/update BOM Correction Request Note",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getBomCorrectionRequestNoteById")
+	public ResponseEntity<ResponseDTO> getBomCorrectionRequestNoteById(
+	        @RequestParam Long id) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        BomCorrectionRequestNoteResponseDTO bomCorrectionRequestNote =
+	        		subContractService
+	                        .getBomCorrectionRequestNoteById(id);
+
+	        responseObjectsMap.put(
+	                "bomCorrectionRequestNote",
+	                bomCorrectionRequestNote);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "BOM Correction Request Note fetched successfully");
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getBomCorrectionRequestNoteByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getBomCorrectionRequestNoteByOrgIdAndBranch(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<BomCorrectionRequestNoteResponseDTO>
+	                bomCorrectionRequestNoteList =
+	                		subContractService
+	                        .getBomCorrectionRequestNoteByOrgIdAndBranch(
+	                                orgId,
+	                                branch);
+
+	        responseObjectsMap.put(
+	                "bomCorrectionRequestNote",
+	                bomCorrectionRequestNoteList);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "BOM Correction Request Note List fetched successfully");
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getBomCorrectionRequestNoteDocId")
+	public ResponseEntity<ResponseDTO> getBomCorrectionRequestNoteDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName = "getBomCorrectionRequestNoteDocId()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String docId = "";
+
+	    try {
+
+	        docId = subContractService
+	                .getBomCorrectionRequestNoteDocId(
+	                        orgId,
+	                        financialYear);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "BOM Correction Request Note DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "bomCorrectionRequestNoteDocId",
+	                docId);
+
+	        responseDTO = createServiceResponse(
+	                responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to retrieve BOM Correction Request Note DocId",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getFGItemsforBOMCorrectionRequestNote")
+	public ResponseEntity<ResponseDTO> getFGItemsforBOMCorrectionRequestNote(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getFGItemsforBOMCorrectionRequestNote()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> itemDetails = subContractService.getFGItemsforBOMCorrectionRequestNote(orgId, branch);
+
+			responseObjectsMap.put("itemDetails", itemDetails);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "FG / SFG Items retrieved successfully");
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve FG / SFG Items", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getAllItemsNotFGforBOMCorrectionRequestNote")
+	public ResponseEntity<ResponseDTO> getAllItemsNotFGforBOMCorrectionRequestNote(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getAllItemsNotFGforBOMCorrectionRequestNote()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> itemDetails = subContractService.getAllItemsNotFGforBOMCorrectionRequestNote(orgId, branch);
+
+			responseObjectsMap.put("itemDetails", itemDetails);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, " Items retrieved successfully");
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve FG / SFG Items", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getEmployeesByDepartmentforBOMCorrectionRequestNote")
+	public ResponseEntity<ResponseDTO> getEmployeesByDepartment(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch,
+	        @RequestParam String department) {
+
+	    String methodName = "getEmployeesByDepartmentforBOMCorrectionRequestNote()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    List<Map<String, Object>> mov = new ArrayList<>();
+
+	    try {
+
+	        mov = subContractService.getEmployeesByDepartmentforBOMCorrectionRequestNote(
+	                orgId,
+	                branch,
+	                department);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Employee information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "employeeList",
+	                mov);
+
+	        responseDTO = createServiceResponse(
+	                responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to retrieve Employee information",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+	@PutMapping("/createUpdateInspectionRequisitionNote")
+	public ResponseEntity<ResponseDTO> createUpdateInspectionRequisitionNote(
+	        @RequestBody InspectionRequisitionNoteDTO inspectionRequisitionNoteDTO) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object> response =
+	        		subContractService
+	                        .createUpdateInspectionRequisitionNote(
+	                                inspectionRequisitionNoteDTO);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                response.get("message"));
+
+	        responseObjectsMap.put(
+	                "inspectionRequisitionNoteVO",
+	                response.get("inspectionRequisitionNoteVO"));
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getInspectionRequisitionNoteById")
+	public ResponseEntity<ResponseDTO> getInspectionRequisitionNoteById(
+	        @RequestParam Long id) {
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        InspectionRequisitionNoteResponseDTO response =
+	        		subContractService
+	                        .getInspectionRequisitionNoteById(id);
+
+	        responseObjectsMap.put(
+	                "inspectionRequisitionNote",
+	                response);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Inspection Requisition Note fetched successfully");
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getInspectionRequisitionNoteByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO>
+	getInspectionRequisitionNoteByOrgIdAndBranch(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<InspectionRequisitionNoteResponseDTO> response =
+	        		subContractService
+	                        .getInspectionRequisitionNoteByOrgIdAndBranch(
+	                                orgId, branch);
+
+	        responseObjectsMap.put(
+	                "inspectionRequisitionNoteList",
+	                response);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Inspection Requisition Note information retrieved successfully");
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
 	}
 }

@@ -67,6 +67,20 @@ public class EightDisciplineEntryResponseDTO {
     
     private List<EightDiscipline4DetailResponseDTO> eightDiscipline4DetailResponseDTO;
     
+    private List<EightDiscipline5DetailResponseDTO> eightDiscipline5DetailResponseDTO;
+    
+    private List<EightDiscipline6DetailResponseDTO> eightDiscipline6DetailResponseDTO;
+    
+    private List<EightDiscipline7DetailResponseDTO> eightDiscipline7DetailResponseDTO;
+    
+    private List<EightDiscipline8DetailResponseDTO> eightDiscipline8DetailResponseDTO;
+    
+    
+    
+    
+    
+    
+    
     
     
     

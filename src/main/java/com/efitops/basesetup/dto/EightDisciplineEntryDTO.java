@@ -58,12 +58,23 @@ public class EightDisciplineEntryDTO {
 	    
 	    private List<EightDiscipline1DetailDTO> eightDiscipline1DetailDTO;
 	    
-	    
 	    private List<EightDiscipline2DetailDTO> eightDiscipline2DetailDTO;
 	    
 	    private List<EightDiscipline3DetailDTO> eightDiscipline3DetailDTO;
 	    
 	    private List<EightDiscipline4DetailDTO> eightDiscipline4DetailDTO;
+	    
+	    private List<EightDiscipline5DetailDTO> eightDiscipline5DetailDTO;
+	    
+	    private List<EightDiscipline6DetailDTO> eightDiscipline6DetailDTO;
+	    
+	    private List<EightDiscipline7DetailDTO> eightDiscipline7DetailDTO;
+	    
+	    private List<EightDiscipline8DetailDTO> eightDiscipline8DetailDTO;
+
+
+
+
 
 
 

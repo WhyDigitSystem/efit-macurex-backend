@@ -122,11 +122,21 @@ public class EightDisciplineEntryVO {
 		@JsonManagedReference
 		private List<EightDiscipline4DetailVO> eightDiscipline4DetailVO = new ArrayList<>();
 		
+		@OneToMany(mappedBy = "eightDisciplineEntryVO", cascade = CascadeType.ALL)
+		@JsonManagedReference
+		private List<EightDiscipline5DetailVO> eightDiscipline5DetailVO = new ArrayList<>();
 		
+		@OneToMany(mappedBy = "eightDisciplineEntryVO", cascade = CascadeType.ALL)
+		@JsonManagedReference
+		private List<EightDiscipline6DetailVO> eightDiscipline6DetailVO = new ArrayList<>();
 		
+		@OneToMany(mappedBy = "eightDisciplineEntryVO", cascade = CascadeType.ALL)
+		@JsonManagedReference
+		private List<EightDiscipline7DetailVO> eightDiscipline7DetailVO = new ArrayList<>();
 		
-		
-		
+		@OneToMany(mappedBy = "eightDisciplineEntryVO", cascade = CascadeType.ALL)
+		@JsonManagedReference
+		private List<EightDiscipline8DetailVO> eightDiscipline8DetailVO = new ArrayList<>();
 		
 		@JsonGetter("activeStatus")
 		public String getActiveStatus() {

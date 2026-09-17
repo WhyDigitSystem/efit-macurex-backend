@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -343,6 +344,62 @@ public class PurchaseController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
+	
+	
+	@GetMapping("/getPurchaseIndentDocId")
+	public ResponseEntity<ResponseDTO> getPurchaseIndentDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName = "getPurchaseIndentDocId()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+	    String mapp = "";
+
+	    try {
+
+	        mapp = purchaseService.getPurchaseIndentDocId(
+	                orgId,
+	                financialYear);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Purchase Indent DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "purchaseIndentDocId",
+	                mapp);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Failed to retrieve Purchase Indent DocId",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
 //	prepared by dropdown
 	@GetMapping("/getPurchaseIndentPreparedByDropdown")
 	public ResponseEntity<ResponseDTO> getPurchaseIndentPreparedByDropdown(

@@ -32,4 +32,6 @@ public interface DocumentTypeMappingDetailsRepo extends JpaRepository<DocumentTy
             String financialYear,
             String screenCode);
 
+	DocumentTypeMappingDetailsVO findByOrgIdAndScreenCode(Long orgId, String screenCode);
+
 }

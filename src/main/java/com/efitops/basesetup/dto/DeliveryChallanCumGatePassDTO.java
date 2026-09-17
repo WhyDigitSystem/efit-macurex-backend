@@ -33,7 +33,7 @@ public class DeliveryChallanCumGatePassDTO {
 
     private String vehicleNo;
 
-    private Long workOrderNo;
+    private String workOrderNo;
 
     private BigDecimal totalQty;
 

@@ -111,4 +111,45 @@ public interface BillOfMaterialRepo extends JpaRepository<BillOfMaterialVO, Long
 	        @Param("orgId") Long orgId,
 	        @Param("branch") Long branch);
 	
+	@Query(value = """
+	        SELECT
+	            b.bill_of_material_id AS bomId,
+
+	            i.item_id AS itemId,
+	            i.item_code AS itemCode,
+	            i.item_description AS itemDescription,
+
+	            u.unitmaster_id AS unitId,
+	            u.unit_id AS unitCode,
+	            u.description AS unitDescription,
+
+	            bd.qty AS bomQty,
+	            bd.scrap_item AS scrapItem,
+	            bd.scrap_qty AS scrapQty
+
+	        FROM bill_of_material b
+
+	        INNER JOIN bill_of_material_details bd
+	            ON bd.bill_of_material_id = b.bill_of_material_id
+
+	        LEFT JOIN item i
+	            ON i.item_id = bd.item
+
+	        LEFT JOIN unitmaster u
+	            ON u.unitmaster_id = bd.uom
+
+	        WHERE b.org_id = :orgId
+	          AND b.branch = :branch
+	          AND b.fg_item = :itemId
+	          AND b.active = 1
+	          AND b.cancel = 0
+
+	        ORDER BY bd.bill_of_material_details_id
+	        """, nativeQuery = true)
+	Set<Object[]> getBomItemDetailsforSubContractingGRN(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch,
+	        @Param("itemId") Long itemId);
+
+	
 }

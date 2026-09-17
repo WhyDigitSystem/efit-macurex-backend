@@ -1,11 +1,9 @@
 package com.efitops.basesetup.ResponseDTO;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
-import com.efitops.basesetup.dto.EmployeeResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,37 +12,29 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdvForStoresResponseDTO {
+public class JobOrderShortCloseResponseDTO {
 
     private Long id;
-
-    private BranchResponseDTO branch;
 
     private String docId;
 
     private LocalDate docDate;
 
-    private String belongsTo;
+    private JOShortCloseCustomerResponseDTO customer;
 
-    private CustomerDropdownResponseDTO customer;
+    private BranchResponseDTO branch;
 
-    private ItemResponseDTO incomingPartNo;
+    private String jobOrderNo;
 
-    private BillOfMaterialDropdownResponseDTO bom;
-
-    private String time;
-
-    private EmployeeResponseDTO preparedBy;
-
-    private String remarks;
+    private String referenceForSc;
 
     private String createdBy;
-
-    private String updatedBy;
 
     private boolean active;
 
     private boolean cancel;
+
+    private String updatedBy;
 
     private String cancelRemarks;
 
@@ -56,5 +46,6 @@ public class AdvForStoresResponseDTO {
 
     private String financialYear;
 
-    private List<AdvForStoresDetailsResponseDTO> advForStoresDetails;
+	private List<JobOrderShortCloseDetailsResponseDTO>
+            jobOrderShortCloseDetails;
 }

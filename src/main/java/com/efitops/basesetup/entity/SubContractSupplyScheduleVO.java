@@ -60,7 +60,7 @@ public class SubContractSupplyScheduleVO {
     private LocalDate schStartDate;
 
     @Column(name = "doc_date")
-    private LocalDate docDate;
+    private LocalDate docDate=LocalDate.now();
 
     @Column(name = "sch_end_date")
     private LocalDate schEndDate;

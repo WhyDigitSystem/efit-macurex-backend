@@ -1,15 +1,33 @@
 package com.efitops.basesetup.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
@@ -17,6 +35,7 @@ import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDetailsRespo
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
+import com.efitops.basesetup.ResponseDTO.FlashNCReportAttachmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FlashNCReportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
@@ -77,6 +96,7 @@ import com.efitops.basesetup.repository.DailyInspectionCumRejectionDetailsRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
+import com.efitops.basesetup.repository.FlashNCReportAttachmentRepo;
 import com.efitops.basesetup.repository.FlashNCReportRepo;
 import com.efitops.basesetup.repository.InstrumentCalibrationDetailsRepo;
 import com.efitops.basesetup.repository.InstrumentCalibrationRepo;
@@ -162,6 +182,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private FlashNCReportRepo flashNCReportRepo;
+
+	@Autowired
+	private FlashNCReportAttachmentRepo flashNCReportAttachmentRepo;
 
 	@Override
 	@Transactional
@@ -2333,55 +2356,13 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateFlashNCReport(FlashNCReportDTO flashNCReportDTO)
-			throws ApplicationException {
+	public Map<String, Object> updateCreateFlashNCReport(FlashNCReportDTO flashNCReportDTO, MultipartFile[] files,
+			MultipartFile[] images) throws ApplicationException {
 
-		FlashNCReportVO flashNCReportVO = new FlashNCReportVO();
-
-		String screenCode = "FNR";
+		FlashNCReportVO flashNCReportVO;
 		String message;
 
-		if (ObjectUtils.isEmpty(flashNCReportDTO.getId())) {
-
-		    
-
-		    String docId = flashNCReportRepo.getFlashNCReportDocId(
-		            flashNCReportDTO.getOrgId(),
-		            flashNCReportDTO.getFinancialYear(),
-		            screenCode);
-
-		    if (StringUtils.isBlank(docId)) {
-		        throw new ApplicationException(
-		                "Flash NC Report DocId Not Found");
-		    }
-
-		    flashNCReportVO.setDocId(docId);
-
-		    DocumentTypeMappingDetailsVO mapping =
-		            documentTypeMappingDetailsRepo
-		                    .findByOrgIdAndFinYearAndScreenCode(
-		                            flashNCReportDTO.getOrgId(),
-		                            flashNCReportDTO.getFinancialYear(),
-		                            screenCode);
-
-		    if (mapping == null) {
-		        throw new ApplicationException(
-		                "Document Type Mapping Details Not Found");
-		    }
-
-		    mapping.setLastNo(mapping.getLastNo() + 1);
-
-		    documentTypeMappingDetailsRepo.save(mapping);
-
-		    flashNCReportVO.setCreatedBy(
-		            flashNCReportDTO.getCreatedBy());
-
-		    flashNCReportVO.setUpdatedBy(
-		            flashNCReportDTO.getCreatedBy());
-
-		    message = "Flash NC Report Created Successfully";
-
-		} else {
+		if (ObjectUtils.isNotEmpty(flashNCReportDTO.getId())) {
 
 			flashNCReportVO = flashNCReportRepo.findById(flashNCReportDTO.getId())
 					.orElseThrow(() -> new ApplicationException("Invalid Flash NC Report"));
@@ -2389,16 +2370,66 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			flashNCReportVO.setUpdatedBy(flashNCReportDTO.getCreatedBy());
 
 			message = "Flash NC Report Updated Successfully";
+
+		} else {
+
+			flashNCReportVO = new FlashNCReportVO();
+
+			String screenCode = "FNR";
+
+			String docId = flashNCReportRepo.getFlashNCReportDocId(flashNCReportDTO.getOrgId(),
+					flashNCReportDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Flash NC Report DocId Not Found");
+			}
+
+			flashNCReportVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO mapping = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+					flashNCReportDTO.getOrgId(), flashNCReportDTO.getFinancialYear(), screenCode);
+
+			if (mapping == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			mapping.setLastNo(mapping.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(mapping);
+
+			flashNCReportVO.setCreatedBy(flashNCReportDTO.getCreatedBy());
+
+			flashNCReportVO.setUpdatedBy(flashNCReportDTO.getCreatedBy());
+
+			message = "Flash NC Report Created Successfully";
 		}
 
+		/*
+		 * Set Flash NC Report values
+		 */
 		createUpdateFlashNCReportVO(flashNCReportDTO, flashNCReportVO);
 
-		FlashNCReportVO savedVO = flashNCReportRepo.save(flashNCReportVO);
+		/*
+		 * Save Main VO first
+		 */
+		flashNCReportVO = flashNCReportRepo.save(flashNCReportVO);
+
+		// Save header image
+		saveFlashNCReportImage(images, flashNCReportVO);
+
+		/*
+		 * Save Attachments
+		 */
+		saveFlashNCReportAttachments(files, flashNCReportVO);
+
+		/*
+		 * Response
+		 */
+		FlashNCReportResponseDTO responseDTO = flashNCReportResponse(flashNCReportVO);
 
 		Map<String, Object> response = new HashMap<>();
 
 		response.put("message", message);
-		response.put("flashNCReportVO", flashNCReportResponse(savedVO));
+		response.put("flashNCReportVO", responseDTO);
 
 		return response;
 	}
@@ -2516,54 +2547,109 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Normal fields
+		 * Normal Fields
 		 */
 		vo.setDescription(dto.getDescription());
+
 		vo.setDrawingNo(dto.getDrawingNo());
+
 		vo.setMrinSCGRNNO(dto.getMrinSCGRNNO());
+
 		vo.setMrinDate(dto.getMrinDate());
+
 		vo.setOccPercentage(dto.getOccPercentage());
+
 		vo.setInvoiceNo(dto.getInvoiceNo());
+
 		vo.setPoNo(dto.getPoNo());
+
 		vo.setOperationNo(dto.getOperationNo());
+
 		vo.setLotQty(dto.getLotQty());
+
 		vo.setSampleQty(dto.getSampleQty());
+
 		vo.setNcQty(dto.getNcQty());
+
 		vo.setDefectSeen(dto.getDefectSeen());
+
 		vo.setProblemStatus(dto.getProblemStatus());
+
 		vo.setActionOnDefectiveLot(dto.getActionOnDefectiveLot());
+
 		vo.setNarration(dto.getNarration());
+
 		vo.setOrgId(dto.getOrgId());
+
 		vo.setFinancialYear(dto.getFinancialYear());
+
 		vo.setActive(dto.isActive());
+
 		vo.setCancelRemarks(dto.getCancelRemarks());
+	}
 
-		/*
-		 * Attachments
-		 */
-		vo.getFlashNCReportAttachmentVO().clear();
+	private void saveFlashNCReportImage(MultipartFile[] images, FlashNCReportVO flashNCReportVO)
+			throws ApplicationException {
 
-		if (dto.getFlashNCReportAttachmentDTO() != null) {
+		if (images == null || images.length == 0) {
+			return;
+		}
 
-			for (FlashNCReportAttachmentDTO attachmentDTO : dto.getFlashNCReportAttachmentDTO()) {
+		try {
 
-				FlashNCReportAttachmentVO attachmentVO = new FlashNCReportAttachmentVO();
+			Path flashNCReportFolder = Paths.get(flashNCReportUploadPath, "flash-nc-report",
+					flashNCReportVO.getId().toString());
 
-				if (attachmentDTO.getId() != null) {
-					attachmentVO.setId(attachmentDTO.getId());
+			createDirectory(flashNCReportFolder);
+
+			for (MultipartFile image : images) {
+
+				if (image == null || image.isEmpty()) {
+					continue;
 				}
 
-				attachmentVO.setName(attachmentDTO.getName());
-				attachmentVO.setFileName(attachmentDTO.getFileName());
-				attachmentVO.setFilePath(attachmentDTO.getFilePath());
-				attachmentVO.setFileSize(attachmentDTO.getFileSize());
-				attachmentVO.setContentType(attachmentDTO.getContentType());
-				attachmentVO.setUploadOn(attachmentDTO.getUploadOn());
+				String originalName = image.getOriginalFilename();
 
-				attachmentVO.setFlashNCReportVO(vo);
+				if (originalName == null) {
+					originalName = "image";
+				}
 
-				vo.getFlashNCReportAttachmentVO().add(attachmentVO);
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+
+					extension = originalName.substring(originalName.lastIndexOf("."));
+
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				String fileName = originalName + "_" + flashNCReportVO.getId() + extension;
+
+				Path filePath = flashNCReportFolder.resolve(fileName);
+
+				try (InputStream inputStream = image.getInputStream()) {
+
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/vendorComplaintEntry/viewFile/").toUriString();
+
+				String relativePath = "flash-nc-report/" + flashNCReportVO.getId() + "/" + fileName;
+
+				String publicUrl = baseUrl + relativePath;
+
+				// Save image URL/path in parent table
+				flashNCReportVO.setFlashNCImageName(publicUrl);
+
+				flashNCReportRepo.save(flashNCReportVO);
 			}
+
+		} catch (IOException e) {
+
+			throw new ApplicationException("Image Upload Failed : " + e.getMessage());
 		}
 	}
 
@@ -2603,6 +2689,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			belongsTo.setDescription(vo.getBelongsTo().getValueDescription());
 
 			response.setBelongsTo(belongsTo);
+
 		}
 
 		/*
@@ -2654,31 +2741,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Normal fields
-		 */
-		response.setDescription(vo.getDescription());
-		response.setDrawingNo(vo.getDrawingNo());
-		response.setMrinSCGRNNO(vo.getMrinSCGRNNO());
-		response.setMrinDate(vo.getMrinDate());
-		response.setOccPercentage(vo.getOccPercentage());
-		response.setInvoiceNo(vo.getInvoiceNo());
-		response.setPoNo(vo.getPoNo());
-		response.setOperationNo(vo.getOperationNo());
-		response.setLotQty(vo.getLotQty());
-		response.setSampleQty(vo.getSampleQty());
-		response.setNcQty(vo.getNcQty());
-		response.setDefectSeen(vo.getDefectSeen());
-		response.setProblemStatus(vo.getProblemStatus());
-		response.setActionOnDefectiveLot(vo.getActionOnDefectiveLot());
-		response.setNarration(vo.getNarration());
-		response.setOrgId(vo.getOrgId());
-		response.setFinancialYear(vo.getFinancialYear());
-		response.setActive(vo.getActive());
-		response.setCancelRemarks(vo.getCancelRemarks());
-		response.setCreatedBy(vo.getCreatedBy());
-
-		/*
-		 * Supplier Response
+		 * Supplier
 		 */
 		if (vo.getSupplier() != null) {
 
@@ -2692,7 +2755,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Item Response
+		 * Item
 		 */
 		if (vo.getItem() != null) {
 
@@ -2708,7 +2771,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Disposal Response
+		 * Disposal
 		 */
 		if (vo.getDisposal() != null) {
 
@@ -2724,7 +2787,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Inspected By Response
+		 * Inspected By
 		 */
 		if (vo.getInspectedBy() != null) {
 
@@ -2738,7 +2801,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Status Response
+		 * Status
 		 */
 		if (vo.getStatus() != null) {
 
@@ -2753,7 +2816,225 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			response.setStatus(status);
 		}
 
+		/*
+		 * Normal Fields
+		 */
+		response.setDescription(vo.getDescription());
+
+		response.setDrawingNo(vo.getDrawingNo());
+
+		response.setMrinSCGRNNO(vo.getMrinSCGRNNO());
+
+		response.setMrinDate(vo.getMrinDate());
+
+		response.setOccPercentage(vo.getOccPercentage());
+
+		response.setInvoiceNo(vo.getInvoiceNo());
+
+		response.setPoNo(vo.getPoNo());
+
+		response.setOperationNo(vo.getOperationNo());
+
+		response.setLotQty(vo.getLotQty());
+
+		response.setSampleQty(vo.getSampleQty());
+
+		response.setNcQty(vo.getNcQty());
+
+		response.setDefectSeen(vo.getDefectSeen());
+
+		response.setProblemStatus(vo.getProblemStatus());
+
+		response.setActionOnDefectiveLot(vo.getActionOnDefectiveLot());
+
+		response.setNarration(vo.getNarration());
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setActive(vo.getActive());
+
+		response.setCancelRemarks(vo.getCancelRemarks());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		response.setFlashNCImageName(vo.getFlashNCImageName());
+
+		/*
+		 * Attachment Response
+		 */
+		List<FlashNCReportAttachmentResponseDTO> attachmentList = new ArrayList<>();
+
+		if (vo.getFlashNCReportAttachmentVO() != null && !vo.getFlashNCReportAttachmentVO().isEmpty()) {
+
+			for (FlashNCReportAttachmentVO attachmentVO : vo.getFlashNCReportAttachmentVO()) {
+
+				FlashNCReportAttachmentResponseDTO attachmentDTO = new FlashNCReportAttachmentResponseDTO();
+
+				attachmentDTO.setId(attachmentVO.getId());
+
+				attachmentDTO.setName(attachmentVO.getName());
+
+				attachmentDTO.setFileName(attachmentVO.getFileName());
+
+				attachmentDTO.setFilePath(attachmentVO.getFilePath());
+
+				attachmentDTO.setFileSize(attachmentVO.getFileSize());
+
+				attachmentDTO.setContentType(attachmentVO.getContentType());
+
+				attachmentDTO.setUploadOn(attachmentVO.getUploadOn());
+
+				attachmentList.add(attachmentDTO);
+			}
+		}
+
+		response.setFlashNCReportAttachmentResponseDTO(attachmentList);
+
 		return response;
+	}
+
+	@Value("${flash.nc.report.upload.path}")
+	private String flashNCReportUploadPath;
+
+	private void saveFlashNCReportAttachments(MultipartFile[] files, FlashNCReportVO flashNCReportVO)
+			throws ApplicationException {
+
+		if (files == null || files.length == 0) {
+			return;
+		}
+
+		try {
+
+			// 1. Create folder
+			Path flashNCReportFolder = Paths.get(flashNCReportUploadPath, "flash-nc-report",
+					flashNCReportVO.getId().toString());
+
+			createDirectory(flashNCReportFolder);
+
+			List<FlashNCReportAttachmentVO> attachmentList = new ArrayList<>();
+
+			for (MultipartFile file : files) {
+
+				if (file == null || file.isEmpty()) {
+					continue;
+				}
+
+				// 2. Get original file name
+				String originalName = file.getOriginalFilename();
+
+				if (originalName == null) {
+					originalName = "file";
+				}
+
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+
+					extension = originalName.substring(originalName.lastIndexOf("."));
+
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				// 3. Create unique file name
+				String fileName = originalName + "_" + flashNCReportVO.getId() + extension;
+
+				// 4. Actual physical file path
+				Path filePath = flashNCReportFolder.resolve(fileName);
+
+				// 5. Save image to disk
+				try (InputStream inputStream = file.getInputStream()) {
+
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				// 6. Create URL for viewing image
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/vendorComplaintEntry/viewFile/").toUriString();
+
+				String relativePath = "flash-nc-report/" + flashNCReportVO.getId() + "/" + fileName;
+
+				String publicUrl = baseUrl + relativePath;
+
+				// 7. Save attachment details in DB
+				FlashNCReportAttachmentVO attachment = new FlashNCReportAttachmentVO();
+
+				attachment.setFlashNCReportVO(flashNCReportVO);
+				attachment.setName(file.getOriginalFilename());
+				attachment.setFileName(fileName);
+				attachment.setFilePath(publicUrl);
+				attachment.setFileSize(file.getSize());
+				attachment.setContentType(file.getContentType());
+				attachment.setUploadOn(LocalDateTime.now());
+
+				attachmentList.add(attachment);
+			}
+
+			// 8. Save attachment records
+			if (!attachmentList.isEmpty()) {
+
+				List<FlashNCReportAttachmentVO> saved = flashNCReportAttachmentRepo.saveAll(attachmentList);
+
+				flashNCReportVO.setFlashNCReportAttachmentVO(saved);
+			}
+
+		} catch (IOException e) {
+
+			throw new ApplicationException("File Upload Failed : " + e.getMessage());
+		}
+	}
+
+	private void createDirectory(Path path) throws IOException {
+
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
+	@Override
+	public ResponseEntity<byte[]> viewFlashNCReportFile(HttpServletRequest request) throws IOException {
+
+		return serveFile(request, "/api/vendorComplaintEntry/viewFile/", flashNCReportUploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveFile(HttpServletRequest request, String apiPrefix, String uploadBasePath)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
 	}
 
 	@Override
@@ -2798,37 +3079,119 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		return docId;
 	}
-	
+
 	@Override
-	public List<Map<String, Object>> getQualityEmployeesForFlashNCReport(
-	        Long orgId,
-	        Long branch) throws ApplicationException {
+	public List<Map<String, Object>> getQualityEmployeesForFlashNCReport(Long orgId, Long branch)
+			throws ApplicationException {
 
-	    List<Object[]> employeeList =
-	            flashNCReportRepo.getQualityEmployeesForFlashNCReport(
-	                    orgId,
-	                    branch);
+		List<Object[]> employeeList = flashNCReportRepo.getQualityEmployeesForFlashNCReport(orgId, branch);
 
-	    if (employeeList == null || employeeList.isEmpty()) {
-	        throw new ApplicationException(
-	                "No Quality Department Employees Found");
-	    }
+		if (employeeList == null || employeeList.isEmpty()) {
+			throw new ApplicationException("No Quality Department Employees Found");
+		}
 
-	    List<Map<String, Object>> responseList =
-	            new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : employeeList) {
+		for (Object[] obj : employeeList) {
 
-	        Map<String, Object> employeeMap =
-	                new HashMap<>();
+			Map<String, Object> employeeMap = new HashMap<>();
 
-	        employeeMap.put("employeeId", obj[0]);
-	        employeeMap.put("employeeCode", obj[1]);
-	        employeeMap.put("employeeName", obj[2]);
+			employeeMap.put("employeeId", obj[0]);
+			employeeMap.put("employeeCode", obj[1]);
+			employeeMap.put("employeeName", obj[2]);
 
-	        responseList.add(employeeMap);
-	    }
+			responseList.add(employeeMap);
+		}
 
-	    return responseList;
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long listOfValuesId)
+			throws ApplicationException {
+
+		List<Object[]> departmentList = flashNCReportRepo.getFromDeptDropdownForFlashNCReport(listOfValuesId);
+
+		if (departmentList == null || departmentList.isEmpty()) {
+
+			throw new ApplicationException("No From Department Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : departmentList) {
+
+			Map<String, Object> departmentMap = new HashMap<>();
+
+			departmentMap.put("id", obj[0]);
+			departmentMap.put("valueCode", obj[1]);
+			departmentMap.put("valueDescription", obj[2]);
+
+			responseList.add(departmentMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long listOfValuesId, Long fromDept)
+			throws ApplicationException {
+
+		List<Object[]> departmentList = flashNCReportRepo.getToDepartmentDropdownForFlashNCReport(listOfValuesId,
+				fromDept);
+
+		if (departmentList == null || departmentList.isEmpty()) {
+
+			throw new ApplicationException("No To Department Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : departmentList) {
+
+			Map<String, Object> departmentMap = new HashMap<>();
+
+			departmentMap.put("id", obj[0]);
+			departmentMap.put("valueCode", obj[1]);
+			departmentMap.put("valueDescription", obj[2]);
+
+			responseList.add(departmentMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getMRINGRNDropdownForFlashNCReport(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> mrinGrnList = flashNCReportRepo.getMRINGRNDropdownForFlashNCReport(orgId, branch);
+
+		if (mrinGrnList == null || mrinGrnList.isEmpty()) {
+
+			throw new ApplicationException("No MRIN/GRN Details Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : mrinGrnList) {
+
+			Map<String, Object> mrinGrnMap = new HashMap<>();
+
+			mrinGrnMap.put("mrinGrnNo", obj[0]);
+			mrinGrnMap.put("supplierCode", obj[1]);
+			mrinGrnMap.put("supplierName", obj[2]);
+			mrinGrnMap.put("invoiceNo", obj[3]);
+			mrinGrnMap.put("item", obj[4]);
+			mrinGrnMap.put("itemDescription", obj[5]);
+			mrinGrnMap.put("mrinGrnDate", obj[6]);
+			mrinGrnMap.put("poNo", obj[7]);
+			mrinGrnMap.put("qty", obj[8]);
+			mrinGrnMap.put("sourceType", obj[9]);
+
+			responseList.add(mrinGrnMap);
+		}
+
+		return responseList;
 	}
 }

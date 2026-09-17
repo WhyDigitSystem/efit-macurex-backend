@@ -1,9 +1,12 @@
 package com.efitops.basesetup.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -1350,17 +1353,16 @@ public class VendorComplaintController extends BaseController {
 	 */
 	@PostMapping(value = "/updateCreateFlashNCReport", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseDTO updateCreateFlashNCReport(@RequestPart("flashNCReportVO") FlashNCReportDTO flashNCReportDTO,
-//			@RequestBody FlashNCReportDTO flashNCReportDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files,
 			@RequestPart(value = "images", required = false) MultipartFile[] images) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
-
 		ResponseDTO responseDTO;
 
 		try {
 
-			Map<String, Object> response = vendorComplaintService.updateCreateFlashNCReport(flashNCReportDTO);
+			Map<String, Object> response = vendorComplaintService.updateCreateFlashNCReport(flashNCReportDTO, files,
+					images);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
 
@@ -1526,6 +1528,139 @@ public class VendorComplaintController extends BaseController {
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Quality Employees Retrieved Successfully");
 
 			responseObjectsMap.put("employeeDetails", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/viewFile/**")
+	public ResponseEntity<byte[]> viewFlashNCReportFile(HttpServletRequest request) {
+
+		String methodName = "viewFlashNCReportFile()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		try {
+
+			return vendorComplaintService.viewFlashNCReportFile(request);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			return ResponseEntity.status(500).build();
+		}
+	}
+
+	@GetMapping("/getFromDeptDropdownForFlashNCReport")
+	public ResponseEntity<ResponseDTO> getFromDeptDropdownForFlashNCReport(@RequestParam Long listOfValuesId) {
+
+		String methodName = "getFromDeptDropdownForFlashNCReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService
+					.getFromDeptDropdownForFlashNCReport(listOfValuesId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "From Department Retrieved Successfully");
+
+			responseObjectsMap.put("fromDepartment", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getToDepartmentDropdownForFlashNCReport")
+	public ResponseEntity<ResponseDTO> getToDepartmentDropdownForFlashNCReport(@RequestParam Long listOfValuesId,
+			@RequestParam Long fromDept) {
+
+		String methodName = "getToDepartmentDropdownForFlashNCReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService
+					.getToDepartmentDropdownForFlashNCReport(listOfValuesId, fromDept);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "To Department Retrieved Successfully");
+
+			responseObjectsMap.put("toDepartment", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMRINGRNDropdownForFlashNCReport")
+	public ResponseEntity<ResponseDTO> getMRINGRNDropdownForFlashNCReport(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getMRINGRNDropdownForFlashNCReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService.getMRINGRNDropdownForFlashNCReport(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "MRIN/GRN Details Retrieved Successfully");
+
+			responseObjectsMap.put("mrinGrnDropdown", response);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 

@@ -4,10 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
+import com.efitops.basesetup.ResponseDTO.FlashNCReportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
+import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
@@ -78,5 +81,30 @@ public interface VendorComplaintService {
 
 //	setupapproval
 	Map<String, Object> updateCreateSetUpApproval(SetUpApprovalDTO setUpApprovalDTO) throws ApplicationException;
+
+	SetUpApprovalResponseDTO getSetUpApprovalById(Long id) throws ApplicationException;
+
+	List<SetUpApprovalResponseDTO> getSetUpApprovalByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getFgSfgItemDropdownForSetUpApproval(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getProcessSheetNoForSetUpApproval(Long item, Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getControlPlanDetailsForSetUpApproval(Long item, String processSheetNo, Long orgId,
+			Long branch) throws ApplicationException;
+
+	String getSetUpApprovalDocId(Long orgId, String financialYear) throws ApplicationException;
+
+//	FlashNC Report
+	Map<String, Object> updateCreateFlashNCReport(FlashNCReportDTO flashNCReportDTO) throws ApplicationException;
+
+	List<FlashNCReportResponseDTO> getFlashNCReportByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	FlashNCReportResponseDTO getFlashNCReportById(Long id) throws ApplicationException;
+
+	String getFlashNCReportDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	List<Map<String, Object>> getQualityEmployeesForFlashNCReport(Long orgId, Long branch) throws ApplicationException;
 
 }

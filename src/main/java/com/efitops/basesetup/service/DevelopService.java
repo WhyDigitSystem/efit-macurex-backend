@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialStageInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
@@ -32,6 +33,7 @@ import com.efitops.basesetup.dto.ControlPlanDTO;
 import com.efitops.basesetup.dto.EightDisciplineEntryDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
+import com.efitops.basesetup.dto.InitialSampleInspectionDTO;
 import com.efitops.basesetup.dto.InitialStageInspectionDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.MachineMasterDTO;
@@ -286,6 +288,19 @@ public interface DevelopService {
 			throws ApplicationException;
 
 	List<Map<String, Object>> getWorkOrderNoDropDownForInitialStageInspection(Long orgId, Long branch, Long partyId)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateInitialSampleInspection(InitialSampleInspectionDTO initialSampleInspectionDTO)
+			throws ApplicationException;
+
+	List<InitialSampleInspectionResponseDTO> getInitialSampleInspectionByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	InitialSampleInspectionResponseDTO getInitialSampleInspectionById(Long id) throws ApplicationException;
+
+	String getInitialSampleInspectionDocId(Long orgId, String financialYear);
+
+	List<Map<String, Object>> getSupplierIdDropDownForInitialSampleInspection(Long orgId, Long branch)
 			throws ApplicationException;
 
 	

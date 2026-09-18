@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialStageInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
@@ -41,6 +42,7 @@ import com.efitops.basesetup.dto.ControlPlanDTO;
 import com.efitops.basesetup.dto.EightDisciplineEntryDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
+import com.efitops.basesetup.dto.InitialSampleInspectionDTO;
 import com.efitops.basesetup.dto.InitialStageInspectionDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.MachineMasterDTO;
@@ -606,7 +608,10 @@ public class DevelopController extends BaseController {
 
 	@PutMapping(value = "/createUpdatePurchaseContractAmendment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
-			@RequestPart("purchaseContractAmendment") PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+//			@RequestPart("purchaseContractAmendment") PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+		
+			@RequestBody PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+
 
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -852,7 +857,7 @@ public class DevelopController extends BaseController {
 	@PostMapping(value = "/updateCreatePurchaseOrderAmendment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreatePurchaseOrderAmendment(
 
-	    	@RequestPart("purchaseOrderAmendment") PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
+   	@RequestPart("purchaseOrderAmendment") PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
 //			@RequestBody PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
 
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
@@ -3515,6 +3520,332 @@ public class DevelopController extends BaseController {
 	    }
 
 	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	//InitialSampleInspection
+	
+	
+	@PutMapping("/createUpdateInitialSampleInspection")
+
+	public ResponseEntity<ResponseDTO> createUpdateInitialSampleInspection(
+
+	        @RequestBody InitialSampleInspectionDTO initialSampleInspectionDTO) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object> initialSampleInspectionMap =
+
+	                developService.createUpdateInitialSampleInspection(
+
+	                        initialSampleInspectionDTO);
+
+	        responseObjectsMap.put(
+
+	                CommonConstant.STRING_MESSAGE,
+
+	                initialSampleInspectionMap.get("message"));
+
+	        responseObjectsMap.put(
+
+	                "initialSampleInspectionVO",
+
+	                initialSampleInspectionMap.get(
+
+	                        "initialSampleInspectionVO"));
+
+	        responseDTO = createServiceResponse(
+
+	                responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+
+	                responseObjectsMap,
+
+	                e.getMessage(),
+
+	                e.getMessage());
+
+	    }
+
+	    return ResponseEntity.ok().body(responseDTO);
+
+	}
+	
+	
+	@GetMapping("/getInitialSampleInspectionByOrgId")
+
+	public ResponseEntity<ResponseDTO> getInitialSampleInspectionByOrgId(
+
+	        @RequestParam Long orgId,
+
+	        @RequestParam Long branch) {
+
+	    String methodName = "getInitialSampleInspectionByOrgId()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<InitialSampleInspectionResponseDTO> initialSampleInspectionResponseDTO =
+
+	                developService.getInitialSampleInspectionByOrgId(orgId, branch);
+
+	        responseObjectsMap.put(
+
+	                CommonConstant.STRING_MESSAGE,
+
+	                "Initial Sample Inspection information retrieved successfully");
+
+	        responseObjectsMap.put(
+
+	                "initialSampleInspectionResponseVO",
+
+	                initialSampleInspectionResponseDTO);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        LOGGER.error(
+
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+
+	                methodName,
+
+	                e.getMessage());
+
+	        responseDTO = createServiceResponseError(
+
+	                responseObjectsMap,
+
+	                "Initial Sample Inspection information retrieval failed",
+
+	                e.getMessage());
+
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+
+	}
+
+
+	@GetMapping("/getInitialSampleInspectionById")
+
+	public ResponseEntity<ResponseDTO> getInitialSampleInspectionById(
+
+	        @RequestParam Long id) {
+
+	    String methodName = "getInitialSampleInspectionById()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        InitialSampleInspectionResponseDTO initialSampleInspectionResponseDTO =
+
+	                developService.getInitialSampleInspectionById(id);
+
+	        responseObjectsMap.put(
+
+	                CommonConstant.STRING_MESSAGE,
+
+	                "Initial Sample Inspection information retrieved successfully");
+
+	        responseObjectsMap.put(
+
+	                "initialSampleInspectionVO",
+
+	                initialSampleInspectionResponseDTO);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+
+	                methodName,
+
+	                errorMsg);
+
+	        responseDTO = createServiceResponseError(
+
+	                responseObjectsMap,
+
+	                "Initial Sample Inspection information retrieval failed",
+
+	                errorMsg);
+
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+
+	}
+
+
+	@GetMapping("/getInitialSampleInspectionDocId")
+
+	public ResponseEntity<ResponseDTO> getInitialSampleInspectionDocId(
+
+	        @RequestParam Long orgId,
+
+	        @RequestParam String financialYear) {
+
+	    String methodName = "getInitialSampleInspectionDocId()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String mapp = "";
+
+	    try {
+
+	        mapp = developService.getInitialSampleInspectionDocId(
+
+	                orgId,
+
+	                financialYear);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+
+	                methodName,
+
+	                errorMsg);
+
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+
+	                CommonConstant.STRING_MESSAGE,
+
+	                "Initial Sample Inspection DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+
+	                "initialSampleInspectionDocId",
+
+	                mapp);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } else {
+
+	        responseDTO = createServiceResponseError(
+
+	                responseObjectsMap,
+
+	                "Failed to retrieve Initial Sample Inspection DocId",
+
+	                errorMsg);
+
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+
+	}
+	
+	
+	//SupplierIdDropDownForInitialSampleInspection
+	
+	
+	@GetMapping("/getSupplierIdDropDownForInitialSampleInspection")
+
+	public ResponseEntity<ResponseDTO> getSupplierIdDropDownForInitialSampleInspection(
+
+	        @RequestParam Long orgId,
+
+	        @RequestParam Long branch) {
+
+	    String methodName = "getSupplierIdDropDownForInitialSampleInspection()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<Map<String, Object>> supplierList =
+	                developService.getSupplierIdDropDownForInitialSampleInspection(
+	                        orgId,
+	                        branch);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Supplier information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "supplierIdDropDown",
+	                supplierList);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e.getMessage());
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Supplier information retrieval failed",
+	                        e.getMessage());
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
 
 	    return ResponseEntity.ok(responseDTO);
 	}

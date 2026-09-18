@@ -20,16 +20,21 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
+import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
@@ -723,6 +728,116 @@ public class SubContractController extends BaseController {
 	}
 	
 	
+	@GetMapping("/getDeliveryChallanSubcontractingById")
+	public ResponseEntity<ResponseDTO> getDeliveryChallanSubcontractingById(
+	        @RequestParam Long id) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        DeliveryChallanSubcontractingResponseDTO response =
+	        		subContractService
+	                        .getDeliveryChallanSubcontractingById(id);
+
+	        responseObjectsMap.put(
+	                "deliveryChallanSubcontracting", response);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Delivery Challan For Sub Contracting Fetched Successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getAllDeliveryChallanSubcontractingByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getAllDeliveryChallanSubcontractingByOrgIdAndBranch(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<DeliveryChallanSubcontractingResponseDTO> response =
+	        		subContractService
+	                        .getAllDeliveryChallanSubcontractingByOrgIdAndBranch(
+	                                orgId, branch);
+
+	        responseObjectsMap.put(
+	                "deliveryChallanSubcontracting", response);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Delivery Challan For Sub Contracting Fetched Successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getDeliveryChallanSubcontractingDocId")
+	public ResponseEntity<ResponseDTO> getDeliveryChallanSubcontractingDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        String docId =
+	        		subContractService
+	                        .getDeliveryChallanSubcontractingDocId(
+	                                orgId,
+	                                financialYear);
+
+	        responseObjectsMap.put("docId", docId);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Document ID Fetched Successfully");
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
 	@PutMapping(value = "/createUpdateDeliveryChallanSubcontracting")
 			public ResponseEntity<ResponseDTO> createUpdateDeliveryChallanSubcontracting(
 	        @RequestBody
@@ -1368,5 +1483,381 @@ public class SubContractController extends BaseController {
 	    }
 
 	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@PutMapping("/createUpdateProductionScheduleForNextThreeMonth")
+	public ResponseEntity<ResponseDTO> createUpdateProductionScheduleForNextThreeMonth(
+	        @RequestBody ProductionScheduleForNextThreeMonthDTO productionScheduleDTO) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object> productionScheduleMap =
+	        		subContractService
+	                        .createUpdateProductionScheduleForNextThreeMonth(
+	                                productionScheduleDTO);
+
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                productionScheduleMap.get("message"));
+
+
+	        responseObjectsMap.put(
+	                "productionScheduleForNextThreeMonth",
+	                productionScheduleMap.get(
+	                        "productionScheduleForNextThreeMonth"));
+
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getProductionScheduleForNextThreeMonthById")
+	public ResponseEntity<ResponseDTO> getProductionScheduleForNextThreeMonthById(
+	        @RequestParam Long id) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        ProductionScheduleForNextThreeMonthResponseDTO
+	                productionScheduleResponseDTO =
+	                		subContractService
+	                        .getProductionScheduleForNextThreeMonthById(id);
+
+
+	        responseObjectsMap.put(
+	                "productionScheduleForNextThreeMonth",
+	                productionScheduleResponseDTO);
+
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Production Schedule For Next Three Month Fetched Successfully");
+
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getAllProductionScheduleForNextThreeMonthByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO>
+	        getAllProductionScheduleForNextThreeMonthByOrgIdAndBranch(
+	                @RequestParam Long orgId,
+	                @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<ProductionScheduleForNextThreeMonthResponseDTO>
+	                productionScheduleList =
+	                		subContractService
+	                        .getAllProductionScheduleForNextThreeMonthByOrgIdAndBranch(
+	                                orgId,
+	                                branch);
+
+
+	        responseObjectsMap.put(
+	                "productionScheduleForNextThreeMonth",
+	                productionScheduleList);
+
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Production Schedule For Next Three Month Fetched Successfully");
+
+
+	        responseDTO =
+	                createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	//DeliveryChallanCumGatePass
+	
+	@PutMapping("/createUpdateDeliveryChallanCumGatePass")
+
+	public ResponseEntity<ResponseDTO> createUpdateDeliveryChallanCumGatePass(
+	        @RequestBody DeliveryChallanCumGatePassDTO deliveryChallanCumGatePassDTO) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object> deliveryChallanCumGatePassMap =
+	        		subContractService
+	                        .createUpdateDeliveryChallanCumGatePass(
+	                                deliveryChallanCumGatePassDTO);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                deliveryChallanCumGatePassMap.get("message"));
+
+	        responseObjectsMap.put(
+	                "deliveryChallanCumGatePassVO",
+	                deliveryChallanCumGatePassMap
+	                        .get("deliveryChallanCumGatePassVO"));
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getDeliveryChallanCumGatePassDetails")
+	public ResponseEntity<ResponseDTO> getDeliveryChallanCumGatePassDetails(
+	        @RequestParam String jobOrderNo,
+	        @RequestParam Long branch,
+	        @RequestParam Long orgId,
+	        @RequestParam Long customer) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<Map<String, Object>> deliveryChallanCumGatePassDetails =
+	        		subContractService
+	                        .getDeliveryChallanCumGatePassDetails(
+	                                jobOrderNo,
+	                                branch,
+	                                orgId,
+	                                customer);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Delivery Challan Cum Gate Pass Details fetched successfully");
+
+	        responseObjectsMap.put(
+	                "deliveryChallanCumGatePassDetails",
+	                deliveryChallanCumGatePassDetails);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getDeliveryChallanCumGatePassById")
+	public ResponseEntity<ResponseDTO> getDeliveryChallanCumGatePassById(
+	        @RequestParam Long id) {
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        DeliveryChallanCumGatePassResponseDTO
+	                deliveryChallanCumGatePass =
+	                		subContractService
+	                        .getDeliveryChallanCumGatePassById(id);
+
+	        responseObjectsMap.put(
+	                "deliveryChallanCumGatePass",
+	                deliveryChallanCumGatePass);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Delivery Challan Cum Gate Pass fetched successfully");
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getDeliveryChallanCumGatePassByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO>
+	getDeliveryChallanCumGatePassByOrgIdAndBranch(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<DeliveryChallanCumGatePassResponseDTO>
+	                deliveryChallanCumGatePassList =
+	                		subContractService
+	                        .getDeliveryChallanCumGatePassByOrgIdAndBranch(
+	                                orgId,
+	                                branch);
+
+	        responseObjectsMap.put(
+	                "deliveryChallanCumGatePass",
+	                deliveryChallanCumGatePassList);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Delivery Challan Cum Gate Pass List fetched successfully");
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        e.getMessage(),
+	                        e.getMessage());
+	    }
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	@GetMapping("/getDeliveryChallanCumGatePassDocId")
+	public ResponseEntity<ResponseDTO>
+	getDeliveryChallanCumGatePassDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName =
+	            "getDeliveryChallanCumGatePassDocId()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String docId = "";
+
+	    try {
+
+	        docId =
+	        		subContractService
+	                        .getDeliveryChallanCumGatePassDocId(
+	                                orgId,
+	                                financialYear);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Delivery Challan Cum Gate Pass DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "deliveryChallanCumGatePassDocId",
+	                docId);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } else {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Delivery Challan Cum Gate Pass DocId",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
 	}
 }

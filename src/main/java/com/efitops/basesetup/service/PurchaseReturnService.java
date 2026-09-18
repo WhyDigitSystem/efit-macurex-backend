@@ -16,4 +16,11 @@ public interface PurchaseReturnService {
 	String getPurchaseReturnDocId(Long orgId, String financialYear);
 
 	List<PurchaseReturnResponseDTO> getPurchaseReturnByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getGrnDetails(Long orgId, Long branch, Long supplierCode);
+
+	List<Map<String, Object>> getPurchaseBill(Long orgId, Long branch, Long supplierCode, String grnNo);
+
+	List<Map<String, Object>> getPurchaseBillItemDetails(Long orgId, Long branch, Long supplierCode, String grnNo,
+			String billNo);
 }

@@ -27,15 +27,14 @@ public interface GrnService {
 
 	ResponseEntity<byte[]> viewGrnFile(HttpServletRequest request) throws IOException;
 
-	List<Map<String, Object>> getSupplierDetailsForGrn(Long orgId, Long branch);
+	String getGrnDocId(Long orgId, String financialYear, String type) throws ApplicationException;
 
-	String getGrnDocId(Long orgId, String financialYear, String screenCode);
+	List<Map<String, Object>> getSupplierDetailsForGrn(Long orgId, Long branch);
 
 	List<Map<String, Object>> getGatePassDocIdDetails(Long orgId, Long branch, Long supplierCode);
 
 	List<Map<String, Object>> getPurchaseOrderNoBasedDocId(Long orgId, Long branch, Long supplierCode, String gatePass);
 
-	List<Map<String, Object>> getScheduleDocIdDetails(Long orgId, String purchaseOrderNo, String date, String gatePass);
 
 	List<Map<String, Object>> getPoNmberBasedItemDetails(Long orgId, Long branch, String purchaseOrderNo);
 
@@ -62,5 +61,12 @@ public interface GrnService {
 	List<Map<String, Object>> getItemDetailsForStockTransfer(Long orgId, Long branch, String purchaseOrderNo);
 
 	List<Map<String, Object>> getLocationDetails(Long orgId, Long branch);
+
+	List<Map<String, Object>> getPurchaseOrderNumberImportGrn(Long orgId, Long branch, Long supplierCode);
+
+	List<Map<String, Object>> getItemDetailsForImportGrn(Long orgId, Long branch, Long supplierCode,
+			String purchaseOrderNo);
+
+	List<Map<String, Object>> getScheduleDocIdDetails(Long orgId, Long branch, Long supplier);
 
 }

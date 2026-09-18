@@ -48,7 +48,7 @@ public class PurchaseReturnVO {
 	private String belongsTo;
 
 	@Column(name = "doc_date")
-	private LocalDate docDate=LocalDate.now();
+	private LocalDate docDate = LocalDate.now();
 
 	@ManyToOne
 	@JoinColumn(name = "supplier")
@@ -77,6 +77,12 @@ public class PurchaseReturnVO {
 
 	@Column(name = "purchaseorder_number")
 	private String purchaseorderNumber;
+
+	@Column(name = "purchase_bill_no")
+	private String purchaseBillNo;
+
+	@Column(name = "purchase_bill_date")
+	private LocalDate purchaseBillDate;
 
 	@Column(name = "purchaseorder_type")
 	private String purchaseorderType;
@@ -152,7 +158,7 @@ public class PurchaseReturnVO {
 
 	@Column(name = "screen_name")
 	private String screenName = "PURCHASE RETURN";
-	
+
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;

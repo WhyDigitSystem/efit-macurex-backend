@@ -26,12 +26,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.efitops.basesetup.ResponseDTO.BomResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.HsnResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
@@ -42,6 +44,8 @@ import com.efitops.basesetup.ResponseDTO.JobOrderDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ServiceAccMasterResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleItemDetailsResponseDTO;
@@ -51,9 +55,11 @@ import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDT
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractItemDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractTaxDetailsResponseDTO;
-import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
+import com.efitops.basesetup.ResponseDTO.WorkOrderResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
+import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDetailsDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDetailsDTO;
 import com.efitops.basesetup.dto.EmployeeResponseDTO;
@@ -63,6 +69,8 @@ import com.efitops.basesetup.dto.JobOrderAmendmentDetailsDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.JobOrderDetailsDTO;
 import com.efitops.basesetup.dto.JobOrderTaxDetailsDTO;
+import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
+import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleItemDetailsDTO;
@@ -72,9 +80,10 @@ import com.efitops.basesetup.dto.SupplierRateContractDTO;
 import com.efitops.basesetup.dto.SupplierRateContractItemDetailsDTO;
 import com.efitops.basesetup.dto.SupplierRateContractTaxDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
-import com.efitops.basesetup.entity.BomVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
+import com.efitops.basesetup.entity.DeliveryChallanCumGatePassDetailsVO;
+import com.efitops.basesetup.entity.DeliveryChallanCumGatePassVO;
 import com.efitops.basesetup.entity.DeliveryChallanSubcontractingDetailsVO;
 import com.efitops.basesetup.entity.DeliveryChallanSubcontractingVO;
 import com.efitops.basesetup.entity.DepartmentVO;
@@ -90,6 +99,8 @@ import com.efitops.basesetup.entity.JobOrderDetailsVO;
 import com.efitops.basesetup.entity.JobOrderTaxDetailsVO;
 import com.efitops.basesetup.entity.JobOrderVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.ProductionScheduleForNextThreeMonthDetailsVO;
+import com.efitops.basesetup.entity.ProductionScheduleForNextThreeMonthVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleDetailsVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleItemDetailsVO;
@@ -99,12 +110,13 @@ import com.efitops.basesetup.entity.SupplierRateContractAmendmentVO;
 import com.efitops.basesetup.entity.SupplierRateContractItemDetailsVO;
 import com.efitops.basesetup.entity.SupplierRateContractTaxDetailsVO;
 import com.efitops.basesetup.entity.SupplierRateContractVO;
-import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BomRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
+import com.efitops.basesetup.repository.DeliveryChallanCumGatePassDetailsRepo;
+import com.efitops.basesetup.repository.DeliveryChallanCumGatePassRepo;
 import com.efitops.basesetup.repository.DeliveryChallanSubcontractingDetailsRepo;
 import com.efitops.basesetup.repository.DeliveryChallanSubcontractingRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
@@ -121,6 +133,8 @@ import com.efitops.basesetup.repository.JobOrderRepo;
 import com.efitops.basesetup.repository.JobOrderTaxDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.ProductionScheduleForNextThreeMonthDetailsRepo;
+import com.efitops.basesetup.repository.ProductionScheduleForNextThreeMonthRepo;
 import com.efitops.basesetup.repository.ServiceAccMasterRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleDetailsRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleItemDetailsRepo;
@@ -235,6 +249,18 @@ public class SubContractServiceImpl implements SubContractService {
 	
 	@Autowired
 	SupplierRateContractAmendmentItemDetailsRepo supplierRateContractAmendmentItemDetailsRepo;
+	 
+	@Autowired
+	ProductionScheduleForNextThreeMonthRepo productionScheduleForNextThreeMonthRepo;
+	
+	@Autowired
+	ProductionScheduleForNextThreeMonthDetailsRepo productionScheduleForNextThreeMonthDetailsRepo;
+	
+	@Autowired
+	DeliveryChallanCumGatePassRepo deliveryChallanCumGatePassRepo;
+	
+	@Autowired
+	DeliveryChallanCumGatePassDetailsRepo deliveryChallanCumGatePassDetailsRepo;
 	
 	@Override
 	@Transactional
@@ -2325,6 +2351,64 @@ public class SubContractServiceImpl implements SubContractService {
 	
 	@Override
 	@Transactional
+	public DeliveryChallanSubcontractingResponseDTO getDeliveryChallanSubcontractingById(
+	        Long id) throws ApplicationException {
+
+	    DeliveryChallanSubcontractingVO vo =
+	            deliveryChallanSubcontractingRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Delivery Challan For Sub Contracting Not Found"));
+
+	    return buildDeliveryChallanSubcontractingResponse(vo);
+	}
+	
+	@Override
+	@Transactional
+	public List<DeliveryChallanSubcontractingResponseDTO> getAllDeliveryChallanSubcontractingByOrgIdAndBranch(
+	        Long orgId, Long branch) throws ApplicationException {
+
+	    List<DeliveryChallanSubcontractingVO> list =
+	            deliveryChallanSubcontractingRepo
+	                    .findAllByOrgIdAndBranch(orgId, branch);
+
+	    List<DeliveryChallanSubcontractingResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (DeliveryChallanSubcontractingVO vo : list) {
+
+	        responseList.add(
+	                buildDeliveryChallanSubcontractingResponse(vo));
+	    }
+
+	    return responseList;
+	}
+	
+	@Override
+	@Transactional
+	public String getDeliveryChallanSubcontractingDocId(
+	        Long orgId, String financialYear) throws ApplicationException {
+
+	    String screenCode = "SCDC";
+
+	    String docId =
+	            deliveryChallanSubcontractingRepo
+	                    .getDeliveryChallanSubcontractingDocId(
+	                            orgId,
+	                            financialYear,
+	                            screenCode);
+
+	    if (docId == null || docId.isEmpty()) {
+	        throw new ApplicationException("Document ID Not Found");
+	    }
+
+	    return docId;
+	}
+	
+	
+	
+	@Override
+	@Transactional
 	public Map<String, Object> createUpdateDeliveryChallanSubcontracting(
 	        DeliveryChallanSubcontractingDTO deliveryChallanSubcontractingDTO)
 	        throws ApplicationException {
@@ -2435,6 +2519,9 @@ public class SubContractServiceImpl implements SubContractService {
 
 	    deliveryChallanSubcontractingVO.setTimeOfIssue(
 	            dto.getTimeOfIssue());
+	    
+	    deliveryChallanSubcontractingVO.setTransportName(
+	            dto.getTransportName());
 
 	    deliveryChallanSubcontractingVO.setDcType(
 	            dto.getDcType());
@@ -2457,7 +2544,8 @@ public class SubContractServiceImpl implements SubContractService {
 	    deliveryChallanSubcontractingVO.setCancelRemarks(
 	            dto.getCancelRemarks());
 
-
+	    deliveryChallanSubcontractingVO.setSfgBom(
+	            dto.getSfgBom());
 	    // ============================================================
 	    // Branch
 	    // ============================================================
@@ -2524,7 +2612,7 @@ public class SubContractServiceImpl implements SubContractService {
 	                                new ApplicationException(
 	                                        "Party Location Not Found"));
 
-	        deliveryChallanSubcontractingVO.setPartyLocation(
+	        deliveryChallanSubcontractingVO.setLocation(
 	                partyLocation);
 	    }
 
@@ -2552,36 +2640,24 @@ public class SubContractServiceImpl implements SubContractService {
 	    // Transport
 	    // ============================================================
 
-	    if (dto.getTransportName() != null
-	            && dto.getTransportName() != 0) {
-
-	        TransportMasterVO transport =
-	                transportRepo.findById(
-	                        dto.getTransportName())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Transport Not Found"));
-
-	        deliveryChallanSubcontractingVO.setTransportName(
-	                transport);
-	    }
+	   
 
 
 	    // ============================================================
 	    // SFG BOM
 	    // ============================================================
 
-	    if (dto.getSfgBomId() != null
-	            && dto.getSfgBomId() != 0) {
-
-	        BomVO bom =
-	                bomRepo.findById(dto.getSfgBomId())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "BOM Not Found"));
-
-	        deliveryChallanSubcontractingVO.setSfgBomId(bom);
-	    }
+//	    if (dto.getSfgBomId() != null
+//	            && dto.getSfgBomId() != 0) {
+//
+//	        BomVO bom =
+//	                bomRepo.findById(dto.getSfgBomId())
+//	                        .orElseThrow(() ->
+//	                                new ApplicationException(
+//	                                        "BOM Not Found"));
+//
+//	        deliveryChallanSubcontractingVO.setSfgBomId(bom);
+//	    }
 
 
 	    // ============================================================
@@ -2742,6 +2818,10 @@ public class SubContractServiceImpl implements SubContractService {
 	                    detailDTO.getRemarks());
 
 
+	            detailVO.setContractNo(
+	                    detailDTO.getContractNo());
+	            detailVO.setJobOrderFor(
+	                    detailDTO.getJobOrderFor());
 	            // ====================================================
 	            // Parent Mapping
 	            // ====================================================
@@ -2796,6 +2876,8 @@ public class SubContractServiceImpl implements SubContractService {
 
 	    response.setOrgId(vo.getOrgId());
 
+	    response.setTransportName(vo.getTransportName());
+
 	    response.setFinancialYear(
 	            vo.getFinancialYear());
 
@@ -2820,6 +2902,8 @@ public class SubContractServiceImpl implements SubContractService {
 	    response.setScreenName(
 	            vo.getScreenName());
 
+	    response.setSfgBom(
+	            vo.getSfgBom());
 
 	    // ============================================================
 	    // Branch
@@ -2891,16 +2975,16 @@ public class SubContractServiceImpl implements SubContractService {
 	    // Party Location
 	    // ============================================================
 
-	    if (vo.getPartyLocation() != null) {
+	    if (vo.getLocation() != null) {
 
 	        LocationMasterResponseDTO location =
 	                new LocationMasterResponseDTO();
 
 	        location.setId(
-	                vo.getPartyLocation().getId());
+	                vo.getLocation().getId());
 
 	        location.setLocationName(
-	                vo.getPartyLocation().getLocationName());
+	                vo.getLocation().getLocationName());
 
 	        response.setPartyLocation(location);
 	    }
@@ -2947,50 +3031,37 @@ public class SubContractServiceImpl implements SubContractService {
 	    // Transport
 	    // ============================================================
 
-	    if (vo.getTransportName() != null) {
-
-	        TransportResponseDTO transport =
-	                new TransportResponseDTO();
-
-	        transport.setId(
-	                vo.getTransportName().getId());
-
-	        transport.setTransportName(
-	                vo.getTransportName().getTransportName());
-
-	        response.setTransportName(transport);
-	    }
-
+	    
 
 	    // ============================================================
 	    // SFG BOM
 	    // ============================================================
 
-	    if (vo.getSfgBomId() != null) {
-
-	        BomResponseDTO bom =
-	                new BomResponseDTO();
-
-	        bom.setId(
-	                vo.getSfgBomId().getId());
-
-	        bom.setProductType(
-	                vo.getSfgBomId().getProductType());
-
-	        bom.setProductCode(
-	                vo.getSfgBomId().getProductCode());
-
-	        bom.setProductName(
-	                vo.getSfgBomId().getProductName());
-
-	        bom.setUom(
-	                vo.getSfgBomId().getUom());
-
-	        bom.setQty(
-	                vo.getSfgBomId().getQty());
-
-	        response.setSfgBomId(bom);
-	    }
+//	    if (vo.getSfgBomId() != null) {
+//
+//	        BomResponseDTO bom =
+//	                new BomResponseDTO();
+//
+//	        bom.setId(
+//	                vo.getSfgBomId().getId());
+//
+//	        bom.setProductType(
+//	                vo.getSfgBomId().getProductType());
+//
+//	        bom.setProductCode(
+//	                vo.getSfgBomId().getProductCode());
+//
+//	        bom.setProductName(
+//	                vo.getSfgBomId().getProductName());
+//
+//	        bom.setUom(
+//	                vo.getSfgBomId().getUom());
+//
+//	        bom.setQty(
+//	                vo.getSfgBomId().getQty());
+//
+//	        response.setSfgBomId(bom);
+//	    }
 
 	    // ============================================================
 	    // Prepared By
@@ -3101,6 +3172,11 @@ public class SubContractServiceImpl implements SubContractService {
 
 	            detailResponse.setRemarks(
 	                    detailVO.getRemarks());
+	            
+	            detailResponse.setContractNo(
+	                    detailVO.getContractNo());
+	            detailResponse.setJobOrderFor(
+	                    detailVO.getJobOrderFor());
 
 
 	            // ====================================================
@@ -3298,28 +3374,28 @@ public class SubContractServiceImpl implements SubContractService {
 	        subContractSupplyScheduleVO = new SubContractSupplyScheduleVO();
 
 	        // Generate Document ID
-//	        String docId = subContractSupplyScheduleRepo.getSubContractSupplyScheduleDocId(
-//	                dto.getOrgId(),
-//	                dto.getFinancialYear(),
-//	                screenCode);
-//
-//	        subContractSupplyScheduleVO.setDocId(docId);
-//
-//
-//	        // Update Document Last Number
-//	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
-//	                documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
-//	                        dto.getOrgId(),
-//	                        dto.getFinancialYear(),
-//	                        screenCode);
-//
-//	        if (documentTypeMappingDetailsVO != null) {
-//
-//	            documentTypeMappingDetailsVO.setLastNo(
-//	                    documentTypeMappingDetailsVO.getLastNo() + 1);
-//
-//	            documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
-//	        }
+	        String docId = subContractSupplyScheduleRepo.getSubContractSupplyScheduleDocId(
+	                dto.getOrgId(),
+	                dto.getFinancialYear(),
+	                screenCode);
+
+	        subContractSupplyScheduleVO.setDocId(docId);
+
+
+	        // Update Document Last Number
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+	                        dto.getOrgId(),
+	                        dto.getFinancialYear(),
+	                        screenCode);
+
+	        if (documentTypeMappingDetailsVO != null) {
+
+	            documentTypeMappingDetailsVO.setLastNo(
+	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	            documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+	        }
 
 
 	        subContractSupplyScheduleVO.setCreatedBy(dto.getCreatedBy());
@@ -4704,4 +4780,1434 @@ public class SubContractServiceImpl implements SubContractService {
 	    return details;
 	}
 	
+	
+	//
+	
+	 @Transactional(rollbackOn = Exception.class)
+	    @Override
+	    public Map<String, Object> createUpdateProductionScheduleForNextThreeMonth(
+	            ProductionScheduleForNextThreeMonthDTO dto)
+	            throws ApplicationException {
+
+	        Map<String, Object> response = new HashMap<>();
+
+	        ProductionScheduleForNextThreeMonthVO productionScheduleVO;
+
+	        String message;
+
+
+	        // =========================================================
+	        // CREATE
+	        // =========================================================
+
+	        if (ObjectUtils.isEmpty(dto.getId())) {
+
+	            productionScheduleVO =
+	                    new ProductionScheduleForNextThreeMonthVO();
+
+	            productionScheduleVO.setCreatedBy(
+	                    dto.getCreatedBy());
+	            productionScheduleVO.setUpdatedBy(
+	                    dto.getCreatedBy());
+
+	            message =
+	                    "Production Schedule For Next Three Month Created Successfully";
+
+	        } else {
+
+	            // =====================================================
+	            // UPDATE
+	            // =====================================================
+
+	            productionScheduleVO =
+	                    productionScheduleForNextThreeMonthRepo
+	                            .findById(dto.getId())
+	                            .orElseThrow(() ->
+	                                    new ApplicationException(
+	                                            "Production Schedule For Next Three Month Not Found"));
+
+
+	            // =====================================================
+	            // DELETE OLD DETAILS
+	            // =====================================================
+
+	            List<ProductionScheduleForNextThreeMonthDetailsVO>
+	                    oldDetails =
+	                    productionScheduleForNextThreeMonthDetailsRepo
+	                            .findByProductionScheduleForNextThreeMonthId(
+	                                    productionScheduleVO.getId());
+
+	            if (oldDetails != null && !oldDetails.isEmpty()) {
+
+	                productionScheduleForNextThreeMonthDetailsRepo
+	                        .deleteAll(oldDetails);
+	            }
+
+
+	            productionScheduleVO.setUpdatedBy(
+	                    dto.getCreatedBy());
+
+	            message =
+	                    "Production Schedule For Next Three Month Updated Successfully";
+	        }
+
+
+	        // =========================================================
+	        // DTO TO VO
+	        // =========================================================
+
+	        getProductionScheduleForNextThreeMonthVOFromDTO(
+	                dto,
+	                productionScheduleVO);
+
+
+	        // =========================================================
+	        // SAVE
+	        // =========================================================
+
+	        productionScheduleVO =
+	                productionScheduleForNextThreeMonthRepo
+	                        .saveAndFlush(productionScheduleVO);
+
+
+	        // =========================================================
+	        // CONVERT RESPONSE
+	        // =========================================================
+
+	        ProductionScheduleForNextThreeMonthResponseDTO
+	                productionScheduleResponseDTO =
+	                convertToResponse(productionScheduleVO);
+
+
+	        // =========================================================
+	        // RESPONSE
+	        // =========================================================
+
+	        response.put(
+	                "message",
+	                message);
+
+	        response.put(
+	                "productionScheduleForNextThreeMonth",
+	                productionScheduleResponseDTO);
+
+
+	        return response;
+	    }
+
+
+	    // =============================================================
+	    // DTO TO VO
+	    // =============================================================
+
+	    private void getProductionScheduleForNextThreeMonthVOFromDTO(
+	            ProductionScheduleForNextThreeMonthDTO dto,
+	            ProductionScheduleForNextThreeMonthVO productionScheduleVO)
+	            throws ApplicationException {
+
+
+	        // =========================================================
+	        // BRANCH
+	        // =========================================================
+
+	        if (dto.getBranch() != null) {
+
+	            BranchVO branch =
+	                    branchRepo.findById(dto.getBranch())
+	                            .orElseThrow(() ->
+	                                    new ApplicationException(
+	                                            "Branch Not Found"));
+
+	            productionScheduleVO.setBranch(branch);
+	        }
+
+
+	        // =========================================================
+	        // HEADER
+	        // =========================================================
+
+	        productionScheduleVO.setMonthYear(
+	                dto.getMonthYear());
+
+	        productionScheduleVO.setOrgId(
+	                dto.getOrgId());
+
+	        productionScheduleVO.setFinancialYear(
+	                dto.getFinancialYear());
+
+	        productionScheduleVO.setCreatedBy(
+	                dto.getCreatedBy());
+
+	        productionScheduleVO.setActive(
+	                dto.isActive());
+
+	        productionScheduleVO.setCancelRemarks(
+	                dto.getCancelRemarks());
+
+
+	        // =========================================================
+	        // DETAILS
+	        // =========================================================
+
+	        List<ProductionScheduleForNextThreeMonthDetailsVO>
+	                detailList = new ArrayList<>();
+
+
+	        if (dto.getProductionScheduleForNextThreeMonthDetails() != null
+	                && !dto.getProductionScheduleForNextThreeMonthDetails()
+	                        .isEmpty()) {
+
+
+	            for (ProductionScheduleForNextThreeMonthDetailsDTO detailDTO :
+	                    dto.getProductionScheduleForNextThreeMonthDetails()) {
+
+
+	                ProductionScheduleForNextThreeMonthDetailsVO detailVO =
+	                        new ProductionScheduleForNextThreeMonthDetailsVO();
+
+
+	                // =================================================
+	                // ITEM
+	                // =================================================
+
+	                if (detailDTO.getItem() != null) {
+
+	                    ItemMasterVO item =
+	                            itemMasterRepo
+	                                    .findById(detailDTO.getItem())
+	                                    .orElseThrow(() ->
+	                                            new ApplicationException(
+	                                                    "Item Not Found"));
+
+	                    detailVO.setItem(item);
+	                }
+
+
+	                // =================================================
+	                // JANUARY
+	                // =================================================
+
+	                detailVO.setDate(
+	                        detailDTO.getDate());
+	                
+	                detailVO.setJanuary(
+	                        detailDTO.getJanuary());
+
+
+	                // =================================================
+	                // FEBRUARY
+	                // =================================================
+
+	                detailVO.setFebruary(
+	                        detailDTO.getFebruary());
+
+
+	                // =================================================
+	                // MARCH
+	                // =================================================
+
+	                detailVO.setMarch(
+	                        detailDTO.getMarch());
+
+
+	                // =================================================
+	                // APRIL
+	                // =================================================
+
+	                detailVO.setApril(
+	                        detailDTO.getApril());
+
+
+	                // =================================================
+	                // MAY
+	                // =================================================
+
+	                detailVO.setMay(
+	                        detailDTO.getMay());
+
+
+	                // =================================================
+	                // JUNE
+	                // =================================================
+
+	                detailVO.setJune(
+	                        detailDTO.getJune());
+
+
+	                // =================================================
+	                // JULY
+	                // =================================================
+
+	                detailVO.setJuly(
+	                        detailDTO.getJuly());
+
+
+	                // =================================================
+	                // AUGUST
+	                // =================================================
+
+	                detailVO.setAugust(
+	                        detailDTO.getAugust());
+
+
+	                // =================================================
+	                // SEPTEMBER
+	                // =================================================
+
+	                detailVO.setSeptember(
+	                        detailDTO.getSeptember());
+
+
+	                // =================================================
+	                // OCTOBER
+	                // =================================================
+
+	                detailVO.setOctober(
+	                        detailDTO.getOctober());
+
+
+	                // =================================================
+	                // NOVEMBER
+	                // =================================================
+
+	                detailVO.setNovember(
+	                        detailDTO.getNovember());
+
+
+	                // =================================================
+	                // DECEMBER
+	                // =================================================
+
+	                detailVO.setDecember(
+	                        detailDTO.getDecember());
+
+
+	                // =================================================
+	                // PARENT
+	                // =================================================
+
+	                detailVO.setProductionScheduleForNextThreeMonth(
+	                        productionScheduleVO);
+
+
+	                detailList.add(detailVO);
+	            }
+	        }
+
+
+	        // =========================================================
+	        // CLEAR EXISTING DETAILS
+	        // =========================================================
+
+	        if (productionScheduleVO
+	                .getProductionScheduleForNextThreeMonthDetails() == null) {
+
+	            productionScheduleVO
+	                    .setProductionScheduleForNextThreeMonthDetails(
+	                            new ArrayList<>());
+	        } else {
+
+	            productionScheduleVO
+	                    .getProductionScheduleForNextThreeMonthDetails()
+	                    .clear();
+	        }
+
+
+	        // =========================================================
+	        // ADD DETAILS
+	        // =========================================================
+
+	        productionScheduleVO
+	                .getProductionScheduleForNextThreeMonthDetails()
+	                .addAll(detailList);
+	    }
+
+
+	    // =============================================================
+	    // VO TO RESPONSE DTO
+	    // =============================================================
+
+	    private ProductionScheduleForNextThreeMonthResponseDTO convertToResponse(
+	            ProductionScheduleForNextThreeMonthVO productionScheduleVO) {
+
+	        ProductionScheduleForNextThreeMonthResponseDTO responseDTO =
+	                new ProductionScheduleForNextThreeMonthResponseDTO();
+
+
+	        // =========================================================
+	        // HEADER
+	        // =========================================================
+
+	        responseDTO.setId(
+	                productionScheduleVO.getId());
+
+	        responseDTO.setMonthYear(
+	                productionScheduleVO.getMonthYear());
+
+	        responseDTO.setOrgId(
+	                productionScheduleVO.getOrgId());
+
+	        responseDTO.setFinancialYear(
+	                productionScheduleVO.getFinancialYear());
+
+	        responseDTO.setCreatedBy(
+	                productionScheduleVO.getCreatedBy());
+
+	        responseDTO.setActive(
+	                productionScheduleVO.isActive());
+
+	        responseDTO.setCancelRemarks(
+	                productionScheduleVO.getCancelRemarks());
+
+
+	        // =========================================================
+	        // BRANCH
+	        // =========================================================
+
+	        if (productionScheduleVO.getBranch() != null) {
+
+	            responseDTO.setBranch(
+	                    productionScheduleVO
+	                            .getBranch()
+	                            .getId());
+	        }
+
+
+	        // =========================================================
+	        // DETAILS RESPONSE
+	        // =========================================================
+
+	        List<ProductionScheduleForNextThreeMonthDetailsResponseDTO>
+	                detailsResponse =
+	                new ArrayList<>();
+
+
+	        if (productionScheduleVO
+	                .getProductionScheduleForNextThreeMonthDetails() != null) {
+
+
+	            for (ProductionScheduleForNextThreeMonthDetailsVO detailVO :
+	                    productionScheduleVO
+	                            .getProductionScheduleForNextThreeMonthDetails()) {
+
+
+	                ProductionScheduleForNextThreeMonthDetailsResponseDTO
+	                        detailResponse =
+	                        new ProductionScheduleForNextThreeMonthDetailsResponseDTO();
+
+
+	                // =================================================
+	                // ITEM RESPONSE
+	                // =================================================
+
+	                if (detailVO.getItem() != null) {
+
+	                	ItemMasterResponseDetailsDTO itemResponseDTO =
+	                            new ItemMasterResponseDetailsDTO();
+
+	                    itemResponseDTO.setId(
+	                            detailVO.getItem().getId());
+
+	                    itemResponseDTO.setItemCode(
+	                            detailVO.getItem().getItemCode());
+
+	                    itemResponseDTO.setItemDescription(
+	                            detailVO.getItem().getItemDescription());
+
+	                    detailResponse.setItem(
+	                            itemResponseDTO);
+	                }
+
+
+	                // =================================================
+	                // MONTHS
+	                // =================================================
+
+	                detailResponse.setId(
+	                        detailVO.getId());
+	                
+	                detailResponse.setDate(
+	                        detailVO.getDate());
+	                
+	                detailResponse.setJanuary(
+	                        detailVO.getJanuary());
+
+	                detailResponse.setFebruary(
+	                        detailVO.getFebruary());
+
+	                detailResponse.setMarch(
+	                        detailVO.getMarch());
+
+	                detailResponse.setApril(
+	                        detailVO.getApril());
+
+	                detailResponse.setMay(
+	                        detailVO.getMay());
+
+	                detailResponse.setJune(
+	                        detailVO.getJune());
+
+	                detailResponse.setJuly(
+	                        detailVO.getJuly());
+
+	                detailResponse.setAugust(
+	                        detailVO.getAugust());
+
+	                detailResponse.setSeptember(
+	                        detailVO.getSeptember());
+
+	                detailResponse.setOctober(
+	                        detailVO.getOctober());
+
+	                detailResponse.setNovember(
+	                        detailVO.getNovember());
+
+	                detailResponse.setDecember(
+	                        detailVO.getDecember());
+
+
+	                detailsResponse.add(
+	                        detailResponse);
+	            }
+	        }
+
+
+	        responseDTO.setProductionScheduleForNextThreeMonthDetails(
+	                detailsResponse);
+
+
+	        return responseDTO;
+	    }
+	    
+	    @Override
+	    public ProductionScheduleForNextThreeMonthResponseDTO
+	            getProductionScheduleForNextThreeMonthById(Long id)
+	            throws ApplicationException {
+
+	        ProductionScheduleForNextThreeMonthVO productionScheduleVO =
+	                productionScheduleForNextThreeMonthRepo
+	                        .findById(id)
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Production Schedule For Next Three Month Not Found"));
+
+	        return convertToResponse(productionScheduleVO);
+	    }
+	    
+	    @Override
+	    public List<ProductionScheduleForNextThreeMonthResponseDTO>
+	            getAllProductionScheduleForNextThreeMonthByOrgIdAndBranch(
+	                    Long orgId,
+	                    Long branch)
+	                    throws ApplicationException {
+
+	        List<ProductionScheduleForNextThreeMonthVO>
+	                productionScheduleList =
+	                productionScheduleForNextThreeMonthRepo
+	                        .findByOrgIdAndBranchId(
+	                                orgId,
+	                                branch);
+
+	        List<ProductionScheduleForNextThreeMonthResponseDTO>
+	                responseList = new ArrayList<>();
+
+	        for (ProductionScheduleForNextThreeMonthVO productionScheduleVO :
+	                productionScheduleList) {
+
+	            responseList.add(
+	                    convertToResponse(productionScheduleVO));
+	        }
+
+	        return responseList;
+	    }
+	
+	    
+	    @Transactional(rollbackOn = Exception.class)
+	    @Override
+	    public Map<String, Object> createUpdateDeliveryChallanCumGatePass(
+	            DeliveryChallanCumGatePassDTO dto)
+	            throws ApplicationException {
+
+	        Map<String, Object> response = new HashMap<>();
+
+	        String screenCode="DCCGP";
+	        DeliveryChallanCumGatePassVO deliveryChallanVO;
+
+	        String message;
+
+	        // =========================================================
+	        // CREATE
+	        // =========================================================
+
+	        if (ObjectUtils.isEmpty(dto.getId())) {
+
+	            deliveryChallanVO =
+	                    new DeliveryChallanCumGatePassVO();
+
+	         // Generate Document ID
+	            String docId =
+	                    deliveryChallanCumGatePassRepo
+	                            .getDeliveryChallanCumGatePassDocId(
+	                                    dto.getOrgId(),
+	                                    dto.getFinancialYear(),
+	                                    screenCode);
+
+	            deliveryChallanVO.setDocId(docId);
+
+
+	            // Update Document Last Number
+	            DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                    documentTypeMappingDetailsRepo
+	                            .findByOrgIdAndFinYearAndScreenCode(
+	                                    dto.getOrgId(),
+	                                    dto.getFinancialYear(),
+	                                    screenCode);
+
+	            if (documentTypeMappingDetailsVO != null) {
+
+	                documentTypeMappingDetailsVO.setLastNo(
+	                        documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	                documentTypeMappingDetailsRepo.save(
+	                        documentTypeMappingDetailsVO);
+	            }
+
+
+	            deliveryChallanVO.setCreatedBy(
+	                    dto.getCreatedBy());
+
+	            deliveryChallanVO.setUpdatedBy(
+	                    dto.getCreatedBy());
+
+	            message =
+	                    "Delivery Challan Cum Gate Pass Created Successfully";
+	            
+	        } else {
+
+	            // =====================================================
+	            // UPDATE
+	            // =====================================================
+
+	            deliveryChallanVO =
+	                    deliveryChallanCumGatePassRepo
+	                            .findById(dto.getId())
+	                            .orElseThrow(() ->
+	                                    new ApplicationException(
+	                                            "Delivery Challan Cum Gate Pass Not Found"));
+
+	            // =====================================================
+	            // DELETE OLD DETAILS
+	            // =====================================================
+
+	            List<DeliveryChallanCumGatePassDetailsVO> oldDetails =
+	                    deliveryChallanCumGatePassDetailsRepo
+	                            .findByDeliveryChallanCumGatePassVO(
+	                                    deliveryChallanVO.getId());
+
+	            if (oldDetails != null && !oldDetails.isEmpty()) {
+
+	                deliveryChallanCumGatePassDetailsRepo
+	                        .deleteAll(oldDetails);
+	            }
+
+	            deliveryChallanVO.setUpdatedBy(
+	                    dto.getCreatedBy());
+
+	            message =
+	                    "Delivery Challan Cum Gate Pass Updated Successfully";
+	        }
+
+	        // =========================================================
+	        // DTO TO VO
+	        // =========================================================
+
+	        getDeliveryChallanCumGatePassVOFromDTO(
+	                dto,
+	                deliveryChallanVO);
+
+	        // =========================================================
+	        // SAVE
+	        // =========================================================
+
+	        deliveryChallanVO =
+	                deliveryChallanCumGatePassRepo
+	                        .saveAndFlush(deliveryChallanVO);
+
+	        // =========================================================
+	        // CONVERT RESPONSE
+	        // =========================================================
+
+	        DeliveryChallanCumGatePassResponseDTO
+	                deliveryChallanResponseDTO =
+	                convertToResponse(deliveryChallanVO);
+
+	        // =========================================================
+	        // RESPONSE
+	        // =========================================================
+
+	        response.put(
+	                "message",
+	                message);
+
+	        response.put(
+	                "deliveryChallanCumGatePassVO",
+	                deliveryChallanResponseDTO);
+
+	        return response;
+	    }
+	    
+	    private void getDeliveryChallanCumGatePassVOFromDTO(
+	            DeliveryChallanCumGatePassDTO dto,
+	            DeliveryChallanCumGatePassVO deliveryChallanVO)
+	            throws ApplicationException {
+
+	        // =========================================================
+	        // BRANCH
+	        // =========================================================
+
+	        if (dto.getBranch() != null) {
+
+	            BranchVO branch =
+	                    branchRepo.findById(dto.getBranch())
+	                            .orElseThrow(() ->
+	                                    new ApplicationException(
+	                                            "Branch Not Found"));
+
+	            deliveryChallanVO.setBranch(branch);
+	        }
+
+	        // =========================================================
+	        // DEPARTMENT
+	        // =========================================================
+
+	        if (dto.getDepartment() != null) {
+
+	            DepartmentVO department =
+	                    departmentRepo.findById(dto.getDepartment())
+	                            .orElseThrow(() ->
+	                                    new ApplicationException(
+	                                            "Department Not Found"));
+
+	            deliveryChallanVO.setDepartment(department);
+	        }
+
+	        // =========================================================
+	        // CUSTOMER / PLANT
+	        // =========================================================
+
+	        if ("PARTY".equalsIgnoreCase(dto.getType())) {
+
+	            if (dto.getPartyPlantId() != null) {
+
+	                CustomerVO customer = customerRepo
+	                        .findById(dto.getPartyPlantId())
+	                        .orElseThrow(() ->
+	                                new ApplicationException("Customer Not Found"));
+
+	                deliveryChallanVO.setCustomer(customer);
+	            }
+
+	        } else if ("BRANCH".equalsIgnoreCase(dto.getType())) {
+
+	            if (dto.getPartyPlantId() != null) {
+
+	                BranchVO branch = branchRepo
+	                        .findById(dto.getPartyPlantId())
+	                        .orElseThrow(() ->
+	                                new ApplicationException("Branch Not Found"));
+
+	                deliveryChallanVO.setToBranch(branch);
+	            }
+	        }
+	        // =========================================================
+	        // FROM LOCATION
+	        // =========================================================
+
+	        if (dto.getFromLocation() != null) {
+
+	            LocationVO location =
+	                    locationRepo.findById(dto.getFromLocation())
+	                            .orElseThrow(() ->
+	                                    new ApplicationException(
+	                                            "Location Not Found"));
+
+	            deliveryChallanVO.setFromLocation(location);
+	        }
+
+	        // =========================================================
+	        // WORK ORDER
+	        // =========================================================
+
+	        if (dto.getWorkOrderNo() != null) {
+
+	            JobOrderVO jobOrder =
+	                    jobOrderRepo.findById(dto.getWorkOrderNo())
+	                            .orElseThrow(() ->
+	                                    new ApplicationException(
+	                                            "Work Order Not Found"));
+
+	            deliveryChallanVO.setWorkOrderNo(jobOrder);
+	        }
+
+	        // =========================================================
+	        // PREPARED BY
+	        // =========================================================
+
+	        if (dto.getPreparedBy() != null) {
+
+	            EmployeeMasterVO employee =
+	                    employeeMasterRepo.findById(dto.getPreparedBy())
+	                            .orElseThrow(() ->
+	                                    new ApplicationException(
+	                                            "Employee Not Found"));
+
+	            deliveryChallanVO.setPreparedBy(employee);
+	        }
+
+	        // =========================================================
+	        // HEADER
+	        // =========================================================
+
+	        deliveryChallanVO.setBelongsTo(
+	                dto.getBelongsTo());
+
+	        deliveryChallanVO.setType(
+	                dto.getType());
+
+	        deliveryChallanVO.setIGSTAppl(
+	                dto.isIGSTAppl());
+
+	        deliveryChallanVO.setGstnNo(
+	                dto.getGstnNo());
+
+	        deliveryChallanVO.setModeOfTransport(
+	                dto.getModeOfTransport());
+
+	        deliveryChallanVO.setVehicleNo(
+	                dto.getVehicleNo());
+
+	        deliveryChallanVO.setTotalQty(
+	                dto.getTotalQty());
+
+	        deliveryChallanVO.setRemarks(
+	                dto.getRemarks());
+
+	        // =========================================================
+	        // COMMON FIELDS
+	        // =========================================================
+
+	        deliveryChallanVO.setOrgId(
+	                dto.getOrgId());
+
+	        deliveryChallanVO.setFinancialYear(
+	                dto.getFinancialYear());
+
+	        deliveryChallanVO.setCreatedBy(
+	                dto.getCreatedBy());
+
+	        deliveryChallanVO.setActive(
+	                dto.isActive());
+
+	        deliveryChallanVO.setCancelRemarks(
+	                dto.getCancelRemarks());
+
+	        // =========================================================
+	        // DETAILS
+	        // =========================================================
+
+	        List<DeliveryChallanCumGatePassDetailsVO>
+	                detailList = new ArrayList<>();
+
+	        if (dto.getDeliveryChallanCumGatePassDetailsDTO() != null
+	                && !dto.getDeliveryChallanCumGatePassDetailsDTO().isEmpty()) {
+
+	            for (DeliveryChallanCumGatePassDetailsDTO detailDTO :
+	                    dto.getDeliveryChallanCumGatePassDetailsDTO()) {
+
+	                DeliveryChallanCumGatePassDetailsVO detailVO =
+	                        new DeliveryChallanCumGatePassDetailsVO();
+
+	                // =================================================
+	                // ITEM
+	                // =================================================
+
+	                if (detailDTO.getItem() != null) {
+
+	                    ItemMasterVO item =
+	                            itemMasterRepo
+	                                    .findById(detailDTO.getItem())
+	                                    .orElseThrow(() ->
+	                                            new ApplicationException(
+	                                                    "Item Not Found"));
+
+	                    detailVO.setItem(item);
+	                }
+
+	                // =================================================
+	                // HSN / SAC
+	                // =================================================
+
+	                if (detailDTO.getHsnSacCode() != null) {
+
+	                    HsnVO hsn =
+	                            hsnRepo
+	                                    .findById(detailDTO.getHsnSacCode())
+	                                    .orElseThrow(() ->
+	                                            new ApplicationException(
+	                                                    "HSN/SAC Code Not Found"));
+
+	                    detailVO.setHsnSacCode(hsn);
+	                }
+
+	                // =================================================
+	                // UNIT
+	                // =================================================
+
+	                if (detailDTO.getUnit() != null) {
+
+	                    UnitMasterVO unit =
+	                            unitMasterRepo
+	                                    .findById(detailDTO.getUnit())
+	                                    .orElseThrow(() ->
+	                                            new ApplicationException(
+	                                                    "Unit Not Found"));
+
+	                    detailVO.setUnit(unit);
+	                }
+
+	                // =================================================
+	                // QUANTITY / RATE
+	                // =================================================
+
+	                detailVO.setStock(
+	                        detailDTO.getStock());
+
+	                detailVO.setAvailableQty(
+	                        detailDTO.getAvailableQty());
+
+	                detailVO.setQty(
+	                        detailDTO.getQty());
+
+	                detailVO.setDueDate(
+	                        detailDTO.getDueDate());
+
+	                detailVO.setPreviousQty(
+	                        detailDTO.getPreviousQty());
+
+	                detailVO.setLcRate(
+	                        detailDTO.getLcRate());
+
+	                detailVO.setRate(
+	                        detailDTO.getRate());
+
+	                if (detailDTO.getRate() != null && detailDTO.getQty() != null) {
+	                    detailVO.setAmount(
+	                            detailDTO.getRate().multiply(detailDTO.getQty())
+	                    );
+	                }
+
+	                // =================================================
+	                // PARENT
+	                // =================================================
+
+	                detailVO.setDeliveryChallanCumGatePassVO(
+	                        deliveryChallanVO);
+
+	                detailList.add(detailVO);
+	            }
+	        }
+
+	        // =========================================================
+	        // CLEAR EXISTING DETAILS
+	        // =========================================================
+
+	        if (deliveryChallanVO
+	                .getDeliveryChallanCumGatePassDetailsVO() == null) {
+
+	            deliveryChallanVO
+	                    .setDeliveryChallanCumGatePassDetailsVO(
+	                            new ArrayList<>());
+
+	        } else {
+
+	            deliveryChallanVO
+	                    .getDeliveryChallanCumGatePassDetailsVO()
+	                    .clear();
+	        }
+
+	        // =========================================================
+	        // ADD DETAILS
+	        // =========================================================
+
+	        deliveryChallanVO
+	                .getDeliveryChallanCumGatePassDetailsVO()
+	                .addAll(detailList);
+	    }
+	    
+	    
+	    private DeliveryChallanCumGatePassResponseDTO convertToResponse(
+	            DeliveryChallanCumGatePassVO deliveryChallanVO) {
+
+	        DeliveryChallanCumGatePassResponseDTO responseDTO =
+	                new DeliveryChallanCumGatePassResponseDTO();
+
+	        responseDTO.setId(deliveryChallanVO.getId());
+	        responseDTO.setDocId(deliveryChallanVO.getDocId());
+	        responseDTO.setDocDate(deliveryChallanVO.getDocDate());
+	        responseDTO.setBelongsTo(deliveryChallanVO.getBelongsTo());
+	        responseDTO.setType(deliveryChallanVO.getType());
+	        responseDTO.setIGSTAppl(deliveryChallanVO.isIGSTAppl());
+	        responseDTO.setGstnNo(deliveryChallanVO.getGstnNo());
+	        responseDTO.setModeOfTransport(
+	                deliveryChallanVO.getModeOfTransport());
+	        responseDTO.setVehicleNo(
+	                deliveryChallanVO.getVehicleNo());
+	        responseDTO.setTotalQty(
+	                deliveryChallanVO.getTotalQty());
+	        responseDTO.setRemarks(
+	                deliveryChallanVO.getRemarks());
+
+	        // Common Fields
+	        responseDTO.setCreatedBy(
+	                deliveryChallanVO.getCreatedBy());
+
+	        responseDTO.setActive(
+	                deliveryChallanVO.getActive());
+
+	        responseDTO.setCancel(
+	                deliveryChallanVO.getCancel());
+
+	        responseDTO.setUpdatedBy(
+	                deliveryChallanVO.getUpdatedBy());
+
+	        responseDTO.setCancelRemarks(
+	                deliveryChallanVO.getCancelRemarks());
+
+	        responseDTO.setScreenName(
+	                deliveryChallanVO.getScreenName());
+
+	        responseDTO.setScreenCode(
+	                deliveryChallanVO.getScreenCode());
+
+	        responseDTO.setOrgId(
+	                deliveryChallanVO.getOrgId());
+
+	        responseDTO.setFinancialYear(
+	                deliveryChallanVO.getFinancialYear());
+
+
+	        // Department
+	        if (deliveryChallanVO.getDepartment() != null) {
+
+	            DepartmentResponseDTO departmentResponseDTO =
+	                    new DepartmentResponseDTO();
+
+	            departmentResponseDTO.setId(
+	                    deliveryChallanVO.getDepartment().getId());
+
+	            departmentResponseDTO.setDepartmentName(
+	                    deliveryChallanVO.getDepartment().getDepartmentName());
+
+	            responseDTO.setDepartment(departmentResponseDTO);
+	        }
+
+
+	        // Customer / Branch Based On Type
+	        if (deliveryChallanVO.getType() != null) {
+
+	            if ("PARTY".equalsIgnoreCase(
+	                    deliveryChallanVO.getType())) {
+
+	                if (deliveryChallanVO.getCustomer() != null) {
+
+	                    CustomerDropdownResponseDTO customerResponseDTO =
+	                            new CustomerDropdownResponseDTO();
+
+	                    customerResponseDTO.setCustomerId(
+	                            deliveryChallanVO
+	                                    .getCustomer()
+	                                    .getId());
+
+	                    customerResponseDTO.setCustomerCode(
+	                            deliveryChallanVO
+	                                    .getCustomer()
+	                                    .getCustomerCode());
+
+	                    customerResponseDTO.setCustomerName(
+	                            deliveryChallanVO
+	                                    .getCustomer()
+	                                    .getCustomerName());
+
+	                    customerResponseDTO.setAddress(
+	                            deliveryChallanVO
+	                                    .getCustomer()
+	                                    .getAddress());
+
+	                    if (deliveryChallanVO
+	                            .getCustomer()
+	                            .getGstState() != null) {
+
+	                        customerResponseDTO.setGstState(
+	                                deliveryChallanVO
+	                                        .getCustomer()
+	                                        .getGstState()
+	                                        .getStateName());
+	                    }
+
+	                    customerResponseDTO.setGstNo(
+	                            deliveryChallanVO
+	                                    .getCustomer()
+	                                    .getGstNo());
+
+	                    customerResponseDTO.setIgstApplicable(
+	                            deliveryChallanVO
+	                                    .getCustomer()
+	                                    .isGstApplicable());
+
+	                    customerResponseDTO.setGstType(
+	                            deliveryChallanVO
+	                                    .getCustomer()
+	                                    .getGstType());
+
+	                    responseDTO.setCustomer(customerResponseDTO);
+	                }
+
+	            } else if ("BRANCH".equalsIgnoreCase(
+	                    deliveryChallanVO.getType())) {
+
+	                if (deliveryChallanVO.getToBranch() != null) {
+
+	                    BranchResponseDTO branchResponseDTO =
+	                            new BranchResponseDTO();
+
+	                    branchResponseDTO.setId(
+	                            deliveryChallanVO
+	                                    .getToBranch()
+	                                    .getId());
+
+	                    branchResponseDTO.setBranchName(
+	                            deliveryChallanVO
+	                                    .getToBranch()
+	                                    .getBranchName());
+
+	                    responseDTO.setToBranch(branchResponseDTO);
+	                }
+	            }
+	        }
+
+
+	        // From Location
+	        if (deliveryChallanVO.getFromLocation() != null) {
+
+	            LocationMasterResponseDTO locationResponseDTO =
+	                    new LocationMasterResponseDTO();
+
+	            locationResponseDTO.setId(
+	                    deliveryChallanVO.getFromLocation().getId());
+
+	            locationResponseDTO.setLocationName(
+	                    deliveryChallanVO.getFromLocation()
+	                            .getLocationName());
+
+	            responseDTO.setFromLocation(
+	                    locationResponseDTO);
+	        }
+
+
+	        // Work Order
+	        if (deliveryChallanVO.getWorkOrderNo() != null) {
+
+	            WorkOrderResponseDTO workOrderResponseDTO =
+	                    new WorkOrderResponseDTO();
+
+	            workOrderResponseDTO.setId(
+	                    deliveryChallanVO.getWorkOrderNo().getId());
+
+	            workOrderResponseDTO.setWorkOrderNO(
+	                    deliveryChallanVO.getWorkOrderNo()
+	                            .getDocId());
+
+	            workOrderResponseDTO.setWorkOrderDate(
+	                    deliveryChallanVO.getWorkOrderNo()
+	                            .getDocDate());
+	            responseDTO.setWorkOrderNo(
+	                    workOrderResponseDTO);
+	        }
+
+
+	     // Prepared By
+	        if (deliveryChallanVO.getPreparedBy() != null) {
+
+	            EmployeeMasterResponseDetailsDTO preparedByDTO =
+	                    new EmployeeMasterResponseDetailsDTO();
+
+	            preparedByDTO.setId(
+	                    deliveryChallanVO.getPreparedBy().getId());
+
+	            preparedByDTO.setEmployeeName(
+	                    deliveryChallanVO.getPreparedBy().getEmployeeName());
+
+	            preparedByDTO.setEmployeeCode(
+	                    deliveryChallanVO.getPreparedBy().getEmployeeId());
+
+	            responseDTO.setPreparedBy(preparedByDTO);
+	        }
+
+	        // Branch
+	        if (deliveryChallanVO.getBranch() != null) {
+
+	            BranchResponseDTO branchResponseDTO =
+	                    new BranchResponseDTO();
+
+	            branchResponseDTO.setId(
+	                    deliveryChallanVO.getBranch().getId());
+
+	            branchResponseDTO.setBranchName(
+	                    deliveryChallanVO.getBranch().getBranchName());
+
+	            responseDTO.setBranch(
+	                    branchResponseDTO);
+	        }
+
+
+	        // Details
+	        if (deliveryChallanVO
+	                .getDeliveryChallanCumGatePassDetailsVO() != null) {
+
+	            List<DeliveryChallanCumGatePassDetailsResponseDTO>
+	                    detailsResponseList = new ArrayList<>();
+
+	            for (DeliveryChallanCumGatePassDetailsVO detailVO :
+	                    deliveryChallanVO
+	                            .getDeliveryChallanCumGatePassDetailsVO()) {
+
+	                DeliveryChallanCumGatePassDetailsResponseDTO
+	                        detailResponseDTO =
+	                        new DeliveryChallanCumGatePassDetailsResponseDTO();
+
+
+	                detailResponseDTO.setId(
+	                        detailVO.getId());
+
+	                detailResponseDTO.setStock(
+	                        detailVO.getStock());
+
+	                detailResponseDTO.setAvailableQty(
+	                        detailVO.getAvailableQty());
+
+	                detailResponseDTO.setQty(
+	                        detailVO.getQty());
+
+	                detailResponseDTO.setDueDate(
+	                        detailVO.getDueDate());
+
+	                detailResponseDTO.setPreviousQty(
+	                        detailVO.getPreviousQty());
+
+	                detailResponseDTO.setLcRate(
+	                        detailVO.getLcRate());
+
+	                detailResponseDTO.setRate(
+	                        detailVO.getRate());
+
+	                detailResponseDTO.setAmount(
+	                        detailVO.getAmount());
+
+
+	                // Item
+	                if (detailVO.getItem() != null) {
+
+	                    ItemMasterResponseDetailsDTO itemResponseDTO =
+	                            new ItemMasterResponseDetailsDTO();
+
+	                    itemResponseDTO.setId(
+	                            detailVO.getItem().getId());
+
+	                    itemResponseDTO.setItemCode(
+	                            detailVO.getItem().getItemCode());
+
+	                    itemResponseDTO.setItemDescription(
+	                            detailVO.getItem().getItemDescription());
+
+	                    detailResponseDTO.setItem(
+	                            itemResponseDTO);
+	                }
+
+
+	                if (detailVO.getHsnSacCode() != null) {
+
+	                    HsnResponseDTO hsnResponseDTO =
+	                            new HsnResponseDTO();
+
+	                    hsnResponseDTO.setId(
+	                            detailVO.getHsnSacCode().getId());
+
+	                    hsnResponseDTO.setHsn(
+	                            detailVO.getHsnSacCode().getHsn());
+
+	                    hsnResponseDTO.setDescription(
+	                            detailVO.getHsnSacCode().getDescription());
+
+	                    detailResponseDTO.setHsnSacCode(
+	                            hsnResponseDTO);
+	                }
+
+
+	             // Unit
+	                if (detailVO.getUnit() != null) {
+
+	                    UnitMasterResponseDTO unitResponseDTO =
+	                            new UnitMasterResponseDTO();
+
+	                    unitResponseDTO.setId(
+	                            detailVO.getUnit().getId());
+
+	                    unitResponseDTO.setUnitId(
+	                            detailVO.getUnit().getUnitId());
+
+	                    unitResponseDTO.setUnitDescription(
+	                            detailVO.getUnit().getDescription());
+
+	                    detailResponseDTO.setUnit(
+	                            unitResponseDTO);
+	                }
+
+	                detailsResponseList.add(
+	                        detailResponseDTO);
+	            }
+
+	            responseDTO.setDeliveryChallanCumGatePassDetails(
+	                    detailsResponseList);
+	        }
+
+	        return responseDTO;
+	    }
+	    
+	    
+	    @Override
+	    public List<Map<String, Object>> getDeliveryChallanCumGatePassDetails(
+	            String jobOrderNo,
+	            Long branch,
+	            Long orgId,
+	            Long customer) {
+
+	        Set<Object[]> result =
+	                deliveryChallanCumGatePassRepo
+	                        .getDeliveryChallanCumGatePassDetails(
+	                                jobOrderNo,
+	                                branch,
+	                                orgId,
+	                                customer);
+
+	        return getDeliveryChallanCumGatePassDetailsResponse(result);
+	    }
+	    
+	    private List<Map<String, Object>> getDeliveryChallanCumGatePassDetailsResponse(
+	            Set<Object[]> result) {
+
+	        List<Map<String, Object>> details = new ArrayList<>();
+
+	        for (Object[] dc : result) {
+
+	            Map<String, Object> part = new HashMap<>();
+
+	            part.put("item",
+	                    dc[0] != null
+	                            ? Long.valueOf(dc[0].toString())
+	                            : null);
+
+	            part.put("itemCode",
+	                    dc[1] != null
+	                            ? dc[1].toString()
+	                            : null);
+
+	            part.put("itemDescription",
+	                    dc[2] != null
+	                            ? dc[2].toString()
+	                            : null);
+
+	            part.put("hsnSacCode",
+	                    dc[3] != null
+	                            ? Long.valueOf(dc[3].toString())
+	                            : null);
+
+	            part.put("unit",
+	                    dc[4] != null
+	                            ? Long.valueOf(dc[4].toString())
+	                            : null);
+
+	            part.put("unitDescription",
+	                    dc[5] != null
+	                            ? dc[5].toString()
+	                            : null);
+
+	            part.put("qty",
+	                    dc[6] != null
+	                            ? new BigDecimal(dc[6].toString())
+	                            : BigDecimal.ZERO);
+
+	            part.put("rate",
+	                    dc[7] != null
+	                            ? new BigDecimal(dc[7].toString())
+	                            : BigDecimal.ZERO);
+
+	            details.add(part);
+	        }
+
+	        return details;
+	    }
+	    
+	    
+	    
+	    @Override
+	    public DeliveryChallanCumGatePassResponseDTO getDeliveryChallanCumGatePassById(
+	            Long id) throws ApplicationException {
+
+	        DeliveryChallanCumGatePassVO deliveryChallanVO =
+	                deliveryChallanCumGatePassRepo.findById(id)
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Delivery Challan Cum Gate Pass Not Found"));
+
+	        return convertToResponse(deliveryChallanVO);
+	    }
+	    
+	    @Override
+	    public List<DeliveryChallanCumGatePassResponseDTO>
+	    getDeliveryChallanCumGatePassByOrgIdAndBranch(
+	            Long orgId,
+	            Long branch) throws ApplicationException {
+
+	        List<DeliveryChallanCumGatePassVO> deliveryChallanList =
+	                deliveryChallanCumGatePassRepo
+	                        .findByOrgIdAndBranch(orgId, branch);
+
+	        List<DeliveryChallanCumGatePassResponseDTO> responseList =
+	                new ArrayList<>();
+
+	        for (DeliveryChallanCumGatePassVO vo : deliveryChallanList) {
+
+	            responseList.add(
+	                    convertToResponse(vo));
+	        }
+
+	        return responseList;
+	    }
+	    
+	    @Override
+		public String getDeliveryChallanCumGatePassDocId(
+	            Long orgId,
+	            String financialYear) {
+
+	        String screenCode = "DCGP";
+
+	        String result =
+	                deliveryChallanCumGatePassRepo
+	                        .getDeliveryChallanCumGatePassDocId(
+	                                orgId,
+	                                financialYear,
+	                                screenCode);
+
+	        return result;
+	    }
 }

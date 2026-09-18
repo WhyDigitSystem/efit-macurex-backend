@@ -66,7 +66,7 @@ public class PurchaseContractVO {
     @ManyToOne
     @JoinColumn(name = "gst_state")
     private GSTStateMasterVO GSTState;
-    
+    	
     @Column(name = "is_igst_appl")
     private boolean isIGSTAppl;
 

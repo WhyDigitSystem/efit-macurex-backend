@@ -161,7 +161,79 @@ public class GrnVO {
 	@Column(name = "remarks")
 	private String remarks;
 
-	// purchaseLocal
+	@Column(name = "grn_type")
+	private String grnType;
+
+	// grnImport
+
+	@Column(name = "shipment_no")
+	private String shipmentNo;
+
+	@Column(name = "shipment_date")
+	private LocalDate shipmentDate;
+
+	@Column(name = "bl_no")
+	private String blNo;
+
+	@Column(name = "bl_date")
+	private LocalDate blDate;
+
+	@ManyToOne
+	@JoinColumn(name = "transporter")
+	private TransportMasterVO transporter;
+
+	@Column(name = "po_date")
+	private LocalDate poDate;
+
+	@Column(name = "vehicle_no")
+	private String vehicleNo;
+
+	@Column(name = "total_packages", precision = 10, scale = 2)
+	private BigDecimal totalPackages;
+
+	@Column(name = "total_gross_weight", precision = 10, scale = 2)
+	private BigDecimal totalGrossWeight;
+
+	@Column(name = "invoice_no")
+	private String invoiceNo;
+
+	@Column(name = "invoice_date")
+	private LocalDate invoiceDate;
+
+	@Column(name = "po_currency")
+	private String poCurrency;
+
+	@Column(name = "lr_no")
+	private String lrNo;
+
+	@Column(name = "po_exchange_rate", precision = 10, scale = 2)
+	private BigDecimal poExchangeRate;
+
+	// grnimportsummary
+
+	@Column(name = "total_fob_value_fc", precision = 10, scale = 2)
+	private BigDecimal totalFobValueFC;
+
+	@Column(name = "total_freight_inr", precision = 10, scale = 2)
+	private BigDecimal totalFreightINR;
+
+	@Column(name = "total_duty_amt_inr", precision = 10, scale = 2)
+	private BigDecimal totalDutyAmtINR;
+
+	@Column(name = "total_land_cost_inr", precision = 10, scale = 2)
+	private BigDecimal totalLandCostINR;
+
+	@Column(name = "total_grn_value_inr", precision = 10, scale = 2)
+	private BigDecimal totalGrnValueINR;
+
+	@Column(name = "total_land_value_inr", precision = 10, scale = 2)
+	private BigDecimal totalLandValueINR;
+
+	@Column(name = "received_by", length = 100)
+	private String receivedBy;
+
+	@Column(name = "quality_check_by", length = 100)
+	private String qualityCheckBy;
 
 	@OneToMany(mappedBy = "grnVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
@@ -174,6 +246,10 @@ public class GrnVO {
 	@OneToMany(mappedBy = "grnVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<GrnFileUploadDetailsVO> grnFileUploadDetailsVO;
+
+	@OneToMany(mappedBy = "grnVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<ImportGrnDetailsVO> importGrnDetailsVO;
 
 	@JsonGetter("active")
 	public String getActive() {

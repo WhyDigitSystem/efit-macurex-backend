@@ -18,6 +18,10 @@ public class DeliveryChallanSubcontractingDetailsDTO {
 
     private Long unit;
 
+   private String contractNo;
+    
+    private String jobOrderFor;
+    
     private Long fromLocation;
 
     private BigDecimal availableStock;
@@ -29,4 +33,5 @@ public class DeliveryChallanSubcontractingDetailsDTO {
 //    private BigDecimal amount;
 
     private String remarks;
+    
 }

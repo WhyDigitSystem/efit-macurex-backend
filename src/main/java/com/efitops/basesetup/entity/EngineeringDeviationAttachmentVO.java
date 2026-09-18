@@ -49,7 +49,7 @@ public class EngineeringDeviationAttachmentVO {
 	private LocalDateTime uploadOn;
 	
 	@ManyToOne
-	@JoinColumn(name = "engineering_deviation_request_basic")
+	@JoinColumn(name = "engineering_deviation_request_basic_id")
 	@JsonBackReference
 	private EngineeringDeviationRequestVO engineeringDeviationRequestVO;
 }

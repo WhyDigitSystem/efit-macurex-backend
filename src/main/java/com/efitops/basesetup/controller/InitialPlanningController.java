@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.efitops.basesetup.ResponseDTO.InitialPlanningResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OperationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProblemSolvingEntryResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.InitialPlanningDTO;
@@ -548,5 +549,98 @@ public class InitialPlanningController extends BaseController {
 		}
 
 		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getProblemSolvingEntryById")
+	public ResponseEntity<ResponseDTO> getProblemSolvingEntryById(@RequestParam Long id) {
+
+		String methodName = "getProblemSolvingEntryById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		ProblemSolvingEntryResponseDTO response = null;
+
+		try {
+
+			response = initialPlanningService.getProblemSolvingEntryById(id);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Problem Solving Entry information retrieved successfully");
+
+			responseObjectsMap.put("problemSolvingEntryVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Problem Solving Entry information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getProblemSolvingEntryByOrgId")
+	public ResponseEntity<ResponseDTO> getProblemSolvingEntryByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getProblemSolvingEntryByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<ProblemSolvingEntryResponseDTO> responseList = new ArrayList<>();
+
+		try {
+
+			responseList = initialPlanningService.getProblemSolvingEntryByOrgId(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Problem Solving Entry information retrieved successfully");
+
+			responseObjectsMap.put("problemSolvingEntryVO", responseList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Problem Solving Entry information", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
 	}
 }

@@ -44,8 +44,7 @@ public class RootCauseAnalysisVO {
 	private BranchVO branch;
 	
 	@Column(name = "doc_id")
-    private String docId;
-	
+    private String docId;	
 	 @Column(name = "doc_date")
 	 private LocalDate docDate;
 	 

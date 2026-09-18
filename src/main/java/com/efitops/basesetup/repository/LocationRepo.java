@@ -29,14 +29,14 @@ public interface LocationRepo extends JpaRepository<LocationVO, Long> {
 			    lm.location_id AS locationId,
 			    lm.location_name AS locationName
 
-			FROM locationmaster lm
+			FROM location lm
 
 			JOIN listofvaluesdetails lov
-			    ON lov.id = lm.location_type
+			    ON lov.listofvaluesdetails_id = lm.location_type
 
 			WHERE lm.org_id = :orgId
 			  AND lm.branch = :branch
-			  AND lov.description = 'SUB CONTRACT'
+			  AND lov.value_description = 'SUB CONTRACT'
 			  AND lm.active = 1
 			  AND lm.cancel = 0
 

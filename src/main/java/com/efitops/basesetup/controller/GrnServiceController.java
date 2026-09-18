@@ -93,8 +93,7 @@ public class GrnServiceController extends BaseController {
 	}
 
 	@PutMapping(value = "/createUpdateGrn", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ResponseDTO> createUpdateGrn(
-			@RequestPart("grn") GrnDTO grnDTO,
+	public ResponseEntity<ResponseDTO> createUpdateGrn(@RequestPart("grn") GrnDTO grnDTO,
 //			@RequestBody GrnDTO grnDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -168,7 +167,7 @@ public class GrnServiceController extends BaseController {
 
 	@GetMapping("/getGrnDocId")
 	public ResponseEntity<ResponseDTO> getGrnDocId(@RequestParam Long orgId, @RequestParam String financialYear,
-			@RequestParam String screenCode) {
+			@RequestParam String type) {
 
 		String methodName = "getGrnDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -178,7 +177,7 @@ public class GrnServiceController extends BaseController {
 		String mapp = "";
 
 		try {
-			mapp = grnService.getGrnDocId(orgId, financialYear, screenCode);
+			mapp = grnService.getGrnDocId(orgId, financialYear, type);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -257,8 +256,8 @@ public class GrnServiceController extends BaseController {
 	}
 
 	@GetMapping("/getScheduleDocIdDetails")
-	public ResponseEntity<ResponseDTO> getScheduleDocIdDetails(@RequestParam Long orgId,
-			@RequestParam String purchaseOrderNo, @RequestParam String date, @RequestParam String gatePass) {
+	public ResponseEntity<ResponseDTO> getScheduleDocIdDetails(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long supplier) {
 		String methodName = "getScheduleDocIdDetails()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -267,7 +266,7 @@ public class GrnServiceController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = grnService.getScheduleDocIdDetails(orgId, purchaseOrderNo, date, gatePass);
+			mapp = grnService.getScheduleDocIdDetails(orgId, branch, supplier);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -588,6 +587,65 @@ public class GrnServiceController extends BaseController {
 		} else {
 			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Location Details",
 					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getPurchaseOrderNumberImportGrn")
+	public ResponseEntity<ResponseDTO> getPurchaseOrderNumberImportGrn(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long supplierCode) {
+		String methodName = "getPurchaseOrderNumberImportGrn()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = grnService.getPurchaseOrderNumberImportGrn(orgId, branch, supplierCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Order retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Purchase Order details",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getItemDetailsForImportGrn")
+	public ResponseEntity<ResponseDTO> getItemDetailsForImportGrn(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long supplierCode, @RequestParam String purchaseOrderNo) {
+		String methodName = "getItemDetailsForImportGrn()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = grnService.getItemDetailsForImportGrn(orgId, branch, supplierCode, purchaseOrderNo);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Item details", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

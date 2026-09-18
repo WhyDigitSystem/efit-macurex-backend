@@ -86,6 +86,9 @@ import com.efitops.basesetup.dto.SalesZoneMasterDTO;
 import com.efitops.basesetup.dto.ScreenNamesDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterDTO;
 import com.efitops.basesetup.dto.ServiceAccMasterResponseDTO;
+import com.efitops.basesetup.dto.ShiftBreakTimingDetailsDTO;
+import com.efitops.basesetup.dto.ShiftDTO;
+import com.efitops.basesetup.dto.ShiftDetailsDTO;
 import com.efitops.basesetup.dto.StateDTO;
 import com.efitops.basesetup.dto.TSBankDTO;
 import com.efitops.basesetup.dto.TaxDefinitionDTO;
@@ -125,6 +128,9 @@ import com.efitops.basesetup.entity.RegionVO;
 import com.efitops.basesetup.entity.SalesZoneMasterVO;
 import com.efitops.basesetup.entity.ScreenNamesVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
+import com.efitops.basesetup.entity.ShiftBreakTimingDetailsVO;
+import com.efitops.basesetup.entity.ShiftDetailsVO;
+import com.efitops.basesetup.entity.ShiftVO;
 import com.efitops.basesetup.entity.StateVO;
 import com.efitops.basesetup.entity.TSBankVO;
 import com.efitops.basesetup.entity.TaxDefinitionDetailsVO;
@@ -159,12 +165,14 @@ import com.efitops.basesetup.repository.ListOfValuesRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.MappingDetailsRepo;
 import com.efitops.basesetup.repository.MappingPartyToAccRepo;
-import com.efitops.basesetup.repository.PartyProjection;
 import com.efitops.basesetup.repository.RegionRepo;
 import com.efitops.basesetup.repository.ResponsibilitiesRepo;
 import com.efitops.basesetup.repository.SalesZoneMasterRepo;
 import com.efitops.basesetup.repository.ScreenNamesRepo;
 import com.efitops.basesetup.repository.ServiceAccMasterRepo;
+import com.efitops.basesetup.repository.ShiftBreakTimingDetailsRepo;
+import com.efitops.basesetup.repository.ShiftDetailsRepo;
+import com.efitops.basesetup.repository.ShiftRepo;
 import com.efitops.basesetup.repository.StateRepo;
 import com.efitops.basesetup.repository.TSBankRepo;
 import com.efitops.basesetup.repository.TaxDefinitionDetailsRepo;
@@ -300,6 +308,15 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 	@Autowired
 	private SalesZoneMasterRepo salesZoneMasterRepo;
 
+	@Autowired
+	ShiftRepo shiftrepo;
+	
+	@Autowired
+	ShiftDetailsRepo shiftDetailsRepo;
+	
+	@Autowired
+	ShiftBreakTimingDetailsRepo shiftBreakTimingDetailsRepo;
+	
 	// Company
 
 	@Override
@@ -5245,5 +5262,124 @@ public class CommonMasterServiceImpl implements CommonMasterService {
 
 	    return true;
 	}
+	
+	
+	
+	// shift master
+
+		@Override
+		public List<ShiftVO> getShiftByOrgId(Long orgId) {
+			List<ShiftVO> shiftVO = new ArrayList<>();
+			if (ObjectUtils.isNotEmpty(orgId)) {
+				LOGGER.info("Successfully Received Uom BY OrgId : {}", orgId);
+				shiftVO = shiftrepo.getShiftByOrgId(orgId);
+			}
+			return shiftVO;
+		}
+
+		@Override
+		public List<ShiftVO> getShiftById(Long id) {
+			List<ShiftVO> shiftVO = new ArrayList<>();
+			if (ObjectUtils.isNotEmpty(id)) {
+				LOGGER.info("Successfully Received Shift BY Id : {}", id);
+				shiftVO = shiftrepo.getShiftById(id);
+			}
+			return shiftVO;
+		}
+
+		@Override
+		public Map<String, Object> updateCreateShift(ShiftDTO shiftdto) throws ApplicationException {
+			String screenCode = "D";
+			ShiftVO shiftVO = new ShiftVO();
+			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+			String message;
+			if (ObjectUtils.isNotEmpty(shiftdto.getId())) {
+				shiftVO = shiftrepo.findById(shiftdto.getId())
+						.orElseThrow(() -> new ApplicationException("SHIFT not found"));
+
+				if (!shiftVO.getShiftName().equalsIgnoreCase(shiftdto.getShiftName())) {
+					if (shiftrepo.existsByShiftCodeAndOrgId(shiftdto.getShiftName(), shiftdto.getOrgId())) {
+						String errorMessage = String.format("The ShiftName: %s  already exists This Organization.",
+								shiftdto.getShiftName());
+						throw new ApplicationException(errorMessage);
+					}
+				}
+
+				List<ShiftDetailsVO> shiftDetailsVOs = shiftDetailsRepo.findByShiftVO(shiftVO);
+				shiftDetailsRepo.deleteAll(shiftDetailsVOs);
+
+				List<ShiftBreakTimingDetailsVO> ShiftBreakTimingDetailsVOs = shiftBreakTimingDetailsRepo
+						.findByshiftVO(shiftVO);
+				shiftBreakTimingDetailsRepo.deleteAll(ShiftBreakTimingDetailsVOs);
+
+				shiftVO.setUpdatedBy(shiftdto.getCreatedBy());
+				createUpdateShiftVOByShiftDTO(shiftdto, shiftVO);
+				message = "Shift  Updated Successfully";
+			} else {
+
+				if (shiftrepo.existsByShiftNameAndOrgId(shiftdto.getShiftName(), shiftdto.getOrgId())) {
+					String errorMessage = String.format("The Shift: %s  already exists This Organization.",
+							shiftdto.getShiftName());
+					throw new ApplicationException(errorMessage);
+				}
+				shiftVO.setCreatedBy(shiftdto.getCreatedBy());
+				shiftVO.setUpdatedBy(shiftdto.getCreatedBy());
+				createUpdateShiftVOByShiftDTO(shiftdto, shiftVO);
+				message = "Shift Created Successfully";
+			}
+
+			shiftrepo.save(shiftVO);
+			Map<String, Object> response = new HashMap<>();
+			response.put("shiftVO", shiftVO);
+			response.put("message", message);
+			return response;
+		}
+
+		private void createUpdateShiftVOByShiftDTO(@Valid ShiftDTO shiftDTO, ShiftVO shiftVO) throws ApplicationException {
+
+			if (shiftDTO.getFromHour() != null) {
+				shiftVO.setFromHour(shiftDTO.getFromHour().toLocalTime());
+			}
+			if (shiftDTO.getToHour() != null) {
+				shiftVO.setToHour(shiftDTO.getToHour().toLocalTime());
+			}
+
+			shiftVO.setTiming(shiftDTO.getTiming());
+
+			shiftVO.setShiftName(shiftDTO.getShiftName());
+			shiftVO.setShiftType(shiftDTO.getShiftType());
+			shiftVO.setShiftCode(shiftDTO.getShiftCode());
+			shiftVO.setOrgId(shiftDTO.getOrgId());
+			shiftVO.setActive(shiftDTO.isActive());
+
+			// Map shift details
+			List<ShiftDetailsVO> shiftDetailsVOs = new ArrayList<>();
+			for (ShiftDetailsDTO shiftDetailsDTO : shiftDTO.getShiftDetailsDTO()) {
+				ShiftDetailsVO shiftDetailsVO = new ShiftDetailsVO();
+
+				if (shiftDetailsDTO.getTimingInHours() != null) {
+					shiftDetailsVO.setTimingInHours(shiftDetailsDTO.getTimingInHours());
+				}
+
+				// Set the reference in the child entity
+				shiftDetailsVO.setShiftVO(shiftVO);
+				shiftDetailsVOs.add(shiftDetailsVO);
+			}
+			shiftVO.setShiftDetailsVO(shiftDetailsVOs);
+
+			List<ShiftBreakTimingDetailsVO> shiftBreakTimingDetailsVOs = new ArrayList<>();
+
+			for (ShiftBreakTimingDetailsDTO shiftBreakTimingDetailsDTO : shiftDTO.getShiftBreakTimingDetailsDTO()) {
+
+				ShiftBreakTimingDetailsVO shiftBreakTimingDetailsVO = new ShiftBreakTimingDetailsVO();
+
+				shiftBreakTimingDetailsVO.setBreakCategory(shiftBreakTimingDetailsDTO.getBreakCategory());
+				shiftBreakTimingDetailsVO.setBreakTimings(shiftBreakTimingDetailsDTO.getBreakTimings());
+				shiftBreakTimingDetailsVO.setShiftVO(shiftVO);
+				shiftBreakTimingDetailsVOs.add(shiftBreakTimingDetailsVO);
+			}
+			shiftVO.setShiftBreakTimingDetailsVO(shiftBreakTimingDetailsVOs);
+		}
 
 }

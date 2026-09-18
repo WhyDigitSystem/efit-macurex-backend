@@ -17,10 +17,6 @@ public class RootCauseAnalysisDTO {
 
 	    private Long branch;
 
-	    private String  docId;
-
-	    private LocalDate docDate;
-
 	    private Long complaintNo;
 
 	    private Long itemCode;

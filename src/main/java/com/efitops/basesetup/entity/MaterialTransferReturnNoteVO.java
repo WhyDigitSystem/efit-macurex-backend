@@ -112,7 +112,6 @@ public class MaterialTransferReturnNoteVO {
 
     @Column(name = "screen_code")
     private String screenCode = "MTRN";
-
     
     @Column(name = "org_id")
     private Long orgId;

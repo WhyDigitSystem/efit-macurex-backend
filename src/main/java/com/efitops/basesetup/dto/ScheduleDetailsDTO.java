@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ScheduleDetailsDTO {
 
-	private Long id;
 	private LocalDate scheduleDate;
 	private BigDecimal qty;
 

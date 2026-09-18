@@ -9,24 +9,32 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
+import com.efitops.basesetup.ResponseDTO.FlashNCReportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
+import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
+import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.service.VendorComplaintService;
@@ -1037,8 +1045,7 @@ public class VendorComplaintController extends BaseController {
 
 		try {
 
-			response = vendorComplaintService.getDailyInspectionCumRejectionDataDocId(orgId,
-					financialYear);
+			response = vendorComplaintService.getDailyInspectionCumRejectionDataDocId(orgId, financialYear);
 
 		} catch (Exception e) {
 
@@ -1060,6 +1067,475 @@ public class VendorComplaintController extends BaseController {
 
 			responseDTO = createServiceResponseError(responseObjectsMap,
 					"Failed to retrieve Daily Inspection Cum Rejection Data DocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping("/updateCreateSetUpApproval")
+	public ResponseEntity<ResponseDTO> updateCreateSetUpApproval(@RequestBody SetUpApprovalDTO dto) {
+
+		String methodName = "updateCreateSetUpApproval()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			Map<String, Object> response = vendorComplaintService.updateCreateSetUpApproval(dto);
+
+			responseObjectsMap.putAll(response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSetUpApprovalById")
+	public ResponseEntity<ResponseDTO> getSetUpApprovalById(@RequestParam Long id) {
+
+		String methodName = "getSetUpApprovalById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			SetUpApprovalResponseDTO response = vendorComplaintService.getSetUpApprovalById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Set Up Approval Retrieved Successfully");
+
+			responseObjectsMap.put("setUpApproval", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSetUpApprovalByOrgId")
+	public ResponseEntity<ResponseDTO> getSetUpApprovalByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getSetUpApprovalByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<SetUpApprovalResponseDTO> response = vendorComplaintService.getSetUpApprovalByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Set Up Approval Retrieved Successfully");
+
+			responseObjectsMap.put("setUpApproval", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getFgSfgItemDropdownForSetUpApproval")
+	public ResponseEntity<ResponseDTO> getFgSfgItemDropdownForSetUpApproval(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getFgSfgItemDropdownForSetUpApproval()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService.getFgSfgItemDropdownForSetUpApproval(orgId,
+					branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "FG and SFG Item Details Retrieved Successfully");
+
+			responseObjectsMap.put("itemDetails", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getProcessSheetNoForSetUpApproval")
+	public ResponseEntity<ResponseDTO> getProcessSheetNoForSetUpApproval(@RequestParam Long item,
+			@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getProcessSheetNoForSetUpApproval()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService.getProcessSheetNoForSetUpApproval(item, orgId,
+					branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Process Sheet Details Retrieved Successfully");
+
+			responseObjectsMap.put("processSheetDetails", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getControlPlanDetailsForSetUpApproval")
+	public ResponseEntity<ResponseDTO> getControlPlanDetailsForSetUpApproval(@RequestParam Long item,
+			@RequestParam String processSheetNo, @RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getControlPlanDetailsForSetUpApproval()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService.getControlPlanDetailsForSetUpApproval(item,
+					processSheetNo, orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Control Plan Details Retrieved Successfully");
+
+			responseObjectsMap.put("controlPlanDetails", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSetUpApprovalDocId")
+	public ResponseEntity<ResponseDTO> getSetUpApprovalDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getSetUpApprovalDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String response = null;
+
+		try {
+
+			response = vendorComplaintService.getSetUpApprovalDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Set Up Approval DocId Retrieved Successfully");
+
+			responseObjectsMap.put("docId", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to Retrieve Set Up Approval DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	flash NC Report
+
+	/*
+	 * Create / Update Flash NC Report
+	 */
+	@PostMapping(value = "/updateCreateFlashNCReport", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseDTO updateCreateFlashNCReport(@RequestPart("flashNCReportVO") FlashNCReportDTO flashNCReportDTO,
+//			@RequestBody FlashNCReportDTO flashNCReportDTO,
+			@RequestPart(value = "files", required = false) MultipartFile[] files,
+			@RequestPart(value = "images", required = false) MultipartFile[] images) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> response = vendorComplaintService.updateCreateFlashNCReport(flashNCReportDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
+
+			responseObjectsMap.put("flashNCReportVO", response.get("flashNCReportVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return responseDTO;
+	}
+
+	/*
+	 * Get Flash NC Report By ID
+	 */
+	@GetMapping("/getFlashNCReportById")
+	public ResponseEntity<ResponseDTO> getFlashNCReportById(@RequestParam Long id) {
+
+		String methodName = "getFlashNCReportById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			FlashNCReportResponseDTO response = vendorComplaintService.getFlashNCReportById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Flash NC Report Retrieved Successfully");
+
+			responseObjectsMap.put("flashNCReportVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	/*
+	 * Get Flash NC Report By Organization And Branch
+	 */
+	@GetMapping("/getFlashNCReportByOrgId")
+	public ResponseEntity<ResponseDTO> getFlashNCReportByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getFlashNCReportByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			List<FlashNCReportResponseDTO> response = vendorComplaintService.getFlashNCReportByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Flash NC Report Details Retrieved Successfully");
+
+			responseObjectsMap.put("flashNCReportList", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	/*
+	 * Get Flash NC Report Doc ID
+	 */
+	@GetMapping("/getFlashNCReportDocId")
+	public ResponseEntity<ResponseDTO> getFlashNCReportDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getFlashNCReportDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String response = null;
+
+		try {
+
+			response = vendorComplaintService.getFlashNCReportDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Flash NC Report DocId Retrieved Successfully");
+
+			responseObjectsMap.put("docId", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Flash NC Report DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getQualityEmployeesForFlashNCReport")
+	public ResponseEntity<ResponseDTO> getQualityEmployeesForFlashNCReport(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getQualityEmployeesForFlashNCReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService.getQualityEmployeesForFlashNCReport(orgId,
+					branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Quality Employees Retrieved Successfully");
+
+			responseObjectsMap.put("employeeDetails", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

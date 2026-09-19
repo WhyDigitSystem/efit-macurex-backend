@@ -5915,6 +5915,124 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		return responseList;
 	}
 
+	@Override
+	public List<Map<String, Object>> getSchNoFromScrapNote(Long orgId, Long branch) {
+
+		Set<Object[]> chType = scrapNoteRepo.getSchNoFromScrapNote(orgId, branch);
+
+		return getSchNoFromScrapNote(chType);
+
+	}
+
+	private List<Map<String, Object>> getSchNoFromScrapNote(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
+
+	}
+
+	@Override
+	public List<Map<String, Object>> getBomNoFromScrapNote(Long orgId, Long branch) {
+
+		Set<Object[]> chType = scrapNoteRepo.getBomNoFromScrapNote(orgId, branch);
+
+		return getBomNoFromScrapNote(chType);
+
+	}
+
+	private List<Map<String, Object>> getBomNoFromScrapNote(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("bomId", ch[2] != null ? ((Number) ch[2]).longValue() : null);
+
+			list.add(map);
+		}
+
+		return list;
+
+	}
+
+	@Override
+	public List<Map<String, Object>> getScrapPartNo(Long orgId, Long branch) {
+
+		Set<Object[]> chType = scrapNoteRepo.getScrapPartNo(orgId, branch);
+
+		return getScrapPartNo(chType);
+
+	}
+
+	private List<Map<String, Object>> getScrapPartNo(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
+
+	}
+
+	@Override
+	public List<Map<String, Object>> getScrapNoteItemDetails(Long orgId, Long branch, Long bom) {
+
+		Set<Object[]> chType = scrapNoteRepo.getScrapNoteItemDetails(orgId, branch, bom);
+
+		return getScrapNoteItemDetails(chType);
+
+	}
+
+	private List<Map<String, Object>> getScrapNoteItemDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
+
+	}
+
 	// Close
 
 	@Override
@@ -6112,6 +6230,66 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			responseList.add(buildProductionSchOrderShortCloseResponse(vo));
 		}
 		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getItemDetailsFromProductionShortClose(Long orgId, Long branch) {
+
+		Set<Object[]> chType = productionSchOrderShortCloseRepo.getItemDetailsFromProductionShortClose(orgId, branch);
+
+		return getItemDetailsFromProductionShortClose(chType);
+	}
+
+	private List<Map<String, Object>> getItemDetailsFromProductionShortClose(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+
+			map.put("unitMasterId", ch[3] != null ? ((Number) ch[3]).longValue() : null);
+
+			map.put("unitMasterDescription", ch[4] != null ? ch[4].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getSchOrderNoProductionShortClose(Long orgId, Long branch) {
+
+		Set<Object[]> chType = productionSchOrderShortCloseRepo.getSchOrderNoProductionShortClose(orgId, branch);
+
+		return getSchOrderNoProductionShortClose(chType);
+	}
+
+	private List<Map<String, Object>> getSchOrderNoProductionShortClose(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("scheduleOrderQty", ch[2] != null ? new BigDecimal(ch[2].toString()) : BigDecimal.ZERO);
+
+			list.add(map);
+		}
+
+		return list;
 	}
 
 }

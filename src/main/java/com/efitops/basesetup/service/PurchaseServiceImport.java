@@ -250,6 +250,14 @@ public interface PurchaseServiceImport {
 
 	List<ScrapNoteResponseDTO> getScrapNoteByOrgId(Long orgId, Long branch) throws ApplicationException;
 
+	List<Map<String, Object>> getSchNoFromScrapNote(Long orgId, Long branch);
+
+	List<Map<String, Object>> getBomNoFromScrapNote(Long orgId, Long branch);
+
+	List<Map<String, Object>> getScrapPartNo(Long orgId, Long branch);
+
+	List<Map<String, Object>> getScrapNoteItemDetails(Long orgId, Long branch, Long bom);
+
 	// ShortClose
 
 	Map<String, Object> createUpdateProductionSchOrderShortClose(ProductionSchOrderShortCloseDTO dto)
@@ -261,5 +269,9 @@ public interface PurchaseServiceImport {
 
 	List<ProductionSchOrderShortCloseResponseDTO> getProductionSchOrderShortCloseByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
+
+	List<Map<String, Object>> getItemDetailsFromProductionShortClose(Long orgId, Long branch);
+
+	List<Map<String, Object>> getSchOrderNoProductionShortClose(Long orgId, Long branch);
 
 }

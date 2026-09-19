@@ -40,7 +40,6 @@ import com.efitops.basesetup.ResponseDTO.BomFgResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CompRouteNoResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.ConsumptionEntryDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ConsumptionEntryResponseDTO;
-import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseCashDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseFileUploadDetailsResponseDTO;
@@ -54,6 +53,7 @@ import com.efitops.basesetup.ResponseDTO.ItemCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseCloseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseImportDTO;
+import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LmeResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
@@ -61,6 +61,8 @@ import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionDetailsRespo
 import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialTransferReturnNoteDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialTransferReturnNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionOrderDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionSchOrderShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionTransferSlipDetailsResponseDTO;
@@ -74,6 +76,9 @@ import com.efitops.basesetup.ResponseDTO.PurchaseOrderLocalTaxDetailsResponseDTO
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.RmConsumptionEntryDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ScheduleDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ScrapNoteDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ScrapNoteReasonDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ScrapNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseDTO;
@@ -96,6 +101,8 @@ import com.efitops.basesetup.dto.MaterialIndentForProductionDetailsDTO;
 import com.efitops.basesetup.dto.MaterialTransferReturnNoteDTO;
 import com.efitops.basesetup.dto.MaterialTransferReturnNoteDetailsDTO;
 import com.efitops.basesetup.dto.PoType;
+import com.efitops.basesetup.dto.ProductionOrderDetailsDTO;
+import com.efitops.basesetup.dto.ProductionSchOrderShortCloseDTO;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDetailsDTO;
 import com.efitops.basesetup.dto.ProductionTransferSlipDTO;
@@ -109,6 +116,9 @@ import com.efitops.basesetup.dto.PurchaseOrderLocalFileUploadDetailsDTO;
 import com.efitops.basesetup.dto.PurchaseOrderLocalTaxDetailsDTO;
 import com.efitops.basesetup.dto.RmConsumptionEntryDetailsDTO;
 import com.efitops.basesetup.dto.ScheduleDetailsDTO;
+import com.efitops.basesetup.dto.ScrapNoteDTO;
+import com.efitops.basesetup.dto.ScrapNoteDetailsDTO;
+import com.efitops.basesetup.dto.ScrapNoteReasonDetailsDTO;
 import com.efitops.basesetup.dto.StockTransferDTO;
 import com.efitops.basesetup.dto.StockTransferDetailsDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
@@ -138,6 +148,8 @@ import com.efitops.basesetup.entity.MaterialIndentForProductionVO;
 import com.efitops.basesetup.entity.MaterialTransferReturnNoteDetailsVO;
 import com.efitops.basesetup.entity.MaterialTransferReturnNoteVO;
 import com.efitops.basesetup.entity.ProcessSheetCompRoutingVO;
+import com.efitops.basesetup.entity.ProductionOrderDetailsVO;
+import com.efitops.basesetup.entity.ProductionSchOrderShortCloseVO;
 import com.efitops.basesetup.entity.ProductionScheduleOrderDetailsVO;
 import com.efitops.basesetup.entity.ProductionScheduleOrderVO;
 import com.efitops.basesetup.entity.ProductionTransferSlipDetailsVO;
@@ -151,6 +163,9 @@ import com.efitops.basesetup.entity.PurchaseOrderLocalTaxDetailsVO;
 import com.efitops.basesetup.entity.PurchaseOrderVO;
 import com.efitops.basesetup.entity.RmConsumptionEntryDetailsVO;
 import com.efitops.basesetup.entity.ScheduleDetailsVO;
+import com.efitops.basesetup.entity.ScrapNoteDetailsVO;
+import com.efitops.basesetup.entity.ScrapNoteReasonDetailsVO;
+import com.efitops.basesetup.entity.ScrapNoteVO;
 import com.efitops.basesetup.entity.StockTransferDetailsVO;
 import com.efitops.basesetup.entity.StockTransferVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
@@ -181,6 +196,8 @@ import com.efitops.basesetup.repository.MaterialIndentForProductionRepo;
 import com.efitops.basesetup.repository.MaterialTransferReturnNoteDetailsRepository;
 import com.efitops.basesetup.repository.MaterialTransferReturnNoteRepository;
 import com.efitops.basesetup.repository.ProcessSheetCompRoutingRepo;
+import com.efitops.basesetup.repository.ProductionOrderDetailsRepo;
+import com.efitops.basesetup.repository.ProductionSchOrderShortCloseRepo;
 import com.efitops.basesetup.repository.ProductionScheduleOrderDetailsRepo;
 import com.efitops.basesetup.repository.ProductionScheduleOrderRepo;
 import com.efitops.basesetup.repository.ProductionTransferSlipDetailsRepo;
@@ -194,6 +211,9 @@ import com.efitops.basesetup.repository.PurchaseOrderLocalTaxDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseOrderRepo;
 import com.efitops.basesetup.repository.RmConsumptionEntryDetailsRepo;
 import com.efitops.basesetup.repository.ScheduleDetailsRepo;
+import com.efitops.basesetup.repository.ScrapNoteDetailsRepo;
+import com.efitops.basesetup.repository.ScrapNoteReasonDetailsRepo;
+import com.efitops.basesetup.repository.ScrapNoteRepo;
 import com.efitops.basesetup.repository.StockTransferDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
@@ -328,6 +348,21 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 	private MaterialTransferReturnNoteRepository materialTransferReturnNoteRepo;
 	@Autowired
 	private MaterialTransferReturnNoteDetailsRepository materialTransferReturnNoteDetailsRepo;
+
+	@Autowired
+	private ScrapNoteRepo scrapNoteRepo;
+
+	@Autowired
+	private ScrapNoteDetailsRepo scrapNoteDetailsRepo;
+
+	@Autowired
+	private ScrapNoteReasonDetailsRepo scrapNoteReasonDetailsRepo;
+
+	@Autowired
+	private ProductionSchOrderShortCloseRepo productionSchOrderShortCloseRepo;
+
+	@Autowired
+	private ProductionOrderDetailsRepo productionOrderDetailsRepo;
 
 	@Override
 	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException {
@@ -5524,4 +5559,559 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 		return list;
 	}
+
+	//
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateScrapNote(ScrapNoteDTO dto) throws ApplicationException {
+		String screenCode = "SN";
+		ScrapNoteVO vo = new ScrapNoteVO();
+		String message;
+
+		if (ObjectUtils.isNotEmpty(dto.getId())) {
+			vo = scrapNoteRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Scrap Note Not Found"));
+			vo.setUpdatedBy(dto.getCreatedBy());
+			message = "Scrap Note Updated Successfully";
+		} else {
+			String docId = scrapNoteRepo.getScrapNoteDocId(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+			vo.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+			if (documentTypeMappingDetailsVO != null) {
+				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			}
+
+			vo.setCreatedBy(dto.getCreatedBy());
+			vo.setUpdatedBy(dto.getCreatedBy());
+			message = "Scrap Note Created Successfully";
+		}
+
+		createUpdateScrapNoteVOByDTO(dto, vo);
+
+		vo = scrapNoteRepo.save(vo);
+
+		ScrapNoteResponseDTO responseDTO = buildScrapNoteResponse(vo);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("scrapNoteVO", responseDTO);
+
+		return response;
+	}
+
+	private void createUpdateScrapNoteVOByDTO(ScrapNoteDTO dto, ScrapNoteVO vo) throws ApplicationException {
+		vo.setBelongsTo(dto.getBelongsTo());
+		vo.setSchOrderNo(dto.getSchOrderNo());
+		vo.setPmApproval(dto.getPmApproval());
+		vo.setQualityApproval(dto.getQualityApproval());
+		vo.setStoreApproval(dto.getStoreApproval());
+		vo.setNarration(dto.getNarration());
+		vo.setActive(dto.isActive());
+		vo.setCancel(dto.isCancel());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		// Map Master Dropdowns
+		if (dto.getDepartment() != null && dto.getDepartment() != 0) {
+			DepartmentVO department = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Department Not Found"));
+			vo.setDepartment(department);
+		}
+
+		if (dto.getFromLocation() != null && dto.getFromLocation() != 0) {
+			LocationVO location = locationRepo.findById(dto.getFromLocation())
+					.orElseThrow(() -> new ApplicationException("From Location Not Found"));
+			vo.setFromLocation(location);
+		}
+
+		if (dto.getToLocation() != null && dto.getToLocation() != 0) {
+			LocationVO location = locationRepo.findById(dto.getToLocation())
+					.orElseThrow(() -> new ApplicationException("To Location Not Found"));
+			vo.setToLocation(location);
+		}
+
+		if (dto.getFgPart() != null && dto.getFgPart() != 0) {
+			ItemMasterVO item = itemMasterRepo.findById(dto.getFgPart())
+					.orElseThrow(() -> new ApplicationException("FG Part Not Found"));
+			vo.setFgPart(item);
+		}
+
+		if (dto.getBom() != null && dto.getBom() != 0) {
+			BillOfMaterialVO bom = billOfMaterialRepo.findById(dto.getBom())
+					.orElseThrow(() -> new ApplicationException("BOM Not Found"));
+			vo.setBom(bom);
+		}
+
+		if (dto.getScrapPart() != null && dto.getScrapPart() != 0) {
+			ItemMasterVO item = itemMasterRepo.findById(dto.getScrapPart())
+					.orElseThrow(() -> new ApplicationException("Scrap Part Not Found"));
+			vo.setScrapPart(item);
+		}
+
+		if (dto.getPreparedBy() != null && dto.getPreparedBy() != 0) {
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Prepared By Employee Not Found"));
+			vo.setPreparedBy(employee);
+		}
+
+		if (dto.getAuthorisedBy() != null && dto.getAuthorisedBy() != 0) {
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getAuthorisedBy())
+					.orElseThrow(() -> new ApplicationException("Authorised By Employee Not Found"));
+			vo.setAuthorisedBy(employee);
+		}
+
+		if (dto.getScrapId() != null && dto.getScrapId() != 0) {
+			ListOfValuesDetailsVO lov = listOfValuesDetailsRepo.findById(dto.getScrapId())
+					.orElseThrow(() -> new ApplicationException("Scrap ID Not Found"));
+			vo.setScrapId(lov);
+		}
+
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+			vo.setBranch(branch);
+		}
+
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+			List<ScrapNoteDetailsVO> existingDetails = scrapNoteDetailsRepo.findByScrapNoteVO(vo);
+			if (existingDetails != null && !existingDetails.isEmpty()) {
+				scrapNoteDetailsRepo.deleteAll(existingDetails);
+			}
+			List<ScrapNoteReasonDetailsVO> existingReasonDetails = scrapNoteReasonDetailsRepo.findByScrapNoteVO(vo);
+			if (existingReasonDetails != null && !existingReasonDetails.isEmpty()) {
+				scrapNoteReasonDetailsRepo.deleteAll(existingReasonDetails);
+			}
+		}
+
+		List<ScrapNoteDetailsVO> itemDetailsList = new ArrayList<>();
+		BigDecimal totalValue = BigDecimal.ZERO;
+
+		if (dto.getScrapNoteDetailsDTO() != null) {
+			for (ScrapNoteDetailsDTO d : dto.getScrapNoteDetailsDTO()) {
+				ScrapNoteDetailsVO detailsVO = new ScrapNoteDetailsVO();
+
+				detailsVO.setStock(d.getStock());
+				detailsVO.setQuantity(d.getQuantity());
+				detailsVO.setWeight(d.getWeight());
+				detailsVO.setRate(d.getRate());
+
+				// Calculate Value
+				BigDecimal calculatedValue = BigDecimal.ZERO;
+				if (d.getQuantity() != null && d.getRate() != null) {
+					calculatedValue = d.getQuantity().multiply(d.getRate());
+				}
+				detailsVO.setValue(calculatedValue);
+				totalValue = totalValue.add(calculatedValue);
+
+				if (d.getItem() != null && d.getItem() != 0) {
+					ItemMasterVO item = itemMasterRepo.findById(d.getItem())
+							.orElseThrow(() -> new ApplicationException("Item Not Found in Details"));
+					detailsVO.setItem(item);
+				}
+
+				if (d.getPrimaryUnit() != null && d.getPrimaryUnit() != 0) {
+					UnitMasterVO unit = unitMasterRepo.findById(d.getPrimaryUnit())
+							.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+					detailsVO.setPrimaryUnit(unit);
+				}
+
+				detailsVO.setScrapNoteVO(vo);
+				itemDetailsList.add(detailsVO);
+			}
+		}
+		vo.setScrapNoteDetailsVO(itemDetailsList);
+		vo.setTotalScrapValue(totalValue);
+
+		List<ScrapNoteReasonDetailsVO> reasonDetailsList = new ArrayList<>();
+		if (dto.getScrapNoteReasonDetailsDTO() != null) {
+			for (ScrapNoteReasonDetailsDTO r : dto.getScrapNoteReasonDetailsDTO()) {
+				ScrapNoteReasonDetailsVO reasonVO = new ScrapNoteReasonDetailsVO();
+				reasonVO.setReasonCode(r.getReasonCode());
+				reasonVO.setReasonDescription(r.getReasonDescription());
+				reasonVO.setRejQty(r.getRejQty());
+				reasonVO.setScrapNoteVO(vo);
+				reasonDetailsList.add(reasonVO);
+			}
+		}
+		vo.setScrapNoteReasonDetailsVO(reasonDetailsList);
+	}
+
+	private ScrapNoteResponseDTO buildScrapNoteResponse(ScrapNoteVO vo) {
+		ScrapNoteResponseDTO responseDTO = new ScrapNoteResponseDTO();
+
+		responseDTO.setId(vo.getId());
+		responseDTO.setDocId(vo.getDocId());
+		responseDTO.setDocDate(vo.getDocDate());
+		responseDTO.setTime(vo.getTime());
+		responseDTO.setBelongsTo(vo.getBelongsTo());
+		responseDTO.setSchOrderNo(vo.getSchOrderNo());
+		responseDTO.setTotalScrapValue(vo.getTotalScrapValue());
+		responseDTO.setPmApproval(vo.getPmApproval());
+		responseDTO.setQualityApproval(vo.getQualityApproval());
+		responseDTO.setStoreApproval(vo.getStoreApproval());
+		responseDTO.setNarration(vo.getNarration());
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
+		responseDTO.setActive(vo.getActive());
+		responseDTO.setCancel(vo.getCancel());
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+		responseDTO.setScreenName(vo.getScreenName());
+		responseDTO.setScreenCode(vo.getScreenCode());
+		responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+
+		if (vo.getDepartment() != null) {
+			DepartmentResponseDTO deptDTO = new DepartmentResponseDTO();
+			deptDTO.setId(vo.getDepartment().getId());
+			deptDTO.setDepartmentName(vo.getDepartment().getDepartmentName()); // Adjust method name if different
+			responseDTO.setDepartment(deptDTO);
+		}
+
+		if (vo.getFromLocation() != null) {
+			LocationMasterResponseDTO locDto = new LocationMasterResponseDTO();
+			locDto.setId(vo.getFromLocation().getId());
+			locDto.setLocationName(vo.getFromLocation().getLocationName());
+			responseDTO.setFromLocation(locDto);
+		}
+
+		if (vo.getToLocation() != null) {
+			LocationMasterResponseDTO locDto = new LocationMasterResponseDTO();
+			locDto.setId(vo.getToLocation().getId());
+			locDto.setLocationName(vo.getToLocation().getLocationName());
+			responseDTO.setToLocation(locDto);
+		}
+
+		if (vo.getFgPart() != null) {
+			ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+			itemDTO.setId(vo.getFgPart().getId());
+			itemDTO.setItemCode(vo.getFgPart().getItemCode());
+			itemDTO.setItemDescription(vo.getFgPart().getItemDescription());
+			responseDTO.setFgPart(itemDTO);
+		}
+
+		if (vo.getBom() != null) {
+			BillOfMaterialResponseDTO bomDTO = new BillOfMaterialResponseDTO();
+			bomDTO.setId(vo.getBom().getId());
+			bomDTO.setDocId(vo.getBom().getDocId());
+			bomDTO.setDocDate(vo.getBom().getDocDate());
+			responseDTO.setBom(bomDTO);
+		}
+
+		if (vo.getScrapPart() != null) {
+			ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+			itemDTO.setId(vo.getScrapPart().getId());
+			itemDTO.setItemCode(vo.getScrapPart().getItemCode());
+			itemDTO.setItemDescription(vo.getScrapPart().getItemDescription());
+			responseDTO.setScrapPart(itemDTO);
+		}
+
+		if (vo.getPreparedBy() != null) {
+			EmployeeMasterDetailsReponseDTO empDto = new EmployeeMasterDetailsReponseDTO();
+			empDto.setId(vo.getPreparedBy().getId());
+			empDto.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+			responseDTO.setPreparedBy(empDto);
+		}
+
+		if (vo.getAuthorisedBy() != null) {
+			EmployeeMasterDetailsReponseDTO empDto = new EmployeeMasterDetailsReponseDTO();
+			empDto.setId(vo.getAuthorisedBy().getId());
+			empDto.setEmployeeName(vo.getAuthorisedBy().getEmployeeName());
+			responseDTO.setAuthorisedBy(empDto);
+		}
+
+		if (vo.getScrapId() != null) {
+			ListOfValuesDetailsResponseDTO lovDto = new ListOfValuesDetailsResponseDTO();
+			lovDto.setId(vo.getScrapId().getId());
+			lovDto.setDescription(vo.getScrapId().getValueDescription());
+			responseDTO.setScrapId(lovDto);
+		}
+
+		if (vo.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(vo.getBranch().getId());
+			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+			branchDTO.setBranchName(vo.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
+
+		List<ScrapNoteDetailsResponseDTO> detailsList = new ArrayList<>();
+		if (vo.getScrapNoteDetailsVO() != null) {
+			for (ScrapNoteDetailsVO detailsVO : vo.getScrapNoteDetailsVO()) {
+				ScrapNoteDetailsResponseDTO detailsDTO = new ScrapNoteDetailsResponseDTO();
+				detailsDTO.setId(detailsVO.getId());
+				detailsDTO.setStock(detailsVO.getStock());
+				detailsDTO.setQuantity(detailsVO.getQuantity());
+				detailsDTO.setWeight(detailsVO.getWeight());
+				detailsDTO.setRate(detailsVO.getRate());
+				detailsDTO.setValue(detailsVO.getValue());
+
+				if (detailsVO.getItem() != null) {
+					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+					itemDTO.setId(detailsVO.getItem().getId());
+					itemDTO.setItemCode(detailsVO.getItem().getItemCode());
+					itemDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+					detailsDTO.setItem(itemDTO);
+				}
+
+				if (detailsVO.getPrimaryUnit() != null) {
+					UnitResponseDTO unitDTO = new UnitResponseDTO();
+					unitDTO.setId(detailsVO.getPrimaryUnit().getId());
+					unitDTO.setUnitId(detailsVO.getPrimaryUnit().getUnitId());
+					detailsDTO.setPrimaryUnit(unitDTO);
+				}
+
+				detailsList.add(detailsDTO);
+			}
+		}
+		responseDTO.setScrapNoteDetails(detailsList);
+
+		// --- Map Reason Details Grid ---
+		List<ScrapNoteReasonDetailsResponseDTO> reasonDetailsList = new ArrayList<>();
+		if (vo.getScrapNoteReasonDetailsVO() != null) {
+			for (ScrapNoteReasonDetailsVO reasonVO : vo.getScrapNoteReasonDetailsVO()) {
+				ScrapNoteReasonDetailsResponseDTO reasonDTO = new ScrapNoteReasonDetailsResponseDTO();
+				reasonDTO.setId(reasonVO.getId());
+				reasonDTO.setReasonCode(reasonVO.getReasonCode());
+				reasonDTO.setReasonDescription(reasonVO.getReasonDescription());
+				reasonDTO.setRejQty(reasonVO.getRejQty());
+				reasonDetailsList.add(reasonDTO);
+			}
+		}
+		responseDTO.setScrapNoteReasonDetails(reasonDetailsList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public String getScrapNoteDocId(Long orgId, String financialYear) throws ApplicationException {
+		String screenCode = "SN";
+		return scrapNoteRepo.getScrapNoteDocId(orgId, financialYear, screenCode);
+	}
+
+	@Override
+	public ScrapNoteResponseDTO getScrapNoteById(Long id) throws ApplicationException {
+		ScrapNoteVO vo = scrapNoteRepo.getScrapNoteById(id);
+		if (vo == null) {
+			throw new ApplicationException("Scrap Note Not Found");
+		}
+		return buildScrapNoteResponse(vo);
+	}
+
+	@Override
+	public List<ScrapNoteResponseDTO> getScrapNoteByOrgId(Long orgId, Long branch) throws ApplicationException {
+		List<ScrapNoteVO> list = scrapNoteRepo.getScrapNoteByOrgId(orgId, branch);
+		if (list == null || list.isEmpty()) {
+			throw new ApplicationException("Scrap Note Not Found");
+		}
+		List<ScrapNoteResponseDTO> responseList = new ArrayList<>();
+		for (ScrapNoteVO vo : list) {
+			responseList.add(buildScrapNoteResponse(vo));
+		}
+		return responseList;
+	}
+
+	// Close
+
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateProductionSchOrderShortClose(ProductionSchOrderShortCloseDTO dto)
+			throws ApplicationException {
+		String screenCode = "PSOSC";
+		ProductionSchOrderShortCloseVO vo = new ProductionSchOrderShortCloseVO();
+		String message;
+
+		if (ObjectUtils.isNotEmpty(dto.getId())) {
+			vo = productionSchOrderShortCloseRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Production Sch Order Short Close Not Found"));
+			vo.setUpdatedBy(dto.getCreatedBy());
+			message = "Production Sch Order Short Close Updated Successfully";
+		} else {
+			String docId = productionSchOrderShortCloseRepo.getProductionSchOrderShortCloseDocId(dto.getOrgId(),
+					dto.getFinancialYear(), screenCode);
+			vo.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+			if (documentTypeMappingDetailsVO != null) {
+				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			}
+
+			vo.setCreatedBy(dto.getCreatedBy());
+			vo.setUpdatedBy(dto.getCreatedBy());
+			message = "Production Sch Order Short Close Created Successfully";
+		}
+
+		createUpdateProductionSchOrderShortCloseVOByDTO(dto, vo);
+
+		vo = productionSchOrderShortCloseRepo.save(vo);
+
+		ProductionSchOrderShortCloseResponseDTO responseDTO = buildProductionSchOrderShortCloseResponse(vo);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", message);
+		response.put("productionSchOrderShortCloseVO", responseDTO);
+
+		return response;
+	}
+
+	private void createUpdateProductionSchOrderShortCloseVOByDTO(ProductionSchOrderShortCloseDTO dto,
+			ProductionSchOrderShortCloseVO vo) throws ApplicationException {
+		vo.setNarration(dto.getNarration());
+		vo.setActive(dto.isActive());
+		vo.setCancel(dto.isCancel());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		// Map Master Dropdowns
+		if (dto.getItem() != null && dto.getItem() != 0) {
+			ItemMasterVO item = itemMasterRepo.findById(dto.getItem())
+					.orElseThrow(() -> new ApplicationException("Item Not Found"));
+			vo.setItem(item);
+		}
+
+		if (dto.getUnit() != null && dto.getUnit() != 0) {
+			UnitMasterVO unit = unitMasterRepo.findById(dto.getUnit())
+					.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+			vo.setUnit(unit);
+		}
+
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+			vo.setBranch(branch);
+		}
+
+		// Handle Deletion of existing child records on Update
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+			List<ProductionOrderDetailsVO> existingDetails = productionOrderDetailsRepo
+					.findByProductionSchOrderShortCloseVO(vo);
+			if (existingDetails != null && !existingDetails.isEmpty()) {
+				productionOrderDetailsRepo.deleteAll(existingDetails);
+			}
+		}
+
+		// --- Map Production Order Details Grid ---
+		List<ProductionOrderDetailsVO> detailsList = new ArrayList<>();
+		if (dto.getProductionOrderDetailsDTO() != null) {
+			for (ProductionOrderDetailsDTO d : dto.getProductionOrderDetailsDTO()) {
+				ProductionOrderDetailsVO detailsVO = new ProductionOrderDetailsVO();
+
+				detailsVO.setScheduleOrderNo(d.getScheduleOrderNo());
+				detailsVO.setScheduleDate(d.getScheduleDate());
+				detailsVO.setScheduleOrderQty(
+						d.getScheduleOrderQty() != null ? d.getScheduleOrderQty() : BigDecimal.ZERO);
+				detailsVO.setBalanceQty(d.getBalanceQty() != null ? d.getBalanceQty() : BigDecimal.ZERO);
+				detailsVO.setNewReqQty(d.getNewReqQty() != null ? d.getNewReqQty() : BigDecimal.ZERO);
+				detailsVO.setShortClosedQty(d.getShortClosedQty() != null ? d.getShortClosedQty() : BigDecimal.ZERO);
+				detailsVO.setReason(d.getReason());
+
+				detailsVO.setProductionSchOrderShortCloseVO(vo);
+				detailsList.add(detailsVO);
+			}
+		}
+		vo.setProductionOrderDetailsVO(detailsList);
+	}
+
+	private ProductionSchOrderShortCloseResponseDTO buildProductionSchOrderShortCloseResponse(
+			ProductionSchOrderShortCloseVO vo) {
+		ProductionSchOrderShortCloseResponseDTO responseDTO = new ProductionSchOrderShortCloseResponseDTO();
+
+		responseDTO.setId(vo.getId());
+		responseDTO.setDocId(vo.getDocId());
+		responseDTO.setDocDate(vo.getDocDate());
+		responseDTO.setNarration(vo.getNarration());
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
+		responseDTO.setActive(vo.getActive());
+		responseDTO.setCancel(vo.getCancel());
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+		responseDTO.setScreenName(vo.getScreenName());
+		responseDTO.setScreenCode(vo.getScreenCode());
+		responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+
+		// Map Nested Objects
+		if (vo.getItem() != null) {
+			ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+			itemDTO.setId(vo.getItem().getId());
+			itemDTO.setItemCode(vo.getItem().getItemCode());
+			itemDTO.setItemDescription(vo.getItem().getItemDescription());
+			responseDTO.setItem(itemDTO);
+		}
+
+		if (vo.getUnit() != null) {
+			UnitResponseDTO unitDTO = new UnitResponseDTO();
+			unitDTO.setId(vo.getUnit().getId());
+			unitDTO.setUnitId(vo.getUnit().getUnitId());
+			responseDTO.setUnit(unitDTO);
+		}
+
+		if (vo.getBranch() != null) {
+			BranchResponseDTO branchDTO = new BranchResponseDTO();
+			branchDTO.setId(vo.getBranch().getId());
+			branchDTO.setBranchCode(vo.getBranch().getBranchCode());
+			branchDTO.setBranchName(vo.getBranch().getBranchName());
+			responseDTO.setBranch(branchDTO);
+		}
+
+		// Map Details Grid
+		List<ProductionOrderDetailsResponseDTO> detailsList = new ArrayList<>();
+		if (vo.getProductionOrderDetailsVO() != null) {
+			for (ProductionOrderDetailsVO detailsVO : vo.getProductionOrderDetailsVO()) {
+				ProductionOrderDetailsResponseDTO detailsDTO = new ProductionOrderDetailsResponseDTO();
+				detailsDTO.setId(detailsVO.getId());
+				detailsDTO.setScheduleOrderNo(detailsVO.getScheduleOrderNo());
+				detailsDTO.setScheduleDate(detailsVO.getScheduleDate());
+				detailsDTO.setScheduleOrderQty(detailsVO.getScheduleOrderQty());
+				detailsDTO.setBalanceQty(detailsVO.getBalanceQty());
+				detailsDTO.setNewReqQty(detailsVO.getNewReqQty());
+				detailsDTO.setShortClosedQty(detailsVO.getShortClosedQty());
+				detailsDTO.setReason(detailsVO.getReason());
+
+				detailsList.add(detailsDTO);
+			}
+		}
+		responseDTO.setProductionOrderDetails(detailsList);
+
+		return responseDTO;
+	}
+
+	@Override
+	public String getProductionSchOrderShortCloseDocId(Long orgId, String financialYear) throws ApplicationException {
+		String screenCode = "PSOSC";
+		return productionSchOrderShortCloseRepo.getProductionSchOrderShortCloseDocId(orgId, financialYear, screenCode);
+	}
+
+	@Override
+	public ProductionSchOrderShortCloseResponseDTO getProductionSchOrderShortCloseById(Long id)
+			throws ApplicationException {
+		ProductionSchOrderShortCloseVO vo = productionSchOrderShortCloseRepo.getProductionSchOrderShortCloseById(id);
+		if (vo == null) {
+			throw new ApplicationException("Production Sch Order Short Close Not Found");
+		}
+		return buildProductionSchOrderShortCloseResponse(vo);
+	}
+
+	@Override
+	public List<ProductionSchOrderShortCloseResponseDTO> getProductionSchOrderShortCloseByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+		List<ProductionSchOrderShortCloseVO> list = productionSchOrderShortCloseRepo
+				.getProductionSchOrderShortCloseByOrgId(orgId, branch);
+		if (list == null || list.isEmpty()) {
+			throw new ApplicationException("Production Sch Order Short Close Not Found");
+		}
+		List<ProductionSchOrderShortCloseResponseDTO> responseList = new ArrayList<>();
+		for (ProductionSchOrderShortCloseVO vo : list) {
+			responseList.add(buildProductionSchOrderShortCloseResponse(vo));
+		}
+		return responseList;
+	}
+
 }

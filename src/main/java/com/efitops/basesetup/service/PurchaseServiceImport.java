@@ -16,10 +16,12 @@ import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FgTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialTransferReturnNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionSchOrderShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ScrapNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.dto.BillOfMaterialDTO;
 import com.efitops.basesetup.dto.ConsumptionEntryDTO;
@@ -28,10 +30,12 @@ import com.efitops.basesetup.dto.FgTransferSlipDTO;
 import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
 import com.efitops.basesetup.dto.MaterialTransferReturnNoteDTO;
 import com.efitops.basesetup.dto.PoType;
+import com.efitops.basesetup.dto.ProductionSchOrderShortCloseDTO;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.ProductionTransferSlipDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
+import com.efitops.basesetup.dto.ScrapNoteDTO;
 import com.efitops.basesetup.dto.StockTransferDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
@@ -217,21 +221,45 @@ public interface PurchaseServiceImport {
 	List<Map<String, Object>> getFgAndSfgItemDetailsConsumptionEntry(Long orgId, Long branch);
 
 	List<Map<String, Object>> getRawMaterialConsumptionEntry(Long orgId, Long branch, Long fgItem);
-	
-	//material
-	
-	Map<String, Object> createUpdateMaterialTransferReturnNote(MaterialTransferReturnNoteDTO dto) throws ApplicationException;
 
-    String getMaterialTransferReturnNoteDocId(Long orgId, String financialYear) throws ApplicationException;
+	// material
 
-    MaterialTransferReturnNoteResponseDTO getMaterialTransferReturnNoteById(Long id) throws ApplicationException;
+	Map<String, Object> createUpdateMaterialTransferReturnNote(MaterialTransferReturnNoteDTO dto)
+			throws ApplicationException;
 
-    List<MaterialTransferReturnNoteResponseDTO> getMaterialTransferReturnNoteByOrgId(Long orgId, Long branch) throws ApplicationException;
+	String getMaterialTransferReturnNoteDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	MaterialTransferReturnNoteResponseDTO getMaterialTransferReturnNoteById(Long id) throws ApplicationException;
+
+	List<MaterialTransferReturnNoteResponseDTO> getMaterialTransferReturnNoteByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
 
 	List<Map<String, Object>> getFgAndSfgFromMaterialTransferReturnNote(Long orgId, Long branch);
 
 	List<Map<String, Object>> getSchNoFromMaterialTransferReturnNote(Long orgId, Long branch);
 
 	List<Map<String, Object>> getSchNoItemDetailsFromMaterialTransferReturnNote(Long orgId, Long branch, String schNo);
+
+	// Note
+
+	Map<String, Object> createUpdateScrapNote(ScrapNoteDTO dto) throws ApplicationException;
+
+	String getScrapNoteDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	ScrapNoteResponseDTO getScrapNoteById(Long id) throws ApplicationException;
+
+	List<ScrapNoteResponseDTO> getScrapNoteByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	// ShortClose
+
+	Map<String, Object> createUpdateProductionSchOrderShortClose(ProductionSchOrderShortCloseDTO dto)
+			throws ApplicationException;
+
+	String getProductionSchOrderShortCloseDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	ProductionSchOrderShortCloseResponseDTO getProductionSchOrderShortCloseById(Long id) throws ApplicationException;
+
+	List<ProductionSchOrderShortCloseResponseDTO> getProductionSchOrderShortCloseByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
 
 }

@@ -142,7 +142,7 @@ public class ScrapNoteVO {
 
 	@OneToMany(mappedBy = "scrapNoteVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<ScrapNoteReasonDetailsVO> scrapNoteReasonDetailsVO; // "Reason Detail" Tab
+	private List<ScrapNoteReasonDetailsVO> scrapNoteReasonDetailsVO; 
 
 	@JsonGetter("active")
 	public String getActive() {

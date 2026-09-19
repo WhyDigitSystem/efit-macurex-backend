@@ -131,19 +131,18 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	              )
 	        ) der
 	            ON der.currency = c.currency_id
-	            AND der.org_id = c.org_id
 	            AND der.branch = pob.branch
 
-	        WHERE pob.doc_id = :docId
+	        WHERE pob.doc_id = :purchaseOrderNumber
 	          AND pob.org_id = :orgId
 	          AND pob.branch = :branch
-	          AND pob.cancel = 0
-	          AND cust.org_id = :orgId
-	          AND c.active = 1
-	          AND c.cancel = 0
+	          AND pob.cancel = FALSE
+	          
+	          AND c.active = TRUE
+	          AND c.cancel = FALSE
 	        """, nativeQuery = true)
-	List<Object[]> getCurrencyExchangeRateForPurchaseOrderAmendment(
-	        @Param("docId") String docId,
+	List<Object[]> getCurrencyExchangeRateforPurchaseOrderAmendment(
+	        @Param("purchaseOrderNumber") String purchaseOrderNumber,
 	        @Param("orgId") Long orgId,
 	        @Param("branch") Long branch);
 
@@ -157,4 +156,5 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 		        Long orgId,
 		        String financialYear,
 		        String screenCode);
+
 }

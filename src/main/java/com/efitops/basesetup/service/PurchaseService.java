@@ -51,6 +51,7 @@ public interface PurchaseService {
 	List<Map<String, Object>> getPurchaseIndentItemDropdown(Long orgId, Long branch);
 	List<Map<String, Object>> getPurchaseIndentConversionFactorDropdown(Long orgId, Long branch,Long fromUnit,Long toUnit);
 	List<Map<String, Object>> getPurchaseIndentDepartmentDropdown(Long orgId);
+	String getPurchaseIndentDocId(Long orgId, String financialYear);
     
     
     //purchase indent

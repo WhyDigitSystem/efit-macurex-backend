@@ -1,22 +1,43 @@
 package com.efitops.basesetup.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
+import com.efitops.basesetup.ResponseDTO.FlashNCReportAttachmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FlashNCReportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
@@ -28,25 +49,30 @@ import com.efitops.basesetup.ResponseDTO.SetUpApprovalDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalParametersDetailsResponeDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ShiftResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SupplierChangeRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.CategoryMasterDTO;
+import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDetailsDTO;
-import com.efitops.basesetup.dto.FlashNCReportAttachmentDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDetailsDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDetailsDTO;
 import com.efitops.basesetup.dto.SetUpApprovalParametersDetailsDTO;
+import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.CategoryMasterVO;
+import com.efitops.basesetup.entity.CauseMasterVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DailyInspectionCumRejectionDataVO;
 import com.efitops.basesetup.entity.DailyInspectionCumRejectionDetailsVO;
@@ -65,18 +91,22 @@ import com.efitops.basesetup.entity.SetUpApprovalDetailsVO;
 import com.efitops.basesetup.entity.SetUpApprovalParametersDetailsVO;
 import com.efitops.basesetup.entity.SetUpApprovalVO;
 import com.efitops.basesetup.entity.ShiftVO;
+import com.efitops.basesetup.entity.SupplierChangeRequestVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryDetailsVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryVO;
 import com.efitops.basesetup.entity.VendorComplaintDetailsVO;
 import com.efitops.basesetup.entity.VendorComplaintEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.CategoryMasterRepo;
+import com.efitops.basesetup.repository.CauseMasterRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DailyInspectionCumRejectionDataRepo;
 import com.efitops.basesetup.repository.DailyInspectionCumRejectionDetailsRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
+import com.efitops.basesetup.repository.FlashNCReportAttachmentRepo;
 import com.efitops.basesetup.repository.FlashNCReportRepo;
 import com.efitops.basesetup.repository.InstrumentCalibrationDetailsRepo;
 import com.efitops.basesetup.repository.InstrumentCalibrationRepo;
@@ -88,6 +118,7 @@ import com.efitops.basesetup.repository.SetUpApprovalDetailsRepo;
 import com.efitops.basesetup.repository.SetUpApprovalParametersDetailsRepo;
 import com.efitops.basesetup.repository.SetUpApprovalRepo;
 import com.efitops.basesetup.repository.ShiftRepo;
+import com.efitops.basesetup.repository.SupplierChangeRequestRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryDetailsRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryRepo;
 import com.efitops.basesetup.repository.VendorComplaintDetailsRepo;
@@ -162,6 +193,18 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private FlashNCReportRepo flashNCReportRepo;
+
+	@Autowired
+	private FlashNCReportAttachmentRepo flashNCReportAttachmentRepo;
+
+	@Autowired
+	SupplierChangeRequestRepo supplierChangeRequestRepo;
+
+	@Autowired
+	private CategoryMasterRepo categoryMasterRepo;
+
+	@Autowired
+	private CauseMasterRepo causeMasterRepo;
 
 	@Override
 	@Transactional
@@ -2333,55 +2376,13 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateFlashNCReport(FlashNCReportDTO flashNCReportDTO)
-			throws ApplicationException {
+	public Map<String, Object> updateCreateFlashNCReport(FlashNCReportDTO flashNCReportDTO, MultipartFile[] files,
+			MultipartFile[] images) throws ApplicationException {
 
-		FlashNCReportVO flashNCReportVO = new FlashNCReportVO();
-
-		String screenCode = "FNR";
+		FlashNCReportVO flashNCReportVO;
 		String message;
 
-		if (ObjectUtils.isEmpty(flashNCReportDTO.getId())) {
-
-		    
-
-		    String docId = flashNCReportRepo.getFlashNCReportDocId(
-		            flashNCReportDTO.getOrgId(),
-		            flashNCReportDTO.getFinancialYear(),
-		            screenCode);
-
-		    if (StringUtils.isBlank(docId)) {
-		        throw new ApplicationException(
-		                "Flash NC Report DocId Not Found");
-		    }
-
-		    flashNCReportVO.setDocId(docId);
-
-		    DocumentTypeMappingDetailsVO mapping =
-		            documentTypeMappingDetailsRepo
-		                    .findByOrgIdAndFinYearAndScreenCode(
-		                            flashNCReportDTO.getOrgId(),
-		                            flashNCReportDTO.getFinancialYear(),
-		                            screenCode);
-
-		    if (mapping == null) {
-		        throw new ApplicationException(
-		                "Document Type Mapping Details Not Found");
-		    }
-
-		    mapping.setLastNo(mapping.getLastNo() + 1);
-
-		    documentTypeMappingDetailsRepo.save(mapping);
-
-		    flashNCReportVO.setCreatedBy(
-		            flashNCReportDTO.getCreatedBy());
-
-		    flashNCReportVO.setUpdatedBy(
-		            flashNCReportDTO.getCreatedBy());
-
-		    message = "Flash NC Report Created Successfully";
-
-		} else {
+		if (ObjectUtils.isNotEmpty(flashNCReportDTO.getId())) {
 
 			flashNCReportVO = flashNCReportRepo.findById(flashNCReportDTO.getId())
 					.orElseThrow(() -> new ApplicationException("Invalid Flash NC Report"));
@@ -2389,16 +2390,66 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			flashNCReportVO.setUpdatedBy(flashNCReportDTO.getCreatedBy());
 
 			message = "Flash NC Report Updated Successfully";
+
+		} else {
+
+			flashNCReportVO = new FlashNCReportVO();
+
+			String screenCode = "FNR";
+
+			String docId = flashNCReportRepo.getFlashNCReportDocId(flashNCReportDTO.getOrgId(),
+					flashNCReportDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Flash NC Report DocId Not Found");
+			}
+
+			flashNCReportVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO mapping = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+					flashNCReportDTO.getOrgId(), flashNCReportDTO.getFinancialYear(), screenCode);
+
+			if (mapping == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			mapping.setLastNo(mapping.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(mapping);
+
+			flashNCReportVO.setCreatedBy(flashNCReportDTO.getCreatedBy());
+
+			flashNCReportVO.setUpdatedBy(flashNCReportDTO.getCreatedBy());
+
+			message = "Flash NC Report Created Successfully";
 		}
 
+		/*
+		 * Set Flash NC Report values
+		 */
 		createUpdateFlashNCReportVO(flashNCReportDTO, flashNCReportVO);
 
-		FlashNCReportVO savedVO = flashNCReportRepo.save(flashNCReportVO);
+		/*
+		 * Save Main VO first
+		 */
+		flashNCReportVO = flashNCReportRepo.save(flashNCReportVO);
+
+		// Save header image
+		saveFlashNCReportImage(images, flashNCReportVO);
+
+		/*
+		 * Save Attachments
+		 */
+		saveFlashNCReportAttachments(files, flashNCReportVO);
+
+		/*
+		 * Response
+		 */
+		FlashNCReportResponseDTO responseDTO = flashNCReportResponse(flashNCReportVO);
 
 		Map<String, Object> response = new HashMap<>();
 
 		response.put("message", message);
-		response.put("flashNCReportVO", flashNCReportResponse(savedVO));
+		response.put("flashNCReportVO", responseDTO);
 
 		return response;
 	}
@@ -2516,54 +2567,109 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Normal fields
+		 * Normal Fields
 		 */
 		vo.setDescription(dto.getDescription());
+
 		vo.setDrawingNo(dto.getDrawingNo());
+
 		vo.setMrinSCGRNNO(dto.getMrinSCGRNNO());
+
 		vo.setMrinDate(dto.getMrinDate());
+
 		vo.setOccPercentage(dto.getOccPercentage());
+
 		vo.setInvoiceNo(dto.getInvoiceNo());
+
 		vo.setPoNo(dto.getPoNo());
+
 		vo.setOperationNo(dto.getOperationNo());
+
 		vo.setLotQty(dto.getLotQty());
+
 		vo.setSampleQty(dto.getSampleQty());
+
 		vo.setNcQty(dto.getNcQty());
+
 		vo.setDefectSeen(dto.getDefectSeen());
+
 		vo.setProblemStatus(dto.getProblemStatus());
+
 		vo.setActionOnDefectiveLot(dto.getActionOnDefectiveLot());
+
 		vo.setNarration(dto.getNarration());
+
 		vo.setOrgId(dto.getOrgId());
+
 		vo.setFinancialYear(dto.getFinancialYear());
+
 		vo.setActive(dto.isActive());
+
 		vo.setCancelRemarks(dto.getCancelRemarks());
+	}
 
-		/*
-		 * Attachments
-		 */
-		vo.getFlashNCReportAttachmentVO().clear();
+	private void saveFlashNCReportImage(MultipartFile[] images, FlashNCReportVO flashNCReportVO)
+			throws ApplicationException {
 
-		if (dto.getFlashNCReportAttachmentDTO() != null) {
+		if (images == null || images.length == 0) {
+			return;
+		}
 
-			for (FlashNCReportAttachmentDTO attachmentDTO : dto.getFlashNCReportAttachmentDTO()) {
+		try {
 
-				FlashNCReportAttachmentVO attachmentVO = new FlashNCReportAttachmentVO();
+			Path flashNCReportFolder = Paths.get(flashNCReportUploadPath, "flash-nc-report",
+					flashNCReportVO.getId().toString());
 
-				if (attachmentDTO.getId() != null) {
-					attachmentVO.setId(attachmentDTO.getId());
+			createDirectory(flashNCReportFolder);
+
+			for (MultipartFile image : images) {
+
+				if (image == null || image.isEmpty()) {
+					continue;
 				}
 
-				attachmentVO.setName(attachmentDTO.getName());
-				attachmentVO.setFileName(attachmentDTO.getFileName());
-				attachmentVO.setFilePath(attachmentDTO.getFilePath());
-				attachmentVO.setFileSize(attachmentDTO.getFileSize());
-				attachmentVO.setContentType(attachmentDTO.getContentType());
-				attachmentVO.setUploadOn(attachmentDTO.getUploadOn());
+				String originalName = image.getOriginalFilename();
 
-				attachmentVO.setFlashNCReportVO(vo);
+				if (originalName == null) {
+					originalName = "image";
+				}
 
-				vo.getFlashNCReportAttachmentVO().add(attachmentVO);
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+
+					extension = originalName.substring(originalName.lastIndexOf("."));
+
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				String fileName = originalName + "_" + flashNCReportVO.getId() + extension;
+
+				Path filePath = flashNCReportFolder.resolve(fileName);
+
+				try (InputStream inputStream = image.getInputStream()) {
+
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/vendorComplaintEntry/viewFile/").toUriString();
+
+				String relativePath = "flash-nc-report/" + flashNCReportVO.getId() + "/" + fileName;
+
+				String publicUrl = baseUrl + relativePath;
+
+				// Save image URL/path in parent table
+				flashNCReportVO.setFlashNCImageName(publicUrl);
+
+				flashNCReportRepo.save(flashNCReportVO);
 			}
+
+		} catch (IOException e) {
+
+			throw new ApplicationException("Image Upload Failed : " + e.getMessage());
 		}
 	}
 
@@ -2603,6 +2709,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			belongsTo.setDescription(vo.getBelongsTo().getValueDescription());
 
 			response.setBelongsTo(belongsTo);
+
 		}
 
 		/*
@@ -2654,31 +2761,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Normal fields
-		 */
-		response.setDescription(vo.getDescription());
-		response.setDrawingNo(vo.getDrawingNo());
-		response.setMrinSCGRNNO(vo.getMrinSCGRNNO());
-		response.setMrinDate(vo.getMrinDate());
-		response.setOccPercentage(vo.getOccPercentage());
-		response.setInvoiceNo(vo.getInvoiceNo());
-		response.setPoNo(vo.getPoNo());
-		response.setOperationNo(vo.getOperationNo());
-		response.setLotQty(vo.getLotQty());
-		response.setSampleQty(vo.getSampleQty());
-		response.setNcQty(vo.getNcQty());
-		response.setDefectSeen(vo.getDefectSeen());
-		response.setProblemStatus(vo.getProblemStatus());
-		response.setActionOnDefectiveLot(vo.getActionOnDefectiveLot());
-		response.setNarration(vo.getNarration());
-		response.setOrgId(vo.getOrgId());
-		response.setFinancialYear(vo.getFinancialYear());
-		response.setActive(vo.getActive());
-		response.setCancelRemarks(vo.getCancelRemarks());
-		response.setCreatedBy(vo.getCreatedBy());
-
-		/*
-		 * Supplier Response
+		 * Supplier
 		 */
 		if (vo.getSupplier() != null) {
 
@@ -2692,7 +2775,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Item Response
+		 * Item
 		 */
 		if (vo.getItem() != null) {
 
@@ -2708,7 +2791,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Disposal Response
+		 * Disposal
 		 */
 		if (vo.getDisposal() != null) {
 
@@ -2724,7 +2807,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Inspected By Response
+		 * Inspected By
 		 */
 		if (vo.getInspectedBy() != null) {
 
@@ -2738,7 +2821,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		/*
-		 * Status Response
+		 * Status
 		 */
 		if (vo.getStatus() != null) {
 
@@ -2753,7 +2836,225 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			response.setStatus(status);
 		}
 
+		/*
+		 * Normal Fields
+		 */
+		response.setDescription(vo.getDescription());
+
+		response.setDrawingNo(vo.getDrawingNo());
+
+		response.setMrinSCGRNNO(vo.getMrinSCGRNNO());
+
+		response.setMrinDate(vo.getMrinDate());
+
+		response.setOccPercentage(vo.getOccPercentage());
+
+		response.setInvoiceNo(vo.getInvoiceNo());
+
+		response.setPoNo(vo.getPoNo());
+
+		response.setOperationNo(vo.getOperationNo());
+
+		response.setLotQty(vo.getLotQty());
+
+		response.setSampleQty(vo.getSampleQty());
+
+		response.setNcQty(vo.getNcQty());
+
+		response.setDefectSeen(vo.getDefectSeen());
+
+		response.setProblemStatus(vo.getProblemStatus());
+
+		response.setActionOnDefectiveLot(vo.getActionOnDefectiveLot());
+
+		response.setNarration(vo.getNarration());
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setActive(vo.getActive());
+
+		response.setCancelRemarks(vo.getCancelRemarks());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		response.setFlashNCImageName(vo.getFlashNCImageName());
+
+		/*
+		 * Attachment Response
+		 */
+		List<FlashNCReportAttachmentResponseDTO> attachmentList = new ArrayList<>();
+
+		if (vo.getFlashNCReportAttachmentVO() != null && !vo.getFlashNCReportAttachmentVO().isEmpty()) {
+
+			for (FlashNCReportAttachmentVO attachmentVO : vo.getFlashNCReportAttachmentVO()) {
+
+				FlashNCReportAttachmentResponseDTO attachmentDTO = new FlashNCReportAttachmentResponseDTO();
+
+				attachmentDTO.setId(attachmentVO.getId());
+
+				attachmentDTO.setName(attachmentVO.getName());
+
+				attachmentDTO.setFileName(attachmentVO.getFileName());
+
+				attachmentDTO.setFilePath(attachmentVO.getFilePath());
+
+				attachmentDTO.setFileSize(attachmentVO.getFileSize());
+
+				attachmentDTO.setContentType(attachmentVO.getContentType());
+
+				attachmentDTO.setUploadOn(attachmentVO.getUploadOn());
+
+				attachmentList.add(attachmentDTO);
+			}
+		}
+
+		response.setFlashNCReportAttachmentResponseDTO(attachmentList);
+
 		return response;
+	}
+
+	@Value("${flash.nc.report.upload.path}")
+	private String flashNCReportUploadPath;
+
+	private void saveFlashNCReportAttachments(MultipartFile[] files, FlashNCReportVO flashNCReportVO)
+			throws ApplicationException {
+
+		if (files == null || files.length == 0) {
+			return;
+		}
+
+		try {
+
+			// 1. Create folder
+			Path flashNCReportFolder = Paths.get(flashNCReportUploadPath, "flash-nc-report",
+					flashNCReportVO.getId().toString());
+
+			createDirectory(flashNCReportFolder);
+
+			List<FlashNCReportAttachmentVO> attachmentList = new ArrayList<>();
+
+			for (MultipartFile file : files) {
+
+				if (file == null || file.isEmpty()) {
+					continue;
+				}
+
+				// 2. Get original file name
+				String originalName = file.getOriginalFilename();
+
+				if (originalName == null) {
+					originalName = "file";
+				}
+
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+
+					extension = originalName.substring(originalName.lastIndexOf("."));
+
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				// 3. Create unique file name
+				String fileName = originalName + "_" + flashNCReportVO.getId() + extension;
+
+				// 4. Actual physical file path
+				Path filePath = flashNCReportFolder.resolve(fileName);
+
+				// 5. Save image to disk
+				try (InputStream inputStream = file.getInputStream()) {
+
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				// 6. Create URL for viewing image
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/vendorComplaintEntry/viewFile/").toUriString();
+
+				String relativePath = "flash-nc-report/" + flashNCReportVO.getId() + "/" + fileName;
+
+				String publicUrl = baseUrl + relativePath;
+
+				// 7. Save attachment details in DB
+				FlashNCReportAttachmentVO attachment = new FlashNCReportAttachmentVO();
+
+				attachment.setFlashNCReportVO(flashNCReportVO);
+				attachment.setName(file.getOriginalFilename());
+				attachment.setFileName(fileName);
+				attachment.setFilePath(publicUrl);
+				attachment.setFileSize(file.getSize());
+				attachment.setContentType(file.getContentType());
+				attachment.setUploadOn(LocalDateTime.now());
+
+				attachmentList.add(attachment);
+			}
+
+			// 8. Save attachment records
+			if (!attachmentList.isEmpty()) {
+
+				List<FlashNCReportAttachmentVO> saved = flashNCReportAttachmentRepo.saveAll(attachmentList);
+
+				flashNCReportVO.setFlashNCReportAttachmentVO(saved);
+			}
+
+		} catch (IOException e) {
+
+			throw new ApplicationException("File Upload Failed : " + e.getMessage());
+		}
+	}
+
+	private void createDirectory(Path path) throws IOException {
+
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
+	@Override
+	public ResponseEntity<byte[]> viewFlashNCReportFile(HttpServletRequest request) throws IOException {
+
+		return serveFile(request, "/api/vendorComplaintEntry/viewFile/", flashNCReportUploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveFile(HttpServletRequest request, String apiPrefix, String uploadBasePath)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
 	}
 
 	@Override
@@ -2798,37 +3099,979 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		return docId;
 	}
-	
+
 	@Override
-	public List<Map<String, Object>> getQualityEmployeesForFlashNCReport(
-	        Long orgId,
-	        Long branch) throws ApplicationException {
+	public List<Map<String, Object>> getQualityEmployeesForFlashNCReport(Long orgId, Long branch)
+			throws ApplicationException {
 
-	    List<Object[]> employeeList =
-	            flashNCReportRepo.getQualityEmployeesForFlashNCReport(
-	                    orgId,
-	                    branch);
+		List<Object[]> employeeList = flashNCReportRepo.getQualityEmployeesForFlashNCReport(orgId, branch);
 
-	    if (employeeList == null || employeeList.isEmpty()) {
-	        throw new ApplicationException(
-	                "No Quality Department Employees Found");
-	    }
+		if (employeeList == null || employeeList.isEmpty()) {
+			throw new ApplicationException("No Quality Department Employees Found");
+		}
 
-	    List<Map<String, Object>> responseList =
-	            new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : employeeList) {
+		for (Object[] obj : employeeList) {
 
-	        Map<String, Object> employeeMap =
-	                new HashMap<>();
+			Map<String, Object> employeeMap = new HashMap<>();
 
-	        employeeMap.put("employeeId", obj[0]);
-	        employeeMap.put("employeeCode", obj[1]);
-	        employeeMap.put("employeeName", obj[2]);
+			employeeMap.put("employeeId", obj[0]);
+			employeeMap.put("employeeCode", obj[1]);
+			employeeMap.put("employeeName", obj[2]);
 
-	        responseList.add(employeeMap);
-	    }
+			responseList.add(employeeMap);
+		}
 
-	    return responseList;
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long listOfValuesId)
+			throws ApplicationException {
+
+		List<Object[]> departmentList = flashNCReportRepo.getFromDeptDropdownForFlashNCReport(listOfValuesId);
+
+		if (departmentList == null || departmentList.isEmpty()) {
+
+			throw new ApplicationException("No From Department Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : departmentList) {
+
+			Map<String, Object> departmentMap = new HashMap<>();
+
+			departmentMap.put("id", obj[0]);
+			departmentMap.put("valueCode", obj[1]);
+			departmentMap.put("valueDescription", obj[2]);
+
+			responseList.add(departmentMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long listOfValuesId, Long fromDept)
+			throws ApplicationException {
+
+		List<Object[]> departmentList = flashNCReportRepo.getToDepartmentDropdownForFlashNCReport(listOfValuesId,
+				fromDept);
+
+		if (departmentList == null || departmentList.isEmpty()) {
+
+			throw new ApplicationException("No To Department Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : departmentList) {
+
+			Map<String, Object> departmentMap = new HashMap<>();
+
+			departmentMap.put("id", obj[0]);
+			departmentMap.put("valueCode", obj[1]);
+			departmentMap.put("valueDescription", obj[2]);
+
+			responseList.add(departmentMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getMRINGRNDropdownForFlashNCReport(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> mrinGrnList = flashNCReportRepo.getMRINGRNDropdownForFlashNCReport(orgId, branch);
+
+		if (mrinGrnList == null || mrinGrnList.isEmpty()) {
+
+			throw new ApplicationException("No MRIN/GRN Details Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : mrinGrnList) {
+
+			Map<String, Object> mrinGrnMap = new HashMap<>();
+
+			mrinGrnMap.put("mrinGrnNo", obj[0]);
+			mrinGrnMap.put("supplierCode", obj[1]);
+			mrinGrnMap.put("supplierName", obj[2]);
+			mrinGrnMap.put("invoiceNo", obj[3]);
+			mrinGrnMap.put("item", obj[4]);
+			mrinGrnMap.put("itemDescription", obj[5]);
+			mrinGrnMap.put("mrinGrnDate", obj[6]);
+			mrinGrnMap.put("poNo", obj[7]);
+			mrinGrnMap.put("qty", obj[8]);
+			mrinGrnMap.put("sourceType", obj[9]);
+
+			responseList.add(mrinGrnMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateSupplierChangeRequest(SupplierChangeRequestDTO supplierChangeRequestDTO)
+			throws ApplicationException {
+
+		SupplierChangeRequestVO supplierChangeRequestVO = new SupplierChangeRequestVO();
+
+		String message;
+
+		String screenCode = "SCR";
+
+		if (ObjectUtils.isEmpty(supplierChangeRequestDTO.getId())) {
+
+			String docId = supplierChangeRequestRepo.getSupplierChangeRequestDocId(supplierChangeRequestDTO.getOrgId(),
+					supplierChangeRequestDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+
+				throw new ApplicationException("Supplier Change Request DocId Not Found");
+			}
+
+			supplierChangeRequestVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO mapping = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+					supplierChangeRequestDTO.getOrgId(), supplierChangeRequestDTO.getFinancialYear(), screenCode);
+
+			if (mapping == null) {
+
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			mapping.setLastNo(mapping.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(mapping);
+
+			supplierChangeRequestVO.setCreatedBy(supplierChangeRequestDTO.getCreatedBy());
+
+			supplierChangeRequestVO.setUpdatedBy(supplierChangeRequestDTO.getCreatedBy());
+
+			message = "Supplier Change Request Created Successfully";
+
+		} else {
+
+			supplierChangeRequestVO = supplierChangeRequestRepo.findById(supplierChangeRequestDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Supplier Change Request Details"));
+
+			supplierChangeRequestVO.setUpdatedBy(supplierChangeRequestDTO.getCreatedBy());
+
+			message = "Supplier Change Request Updated Successfully";
+		}
+
+		createUpdateSupplierChangeRequestVO(supplierChangeRequestDTO, supplierChangeRequestVO);
+
+		SupplierChangeRequestVO savedVO = supplierChangeRequestRepo.save(supplierChangeRequestVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("supplierChangeRequestVO", supplierChangeRequestResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdateSupplierChangeRequestVO(SupplierChangeRequestDTO dto, SupplierChangeRequestVO vo)
+			throws ApplicationException {
+
+		if (dto.getBranch() != null) {
+
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Invalid Branch"));
+
+			vo.setBranch(branch);
+		}
+
+		if (dto.getVendorCode() != null) {
+
+			CustomerVO customer = customerRepo.findById(dto.getVendorCode())
+					.orElseThrow(() -> new ApplicationException("Invalid Vendor"));
+
+			vo.setVendorCode(customer);
+		}
+
+		if (dto.getBuyerName() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getBuyerName())
+					.orElseThrow(() -> new ApplicationException("Invalid Buyer"));
+
+			vo.setBuyerName(employee);
+		}
+
+		if (dto.getSourceTriggeredBy() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getSourceTriggeredBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Source Triggered By"));
+
+			vo.setSourceTriggeredBy(employee);
+		}
+
+		// Basic Details
+
+		vo.setPartNo(dto.getPartNo());
+		vo.setPartDescription(dto.getPartDescription());
+		vo.setSupplierContact(dto.getSupplierContact());
+		vo.setSupplierPhoneNo(dto.getSupplierPhoneNo());
+		vo.setSupplierEmailId(dto.getSupplierEmailId());
+
+		vo.setBuyerPhoneNo(dto.getBuyerPhoneNo());
+		vo.setBuyerEmailId(dto.getBuyerEmailId());
+
+		vo.setSourcePhoneNo(dto.getSourcePhoneNo());
+		vo.setSourceEmailId(dto.getSourceEmailId());
+
+		// Reason for Change
+
+		vo.setCapacityIssueWithExisitingSupplier(dto.getCapacityIssueWithExisitingSupplier());
+
+		vo.setCustomerRequirementDemandIncreased(dto.getCustomerRequirementDemandIncreased());
+
+		vo.setAlternativeRMSourceorAdditionalRMSource(dto.getAlternativeRMSourceorAdditionalRMSource());
+
+		vo.setInternalCapacityIssue(dto.getInternalCapacityIssue());
+
+		vo.setChangeInSupplierBaseQualityIssueinExisitingSupplier(
+				dto.getChangeInSupplierBaseQualityIssueinExisitingSupplier());
+
+		vo.setSupplierCommercialIssue(dto.getSupplierCommercialIssue());
+
+		vo.setCustomeApprovedSource(dto.getCustomeApprovedSource());
+
+		vo.setOthers(dto.getOthers());
+
+		vo.setChangeDescriptionInDetails(dto.getChangeDescriptionInDetails());
+
+		vo.setDetailOfProposedProcessOfOutSourced(dto.getDetailOfProposedProcessOfOutSourced());
+
+		// Impact of Change
+
+		vo.setQualityImprovement(dto.getQualityImprovement());
+
+		vo.setReducedLeadTime(dto.getReducedLeadTime());
+
+		vo.setCostReduction(dto.getCostReduction());
+
+		vo.setIncreaseManufacturingEfficiency(dto.getIncreaseManufacturingEfficiency());
+
+		vo.setOthersPleaseSpecify(dto.getOthersPleaseSpecify());
+
+		vo.setEffectOfChanges(dto.getEffectOfChanges());
+
+		vo.setRiskAssessment(dto.getRiskAssessment());
+
+		vo.setProposedIntroductionImplementationDate(dto.getProposedIntroductionImplementationDate());
+
+		vo.setSupplierEvaluationReport(dto.getSupplierEvaluationReport());
+
+		vo.setReliabilityFunctionalReportFromTDC(dto.getReliabilityFunctionalReportFromTDC());
+
+		vo.setCustomerApproval(dto.getCustomerApproval());
+
+		vo.setOnJobTrainingReportFromMfg(dto.getOnJobTrainingReportFromMfg());
+
+		vo.setProcessAuditReport(dto.getProcessAuditReport());
+
+		vo.setSupplierRegistrationFrom(dto.getSupplierRegistrationFrom());
+
+		vo.setPpapIsirRequired(dto.getPpapIsirRequired());
+
+		vo.setChangeRequestApproval(dto.getChangeRequestApproval());
+
+		// Authorized Signatures
+
+		if (dto.getSignByPurchase() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getSignByPurchase())
+					.orElseThrow(() -> new ApplicationException("Invalid Purchase Employee"));
+
+			vo.setSignByPurchase(employee);
+		}
+
+		vo.setPurchaseDisposition(dto.getPurchaseDisposition());
+
+		if (dto.getSignByTDC() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getSignByTDC())
+					.orElseThrow(() -> new ApplicationException("Invalid TDC Employee"));
+
+			vo.setSignByTDC(employee);
+		}
+
+		vo.setTdcDisposition(dto.getTdcDisposition());
+
+		if (dto.getSignByProduction() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getSignByProduction())
+					.orElseThrow(() -> new ApplicationException("Invalid Production Employee"));
+
+			vo.setSignByProduction(employee);
+		}
+
+		vo.setProductionDisposition(dto.getProductionDisposition());
+
+		if (dto.getSignByQuality() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getSignByQuality())
+					.orElseThrow(() -> new ApplicationException("Invalid Quality Employee"));
+
+			vo.setSignByQuality(employee);
+		}
+
+		vo.setQualityDisposition(dto.getQualityDisposition());
+
+		vo.setNote(dto.getNote());
+
+		// Common fields
+
+		vo.setActive(dto.isActive());
+
+		vo.setOrgId(dto.getOrgId());
+
+		vo.setFinancialYear(dto.getFinancialYear());
+
+	}
+
+	private SupplierChangeRequestResponseDTO supplierChangeRequestResponse(SupplierChangeRequestVO vo) {
+
+		SupplierChangeRequestResponseDTO response = new SupplierChangeRequestResponseDTO();
+
+		response.setId(vo.getId());
+
+		response.setDocId(vo.getDocId());
+
+		response.setDocDate(vo.getDocDate());
+
+		// Branch
+
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponse = new BranchResponseDTO();
+
+			branchResponse.setId(vo.getBranch().getId());
+
+			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+
+			branchResponse.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponse);
+		}
+
+		// Vendor
+
+		if (vo.getVendorCode() != null) {
+
+			CustomerResponse1DTO customerResponse = new CustomerResponse1DTO();
+
+			customerResponse.setId(vo.getVendorCode().getId());
+
+			customerResponse.setCustomerName(vo.getVendorCode().getCustomerName());
+
+			response.setVendorCode(customerResponse);
+		}
+
+		// Basic Details
+
+		response.setPartNo(vo.getPartNo());
+
+		response.setPartDescription(vo.getPartDescription());
+
+		response.setSupplierContact(vo.getSupplierContact());
+
+		response.setSupplierPhoneNo(vo.getSupplierPhoneNo());
+
+		response.setSupplierEmailId(vo.getSupplierEmailId());
+
+		// Buyer
+
+		if (vo.getBuyerName() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getBuyerName().getId());
+
+			employeeResponse.setEmployeeName(vo.getBuyerName().getEmployeeName());
+
+			response.setBuyerName(employeeResponse);
+		}
+
+		response.setBuyerPhoneNo(vo.getBuyerPhoneNo());
+
+		response.setBuyerEmailId(vo.getBuyerEmailId());
+
+		// Source Triggered By
+
+		if (vo.getSourceTriggeredBy() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getSourceTriggeredBy().getId());
+
+			employeeResponse.setEmployeeName(vo.getSourceTriggeredBy().getEmployeeName());
+
+			response.setSourceTriggeredBy(employeeResponse);
+		}
+
+		response.setSourcePhoneNo(vo.getSourcePhoneNo());
+
+		response.setSourceEmailId(vo.getSourceEmailId());
+
+		// Reason for Change
+
+		response.setCapacityIssueWithExisitingSupplier(vo.getCapacityIssueWithExisitingSupplier());
+
+		response.setCustomerRequirementDemandIncreased(vo.getCustomerRequirementDemandIncreased());
+
+		response.setAlternativeRMSourceorAdditionalRMSource(vo.getAlternativeRMSourceorAdditionalRMSource());
+
+		response.setInternalCapacityIssue(vo.getInternalCapacityIssue());
+
+		response.setChangeInSupplierBaseQualityIssueinExisitingSupplier(
+				vo.getChangeInSupplierBaseQualityIssueinExisitingSupplier());
+
+		response.setSupplierCommercialIssue(vo.getSupplierCommercialIssue());
+
+		response.setCustomeApprovedSource(vo.getCustomeApprovedSource());
+
+		response.setOthers(vo.getOthers());
+
+		response.setChangeDescriptionInDetails(vo.getChangeDescriptionInDetails());
+
+		response.setDetailOfProposedProcessOfOutSourced(vo.getDetailOfProposedProcessOfOutSourced());
+
+		// Impact of Change
+
+		response.setQualityImprovement(vo.getQualityImprovement());
+
+		response.setReducedLeadTime(vo.getReducedLeadTime());
+
+		response.setCostReduction(vo.getCostReduction());
+
+		response.setIncreaseManufacturingEfficiency(vo.getIncreaseManufacturingEfficiency());
+
+		response.setOthersPleaseSpecify(vo.getOthersPleaseSpecify());
+
+		response.setEffectOfChanges(vo.getEffectOfChanges());
+
+		response.setRiskAssessment(vo.getRiskAssessment());
+
+		response.setProposedIntroductionImplementationDate(vo.getProposedIntroductionImplementationDate());
+
+		response.setSupplierEvaluationReport(vo.getSupplierEvaluationReport());
+
+		response.setReliabilityFunctionalReportFromTDC(vo.getReliabilityFunctionalReportFromTDC());
+
+		response.setCustomerApproval(vo.getCustomerApproval());
+
+		response.setOnJobTrainingReportFromMfg(vo.getOnJobTrainingReportFromMfg());
+
+		response.setProcessAuditReport(vo.getProcessAuditReport());
+
+		response.setSupplierRegistrationFrom(vo.getSupplierRegistrationFrom());
+
+		response.setPpapIsirRequired(vo.getPpapIsirRequired());
+
+		response.setChangeRequestApproval(vo.getChangeRequestApproval());
+
+		// Sign By Purchase
+
+		if (vo.getSignByPurchase() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getSignByPurchase().getId());
+
+			employeeResponse.setEmployeeName(vo.getSignByPurchase().getEmployeeName());
+
+			response.setSignByPurchase(employeeResponse);
+		}
+
+		response.setPurchaseDisposition(vo.getPurchaseDisposition());
+
+		// Sign By TDC
+
+		if (vo.getSignByTDC() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getSignByTDC().getId());
+
+			employeeResponse.setEmployeeName(vo.getSignByTDC().getEmployeeName());
+
+			response.setSignByTDC(employeeResponse);
+		}
+
+		response.setTdcDisposition(vo.getTdcDisposition());
+
+		// Sign By Production
+
+		if (vo.getSignByProduction() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getSignByProduction().getId());
+
+			employeeResponse.setEmployeeName(vo.getSignByProduction().getEmployeeName());
+
+			response.setSignByProduction(employeeResponse);
+		}
+
+		response.setProductionDisposition(vo.getProductionDisposition());
+
+		// Sign By Quality
+
+		if (vo.getSignByQuality() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getSignByQuality().getId());
+
+			employeeResponse.setEmployeeName(vo.getSignByQuality().getEmployeeName());
+
+			response.setSignByQuality(employeeResponse);
+		}
+
+		response.setQualityDisposition(vo.getQualityDisposition());
+
+		response.setNote(vo.getNote());
+
+		// Common fields
+
+		response.setActive(vo.isActive() ? "Active" : "In-Active");
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		return response;
+	}
+
+	@Override
+	public String getSupplierChangeRequestDocId(Long orgId, String financialYear, String screenCode)
+			throws ApplicationException {
+
+		String docId = supplierChangeRequestRepo.getSupplierChangeRequestDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("Supplier Change Request DocId Not Found");
+		}
+
+		return docId;
+	}
+
+	@Override
+	public SupplierChangeRequestResponseDTO getSupplierChangeRequestById(Long id) throws ApplicationException {
+
+		SupplierChangeRequestVO supplierChangeRequestVO = supplierChangeRequestRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Supplier Change Request Details"));
+
+		return supplierChangeRequestResponse(supplierChangeRequestVO);
+	}
+
+	@Override
+	public List<SupplierChangeRequestResponseDTO> getSupplierChangeRequestByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<SupplierChangeRequestVO> supplierChangeRequestList = supplierChangeRequestRepo
+				.getSupplierChangeRequestByOrgId(orgId, branch);
+
+		if (supplierChangeRequestList == null || supplierChangeRequestList.isEmpty()) {
+
+			throw new ApplicationException("No Supplier Change Request Details Found");
+		}
+
+		List<SupplierChangeRequestResponseDTO> responseList = new ArrayList<>();
+
+		for (SupplierChangeRequestVO vo : supplierChangeRequestList) {
+
+			responseList.add(supplierChangeRequestResponse(vo));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getVendorCodeDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> vendorList = supplierChangeRequestRepo.getVendorCodeDropdownForSupplierChangeRequest(orgId,
+				branch);
+
+		if (vendorList == null || vendorList.isEmpty()) {
+			throw new ApplicationException("No Vendor Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : vendorList) {
+
+			Map<String, Object> vendorMap = new HashMap<>();
+
+			vendorMap.put("id", obj[0]);
+			vendorMap.put("vendorCode", obj[1]);
+			vendorMap.put("supplierName", obj[2]);
+
+			responseList.add(vendorMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getPurchaseEmployeesDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> employeeList = supplierChangeRequestRepo
+				.getPurchaseEmployeesDropdownForSupplierChangeRequest(orgId, branch);
+
+		if (employeeList == null || employeeList.isEmpty()) {
+			throw new ApplicationException("No Purchase Employee Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : employeeList) {
+
+			Map<String, Object> employeeMap = new HashMap<>();
+
+			employeeMap.put("employeeId", obj[0]);
+			employeeMap.put("employeeCode", obj[1]);
+			employeeMap.put("employeeName", obj[2]);
+
+			responseList.add(employeeMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getTDCEmployeesDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> employeeList = supplierChangeRequestRepo.getTDCEmployeesDropdownForSupplierChangeRequest(orgId,
+				branch);
+
+		if (employeeList == null || employeeList.isEmpty()) {
+			throw new ApplicationException("No TDC Employee Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : employeeList) {
+
+			Map<String, Object> employeeMap = new HashMap<>();
+
+			employeeMap.put("employeeId", obj[0]);
+			employeeMap.put("employeeCode", obj[1]);
+			employeeMap.put("employeeName", obj[2]);
+
+			responseList.add(employeeMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getProductionEmployeesDropdownSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> employeeList = supplierChangeRequestRepo
+				.getProductionEmployeesDropdownForSupplierChangeRequest(orgId, branch);
+
+		if (employeeList == null || employeeList.isEmpty()) {
+			throw new ApplicationException("No Production Employee Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : employeeList) {
+
+			Map<String, Object> employeeMap = new HashMap<>();
+
+			employeeMap.put("employeeId", obj[0]);
+			employeeMap.put("employeeCode", obj[1]);
+			employeeMap.put("employeeName", obj[2]);
+
+			responseList.add(employeeMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateCategoryMaster(CategoryMasterDTO categoryMasterDTO)
+			throws ApplicationException {
+
+		CategoryMasterVO categoryMasterVO = new CategoryMasterVO();
+
+		String message;
+
+		if (ObjectUtils.isEmpty(categoryMasterDTO.getId())) {
+
+			categoryMasterVO.setCreatedBy(categoryMasterDTO.getCreatedBy());
+
+			message = "Category Master Created Successfully";
+
+		} else {
+
+			categoryMasterVO = categoryMasterRepo.findById(categoryMasterDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Category Master Details"));
+
+			categoryMasterVO.setUpdatedBy(categoryMasterDTO.getCreatedBy());
+
+			message = "Category Master Updated Successfully";
+		}
+
+		createUpdateCategoryMasterVO(categoryMasterDTO, categoryMasterVO);
+
+		CategoryMasterVO savedVO = categoryMasterRepo.save(categoryMasterVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("categoryMasterVO", categoryMasterResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdateCategoryMasterVO(CategoryMasterDTO dto, CategoryMasterVO vo) throws ApplicationException {
+
+		// Applicable For
+		if (dto.getApplicableFor() != null) {
+
+			ListOfValuesDetailsVO applicableFor = listOfValuesDetailsRepo.findById(dto.getApplicableFor())
+					.orElseThrow(() -> new ApplicationException("Invalid Applicable For"));
+
+			vo.setApplicableFor(applicableFor);
+		}
+
+		// Basic Details
+		vo.setCategory(dto.getCategory());
+
+		// Common Fields
+		vo.setActive(dto.isActive());
+
+		vo.setOrgId(dto.getOrgId());
+
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		vo.setCancelRemarks(dto.getCancelRemarks());
+	}
+
+	private CategoryMasterResponseDTO categoryMasterResponse(CategoryMasterVO vo) {
+
+		CategoryMasterResponseDTO response = new CategoryMasterResponseDTO();
+
+		response.setId(vo.getId());
+
+		// Applicable For
+		if (vo.getApplicableFor() != null) {
+
+			ListOfValuesDetailsResponseDTO applicableForResponse = new ListOfValuesDetailsResponseDTO();
+
+			applicableForResponse.setId(vo.getApplicableFor().getId());
+
+			applicableForResponse.setCode(vo.getApplicableFor().getValueCode());
+
+			applicableForResponse.setDescription(vo.getApplicableFor().getValueDescription());
+
+			response.setApplicableFor(applicableForResponse);
+		}
+
+		response.setCategory(vo.getCategory());
+
+		response.setActive(vo.isActive() ? "Active" : "In-Active");
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setCancelRemarks(vo.getCancelRemarks());
+
+		return response;
+	}
+
+	@Override
+	public CategoryMasterResponseDTO getCategoryMasterById(Long id) throws ApplicationException {
+
+		CategoryMasterVO categoryMasterVO = categoryMasterRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Category Master Details"));
+
+		return categoryMasterResponse(categoryMasterVO);
+	}
+
+	@Override
+	public List<CategoryMasterResponseDTO> getCategoryMasterByOrgId(Long orgId) throws ApplicationException {
+
+		List<CategoryMasterVO> categoryMasterList = categoryMasterRepo.getCategoryMasterByOrgId(orgId);
+
+		if (categoryMasterList == null || categoryMasterList.isEmpty()) {
+
+			throw new ApplicationException("No Category Master Details Found");
+		}
+
+		List<CategoryMasterResponseDTO> responseList = new ArrayList<>();
+
+		for (CategoryMasterVO vo : categoryMasterList) {
+
+			responseList.add(categoryMasterResponse(vo));
+		}
+
+		return responseList;
+	}
+
+//	cause Master
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateCauseMaster(CauseMasterDTO causeMasterDTO) throws ApplicationException {
+
+		CauseMasterVO causeMasterVO = new CauseMasterVO();
+
+		String message;
+
+		if (ObjectUtils.isEmpty(causeMasterDTO.getId())) {
+
+			causeMasterVO.setCreatedBy(causeMasterDTO.getCreatedBy());
+
+			message = "Cause Master Created Successfully";
+
+		} else {
+
+			causeMasterVO = causeMasterRepo.findById(causeMasterDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Cause Master Details"));
+
+			causeMasterVO.setUpdatedBy(causeMasterDTO.getCreatedBy());
+
+			message = "Cause Master Updated Successfully";
+		}
+
+		createUpdateCauseMasterVO(causeMasterDTO, causeMasterVO);
+
+		CauseMasterVO savedCauseMasterVO = causeMasterRepo.save(causeMasterVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+		response.put("causeMasterVO", causeMasterResponse(savedCauseMasterVO));
+
+		return response;
+	}
+
+	private void createUpdateCauseMasterVO(CauseMasterDTO causeMasterDTO, CauseMasterVO causeMasterVO)
+			throws ApplicationException {
+
+		if (causeMasterDTO.getDepartment() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(causeMasterDTO.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Invalid Department Details"));
+
+			causeMasterVO.setDepartment(departmentVO);
+		}
+
+		if (causeMasterDTO.getMaintenanceType() != null) {
+
+			ListOfValuesDetailsVO maintenanceTypeVO = listOfValuesDetailsRepo
+					.findById(causeMasterDTO.getMaintenanceType())
+					.orElseThrow(() -> new ApplicationException("Invalid Maintenance Type Details"));
+
+			causeMasterVO.setMaintenanceType(maintenanceTypeVO);
+		}
+
+		causeMasterVO.setCauseCode(causeMasterDTO.getCauseCode());
+		causeMasterVO.setCause(causeMasterDTO.getCause());
+		causeMasterVO.setActive(causeMasterDTO.isActive());
+		causeMasterVO.setOrgId(causeMasterDTO.getOrgId());
+		causeMasterVO.setFinancialYear(causeMasterDTO.getFinancialYear());
+		causeMasterVO.setCancelRemarks(causeMasterDTO.getCancelRemarks());
+	}
+
+	private CauseMasterResponseDTO causeMasterResponse(CauseMasterVO causeMasterVO) {
+
+		CauseMasterResponseDTO response = new CauseMasterResponseDTO();
+
+		response.setId(causeMasterVO.getId());
+
+		if (causeMasterVO.getDepartment() != null) {
+
+			DepartmentResponseDTO departmentResponseDTO = new DepartmentResponseDTO();
+
+			departmentResponseDTO.setId(causeMasterVO.getDepartment().getId());
+
+			departmentResponseDTO.setDepartmentCode(causeMasterVO.getDepartment().getDepartmentCode());
+
+			departmentResponseDTO.setDepartmentName(causeMasterVO.getDepartment().getDepartmentName());
+
+			response.setDepartment(departmentResponseDTO);
+		}
+
+		if (causeMasterVO.getMaintenanceType() != null) {
+
+			ListOfValuesDetailsResponseDTO maintenanceTypeResponseDTO = new ListOfValuesDetailsResponseDTO();
+
+			maintenanceTypeResponseDTO.setId(causeMasterVO.getMaintenanceType().getId());
+
+			maintenanceTypeResponseDTO.setCode(causeMasterVO.getMaintenanceType().getValueCode());
+
+			maintenanceTypeResponseDTO.setDescription(causeMasterVO.getMaintenanceType().getValueDescription());
+
+			response.setMaintenanceType(maintenanceTypeResponseDTO);
+		}
+
+		response.setCauseCode(causeMasterVO.getCauseCode());
+		response.setCause(causeMasterVO.getCause());
+		response.setActive(causeMasterVO.isActive());
+		response.setOrgId(causeMasterVO.getOrgId());
+		response.setCreatedBy(causeMasterVO.getCreatedBy());
+		response.setFinancialYear(causeMasterVO.getFinancialYear());
+		response.setCancelRemarks(causeMasterVO.getCancelRemarks());
+
+		return response;
+	}
+
+	@Override
+	public CauseMasterResponseDTO getCauseMasterById(Long id) throws ApplicationException {
+
+		CauseMasterVO causeMasterVO = causeMasterRepo.findById(id).orElse(null);
+
+		if (causeMasterVO == null) {
+			throw new ApplicationException("Invalid Cause Master Details");
+		}
+
+		return causeMasterResponse(causeMasterVO);
+	}
+
+	@Override
+	public List<CauseMasterResponseDTO> getCauseMasterByOrgId(Long orgId) throws ApplicationException {
+
+		List<CauseMasterVO> causeMasterList = causeMasterRepo.getCauseMasterByOrgId(orgId);
+
+		if (causeMasterList == null || causeMasterList.isEmpty()) {
+			throw new ApplicationException("No Cause Master Details Found");
+		}
+
+		List<CauseMasterResponseDTO> responseList = new ArrayList<>();
+
+		for (CauseMasterVO causeMasterVO : causeMasterList) {
+
+			CauseMasterResponseDTO response = causeMasterResponse(causeMasterVO);
+
+			responseList.add(response);
+		}
+
+		return responseList;
 	}
 }

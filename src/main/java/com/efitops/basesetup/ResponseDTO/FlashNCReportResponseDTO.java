@@ -2,6 +2,7 @@ package com.efitops.basesetup.ResponseDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
 
@@ -76,5 +77,9 @@ public class FlashNCReportResponseDTO {
 	private String cancelRemarks;
 
 	private String createdBy;
+	
+	private String flashNCImageName;
+
+	private List<FlashNCReportAttachmentResponseDTO> FlashNCReportAttachmentResponseDTO;
 
 }

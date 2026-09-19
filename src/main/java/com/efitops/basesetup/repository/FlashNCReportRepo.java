@@ -56,4 +56,99 @@ public interface FlashNCReportRepo extends JpaRepository<FlashNCReportVO, Long>{
 	            @Param("orgId") Long orgId,
 	            @Param("branch") Long branch);
 	    
+	    @Query(value = """
+	            SELECT
+	                lovd.listofvaluesdetails_id AS id,
+	                lovd.value_code AS valueCode,
+	                lovd.value_description AS valueDescription
+	            FROM listofvaluesdetails lovd
+	            WHERE lovd.listofvalues_id = :listOfValuesId
+	              AND lovd.active = 1
+	            ORDER BY lovd.listofvaluesdetails_id DESC
+	            """, nativeQuery = true)
+	    List<Object[]> getFromDeptDropdownForFlashNCReport(
+	            @Param("listOfValuesId") Long listOfValuesId);
+	    
+	    @Query(value = """
+	            SELECT
+	                lovd.listofvaluesdetails_id AS id,
+	                lovd.value_code AS valueCode,
+	                lovd.value_description AS valueDescription
+	            FROM listofvaluesdetails lovd
+	            WHERE lovd.listofvalues_id = :listOfValuesId
+	              AND lovd.listofvaluesdetails_id <> :fromDept
+	              AND lovd.active = 1
+	            ORDER BY lovd.listofvaluesdetails_id DESC
+	            """, nativeQuery = true)
+	    List<Object[]> getToDepartmentDropdownForFlashNCReport(
+	            @Param("listOfValuesId") Long listOfValuesId,
+	            @Param("fromDept") Long fromDept);
+
+
+	    @Query(value = """
+	            SELECT
+	                iib.mrin_grn_no AS mrinGrnNo,
+	                ch.customer_code AS supplierCode,
+	                ch.customer_name AS supplierName,
+	                iib.sup_inv_no AS invoiceNo,
+	                i.item_code AS item,
+	                i.item_description AS itemDescription,
+	                iib.mrin_grn_date AS mrinGrnDate,
+	                iib.po_pc_jo_no AS poNo,
+	                iid.received_qty AS qty,
+	                'MRIN' AS sourceType
+	            FROM inward_inspection_basic iib
+
+	            INNER JOIN inward_inspection_details iid
+	                ON iid.inward_inspection_basic_id =
+	                   iib.inward_inspection_basic_id
+
+	            LEFT JOIN customer_header ch
+	                ON ch.customer_id = iib.supplier_code
+
+	            LEFT JOIN item i
+	                ON i.item_id = iid.item
+
+	            WHERE iib.org_id = :orgId
+	              AND iib.branch = :branch
+	              AND iib.active = 1
+	              AND iib.cancel = 0
+
+
+	            UNION ALL
+
+
+	            SELECT
+	                gb.doc_id AS mrinGrnNo,
+	                ch.customer_code AS supplierCode,
+	                ch.customer_name AS supplierName,
+	                gb.invoice_no AS invoiceNo,
+	                i.item_code AS item,
+	                i.item_description AS itemDescription,
+	                gb.doc_date AS mrinGrnDate,
+	                gb.po_no AS poNo,
+	                gd.received_qty AS qty,
+	                'GRN' AS sourceType
+	            FROM grn_basic gb
+
+	            INNER JOIN grn_details gd
+	                ON gd.grn_basic_id = gb.grn_basic_id
+
+	            LEFT JOIN customer_header ch
+	                ON ch.customer_id = gb.supplier_code
+
+	            LEFT JOIN item i
+	                ON i.item_id = gd.item
+
+	            WHERE gb.org_id = :orgId
+	              AND gb.branch = :branch
+	              AND gb.active = 1
+	              AND gb.cancel = 0
+
+	            ORDER BY mrinGrnNo DESC
+	            """, nativeQuery = true)
+	    List<Object[]> getMRINGRNDropdownForFlashNCReport(
+	            @Param("orgId") Long orgId,
+	            @Param("branch") Long branch);
+	    
 }

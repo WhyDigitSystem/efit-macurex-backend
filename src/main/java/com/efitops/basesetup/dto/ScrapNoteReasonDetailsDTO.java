@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScrapNoteReasonDetailsDTO {
-    private Long id;
     private String reasonCode;
     private String reasonDescription;
     private BigDecimal rejQty;

@@ -1,10 +1,9 @@
 package com.efitops.basesetup.dto;
 
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +25,6 @@ public class ScrapNoteDTO {
     private Long preparedBy;
     private Long authorisedBy;
     private Long scrapId;
-    private BigDecimal totalScrapValue;
     private String pmApproval;
     private String qualityApproval;
     private String storeApproval;

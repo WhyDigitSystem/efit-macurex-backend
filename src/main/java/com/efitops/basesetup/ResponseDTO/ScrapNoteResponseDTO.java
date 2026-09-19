@@ -41,7 +41,7 @@ public class ScrapNoteResponseDTO {
 	private LocationMasterResponseDTO fromLocation;
 	private LocationMasterResponseDTO toLocation;
 	private ItemMasterDetailsResponseImportDTO fgPart;
-	private BillOfMaterialResponseDTO bom;
+	private BillOfMaterialDropdownResponseDTO bom;
 	private ItemMasterDetailsResponseImportDTO scrapPart;
 	private EmployeeMasterDetailsReponseDTO preparedBy;
 	private EmployeeMasterDetailsReponseDTO authorisedBy;

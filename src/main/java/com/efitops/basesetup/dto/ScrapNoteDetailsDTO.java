@@ -16,5 +16,4 @@ public class ScrapNoteDetailsDTO {
     private BigDecimal quantity;
     private BigDecimal weight;
     private BigDecimal rate;
-    private BigDecimal value;
 }

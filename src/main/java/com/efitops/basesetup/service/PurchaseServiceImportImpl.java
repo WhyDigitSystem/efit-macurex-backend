@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.BillOfMaterialDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialResDTO;
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialResponseDTO;
 import com.efitops.basesetup.ResponseDTO.BomFgResponseDTO;
@@ -5616,7 +5617,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setOrgId(dto.getOrgId());
 		vo.setFinancialYear(dto.getFinancialYear());
 
-		// Map Master Dropdowns
+
 		if (dto.getDepartment() != null && dto.getDepartment() != 0) {
 			DepartmentVO department = departmentRepo.findById(dto.getDepartment())
 					.orElseThrow(() -> new ApplicationException("Department Not Found"));
@@ -5768,7 +5769,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		if (vo.getDepartment() != null) {
 			DepartmentResponseDTO deptDTO = new DepartmentResponseDTO();
 			deptDTO.setId(vo.getDepartment().getId());
-			deptDTO.setDepartmentName(vo.getDepartment().getDepartmentName()); // Adjust method name if different
+			deptDTO.setDepartmentName(vo.getDepartment().getDepartmentName()); 
+			deptDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode()); 
 			responseDTO.setDepartment(deptDTO);
 		}
 
@@ -5795,7 +5797,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		}
 
 		if (vo.getBom() != null) {
-			BillOfMaterialResponseDTO bomDTO = new BillOfMaterialResponseDTO();
+			BillOfMaterialDropdownResponseDTO bomDTO = new BillOfMaterialDropdownResponseDTO();
 			bomDTO.setId(vo.getBom().getId());
 			bomDTO.setDocId(vo.getBom().getDocId());
 			bomDTO.setDocDate(vo.getBom().getDocDate());
@@ -6106,7 +6108,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			vo.setBranch(branch);
 		}
 
-		// Handle Deletion of existing child records on Update
 		if (ObjectUtils.isNotEmpty(vo.getId())) {
 			List<ProductionOrderDetailsVO> existingDetails = productionOrderDetailsRepo
 					.findByProductionSchOrderShortCloseVO(vo);
@@ -6155,7 +6156,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setOrgId(vo.getOrgId());
 		responseDTO.setFinancialYear(vo.getFinancialYear());
 
-		// Map Nested Objects
 		if (vo.getItem() != null) {
 			ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
 			itemDTO.setId(vo.getItem().getId());

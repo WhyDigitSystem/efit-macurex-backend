@@ -115,35 +115,28 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	        INNER JOIN currency c
 	            ON c.currency_id = cust.primary_currency
 
-	        INNER JOIN (
-	            SELECT
-	                d.org_id,
-	                d.branch,
-	                d.currency,
-	                d.selling_ex_rate,
-	                d.buying_ex_rate
-	            FROM dailyexchangerate d, currency c
-	            WHERE d.currency = c.currency_id
-	              AND d.effective_from = (
-	                  SELECT MAX(d1.effective_from)
-	                  FROM dailyexchangerate d1
-	                  WHERE d1.currency = c.currency_id
-	              )
-	        ) der
+	        INNER JOIN dailyexchangerate der
 	            ON der.currency = c.currency_id
-	            AND der.org_id = c.org_id
 	            AND der.branch = pob.branch
+	            AND der.org_id = pob.org_id
+	            AND der.effective_from = (
+	                SELECT MAX(d1.effective_from)
+	                FROM dailyexchangerate d1
+	                WHERE d1.currency = c.currency_id
+	                  AND d1.branch = pob.branch
+	                  AND d1.org_id = pob.org_id
+	            )
 
-	        WHERE pob.doc_id = :docId
+	        WHERE pob.doc_id = :purchaseOrderNumber
 	          AND pob.org_id = :orgId
 	          AND pob.branch = :branch
-	          AND pob.cancel = 0
+	          AND pob.cancel = FALSE
 	          AND cust.org_id = :orgId
-	          AND c.active = 1
-	          AND c.cancel = 0
+	          AND c.active = TRUE
+	          AND c.cancel = FALSE
 	        """, nativeQuery = true)
-	List<Object[]> getCurrencyExchangeRateForPurchaseOrderAmendment(
-	        @Param("docId") String docId,
+	List<Object[]> getCurrencyExchangeRateforPurchaseOrderAmendment(
+	        @Param("purchaseOrderNumber") String purchaseOrderNumber,
 	        @Param("orgId") Long orgId,
 	        @Param("branch") Long branch);
 
@@ -157,4 +150,5 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 		        Long orgId,
 		        String financialYear,
 		        String screenCode);
+
 }

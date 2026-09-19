@@ -16,6 +16,7 @@ import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialPlanningResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProcessValidationEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractingGRNResponseDTO;
@@ -31,6 +32,7 @@ import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.JobOrderShortCloseDTO;
 import com.efitops.basesetup.dto.MaterialPlanningDTO;
+import com.efitops.basesetup.dto.ProcessValidationEntryDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SubContractingGRNDTO;
@@ -235,5 +237,13 @@ public interface SubContractService {
 	InspectionRequisitionNoteResponseDTO getInspectionRequisitionNoteById(Long id) throws ApplicationException;
 
 	List<InspectionRequisitionNoteResponseDTO> getInspectionRequisitionNoteByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> createUpdateProcessValidationEntry(ProcessValidationEntryDTO processValidationEntryDTO) throws ApplicationException;
+
+	String getProcessValidationEntryDocId(Long orgId, String financialYear)  throws ApplicationException;
+
+	List<ProcessValidationEntryResponseDTO> getProcessValidationEntryByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	ProcessValidationEntryResponseDTO getProcessValidationEntryById(Long id) throws ApplicationException;
 
 }

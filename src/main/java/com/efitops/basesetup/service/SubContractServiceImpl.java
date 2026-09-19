@@ -31,7 +31,9 @@ import com.efitops.basesetup.ResponseDTO.AdvForStoresResponseDTO;
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.BomCorrectionRequestNoteDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.BomCorrectionRequestNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCapitalItemsDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCapitalItemsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassDetailsResponseDTO;
@@ -58,6 +60,10 @@ import com.efitops.basesetup.ResponseDTO.JobOrderShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialPlanningResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMasterResponseforPSCRDTO;
+import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingResponseDetails;
+import com.efitops.basesetup.ResponseDTO.ProcessValidationEntryDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProcessValidationEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ServiceAccMasterResponse1DTO;
@@ -96,6 +102,8 @@ import com.efitops.basesetup.dto.JobOrderShortCloseDTO;
 import com.efitops.basesetup.dto.JobOrderShortCloseDetailsDTO;
 import com.efitops.basesetup.dto.JobOrderTaxDetailsDTO;
 import com.efitops.basesetup.dto.MaterialPlanningDTO;
+import com.efitops.basesetup.dto.ProcessValidationEntryDTO;
+import com.efitops.basesetup.dto.ProcessValidationEntryDetailsDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
@@ -117,6 +125,7 @@ import com.efitops.basesetup.entity.BillOfMaterialVO;
 import com.efitops.basesetup.entity.BomCorrectionRequestNoteDetailsVO;
 import com.efitops.basesetup.entity.BomCorrectionRequestNoteVO;
 import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.ControlPlanVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DeliveryChallanCapitalItemsDetailsVO;
 import com.efitops.basesetup.entity.DeliveryChallanCapitalItemsVO;
@@ -141,6 +150,10 @@ import com.efitops.basesetup.entity.JobOrderTaxDetailsVO;
 import com.efitops.basesetup.entity.JobOrderVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.MaterialPlanningVO;
+import com.efitops.basesetup.entity.ProcessSheetCompRoutingDetailVO;
+import com.efitops.basesetup.entity.ProcessSheetCompRoutingVO;
+import com.efitops.basesetup.entity.ProcessValidationEntryDetailsVO;
+import com.efitops.basesetup.entity.ProcessValidationEntryVO;
 import com.efitops.basesetup.entity.ProductionScheduleForNextThreeMonthDetailsVO;
 import com.efitops.basesetup.entity.ProductionScheduleForNextThreeMonthVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
@@ -165,6 +178,7 @@ import com.efitops.basesetup.repository.BomCorrectionRequestNoteDetailsRepo;
 import com.efitops.basesetup.repository.BomCorrectionRequestNoteRepo;
 import com.efitops.basesetup.repository.BomRepo;
 import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.ControlPlanRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DeliveryChallanCapitalItemsDetailsRepo;
 import com.efitops.basesetup.repository.DeliveryChallanCapitalItemsRepo;
@@ -191,6 +205,9 @@ import com.efitops.basesetup.repository.JobOrderTaxDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.MaterialPlanningRepo;
+import com.efitops.basesetup.repository.ProcessSheetCompRoutingRepo;
+import com.efitops.basesetup.repository.ProcessValidationEntryDetailsRepo;
+import com.efitops.basesetup.repository.ProcessValidationEntryRepo;
 import com.efitops.basesetup.repository.ProductionScheduleForNextThreeMonthDetailsRepo;
 import com.efitops.basesetup.repository.ProductionScheduleForNextThreeMonthRepo;
 import com.efitops.basesetup.repository.ServiceAccMasterRepo;
@@ -376,6 +393,20 @@ public class SubContractServiceImpl implements SubContractService {
 	
 	@Autowired
 	InspectionRequisitionNoteRepo inspectionRequisitionNoteRepo;
+	
+	@Autowired
+	ProcessValidationEntryRepo processValidationEntryRepo;
+	
+	@Autowired
+	ProcessValidationEntryDetailsRepo processValidationEntryDetailsRepo;
+	
+	@Autowired
+	ControlPlanRepo controlPlanRepo;
+	
+	@Autowired
+	ProcessSheetCompRoutingRepo processSheetCompRoutingRepo;
+	
+	
 	
 	@Override
 	@Transactional
@@ -2208,6 +2239,8 @@ public class SubContractServiceImpl implements SubContractService {
 			part.put("bom", fs[7] != null ? fs[7] : null);
 
 			part.put("deliveryDate", fs[8] != null ? fs[8] : null);
+			part.put("orderQty", fs[9] != null ? fs[9] : null);
+
 
 			details1.add(part);
 		}
@@ -9065,5 +9098,534 @@ public class SubContractServiceImpl implements SubContractService {
 
 	    return responseList;
 	}
+	
+	
+	
+	@Override
+	@Transactional(rollbackOn = Exception.class)
+	public Map<String, Object> createUpdateProcessValidationEntry(
+	        ProcessValidationEntryDTO dto) throws ApplicationException {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    String screenCode = "PVE";
+
+	    ProcessValidationEntryVO vo;
+	    String message;
+
+	    if (ObjectUtils.isEmpty(dto.getId())) {
+
+	        vo = new ProcessValidationEntryVO();
+
+	        String docId = processValidationEntryRepo
+	                .getProcessValidationEntryDocId(
+	                        dto.getOrgId(),
+	                        dto.getFinancialYear(),
+	                        screenCode);
+
+	        if (docId == null || docId.isBlank()) {
+	            throw new ApplicationException(
+	                    "BOM Correction Request Note DocId Generation Failed");
+	        }
+
+	        vo.setDocId(docId);
+	        
+	        
+
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo
+	                        .findByOrgIdAndFinYearAndScreenCode(
+	                                dto.getOrgId(),
+	                                dto.getFinancialYear(),
+	                                screenCode);
+
+	        if (documentTypeMappingDetailsVO != null) {
+
+	            documentTypeMappingDetailsVO.setLastNo(
+	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	            documentTypeMappingDetailsRepo
+	                    .save(documentTypeMappingDetailsVO);
+	        }
+
+	        vo.setCreatedBy(dto.getCreatedBy());
+	        vo.setUpdatedBy(dto.getCreatedBy());
+
+	        message = "Process Validation Entry Created Successfully";
+
+	    } else {
+
+	        vo = processValidationEntryRepo
+	                .findById(dto.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Process Validation Entry Not Found"));
+
+	        /*
+	         * Delete old child records
+	         */
+	        List<ProcessValidationEntryDetailsVO> oldDetails =
+	                processValidationEntryDetailsRepo
+	                        .findByProcessValidationEntryVO(vo);
+
+	        if (oldDetails != null && !oldDetails.isEmpty()) {
+
+	            processValidationEntryDetailsRepo.deleteAll(oldDetails);
+	        }
+
+	        vo.getDetails().clear();
+
+	        vo.setUpdatedBy(dto.getCreatedBy());
+
+	        message = "Process Validation Entry Updated Successfully";
+	    }
+
+	    getProcessValidationEntryVOFromDTO(dto, vo);
+
+	    vo = processValidationEntryRepo.saveAndFlush(vo);
+
+	    ProcessValidationEntryResponseDTO responseDTO =
+	            convertToResponse(vo);
+
+	    response.put("message", message);
+
+	    response.put(
+	            "processValidationEntryVO",
+	            responseDTO);
+
+	    return response;
+	}
+	
+	private void getProcessValidationEntryVOFromDTO(
+	        ProcessValidationEntryDTO dto,
+	        ProcessValidationEntryVO vo)
+	        throws ApplicationException {
+
+		if (dto.getItem() != null) {
+		    ItemMasterVO itemVO = itemMasterRepo.findById(dto.getItem())
+		            .orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+		    vo.setItem(itemVO);
+		} else {
+		    vo.setItem(null);
+		}
+		
+		if (dto.getCustomer() != null) {
+		    CustomerVO customerVO = customerRepo.findById(dto.getCustomer())
+		            .orElseThrow(() -> new ApplicationException("Customer Not Found"));
+
+		    vo.setCustomer(customerVO);
+		} else {
+		    vo.setCustomer(null);
+		}
+		
+	    vo.setValidationReason(
+	            dto.getValidationReason());
+
+	    vo.setDetailsOfChanges(
+	            dto.getDetailsOfChanges());
+
+	    vo.setCharacteristicsToBeMeasured(
+	            dto.getCharacteristicsToBeMeasured());
+
+	    vo.setSpecification(
+	            dto.getSpecification());
+
+	    vo.setDateImplemented(
+	            dto.getDateImplemented());
+
+	    vo.setRecommendedForProduction(
+	            dto.getRecommendedForProduction());
+
+	    vo.setDateOfNextValidation(
+	            dto.getDateOfNextValidation());
+
+	    vo.setResultsRemarks(
+	            dto.getResultsRemarks());
+
+	    vo.setOrgId(dto.getOrgId());
+
+	    vo.setFinancialYear(
+	            dto.getFinancialYear());
+
+	    vo.setActive(dto.isActive());
+
+	    vo.setCancelRemarks(
+	            dto.getCancelRemarks());
+
+
+	    /*
+	     * Branch
+	     */
+	    if (dto.getBranch() != null) {
+
+	        BranchVO branch =
+	                branchRepo.findById(dto.getBranch())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Branch Not Found"));
+
+	        vo.setBranch(branch);
+	    }
+
+
+	    /*
+	     * Process Sheet
+	     */
+	    if (dto.getProcessSheetNo() != null) {
+
+	        ProcessSheetCompRoutingVO processSheet =
+	                processSheetCompRoutingRepo
+	                        .findById(dto.getProcessSheetNo())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Process Sheet Not Found"));
+
+	        vo.setProcessSheetNo(processSheet);
+
+	    } else {
+
+	        vo.setProcessSheetNo(null);
+	    }
+
+
+	    /*
+	     * Control Plan
+	     */
+	    if (dto.getControlPlan() != null) {
+
+	        ControlPlanVO controlPlan =
+	                controlPlanRepo
+	                        .findById(dto.getControlPlan())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Control Plan Not Found"));
+
+	        vo.setControlPlan(controlPlan);
+
+	    } else {
+
+	        vo.setControlPlan(null);
+	    }
+
+
+	    /*
+	     * Details
+	     */
+	    if (dto.getDetails() != null) {
+
+	        for (ProcessValidationEntryDetailsDTO detailsDTO
+	                : dto.getDetails()) {
+
+	            ProcessValidationEntryDetailsVO detailsVO =
+	                    new ProcessValidationEntryDetailsVO();
+
+	            detailsVO.setParameter1(
+	                    detailsDTO.getParameter1());
+
+	            detailsVO.setParameter2(
+	                    detailsDTO.getParameter2());
+
+	            detailsVO.setParameter3(
+	                    detailsDTO.getParameter3());
+
+	            detailsVO.setParameter4(
+	                    detailsDTO.getParameter4());
+
+	            detailsVO.setParameter5(
+	                    detailsDTO.getParameter5());
+
+	            detailsVO.setParameter6(
+	                    detailsDTO.getParameter6());
+
+	            detailsVO.setParameter7(
+	                    detailsDTO.getParameter7());
+
+	            detailsVO.setProcessValidationEntryVO(vo);
+
+	            vo.getDetails().add(detailsVO);
+	        }
+	    }
+	}
+	
+	private ProcessValidationEntryResponseDTO convertToResponse(
+	        ProcessValidationEntryVO vo) {
+
+	    ProcessValidationEntryResponseDTO response =
+	            new ProcessValidationEntryResponseDTO();
+
+	    response.setId(vo.getId());
+
+	    response.setDocId(vo.getDocId());
+
+	    response.setDocDate(vo.getDocDate());
+
+	 // Item
+	 // Item
+	    if (vo.getItem() != null) {
+
+	        ItemResponse1DTO itemResponse = new ItemResponse1DTO();
+
+	        itemResponse.setId(vo.getItem().getId());
+
+	        itemResponse.setItemCode(
+	                vo.getItem().getItemCode());
+
+	        itemResponse.setItemDescription(
+	                vo.getItem().getItemDescription());
+
+	        if (vo.getItem().getPurchaseUnit() != null) {
+
+	            UnitMasterResponseDTO unitResponse =
+	                    new UnitMasterResponseDTO();
+
+	            unitResponse.setId(
+	                    vo.getItem().getPurchaseUnit().getId());
+
+	            unitResponse.setUnitId(
+	                    vo.getItem().getPurchaseUnit().getUnitId());
+
+	            unitResponse.setUnitDescription(
+	                    vo.getItem().getPurchaseUnit().getDescription());
+
+	            itemResponse.setUnit(unitResponse);
+	        }
+
+	        response.setItem(itemResponse);
+	    }
+	    
+	 // Customer
+	    if (vo.getCustomer() != null) {
+
+	        CustomerResponse1DTO customerResponse =
+	                new CustomerResponse1DTO();
+
+	        customerResponse.setId(
+	                vo.getCustomer().getId());
+
+	        customerResponse.setCustomerName(
+	                vo.getCustomer().getCustomerName());
+
+	        response.setCustomer(customerResponse);
+	    }
+
+	    response.setValidationReason(
+	            vo.getValidationReason());
+
+	    response.setDetailsOfChanges(
+	            vo.getDetailsOfChanges());
+
+	    response.setCharacteristicsToBeMeasured(
+	            vo.getCharacteristicsToBeMeasured());
+
+	    response.setSpecification(
+	            vo.getSpecification());
+
+	    response.setDateImplemented(
+	            vo.getDateImplemented());
+
+	    response.setRecommendedForProduction(
+	            vo.getRecommendedForProduction());
+
+	    response.setDateOfNextValidation(
+	            vo.getDateOfNextValidation());
+
+	    response.setResultsRemarks(
+	            vo.getResultsRemarks());
+
+	    response.setCreatedBy(vo.getCreatedBy());
+
+	    response.setActive(vo.isActive());
+
+	    response.setCancel(vo.isCancel());
+
+	    response.setUpdatedBy(vo.getUpdatedBy());
+
+	    response.setCancelRemarks(
+	            vo.getCancelRemarks());
+
+	    response.setScreenName(
+	            vo.getScreenName());
+
+	    response.setScreenCode(
+	            vo.getScreenCode());
+
+	    response.setOrgId(vo.getOrgId());
+
+	    response.setFinancialYear(
+	            vo.getFinancialYear());
+
+
+	    /*
+	     * Branch
+	     */
+	    if (vo.getBranch() != null) {
+
+	        BranchResponseDTO branch =
+	                new BranchResponseDTO();
+
+	        branch.setId(
+	                vo.getBranch().getId());
+
+	        branch.setBranchCode(
+	                vo.getBranch().getBranchCode());
+
+	        branch.setBranchName(
+	                vo.getBranch().getBranchName());
+
+	        response.setBranch(branch);
+	    }
+
+
+	    /*
+	     * Process Sheet
+	     */
+	    if (vo.getProcessSheetNo() != null) {
+
+	        ProcessSheetCompRoutingVO processSheetVO = vo.getProcessSheetNo();
+
+	        ProcessSheetCompRoutingResponseDetails processSheet =
+	                new ProcessSheetCompRoutingResponseDetails();
+
+	        processSheet.setId(processSheetVO.getId());
+	        processSheet.setDocId(processSheetVO.getDocId());
+	        processSheet.setDocDate(processSheetVO.getDocDate());
+
+	        List<OperationMasterResponseforPSCRDTO> operations =
+	                new ArrayList<>();
+
+	        if (processSheetVO.getProcessSheetCompRoutingDetailVO() != null) {
+
+	            for (ProcessSheetCompRoutingDetailVO detailVO :
+	                    processSheetVO.getProcessSheetCompRoutingDetailVO()) {
+
+	                if (detailVO.getOperation() != null) {
+
+	                    OperationMasterResponseforPSCRDTO operation =
+	                            new OperationMasterResponseforPSCRDTO();
+
+	                    operation.setId(detailVO.getOperation().getId());
+	                    operation.setOperationId(
+	                            detailVO.getOperation().getOperationId());
+	                    operation.setDescription(
+	                            detailVO.getOperation().getDescription());
+
+	                    operations.add(operation);
+	                }
+	            }
+	        }
+
+	        processSheet.setOperations(operations);
+
+	        response.setProcessSheetNo(processSheet);
+	    }
+
+	    /*
+	     * Control Plan
+	     */
+	    if (vo.getControlPlan() != null) {
+
+	        ControlPlanResponseDetailsDTO controlPlan =
+	                new ControlPlanResponseDetailsDTO();
+
+	        controlPlan.setId(vo.getControlPlan().getId());
+	        controlPlan.setPlanNo(vo.getControlPlan().getPlanNo());
+
+	        response.setControlPlan(controlPlan);
+	    }
+
+
+	    /*
+	     * Details
+	     */
+	    List<ProcessValidationEntryDetailsResponseDTO>
+	            detailsList = new ArrayList<>();
+
+	    if (vo.getDetails() != null) {
+
+	        for (ProcessValidationEntryDetailsVO detailsVO
+	                : vo.getDetails()) {
+
+	            ProcessValidationEntryDetailsResponseDTO
+	                    detailsResponse =
+	                    new ProcessValidationEntryDetailsResponseDTO();
+
+	            detailsResponse.setId(
+	                    detailsVO.getId());
+
+	            detailsResponse.setParameter1(
+	                    detailsVO.getParameter1());
+
+	            detailsResponse.setParameter2(
+	                    detailsVO.getParameter2());
+
+	            detailsResponse.setParameter3(
+	                    detailsVO.getParameter3());
+
+	            detailsResponse.setParameter4(
+	                    detailsVO.getParameter4());
+
+	            detailsResponse.setParameter5(
+	                    detailsVO.getParameter5());
+
+	            detailsResponse.setParameter6(
+	                    detailsVO.getParameter6());
+
+	            detailsResponse.setParameter7(
+	                    detailsVO.getParameter7());
+
+	            detailsList.add(detailsResponse);
+	        }
+	    }
+
+	    response.setDetails(detailsList);
+
+	    return response;
+	}
+	
+	
+	@Override
+	public ProcessValidationEntryResponseDTO getProcessValidationEntryById(Long id)
+	        throws ApplicationException {
+
+	    ProcessValidationEntryVO vo =
+	            processValidationEntryRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Process Validation Entry Not Found"));
+
+	    return convertToResponse(vo);
+	}
+	
+	@Override
+	public List<ProcessValidationEntryResponseDTO> getProcessValidationEntryByOrgIdAndBranch(
+	        Long orgId, Long branch) throws ApplicationException {
+
+	    List<ProcessValidationEntryVO> list =
+	            processValidationEntryRepo
+	                    .findByOrgIdAndBranch(orgId, branch);
+
+	    List<ProcessValidationEntryResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (ProcessValidationEntryVO vo : list) {
+
+	        responseList.add(convertToResponse(vo));
+	    }
+
+	    return responseList;
+	}
+	
+	@Override
+	public String getProcessValidationEntryDocId(
+	        Long orgId, String financialYear) {
+
+	    String screenCode = "PVE";
+
+	    return processValidationEntryRepo
+	            .getProcessValidationEntryDocId(
+	                    orgId, financialYear, screenCode);
+	}
+	
 	
 }

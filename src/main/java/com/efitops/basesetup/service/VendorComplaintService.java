@@ -9,16 +9,22 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FlashNCReportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SupplierChangeRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
+import com.efitops.basesetup.dto.CategoryMasterDTO;
+import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
+import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -124,5 +130,45 @@ public interface VendorComplaintService {
 			throws ApplicationException;
 
 	List<Map<String, Object>> getMRINGRNDropdownForFlashNCReport(Long orgId, Long branch) throws ApplicationException;
+
+//	SupplierChangeRequest
+	Map<String, Object> updateCreateSupplierChangeRequest(SupplierChangeRequestDTO supplierChangeRequestDTO)
+			throws ApplicationException;
+
+	String getSupplierChangeRequestDocId(Long orgId, String financialYear, String screenCode)
+			throws ApplicationException;
+
+	SupplierChangeRequestResponseDTO getSupplierChangeRequestById(Long id) throws ApplicationException;
+
+
+	List<SupplierChangeRequestResponseDTO> getSupplierChangeRequestByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getVendorCodeDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getPurchaseEmployeesDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException;
+	
+	List<Map<String, Object>> getTDCEmployeesDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getProductionEmployeesDropdownSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException;
+
+//	category master
+	Map<String, Object> updateCreateCategoryMaster(CategoryMasterDTO categoryMasterDTO) throws ApplicationException;
+
+	CategoryMasterResponseDTO getCategoryMasterById(Long id) throws ApplicationException;
+
+	List<CategoryMasterResponseDTO> getCategoryMasterByOrgId(Long orgId) throws ApplicationException;
+
+//	cause master
+	Map<String, Object> updateCreateCauseMaster(CauseMasterDTO causeMasterDTO) throws ApplicationException;
+
+	CauseMasterResponseDTO getCauseMasterById(Long id) throws ApplicationException;
+
+	List<CauseMasterResponseDTO> getCauseMasterByOrgId(Long orgId) throws ApplicationException;
+
 
 }

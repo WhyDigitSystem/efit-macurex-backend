@@ -29,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDetailsResponseDTO;
@@ -47,25 +49,30 @@ import com.efitops.basesetup.ResponseDTO.SetUpApprovalDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalParametersDetailsResponeDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ShiftResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SupplierChangeRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.CategoryMasterDTO;
+import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDetailsDTO;
-import com.efitops.basesetup.dto.FlashNCReportAttachmentDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDetailsDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDetailsDTO;
 import com.efitops.basesetup.dto.SetUpApprovalParametersDetailsDTO;
+import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.CategoryMasterVO;
+import com.efitops.basesetup.entity.CauseMasterVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DailyInspectionCumRejectionDataVO;
 import com.efitops.basesetup.entity.DailyInspectionCumRejectionDetailsVO;
@@ -84,12 +91,15 @@ import com.efitops.basesetup.entity.SetUpApprovalDetailsVO;
 import com.efitops.basesetup.entity.SetUpApprovalParametersDetailsVO;
 import com.efitops.basesetup.entity.SetUpApprovalVO;
 import com.efitops.basesetup.entity.ShiftVO;
+import com.efitops.basesetup.entity.SupplierChangeRequestVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryDetailsVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryVO;
 import com.efitops.basesetup.entity.VendorComplaintDetailsVO;
 import com.efitops.basesetup.entity.VendorComplaintEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.CategoryMasterRepo;
+import com.efitops.basesetup.repository.CauseMasterRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DailyInspectionCumRejectionDataRepo;
 import com.efitops.basesetup.repository.DailyInspectionCumRejectionDetailsRepo;
@@ -108,6 +118,7 @@ import com.efitops.basesetup.repository.SetUpApprovalDetailsRepo;
 import com.efitops.basesetup.repository.SetUpApprovalParametersDetailsRepo;
 import com.efitops.basesetup.repository.SetUpApprovalRepo;
 import com.efitops.basesetup.repository.ShiftRepo;
+import com.efitops.basesetup.repository.SupplierChangeRequestRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryDetailsRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryRepo;
 import com.efitops.basesetup.repository.VendorComplaintDetailsRepo;
@@ -185,6 +196,15 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private FlashNCReportAttachmentRepo flashNCReportAttachmentRepo;
+
+	@Autowired
+	SupplierChangeRequestRepo supplierChangeRequestRepo;
+
+	@Autowired
+	private CategoryMasterRepo categoryMasterRepo;
+
+	@Autowired
+	private CauseMasterRepo causeMasterRepo;
 
 	@Override
 	@Transactional
@@ -3190,6 +3210,866 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			mrinGrnMap.put("sourceType", obj[9]);
 
 			responseList.add(mrinGrnMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateSupplierChangeRequest(SupplierChangeRequestDTO supplierChangeRequestDTO)
+			throws ApplicationException {
+
+		SupplierChangeRequestVO supplierChangeRequestVO = new SupplierChangeRequestVO();
+
+		String message;
+
+		String screenCode = "SCR";
+
+		if (ObjectUtils.isEmpty(supplierChangeRequestDTO.getId())) {
+
+			String docId = supplierChangeRequestRepo.getSupplierChangeRequestDocId(supplierChangeRequestDTO.getOrgId(),
+					supplierChangeRequestDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+
+				throw new ApplicationException("Supplier Change Request DocId Not Found");
+			}
+
+			supplierChangeRequestVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO mapping = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+					supplierChangeRequestDTO.getOrgId(), supplierChangeRequestDTO.getFinancialYear(), screenCode);
+
+			if (mapping == null) {
+
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			mapping.setLastNo(mapping.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(mapping);
+
+			supplierChangeRequestVO.setCreatedBy(supplierChangeRequestDTO.getCreatedBy());
+
+			supplierChangeRequestVO.setUpdatedBy(supplierChangeRequestDTO.getCreatedBy());
+
+			message = "Supplier Change Request Created Successfully";
+
+		} else {
+
+			supplierChangeRequestVO = supplierChangeRequestRepo.findById(supplierChangeRequestDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Supplier Change Request Details"));
+
+			supplierChangeRequestVO.setUpdatedBy(supplierChangeRequestDTO.getCreatedBy());
+
+			message = "Supplier Change Request Updated Successfully";
+		}
+
+		createUpdateSupplierChangeRequestVO(supplierChangeRequestDTO, supplierChangeRequestVO);
+
+		SupplierChangeRequestVO savedVO = supplierChangeRequestRepo.save(supplierChangeRequestVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("supplierChangeRequestVO", supplierChangeRequestResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdateSupplierChangeRequestVO(SupplierChangeRequestDTO dto, SupplierChangeRequestVO vo)
+			throws ApplicationException {
+
+		if (dto.getBranch() != null) {
+
+			BranchVO branch = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Invalid Branch"));
+
+			vo.setBranch(branch);
+		}
+
+		if (dto.getVendorCode() != null) {
+
+			CustomerVO customer = customerRepo.findById(dto.getVendorCode())
+					.orElseThrow(() -> new ApplicationException("Invalid Vendor"));
+
+			vo.setVendorCode(customer);
+		}
+
+		if (dto.getBuyerName() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getBuyerName())
+					.orElseThrow(() -> new ApplicationException("Invalid Buyer"));
+
+			vo.setBuyerName(employee);
+		}
+
+		if (dto.getSourceTriggeredBy() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getSourceTriggeredBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Source Triggered By"));
+
+			vo.setSourceTriggeredBy(employee);
+		}
+
+		// Basic Details
+
+		vo.setPartNo(dto.getPartNo());
+		vo.setPartDescription(dto.getPartDescription());
+		vo.setSupplierContact(dto.getSupplierContact());
+		vo.setSupplierPhoneNo(dto.getSupplierPhoneNo());
+		vo.setSupplierEmailId(dto.getSupplierEmailId());
+
+		vo.setBuyerPhoneNo(dto.getBuyerPhoneNo());
+		vo.setBuyerEmailId(dto.getBuyerEmailId());
+
+		vo.setSourcePhoneNo(dto.getSourcePhoneNo());
+		vo.setSourceEmailId(dto.getSourceEmailId());
+
+		// Reason for Change
+
+		vo.setCapacityIssueWithExisitingSupplier(dto.getCapacityIssueWithExisitingSupplier());
+
+		vo.setCustomerRequirementDemandIncreased(dto.getCustomerRequirementDemandIncreased());
+
+		vo.setAlternativeRMSourceorAdditionalRMSource(dto.getAlternativeRMSourceorAdditionalRMSource());
+
+		vo.setInternalCapacityIssue(dto.getInternalCapacityIssue());
+
+		vo.setChangeInSupplierBaseQualityIssueinExisitingSupplier(
+				dto.getChangeInSupplierBaseQualityIssueinExisitingSupplier());
+
+		vo.setSupplierCommercialIssue(dto.getSupplierCommercialIssue());
+
+		vo.setCustomeApprovedSource(dto.getCustomeApprovedSource());
+
+		vo.setOthers(dto.getOthers());
+
+		vo.setChangeDescriptionInDetails(dto.getChangeDescriptionInDetails());
+
+		vo.setDetailOfProposedProcessOfOutSourced(dto.getDetailOfProposedProcessOfOutSourced());
+
+		// Impact of Change
+
+		vo.setQualityImprovement(dto.getQualityImprovement());
+
+		vo.setReducedLeadTime(dto.getReducedLeadTime());
+
+		vo.setCostReduction(dto.getCostReduction());
+
+		vo.setIncreaseManufacturingEfficiency(dto.getIncreaseManufacturingEfficiency());
+
+		vo.setOthersPleaseSpecify(dto.getOthersPleaseSpecify());
+
+		vo.setEffectOfChanges(dto.getEffectOfChanges());
+
+		vo.setRiskAssessment(dto.getRiskAssessment());
+
+		vo.setProposedIntroductionImplementationDate(dto.getProposedIntroductionImplementationDate());
+
+		vo.setSupplierEvaluationReport(dto.getSupplierEvaluationReport());
+
+		vo.setReliabilityFunctionalReportFromTDC(dto.getReliabilityFunctionalReportFromTDC());
+
+		vo.setCustomerApproval(dto.getCustomerApproval());
+
+		vo.setOnJobTrainingReportFromMfg(dto.getOnJobTrainingReportFromMfg());
+
+		vo.setProcessAuditReport(dto.getProcessAuditReport());
+
+		vo.setSupplierRegistrationFrom(dto.getSupplierRegistrationFrom());
+
+		vo.setPpapIsirRequired(dto.getPpapIsirRequired());
+
+		vo.setChangeRequestApproval(dto.getChangeRequestApproval());
+
+		// Authorized Signatures
+
+		if (dto.getSignByPurchase() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getSignByPurchase())
+					.orElseThrow(() -> new ApplicationException("Invalid Purchase Employee"));
+
+			vo.setSignByPurchase(employee);
+		}
+
+		vo.setPurchaseDisposition(dto.getPurchaseDisposition());
+
+		if (dto.getSignByTDC() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getSignByTDC())
+					.orElseThrow(() -> new ApplicationException("Invalid TDC Employee"));
+
+			vo.setSignByTDC(employee);
+		}
+
+		vo.setTdcDisposition(dto.getTdcDisposition());
+
+		if (dto.getSignByProduction() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getSignByProduction())
+					.orElseThrow(() -> new ApplicationException("Invalid Production Employee"));
+
+			vo.setSignByProduction(employee);
+		}
+
+		vo.setProductionDisposition(dto.getProductionDisposition());
+
+		if (dto.getSignByQuality() != null) {
+
+			EmployeeMasterVO employee = employeeMasterRepo.findById(dto.getSignByQuality())
+					.orElseThrow(() -> new ApplicationException("Invalid Quality Employee"));
+
+			vo.setSignByQuality(employee);
+		}
+
+		vo.setQualityDisposition(dto.getQualityDisposition());
+
+		vo.setNote(dto.getNote());
+
+		// Common fields
+
+		vo.setActive(dto.isActive());
+
+		vo.setOrgId(dto.getOrgId());
+
+		vo.setFinancialYear(dto.getFinancialYear());
+
+	}
+
+	private SupplierChangeRequestResponseDTO supplierChangeRequestResponse(SupplierChangeRequestVO vo) {
+
+		SupplierChangeRequestResponseDTO response = new SupplierChangeRequestResponseDTO();
+
+		response.setId(vo.getId());
+
+		response.setDocId(vo.getDocId());
+
+		response.setDocDate(vo.getDocDate());
+
+		// Branch
+
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponse = new BranchResponseDTO();
+
+			branchResponse.setId(vo.getBranch().getId());
+
+			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+
+			branchResponse.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponse);
+		}
+
+		// Vendor
+
+		if (vo.getVendorCode() != null) {
+
+			CustomerResponse1DTO customerResponse = new CustomerResponse1DTO();
+
+			customerResponse.setId(vo.getVendorCode().getId());
+
+			customerResponse.setCustomerName(vo.getVendorCode().getCustomerName());
+
+			response.setVendorCode(customerResponse);
+		}
+
+		// Basic Details
+
+		response.setPartNo(vo.getPartNo());
+
+		response.setPartDescription(vo.getPartDescription());
+
+		response.setSupplierContact(vo.getSupplierContact());
+
+		response.setSupplierPhoneNo(vo.getSupplierPhoneNo());
+
+		response.setSupplierEmailId(vo.getSupplierEmailId());
+
+		// Buyer
+
+		if (vo.getBuyerName() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getBuyerName().getId());
+
+			employeeResponse.setEmployeeName(vo.getBuyerName().getEmployeeName());
+
+			response.setBuyerName(employeeResponse);
+		}
+
+		response.setBuyerPhoneNo(vo.getBuyerPhoneNo());
+
+		response.setBuyerEmailId(vo.getBuyerEmailId());
+
+		// Source Triggered By
+
+		if (vo.getSourceTriggeredBy() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getSourceTriggeredBy().getId());
+
+			employeeResponse.setEmployeeName(vo.getSourceTriggeredBy().getEmployeeName());
+
+			response.setSourceTriggeredBy(employeeResponse);
+		}
+
+		response.setSourcePhoneNo(vo.getSourcePhoneNo());
+
+		response.setSourceEmailId(vo.getSourceEmailId());
+
+		// Reason for Change
+
+		response.setCapacityIssueWithExisitingSupplier(vo.getCapacityIssueWithExisitingSupplier());
+
+		response.setCustomerRequirementDemandIncreased(vo.getCustomerRequirementDemandIncreased());
+
+		response.setAlternativeRMSourceorAdditionalRMSource(vo.getAlternativeRMSourceorAdditionalRMSource());
+
+		response.setInternalCapacityIssue(vo.getInternalCapacityIssue());
+
+		response.setChangeInSupplierBaseQualityIssueinExisitingSupplier(
+				vo.getChangeInSupplierBaseQualityIssueinExisitingSupplier());
+
+		response.setSupplierCommercialIssue(vo.getSupplierCommercialIssue());
+
+		response.setCustomeApprovedSource(vo.getCustomeApprovedSource());
+
+		response.setOthers(vo.getOthers());
+
+		response.setChangeDescriptionInDetails(vo.getChangeDescriptionInDetails());
+
+		response.setDetailOfProposedProcessOfOutSourced(vo.getDetailOfProposedProcessOfOutSourced());
+
+		// Impact of Change
+
+		response.setQualityImprovement(vo.getQualityImprovement());
+
+		response.setReducedLeadTime(vo.getReducedLeadTime());
+
+		response.setCostReduction(vo.getCostReduction());
+
+		response.setIncreaseManufacturingEfficiency(vo.getIncreaseManufacturingEfficiency());
+
+		response.setOthersPleaseSpecify(vo.getOthersPleaseSpecify());
+
+		response.setEffectOfChanges(vo.getEffectOfChanges());
+
+		response.setRiskAssessment(vo.getRiskAssessment());
+
+		response.setProposedIntroductionImplementationDate(vo.getProposedIntroductionImplementationDate());
+
+		response.setSupplierEvaluationReport(vo.getSupplierEvaluationReport());
+
+		response.setReliabilityFunctionalReportFromTDC(vo.getReliabilityFunctionalReportFromTDC());
+
+		response.setCustomerApproval(vo.getCustomerApproval());
+
+		response.setOnJobTrainingReportFromMfg(vo.getOnJobTrainingReportFromMfg());
+
+		response.setProcessAuditReport(vo.getProcessAuditReport());
+
+		response.setSupplierRegistrationFrom(vo.getSupplierRegistrationFrom());
+
+		response.setPpapIsirRequired(vo.getPpapIsirRequired());
+
+		response.setChangeRequestApproval(vo.getChangeRequestApproval());
+
+		// Sign By Purchase
+
+		if (vo.getSignByPurchase() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getSignByPurchase().getId());
+
+			employeeResponse.setEmployeeName(vo.getSignByPurchase().getEmployeeName());
+
+			response.setSignByPurchase(employeeResponse);
+		}
+
+		response.setPurchaseDisposition(vo.getPurchaseDisposition());
+
+		// Sign By TDC
+
+		if (vo.getSignByTDC() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getSignByTDC().getId());
+
+			employeeResponse.setEmployeeName(vo.getSignByTDC().getEmployeeName());
+
+			response.setSignByTDC(employeeResponse);
+		}
+
+		response.setTdcDisposition(vo.getTdcDisposition());
+
+		// Sign By Production
+
+		if (vo.getSignByProduction() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getSignByProduction().getId());
+
+			employeeResponse.setEmployeeName(vo.getSignByProduction().getEmployeeName());
+
+			response.setSignByProduction(employeeResponse);
+		}
+
+		response.setProductionDisposition(vo.getProductionDisposition());
+
+		// Sign By Quality
+
+		if (vo.getSignByQuality() != null) {
+
+			EmployeeDropdownResponseDTO employeeResponse = new EmployeeDropdownResponseDTO();
+
+			employeeResponse.setEmployeeId(vo.getSignByQuality().getId());
+
+			employeeResponse.setEmployeeName(vo.getSignByQuality().getEmployeeName());
+
+			response.setSignByQuality(employeeResponse);
+		}
+
+		response.setQualityDisposition(vo.getQualityDisposition());
+
+		response.setNote(vo.getNote());
+
+		// Common fields
+
+		response.setActive(vo.isActive() ? "Active" : "In-Active");
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		return response;
+	}
+
+	@Override
+	public String getSupplierChangeRequestDocId(Long orgId, String financialYear, String screenCode)
+			throws ApplicationException {
+
+		String docId = supplierChangeRequestRepo.getSupplierChangeRequestDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("Supplier Change Request DocId Not Found");
+		}
+
+		return docId;
+	}
+
+	@Override
+	public SupplierChangeRequestResponseDTO getSupplierChangeRequestById(Long id) throws ApplicationException {
+
+		SupplierChangeRequestVO supplierChangeRequestVO = supplierChangeRequestRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Supplier Change Request Details"));
+
+		return supplierChangeRequestResponse(supplierChangeRequestVO);
+	}
+
+	@Override
+	public List<SupplierChangeRequestResponseDTO> getSupplierChangeRequestByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<SupplierChangeRequestVO> supplierChangeRequestList = supplierChangeRequestRepo
+				.getSupplierChangeRequestByOrgId(orgId, branch);
+
+		if (supplierChangeRequestList == null || supplierChangeRequestList.isEmpty()) {
+
+			throw new ApplicationException("No Supplier Change Request Details Found");
+		}
+
+		List<SupplierChangeRequestResponseDTO> responseList = new ArrayList<>();
+
+		for (SupplierChangeRequestVO vo : supplierChangeRequestList) {
+
+			responseList.add(supplierChangeRequestResponse(vo));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getVendorCodeDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> vendorList = supplierChangeRequestRepo.getVendorCodeDropdownForSupplierChangeRequest(orgId,
+				branch);
+
+		if (vendorList == null || vendorList.isEmpty()) {
+			throw new ApplicationException("No Vendor Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : vendorList) {
+
+			Map<String, Object> vendorMap = new HashMap<>();
+
+			vendorMap.put("id", obj[0]);
+			vendorMap.put("vendorCode", obj[1]);
+			vendorMap.put("supplierName", obj[2]);
+
+			responseList.add(vendorMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getPurchaseEmployeesDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> employeeList = supplierChangeRequestRepo
+				.getPurchaseEmployeesDropdownForSupplierChangeRequest(orgId, branch);
+
+		if (employeeList == null || employeeList.isEmpty()) {
+			throw new ApplicationException("No Purchase Employee Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : employeeList) {
+
+			Map<String, Object> employeeMap = new HashMap<>();
+
+			employeeMap.put("employeeId", obj[0]);
+			employeeMap.put("employeeCode", obj[1]);
+			employeeMap.put("employeeName", obj[2]);
+
+			responseList.add(employeeMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getTDCEmployeesDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> employeeList = supplierChangeRequestRepo.getTDCEmployeesDropdownForSupplierChangeRequest(orgId,
+				branch);
+
+		if (employeeList == null || employeeList.isEmpty()) {
+			throw new ApplicationException("No TDC Employee Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : employeeList) {
+
+			Map<String, Object> employeeMap = new HashMap<>();
+
+			employeeMap.put("employeeId", obj[0]);
+			employeeMap.put("employeeCode", obj[1]);
+			employeeMap.put("employeeName", obj[2]);
+
+			responseList.add(employeeMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getProductionEmployeesDropdownSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> employeeList = supplierChangeRequestRepo
+				.getProductionEmployeesDropdownForSupplierChangeRequest(orgId, branch);
+
+		if (employeeList == null || employeeList.isEmpty()) {
+			throw new ApplicationException("No Production Employee Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : employeeList) {
+
+			Map<String, Object> employeeMap = new HashMap<>();
+
+			employeeMap.put("employeeId", obj[0]);
+			employeeMap.put("employeeCode", obj[1]);
+			employeeMap.put("employeeName", obj[2]);
+
+			responseList.add(employeeMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateCategoryMaster(CategoryMasterDTO categoryMasterDTO)
+			throws ApplicationException {
+
+		CategoryMasterVO categoryMasterVO = new CategoryMasterVO();
+
+		String message;
+
+		if (ObjectUtils.isEmpty(categoryMasterDTO.getId())) {
+
+			categoryMasterVO.setCreatedBy(categoryMasterDTO.getCreatedBy());
+
+			message = "Category Master Created Successfully";
+
+		} else {
+
+			categoryMasterVO = categoryMasterRepo.findById(categoryMasterDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Category Master Details"));
+
+			categoryMasterVO.setUpdatedBy(categoryMasterDTO.getCreatedBy());
+
+			message = "Category Master Updated Successfully";
+		}
+
+		createUpdateCategoryMasterVO(categoryMasterDTO, categoryMasterVO);
+
+		CategoryMasterVO savedVO = categoryMasterRepo.save(categoryMasterVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("categoryMasterVO", categoryMasterResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdateCategoryMasterVO(CategoryMasterDTO dto, CategoryMasterVO vo) throws ApplicationException {
+
+		// Applicable For
+		if (dto.getApplicableFor() != null) {
+
+			ListOfValuesDetailsVO applicableFor = listOfValuesDetailsRepo.findById(dto.getApplicableFor())
+					.orElseThrow(() -> new ApplicationException("Invalid Applicable For"));
+
+			vo.setApplicableFor(applicableFor);
+		}
+
+		// Basic Details
+		vo.setCategory(dto.getCategory());
+
+		// Common Fields
+		vo.setActive(dto.isActive());
+
+		vo.setOrgId(dto.getOrgId());
+
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		vo.setCancelRemarks(dto.getCancelRemarks());
+	}
+
+	private CategoryMasterResponseDTO categoryMasterResponse(CategoryMasterVO vo) {
+
+		CategoryMasterResponseDTO response = new CategoryMasterResponseDTO();
+
+		response.setId(vo.getId());
+
+		// Applicable For
+		if (vo.getApplicableFor() != null) {
+
+			ListOfValuesDetailsResponseDTO applicableForResponse = new ListOfValuesDetailsResponseDTO();
+
+			applicableForResponse.setId(vo.getApplicableFor().getId());
+
+			applicableForResponse.setCode(vo.getApplicableFor().getValueCode());
+
+			applicableForResponse.setDescription(vo.getApplicableFor().getValueDescription());
+
+			response.setApplicableFor(applicableForResponse);
+		}
+
+		response.setCategory(vo.getCategory());
+
+		response.setActive(vo.isActive() ? "Active" : "In-Active");
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setCancelRemarks(vo.getCancelRemarks());
+
+		return response;
+	}
+
+	@Override
+	public CategoryMasterResponseDTO getCategoryMasterById(Long id) throws ApplicationException {
+
+		CategoryMasterVO categoryMasterVO = categoryMasterRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Category Master Details"));
+
+		return categoryMasterResponse(categoryMasterVO);
+	}
+
+	@Override
+	public List<CategoryMasterResponseDTO> getCategoryMasterByOrgId(Long orgId) throws ApplicationException {
+
+		List<CategoryMasterVO> categoryMasterList = categoryMasterRepo.getCategoryMasterByOrgId(orgId);
+
+		if (categoryMasterList == null || categoryMasterList.isEmpty()) {
+
+			throw new ApplicationException("No Category Master Details Found");
+		}
+
+		List<CategoryMasterResponseDTO> responseList = new ArrayList<>();
+
+		for (CategoryMasterVO vo : categoryMasterList) {
+
+			responseList.add(categoryMasterResponse(vo));
+		}
+
+		return responseList;
+	}
+
+//	cause Master
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateCauseMaster(CauseMasterDTO causeMasterDTO) throws ApplicationException {
+
+		CauseMasterVO causeMasterVO = new CauseMasterVO();
+
+		String message;
+
+		if (ObjectUtils.isEmpty(causeMasterDTO.getId())) {
+
+			causeMasterVO.setCreatedBy(causeMasterDTO.getCreatedBy());
+
+			message = "Cause Master Created Successfully";
+
+		} else {
+
+			causeMasterVO = causeMasterRepo.findById(causeMasterDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Cause Master Details"));
+
+			causeMasterVO.setUpdatedBy(causeMasterDTO.getCreatedBy());
+
+			message = "Cause Master Updated Successfully";
+		}
+
+		createUpdateCauseMasterVO(causeMasterDTO, causeMasterVO);
+
+		CauseMasterVO savedCauseMasterVO = causeMasterRepo.save(causeMasterVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+		response.put("causeMasterVO", causeMasterResponse(savedCauseMasterVO));
+
+		return response;
+	}
+
+	private void createUpdateCauseMasterVO(CauseMasterDTO causeMasterDTO, CauseMasterVO causeMasterVO)
+			throws ApplicationException {
+
+		if (causeMasterDTO.getDepartment() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(causeMasterDTO.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Invalid Department Details"));
+
+			causeMasterVO.setDepartment(departmentVO);
+		}
+
+		if (causeMasterDTO.getMaintenanceType() != null) {
+
+			ListOfValuesDetailsVO maintenanceTypeVO = listOfValuesDetailsRepo
+					.findById(causeMasterDTO.getMaintenanceType())
+					.orElseThrow(() -> new ApplicationException("Invalid Maintenance Type Details"));
+
+			causeMasterVO.setMaintenanceType(maintenanceTypeVO);
+		}
+
+		causeMasterVO.setCauseCode(causeMasterDTO.getCauseCode());
+		causeMasterVO.setCause(causeMasterDTO.getCause());
+		causeMasterVO.setActive(causeMasterDTO.isActive());
+		causeMasterVO.setOrgId(causeMasterDTO.getOrgId());
+		causeMasterVO.setFinancialYear(causeMasterDTO.getFinancialYear());
+		causeMasterVO.setCancelRemarks(causeMasterDTO.getCancelRemarks());
+	}
+
+	private CauseMasterResponseDTO causeMasterResponse(CauseMasterVO causeMasterVO) {
+
+		CauseMasterResponseDTO response = new CauseMasterResponseDTO();
+
+		response.setId(causeMasterVO.getId());
+
+		if (causeMasterVO.getDepartment() != null) {
+
+			DepartmentResponseDTO departmentResponseDTO = new DepartmentResponseDTO();
+
+			departmentResponseDTO.setId(causeMasterVO.getDepartment().getId());
+
+			departmentResponseDTO.setDepartmentCode(causeMasterVO.getDepartment().getDepartmentCode());
+
+			departmentResponseDTO.setDepartmentName(causeMasterVO.getDepartment().getDepartmentName());
+
+			response.setDepartment(departmentResponseDTO);
+		}
+
+		if (causeMasterVO.getMaintenanceType() != null) {
+
+			ListOfValuesDetailsResponseDTO maintenanceTypeResponseDTO = new ListOfValuesDetailsResponseDTO();
+
+			maintenanceTypeResponseDTO.setId(causeMasterVO.getMaintenanceType().getId());
+
+			maintenanceTypeResponseDTO.setCode(causeMasterVO.getMaintenanceType().getValueCode());
+
+			maintenanceTypeResponseDTO.setDescription(causeMasterVO.getMaintenanceType().getValueDescription());
+
+			response.setMaintenanceType(maintenanceTypeResponseDTO);
+		}
+
+		response.setCauseCode(causeMasterVO.getCauseCode());
+		response.setCause(causeMasterVO.getCause());
+		response.setActive(causeMasterVO.isActive());
+		response.setOrgId(causeMasterVO.getOrgId());
+		response.setCreatedBy(causeMasterVO.getCreatedBy());
+		response.setFinancialYear(causeMasterVO.getFinancialYear());
+		response.setCancelRemarks(causeMasterVO.getCancelRemarks());
+
+		return response;
+	}
+
+	@Override
+	public CauseMasterResponseDTO getCauseMasterById(Long id) throws ApplicationException {
+
+		CauseMasterVO causeMasterVO = causeMasterRepo.findById(id).orElse(null);
+
+		if (causeMasterVO == null) {
+			throw new ApplicationException("Invalid Cause Master Details");
+		}
+
+		return causeMasterResponse(causeMasterVO);
+	}
+
+	@Override
+	public List<CauseMasterResponseDTO> getCauseMasterByOrgId(Long orgId) throws ApplicationException {
+
+		List<CauseMasterVO> causeMasterList = causeMasterRepo.getCauseMasterByOrgId(orgId);
+
+		if (causeMasterList == null || causeMasterList.isEmpty()) {
+			throw new ApplicationException("No Cause Master Details Found");
+		}
+
+		List<CauseMasterResponseDTO> responseList = new ArrayList<>();
+
+		for (CauseMasterVO causeMasterVO : causeMasterList) {
+
+			CauseMasterResponseDTO response = causeMasterResponse(causeMasterVO);
+
+			responseList.add(response);
 		}
 
 		return responseList;

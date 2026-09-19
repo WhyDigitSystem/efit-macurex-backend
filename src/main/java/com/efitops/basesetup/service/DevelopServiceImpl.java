@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
@@ -82,6 +83,7 @@ import com.efitops.basesetup.ResponseDTO.ToolMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ZeroEntryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
+import com.efitops.basesetup.dto.ActivityMasterDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.ControlPlanDTO;
 import com.efitops.basesetup.dto.ControlPlanDetailDTO;
@@ -138,6 +140,7 @@ import com.efitops.basesetup.dto.ToolCategoryDetailDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.dto.ZeroEntryDetailDTO;
 import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
+import com.efitops.basesetup.entity.ActivityMasterVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.ControlPlanDetailVO;
 import com.efitops.basesetup.entity.ControlPlanMachineFixtureVO;
@@ -200,6 +203,7 @@ import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.entity.ZeroEntryDetailVO;
 import com.efitops.basesetup.entity.ZeroKmFailureEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.ActivityMasterRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.ControlPlanDetailRepo;
 import com.efitops.basesetup.repository.ControlPlanMachineFixtureRepo;
@@ -478,6 +482,9 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	@Autowired
 	private InitialSampleInspectionDetailRepo initialSampleInspectionDetailRepo;
+	
+	@Autowired
+	private ActivityMasterRepo activityMasterRepo;
 	
 	
 	
@@ -6781,12 +6788,18 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	
 	@Override
-	public String getProcessSheetCompRoutingDocId(Long orgId, String financialYear) {
+	public String getProcessSheetCompRoutingDocId(
+	        Long orgId,
+	        String financialYear) {
 
 	    String screenCode = "PSCR";
 
-	    String result = processSheetCompRoutingRepo
-	            .getProcessSheetCompRoutingDocId(orgId, financialYear, screenCode);
+	    String result =
+	            processSheetCompRoutingRepo
+	                    .getProcessSheetCompRoutingDocId(
+	                            orgId,
+	                            financialYear,
+	                            screenCode);
 
 	    return result;
 	}
@@ -10675,5 +10688,278 @@ public class DevelopServiceImpl implements DevelopService {
 	    }
 
 	    return responseList;
+	}
+	
+	
+	//activity master
+	
+	
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateActivityMaster(
+	        ActivityMasterDTO activityMasterDTO)
+	        throws ApplicationException {
+
+	    ActivityMasterVO activityMasterVO;
+
+	    String message;
+
+	    // ============================================================
+	    // CREATE / UPDATE
+	    // ============================================================
+
+	    if (ObjectUtils.isNotEmpty(activityMasterDTO.getId())) {
+
+	        // UPDATE
+
+	        activityMasterVO = activityMasterRepo
+	                .findById(activityMasterDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Activity Master Not Found"));
+
+	        activityMasterVO.setUpdatedBy(
+	                activityMasterDTO.getCreatedBy());
+
+	        message = "Activity Master Updated Successfully";
+
+	    } else {
+
+	        // CREATE
+
+	        activityMasterVO =
+	                new ActivityMasterVO();
+
+	        activityMasterVO.setCreatedBy(
+	                activityMasterDTO.getCreatedBy());
+
+	        activityMasterVO.setUpdatedBy(
+	                activityMasterDTO.getCreatedBy());
+
+	        message = "Activity Master Created Successfully";
+	    }
+
+	    // ============================================================
+	    // HEADER MAPPING
+	    // ============================================================
+
+	    createUpdateActivityMasterVOByDTO(
+	            activityMasterDTO,
+	            activityMasterVO);
+
+	    // ============================================================
+	    // SAVE
+	    // ============================================================
+
+	    activityMasterVO =
+	            activityMasterRepo.save(
+	                    activityMasterVO);
+
+	    // ============================================================
+	    // RESPONSE
+	    // ============================================================
+
+	    ActivityMasterResponseDTO responseDTO =
+	            buildActivityMasterResponse(
+	                    activityMasterVO);
+
+	    Map<String, Object> response =
+	            new HashMap<>();
+
+	    response.put(
+	            "message",
+	            message);
+
+	    response.put(
+	            "activityMasterVO",
+	            responseDTO);
+
+	    return response;
+	}
+	
+	// ================================================================
+	// HEADER MAPPING
+	// ================================================================
+
+	private void createUpdateActivityMasterVOByDTO(
+	        ActivityMasterDTO dto,
+	        ActivityMasterVO vo)
+	        throws ApplicationException {
+
+	    // ============================================================
+	    // DEPARTMENT
+	    // ============================================================
+
+	    if (dto.getDepartment() != null) {
+
+	        DepartmentVO departmentVO =
+	                departmentRepo
+	                        .findById(dto.getDepartment())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Department Not Found"));
+
+	        vo.setDepartment(
+	                departmentVO);
+	    }
+
+	    // ============================================================
+	    // ACTIVITY
+	    // ============================================================
+
+	    vo.setActivity(
+	            dto.getActivity());
+
+	    // ============================================================
+	    // COMMON FIELDS
+	    // ============================================================
+
+	    vo.setActive(
+	            dto.isActive());
+
+	    vo.setOrgId(
+	            dto.getOrgId());
+
+	    vo.setFinancialYear(
+	            dto.getFinancialYear());
+
+	    vo.setCreatedBy(
+	            dto.getCreatedBy());
+
+	    vo.setUpdatedBy(
+	            dto.getUpdatedBy());
+
+	    vo.setCancel(
+	            dto.isCancel());
+
+	    vo.setCancelRemarks(
+	            dto.getCancelRemarks());
+
+	    // ============================================================
+	    // SCREEN DETAILS
+	    // ============================================================
+
+	    vo.setScreenName(
+	            "ACTIVITYMASTER");
+
+	    vo.setScreenCode(
+	            "AM");
+	}
+	
+	
+	// ================================================================
+	// BUILD RESPONSE
+	// ================================================================
+
+	private ActivityMasterResponseDTO buildActivityMasterResponse(
+	        ActivityMasterVO vo) {
+
+	    ActivityMasterResponseDTO responseDTO =
+	            new ActivityMasterResponseDTO();
+
+	    // ============================================================
+	    // BASIC DETAILS
+	    // ============================================================
+
+	    responseDTO.setId(
+	            vo.getId());
+
+	    responseDTO.setActivity(
+	            vo.getActivity());
+
+	    // ============================================================
+	    // DEPARTMENT
+	    // ============================================================
+
+	    if (vo.getDepartment() != null) {
+
+	        DepartmentResponseDTO departmentResponseDTO =
+	                new DepartmentResponseDTO();
+
+	        departmentResponseDTO.setId(
+	                vo.getDepartment().getId());
+
+	        departmentResponseDTO.setDepartmentCode(
+	                vo.getDepartment().getDepartmentCode());
+
+	        departmentResponseDTO.setDepartmentName(
+	                vo.getDepartment().getDepartmentName());
+
+	        responseDTO.setDepartment(
+	                departmentResponseDTO);
+	    }
+
+	    // ============================================================
+	    // COMMON FIELDS
+	    // ============================================================
+
+	    responseDTO.setActive(
+	            vo.isActive());
+
+	    responseDTO.setOrgId(
+	            vo.getOrgId());
+
+	    responseDTO.setFinancialYear(
+	            vo.getFinancialYear());
+
+	    responseDTO.setCreatedBy(
+	            vo.getCreatedBy());
+
+	    responseDTO.setUpdatedBy(
+	            vo.getUpdatedBy());
+
+	    responseDTO.setCancel(
+	            vo.isCancel());
+
+	    responseDTO.setCancelRemarks(
+	            vo.getCancelRemarks());
+
+	    return responseDTO;
+	}
+	
+	
+	@Override
+	public List<ActivityMasterResponseDTO> getActivityMasterByOrgId(
+	        Long orgId) throws ApplicationException {
+
+	    List<ActivityMasterVO> activityMasterList =
+	            activityMasterRepo.findByOrgId(orgId);
+
+	    if (activityMasterList == null
+	            || activityMasterList.isEmpty()) {
+
+	        throw new ApplicationException(
+	                "Activity Master Not Found");
+	    }
+
+	    List<ActivityMasterResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (ActivityMasterVO activityMasterVO :
+	            activityMasterList) {
+
+	        responseList.add(
+	                buildActivityMasterResponse(
+	                        activityMasterVO));
+	    }
+
+	    return responseList;
+	}
+
+	@Override
+	public ActivityMasterResponseDTO getActivityMasterById(
+	        Long id) throws ApplicationException {
+
+	    ActivityMasterVO activityMasterVO =
+	            activityMasterRepo.findById(id).orElse(null);
+
+	    if (activityMasterVO == null) {
+
+	        throw new ApplicationException(
+	                "Activity Master Not Found");
+	    }
+
+	    return buildActivityMasterResponse(
+	            activityMasterVO);
 	}
 }

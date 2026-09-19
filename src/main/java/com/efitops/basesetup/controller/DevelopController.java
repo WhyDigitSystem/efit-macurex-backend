@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionResponseDTO;
@@ -38,6 +39,7 @@ import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.ActivityMasterDTO;
 import com.efitops.basesetup.dto.ControlPlanDTO;
 import com.efitops.basesetup.dto.EightDisciplineEntryDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
@@ -2190,6 +2192,8 @@ public class DevelopController extends BaseController {
 	//docid
 	
 	
+	// DOCID
+
 	@GetMapping("/getProcessSheetCompRoutingDocId")
 	public ResponseEntity<ResponseDTO> getProcessSheetCompRoutingDocId(
 	        @RequestParam Long orgId,
@@ -2197,11 +2201,14 @@ public class DevelopController extends BaseController {
 
 	    String methodName = "getProcessSheetCompRoutingDocId()";
 
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
 
 	    String errorMsg = null;
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
 
 	    ResponseDTO responseDTO = null;
 
@@ -2211,8 +2218,7 @@ public class DevelopController extends BaseController {
 
 	        mapp = developService.getProcessSheetCompRoutingDocId(
 	                orgId,
-	                financialYear
-	        );
+	                financialYear);
 
 	    } catch (Exception e) {
 
@@ -2221,38 +2227,40 @@ public class DevelopController extends BaseController {
 	        LOGGER.error(
 	                UserConstants.ERROR_MSG_METHOD_NAME,
 	                methodName,
-	                errorMsg
-	        );
+	                errorMsg);
 	    }
 
 	    if (StringUtils.isBlank(errorMsg)) {
 
 	        responseObjectsMap.put(
 	                CommonConstant.STRING_MESSAGE,
-	                "Process Sheet Component Routing DocId information retrieved successfully"
-	        );
+	                "Process Sheet Component Routing DocId information retrieved successfully");
 
 	        responseObjectsMap.put(
 	                "processSheetCompRoutingDocId",
-	                mapp
-	        );
+	                mapp);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
 
 	    } else {
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Failed to retrieve Process Sheet Component Routing DocId",
-	                errorMsg
-	        );
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Process Sheet Component Routing DocId",
+	                        errorMsg);
 	    }
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
 
 	    return ResponseEntity.ok().body(responseDTO);
 	}
-
+	
+	
 	// FG/SFG Item Code Dropdown
 
 	@GetMapping("/getFgSfgItemCodeDropdownforProcessSheetCompRouting")
@@ -3846,6 +3854,146 @@ public class DevelopController extends BaseController {
 	    LOGGER.debug(
 	            CommonConstant.ENDING_METHOD,
 	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	
+	//activity master
+	
+	
+	@PutMapping("/createUpdateActivityMaster")
+
+	public ResponseEntity<ResponseDTO> createUpdateActivityMaster(
+	        @RequestBody ActivityMasterDTO activityMasterDTO) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object> activityMasterMap =
+	                developService.createUpdateActivityMaster(
+	                        activityMasterDTO);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                activityMasterMap.get("message"));
+
+	        responseObjectsMap.put(
+	                "activityMasterVO",
+	                activityMasterMap.get(
+	                        "activityMasterVO"));
+
+	        responseDTO = createServiceResponse(
+	                responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+	@GetMapping("/getActivityMasterByOrgId")
+
+	public ResponseEntity<ResponseDTO> getActivityMasterByOrgId(
+	        @RequestParam Long orgId) {
+
+	    String methodName = "getActivityMasterByOrgId()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<ActivityMasterResponseDTO> activityMasterResponseDTO =
+	                developService.getActivityMasterByOrgId(orgId);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Activity Master information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "activityMasterResponseVO",
+	                activityMasterResponseDTO);
+
+	        responseDTO = createServiceResponse(
+	                responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e.getMessage());
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Activity Master information retrieval failed",
+	                e.getMessage());
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+
+
+	@GetMapping("/getActivityMasterById")
+
+	public ResponseEntity<ResponseDTO> getActivityMasterById(
+	        @RequestParam Long id) {
+
+	    String methodName = "getActivityMasterById()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        ActivityMasterResponseDTO activityMasterResponseDTO =
+	                developService.getActivityMasterById(id);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Activity Master information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "activityMasterVO",
+	                activityMasterResponseDTO);
+
+	        responseDTO = createServiceResponse(
+	                responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                "Activity Master information retrieval failed",
+	                errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 	    return ResponseEntity.ok(responseDTO);
 	}

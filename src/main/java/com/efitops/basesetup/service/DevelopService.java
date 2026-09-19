@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
@@ -29,6 +30,7 @@ import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
+import com.efitops.basesetup.dto.ActivityMasterDTO;
 import com.efitops.basesetup.dto.ControlPlanDTO;
 import com.efitops.basesetup.dto.EightDisciplineEntryDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
@@ -302,6 +304,12 @@ public interface DevelopService {
 
 	List<Map<String, Object>> getSupplierIdDropDownForInitialSampleInspection(Long orgId, Long branch)
 			throws ApplicationException;
+
+	Map<String, Object> createUpdateActivityMaster(ActivityMasterDTO activityMasterDTO) throws ApplicationException;
+
+	List<ActivityMasterResponseDTO> getActivityMasterByOrgId(Long orgId) throws ApplicationException;
+
+	ActivityMasterResponseDTO getActivityMasterById(Long id) throws ApplicationException;
 
 	
 	

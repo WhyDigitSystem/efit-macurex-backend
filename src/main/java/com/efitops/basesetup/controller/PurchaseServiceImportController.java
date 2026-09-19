@@ -27,6 +27,7 @@ import com.efitops.basesetup.ResponseDTO.ConsumptionEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FgTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaterialTransferReturnNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
@@ -39,6 +40,7 @@ import com.efitops.basesetup.dto.ConsumptionEntryDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.FgTransferSlipDTO;
 import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
+import com.efitops.basesetup.dto.MaterialTransferReturnNoteDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.ProductionTransferSlipDTO;
@@ -89,7 +91,7 @@ public class PurchaseServiceImportController extends BaseController {
 	@PutMapping(value = "/createUpdatePurchaseOrder", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdatePurchaseOrder(
 			@RequestPart("purchaseOrder") PurchaseOrderDTO purchaseOrderDTO,
-//		@RequestBody PurchaseOrderDTO purchaseOrderDTO,
+//	@RequestBody PurchaseOrderDTO purchaseOrderDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		String methodName = "createUpdatePurchaseOrder()";
@@ -2561,4 +2563,273 @@ public class PurchaseServiceImportController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
+	// Mat
+
+	@GetMapping("/getMaterialTransferReturnNoteById")
+	public ResponseEntity<ResponseDTO> getMaterialTransferReturnNoteById(@RequestParam Long id) {
+
+		String methodName = "getMaterialTransferReturnNoteById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+			MaterialTransferReturnNoteResponseDTO materialTransferReturnNoteResponseDTO = purchaseOrderService
+					.getMaterialTransferReturnNoteById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Material Transfer Return Note information retrieved successfully");
+			responseObjectsMap.put("materialTransferReturnNoteResponseVO", materialTransferReturnNoteResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Material Transfer Return Note retrieval failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getMaterialTransferReturnNoteDocId")
+	public ResponseEntity<ResponseDTO> getMaterialTransferReturnNoteDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getMaterialTransferReturnNoteDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+			mapp = purchaseOrderService.getMaterialTransferReturnNoteDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Material Transfer Return Note DocId information retrieved successfully");
+
+			responseObjectsMap.put("materialTransferReturnNoteDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Material Transfer Return Note DocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping("/createUpdateMaterialTransferReturnNote")
+	public ResponseEntity<ResponseDTO> createUpdateMaterialTransferReturnNote(
+			@RequestBody MaterialTransferReturnNoteDTO materialTransferReturnNoteDTO) {
+
+		String methodName = "createUpdateMaterialTransferReturnNote()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> materialTransferReturnNoteVO = purchaseOrderService
+					.createUpdateMaterialTransferReturnNote(materialTransferReturnNoteDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, materialTransferReturnNoteVO.get("message"));
+
+			responseObjectsMap.put("materialTransferReturnNoteVO",
+					materialTransferReturnNoteVO.get("materialTransferReturnNoteVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMaterialTransferReturnNoteByOrgId")
+	public ResponseEntity<ResponseDTO> getMaterialTransferReturnNoteByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getMaterialTransferReturnNoteByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<MaterialTransferReturnNoteResponseDTO> materialTransferReturnNoteResponseDTO = purchaseOrderService
+					.getMaterialTransferReturnNoteByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Material Transfer Return Note information retrieved successfully");
+
+			responseObjectsMap.put("materialTransferReturnNoteResponseVO", materialTransferReturnNoteResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Material Transfer Return Note information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getFgAndSfgFromMaterialTransferReturnNote")
+	public ResponseEntity<ResponseDTO> getFgAndSfgFromMaterialTransferReturnNote(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getFgAndSfgFromMaterialTransferReturnNote()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getFgAndSfgFromMaterialTransferReturnNote(orgId, branch);
+
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "FG and SFG item details retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve FG and SFG item details",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSchNoFromMaterialTransferReturnNote")
+	public ResponseEntity<ResponseDTO> getSchNoFromMaterialTransferReturnNote(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getSchNoFromMaterialTransferReturnNote()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getSchNoFromMaterialTransferReturnNote(orgId, branch);
+
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Schedule number details retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Schedule number details",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSchNoItemDetailsFromMaterialTransferReturnNote")
+	public ResponseEntity<ResponseDTO> getSchNoItemDetailsFromMaterialTransferReturnNote(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam String schNo) {
+
+		String methodName = "getSchNoItemDetailsFromMaterialTransferReturnNote()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getSchNoItemDetailsFromMaterialTransferReturnNote(orgId, branch, schNo);
+
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Schedule number item details retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Schedule number item details", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
 }

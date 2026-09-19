@@ -15,6 +15,7 @@ import com.efitops.basesetup.ResponseDTO.ConsumptionEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FgTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaterialTransferReturnNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
@@ -25,6 +26,7 @@ import com.efitops.basesetup.dto.ConsumptionEntryDTO;
 import com.efitops.basesetup.dto.DirectPurchaseDTO;
 import com.efitops.basesetup.dto.FgTransferSlipDTO;
 import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
+import com.efitops.basesetup.dto.MaterialTransferReturnNoteDTO;
 import com.efitops.basesetup.dto.PoType;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.ProductionTransferSlipDTO;
@@ -215,5 +217,21 @@ public interface PurchaseServiceImport {
 	List<Map<String, Object>> getFgAndSfgItemDetailsConsumptionEntry(Long orgId, Long branch);
 
 	List<Map<String, Object>> getRawMaterialConsumptionEntry(Long orgId, Long branch, Long fgItem);
+	
+	//material
+	
+	Map<String, Object> createUpdateMaterialTransferReturnNote(MaterialTransferReturnNoteDTO dto) throws ApplicationException;
+
+    String getMaterialTransferReturnNoteDocId(Long orgId, String financialYear) throws ApplicationException;
+
+    MaterialTransferReturnNoteResponseDTO getMaterialTransferReturnNoteById(Long id) throws ApplicationException;
+
+    List<MaterialTransferReturnNoteResponseDTO> getMaterialTransferReturnNoteByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getFgAndSfgFromMaterialTransferReturnNote(Long orgId, Long branch);
+
+	List<Map<String, Object>> getSchNoFromMaterialTransferReturnNote(Long orgId, Long branch);
+
+	List<Map<String, Object>> getSchNoItemDetailsFromMaterialTransferReturnNote(Long orgId, Long branch, String schNo);
 
 }

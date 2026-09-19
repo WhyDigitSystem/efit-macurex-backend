@@ -29,5 +29,20 @@ public interface PurchaseIndentRepo
             FROM Indent_Basic
             """, nativeQuery = true)
     String findLastIndentNo();
+    
+    @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid "
+            + "from documenttypemapping_details "
+            + "where org_id=?1 and screen_code=?2")
+    String getPurchaseIndentDocId(
+            Long orgId,
+            String screenCode);
 
+
+    @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid "
+            + "from documenttypemapping_details "
+            + "where org_id=?1 and fin_year=?2 and screen_code=?3")
+    String getPurchaseIndentDocIdByFinancialYear(
+            Long orgId,
+            String financialYear,
+            String screenCode);
 }

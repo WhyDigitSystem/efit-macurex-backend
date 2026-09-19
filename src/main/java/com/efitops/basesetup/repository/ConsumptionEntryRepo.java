@@ -32,4 +32,5 @@ public interface ConsumptionEntryRepo extends JpaRepository<ConsumptionEntryVO, 
 			+ " left join item i on i.item_id=b1.item left join unitmaster u on u.unitmaster_id=b1.uom where b.org_id=?1 and b.branch=?2\r\n"
 			+ " and b.fg_item=?3  group by b1.item,i.item_code,i.item_description,b1.qty,b1.scrap_qty,b1.uom,u.unit_id")
 	Set<Object[]> getRawMaterialConsumptionEntry(Long orgId, Long branch,Long fgItem);
+	
 }

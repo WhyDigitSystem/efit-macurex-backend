@@ -60,6 +60,7 @@ import com.efitops.basesetup.dto.PurchaseShortCloseDetailsDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
+import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
@@ -80,8 +81,10 @@ import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.entity.UomConversionVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
+import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.HsnRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
@@ -172,6 +175,12 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Autowired TaxDefinitionRepo taxDefinitionRepo;
     @Autowired UnitMasterRepo unitMasterRepo;
     @Autowired ListOfValuesDetailsRepo listOfValuesDetailsRepo;
+    
+    
+    @Autowired
+	private DocumentTypeMappingDetailsRepo documentTypeMappingDetailsRepo;
+
+    
 
     @Value("${purchasecontract.upload.path}")
     private String purchaseContractUploadPath;
@@ -1266,21 +1275,21 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             purchaseIndentVO = new PurchaseIndentVO();
 
-//            String docId = purchaseIndentRepo.getPurchaseIndentDocId(
-//                    purchaseIndentDTO.getOrgId(),
-//                    screenCode);
-//
-//            purchaseIndentVO.setDocId(docId);
-//
-//            DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
-//                    documentTypeMappingDetailsRepo.findByOrgIdAndScreenCode(
-//                            purchaseIndentDTO.getOrgId(),
-//                            screenCode);
-//
-//            documentTypeMappingDetailsVO
-//                    .setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-//
-//            documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+            String docId = purchaseIndentRepo.getPurchaseIndentDocId(
+                    purchaseIndentDTO.getOrgId(),
+                    screenCode);
+
+            purchaseIndentVO.setDocId(docId);
+
+            DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+                    documentTypeMappingDetailsRepo.findByOrgIdAndScreenCode(
+                            purchaseIndentDTO.getOrgId(),
+                            screenCode);
+
+            documentTypeMappingDetailsVO
+                    .setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+            documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
             purchaseIndentVO.setCreatedBy(purchaseIndentDTO.getCreatedBy());
             purchaseIndentVO.setUpdatedBy(purchaseIndentDTO.getCreatedBy());
@@ -1682,6 +1691,23 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             return responseDTOList;
         }
+        
+        @Override
+        public String getPurchaseIndentDocId(
+                Long orgId,
+                String financialYear) {
+
+            String screenCode = "PI";
+
+            String result =
+                    purchaseIndentRepo.getPurchaseIndentDocIdByFinancialYear(
+                            orgId,
+                            financialYear,
+                            screenCode);
+
+            return result;
+        }
+        
     
     //purchaseindent dropdown
     

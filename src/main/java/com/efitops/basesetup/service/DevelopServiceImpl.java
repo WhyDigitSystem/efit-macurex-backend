@@ -3355,7 +3355,7 @@ public class DevelopServiceImpl implements DevelopService {
 	public List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(String docId, Long orgId,
 			Long branch) throws ApplicationException {
 
-		List<Object[]> result = purchaseOrderAmendmentRepo.getCurrencyExchangeRateForPurchaseOrderAmendment(docId,
+		List<Object[]> result = purchaseOrderAmendmentRepo.getCurrencyExchangeRateforPurchaseOrderAmendment(docId,
 				orgId, branch);
 
 		if (result.isEmpty()) {

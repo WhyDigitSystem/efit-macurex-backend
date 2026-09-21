@@ -60,14 +60,21 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	            i.item_code AS itemCode,
 	            i.item_description AS itemDescription,
 	            b.hsn_code AS hsnSacCode,
-	            h.hsn_id AS hsnId
+	            h.hsn_id AS hsnId,
+	            b.purchase_unit AS unit,
+	            b.po_qty_in_purchase_unit AS oldQty,
+	            b.delivery_date AS oldDeliveryDate
 	        FROM purchase_order_local_details b
+
 	        INNER JOIN purchase_order_basic a
 	            ON a.purchase_order_basic_id = b.purchase_order_basic_id
+
 	        INNER JOIN item i
 	            ON i.item_id = b.item
+
 	        LEFT JOIN hsn h
 	            ON h.hsn = b.hsn_code
+
 	        WHERE a.cancel = 0
 	          AND a.doc_id = :docId
 	          AND a.org_id = :orgId
@@ -80,14 +87,21 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	            i.item_code AS itemCode,
 	            i.item_description AS itemDescription,
 	            b.hsn_code AS hsnSacCode,
-	            h.hsn_id AS hsnId
+	            h.hsn_id AS hsnId,
+	            b.uom AS unit,
+	            b.po_qty AS oldQty,
+	            NULL AS oldDeliveryDate
 	        FROM purchase_order_import_details b
+
 	        INNER JOIN purchase_order_basic a
 	            ON a.purchase_order_basic_id = b.purchase_order_basic_id
+
 	        INNER JOIN item i
 	            ON i.item_id = b.item
+
 	        LEFT JOIN hsn h
 	            ON h.hsn = b.hsn_code
+
 	        WHERE a.cancel = 0
 	          AND a.doc_id = :docId
 	          AND a.org_id = :orgId
@@ -108,13 +122,10 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	            der.selling_ex_rate AS exchangeRate,
 	            der.buying_ex_rate AS buyingExRate
 	        FROM purchase_order_basic pob
-
 	        INNER JOIN customer_header cust
 	            ON cust.customer_id = pob.supplier_code
-
 	        INNER JOIN currency c
 	            ON c.currency_id = cust.primary_currency
-
 	        INNER JOIN (
 	            SELECT
 	                d.org_id,
@@ -122,30 +133,30 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	                d.currency,
 	                d.selling_ex_rate,
 	                d.buying_ex_rate
-	            FROM dailyexchangerate d, currency c
-	            WHERE d.currency = c.currency_id
-	              AND d.effective_from = (
-	                  SELECT MAX(d1.effective_from)
-	                  FROM dailyexchangerate d1
-	                  WHERE d1.currency = c.currency_id
-	              )
+	            FROM dailyexchangerate d
+	            INNER JOIN currency c1
+	                ON d.currency = c1.currency_id
+	            WHERE d.effective_from = (
+	                SELECT MAX(d1.effective_from)
+	                FROM dailyexchangerate d1
+	                WHERE d1.currency = c1.currency_id
+	            )
 	        ) der
 	            ON der.currency = c.currency_id
-	            AND der.org_id = c.org_id
 	            AND der.branch = pob.branch
-
-	        WHERE pob.doc_id = :docId
+	        WHERE pob.doc_id = :purchaseOrderNumber
 	          AND pob.org_id = :orgId
 	          AND pob.branch = :branch
-	          AND pob.cancel = 0
-	          AND cust.org_id = :orgId
-	          AND c.active = 1
-	          AND c.cancel = 0
+	          AND pob.cancel = FALSE
+	          AND c.active = TRUE
+	          AND c.cancel = FALSE
 	        """, nativeQuery = true)
-	List<Object[]> getCurrencyExchangeRateForPurchaseOrderAmendment(
-	        @Param("docId") String docId,
+	List<Object[]> getCurrencyExchangeRateforPurchaseOrderAmendment(
+	        @Param("purchaseOrderNumber") String purchaseOrderNumber,
 	        @Param("orgId") Long orgId,
 	        @Param("branch") Long branch);
+	
+	
 
 	@Query(
 		    nativeQuery = true,
@@ -157,4 +168,5 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 		        Long orgId,
 		        String financialYear,
 		        String screenCode);
+
 }

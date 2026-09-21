@@ -216,7 +216,7 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 			    customer_code AS customerCode
 			FROM customer_header
 			WHERE org_id = ?1
-			  AND branch = ?2 and customer_type="CUSTOMER"
+			  AND branch = ?2 
 			  AND active = 1
 			  AND cancel = 0
 			ORDER BY customer_name

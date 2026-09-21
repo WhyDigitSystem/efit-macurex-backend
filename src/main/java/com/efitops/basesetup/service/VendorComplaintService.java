@@ -1,18 +1,31 @@
 package com.efitops.basesetup.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FlashNCReportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SupplierChangeRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
+import com.efitops.basesetup.dto.CategoryMasterDTO;
+import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
+import com.efitops.basesetup.dto.PMCheckListMasterDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
+import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -97,7 +110,6 @@ public interface VendorComplaintService {
 	String getSetUpApprovalDocId(Long orgId, String financialYear) throws ApplicationException;
 
 //	FlashNC Report
-	Map<String, Object> updateCreateFlashNCReport(FlashNCReportDTO flashNCReportDTO) throws ApplicationException;
 
 	List<FlashNCReportResponseDTO> getFlashNCReportByOrgId(Long orgId, Long branch) throws ApplicationException;
 
@@ -106,5 +118,60 @@ public interface VendorComplaintService {
 	String getFlashNCReportDocId(Long orgId, String financialYear) throws ApplicationException;
 
 	List<Map<String, Object>> getQualityEmployeesForFlashNCReport(Long orgId, Long branch) throws ApplicationException;
+
+	
+	ResponseEntity<byte[]> viewFlashNCReportFile(HttpServletRequest request) throws IOException;
+
+	Map<String, Object> updateCreateFlashNCReport(FlashNCReportDTO flashNCReportDTO, MultipartFile[] files,
+			MultipartFile[] images) throws ApplicationException;
+
+	List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long listOfValuesId) throws ApplicationException;
+
+	List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long listOfValuesId, Long fromDept)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getMRINGRNDropdownForFlashNCReport(Long orgId, Long branch) throws ApplicationException;
+
+//	SupplierChangeRequest
+	Map<String, Object> updateCreateSupplierChangeRequest(SupplierChangeRequestDTO supplierChangeRequestDTO)
+			throws ApplicationException;
+
+	String getSupplierChangeRequestDocId(Long orgId, String financialYear, String screenCode)
+			throws ApplicationException;
+
+	SupplierChangeRequestResponseDTO getSupplierChangeRequestById(Long id) throws ApplicationException;
+
+
+	List<SupplierChangeRequestResponseDTO> getSupplierChangeRequestByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getVendorCodeDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getPurchaseEmployeesDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException;
+	
+	List<Map<String, Object>> getTDCEmployeesDropdownForSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getProductionEmployeesDropdownSupplierChangeRequest(Long orgId, Long branch)
+			throws ApplicationException;
+
+//	category master
+	Map<String, Object> updateCreateCategoryMaster(CategoryMasterDTO categoryMasterDTO) throws ApplicationException;
+
+	CategoryMasterResponseDTO getCategoryMasterById(Long id) throws ApplicationException;
+
+	List<CategoryMasterResponseDTO> getCategoryMasterByOrgId(Long orgId) throws ApplicationException;
+
+//	cause master
+	Map<String, Object> updateCreateCauseMaster(CauseMasterDTO causeMasterDTO) throws ApplicationException;
+
+	CauseMasterResponseDTO getCauseMasterById(Long id) throws ApplicationException;
+
+	List<CauseMasterResponseDTO> getCauseMasterByOrgId(Long orgId) throws ApplicationException;
+
+	Map<String, Object> updateCreatePMCheckListMaster(PMCheckListMasterDTO dto) throws ApplicationException;
+
 
 }

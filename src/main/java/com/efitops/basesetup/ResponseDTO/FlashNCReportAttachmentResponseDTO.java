@@ -26,6 +26,7 @@ public class FlashNCReportAttachmentResponseDTO {
 
 	    private LocalDateTime uploadOn;
 	    
-	    private List<FlashNCReportAttachmentResponseDTO> flashNCReportAttachmentResponseDTO;
+	    
+	    private List<FlashNCReportAttachmentResponseDTO> flashNCReportAttachmentVO;
 
 }

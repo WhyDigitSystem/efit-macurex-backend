@@ -7747,34 +7747,34 @@ public class SubContractServiceImpl implements SubContractService {
 	        // CREATE
 	        materialPlanningVO = new MaterialPlanningVO();
 
-//	        String docId = materialPlanningRepo.getMaterialPlanningDocId(
-//	                dto.getOrgId(),
-//	                dto.getFinancialYear(),
-//	                screenCode);
-//
-//	        if (docId == null || docId.isBlank()) {
-//	            throw new ApplicationException(
-//	                    "Material Planning DocId Generation Failed");
-//	        }
-//
-//	        materialPlanningVO.setDocId(docId);
+	        String docId = materialPlanningRepo.getMaterialPlanningDocId(
+	                dto.getOrgId(),
+	                dto.getFinancialYear(),
+	                screenCode);
+
+	        if (docId == null || docId.isBlank()) {
+	            throw new ApplicationException(
+	                    "Material Planning DocId Generation Failed");
+	        }
+
+	        materialPlanningVO.setDocId(docId);
 
 	        // Update document last number
-//	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
-//	                documentTypeMappingDetailsRepo
-//	                        .findByOrgIdAndFinYearAndScreenCode(
-//	                                dto.getOrgId(),
-//	                                dto.getFinancialYear(),
-//	                                screenCode);
-//
-//	        if (documentTypeMappingDetailsVO != null) {
-//
-//	            documentTypeMappingDetailsVO.setLastNo(
-//	                    documentTypeMappingDetailsVO.getLastNo() + 1);
-//
-//	            documentTypeMappingDetailsRepo.save(
-//	                    documentTypeMappingDetailsVO);
-//	        }
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo
+	                        .findByOrgIdAndFinYearAndScreenCode(
+	                                dto.getOrgId(),
+	                                dto.getFinancialYear(),
+	                                screenCode);
+
+	        if (documentTypeMappingDetailsVO != null) {
+
+	            documentTypeMappingDetailsVO.setLastNo(
+	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	            documentTypeMappingDetailsRepo.save(
+	                    documentTypeMappingDetailsVO);
+	        }
 
 	        materialPlanningVO.setCreatedBy(dto.getCreatedBy());
 	        materialPlanningVO.setUpdatedBy(dto.getCreatedBy());

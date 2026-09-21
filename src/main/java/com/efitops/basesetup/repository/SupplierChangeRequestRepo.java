@@ -36,19 +36,33 @@ public interface SupplierChangeRequestRepo extends JpaRepository<SupplierChangeR
 	        @Param("branch") Long branch);
 	
 	@Query(value = """
-	        SELECT
+	        SELECT DISTINCT
 	            ch.customer_id AS id,
 	            ch.customer_code AS vendorCode,
 	            ch.customer_name AS supplierName
 	        FROM customer_header ch
-	        INNER JOIN listofvaluesdetails lovd
-	            ON lovd.listofvaluesdetails_id = ch.customer_category
+
+	        LEFT JOIN listofvaluesdetails lovd1
+	            ON lovd1.listofvaluesdetails_id = ch.customer_category
+
+	        LEFT JOIN listofvaluesdetails lovd2
+	            ON lovd2.listofvaluesdetails_id = ch.customer_category1
+
+	        LEFT JOIN listofvaluesdetails lovd3
+	            ON lovd3.listofvaluesdetails_id = ch.customer_category2
+
 	        WHERE ch.org_id = :orgId
 	          AND ch.branch = :branch
-	          AND UPPER(lovd.value_description) = 'VENDOR'
+
+	          AND (
+	                UPPER(lovd1.value_description) = 'VENDOR'
+	                OR UPPER(lovd2.value_description) = 'VENDOR'
+	                OR UPPER(lovd3.value_description) = 'VENDOR'
+	              )
+
 	          AND ch.active = 1
 	          AND ch.cancel = 0
-	          AND lovd.active = 1
+
 	        ORDER BY ch.customer_id DESC
 	        """, nativeQuery = true)
 	List<Object[]> getVendorCodeDropdownForSupplierChangeRequest(

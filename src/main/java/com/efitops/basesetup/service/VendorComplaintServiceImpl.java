@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.efitops.basesetup.ResponseDTO.ActivityResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
@@ -45,6 +46,8 @@ import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.PMCheckListDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PMCheckListMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalParametersDetailsResponeDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
@@ -52,6 +55,8 @@ import com.efitops.basesetup.ResponseDTO.ShiftResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierChangeRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailRepo;
+import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
@@ -59,9 +64,13 @@ import com.efitops.basesetup.dto.CategoryMasterDTO;
 import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDetailsDTO;
+import com.efitops.basesetup.dto.EmployeeMasterDetailsReponseDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDetailsDTO;
+import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
+import com.efitops.basesetup.dto.PMCheckListDetailsDTO;
+import com.efitops.basesetup.dto.PMCheckListMasterDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDetailsDTO;
 import com.efitops.basesetup.dto.SetUpApprovalParametersDetailsDTO;
@@ -70,6 +79,7 @@ import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
+import com.efitops.basesetup.entity.ActivityMasterVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CategoryMasterVO;
 import com.efitops.basesetup.entity.CauseMasterVO;
@@ -87,6 +97,8 @@ import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.MachineMasterVO;
+import com.efitops.basesetup.entity.PMCheckListDetailsVO;
+import com.efitops.basesetup.entity.PMCheckListMasterVO;
 import com.efitops.basesetup.entity.SetUpApprovalDetailsVO;
 import com.efitops.basesetup.entity.SetUpApprovalParametersDetailsVO;
 import com.efitops.basesetup.entity.SetUpApprovalVO;
@@ -94,9 +106,12 @@ import com.efitops.basesetup.entity.ShiftVO;
 import com.efitops.basesetup.entity.SupplierChangeRequestVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryDetailsVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryVO;
+import com.efitops.basesetup.entity.ToolCategoryDetailVO;
+import com.efitops.basesetup.entity.ToolCategoryVO;
 import com.efitops.basesetup.entity.VendorComplaintDetailsVO;
 import com.efitops.basesetup.entity.VendorComplaintEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.ActivityMasterRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CategoryMasterRepo;
 import com.efitops.basesetup.repository.CauseMasterRepo;
@@ -114,6 +129,7 @@ import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.MachineMasterRepo;
+import com.efitops.basesetup.repository.PMCheckListMasterRepo;
 import com.efitops.basesetup.repository.SetUpApprovalDetailsRepo;
 import com.efitops.basesetup.repository.SetUpApprovalParametersDetailsRepo;
 import com.efitops.basesetup.repository.SetUpApprovalRepo;
@@ -121,6 +137,7 @@ import com.efitops.basesetup.repository.ShiftRepo;
 import com.efitops.basesetup.repository.SupplierChangeRequestRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryDetailsRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryRepo;
+import com.efitops.basesetup.repository.ToolCategoryRepo;
 import com.efitops.basesetup.repository.VendorComplaintDetailsRepo;
 import com.efitops.basesetup.repository.VendorComplaintEntryRepo;
 
@@ -205,6 +222,15 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private CauseMasterRepo causeMasterRepo;
+
+	@Autowired
+	private PMCheckListMasterRepo pmCheckListMasterRepo;
+
+	@Autowired
+	private ToolCategoryDetailRepo toolCategoryDetailRepo;
+	
+	@Autowired
+	private ActivityMasterRepo activityMasterRepo;
 
 	@Override
 	@Transactional
@@ -4073,5 +4099,413 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		return responseList;
+	}
+
+//	pm check list master
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreatePMCheckListMaster(PMCheckListMasterDTO dto) throws ApplicationException {
+
+		PMCheckListMasterVO pmCheckListMasterVO = new PMCheckListMasterVO();
+
+		String message;
+
+		String screenCode = "PMCLM";
+
+		/*
+		 * CREATE
+		 */
+		if (ObjectUtils.isEmpty(dto.getId())) {
+
+			String docId = pmCheckListMasterRepo.getPMCheckListMasterDocId(dto.getOrgId(), dto.getFinancialYear(),
+					screenCode);
+
+			if (docId == null || docId.isEmpty()) {
+				throw new ApplicationException("PM Check List Master DocId Not Found");
+			}
+
+			pmCheckListMasterVO.setDocId(docId);
+
+			/*
+			 * Update document number
+			 */
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			pmCheckListMasterVO.setCreatedBy(dto.getCreatedBy());
+
+			pmCheckListMasterVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "PM Check List Master Created Successfully";
+
+		} else {
+
+			/*
+			 * UPDATE
+			 */
+			pmCheckListMasterVO = pmCheckListMasterRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid PM Check List Master Details"));
+
+			pmCheckListMasterVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "PM Check List Master Updated Successfully";
+		}
+
+		/*
+		 * Set Master Details
+		 */
+		createUpdatePMCheckListMasterVO(dto, pmCheckListMasterVO);
+
+		/*
+		 * Save Master
+		 */
+		PMCheckListMasterVO savedVO = pmCheckListMasterRepo.save(pmCheckListMasterVO);
+
+		/*
+		 * Response
+		 */
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("pmCheckListMasterVO", pmCheckListMasterResponse(savedVO));
+
+		return response;
+	}
+
+	private void createUpdatePMCheckListMasterVO(PMCheckListMasterDTO dto, PMCheckListMasterVO pmCheckListMasterVO)
+			throws ApplicationException {
+
+		/*
+		 * Branch
+		 */
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Invalid Branch Details"));
+
+			pmCheckListMasterVO.setBranch(branchVO);
+		}
+
+		/*
+		 * Department
+		 */
+		if (dto.getDepartment() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Invalid Department Details"));
+
+			pmCheckListMasterVO.setDepartment(departmentVO);
+		}
+
+		/*
+		 * PM Check List For
+		 */
+		if (dto.getPmCheckListFor() != null) {
+
+			ListOfValuesDetailsVO pmCheckListForVO = listOfValuesDetailsRepo.findById(dto.getPmCheckListFor())
+					.orElseThrow(() -> new ApplicationException("Invalid PM Check List For Details"));
+
+			pmCheckListMasterVO.setPmCheckListFor(pmCheckListForVO);
+		}
+
+		/*
+		 * Tool Category
+		 */
+		if (dto.getToolCategory() != null) {
+
+			ToolCategoryDetailVO toolCategoryVO = toolCategoryDetailRepo.findById(dto.getToolCategory())
+					.orElseThrow(() -> new ApplicationException("Invalid Tool Category Details"));
+
+			pmCheckListMasterVO.setToolCategory(toolCategoryVO);
+		}
+
+		/*
+		 * Prepared By
+		 */
+		if (dto.getPreparedBy() != null) {
+
+			EmployeeMasterVO preparedByVO = employeeMasterRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Prepared By Details"));
+
+			pmCheckListMasterVO.setPreparedBy(preparedByVO);
+		}
+
+		/*
+		 * Approved By
+		 */
+		if (dto.getApprovedBy() != null) {
+
+			EmployeeMasterVO approvedByVO = employeeMasterRepo.findById(dto.getApprovedBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Approved By Details"));
+
+			pmCheckListMasterVO.setApprovedBy(approvedByVO);
+		}
+
+		/*
+		 * Normal Fields
+		 */
+		pmCheckListMasterVO.setPmCheckListNo(dto.getPmCheckListNo());
+
+		if (dto.getActive() != null) {
+			pmCheckListMasterVO.setActive(dto.getActive());
+		}
+
+		pmCheckListMasterVO.setOrgId(dto.getOrgId());
+
+		pmCheckListMasterVO.setFinancialYear(dto.getFinancialYear());
+
+		pmCheckListMasterVO.setCancelRemarks(dto.getCancelRemarks());
+
+		/*
+		 * Child Details
+		 */
+		if (dto.getPmCheckListDetailsDTO() != null) {
+
+			List<PMCheckListDetailsVO> detailsList = new ArrayList<>();
+
+			for (PMCheckListDetailsDTO detailsDTO : dto.getPmCheckListDetailsDTO()) {
+
+				PMCheckListDetailsVO detailsVO = new PMCheckListDetailsVO();
+
+				/*
+				 * Category
+				 */
+				if (detailsDTO.getCategory() != null) {
+
+					ListOfValuesDetailsVO categoryVO = listOfValuesDetailsRepo.findById(detailsDTO.getCategory())
+							.orElseThrow(() -> new ApplicationException("Invalid Category Details"));
+
+					detailsVO.setCategory(categoryVO);
+				}
+
+				/*
+				 * Activity
+				 */
+				if (detailsDTO.getActivity() != null) {
+
+					ActivityMasterVO activityVO = activityMasterRepo.findById(detailsDTO.getActivity())
+							.orElseThrow(() -> new ApplicationException("Invalid Activity Details"));
+
+					detailsVO.setActivity(activityVO);
+				}
+
+				/*
+				 * Child Normal Fields
+				 */
+				detailsVO.setCheckingPoints(detailsDTO.getCheckingPoints());
+
+				detailsVO.setParameter(detailsDTO.getParameter());
+
+				detailsVO.setSpecification(detailsDTO.getSpecification());
+
+				detailsVO.setGeneralDevObs(detailsDTO.getGeneralDevObs());
+
+				detailsVO.setRemediesRemarks(detailsDTO.getRemediesRemarks());
+
+				detailsVO.setNoOfHrs(detailsDTO.getNoOfHrs());
+
+				detailsVO.setFrequency(detailsDTO.getFrequency());
+
+				/*
+				 * Set Parent
+				 */
+				detailsVO.setPmCheckListMasterVO(pmCheckListMasterVO);
+
+				detailsList.add(detailsVO);
+			}
+
+			/*
+			 * Set Child List
+			 */
+			pmCheckListMasterVO.setPmCheckListDetailsVO(detailsList);
+		}
+	}
+
+	private PMCheckListMasterResponseDTO pmCheckListMasterResponse(PMCheckListMasterVO vo) {
+
+		PMCheckListMasterResponseDTO response = new PMCheckListMasterResponseDTO();
+
+		response.setId(vo.getId());
+
+		/*
+		 * Branch
+		 */
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+
+			branchResponseDTO.setId(vo.getBranch().getId());
+
+			branchResponseDTO.setBranchCode(vo.getBranch().getBranchCode());
+
+			branchResponseDTO.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponseDTO);
+		}
+
+		/*
+		 * Department
+		 */
+		if (vo.getDepartment() != null) {
+
+			DepartmentResponseDTO departmentResponseDTO = new DepartmentResponseDTO();
+
+			departmentResponseDTO.setId(vo.getDepartment().getId());
+
+			departmentResponseDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+
+			departmentResponseDTO.setDepartmentName(vo.getDepartment().getDepartmentName());
+
+			response.setDepartment(departmentResponseDTO);
+		}
+
+		/*
+		 * PM Check List For
+		 */
+		if (vo.getPmCheckListFor() != null) {
+
+			ListOfVlauesDetailsResponseDTO responseDTO = new ListOfVlauesDetailsResponseDTO();
+
+			responseDTO.setId(vo.getPmCheckListFor().getId());
+
+			responseDTO.setValueCode(vo.getPmCheckListFor().getValueCode());
+
+			responseDTO.setValueDescription(vo.getPmCheckListFor().getValueDescription());
+
+			response.setPmCheckListFor(responseDTO);
+		}
+
+		/*
+		 * Tool Category
+		 */
+		if (vo.getToolCategory() != null) {
+
+			ToolCategoryDetailResponseDTO toolCategoryResponseDTO = new ToolCategoryDetailResponseDTO();
+
+			toolCategoryResponseDTO.setId(vo.getToolCategory().getId());
+			
+			toolCategoryResponseDTO.setCategory(vo.getToolCategory().getCategory());
+
+			response.setToolCategory(toolCategoryResponseDTO);
+		}
+
+		/*
+		 * Prepared By
+		 */
+		if (vo.getPreparedBy() != null) {
+
+			EmployeeMasterDetailsReponseDTO preparedByResponseDTO = new EmployeeMasterDetailsReponseDTO();
+
+			preparedByResponseDTO.setId(vo.getPreparedBy().getId());
+
+			
+
+			preparedByResponseDTO.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+
+			response.setPreparedBy(preparedByResponseDTO);
+		}
+
+		/*
+		 * Approved By
+		 */
+		if (vo.getApprovedBy() != null) {
+
+			EmployeeMasterDetailsReponseDTO approvedByResponseDTO = new EmployeeMasterDetailsReponseDTO();
+
+			approvedByResponseDTO.setId(vo.getApprovedBy().getId());
+
+			
+
+			approvedByResponseDTO.setEmployeeName(vo.getApprovedBy().getEmployeeName());
+
+			response.setApprovedBy(approvedByResponseDTO);
+		}
+
+		/*
+		 * Normal Fields
+		 */
+		response.setPmCheckListNo(vo.getPmCheckListNo());
+
+		response.setActive(vo.isActive() );
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setCancelRemarks(vo.getCancelRemarks());
+
+		/*
+		 * Child Details Response
+		 */
+		if (vo.getPmCheckListDetailsVO() != null) {
+
+			List<PMCheckListDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+
+			for (PMCheckListDetailsVO detailsVO : vo.getPmCheckListDetailsVO()) {
+
+				PMCheckListDetailsResponseDTO detailsResponse = new PMCheckListDetailsResponseDTO();
+
+				/*
+				 * Category
+				 */
+				if (detailsVO.getCategory() != null) {
+
+					ListOfValuesDetailsResponseDTO categoryResponse = new ListOfValuesDetailsResponseDTO();
+
+					categoryResponse.setId(detailsVO.getCategory().getId());
+
+					categoryResponse.setCode(detailsVO.getCategory().getValueCode());
+
+					categoryResponse.setDescription(detailsVO.getCategory().getValueDescription());
+
+					detailsResponse.setCategory(categoryResponse);
+				}
+
+				/*
+				 * Activity
+				 */
+				if (detailsVO.getActivity() != null) {
+
+					ActivityResponseDTO activityResponse = new ActivityResponseDTO();
+
+					activityResponse.setId(detailsVO.getActivity().getId());
+					
+					activityResponse.setActivity(detailsVO.getActivity().getActivity());	
+					detailsResponse.setActivity(activityResponse);
+				}
+
+				detailsResponse.setCheckingPoints(detailsVO.getCheckingPoints());
+
+				detailsResponse.setParameter(detailsVO.getParameter());
+
+				detailsResponse.setSpecification(detailsVO.getSpecification());
+
+				detailsResponse.setGeneralDevObs(detailsVO.getGeneralDevObs());
+
+				detailsResponse.setRemediesRemarks(detailsVO.getRemediesRemarks());
+
+				detailsResponse.setNoOfHrs(detailsVO.getNoOfHrs());
+
+				detailsResponse.setFrequency(detailsVO.getFrequency());
+
+				detailsResponseList.add(detailsResponse);
+			}
+
+			response.setPmCheckListDetailsResponseDTO(detailsResponseList);
+		}
+
+		return response;
 	}
 }

@@ -23,6 +23,7 @@ import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
+import com.efitops.basesetup.dto.PMCheckListMasterDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
@@ -169,6 +170,8 @@ public interface VendorComplaintService {
 	CauseMasterResponseDTO getCauseMasterById(Long id) throws ApplicationException;
 
 	List<CauseMasterResponseDTO> getCauseMasterByOrgId(Long orgId) throws ApplicationException;
+
+	Map<String, Object> updateCreatePMCheckListMaster(PMCheckListMasterDTO dto) throws ApplicationException;
 
 
 }

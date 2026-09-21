@@ -31,6 +31,8 @@ import com.efitops.basesetup.ResponseDTO.AdvForStoresResponseDTO;
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.BomCorrectionRequestNoteDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.BomCorrectionRequestNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.BulkIssueIndentDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.BulkIssueIndentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
@@ -66,6 +68,8 @@ import com.efitops.basesetup.ResponseDTO.ProcessValidationEntryDetailsResponseDT
 import com.efitops.basesetup.ResponseDTO.ProcessValidationEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ReconcileConsumptionStockDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ReconcileConsumptionStockResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ServiceAccMasterResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleItemDetailsResponseDTO;
@@ -85,6 +89,8 @@ import com.efitops.basesetup.dto.AdvForStoresDetailsDTO;
 import com.efitops.basesetup.dto.BomCorrectionRequestNoteDTO;
 import com.efitops.basesetup.dto.BomCorrectionRequestNoteDetailsDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.BulkIssueIndentDTO;
+import com.efitops.basesetup.dto.BulkIssueIndentDetailsDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCapitalItemsDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCapitalItemsDetailsDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
@@ -106,6 +112,8 @@ import com.efitops.basesetup.dto.ProcessValidationEntryDTO;
 import com.efitops.basesetup.dto.ProcessValidationEntryDetailsDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDetailsDTO;
+import com.efitops.basesetup.dto.ReconcileConsumptionStockDTO;
+import com.efitops.basesetup.dto.ReconcileConsumptionStockDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleItemDetailsDTO;
@@ -125,6 +133,8 @@ import com.efitops.basesetup.entity.BillOfMaterialVO;
 import com.efitops.basesetup.entity.BomCorrectionRequestNoteDetailsVO;
 import com.efitops.basesetup.entity.BomCorrectionRequestNoteVO;
 import com.efitops.basesetup.entity.BranchVO;
+import com.efitops.basesetup.entity.BulkIssueIndentDetailsVO;
+import com.efitops.basesetup.entity.BulkIssueIndentVO;
 import com.efitops.basesetup.entity.ControlPlanVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DeliveryChallanCapitalItemsDetailsVO;
@@ -156,6 +166,8 @@ import com.efitops.basesetup.entity.ProcessValidationEntryDetailsVO;
 import com.efitops.basesetup.entity.ProcessValidationEntryVO;
 import com.efitops.basesetup.entity.ProductionScheduleForNextThreeMonthDetailsVO;
 import com.efitops.basesetup.entity.ProductionScheduleForNextThreeMonthVO;
+import com.efitops.basesetup.entity.ReconcileConsumptionStockDetailsVO;
+import com.efitops.basesetup.entity.ReconcileConsumptionStockVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleDetailsVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleItemDetailsVO;
@@ -178,6 +190,8 @@ import com.efitops.basesetup.repository.BomCorrectionRequestNoteDetailsRepo;
 import com.efitops.basesetup.repository.BomCorrectionRequestNoteRepo;
 import com.efitops.basesetup.repository.BomRepo;
 import com.efitops.basesetup.repository.BranchRepo;
+import com.efitops.basesetup.repository.BulkIssueIndentDetailsRepo;
+import com.efitops.basesetup.repository.BulkIssueIndentRepo;
 import com.efitops.basesetup.repository.ControlPlanRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DeliveryChallanCapitalItemsDetailsRepo;
@@ -210,6 +224,8 @@ import com.efitops.basesetup.repository.ProcessValidationEntryDetailsRepo;
 import com.efitops.basesetup.repository.ProcessValidationEntryRepo;
 import com.efitops.basesetup.repository.ProductionScheduleForNextThreeMonthDetailsRepo;
 import com.efitops.basesetup.repository.ProductionScheduleForNextThreeMonthRepo;
+import com.efitops.basesetup.repository.ReconcileConsumptionStockDetailsRepo;
+import com.efitops.basesetup.repository.ReconcileConsumptionStockRepo;
 import com.efitops.basesetup.repository.ServiceAccMasterRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleDetailsRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleItemDetailsRepo;
@@ -407,6 +423,17 @@ public class SubContractServiceImpl implements SubContractService {
 	ProcessSheetCompRoutingRepo processSheetCompRoutingRepo;
 	
 	
+	@Autowired
+	BulkIssueIndentDetailsRepo bulkIssueIndentDetailsRepo;
+	
+	@Autowired
+	BulkIssueIndentRepo bulkIssueIndentRepo;
+	
+	@Autowired
+	ReconcileConsumptionStockRepo reconcileConsumptionStockRepo;
+	
+	@Autowired
+	ReconcileConsumptionStockDetailsRepo reconcileConsumptionStockDetailsRepo;
 	
 	@Override
 	@Transactional
@@ -7670,6 +7697,9 @@ public class SubContractServiceImpl implements SubContractService {
 	        part.put("scrapQty",
 	                fs[9] != null ? fs[9] : null);
 
+	        part.put("BomDocId",
+	                fs[10] != null ? fs[10] : null);
+	        
 	        details.add(part);
 	    }
 
@@ -9626,6 +9656,972 @@ public class SubContractServiceImpl implements SubContractService {
 	            .getProcessValidationEntryDocId(
 	                    orgId, financialYear, screenCode);
 	}
+	
+	
+	@Override
+	@Transactional(rollbackOn = Exception.class)
+	public Map<String, Object> createUpdateBulkIssueIndent(
+	        BulkIssueIndentDTO bulkIssueIndentDTO) throws ApplicationException {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    BulkIssueIndentVO bulkIssueIndentVO = null;
+	    String message = null;
+
+	    if (ObjectUtils.isEmpty(bulkIssueIndentDTO.getId())) {
+
+	        bulkIssueIndentVO = new BulkIssueIndentVO();
+
+	        String screenCode = "BII";
+
+//	        String docId = bulkIssueIndentRepo.getBulkIssueIndentDocId(
+//	                bulkIssueIndentDTO.getOrgId(),
+//	                bulkIssueIndentDTO.getFinancialYear(),
+//	                screenCode);
+//
+//	        bulkIssueIndentVO.setDocId(docId);
+//
+//	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+//	                documentTypeMappingDetailsRepo
+//	                        .findByOrgIdAndFinYearAndScreenCode(
+//	                        		bulkIssueIndentDTO.getOrgId(),
+//	                        		bulkIssueIndentDTO.getFinancialYear(),
+//	                                screenCode);
+//
+//	        if (documentTypeMappingDetailsVO != null) {
+//
+//	            documentTypeMappingDetailsVO.setLastNo(
+//	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//	            documentTypeMappingDetailsRepo
+//	                    .save(documentTypeMappingDetailsVO);
+//	        }
+
+	        bulkIssueIndentVO.setCreatedBy(
+	                bulkIssueIndentDTO.getCreatedBy());
+
+	        bulkIssueIndentVO.setUpdatedBy(
+	                bulkIssueIndentDTO.getCreatedBy());
+
+	        bulkIssueIndentVO.setActive(true);
+	        bulkIssueIndentVO.setCancel(false);
+
+	        message = "Bulk Issue Indent created successfully";
+
+	    } else {
+
+	        bulkIssueIndentVO = bulkIssueIndentRepo
+	                .findById(bulkIssueIndentDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Bulk Issue Indent Not Found"));
+
+	        List<BulkIssueIndentDetailsVO> oldDetails =
+	                bulkIssueIndentDetailsRepo
+	                        .findByBulkIssueIndentVO(
+	                                bulkIssueIndentVO);
+
+	        if (oldDetails != null && !oldDetails.isEmpty()) {
+
+	            bulkIssueIndentDetailsRepo.deleteAll(oldDetails);
+
+	            bulkIssueIndentDetailsRepo.flush();
+	        }
+
+	        bulkIssueIndentVO.getDetails().clear();
+
+	        bulkIssueIndentVO.setUpdatedBy(
+	                bulkIssueIndentDTO.getCreatedBy());
+
+	        message = "Bulk Issue Indent updated successfully";
+	    }
+
+	    bulkIssueIndentVO =
+	            getBulkIssueIndentVOFromDTO(
+	                    bulkIssueIndentDTO,
+	                    bulkIssueIndentVO);
+
+	    BulkIssueIndentVO savedVO =
+	            bulkIssueIndentRepo.saveAndFlush(
+	                    bulkIssueIndentVO);
+
+	    response.put("message", message);
+
+	    response.put(
+	            "bulkIssueIndentVO",
+	            convertToResponse(savedVO));
+
+	    return response;
+	}
+	
+	private BulkIssueIndentVO getBulkIssueIndentVOFromDTO(
+	        BulkIssueIndentDTO dto,
+	        BulkIssueIndentVO vo) throws ApplicationException {
+
+	    vo.setBelongsTo(dto.getBelongsTo());
+	    vo.setTimeOfIndent(dto.getTimeOfIndent());
+	    vo.setApprovedByPM(dto.getApprovedByPM());
+	    vo.setRemarks(dto.getRemarks());
+	    vo.setOrgId(dto.getOrgId());
+	    vo.setFinancialYear(dto.getFinancialYear());
+
+	    if (dto.getBranch() != null) {
+
+	        BranchVO branch = branchRepo.findById(dto.getBranch())
+	                .orElseThrow(() ->
+	                        new ApplicationException("Branch Not Found"));
+
+	        vo.setBranch(branch);
+	    }
+
+	    if (dto.getDepartment() != null) {
+
+	        DepartmentVO department =
+	                departmentRepo.findById(dto.getDepartment())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Department Not Found"));
+
+	        vo.setDepartment(department);
+	    }
+
+	    if (dto.getFgSfgItem() != null) {
+
+	        ItemMasterVO item =
+	                itemMasterRepo.findById(dto.getFgSfgItem())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "FG/SFG Item Not Found"));
+
+	        vo.setFgSfgItem(item);
+	    }
+
+	    if (dto.getBom() != null) {
+
+	        BillOfMaterialVO bom =
+	                billOfMaterialRepo.findById(dto.getBom())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "BOM Not Found"));
+
+	        vo.setBom(bom);
+	    }
+
+	    if (dto.getFromLocation() != null) {
+
+	        LocationVO location =
+	                locationRepo.findById(dto.getFromLocation())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "From Location Not Found"));
+
+	        vo.setFromLocation(location);
+	    }
+
+	    if (dto.getPreparedBy() != null) {
+
+	        EmployeeMasterVO preparedBy =
+	                employeeMasterRepo.findById(dto.getPreparedBy())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Prepared By Employee Not Found"));
+
+	        vo.setPreparedBy(preparedBy);
+	    }
+
+	    if (dto.getAuthorisedBy() != null) {
+
+	        EmployeeMasterVO authorisedBy =
+	                employeeMasterRepo.findById(dto.getAuthorisedBy())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Authorised By Employee Not Found"));
+
+	        vo.setAuthorisedBy(authorisedBy);
+	    }
+
+	    if (dto.getDetails() != null) {
+
+	        for (BulkIssueIndentDetailsDTO detailsDTO :
+	                dto.getDetails()) {
+
+	            BulkIssueIndentDetailsVO detailsVO =
+	                    new BulkIssueIndentDetailsVO();
+
+	            if (detailsDTO.getItem() != null) {
+
+	                ItemMasterVO item =
+	                        itemMasterRepo.findById(detailsDTO.getItem())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Item Not Found"));
+
+	                detailsVO.setItem(item);
+	            }
+
+	            detailsVO.setReqQty(
+	                    detailsDTO.getReqQty());
+
+	            if (detailsDTO.getUnit() != null) {
+
+	                UnitMasterVO unit =
+	                        unitMasterRepo.findById(detailsDTO.getUnit())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Unit Not Found"));
+
+	                detailsVO.setUnit(unit);
+	            }
+
+	            detailsVO.setRequiredDate(
+	                    detailsDTO.getRequiredDate());
+
+	            detailsVO.setPurpose(
+	                    detailsDTO.getPurpose());
+
+	            detailsVO.setBulkIssueIndentVO(vo);
+
+	            vo.getDetails().add(detailsVO);
+	        }
+	    }
+
+	    return vo;
+	}
+	
+	private BulkIssueIndentResponseDTO convertToResponse(
+	        BulkIssueIndentVO vo) {
+
+	    BulkIssueIndentResponseDTO response =
+	            new BulkIssueIndentResponseDTO();
+
+	    response.setId(vo.getId());
+	    response.setDocId(vo.getDocId());
+	    response.setDocDate(vo.getDocDate());
+
+	    response.setBelongsTo(vo.getBelongsTo());
+
+	    response.setTimeOfIndent(
+	            vo.getTimeOfIndent());
+
+	    response.setApprovedByPM(
+	            vo.getApprovedByPM());
+
+	    response.setRemarks(vo.getRemarks());
+
+	    response.setCreatedBy(vo.getCreatedBy());
+
+	    response.setActive(vo.isActive());
+
+	    response.setCancel(vo.isCancel());
+
+	    response.setUpdatedBy(vo.getUpdatedBy());
+
+	    response.setCancelRemarks(
+	            vo.getCancelRemarks());
+
+	    response.setScreenName(
+	            vo.getScreenName());
+
+	    response.setScreenCode(
+	            vo.getScreenCode());
+
+	    response.setOrgId(vo.getOrgId());
+
+	    response.setFinancialYear(
+	            vo.getFinancialYear());
+
+	    // Branch
+	    if (vo.getBranch() != null) {
+
+	        BranchResponseDTO branch =
+	                new BranchResponseDTO();
+
+	        branch.setId(vo.getBranch().getId());
+	        branch.setBranchCode(
+	                vo.getBranch().getBranchCode());
+	        branch.setBranchName(
+	                vo.getBranch().getBranchName());
+
+	        response.setBranch(branch);
+	    }
+
+	    // Department
+	    if (vo.getDepartment() != null) {
+
+	        DepartmentResponseDTO department =
+	                new DepartmentResponseDTO();
+
+	        department.setId(
+	                vo.getDepartment().getId());
+
+	        department.setDepartmentCode(
+	                vo.getDepartment().getDepartmentCode());
+
+	        department.setDepartmentName(
+	                vo.getDepartment().getDepartmentName());
+
+	        response.setDepartment(department);
+	    }
+
+	    // FG / SFG Item
+	    if (vo.getFgSfgItem() != null) {
+
+	        ItemResponse1DTO item =
+	                new ItemResponse1DTO();
+
+	        item.setId(
+	                vo.getFgSfgItem().getId());
+
+	        item.setItemCode(
+	                vo.getFgSfgItem().getItemCode());
+
+	        item.setItemDescription(
+	                vo.getFgSfgItem().getItemDescription());
+
+	        if (vo.getFgSfgItem().getPurchaseUnit() != null) {
+
+	            UnitMasterResponseDTO unit =
+	                    new UnitMasterResponseDTO();
+
+	            unit.setId(
+	                    vo.getFgSfgItem()
+	                            .getPurchaseUnit()
+	                            .getId());
+
+	            unit.setUnitId(
+	                    vo.getFgSfgItem()
+	                            .getPurchaseUnit()
+	                            .getUnitId());
+
+	            unit.setUnitDescription(
+	                    vo.getFgSfgItem()
+	                            .getPurchaseUnit()
+	                            .getDescription());
+
+	            item.setUnit(unit);
+	        }
+
+	        response.setFgSfgItem(item);
+	    }
+
+	    // BOM
+	    if (vo.getBom() != null) {
+
+	        response.setBomId(
+	                vo.getBom().getId());
+	    }
+
+	    // From Location
+	    if (vo.getFromLocation() != null) {
+
+	        LocationMasterResponseDTO location =
+	                new LocationMasterResponseDTO();
+
+	        location.setId(
+	                vo.getFromLocation().getId());
+
+	        location.setLocationName(
+	                vo.getFromLocation().getLocationName());
+
+	        response.setFromLocation(location);
+	    }
+
+	    // Prepared By
+	    if (vo.getPreparedBy() != null) {
+
+	        EmployeeDropdownResponseDTO employee =
+	                new EmployeeDropdownResponseDTO();
+
+	        employee.setEmployeeId(
+	                vo.getPreparedBy().getId());
+
+	        employee.setEmployeeCode(
+	                vo.getPreparedBy().getEmployeeId());
+
+	        employee.setEmployeeName(
+	                vo.getPreparedBy().getEmployeeName());
+
+	        employee.setEmail(
+	                vo.getPreparedBy().getEmail());
+
+	        response.setPreparedBy(employee);
+	    }
+
+	    // Authorised By
+	    if (vo.getAuthorisedBy() != null) {
+
+	        EmployeeDropdownResponseDTO employee =
+	                new EmployeeDropdownResponseDTO();
+
+	        employee.setEmployeeId(
+	                vo.getAuthorisedBy().getId());
+
+	        employee.setEmployeeCode(
+	                vo.getAuthorisedBy().getEmployeeId());
+
+	        employee.setEmployeeName(
+	                vo.getAuthorisedBy().getEmployeeName());
+
+	        employee.setEmail(
+	                vo.getAuthorisedBy().getEmail());
+
+	        response.setAuthorisedBy(employee);
+	    }
+
+	    // Child Details
+	    List<BulkIssueIndentDetailsResponseDTO> detailsList =
+	            new ArrayList<>();
+
+	    if (vo.getDetails() != null &&
+	            !vo.getDetails().isEmpty()) {
+
+	        for (BulkIssueIndentDetailsVO detailsVO :
+	                vo.getDetails()) {
+
+	            BulkIssueIndentDetailsResponseDTO detailsResponse =
+	                    new BulkIssueIndentDetailsResponseDTO();
+
+	            detailsResponse.setId(
+	                    detailsVO.getId());
+
+	            detailsResponse.setReqQty(
+	                    detailsVO.getReqQty());
+
+	            detailsResponse.setRequiredDate(
+	                    detailsVO.getRequiredDate());
+
+	            detailsResponse.setPurpose(
+	                    detailsVO.getPurpose());
+
+	            // Item
+	            if (detailsVO.getItem() != null) {
+
+	                ItemResponse1DTO item =
+	                        new ItemResponse1DTO();
+
+	                item.setId(
+	                        detailsVO.getItem().getId());
+
+	                item.setItemCode(
+	                        detailsVO.getItem().getItemCode());
+
+	                item.setItemDescription(
+	                        detailsVO.getItem()
+	                                .getItemDescription());
+
+	                detailsResponse.setItem(item);
+	            }
+
+	            // Unit
+	            if (detailsVO.getUnit() != null) {
+
+	                UnitMasterResponseDTO unit =
+	                        new UnitMasterResponseDTO();
+
+	                unit.setId(
+	                        detailsVO.getUnit().getId());
+
+	                unit.setUnitId(
+	                        detailsVO.getUnit().getUnitId());
+
+	                unit.setUnitDescription(
+	                        detailsVO.getUnit().getDescription());
+
+	                detailsResponse.setUnit(unit);
+	            }
+
+	            detailsList.add(detailsResponse);
+	        }
+	    }
+
+	    response.setDetails(detailsList);
+
+	    return response;
+	}
+	
+	
+	@Override
+	public BulkIssueIndentResponseDTO getBulkIssueIndentById(Long id)
+	        throws ApplicationException {
+
+	    BulkIssueIndentVO vo = bulkIssueIndentRepo.findById(id)
+	            .orElseThrow(() ->
+	                    new ApplicationException("Bulk Issue Indent Not Found"));
+
+	    return convertToResponse(vo);
+	}
+
+	@Override
+	public List<BulkIssueIndentResponseDTO> getBulkIssueIndentByOrgIdAndBranch(
+	        Long orgId, Long branch) throws ApplicationException {
+
+	    List<BulkIssueIndentVO> list =
+	            bulkIssueIndentRepo.findByOrgIdAndBranch(orgId, branch);
+
+	    List<BulkIssueIndentResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (BulkIssueIndentVO vo : list) {
+	        responseList.add(convertToResponse(vo));
+	    }
+
+	    return responseList;
+	}
+	
+	
+	@Override
+	public String getBulkIssueIndentDocId(Long orgId, String financialYear) {
+
+	    String screenCode = "BII";
+
+	    return bulkIssueIndentRepo.getBulkIssueIndentDocId(
+	            orgId, financialYear, screenCode);
+	}
+	
+	//ReconcileConsumptionStock
+	
+	@Override
+	@Transactional(rollbackOn = Exception.class)
+	public Map<String, Object> createUpdateReconcileConsumptionStock(
+	        ReconcileConsumptionStockDTO reconcileConsumptionStockDTO)
+	        throws ApplicationException {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    ReconcileConsumptionStockVO reconcileConsumptionStockVO = null;
+
+	    String message = null;
+
+	    if (ObjectUtils.isEmpty(reconcileConsumptionStockDTO.getId())) {
+
+	        reconcileConsumptionStockVO =
+	                new ReconcileConsumptionStockVO();
+
+	        String screenCode = "RCS";
+
+//	        String docId =
+//	                reconcileConsumptionStockRepo
+//	                        .getReconcileConsumptionStockDocId(
+//	                                reconcileConsumptionStockDTO.getOrgId(),
+//	                                reconcileConsumptionStockDTO.getFinancialYear(),
+//	                                screenCode);
+//
+//	        reconcileConsumptionStockVO.setDocId(docId);
+//
+//	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+//	                documentTypeMappingDetailsRepo
+//	                        .findByOrgIdAndFinYearAndScreenCode(
+//	                        		reconcileConsumptionStockDTO.getOrgId(),
+//	                                reconcileConsumptionStockDTO.getFinancialYear(),
+//	                                screenCode);
+//
+//	        if (documentTypeMappingDetailsVO != null) {
+//
+//	            documentTypeMappingDetailsVO.setLastNo(
+//	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//	            documentTypeMappingDetailsRepo.save(
+//	                    documentTypeMappingDetailsVO);
+//	        }
+
+
+	        reconcileConsumptionStockVO.setCreatedBy(
+	                reconcileConsumptionStockDTO.getCreatedBy());
+
+	        reconcileConsumptionStockVO.setUpdatedBy(
+	                reconcileConsumptionStockDTO.getCreatedBy());
+
+	        reconcileConsumptionStockVO.setActive(true);
+
+	        reconcileConsumptionStockVO.setCancel(false);
+
+	        message =
+	                "Reconcile Consumption Stock created successfully";
+
+	    } else {
+
+	        reconcileConsumptionStockVO =
+	                reconcileConsumptionStockRepo
+	                        .findById(
+	                                reconcileConsumptionStockDTO.getId())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Reconcile Consumption Stock Not Found"));
+
+	        List<ReconcileConsumptionStockDetailsVO> oldDetails =
+	                reconcileConsumptionStockDetailsRepo
+	                        .findByReconcileConsumptionStockVO(
+	                                reconcileConsumptionStockVO);
+
+	        if (oldDetails != null && !oldDetails.isEmpty()) {
+
+	            reconcileConsumptionStockDetailsRepo
+	                    .deleteAll(oldDetails);
+
+	            reconcileConsumptionStockDetailsRepo.flush();
+	        }
+
+	        reconcileConsumptionStockVO.getDetails().clear();
+
+	        reconcileConsumptionStockVO.setUpdatedBy(
+	                reconcileConsumptionStockDTO.getCreatedBy());
+
+	        message =
+	                "Reconcile Consumption Stock updated successfully";
+	    }
+
+	    reconcileConsumptionStockVO =
+	            getReconcileConsumptionStockVOFromDTO(
+	                    reconcileConsumptionStockDTO,
+	                    reconcileConsumptionStockVO);
+
+	    ReconcileConsumptionStockVO savedVO =
+	            reconcileConsumptionStockRepo.saveAndFlush(
+	                    reconcileConsumptionStockVO);
+
+	    response.put("message", message);
+
+	    response.put(
+	            "reconcileConsumptionStockVO",
+	            convertToResponse(savedVO));
+
+	    return response;
+	}
+	
+	private ReconcileConsumptionStockVO getReconcileConsumptionStockVOFromDTO(
+	        ReconcileConsumptionStockDTO dto,
+	        ReconcileConsumptionStockVO vo)
+	        throws ApplicationException {
+
+	    vo.setReconcileDate(dto.getReconcileDate());
+
+	    vo.setOrgId(dto.getOrgId());
+
+	    vo.setFinancialYear(dto.getFinancialYear());
+
+	    if (dto.getBranch() != null) {
+
+	        BranchVO branch =
+	                branchRepo.findById(dto.getBranch())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Branch Not Found"));
+
+	        vo.setBranch(branch);
+	    }
+
+	    if (dto.getShopFloor() != null) {
+
+	        LocationVO shopFloor =
+	                locationRepo.findById(dto.getShopFloor())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Shop Floor Not Found"));
+
+	        vo.setShopFloor(shopFloor);
+	    }
+
+	    if (dto.getFgItem() != null) {
+
+	        ItemMasterVO fgItem =
+	                itemMasterRepo.findById(dto.getFgItem())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "FG Item Not Found"));
+
+	        vo.setFgItem(fgItem);
+	    }
+
+	    if (dto.getRmLocation() != null) {
+
+	        LocationVO rmLocation =
+	                locationRepo.findById(dto.getRmLocation())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "RM Location Not Found"));
+
+	        vo.setRmLocation(rmLocation);
+	    }
+
+	    if (dto.getDetails() != null) {
+
+	        for (ReconcileConsumptionStockDetailsDTO detailsDTO :
+	                dto.getDetails()) {
+
+	            ReconcileConsumptionStockDetailsVO detailsVO =
+	                    new ReconcileConsumptionStockDetailsVO();
+
+	            if (detailsDTO.getItem() != null) {
+
+	                ItemMasterVO item =
+	                        itemMasterRepo.findById(detailsDTO.getItem())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Item Not Found"));
+
+	                detailsVO.setItem(item);
+	            }
+
+	            if (detailsDTO.getUnit() != null) {
+
+	                UnitMasterVO unit =
+	                        unitMasterRepo.findById(detailsDTO.getUnit())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Unit Not Found"));
+
+	                detailsVO.setUnit(unit);
+	            }
+
+	            detailsVO.setAvailableQty(
+	                    detailsDTO.getAvailableQty());
+
+	            detailsVO.setConsumptionQty(
+	                    detailsDTO.getConsumptionQty());
+
+	            detailsVO.setPostedQty(
+	                    detailsDTO.getPostedQty());
+
+	            BigDecimal differenceQty = detailsDTO.getDifferenceQty() != null
+	                    ? detailsDTO.getDifferenceQty()
+	                    : BigDecimal.ZERO;
+
+	            BigDecimal rate = detailsDTO.getRate() != null
+	                    ? detailsDTO.getRate()
+	                    : BigDecimal.ZERO;
+
+	            BigDecimal value = differenceQty
+	                    .multiply(rate)
+	                    .setScale(2, RoundingMode.HALF_UP);
+
+	            detailsVO.setDifferenceQty(differenceQty);
+	            detailsVO.setRate(rate);
+	            detailsVO.setValue(value);
+
+	            detailsVO.setReconcileConsumptionStockVO(vo);
+
+	            vo.getDetails().add(detailsVO);
+	        }
+	    }
+
+	    return vo;
+	}
+	
+	private ReconcileConsumptionStockResponseDTO convertToResponse(
+	        ReconcileConsumptionStockVO vo) {
+
+	    ReconcileConsumptionStockResponseDTO response =
+	            new ReconcileConsumptionStockResponseDTO();
+
+	    response.setId(vo.getId());
+	    response.setDocId(vo.getDocId());
+	    response.setDocDate(vo.getDocDate());
+	    response.setReconcileDate(vo.getReconcileDate());
+
+	    response.setCreatedBy(vo.getCreatedBy());
+	    response.setActive(vo.isActive());
+	    response.setCancel(vo.isCancel());
+	    response.setUpdatedBy(vo.getUpdatedBy());
+	    response.setCancelRemarks(vo.getCancelRemarks());
+	    response.setScreenName(vo.getScreenName());
+	    response.setScreenCode(vo.getScreenCode());
+	    response.setOrgId(vo.getOrgId());
+	    response.setFinancialYear(vo.getFinancialYear());
+
+	    if (vo.getBranch() != null) {
+
+	        BranchResponseDTO branch =
+	                new BranchResponseDTO();
+
+	        branch.setId(vo.getBranch().getId());
+	        branch.setBranchCode(
+	                vo.getBranch().getBranchCode());
+	        branch.setBranchName(
+	                vo.getBranch().getBranchName());
+
+	        response.setBranch(branch);
+	    }
+
+	    if (vo.getShopFloor() != null) {
+
+	        LocationMasterResponseDTO location =
+	                new LocationMasterResponseDTO();
+
+	        location.setId(vo.getShopFloor().getId());
+	        location.setLocationName(
+	                vo.getShopFloor().getLocationName());
+
+	        response.setShopFloor(location);
+	    }
+
+	    if (vo.getFgItem() != null) {
+
+	        ItemResponse1DTO item =
+	                new ItemResponse1DTO();
+
+	        item.setId(vo.getFgItem().getId());
+	        item.setItemCode(
+	                vo.getFgItem().getItemCode());
+	        item.setItemDescription(
+	                vo.getFgItem().getItemDescription());
+
+	        if (vo.getFgItem().getPurchaseUnit() != null) {
+
+	            UnitMasterResponseDTO unit =
+	                    new UnitMasterResponseDTO();
+
+	            unit.setId(
+	                    vo.getFgItem()
+	                            .getPurchaseUnit()
+	                            .getId());
+
+	            unit.setUnitId(
+	                    vo.getFgItem()
+	                            .getPurchaseUnit()
+	                            .getUnitId());
+
+	            unit.setUnitDescription(
+	                    vo.getFgItem()
+	                            .getPurchaseUnit()
+	                            .getDescription());
+
+	            item.setUnit(unit);
+	        }
+
+	        response.setFgItem(item);
+	    }
+
+	    if (vo.getRmLocation() != null) {
+
+	        LocationMasterResponseDTO location =
+	                new LocationMasterResponseDTO();
+
+	        location.setId(vo.getRmLocation().getId());
+
+	        location.setLocationName(
+	                vo.getRmLocation().getLocationName());
+
+	        response.setRmLocation(location);
+	    }
+
+	    List<ReconcileConsumptionStockDetailsResponseDTO> detailsList =
+	            new ArrayList<>();
+
+	    if (vo.getDetails() != null &&
+	            !vo.getDetails().isEmpty()) {
+
+	        for (ReconcileConsumptionStockDetailsVO detailsVO :
+	                vo.getDetails()) {
+
+	            ReconcileConsumptionStockDetailsResponseDTO detailsResponse =
+	                    new ReconcileConsumptionStockDetailsResponseDTO();
+
+	            detailsResponse.setId(detailsVO.getId());
+
+	            detailsResponse.setAvailableQty(
+	                    detailsVO.getAvailableQty());
+
+	            detailsResponse.setConsumptionQty(
+	                    detailsVO.getConsumptionQty());
+
+	            detailsResponse.setPostedQty(
+	                    detailsVO.getPostedQty());
+
+	            detailsResponse.setDifferenceQty(
+	                    detailsVO.getDifferenceQty());
+
+	            detailsResponse.setRate(
+	                    detailsVO.getRate());
+
+	            detailsResponse.setValue(
+	                    detailsVO.getValue());
+
+	            if (detailsVO.getItem() != null) {
+
+	                ItemResponse1DTO item =
+	                        new ItemResponse1DTO();
+
+	                item.setId(detailsVO.getItem().getId());
+	                item.setItemCode(
+	                        detailsVO.getItem().getItemCode());
+	                item.setItemDescription(
+	                        detailsVO.getItem().getItemDescription());
+
+	                detailsResponse.setItem(item);
+	            }
+
+	            if (detailsVO.getUnit() != null) {
+
+	                UnitMasterResponseDTO unit =
+	                        new UnitMasterResponseDTO();
+
+	                unit.setId(detailsVO.getUnit().getId());
+	                unit.setUnitId(
+	                        detailsVO.getUnit().getUnitId());
+	                unit.setUnitDescription(
+	                        detailsVO.getUnit().getDescription());
+
+	                detailsResponse.setUnit(unit);
+	            }
+
+	            detailsList.add(detailsResponse);
+	        }
+	    }
+
+	    response.setDetails(detailsList);
+
+	    return response;
+	}
+	
+	
+	@Override
+	public ReconcileConsumptionStockResponseDTO getReconcileConsumptionStockById(
+	        Long id) throws ApplicationException {
+
+	    ReconcileConsumptionStockVO vo =
+	            reconcileConsumptionStockRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Reconcile Consumption Stock Not Found"));
+
+	    return convertToResponse(vo);
+	}
+	
+	@Override
+	public List<ReconcileConsumptionStockResponseDTO>
+	        getReconcileConsumptionStockByOrgIdAndBranch(
+	                Long orgId, Long branch)
+	                throws ApplicationException {
+
+	    List<ReconcileConsumptionStockVO> list =
+	            reconcileConsumptionStockRepo
+	                    .findByOrgIdAndBranch(orgId, branch);
+
+	    List<ReconcileConsumptionStockResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (ReconcileConsumptionStockVO vo : list) {
+
+	        responseList.add(
+	                convertToResponse(vo));
+	    }
+
+	    return responseList;
+	}
+	
+	@Override
+	public String getReconcileConsumptionStockDocId(
+	        Long orgId, String financialYear) {
+
+	    String screenCode = "RCS";
+
+	    return reconcileConsumptionStockRepo
+	            .getReconcileConsumptionStockDocId(
+	                    orgId,
+	                    financialYear,
+	                    screenCode);
+	}
+	
 	
 	
 }

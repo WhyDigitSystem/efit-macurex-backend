@@ -40,6 +40,7 @@ import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
+import com.efitops.basesetup.dto.PMCheckListMasterDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
@@ -2200,6 +2201,45 @@ public class VendorComplaintController extends BaseController {
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Cause Master Retrieved Successfully");
 
 			responseObjectsMap.put("causeMasterVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+//	pmchecklist  master
+
+	@PutMapping("/updateCreatePMCheckListMaster")
+	public ResponseDTO updateCreatePMCheckListMaster(@RequestBody PMCheckListMasterDTO pmCheckListMasterDTO) {
+
+		String methodName = "updateCreatePMCheckListMaster()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			Map<String, Object> response = vendorComplaintService.updateCreatePMCheckListMaster(pmCheckListMasterDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
+
+			responseObjectsMap.put("pmCheckListMasterVO", response.get("pmCheckListMasterVO"));
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 

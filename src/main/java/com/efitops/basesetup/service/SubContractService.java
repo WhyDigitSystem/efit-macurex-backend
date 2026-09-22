@@ -1,8 +1,12 @@
 package com.efitops.basesetup.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,8 +20,10 @@ import com.efitops.basesetup.ResponseDTO.InspectionRequisitionNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderShortCloseResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineSettingPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialPlanningResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessValidationEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionBulkIssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ReconcileConsumptionStockResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
@@ -34,8 +40,10 @@ import com.efitops.basesetup.dto.InspectionRequisitionNoteDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
 import com.efitops.basesetup.dto.JobOrderShortCloseDTO;
+import com.efitops.basesetup.dto.MachineSettingPlanDTO;
 import com.efitops.basesetup.dto.MaterialPlanningDTO;
 import com.efitops.basesetup.dto.ProcessValidationEntryDTO;
+import com.efitops.basesetup.dto.ProductionBulkIssuesDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.ReconcileConsumptionStockDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
@@ -195,7 +203,7 @@ public interface SubContractService {
 	List<DeliveryChallanCapitalItemsResponseDTO> getDeliveryChallanCapitalItemsByOrgIdAndBranch(Long orgId,
 			Long branch) throws ApplicationException;
 
-	Map<String, Object> createUpdateSubContractingGRN(SubContractingGRNDTO dto) throws ApplicationException;
+	Map<String, Object> createUpdateSubContractingGRN(SubContractingGRNDTO dto, MultipartFile[] files) throws ApplicationException;
 
 	List<Map<String, Object>> getGateInwardEntryDropdown(Long orgId, Long branch, Long customer);
 
@@ -269,5 +277,25 @@ public interface SubContractService {
 	List<ReconcileConsumptionStockResponseDTO> getReconcileConsumptionStockByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
 
 	String getReconcileConsumptionStockDocId(Long orgId, String financialYear);
+
+	ResponseEntity<byte[]> viewSubContractingGRNFile(HttpServletRequest request) throws IOException;
+
+	Map<String, Object> createUpdateMachineSettingPlan(MachineSettingPlanDTO dto) throws ApplicationException;
+
+	MachineSettingPlanResponseDTO getMachineSettingPlanById(Long id)throws ApplicationException;
+
+	List<MachineSettingPlanResponseDTO> getMachineSettingPlanByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	String getMachineSettingPlanDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	Map<String, Object> createUpdateProductionBulkIssues(ProductionBulkIssuesDTO productionBulkIssuesDTO) throws ApplicationException;
+
+	ProductionBulkIssuesResponseDTO getProductionBulkIssuesById(Long id) throws ApplicationException;
+
+	List<ProductionBulkIssuesResponseDTO> getProductionBulkIssuesByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	String getProductionBulkIssuesDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	List<Map<String, Object>> getIndentByItemForProductionBulkIssues(Long itemId, Long orgId, Long branch) throws ApplicationException;
 
 }

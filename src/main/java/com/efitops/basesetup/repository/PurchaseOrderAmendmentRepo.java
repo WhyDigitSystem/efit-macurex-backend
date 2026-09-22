@@ -40,7 +40,8 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	
 	
 	@Query(value = """
-	        SELECT COALESCE(MAX(revision_no), 0)
+	        SELECT
+	            COALESCE(MAX(CAST(revision_no AS UNSIGNED)), 0) + 1
 	        FROM purchaseorder_amendment_basic
 	        WHERE purchase_order_number = :purchaseOrderNumber
 	          AND org_id = :orgId
@@ -53,64 +54,119 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	        @Param("branch") Long branch);
 	
 	
-	
 	@Query(value = """
-	        SELECT
-	            b.item AS id,
-	            i.item_code AS itemCode,
-	            i.item_description AS itemDescription,
-	            b.hsn_code AS hsnSacCode,
-	            h.hsn_id AS hsnId,
-	            b.purchase_unit AS unit,
-	            b.po_qty_in_purchase_unit AS oldQty,
-	            b.delivery_date AS oldDeliveryDate
-	        FROM purchase_order_local_details b
+	        select
+	            i.item_id, i.item_code, pdl.hsn_code, pdl.primary_unit unit,
+	            pdl.qty_in_primary_unit qty, pdl.rate_in_inr rate, pdl.delivery_date,
 
-	        INNER JOIN purchase_order_basic a
-	            ON a.purchase_order_basic_id = b.purchase_order_basic_id
+	            (
+	                select coalesce(new_rate, 0) new_rate
+	                from purchaseorder_amendment_basic pb
+	                inner join purchaseorder_amendment_detail pd
+	                    on pb.purchaseorder_amendment_basic_id =
+	                       pd.purchaseorder_amendment_basic_id
+	                where purchase_order_number = po.doc_id
+	                and created_on =
+	                    (select max(created_on)
+	                     from purchaseorder_amendment_basic pb1
+	                     where pb1.purchase_order_number = pb.purchase_order_number)
+	            ) old_rate,
 
-	        INNER JOIN item i
-	            ON i.item_id = b.item
+	            (
+	                select coalesce(pd.new_qty, 0) new_qty
+	                from purchaseorder_amendment_basic pb
+	                inner join purchaseorder_amendment_detail pd
+	                    on pb.purchaseorder_amendment_basic_id =
+	                       pd.purchaseorder_amendment_basic_id
+	                where purchase_order_number = po.doc_id
+	                and created_on =
+	                    (select max(created_on)
+	                     from purchaseorder_amendment_basic pb1
+	                     where pb1.purchase_order_number = pb.purchase_order_number)
+	            ) old_qty,
 
-	        LEFT JOIN hsn h
-	            ON h.hsn = b.hsn_code
+	            (
+	                select coalesce(pd.olddelivery_date, 0) olddelivery_date
+	                from purchaseorder_amendment_basic pb
+	                inner join purchaseorder_amendment_detail pd
+	                    on pb.purchaseorder_amendment_basic_id =
+	                       pd.purchaseorder_amendment_basic_id
+	                where purchase_order_number = po.doc_id
+	                and created_on =
+	                    (select max(created_on)
+	                     from purchaseorder_amendment_basic pb1
+	                     where pb1.purchase_order_number = pb.purchase_order_number)
+	            ) olddelivery_date
 
-	        WHERE a.cancel = 0
-	          AND a.doc_id = :docId
-	          AND a.org_id = :orgId
-	          AND a.branch = :branch
+	        from purchase_order_basic po
+	        inner join purchase_order_local_details pdl
+	            on po.purchase_order_basic_id = pdl.purchase_order_basic_id
+	        inner join item i
+	            on i.item_id = pdl.item
+	        where po.doc_id = :purchaseordernumber
+	        AND po.org_id = :orgId
+	        AND po.branch = :branch
 
-	        UNION
+	        union
 
-	        SELECT
-	            b.item AS id,
-	            i.item_code AS itemCode,
-	            i.item_description AS itemDescription,
-	            b.hsn_code AS hsnSacCode,
-	            h.hsn_id AS hsnId,
-	            b.uom AS unit,
-	            b.po_qty AS oldQty,
-	            NULL AS oldDeliveryDate
-	        FROM purchase_order_import_details b
+	        select
+	            i.item_id, i.item_code, pdl.hsn_code, pdl.uom unit,
+	            pdl.po_qty qty, pdl.order_rate rate, pdl.indent_date delivery_date,
 
-	        INNER JOIN purchase_order_basic a
-	            ON a.purchase_order_basic_id = b.purchase_order_basic_id
+	            (
+	                select coalesce(new_rate, 0) new_rate
+	                from purchaseorder_amendment_basic pb
+	                inner join purchaseorder_amendment_detail pd
+	                    on pb.purchaseorder_amendment_basic_id =
+	                       pd.purchaseorder_amendment_basic_id
+	                where purchase_order_number = po.doc_id
+	                and created_on =
+	                    (select max(created_on)
+	                     from purchaseorder_amendment_basic pb1
+	                     where pb1.purchase_order_number = pb.purchase_order_number)
+	            ) old_rate,
 
-	        INNER JOIN item i
-	            ON i.item_id = b.item
+	            (
+	                select coalesce(pd.new_qty, 0) new_qty
+	                from purchaseorder_amendment_basic pb
+	                inner join purchaseorder_amendment_detail pd
+	                    on pb.purchaseorder_amendment_basic_id =
+	                       pd.purchaseorder_amendment_basic_id
+	                where purchase_order_number = po.doc_id
+	                and created_on =
+	                    (select max(created_on)
+	                     from purchaseorder_amendment_basic pb1
+	                     where pb1.purchase_order_number = pb.purchase_order_number)
+	            ) old_qty,
 
-	        LEFT JOIN hsn h
-	            ON h.hsn = b.hsn_code
+	            (
+	                select coalesce(pd.olddelivery_date, 0) olddelivery_date
+	                from purchaseorder_amendment_basic pb
+	                inner join purchaseorder_amendment_detail pd
+	                    on pb.purchaseorder_amendment_basic_id =
+	                       pd.purchaseorder_amendment_basic_id
+	                where purchase_order_number = po.doc_id
+	                and created_on =
+	                    (select max(created_on)
+	                     from purchaseorder_amendment_basic pb1
+	                     where pb1.purchase_order_number = pb.purchase_order_number)
+	            ) olddelivery_date
 
-	        WHERE a.cancel = 0
-	          AND a.doc_id = :docId
-	          AND a.org_id = :orgId
-	          AND a.branch = :branch
+	        from purchase_order_basic po
+	        inner join purchase_order_import_details pdl
+	            on po.purchase_order_basic_id = pdl.purchase_order_basic_id
+	        inner join item i
+	            on i.item_id = pdl.item
+	        where po.doc_id = :purchaseordernumber
+	        AND po.org_id = :orgId
+	        AND po.branch = :branch
 	        """, nativeQuery = true)
 	List<Object[]> getPurchaseOrderAmendmentItemCodeDropdown(
-	        @Param("docId") String docId,
+	        @Param("purchaseordernumber") String purchaseordernumber,
 	        @Param("branch") Long branch,
-	        @Param("orgId") Long orgId);
+	        @Param("orgId") Long orgId
+	        );
+	
 	
 	
 	

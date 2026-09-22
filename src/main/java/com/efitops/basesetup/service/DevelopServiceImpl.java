@@ -3323,34 +3323,45 @@ public class DevelopServiceImpl implements DevelopService {
 	// purchaseorderamendmentitemdropdown
 
 	@Override
-	public List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
-			throws ApplicationException {
+	public List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(
+	        String purchaseordernumber,
+	        Long branch,
+	        Long orgId) throws ApplicationException {
 
-		List<Object[]> itemList = purchaseOrderAmendmentRepo.getPurchaseOrderAmendmentItemCodeDropdown(docId, branch,
-				orgId);
+	    List<Object[]> itemList =
+	            purchaseOrderAmendmentRepo
+	                    .getPurchaseOrderAmendmentItemCodeDropdown(
+	                            purchaseordernumber,
+	                            branch,
+	                            orgId
+	                            );
 
-		if (itemList.isEmpty()) {
-			throw new ApplicationException("No Item Details Found");
-		}
+	    if (itemList == null || itemList.isEmpty()) {
+	        throw new ApplicationException("No Item Details Found");
+	    }
 
-		List<Map<String, Object>> responseList = new ArrayList<>();
+	    List<Map<String, Object>> responseList = new ArrayList<>();
 
-		for (Object[] obj : itemList) {
+	    for (Object[] obj : itemList) {
 
-			Map<String, Object> map = new HashMap<>();
+	        Map<String, Object> response = new HashMap<>();
 
-			map.put("id", obj[0]);
-			map.put("itemCode", obj[1]);
-			map.put("itemDescription", obj[2]);
-			map.put("hsnSacCode", obj[3]);
-			map.put("hsnId", obj[4]);
+	        response.put("id", obj[0]);
+	        response.put("itemCode", obj[1]);
+	        response.put("hsnSacCode", obj[2]);
+	        response.put("unit", obj[3]);
+	        response.put("qty", obj[4]);
+	        response.put("rate", obj[5]);
+	        response.put("deliveryDate", obj[6]);
+	        response.put("oldRate", obj[7]);
+	        response.put("oldQty", obj[8]);
+	        response.put("oldDeliveryDate", obj[9]);
 
-			responseList.add(map);
-		}
+	        responseList.add(response);
+	    }
 
-		return responseList;
+	    return responseList;
 	}
-
 	@Override
 	public List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(String docId, Long orgId,
 			Long branch) throws ApplicationException {

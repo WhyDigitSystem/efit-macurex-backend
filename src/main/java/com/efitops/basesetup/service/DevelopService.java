@@ -188,7 +188,7 @@ public interface DevelopService {
 
 	List<MachineMasterResponseDTO> getMachineMasterByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
+	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String purchaseOrderNumber, Long branch, Long orgId)
 			throws ApplicationException;
 	
 

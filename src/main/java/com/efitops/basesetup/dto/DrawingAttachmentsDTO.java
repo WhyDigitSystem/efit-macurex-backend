@@ -38,6 +38,6 @@ public class DrawingAttachmentsDTO {
 	    private String cancelRemarks;
 	    
 	    
-	    private List<DrawingAttachmentDetailDTO> drawingAttachmentDetailDTO;
+	  
 
 }

@@ -26,18 +26,17 @@ public interface PurchaseContractAmendmentRepo
             @Param("branch") Long branch);
 
     @Query(value = """
-            SELECT COALESCE(MAX(revision_no),0)
+            SELECT COALESCE(MAX(CAST(revision_no AS UNSIGNED)), 0) + 1
             FROM pcamdbasic
-            WHERE contract_no = :contractNo
-              AND org_id = :orgId
-              AND branch = :branch
-              AND cancel = false
+            WHERE contract_no = ?1
+              AND org_id = ?2
+              AND branch = ?3
+              AND cancel = FALSE
             """, nativeQuery = true)
     Integer getPurchaseContractAmdRevisionNo(
-            @Param("contractNo") String contractNo,
-            @Param("orgId") Long orgId,
-            @Param("branch") Long branch);
-    
+            String contractNo,
+            Long orgId,
+            Long branch);
     
     @Query(value = """
             SELECT

@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DrawingAttachmentsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialStageInspectionResponseDTO;
@@ -32,6 +33,7 @@ import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownRe
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.dto.ActivityMasterDTO;
 import com.efitops.basesetup.dto.ControlPlanDTO;
+import com.efitops.basesetup.dto.DrawingAttachmentsDTO;
 import com.efitops.basesetup.dto.EightDisciplineEntryDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
@@ -188,7 +190,7 @@ public interface DevelopService {
 
 	List<MachineMasterResponseDTO> getMachineMasterByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
+	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String purchaseOrderNumber, Long branch, Long orgId)
 			throws ApplicationException;
 	
 
@@ -310,6 +312,13 @@ public interface DevelopService {
 	List<ActivityMasterResponseDTO> getActivityMasterByOrgId(Long orgId) throws ApplicationException;
 
 	ActivityMasterResponseDTO getActivityMasterById(Long id) throws ApplicationException;
+
+	Map<String, Object> updateCreateDrawingAttachments(DrawingAttachmentsDTO drawingAttachmentsDTO,
+			MultipartFile[] files) throws ApplicationException;
+
+	DrawingAttachmentsResponseDTO getDrawingAttachmentsById(Long id) throws ApplicationException;
+
+	List<DrawingAttachmentsResponseDTO> getDrawingAttachmentsByOrgId(Long orgId) throws ApplicationException;
 
 	
 	

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,19 +24,26 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FlashNCReportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SupplierChangeRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.CategoryMasterDTO;
+import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
+import com.efitops.basesetup.dto.PMCheckListMasterDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
+import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.service.VendorComplaintService;
@@ -1350,17 +1359,16 @@ public class VendorComplaintController extends BaseController {
 	 */
 	@PostMapping(value = "/updateCreateFlashNCReport", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseDTO updateCreateFlashNCReport(@RequestPart("flashNCReportVO") FlashNCReportDTO flashNCReportDTO,
-//			@RequestBody FlashNCReportDTO flashNCReportDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files,
 			@RequestPart(value = "images", required = false) MultipartFile[] images) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
-
 		ResponseDTO responseDTO;
 
 		try {
 
-			Map<String, Object> response = vendorComplaintService.updateCreateFlashNCReport(flashNCReportDTO);
+			Map<String, Object> response = vendorComplaintService.updateCreateFlashNCReport(flashNCReportDTO, files,
+					images);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
 
@@ -1541,5 +1549,711 @@ public class VendorComplaintController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/viewFile/**")
+	public ResponseEntity<byte[]> viewFlashNCReportFile(HttpServletRequest request) {
+
+		String methodName = "viewFlashNCReportFile()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		try {
+
+			return vendorComplaintService.viewFlashNCReportFile(request);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			return ResponseEntity.status(500).build();
+		}
+	}
+
+	@GetMapping("/getFromDeptDropdownForFlashNCReport")
+	public ResponseEntity<ResponseDTO> getFromDeptDropdownForFlashNCReport(@RequestParam Long listOfValuesId) {
+
+		String methodName = "getFromDeptDropdownForFlashNCReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService
+					.getFromDeptDropdownForFlashNCReport(listOfValuesId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "From Department Retrieved Successfully");
+
+			responseObjectsMap.put("fromDepartment", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getToDepartmentDropdownForFlashNCReport")
+	public ResponseEntity<ResponseDTO> getToDepartmentDropdownForFlashNCReport(@RequestParam Long listOfValuesId,
+			@RequestParam Long fromDept) {
+
+		String methodName = "getToDepartmentDropdownForFlashNCReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService
+					.getToDepartmentDropdownForFlashNCReport(listOfValuesId, fromDept);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "To Department Retrieved Successfully");
+
+			responseObjectsMap.put("toDepartment", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMRINGRNDropdownForFlashNCReport")
+	public ResponseEntity<ResponseDTO> getMRINGRNDropdownForFlashNCReport(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getMRINGRNDropdownForFlashNCReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService.getMRINGRNDropdownForFlashNCReport(orgId,
+					branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "MRIN/GRN Details Retrieved Successfully");
+
+			responseObjectsMap.put("mrinGrnDropdown", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping("/updateCreateSupplierChangeRequest")
+	public ResponseDTO updateCreateSupplierChangeRequest(
+			@RequestBody SupplierChangeRequestDTO supplierChangeRequestDTO) {
+
+		String methodName = "updateCreateSupplierChangeRequest()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			Map<String, Object> response = vendorComplaintService
+					.updateCreateSupplierChangeRequest(supplierChangeRequestDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
+
+			responseObjectsMap.put("supplierChangeRequestVO", response.get("supplierChangeRequestVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getSupplierChangeRequestDocId")
+	public ResponseDTO getSupplierChangeRequestDocId(@RequestParam Long orgId, @RequestParam String financialYear) {
+
+		String methodName = "getSupplierChangeRequestDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			String docId = vendorComplaintService.getSupplierChangeRequestDocId(orgId, financialYear, "SCR");
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Supplier Change Request DocId Retrieved Successfully");
+
+			responseObjectsMap.put("docId", docId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getSupplierChangeRequestById")
+	public ResponseDTO getSupplierChangeRequestById(@RequestParam Long id) {
+
+		String methodName = "getSupplierChangeRequestById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			SupplierChangeRequestResponseDTO response = vendorComplaintService.getSupplierChangeRequestById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Supplier Change Request Retrieved Successfully");
+
+			responseObjectsMap.put("supplierChangeRequestVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getSupplierChangeRequestByOrgId")
+	public ResponseDTO getSupplierChangeRequestByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getSupplierChangeRequestByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<SupplierChangeRequestResponseDTO> response = vendorComplaintService
+					.getSupplierChangeRequestByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Supplier Change Request Retrieved Successfully");
+
+			responseObjectsMap.put("supplierChangeRequestVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getVendorCodeDropdownForSupplierChangeRequest")
+	public ResponseDTO getVendorCodeDropdownForSupplierChangeRequest(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getVendorCodeDropdownForSupplierChangeRequest()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService
+					.getVendorCodeDropdownForSupplierChangeRequest(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Vendor Code Retrieved Successfully");
+
+			responseObjectsMap.put("vendorCode", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getPurchaseEmployeesDropdownForSupplierChangeRequest")
+	public ResponseDTO getPurchaseEmployeesDropdownForSupplierChangeRequest(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getPurchaseEmployeesDropdownForSupplierChangeRequest()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService
+					.getPurchaseEmployeesDropdownForSupplierChangeRequest(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Purchase Employees Retrieved Successfully");
+
+			responseObjectsMap.put("purchaseEmployees", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getTDCEmployeesDropdownForSupplierChangeRequest")
+	public ResponseDTO getTDCEmployeesDropdownForSupplierChangeRequest(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getTDCEmployeesDropdownForSupplierChangeRequest()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService
+					.getTDCEmployeesDropdownForSupplierChangeRequest(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "TDC Employees Retrieved Successfully");
+
+			responseObjectsMap.put("tdcEmployees", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getProductionEmployeesDropdownSupplierChangeRequest")
+	public ResponseDTO getProductionEmployeesDropdownSupplierChangeRequest(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getProductionEmployeesDropdownSupplierChangeRequest()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService
+					.getProductionEmployeesDropdownSupplierChangeRequest(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Production Employees Retrieved Successfully");
+
+			responseObjectsMap.put("productionEmployees", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@PutMapping("/updateCreateCategoryMaster")
+	public ResponseDTO updateCreateCategoryMaster(@RequestBody CategoryMasterDTO categoryMasterDTO) {
+
+		String methodName = "updateCreateCategoryMaster()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			Map<String, Object> response = vendorComplaintService.updateCreateCategoryMaster(categoryMasterDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
+
+			responseObjectsMap.put("categoryMasterVO", response.get("categoryMasterVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getCategoryMasterById")
+	public ResponseDTO getCategoryMasterById(@RequestParam Long id) {
+
+		String methodName = "getCategoryMasterById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			CategoryMasterResponseDTO response = vendorComplaintService.getCategoryMasterById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Category Master Retrieved Successfully");
+
+			responseObjectsMap.put("categoryMasterVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getCategoryMasterByOrgId")
+	public ResponseDTO getCategoryMasterByOrgId(@RequestParam Long orgId) {
+
+		String methodName = "getCategoryMasterByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<CategoryMasterResponseDTO> response = vendorComplaintService.getCategoryMasterByOrgId(orgId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Category Master Retrieved Successfully");
+
+			responseObjectsMap.put("categoryMasterVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+//	cause master
+
+	@PutMapping("/updateCreateCauseMaster")
+	public ResponseDTO updateCreateCauseMaster(@RequestBody CauseMasterDTO causeMasterDTO) {
+
+		String methodName = "updateCreateCauseMaster()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			Map<String, Object> response = vendorComplaintService.updateCreateCauseMaster(causeMasterDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
+
+			responseObjectsMap.put("causeMasterVO", response.get("causeMasterVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getCauseMasterById")
+	public ResponseDTO getCauseMasterById(@RequestParam Long id) {
+
+		String methodName = "getCauseMasterById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			CauseMasterResponseDTO response = vendorComplaintService.getCauseMasterById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Cause Master Retrieved Successfully");
+
+			responseObjectsMap.put("causeMasterVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+	@GetMapping("/getCauseMasterByOrgId")
+	public ResponseDTO getCauseMasterByOrgId(@RequestParam Long orgId) {
+
+		String methodName = "getCauseMasterByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<CauseMasterResponseDTO> response = vendorComplaintService.getCauseMasterByOrgId(orgId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Cause Master Retrieved Successfully");
+
+			responseObjectsMap.put("causeMasterVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
+	}
+
+//	pmchecklist  master
+
+	@PutMapping("/updateCreatePMCheckListMaster")
+	public ResponseDTO updateCreatePMCheckListMaster(@RequestBody PMCheckListMasterDTO pmCheckListMasterDTO) {
+
+		String methodName = "updateCreatePMCheckListMaster()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			Map<String, Object> response = vendorComplaintService.updateCreatePMCheckListMaster(pmCheckListMasterDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
+
+			responseObjectsMap.put("pmCheckListMasterVO", response.get("pmCheckListMasterVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return responseDTO;
 	}
 }

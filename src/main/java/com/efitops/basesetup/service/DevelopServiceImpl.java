@@ -32,6 +32,8 @@ import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DrawingAttachmentDetailResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DrawingAttachmentsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDiscipline1DetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDiscipline2DetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDiscipline3DetailResponseDTO;
@@ -90,6 +92,7 @@ import com.efitops.basesetup.dto.ControlPlanDetailDTO;
 import com.efitops.basesetup.dto.ControlPlanMachineFixtureDTO;
 import com.efitops.basesetup.dto.ControlPlanParameterDTO;
 import com.efitops.basesetup.dto.ControlPlanSampleDTO;
+import com.efitops.basesetup.dto.DrawingAttachmentsDTO;
 import com.efitops.basesetup.dto.EightDiscipline1DetailDTO;
 import com.efitops.basesetup.dto.EightDiscipline2DetailDTO;
 import com.efitops.basesetup.dto.EightDiscipline3DetailDTO;
@@ -152,6 +155,8 @@ import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
+import com.efitops.basesetup.entity.DrawingAttachmentDetailVO;
+import com.efitops.basesetup.entity.DrawingAttachmentsVO;
 import com.efitops.basesetup.entity.EightDiscipline1DetailVO;
 import com.efitops.basesetup.entity.EightDiscipline2DetailVO;
 import com.efitops.basesetup.entity.EightDiscipline3DetailVO;
@@ -216,6 +221,8 @@ import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
+import com.efitops.basesetup.repository.DrawingAttachmentDetailRepo;
+import com.efitops.basesetup.repository.DrawingAttachmentsRepo;
 import com.efitops.basesetup.repository.EightDiscipline1DetailRepo;
 import com.efitops.basesetup.repository.EightDiscipline2DetailRepo;
 import com.efitops.basesetup.repository.EightDiscipline3DetailRepo;
@@ -485,6 +492,17 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	@Autowired
 	private ActivityMasterRepo activityMasterRepo;
+	
+	@Autowired
+	private DrawingAttachmentsRepo drawingAttachmentsRepo;
+	
+	
+	@Autowired
+	private DrawingAttachmentDetailRepo drawingAttachmentDetailRepo;
+	
+	
+	
+	
 	
 	
 	
@@ -4599,7 +4617,7 @@ public class DevelopServiceImpl implements DevelopService {
 		createUpdateMachineMasterVO(machineMasterDTO, machineMasterVO);
 
 		// =========================================================
-		// SAVE MASTER
+		// SAVE MASTE
 		// =========================================================
 
 		MachineMasterVO savedVO = machineMasterRepo.save(machineMasterVO);
@@ -10972,5 +10990,544 @@ public class DevelopServiceImpl implements DevelopService {
 
 	    return buildActivityMasterResponse(
 	            activityMasterVO);
+	}
+	
+	
+	// ======================================================
+	// Drawing Attachments - Create / Update
+	// ======================================================
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateDrawingAttachments(
+	        DrawingAttachmentsDTO drawingAttachmentsDTO,
+	        MultipartFile[] files) throws ApplicationException {
+
+	    DrawingAttachmentsVO drawingAttachmentsVO;
+
+	    String message;
+
+	    // ======================================================
+	    // Create / Update
+	    // ======================================================
+
+	    if (ObjectUtils.isNotEmpty(drawingAttachmentsDTO.getId())) {
+
+	        drawingAttachmentsVO = drawingAttachmentsRepo
+	                .findById(drawingAttachmentsDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Drawing Attachments Not Found"));
+
+	        drawingAttachmentsVO.setUpdatedBy(
+	                drawingAttachmentsDTO.getCreatedBy());
+
+	        message = "Drawing Attachments Updated Successfully";
+
+	    } else {
+
+	        drawingAttachmentsVO = new DrawingAttachmentsVO();
+
+	        drawingAttachmentsVO.setCreatedBy(
+	                drawingAttachmentsDTO.getCreatedBy());
+
+	        drawingAttachmentsVO.setUpdatedBy(
+	                drawingAttachmentsDTO.getCreatedBy());
+
+	        message = "Drawing Attachments Created Successfully";
+	    }
+
+	    // ======================================================
+	    // Header Mapping
+	    // ======================================================
+
+	    drawingAttachmentsVO.setFgPartDescription(
+	            drawingAttachmentsDTO.getFgPartDescription());
+
+	    drawingAttachmentsVO.setOrgId(
+	            drawingAttachmentsDTO.getOrgId());
+
+	    drawingAttachmentsVO.setFinancialYear(
+	            drawingAttachmentsDTO.getFinancialYear());
+
+	    drawingAttachmentsVO.setActive(
+	            drawingAttachmentsDTO.isActive());
+
+	    drawingAttachmentsVO.setCancel(
+	            drawingAttachmentsDTO.isCancel());
+
+	    drawingAttachmentsVO.setCancelRemarks(
+	            drawingAttachmentsDTO.getCancelRemarks());
+
+	    // ======================================================
+	    // Type Of Item
+	    // ======================================================
+
+	    if (drawingAttachmentsDTO.getTypeOfItem() != null
+	            && drawingAttachmentsDTO.getTypeOfItem() > 0) {
+
+	        ListOfValuesDetailsVO typeOfItem =
+	                listOfValuesDetailsRepo
+	                        .findById(
+	                                drawingAttachmentsDTO.getTypeOfItem())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Type Of Item Not Found"));
+
+	        drawingAttachmentsVO.setTypeOfItem(typeOfItem);
+	    }
+
+	    // ======================================================
+	    // FG Part No
+	    // ======================================================
+
+	    if (drawingAttachmentsDTO.getFgPartNo() != null
+	            && drawingAttachmentsDTO.getFgPartNo() > 0) {
+
+	        ItemMasterVO item =
+	                itemMasterRepo
+	                        .findById(
+	                                drawingAttachmentsDTO.getFgPartNo())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "FG Part No Not Found"));
+
+	        drawingAttachmentsVO.setFgPartNo(item);
+	    }
+
+	    // ======================================================
+	    // Save Header
+	    // ======================================================
+
+	    drawingAttachmentsVO =
+	            drawingAttachmentsRepo.save(
+	                    drawingAttachmentsVO);
+
+	    // ======================================================
+	    // Save / Update Attachments
+	    // ======================================================
+
+	    if (files != null && files.length > 0) {
+
+	        // --------------------------------------------------
+	        // Get Old Attachments
+	        // --------------------------------------------------
+
+	        List<DrawingAttachmentDetailVO> oldAttachments =
+	                drawingAttachmentDetailRepo
+	                        .findByDrawingAttachmentsVO(
+	                                drawingAttachmentsVO);
+
+	        // --------------------------------------------------
+	        // Delete Old Physical Files
+	        // --------------------------------------------------
+
+	        for (DrawingAttachmentDetailVO attachment :
+	                oldAttachments) {
+
+	            if (attachment.getFilePath() != null) {
+
+	                File file =
+	                        new File(
+	                                attachment.getFilePath());
+
+	                if (file.exists()) {
+	                    file.delete();
+	                }
+	            }
+	        }
+
+	        // --------------------------------------------------
+	        // Delete Old Attachment Records
+	        // --------------------------------------------------
+
+	        if (!oldAttachments.isEmpty()) {
+
+	            drawingAttachmentDetailRepo
+	                    .deleteAll(oldAttachments);
+	        }
+
+	        // --------------------------------------------------
+	        // Clear Old Attachments From Parent
+	        // --------------------------------------------------
+
+	        if (drawingAttachmentsVO
+	                .getDrawingAttachmentDetailVO() != null) {
+
+	            drawingAttachmentsVO
+	                    .getDrawingAttachmentDetailVO()
+	                    .clear();
+	        }
+
+	        // --------------------------------------------------
+	        // Save New Attachments
+	        // --------------------------------------------------
+
+	        saveDrawingAttachments(
+	                files,
+	                drawingAttachmentsVO);
+
+	        // --------------------------------------------------
+	        // Save Parent Again
+	        // --------------------------------------------------
+
+	        drawingAttachmentsRepo.save(
+	                drawingAttachmentsVO);
+	    }
+
+	    // ======================================================
+	    // Build Response
+	    // ======================================================
+
+	    DrawingAttachmentsResponseDTO responseDTO =
+	            buildDrawingAttachmentsResponse(
+	                    drawingAttachmentsVO);
+
+	    // ======================================================
+	    // Response
+	    // ======================================================
+
+	    Map<String, Object> response =
+	            new HashMap<>();
+
+	    response.put(
+	            "message",
+	            message);
+
+	    response.put(
+	            "drawingAttachmentsVO",
+	            responseDTO);
+
+	    return response;
+	}
+
+
+	// ======================================================
+	// Save Drawing Attachments
+	// ======================================================
+
+	@Value("${drawingattachment.upload.path}")
+	private String drawingAttachmentUploadPath;
+
+
+	private void saveDrawingAttachments(
+	        MultipartFile[] files,
+	        DrawingAttachmentsVO drawingAttachmentsVO)
+	        throws ApplicationException {
+
+	    if (files == null || files.length == 0) {
+	        return;
+	    }
+
+	    try {
+
+	        // ==================================================
+	        // Create Upload Folder
+	        // ==================================================
+
+	        File folder =
+	                new File(
+	                        drawingAttachmentUploadPath);
+
+	        if (!folder.exists()) {
+	            folder.mkdirs();
+	        }
+
+	        // ==================================================
+	        // Attachment List
+	        // ==================================================
+
+	        List<DrawingAttachmentDetailVO> attachmentList =
+	                new ArrayList<>();
+
+	        // ==================================================
+	        // Upload Files
+	        // ==================================================
+
+	        for (MultipartFile file : files) {
+
+	            if (file == null || file.isEmpty()) {
+	                continue;
+	            }
+
+	            // ------------------------------------------------
+	            // Original File Name
+	            // ------------------------------------------------
+
+	            String originalFileName =
+	                    file.getOriginalFilename();
+
+	            // ------------------------------------------------
+	            // Unique File Name
+	            // ------------------------------------------------
+
+	            String uniqueFileName =
+	                    UUID.randomUUID()
+	                            + "_"
+	                            + originalFileName;
+
+	            // ------------------------------------------------
+	            // File Path
+	            // ------------------------------------------------
+
+	            Path path =
+	                    Paths.get(
+	                            drawingAttachmentUploadPath,
+	                            uniqueFileName);
+
+	            // ------------------------------------------------
+	            // Save Physical File
+	            // ------------------------------------------------
+
+	            try (InputStream inputStream =
+	                    file.getInputStream()) {
+
+	                Files.copy(
+	                        inputStream,
+	                        path,
+	                        StandardCopyOption.REPLACE_EXISTING);
+	            }
+
+	            // ------------------------------------------------
+	            // Create Detail VO
+	            // ------------------------------------------------
+
+	            DrawingAttachmentDetailVO attachment =
+	                    new DrawingAttachmentDetailVO();
+
+	            attachment.setDrawingAttachmentsVO(
+	                    drawingAttachmentsVO);
+
+	            attachment.setName(
+	                    originalFileName);
+
+	            attachment.setFileName(
+	                    uniqueFileName);
+
+	            attachment.setFilePath(
+	                    path.toString());
+
+	            attachment.setFileSize(
+	                    file.getSize());
+
+	            attachment.setContentType(
+	                    file.getContentType());
+
+	            attachment.setUploadOn(
+	                    LocalDateTime.now());
+
+	            attachmentList.add(
+	                    attachment);
+	        }
+
+	        // ==================================================
+	        // Save Attachment Details
+	        // ==================================================
+
+	        if (!attachmentList.isEmpty()) {
+
+	            List<DrawingAttachmentDetailVO>
+	                    savedAttachments =
+	                    drawingAttachmentDetailRepo
+	                            .saveAll(
+	                                    attachmentList);
+
+	            drawingAttachmentsVO
+	                    .setDrawingAttachmentDetailVO(
+	                            savedAttachments);
+	        }
+
+	    } catch (IOException e) {
+
+	        throw new ApplicationException(
+	                "File Upload Failed : "
+	                        + e.getMessage());
+	    }
+	}
+
+
+	// ======================================================
+	// Build Drawing Attachments Response
+	// ======================================================
+
+	private DrawingAttachmentsResponseDTO
+	buildDrawingAttachmentsResponse(
+	        DrawingAttachmentsVO vo) {
+
+	    DrawingAttachmentsResponseDTO dto =
+	            new DrawingAttachmentsResponseDTO();
+
+	    // ======================================================
+	    // Basic Fields
+	    // ======================================================
+
+	    dto.setId(
+	            vo.getId());
+
+	    dto.setFgPartDescription(
+	            vo.getFgPartDescription());
+
+	    dto.setOrgId(
+	            vo.getOrgId());
+
+	    dto.setFinancialYear(
+	            vo.getFinancialYear());
+
+	    dto.setCreatedBy(
+	            vo.getCreatedBy());
+
+	    dto.setUpdatedBy(
+	            vo.getUpdatedBy());
+
+	    dto.setActive(
+	            vo.isActive());
+
+	    dto.setCancel(
+	            vo.isCancel());
+
+	    dto.setCancelRemarks(
+	            vo.getCancelRemarks());
+
+	    // ======================================================
+	    // Type Of Item
+	    // ======================================================
+
+	    if (vo.getTypeOfItem() != null) {
+
+	        ListOfValuesDetailsResponseDTO
+	                typeOfItemDTO =
+	                new ListOfValuesDetailsResponseDTO();
+
+	        typeOfItemDTO.setId(
+	                vo.getTypeOfItem().getId());
+
+	        typeOfItemDTO.setCode(
+	                vo.getTypeOfItem().getValueCode());
+
+	        typeOfItemDTO.setDescription(
+	                vo.getTypeOfItem()
+	                        .getValueDescription());
+
+	        dto.setTypeOfItem(
+	                typeOfItemDTO);
+	    }
+
+	    // ======================================================
+	    // FG Part No
+	    // ======================================================
+
+	    if (vo.getFgPartNo() != null) {
+
+	        ItemResponse1DTO itemDTO =
+	                new ItemResponse1DTO();
+
+	        itemDTO.setId(
+	                vo.getFgPartNo().getId());
+
+	        itemDTO.setItemCode(
+	                vo.getFgPartNo().getItemCode());
+
+	        itemDTO.setItemDescription(
+	                vo.getFgPartNo()
+	                        .getItemDescription());
+
+	        dto.setFgPartNo(
+	                itemDTO);
+	    }
+
+	    // ======================================================
+	    // Attachments
+	    // ======================================================
+
+	    List<DrawingAttachmentDetailResponseDTO>
+	            attachmentList =
+	                    new ArrayList<>();
+
+	    if (vo.getDrawingAttachmentDetailVO()
+	            != null) {
+
+	        for (DrawingAttachmentDetailVO attachmentVO :
+	                vo.getDrawingAttachmentDetailVO()) {
+
+	            DrawingAttachmentDetailResponseDTO
+	                    attachmentDTO =
+	                    new DrawingAttachmentDetailResponseDTO();
+
+	            attachmentDTO.setId(
+	                    attachmentVO.getId());
+
+	            attachmentDTO.setName(
+	                    attachmentVO.getName());
+
+	            attachmentDTO.setFileName(
+	                    attachmentVO.getFileName());
+
+	            attachmentDTO.setFilePath(
+	                    attachmentVO.getFilePath());
+
+	            attachmentDTO.setFileSize(
+	                    attachmentVO.getFileSize());
+
+	            attachmentDTO.setContentType(
+	                    attachmentVO.getContentType());
+
+	            attachmentDTO.setUploadOn(
+	                    attachmentVO.getUploadOn());
+
+	            attachmentList.add(
+	                    attachmentDTO);
+	        }
+	    }
+
+	    dto.setDrawingAttachmentDetailResponseDTO(
+	            attachmentList);
+
+	    return dto;
+	}
+	
+	
+	@Override
+	public DrawingAttachmentsResponseDTO getDrawingAttachmentsById(Long id)
+	        throws ApplicationException {
+
+	    DrawingAttachmentsVO drawingAttachmentsVO =
+	            drawingAttachmentsRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Drawing Attachments Not Found"));
+
+	    return buildDrawingAttachmentsResponse(
+	            drawingAttachmentsVO);
+	}
+	
+	@Override
+	public List<DrawingAttachmentsResponseDTO> getDrawingAttachmentsByOrgId(
+	        Long orgId) throws ApplicationException {
+
+	    List<DrawingAttachmentsVO> drawingAttachmentsVOList =
+	            drawingAttachmentsRepo
+	                    .findByOrgIdAndCancelFalse(orgId);
+
+	    if (drawingAttachmentsVOList == null
+	            || drawingAttachmentsVOList.isEmpty()) {
+
+	        throw new ApplicationException(
+	                "Drawing Attachments not found");
+	    }
+
+	    List<DrawingAttachmentsResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (DrawingAttachmentsVO drawingAttachmentsVO :
+	            drawingAttachmentsVOList) {
+
+	        DrawingAttachmentsResponseDTO responseDTO =
+	                buildDrawingAttachmentsResponse(
+	                        drawingAttachmentsVO);
+
+	        responseList.add(responseDTO);
+	    }
+
+	    return responseList;
 	}
 }

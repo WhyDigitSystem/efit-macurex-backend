@@ -16,6 +16,8 @@ import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FgTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialTransferReturnNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionBulkIssueResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionIssueResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionSchOrderShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionTransferSlipResponseDTO;
@@ -30,6 +32,8 @@ import com.efitops.basesetup.dto.FgTransferSlipDTO;
 import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
 import com.efitops.basesetup.dto.MaterialTransferReturnNoteDTO;
 import com.efitops.basesetup.dto.PoType;
+import com.efitops.basesetup.dto.ProductionBulkIssueDTO;
+import com.efitops.basesetup.dto.ProductionIssueDTO;
 import com.efitops.basesetup.dto.ProductionSchOrderShortCloseDTO;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.ProductionTransferSlipDTO;
@@ -273,5 +277,26 @@ public interface PurchaseServiceImport {
 	List<Map<String, Object>> getItemDetailsFromProductionShortClose(Long orgId, Long branch);
 
 	List<Map<String, Object>> getSchOrderNoProductionShortClose(Long orgId, Long branch);
+
+	// Production
+
+	Map<String, Object> createUpdateProductionIssue(ProductionIssueDTO dto) throws ApplicationException;
+
+	String getProductionIssueDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	ProductionIssueResponseDTO getProductionIssueById(Long id) throws ApplicationException;
+
+	List<ProductionIssueResponseDTO> getProductionIssueByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	// Bulk
+
+	Map<String, Object> createUpdateProductionBulkIssue(ProductionBulkIssueDTO dto) throws ApplicationException;
+
+	String getProductionBulkIssueDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	ProductionBulkIssueResponseDTO getProductionBulkIssueById(Long id) throws ApplicationException;
+
+	List<ProductionBulkIssueResponseDTO> getProductionBulkIssueByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
 
 }

@@ -34,5 +34,4 @@ public interface ProductionScheduleOrderRepo extends JpaRepository<ProductionSch
 	Set<Object[]> getFgAndSfgItemDetailsFromProductionDetails(Long orgId, Long branch,Long bom);
 
 
-
 }

@@ -125,7 +125,8 @@ public interface BillOfMaterialRepo extends JpaRepository<BillOfMaterialVO, Long
 
 	            bd.qty AS bomQty,
 	            bd.scrap_item AS scrapItem,
-	            bd.scrap_qty AS scrapQty
+	            bd.scrap_qty AS scrapQty,
+	            b.doc_id
 
 	        FROM bill_of_material b
 
@@ -142,7 +143,17 @@ public interface BillOfMaterialRepo extends JpaRepository<BillOfMaterialVO, Long
 	          AND b.branch = :branch
 	          AND b.fg_item = :itemId
 	          AND b.active = 1
-	          AND b.cancel = 0
+	          AND b.cancel = 0  
+
+			AND b.wef = (
+			      SELECT MAX(b2.wef)
+			      FROM bill_of_material b2
+			      WHERE b2.org_id = :orgId
+			        AND b2.branch = :branch
+			        AND b2.fg_item = :itemId
+			        AND b2.active = 1
+			        AND b2.cancel = 0
+			  )
 
 	        ORDER BY bd.bill_of_material_details_id
 	        """, nativeQuery = true)

@@ -9,25 +9,34 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.AuthorizationForBreakdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FlashNCReportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineToolBreakdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineToolsScrapNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PMCheckListMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierChangeRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
+import com.efitops.basesetup.dto.AuthorizationForBreakdownDTO;
 import com.efitops.basesetup.dto.CategoryMasterDTO;
 import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
+import com.efitops.basesetup.dto.MachineToolBreakdownDTO;
+import com.efitops.basesetup.dto.MachineToolRectificationDTO;
+import com.efitops.basesetup.dto.MachineToolsScrapNoteDTO;
 import com.efitops.basesetup.dto.PMCheckListMasterDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
+import com.efitops.basesetup.entity.MachineToolRectificationResponseDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
 public interface VendorComplaintService {
@@ -171,7 +180,86 @@ public interface VendorComplaintService {
 
 	List<CauseMasterResponseDTO> getCauseMasterByOrgId(Long orgId) throws ApplicationException;
 
+//pmcheck list master
 	Map<String, Object> updateCreatePMCheckListMaster(PMCheckListMasterDTO dto) throws ApplicationException;
+
+	PMCheckListMasterResponseDTO getPMCheckListMasterById(Long id) throws ApplicationException;
+
+	List<PMCheckListMasterResponseDTO> getPMCheckListMasterByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+
+	List<Map<String, Object>> getActivityForPMCheckListMaster(Long department, Long orgId) throws ApplicationException;
+
+	List<Map<String, Object>> getToolMachineCategoryForPMCheckListMaster(Long orgId, String pmCheckListFor)
+			throws ApplicationException;
+
+//MachineTool breakdown
+	Map<String, Object> updateCreateMachineToolBreakdown(MachineToolBreakdownDTO machineToolBreakdownDTO,
+			MultipartFile[] files, MultipartFile[] images) throws ApplicationException;
+
+	ResponseEntity<byte[]> viewMachineToolBreakdownFile(HttpServletRequest request) throws IOException;
+
+	String getMachineToolBreakdownDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	MachineToolBreakdownResponseDTO getMachineToolBreakdownById(Long id) throws ApplicationException;
+
+	List<MachineToolBreakdownResponseDTO> getMachineToolBreakdownByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	
+	List<Map<String, Object>> getMachineToolForBreakdown(Long toolCategoryId, Long orgId, Long branch)
+			throws ApplicationException;
+
+	//MACHINE TOOL RECTIFICATION
+	
+	Map<String, Object> updateCreateMachineToolRectification(MachineToolRectificationDTO dto)
+			throws ApplicationException;
+
+	String getMachineToolRectificationDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	List<MachineToolRectificationResponseDTO> getMachineToolRectificationByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	MachineToolRectificationResponseDTO getMachineToolRectificationById(Long id) throws ApplicationException;
+
+	List<Map<String, Object>> getBreakdownDetailsForRectification(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getPrepareByForMachineToolRectification(Long orgId, Long branch, Long department)
+			throws ApplicationException;
+
+//Authorization For Breakdown
+	Map<String, Object> updateCreateAuthorizationForBreakdown(AuthorizationForBreakdownDTO dto)
+			throws ApplicationException;
+
+	String getAuthorizationForBreakdownDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	AuthorizationForBreakdownResponseDTO getAuthorizationForBreakdownById(Long id) throws ApplicationException;
+
+	List<AuthorizationForBreakdownResponseDTO> getAuthorizationForBreakdownByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getMachineToolRectificationDetailsForAuthorizationBreakdown(Long branch, Long orgId)
+			throws ApplicationException;
+
+	String getPMCheckListMasterDocId(Long orgId, String financialYear) throws ApplicationException;
+
+// machinetoolsscarpnote
+
+	ResponseEntity<byte[]> viewMachineToolsScrapNoteFile(HttpServletRequest request) throws IOException;
+
+	Map<String, Object> updateCreateMachineToolsScrapNote(MachineToolsScrapNoteDTO machineToolsScrapNoteDTO,
+			MultipartFile[] files) throws ApplicationException;
+
+	String getMachineToolsScrapNoteDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	Map<String, Object> getMachineToolsScrapNoteById(Long id) throws ApplicationException;
+
+
+	List<MachineToolsScrapNoteResponseDTO> getMachineToolsScrapNoteByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	
+
 
 
 }

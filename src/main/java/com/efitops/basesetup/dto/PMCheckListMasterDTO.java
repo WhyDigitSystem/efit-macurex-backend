@@ -16,7 +16,7 @@ public class PMCheckListMasterDTO {
 
 	private Long department;
 
-	private Long pmCheckListFor;
+	private String pmCheckListFor;
 
 	private String pmCheckListNo;
 

@@ -23,7 +23,7 @@ public class PMCheckListMasterResponseDTO {
 
 	private DepartmentResponseDTO department;
 
-	private ListOfVlauesDetailsResponseDTO pmCheckListFor;
+	private String pmCheckListFor;
 
 	private String pmCheckListNo;
 

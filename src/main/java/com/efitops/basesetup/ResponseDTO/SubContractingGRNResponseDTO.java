@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
-import com.efitops.basesetup.service.CustomerResponseDetailsDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -97,4 +96,8 @@ public class SubContractingGRNResponseDTO {
     private List<SubContractingGRNDetailsResponseDTO> details;
 
     private List<SubContractingGRNTaxDetailsResponseDTO> taxDetails;
+    
+    
+    private List<SubContractingGRNAttachmentResponseDTO> attachments;
+
 }

@@ -2,6 +2,7 @@ package com.efitops.basesetup.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.ActivityResponseDTO;
+import com.efitops.basesetup.ResponseDTO.AuthorizationForBreakdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
@@ -46,8 +48,14 @@ import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.MachineToolBreakdownAttchmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineToolBreakdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineToolScrapNoteAttachmentResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineToolsScrapNoteDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineToolsScrapNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PMCheckListDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PMCheckListMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PMCheckListResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalParametersDetailsResponeDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
@@ -57,18 +65,25 @@ import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryDetailsResponseDTO
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailRepo;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ToolCategoryResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
+import com.efitops.basesetup.common.CommonConstant;
+import com.efitops.basesetup.dto.AuthorizationForBreakdownDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CategoryMasterDTO;
 import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDetailsDTO;
 import com.efitops.basesetup.dto.EmployeeMasterDetailsReponseDTO;
+import com.efitops.basesetup.dto.EmployeeResponseDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDetailsDTO;
-import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
+import com.efitops.basesetup.dto.MachineToolBreakdownDTO;
+import com.efitops.basesetup.dto.MachineToolRectificationDTO;
+import com.efitops.basesetup.dto.MachineToolsScrapNoteDTO;
+import com.efitops.basesetup.dto.MachineToolsScrapNoteDetailsDTO;
 import com.efitops.basesetup.dto.PMCheckListDetailsDTO;
 import com.efitops.basesetup.dto.PMCheckListMasterDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
@@ -80,6 +95,7 @@ import com.efitops.basesetup.dto.SupplierResponseEntryDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
 import com.efitops.basesetup.entity.ActivityMasterVO;
+import com.efitops.basesetup.entity.AuthorizationForBreakdownVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CategoryMasterVO;
 import com.efitops.basesetup.entity.CauseMasterVO;
@@ -97,6 +113,13 @@ import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.MachineMasterVO;
+import com.efitops.basesetup.entity.MachineToolBreakdownAttachmentVO;
+import com.efitops.basesetup.entity.MachineToolBreakdownVO;
+import com.efitops.basesetup.entity.MachineToolRectificationResponseDTO;
+import com.efitops.basesetup.entity.MachineToolRectificationVO;
+import com.efitops.basesetup.entity.MachineToolScrapNoteAttachmentVO;
+import com.efitops.basesetup.entity.MachineToolsScrapNoteDetailsVO;
+import com.efitops.basesetup.entity.MachineToolsScrapNoteVO;
 import com.efitops.basesetup.entity.PMCheckListDetailsVO;
 import com.efitops.basesetup.entity.PMCheckListMasterVO;
 import com.efitops.basesetup.entity.SetUpApprovalDetailsVO;
@@ -112,6 +135,7 @@ import com.efitops.basesetup.entity.VendorComplaintDetailsVO;
 import com.efitops.basesetup.entity.VendorComplaintEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.ActivityMasterRepo;
+import com.efitops.basesetup.repository.AuthorizationForBreakdownRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.CategoryMasterRepo;
 import com.efitops.basesetup.repository.CauseMasterRepo;
@@ -129,6 +153,12 @@ import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.MachineMasterRepo;
+import com.efitops.basesetup.repository.MachineToolBreakdownAttachementRepo;
+import com.efitops.basesetup.repository.MachineToolBreakdownRepo;
+import com.efitops.basesetup.repository.MachineToolRectificationRepo;
+import com.efitops.basesetup.repository.MachineToolsScrapNoteAttachmentRepo;
+import com.efitops.basesetup.repository.MachineToolsScrapNoteDetailsRepo;
+import com.efitops.basesetup.repository.MachineToolsScrapNoteRepo;
 import com.efitops.basesetup.repository.PMCheckListMasterRepo;
 import com.efitops.basesetup.repository.SetUpApprovalDetailsRepo;
 import com.efitops.basesetup.repository.SetUpApprovalParametersDetailsRepo;
@@ -228,9 +258,33 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private ToolCategoryDetailRepo toolCategoryDetailRepo;
-	
+
 	@Autowired
 	private ActivityMasterRepo activityMasterRepo;
+
+	@Autowired
+	private MachineToolBreakdownRepo machineToolBreakdownRepo;
+
+	@Autowired
+	private MachineToolBreakdownAttachementRepo machineToolBreakdownAttachementRepo;
+
+	@Autowired
+	private ToolCategoryRepo toolCategoryRepo;
+
+	@Autowired
+	private MachineToolRectificationRepo machineToolRectificationRepo;
+
+	@Autowired
+	private AuthorizationForBreakdownRepo authorizationForBreakdownRepo;
+
+	@Autowired
+	private MachineToolsScrapNoteRepo machineToolsScrapNoteRepo;
+
+	@Autowired
+	private MachineToolsScrapNoteDetailsRepo machineToolsScrapNoteDetailsRepo;
+
+	@Autowired
+	private MachineToolsScrapNoteAttachmentRepo machineToolScrapNoteAttachmentRepo;
 
 	@Override
 	@Transactional
@@ -4210,13 +4264,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * PM Check List For
 		 */
-		if (dto.getPmCheckListFor() != null) {
-
-			ListOfValuesDetailsVO pmCheckListForVO = listOfValuesDetailsRepo.findById(dto.getPmCheckListFor())
-					.orElseThrow(() -> new ApplicationException("Invalid PM Check List For Details"));
-
-			pmCheckListMasterVO.setPmCheckListFor(pmCheckListForVO);
-		}
 
 		/*
 		 * Tool Category
@@ -4259,6 +4306,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		if (dto.getActive() != null) {
 			pmCheckListMasterVO.setActive(dto.getActive());
 		}
+
+		pmCheckListMasterVO.setPmCheckListFor(dto.getPmCheckListFor());
 
 		pmCheckListMasterVO.setOrgId(dto.getOrgId());
 
@@ -4372,18 +4421,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * PM Check List For
 		 */
-		if (vo.getPmCheckListFor() != null) {
-
-			ListOfVlauesDetailsResponseDTO responseDTO = new ListOfVlauesDetailsResponseDTO();
-
-			responseDTO.setId(vo.getPmCheckListFor().getId());
-
-			responseDTO.setValueCode(vo.getPmCheckListFor().getValueCode());
-
-			responseDTO.setValueDescription(vo.getPmCheckListFor().getValueDescription());
-
-			response.setPmCheckListFor(responseDTO);
-		}
 
 		/*
 		 * Tool Category
@@ -4393,7 +4430,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			ToolCategoryDetailResponseDTO toolCategoryResponseDTO = new ToolCategoryDetailResponseDTO();
 
 			toolCategoryResponseDTO.setId(vo.getToolCategory().getId());
-			
+
 			toolCategoryResponseDTO.setCategory(vo.getToolCategory().getCategory());
 
 			response.setToolCategory(toolCategoryResponseDTO);
@@ -4407,8 +4444,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			EmployeeMasterDetailsReponseDTO preparedByResponseDTO = new EmployeeMasterDetailsReponseDTO();
 
 			preparedByResponseDTO.setId(vo.getPreparedBy().getId());
-
-			
 
 			preparedByResponseDTO.setEmployeeName(vo.getPreparedBy().getEmployeeName());
 
@@ -4424,8 +4459,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			approvedByResponseDTO.setId(vo.getApprovedBy().getId());
 
-			
-
 			approvedByResponseDTO.setEmployeeName(vo.getApprovedBy().getEmployeeName());
 
 			response.setApprovedBy(approvedByResponseDTO);
@@ -4434,9 +4467,12 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * Normal Fields
 		 */
+
+		response.setPmCheckListFor(vo.getPmCheckListFor());
+
 		response.setPmCheckListNo(vo.getPmCheckListNo());
 
-		response.setActive(vo.isActive() );
+		response.setActive(vo.isActive());
 
 		response.setOrgId(vo.getOrgId());
 
@@ -4481,8 +4517,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 					ActivityResponseDTO activityResponse = new ActivityResponseDTO();
 
 					activityResponse.setId(detailsVO.getActivity().getId());
-					
-					activityResponse.setActivity(detailsVO.getActivity().getActivity());	
+
+					activityResponse.setActivity(detailsVO.getActivity().getActivity());
 					detailsResponse.setActivity(activityResponse);
 				}
 
@@ -4507,5 +4543,2145 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		return response;
+	}
+
+	@Override
+	public PMCheckListMasterResponseDTO getPMCheckListMasterById(Long id) throws ApplicationException {
+
+		PMCheckListMasterVO pmCheckListMasterVO = pmCheckListMasterRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid PM Check List Master Details"));
+
+		return pmCheckListMasterResponse(pmCheckListMasterVO);
+	}
+
+	@Override
+	public List<PMCheckListMasterResponseDTO> getPMCheckListMasterByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<PMCheckListMasterVO> pmCheckListMasterList = pmCheckListMasterRepo.getPMCheckListMasterByOrgId(orgId,
+				branch);
+
+		if (pmCheckListMasterList == null || pmCheckListMasterList.isEmpty()) {
+			throw new ApplicationException("No PM Check List Master Found");
+		}
+
+		List<PMCheckListMasterResponseDTO> responseList = new ArrayList<>();
+
+		for (PMCheckListMasterVO pmCheckListMasterVO : pmCheckListMasterList) {
+
+			PMCheckListMasterResponseDTO response = pmCheckListMasterResponse(pmCheckListMasterVO);
+
+			responseList.add(response);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getToolMachineCategoryForPMCheckListMaster(Long orgId, String pmCheckListFor)
+			throws ApplicationException {
+
+		List<Object[]> toolCategoryList = pmCheckListMasterRepo.getToolMachineCategoryForPMCheckListMaster(orgId,
+				pmCheckListFor);
+
+		if (toolCategoryList == null || toolCategoryList.isEmpty()) {
+			throw new ApplicationException("No Tool Machine Category Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : toolCategoryList) {
+
+			Map<String, Object> toolCategoryMap = new HashMap<>();
+
+			toolCategoryMap.put("id", obj[0]);
+			toolCategoryMap.put("name", obj[1]);
+
+			responseList.add(toolCategoryMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getActivityForPMCheckListMaster(Long department, Long orgId)
+			throws ApplicationException {
+
+		List<Object[]> activityList = pmCheckListMasterRepo.getActivityForPMCheckListMaster(department, orgId);
+
+		if (activityList == null || activityList.isEmpty()) {
+			throw new ApplicationException("No Activity Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : activityList) {
+
+			Map<String, Object> activityMap = new HashMap<>();
+
+			activityMap.put("id", obj[0]);
+			activityMap.put("name", obj[1]);
+
+			responseList.add(activityMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateMachineToolBreakdown(MachineToolBreakdownDTO machineToolBreakdownDTO,
+			MultipartFile[] files, MultipartFile[] images) throws ApplicationException {
+
+		MachineToolBreakdownVO machineToolBreakdownVO;
+		String message;
+
+		/*
+		 * Update
+		 */
+		if (ObjectUtils.isNotEmpty(machineToolBreakdownDTO.getId())) {
+
+			machineToolBreakdownVO = machineToolBreakdownRepo.findById(machineToolBreakdownDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Machine Tool Breakdown"));
+
+			machineToolBreakdownVO.setUpdatedBy(machineToolBreakdownDTO.getCreatedBy());
+
+			message = "Machine Tool Breakdown Updated Successfully";
+
+		}
+
+		/*
+		 * Create
+		 */
+		else {
+
+			machineToolBreakdownVO = new MachineToolBreakdownVO();
+
+			String screenCode = "MTB";
+
+			String docId = machineToolBreakdownRepo.getMachineToolBreakdownDocId(machineToolBreakdownDTO.getOrgId(),
+					machineToolBreakdownDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+
+				throw new ApplicationException("Machine Tool Breakdown DocId Not Found");
+			}
+
+			machineToolBreakdownVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO mapping = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+					machineToolBreakdownDTO.getOrgId(), machineToolBreakdownDTO.getFinancialYear(), screenCode);
+
+			if (mapping == null) {
+
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			mapping.setLastNo(mapping.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(mapping);
+
+			machineToolBreakdownVO.setCreatedBy(machineToolBreakdownDTO.getCreatedBy());
+
+			machineToolBreakdownVO.setUpdatedBy(machineToolBreakdownDTO.getCreatedBy());
+
+			message = "Machine Tool Breakdown Created Successfully";
+		}
+
+		/*
+		 * Set Machine Tool Breakdown values
+		 */
+		createUpdateMachineToolBreakdownVO(machineToolBreakdownDTO, machineToolBreakdownVO);
+
+		/*
+		 * Save Main VO first
+		 */
+		machineToolBreakdownVO = machineToolBreakdownRepo.save(machineToolBreakdownVO);
+
+		/*
+		 * Save Header Image
+		 */
+		saveMachineToolBreakdownImage(images, machineToolBreakdownVO);
+
+		/*
+		 * Save Attachments
+		 */
+		saveMachineToolBreakdownAttachments(files, machineToolBreakdownVO);
+
+		/*
+		 * Response
+		 */
+		MachineToolBreakdownResponseDTO responseDTO = machineToolBreakdownResponse(machineToolBreakdownVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+		response.put("machineToolBreakdownVO", responseDTO);
+
+		return response;
+	}
+
+	private void createUpdateMachineToolBreakdownVO(MachineToolBreakdownDTO dto, MachineToolBreakdownVO vo)
+			throws ApplicationException {
+
+		/*
+		 * Branch
+		 */
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branchVO);
+		}
+
+		/*
+		 * Department
+		 */
+		if (dto.getDepartment() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Department Not Found"));
+
+			vo.setDepartment(departmentVO);
+		}
+
+		/*
+		 * Select Machine Tool Instrument
+		 */
+		if (dto.getSelectMachineToolInst() != null) {
+
+			ToolCategoryVO selectMachineToolInst = toolCategoryRepo.findById(dto.getSelectMachineToolInst())
+					.orElseThrow(() -> new ApplicationException("Select Machine Tool Instrument Not Found"));
+
+			vo.setSelectMachineToolInst(selectMachineToolInst);
+		}
+
+		/*
+		 * PM Check List No
+		 */
+		if (dto.getPmCheckListNo() != null) {
+
+			PMCheckListMasterVO pmCheckListNo = pmCheckListMasterRepo.findById(dto.getPmCheckListNo())
+					.orElseThrow(() -> new ApplicationException("PM Check List Not Found"));
+
+			vo.setPmCheckListNo(pmCheckListNo);
+		}
+
+		/*
+		 * Operator Name
+		 */
+		if (dto.getOperatorName() != null) {
+
+			EmployeeMasterVO operatorName = employeeMasterRepo.findById(dto.getOperatorName())
+					.orElseThrow(() -> new ApplicationException("Operator Employee Not Found"));
+
+			vo.setOperatorName(operatorName);
+		}
+
+		/*
+		 * Maintenance Type
+		 */
+		if (dto.getMaintenanceType() != null) {
+
+			ListOfValuesDetailsVO maintenanceType = listOfValuesDetailsRepo.findById(dto.getMaintenanceType())
+					.orElseThrow(() -> new ApplicationException("Maintenance Type Not Found"));
+
+			vo.setMaintenanceType(maintenanceType);
+		}
+
+		/*
+		 * Nature Of Breakdown
+		 */
+		if (dto.getNatureOfBreakdown() != null) {
+
+			ListOfValuesDetailsVO natureOfBreakdown = listOfValuesDetailsRepo.findById(dto.getNatureOfBreakdown())
+					.orElseThrow(() -> new ApplicationException("Nature Of Breakdown Not Found"));
+
+			vo.setNatureOfBreakdown(natureOfBreakdown);
+		}
+
+		/*
+		 * Breakdown Type
+		 */
+		if (dto.getBreakdownType() != null) {
+
+			ListOfValuesDetailsVO breakdownType = listOfValuesDetailsRepo.findById(dto.getBreakdownType())
+					.orElseThrow(() -> new ApplicationException("Breakdown Type Not Found"));
+
+			vo.setBreakdownType(breakdownType);
+		}
+
+		/*
+		 * Normal Fields
+		 */
+		vo.setDocDate(dto.getId() == null ? vo.getDocDate() : vo.getDocDate());
+
+		vo.setMachineToolIdInst(dto.getMachineToolIdInst());
+
+		vo.setMachineName(dto.getMachineName());
+
+		vo.setLocation(dto.getLocation());
+
+		vo.setBreakdownTime(dto.getBreakdownTime());
+
+		vo.setReportedTime(dto.getReportedTime());
+
+		vo.setReportedDate(dto.getReportedDate());
+
+		vo.setNatureOfProblem(dto.getNatureOfProblem());
+
+		vo.setEstimatedTime(dto.getEstimatedTime());
+
+		vo.setRemarks(dto.getRemarks());
+
+		vo.setOrgId(dto.getOrgId());
+
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		vo.setActive(dto.isActive());
+
+		vo.setCancelRemarks(dto.getCancelRemarks());
+
+		/*
+		 * Image field from DTO
+		 */
+		if (dto.getImage() != null) {
+			vo.setImage(dto.getImage());
+		}
+	}
+
+	private void saveMachineToolBreakdownImage(MultipartFile[] images, MachineToolBreakdownVO machineToolBreakdownVO)
+			throws ApplicationException {
+
+		if (images == null || images.length == 0) {
+			return;
+		}
+
+		try {
+
+			Path machineToolBreakdownFolder = Paths.get(machineToolBreakdownUploadPath, "machine-tool-breakdown",
+					machineToolBreakdownVO.getId().toString());
+
+			createDirectory(machineToolBreakdownFolder);
+
+			for (MultipartFile image : images) {
+
+				if (image == null || image.isEmpty()) {
+					continue;
+				}
+
+				String originalName = image.getOriginalFilename();
+
+				if (originalName == null) {
+					originalName = "image";
+				}
+
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+
+					extension = originalName.substring(originalName.lastIndexOf("."));
+
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				String fileName = originalName + "_" + machineToolBreakdownVO.getId() + extension;
+
+				Path filePath = machineToolBreakdownFolder.resolve(fileName);
+
+				try (InputStream inputStream = image.getInputStream()) {
+
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/vendorComplaintEntry/viewFile/").toUriString();
+
+				String relativePath = "machine-tool-breakdown/" + machineToolBreakdownVO.getId() + "/" + fileName;
+
+				String publicUrl = baseUrl + relativePath;
+
+				/*
+				 * Save image URL/path in parent table
+				 */
+				machineToolBreakdownVO.setImage(publicUrl);
+
+				machineToolBreakdownRepo.save(machineToolBreakdownVO);
+			}
+
+		} catch (IOException e) {
+
+			throw new ApplicationException("Image Upload Failed : " + e.getMessage());
+		}
+	}
+
+	private void saveMachineToolBreakdownAttachments(MultipartFile[] files,
+			MachineToolBreakdownVO machineToolBreakdownVO) throws ApplicationException {
+
+		if (files == null || files.length == 0) {
+			return;
+		}
+
+		try {
+
+			/*
+			 * Create folder
+			 */
+			Path machineToolBreakdownFolder = Paths.get(machineToolBreakdownUploadPath, "machine-tool-breakdown",
+					machineToolBreakdownVO.getId().toString());
+
+			createDirectory(machineToolBreakdownFolder);
+
+			List<MachineToolBreakdownAttachmentVO> attachmentList = new ArrayList<>();
+
+			for (MultipartFile file : files) {
+
+				if (file == null || file.isEmpty()) {
+					continue;
+				}
+
+				/*
+				 * Get original file name
+				 */
+				String originalName = file.getOriginalFilename();
+
+				if (originalName == null) {
+					originalName = "file";
+				}
+
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+
+					extension = originalName.substring(originalName.lastIndexOf("."));
+
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				/*
+				 * Create unique file name
+				 */
+				String fileName = originalName + "_" + machineToolBreakdownVO.getId() + extension;
+
+				/*
+				 * Actual physical file path
+				 */
+				Path filePath = machineToolBreakdownFolder.resolve(fileName);
+
+				/*
+				 * Save file to disk
+				 */
+				try (InputStream inputStream = file.getInputStream()) {
+
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				/*
+				 * Create URL
+				 */
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/vendorComplaintEntry/machineToolBreakdown/viewFile/").toUriString();
+
+				String relativePath = "machine-tool-breakdown/" + machineToolBreakdownVO.getId() + "/" + fileName;
+
+				String publicUrl = baseUrl + relativePath;
+
+				/*
+				 * Save attachment details
+				 */
+				MachineToolBreakdownAttachmentVO attachment = new MachineToolBreakdownAttachmentVO();
+
+				attachment.setMachineToolBreakdownVO(machineToolBreakdownVO);
+
+				attachment.setName(file.getOriginalFilename());
+
+				attachment.setFileName(fileName);
+
+				attachment.setFilePath(publicUrl);
+
+				attachment.setFileSize(file.getSize());
+
+				attachment.setContentType(file.getContentType());
+
+				attachment.setUploadOn(LocalDateTime.now());
+
+				attachmentList.add(attachment);
+			}
+
+			/*
+			 * Save attachment records
+			 */
+			if (!attachmentList.isEmpty()) {
+
+				List<MachineToolBreakdownAttachmentVO> saved = machineToolBreakdownAttachementRepo
+						.saveAll(attachmentList);
+
+				machineToolBreakdownVO.setMachineToolBreakdownAttachmentVO(saved);
+			}
+
+		} catch (IOException e) {
+
+			throw new ApplicationException("File Upload Failed : " + e.getMessage());
+		}
+	}
+
+	private MachineToolBreakdownResponseDTO machineToolBreakdownResponse(MachineToolBreakdownVO vo) {
+
+		MachineToolBreakdownResponseDTO response = new MachineToolBreakdownResponseDTO();
+
+		response.setId(vo.getId());
+
+		/*
+		 * Branch Response
+		 */
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponse = new BranchResponseDTO();
+
+			branchResponse.setId(vo.getBranch().getId());
+
+			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+
+			branchResponse.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponse);
+		}
+
+		/*
+		 * Department Response
+		 */
+		if (vo.getDepartment() != null) {
+
+			DepartmentResponseDTO departmentResponse = new DepartmentResponseDTO();
+
+			departmentResponse.setId(vo.getDepartment().getId());
+
+			departmentResponse.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+
+			departmentResponse.setDepartmentName(vo.getDepartment().getDepartmentName());
+
+			response.setDepartment(departmentResponse);
+		}
+
+		/*
+		 * Select Machine Tool Instrument
+		 */
+		if (vo.getSelectMachineToolInst() != null) {
+
+			ToolCategoryResponse1DTO selectMachineToolInst = new ToolCategoryResponse1DTO();
+
+			selectMachineToolInst.setId(vo.getSelectMachineToolInst().getId());
+
+			selectMachineToolInst.setApplicableFor(vo.getSelectMachineToolInst().getApllicableFor());
+
+			response.setSelectMachineToolInst(selectMachineToolInst);
+		}
+
+		/*
+		 * PM Check List
+		 */
+		if (vo.getPmCheckListNo() != null) {
+
+			PMCheckListResponseDTO pmCheckListResponse = new PMCheckListResponseDTO();
+
+			pmCheckListResponse.setId(vo.getPmCheckListNo().getId());
+			pmCheckListResponse.setPmCheckListNo(vo.getPmCheckListNo().getPmCheckListNo());
+
+			/*
+			 * Add your PM Check List fields here according to your PMCheckListResponseDTO
+			 */
+
+			response.setPmCheckListNo(pmCheckListResponse);
+		}
+
+		/*
+		 * Operator Name
+		 */
+		if (vo.getOperatorName() != null) {
+
+			EmployeeDropdownResponseDTO operatorName = new EmployeeDropdownResponseDTO();
+
+			operatorName.setEmployeeId(vo.getOperatorName().getId());
+
+			operatorName.setEmployeeName(vo.getOperatorName().getEmployeeName());
+
+			response.setOperatorName(operatorName);
+		}
+
+		/*
+		 * Maintenance Type
+		 */
+		if (vo.getMaintenanceType() != null) {
+
+			ListOfValuesDetailsResponseDTO maintenanceType = new ListOfValuesDetailsResponseDTO();
+
+			maintenanceType.setId(vo.getMaintenanceType().getId());
+
+			maintenanceType.setCode(vo.getMaintenanceType().getValueCode());
+
+			maintenanceType.setDescription(vo.getMaintenanceType().getValueDescription());
+
+			response.setMaintenanceType(maintenanceType);
+		}
+
+		/*
+		 * Nature Of Breakdown
+		 */
+		if (vo.getNatureOfBreakdown() != null) {
+
+			ListOfValuesDetailsResponseDTO natureOfBreakdown = new ListOfValuesDetailsResponseDTO();
+
+			natureOfBreakdown.setId(vo.getNatureOfBreakdown().getId());
+
+			natureOfBreakdown.setCode(vo.getNatureOfBreakdown().getValueCode());
+
+			natureOfBreakdown.setDescription(vo.getNatureOfBreakdown().getValueDescription());
+
+			response.setNatureOfBreakdown(natureOfBreakdown);
+		}
+
+		/*
+		 * Breakdown Type
+		 */
+		if (vo.getBreakdownType() != null) {
+
+			ListOfValuesDetailsResponseDTO breakdownType = new ListOfValuesDetailsResponseDTO();
+
+			breakdownType.setId(vo.getBreakdownType().getId());
+
+			breakdownType.setCode(vo.getBreakdownType().getValueCode());
+
+			breakdownType.setDescription(vo.getBreakdownType().getValueDescription());
+
+			response.setBreakdownType(breakdownType);
+		}
+
+		/*
+		 * Normal Fields
+		 */
+		response.setMachineToolIdInst(vo.getMachineToolIdInst());
+
+		response.setMachineName(vo.getMachineName());
+
+		response.setLocation(vo.getLocation());
+
+		response.setBreakdownTime(vo.getBreakdownTime());
+
+		response.setReportedTime(vo.getReportedTime());
+
+		response.setReportedDate(vo.getReportedDate());
+
+		response.setNatureOfProblem(vo.getNatureOfProblem());
+
+		response.setEstimatedTime(vo.getEstimatedTime());
+
+		response.setRemarks(vo.getRemarks());
+
+		response.setActive(vo.isActive());
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setImage(vo.getImage());
+
+		/*
+		 * Attachment Response
+		 */
+		List<MachineToolBreakdownAttchmentResponseDTO> attachmentList = new ArrayList<>();
+
+		if (vo.getMachineToolBreakdownAttachmentVO() != null && !vo.getMachineToolBreakdownAttachmentVO().isEmpty()) {
+
+			for (MachineToolBreakdownAttachmentVO attachmentVO : vo.getMachineToolBreakdownAttachmentVO()) {
+
+				MachineToolBreakdownAttchmentResponseDTO attachmentDTO = new MachineToolBreakdownAttchmentResponseDTO();
+
+				attachmentDTO.setId(attachmentVO.getId());
+
+				attachmentDTO.setName(attachmentVO.getName());
+
+				attachmentDTO.setFileName(attachmentVO.getFileName());
+
+				attachmentDTO.setFilePath(attachmentVO.getFilePath());
+
+				attachmentDTO.setFileSize(attachmentVO.getFileSize());
+
+				attachmentDTO.setContentType(attachmentVO.getContentType());
+
+				attachmentDTO.setUploadOn(attachmentVO.getUploadOn());
+
+				attachmentList.add(attachmentDTO);
+			}
+		}
+
+		response.setMachineToolBreakdownAttchmentResponseDTO(attachmentList);
+
+		return response;
+	}
+
+	@Value("${machine.tool.breakdown.upload.path}")
+	private String machineToolBreakdownUploadPath;
+
+	@Override
+	public ResponseEntity<byte[]> viewMachineToolBreakdownFile(HttpServletRequest request) throws IOException {
+
+		return serveMachineToolBreakdownFile(request, "/api/vendorComplaintEntry/machineToolBreakdown/viewFile/",
+				machineToolBreakdownUploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveMachineToolBreakdownFile(HttpServletRequest request, String apiPrefix,
+			String uploadBasePath) throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		/*
+		 * Prevent path traversal
+		 */
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		/*
+		 * File not found
+		 */
+		if (!Files.exists(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+
+	private ResponseEntity<byte[]> serveFile1(HttpServletRequest request, String apiPrefix, String uploadBasePath)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		/*
+		 * Prevent path traversal
+		 */
+		if (!filePath.startsWith(baseDir)) {
+
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		/*
+		 * File not found
+		 */
+		if (!Files.exists(filePath)) {
+
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+
+	private void createDirectory1(Path path) throws IOException {
+
+		if (!Files.exists(path)) {
+
+			Files.createDirectories(path);
+		}
+	}
+
+	@Override
+	public MachineToolBreakdownResponseDTO getMachineToolBreakdownById(Long id) throws ApplicationException {
+
+		MachineToolBreakdownVO machineToolBreakdownVO = machineToolBreakdownRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Machine Tool Breakdown Not Found"));
+
+		return machineToolBreakdownResponse(machineToolBreakdownVO);
+	}
+
+	@Override
+	public List<MachineToolBreakdownResponseDTO> getMachineToolBreakdownByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<MachineToolBreakdownVO> machineToolBreakdownList = machineToolBreakdownRepo.findByOrgIdAndBranchId(orgId,
+				branch);
+
+		List<MachineToolBreakdownResponseDTO> responseList = new ArrayList<>();
+
+		for (MachineToolBreakdownVO machineToolBreakdownVO : machineToolBreakdownList) {
+
+			MachineToolBreakdownResponseDTO response = machineToolBreakdownResponse(machineToolBreakdownVO);
+
+			responseList.add(response);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public String getMachineToolBreakdownDocId(Long orgId, String financialYear) throws ApplicationException {
+
+		String screenCode = "MTB";
+
+		String docId = machineToolBreakdownRepo.getMachineToolBreakdownDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+
+			throw new ApplicationException("Machine Tool Breakdown DocId Not Found");
+		}
+
+		return docId;
+	}
+
+	@Override
+	public List<Map<String, Object>> getMachineToolForBreakdown(Long toolCategoryId, Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> machineToolList = machineToolBreakdownRepo.getMachineToolForBreakdown(toolCategoryId, orgId,
+				branch);
+
+		if (machineToolList == null || machineToolList.isEmpty()) {
+			throw new ApplicationException("No Machine/Tool Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : machineToolList) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("name", obj[0]);
+			map.put("number", obj[1]);
+			map.put("location", obj[2]);
+
+			responseList.add(map);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateMachineToolRectification(MachineToolRectificationDTO dto)
+			throws ApplicationException {
+
+		String screenCode = "MTR";
+
+		MachineToolRectificationVO machineToolRectificationVO;
+		String message;
+
+		if (dto.getId() != null) {
+
+			machineToolRectificationVO = machineToolRectificationRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Machine Tool Rectification Details"));
+
+			machineToolRectificationVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Machine Tool Rectification Updated Successfully";
+
+		} else {
+
+			machineToolRectificationVO = new MachineToolRectificationVO();
+
+			String docId = machineToolRectificationRepo.getMachineToolRectificationDocId(dto.getOrgId(),
+					dto.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Machine Tool Rectification DocId Not Found");
+			}
+
+			machineToolRectificationVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdScreenCode(dto.getOrgId(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			machineToolRectificationVO.setCreatedBy(dto.getCreatedBy());
+
+			machineToolRectificationVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Machine Tool Rectification Created Successfully";
+		}
+
+		createUpdateMachineToolRectificationVO(machineToolRectificationVO, dto);
+
+		machineToolRectificationVO = machineToolRectificationRepo.save(machineToolRectificationVO);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put(CommonConstant.STRING_MESSAGE, message);
+
+		responseObjectsMap.put("machineToolRectificationVO",
+				machineToolRectificationResponse(machineToolRectificationVO));
+
+		return responseObjectsMap;
+	}
+
+	private void createUpdateMachineToolRectificationVO(MachineToolRectificationVO machineToolRectificationVO,
+			MachineToolRectificationDTO dto) throws ApplicationException {
+
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Invalid Branch Details"));
+
+			machineToolRectificationVO.setBranch(branchVO);
+		}
+
+		if (dto.getDepartment() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Invalid Department Details"));
+
+			machineToolRectificationVO.setDepartment(departmentVO);
+		}
+
+		if (dto.getAttendBy() != null) {
+
+			EmployeeMasterVO employeeVO = employeeMasterRepo.findById(dto.getAttendBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Attend By Employee Details"));
+
+			machineToolRectificationVO.setAttendBy(employeeVO);
+		}
+
+		if (dto.getCarriedOutBy() != null) {
+
+			EmployeeMasterVO employeeVO = employeeMasterRepo.findById(dto.getCarriedOutBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Carried Out By Employee Details"));
+
+			machineToolRectificationVO.setCarriedOutBy(employeeVO);
+		}
+
+		if (dto.getPreparedBy() != null) {
+
+			EmployeeMasterVO employeeVO = employeeMasterRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Prepared By Employee Details"));
+
+			machineToolRectificationVO.setPreparedBy(employeeVO);
+		}
+
+		if (dto.getApprovedBy() != null) {
+
+			EmployeeMasterVO employeeVO = employeeMasterRepo.findById(dto.getApprovedBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Approved By Employee Details"));
+
+			machineToolRectificationVO.setApprovedBy(employeeVO);
+		}
+
+		machineToolRectificationVO.setBreakdownNo(dto.getBreakdownNo());
+		machineToolRectificationVO.setBreakdownDate(dto.getBreakdownDate());
+		machineToolRectificationVO.setTime(dto.getTime());
+		machineToolRectificationVO.setMachineToolNo(dto.getMachineToolNo());
+		machineToolRectificationVO.setRectificationTime(dto.getRectificationTime());
+		machineToolRectificationVO.setDescription(dto.getDescription());
+		machineToolRectificationVO.setCause(dto.getCause());
+		machineToolRectificationVO.setMaintenanceType(dto.getMaintenanceType());
+		machineToolRectificationVO.setActionTaken(dto.getActionTaken());
+		machineToolRectificationVO.setNatureOfProblem(dto.getNatureOfProblem());
+		machineToolRectificationVO.setTimeTakenForRectification(dto.getTimeTakenForRectification());
+		machineToolRectificationVO.setLocation(dto.getLocation());
+		machineToolRectificationVO.setSparesUsed(dto.getSparesUsed());
+		machineToolRectificationVO.setRemarks(dto.getRemarks());
+		machineToolRectificationVO.setOrgId(dto.getOrgId());
+		machineToolRectificationVO.setFinancialYear(dto.getFinancialYear());
+		machineToolRectificationVO.setActive(dto.isActive());
+		machineToolRectificationVO.setCancelRemarks(dto.getCancelRemarks());
+	}
+
+	private MachineToolRectificationResponseDTO machineToolRectificationResponse(MachineToolRectificationVO vo) {
+
+		MachineToolRectificationResponseDTO response = new MachineToolRectificationResponseDTO();
+
+		response.setId(vo.getId());
+
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+
+			branchResponseDTO.setId(vo.getBranch().getId());
+			branchResponseDTO.setBranchCode(vo.getBranch().getBranchCode());
+			branchResponseDTO.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponseDTO);
+		}
+
+		if (vo.getDepartment() != null) {
+
+			DepartmentResponseDTO departmentResponseDTO = new DepartmentResponseDTO();
+
+			departmentResponseDTO.setId(vo.getDepartment().getId());
+			departmentResponseDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+			departmentResponseDTO.setDepartmentName(vo.getDepartment().getDepartmentName());
+
+			response.setDepartment(departmentResponseDTO);
+		}
+
+		if (vo.getAttendBy() != null) {
+
+			EmployeeMasterDetailsReponseDTO employeeResponse = new EmployeeMasterDetailsReponseDTO();
+
+			employeeResponse.setId(vo.getAttendBy().getId());
+			employeeResponse.setEmployeeName(vo.getAttendBy().getEmployeeName());
+
+			response.setAttendBy(employeeResponse);
+		}
+
+		if (vo.getCarriedOutBy() != null) {
+
+			EmployeeMasterDetailsReponseDTO employeeResponse = new EmployeeMasterDetailsReponseDTO();
+
+			employeeResponse.setId(vo.getCarriedOutBy().getId());
+			employeeResponse.setEmployeeName(vo.getCarriedOutBy().getEmployeeName());
+
+			response.setCarriedOutBy(employeeResponse);
+		}
+
+		if (vo.getPreparedBy() != null) {
+
+			EmployeeMasterDetailsReponseDTO employeeResponse = new EmployeeMasterDetailsReponseDTO();
+
+			employeeResponse.setId(vo.getPreparedBy().getId());
+			employeeResponse.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+
+			response.setPreparedBy(employeeResponse);
+		}
+
+		if (vo.getApprovedBy() != null) {
+
+			EmployeeMasterDetailsReponseDTO employeeResponse = new EmployeeMasterDetailsReponseDTO();
+
+			employeeResponse.setId(vo.getApprovedBy().getId());
+
+			employeeResponse.setEmployeeName(vo.getApprovedBy().getEmployeeName());
+
+			response.setApprovedBy(employeeResponse);
+		}
+
+		response.setBreakdownNo(vo.getBreakdownNo());
+		response.setBreakdownDate(vo.getBreakdownDate());
+		response.setTime(vo.getTime());
+		response.setMachineToolNo(vo.getMachineToolNo());
+		response.setRectificationTime(vo.getRectificationTime());
+		response.setDescription(vo.getDescription());
+		response.setCause(vo.getCause());
+		response.setMaintenanceType(vo.getMaintenanceType());
+		response.setActionTaken(vo.getActionTaken());
+		response.setNatureOfProblem(vo.getNatureOfProblem());
+		response.setTimeTakenForRectification(vo.getTimeTakenForRectification());
+		response.setLocation(vo.getLocation());
+		response.setSparesUsed(vo.getSparesUsed());
+		response.setRemarks(vo.getRemarks());
+		response.setOrgId(vo.getOrgId());
+		response.setFinancialYear(vo.getFinancialYear());
+		response.setActive(vo.getActive());
+		response.setCancelRemarks(vo.getCancelRemarks());
+		response.setCreatedBy(vo.getCreatedBy());
+
+		return response;
+	}
+
+	@Override
+	public String getMachineToolRectificationDocId(Long orgId, String financialYear) throws ApplicationException {
+
+		String screenCode = "MTR";
+
+		String docId = machineToolRectificationRepo.getMachineToolRectificationDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("Machine Tool Rectification DocId Not Found");
+		}
+
+		return docId;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public MachineToolRectificationResponseDTO getMachineToolRectificationById(Long id) throws ApplicationException {
+
+		MachineToolRectificationVO machineToolRectificationVO = machineToolRectificationRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Machine Tool Rectification Details"));
+
+		return machineToolRectificationResponse(machineToolRectificationVO);
+	}
+
+	@Override
+	@Transactional
+	public List<MachineToolRectificationResponseDTO> getMachineToolRectificationByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<MachineToolRectificationVO> machineToolRectificationList = machineToolRectificationRepo
+				.getMachineToolRectificationByOrgId(orgId, branch);
+
+		if (machineToolRectificationList == null || machineToolRectificationList.isEmpty()) {
+
+			throw new ApplicationException("No Machine Tool Rectification Details Found");
+		}
+
+		List<MachineToolRectificationResponseDTO> responseList = new ArrayList<>();
+
+		for (MachineToolRectificationVO machineToolRectificationVO : machineToolRectificationList) {
+
+			MachineToolRectificationResponseDTO response = machineToolRectificationResponse(machineToolRectificationVO);
+
+			responseList.add(response);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getBreakdownDetailsForRectification(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<Object[]> breakdownList = machineToolRectificationRepo.getBreakdownDetailsForRectification(orgId, branch);
+
+		if (breakdownList == null || breakdownList.isEmpty()) {
+			throw new ApplicationException("No Breakdown Details Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : breakdownList) {
+
+			Map<String, Object> breakdownMap = new HashMap<>();
+
+			breakdownMap.put("id", obj[0]);
+			breakdownMap.put("breakdownNo", obj[1]);
+			breakdownMap.put("breakdownDate", obj[2]);
+			breakdownMap.put("time", obj[3]);
+			breakdownMap.put("machineToolNo", obj[4]);
+			breakdownMap.put("description", obj[5]);
+			breakdownMap.put("maintenanceType", obj[6]);
+			breakdownMap.put("natureOfProblem", obj[7]);
+			breakdownMap.put("timeTakenForRectification", obj[8]);
+			breakdownMap.put("location", obj[9]);
+
+			responseList.add(breakdownMap);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getPrepareByForMachineToolRectification(Long orgId, Long branch, Long department)
+			throws ApplicationException {
+
+		List<Object[]> employeeList = machineToolRectificationRepo.getPrepareByForMachineToolRectification(orgId,
+				branch, department);
+
+		if (employeeList == null || employeeList.isEmpty()) {
+			throw new ApplicationException("No Prepare By Employee Found");
+		}
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : employeeList) {
+
+			Map<String, Object> employeeMap = new HashMap<>();
+
+			employeeMap.put("id", obj[0]);
+			employeeMap.put("employeeId", obj[1]);
+			employeeMap.put("name", obj[2]);
+
+			responseList.add(employeeMap);
+		}
+
+		return responseList;
+	}
+
+//	Authorization for breakdown
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateAuthorizationForBreakdown(AuthorizationForBreakdownDTO dto)
+			throws ApplicationException {
+
+		String screenCode = "AUFBR";
+
+		AuthorizationForBreakdownVO authorizationForBreakdownVO;
+		String message;
+
+		if (dto.getId() != null) {
+
+			authorizationForBreakdownVO = authorizationForBreakdownRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Authorization For Breakdown Details"));
+
+			authorizationForBreakdownVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Authorization For Breakdown Updated Successfully";
+
+		} else {
+
+			authorizationForBreakdownVO = new AuthorizationForBreakdownVO();
+
+			String docId = authorizationForBreakdownRepo.getAuthorizationForBreakdownDocId(dto.getOrgId(),
+					dto.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Authorization For Breakdown DocId Not Found");
+			}
+
+			authorizationForBreakdownVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdScreenCode(dto.getOrgId(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			authorizationForBreakdownVO.setCreatedBy(dto.getCreatedBy());
+
+			authorizationForBreakdownVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Authorization For Breakdown Created Successfully";
+		}
+
+		createUpdateAuthorizationForBreakdownVO(authorizationForBreakdownVO, dto);
+
+		authorizationForBreakdownVO = authorizationForBreakdownRepo.save(authorizationForBreakdownVO);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put(CommonConstant.STRING_MESSAGE, message);
+
+		responseObjectsMap.put("docId", authorizationForBreakdownVO.getDocId());
+
+		responseObjectsMap.put("docDate", authorizationForBreakdownVO.getDocDate());
+
+		responseObjectsMap.put("authorizationForBreakdownVO",
+				authorizationForBreakdownResponse(authorizationForBreakdownVO));
+
+		return responseObjectsMap;
+	}
+
+	private void createUpdateAuthorizationForBreakdownVO(AuthorizationForBreakdownVO authorizationForBreakdownVO,
+			AuthorizationForBreakdownDTO dto) throws ApplicationException {
+
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Invalid Branch Details"));
+
+			authorizationForBreakdownVO.setBranch(branchVO);
+		}
+
+		if (dto.getDepartment() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Invalid Department Details"));
+
+			authorizationForBreakdownVO.setDepartment(departmentVO);
+		}
+
+		if (dto.getAuthorizedBy() != null) {
+
+			EmployeeMasterVO employeeVO = employeeMasterRepo.findById(dto.getAuthorizedBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Authorized By Employee Details"));
+
+			authorizationForBreakdownVO.setAuthorizedBy(employeeVO);
+		}
+
+		authorizationForBreakdownVO.setRectificationNo(dto.getRectificationNo());
+
+		authorizationForBreakdownVO.setRectificationDate(dto.getRectificationDate());
+
+		authorizationForBreakdownVO.setBreakdownNo(dto.getBreakdownNo());
+
+		authorizationForBreakdownVO.setBreakdownDate(dto.getBreakdownDate());
+
+		authorizationForBreakdownVO.setWorking(dto.getWorking());
+
+		authorizationForBreakdownVO.setProblem(dto.getProblem());
+
+		authorizationForBreakdownVO.setSolution(dto.getSolution());
+
+		authorizationForBreakdownVO.setMachineNo(dto.getMachineNo());
+
+		authorizationForBreakdownVO.setRectifiedTime(dto.getRectifiedTime());
+
+		authorizationForBreakdownVO.setReasonIfNo(dto.getReasonIfNo());
+
+		authorizationForBreakdownVO.setOrgId(dto.getOrgId());
+
+		authorizationForBreakdownVO.setFinancialYear(dto.getFinancialYear());
+
+		authorizationForBreakdownVO.setActive(dto.isActive());
+
+		authorizationForBreakdownVO.setCancelRemarks(dto.getCancelRemarks());
+	}
+
+	private AuthorizationForBreakdownResponseDTO authorizationForBreakdownResponse(AuthorizationForBreakdownVO vo) {
+
+		AuthorizationForBreakdownResponseDTO response = new AuthorizationForBreakdownResponseDTO();
+
+		response.setId(vo.getId());
+
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+
+			branchResponseDTO.setId(vo.getBranch().getId());
+
+			branchResponseDTO.setBranchCode(vo.getBranch().getBranchCode());
+
+			branchResponseDTO.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponseDTO);
+		}
+
+		if (vo.getDepartment() != null) {
+
+			DepartmentResponseDTO departmentResponseDTO = new DepartmentResponseDTO();
+
+			departmentResponseDTO.setId(vo.getDepartment().getId());
+
+			departmentResponseDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+
+			departmentResponseDTO.setDepartmentName(vo.getDepartment().getDepartmentName());
+
+			response.setDepartment(departmentResponseDTO);
+		}
+
+		if (vo.getAuthorizedBy() != null) {
+
+			EmployeeResponseDTO employeeResponse = new EmployeeResponseDTO();
+
+			employeeResponse.setId(vo.getAuthorizedBy().getId());
+			employeeResponse.setEmployeeName(vo.getAuthorizedBy().getEmployeeName());
+
+			response.setAuthorizedBy(employeeResponse);
+		}
+
+		response.setRectificationNo(vo.getRectificationNo());
+
+		response.setRectificationDate(vo.getRectificationDate());
+
+		response.setBreakdownNo(vo.getBreakdownNo());
+
+		response.setBreakdownDate(vo.getBreakdownDate());
+
+		response.setWorking(vo.getWorking());
+
+		response.setProblem(vo.getProblem());
+
+		response.setSolution(vo.getSolution());
+
+		response.setMachineNo(vo.getMachineNo());
+
+		response.setRectifiedTime(vo.getRectifiedTime());
+
+		response.setReasonIfNo(vo.getReasonIfNo());
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setActive(vo.getActive());
+
+		response.setCancelRemarks(vo.getCancelRemarks());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		return response;
+	}
+
+	@Override
+	public String getAuthorizationForBreakdownDocId(Long orgId, String financialYear) throws ApplicationException {
+
+		String screenCode = "AUFBR";
+
+		String docId = authorizationForBreakdownRepo.getAuthorizationForBreakdownDocId(orgId, financialYear,
+				screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("Authorization For Breakdown DocId Not Found");
+		}
+
+		return docId;
+	}
+
+	@Override
+	public AuthorizationForBreakdownResponseDTO getAuthorizationForBreakdownById(Long id) throws ApplicationException {
+
+		AuthorizationForBreakdownVO authorizationForBreakdownVO = authorizationForBreakdownRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Authorization For Breakdown Details"));
+
+		return authorizationForBreakdownResponse(authorizationForBreakdownVO);
+	}
+
+	@Override
+	public List<AuthorizationForBreakdownResponseDTO> getAuthorizationForBreakdownByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<AuthorizationForBreakdownVO> authorizationForBreakdownList = authorizationForBreakdownRepo
+				.findByOrgIdAndBranchId(orgId, branch);
+
+		List<AuthorizationForBreakdownResponseDTO> responseList = new ArrayList<>();
+
+		for (AuthorizationForBreakdownVO authorizationForBreakdownVO : authorizationForBreakdownList) {
+
+			responseList.add(authorizationForBreakdownResponse(authorizationForBreakdownVO));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getMachineToolRectificationDetailsForAuthorizationBreakdown(Long branch,
+			Long orgId) throws ApplicationException {
+
+		List<Object[]> machineToolRectificationList = authorizationForBreakdownRepo
+				.getMachineToolRectificationDetails(branch, orgId);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] row : machineToolRectificationList) {
+
+			Map<String, Object> response = new HashMap<>();
+
+			response.put("docId", row[0]);
+			response.put("docDate", row[1]);
+			response.put("breakdownNo", row[2]);
+			response.put("breakdownDate", row[3]);
+			response.put("natureOfProblem", row[4]);
+			response.put("actionTaken", row[5]);
+			response.put("rectificationTime", row[6]);
+			response.put("machineToolNo", row[7]);
+
+			responseList.add(response);
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public String getPMCheckListMasterDocId(Long orgId, String financialYear) throws ApplicationException {
+
+		String screenCode = "PMCLM";
+
+		String docId = pmCheckListMasterRepo.getPMCheckListMasterDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("PM Check List Master DocId Not Found");
+		}
+
+		return docId;
+	}
+
+//	MachineToolsScrapNote 
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateMachineToolsScrapNote(MachineToolsScrapNoteDTO machineToolsScrapNoteDTO,
+			MultipartFile[] files) throws ApplicationException {
+
+		MachineToolsScrapNoteVO machineToolsScrapNoteVO;
+		String message;
+
+		/*
+		 * Update
+		 */
+		if (ObjectUtils.isNotEmpty(machineToolsScrapNoteDTO.getId())) {
+
+			machineToolsScrapNoteVO = machineToolsScrapNoteRepo.findById(machineToolsScrapNoteDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Machine Tools Scrap Note"));
+
+			machineToolsScrapNoteVO.setUpdatedBy(machineToolsScrapNoteDTO.getCreatedBy());
+
+			message = "Machine Tools Scrap Note Updated Successfully";
+		}
+
+		/*
+		 * Create
+		 */
+		else {
+
+			machineToolsScrapNoteVO = new MachineToolsScrapNoteVO();
+
+			String screenCode = "MTSN";
+
+			String docId = machineToolsScrapNoteRepo.getMachineToolsScrapNoteDocId(machineToolsScrapNoteDTO.getOrgId(),
+					machineToolsScrapNoteDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+
+				throw new ApplicationException("Machine Tools Scrap Note DocId Not Found");
+			}
+
+			machineToolsScrapNoteVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO mapping = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+					machineToolsScrapNoteDTO.getOrgId(), machineToolsScrapNoteDTO.getFinancialYear(), screenCode);
+
+			if (mapping == null) {
+
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			mapping.setLastNo(mapping.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(mapping);
+
+			machineToolsScrapNoteVO.setCreatedBy(machineToolsScrapNoteDTO.getCreatedBy());
+
+			machineToolsScrapNoteVO.setUpdatedBy(machineToolsScrapNoteDTO.getCreatedBy());
+
+			message = "Machine Tools Scrap Note Created Successfully";
+		}
+
+		/*
+		 * Set Machine Tools Scrap Note values
+		 */
+		createUpdateMachineToolsScrapNoteVO(machineToolsScrapNoteDTO, machineToolsScrapNoteVO);
+
+		/*
+		 * Save Main VO first
+		 */
+		machineToolsScrapNoteVO = machineToolsScrapNoteRepo.save(machineToolsScrapNoteVO);
+
+		/*
+		 * Save Details
+		 */
+		saveMachineToolsScrapNoteDetails(machineToolsScrapNoteDTO.getMachineToolsScrapNoteDetailsDTO(),
+				machineToolsScrapNoteVO);
+
+		/*
+		 * Save Attachments
+		 */
+		saveMachineToolsScrapNoteAttachments(files, machineToolsScrapNoteVO);
+
+		/*
+		 * Response
+		 */
+		MachineToolsScrapNoteResponseDTO responseDTO = machineToolsScrapNoteResponse(machineToolsScrapNoteVO);
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("message", message);
+
+		response.put("machineToolsScrapNoteVO", responseDTO);
+
+		return response;
+	}
+
+	/*
+	 * ============================================================ SET MACHINE
+	 * TOOLS SCRAP NOTE VALUES
+	 * ============================================================
+	 */
+
+	private void createUpdateMachineToolsScrapNoteVO(MachineToolsScrapNoteDTO dto, MachineToolsScrapNoteVO vo)
+			throws ApplicationException {
+
+		/*
+		 * Branch
+		 */
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branchVO);
+		}
+
+		/*
+		 * Belongs To
+		 */
+		if (dto.getBelongsTo() != null) {
+
+			ListOfValuesDetailsVO belongsTo = listOfValuesDetailsRepo.findById(dto.getBelongsTo())
+					.orElseThrow(() -> new ApplicationException("Belongs To Not Found"));
+
+			vo.setBelongsTo(belongsTo);
+		}
+
+		/*
+		 * Department
+		 */
+		if (dto.getDepartement() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartement())
+					.orElseThrow(() -> new ApplicationException("Department Not Found"));
+
+			vo.setDepartement(departmentVO);
+		}
+
+		/*
+		 * From Location
+		 */
+		if (dto.getFromLocation() != null) {
+
+			LocationVO fromLocation = locationRepo.findById(dto.getFromLocation())
+					.orElseThrow(() -> new ApplicationException("From Location Not Found"));
+
+			vo.setFromLocation(fromLocation);
+		}
+
+		/*
+		 * To Location
+		 */
+		if (dto.getToLocation() != null) {
+
+			LocationVO toLocation = locationRepo.findById(dto.getToLocation())
+					.orElseThrow(() -> new ApplicationException("To Location Not Found"));
+
+			vo.setToLocation(toLocation);
+		}
+
+		/*
+		 * Prepared By
+		 */
+		if (dto.getPreparedBy() != null) {
+
+			EmployeeMasterVO preparedBy = employeeMasterRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Prepared By Employee Not Found"));
+
+			vo.setPreparedBy(preparedBy);
+		}
+
+		/*
+		 * Authorized By
+		 */
+		if (dto.getAuthorizedBy() != null) {
+
+			EmployeeMasterVO authorizedBy = employeeMasterRepo.findById(dto.getAuthorizedBy())
+					.orElseThrow(() -> new ApplicationException("Authorized By Employee Not Found"));
+
+			vo.setAuthorizedBy(authorizedBy);
+		}
+
+		/*
+		 * Normal Fields
+		 */
+		vo.setTime(dto.getTime());
+
+		vo.setProductionApproval(dto.getProductionApproval());
+
+		vo.setQualityApproval(dto.getQualityApproval());
+
+		vo.setStoreApproval(dto.getStoreApproval());
+
+		vo.setNarration(dto.getNarration());
+
+		vo.setOrgId(dto.getOrgId());
+
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		vo.setActive(dto.isActive());
+
+		vo.setCancelRemarks(dto.getCancelRemarks());
+	}
+
+	/*
+	 * ============================================================ SAVE DETAILS
+	 * ============================================================
+	 */
+
+	private void saveMachineToolsScrapNoteDetails(List<MachineToolsScrapNoteDetailsDTO> detailsDTOList,
+			MachineToolsScrapNoteVO machineToolsScrapNoteVO) throws ApplicationException {
+
+		if (detailsDTOList == null || detailsDTOList.isEmpty()) {
+
+			return;
+		}
+
+		List<MachineToolsScrapNoteDetailsVO> detailsList = new ArrayList<>();
+
+		for (MachineToolsScrapNoteDetailsDTO dto : detailsDTOList) {
+
+			MachineToolsScrapNoteDetailsVO detailsVO = new MachineToolsScrapNoteDetailsVO();
+
+			/*
+			 * Item
+			 */
+			if (dto.getItem() != null) {
+
+				ItemMasterVO itemVO = itemRepo.findById(dto.getItem())
+						.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+				detailsVO.setItem(itemVO);
+			}
+
+			/*
+			 * Normal Fields
+			 */
+			detailsVO.setStock(dto.getStock());
+
+			detailsVO.setQuantity(dto.getQuantity());
+
+			detailsVO.setRate(dto.getRate());
+
+			// Quantity * Rate = Value
+			if (detailsVO.getQuantity() != null && detailsVO.getRate() != null) {
+
+				BigDecimal value = detailsVO.getQuantity().multiply(detailsVO.getRate());
+
+				detailsVO.setValue(value);
+
+			} else {
+
+				detailsVO.setValue(BigDecimal.ZERO);
+			}
+
+			/*
+			 * Parent
+			 */
+			detailsVO.setMachineToolsScrapNoteVO(machineToolsScrapNoteVO);
+
+			detailsList.add(detailsVO);
+		}
+
+		/*
+		 * Save Details
+		 */
+		machineToolsScrapNoteDetailsRepo.saveAll(detailsList);
+
+		machineToolsScrapNoteVO.setMachineToolsScrapNoteDetailsVO(detailsList);
+	}
+
+	/*
+	 * ============================================================ SAVE CHILD
+	 * ATTACHMENTS ============================================================
+	 */
+
+	@Value("${machine.tools.scrap.note.upload.path}")
+	private String machineToolsScrapNoteUploadPath;
+
+	private void saveMachineToolsScrapNoteAttachments(MultipartFile[] files,
+			MachineToolsScrapNoteVO machineToolsScrapNoteVO) throws ApplicationException {
+
+		if (files == null || files.length == 0) {
+			return;
+		}
+
+		try {
+
+			/*
+			 * Create folder
+			 */
+			Path machineToolsScrapNoteFolder = Paths.get(machineToolsScrapNoteUploadPath, "machine-tools-scrap-note",
+					machineToolsScrapNoteVO.getId().toString());
+
+			createDirectory(machineToolsScrapNoteFolder);
+
+			List<MachineToolScrapNoteAttachmentVO> attachmentList = new ArrayList<>();
+
+			for (MultipartFile file : files) {
+
+				if (file == null || file.isEmpty()) {
+					continue;
+				}
+
+				/*
+				 * Get original file name
+				 */
+				String originalName = file.getOriginalFilename();
+
+				if (originalName == null) {
+					originalName = "file";
+				}
+
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+
+					extension = originalName.substring(originalName.lastIndexOf("."));
+
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				/*
+				 * Create unique file name
+				 */
+				String fileName = originalName + "_" + machineToolsScrapNoteVO.getId() + extension;
+
+				/*
+				 * Actual physical file path
+				 */
+				Path filePath = machineToolsScrapNoteFolder.resolve(fileName);
+
+				/*
+				 * Save file to disk
+				 */
+				try (InputStream inputStream = file.getInputStream()) {
+
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				/*
+				 * Create URL
+				 */
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/vendorComplaintEntry/machineToolsScrapNote/viewFile/").toUriString();
+
+				String relativePath = "machine-tools-scrap-note/" + machineToolsScrapNoteVO.getId() + "/" + fileName;
+
+				String publicUrl = baseUrl + relativePath;
+
+				/*
+				 * Save Attachment Details
+				 */
+				MachineToolScrapNoteAttachmentVO attachment = new MachineToolScrapNoteAttachmentVO();
+
+				attachment.setMachineToolsScrapNoteVO(machineToolsScrapNoteVO);
+
+				attachment.setName(file.getOriginalFilename());
+
+				attachment.setFileName(fileName);
+
+				attachment.setFilePath(publicUrl);
+
+				attachment.setFileSize(file.getSize());
+
+				attachment.setContentType(file.getContentType());
+
+				attachment.setUploadOn(LocalDateTime.now());
+
+				attachmentList.add(attachment);
+			}
+
+			/*
+			 * Save Attachment Records
+			 */
+			if (!attachmentList.isEmpty()) {
+
+				List<MachineToolScrapNoteAttachmentVO> saved = machineToolScrapNoteAttachmentRepo
+						.saveAll(attachmentList);
+
+				machineToolsScrapNoteVO.setMachineToolScrapNoteAttachmentVO(saved);
+			}
+
+		} catch (IOException e) {
+
+			throw new ApplicationException("File Upload Failed : " + e.getMessage());
+		}
+	}
+
+	/*
+	 * ============================================================ RESPONSE
+	 * ============================================================
+	 */
+
+	private MachineToolsScrapNoteResponseDTO machineToolsScrapNoteResponse(MachineToolsScrapNoteVO vo) {
+
+		MachineToolsScrapNoteResponseDTO response = new MachineToolsScrapNoteResponseDTO();
+
+		response.setId(vo.getId());
+
+		// Branch Response
+		if (vo.getBranch() != null) {
+			BranchResponseDTO branchResponse = new BranchResponseDTO();
+
+			branchResponse.setId(vo.getBranch().getId());
+			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+			branchResponse.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponse);
+		}
+
+		// Belongs To Response
+		if (vo.getBelongsTo() != null) {
+			ListOfValuesDetailsResponseDTO belongsTo = new ListOfValuesDetailsResponseDTO();
+
+			belongsTo.setId(vo.getBelongsTo().getId());
+			belongsTo.setCode(vo.getBelongsTo().getValueCode());
+			belongsTo.setDescription(vo.getBelongsTo().getValueDescription());
+
+			response.setBelongsTo(belongsTo);
+		}
+
+		// Department Response
+		if (vo.getDepartement() != null) {
+			DepartmentResponseDTO departmentResponse = new DepartmentResponseDTO();
+
+			departmentResponse.setId(vo.getDepartement().getId());
+			departmentResponse.setDepartmentCode(vo.getDepartement().getDepartmentCode());
+			departmentResponse.setDepartmentName(vo.getDepartement().getDepartmentName());
+
+			response.setDepartement(departmentResponse);
+		}
+
+		// From Location Response
+		if (vo.getFromLocation() != null) {
+			LocationMasterResponseDTO fromLocation = new LocationMasterResponseDTO();
+
+			fromLocation.setId(vo.getFromLocation().getId());
+			fromLocation.setLocationName(vo.getFromLocation().getLocationName());
+
+			response.setFromLocation(fromLocation);
+		}
+
+		// To Location Response
+		if (vo.getToLocation() != null) {
+			LocationMasterResponseDTO toLocation = new LocationMasterResponseDTO();
+
+			toLocation.setId(vo.getToLocation().getId());
+			toLocation.setLocationName(vo.getToLocation().getLocationName());
+
+			response.setToLocation(toLocation);
+		}
+
+		// Prepared By Response
+		if (vo.getPreparedBy() != null) {
+			EmployeeMasterResponseDetailsDTO preparedBy = new EmployeeMasterResponseDetailsDTO();
+
+			preparedBy.setId(vo.getPreparedBy().getId());
+			preparedBy.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+
+			response.setPreparedBy(preparedBy);
+		}
+
+		// Authorized By Response
+		if (vo.getAuthorizedBy() != null) {
+			EmployeeMasterResponseDetailsDTO authorizedBy = new EmployeeMasterResponseDetailsDTO();
+
+			authorizedBy.setId(vo.getAuthorizedBy().getId());
+			authorizedBy.setEmployeeName(vo.getAuthorizedBy().getEmployeeName());
+
+			response.setAuthorizedBy(authorizedBy);
+		}
+
+		// Normal Fields
+		response.setTime(vo.getTime());
+		response.setProductionApproval(vo.getProductionApproval());
+		response.setQualityApproval(vo.getQualityApproval());
+		response.setStoreApproval(vo.getStoreApproval());
+		response.setNarration(vo.getNarration());
+		response.setOrgId(vo.getOrgId());
+		response.setFinancialYear(vo.getFinancialYear());
+		response.setActive(vo.getActive());
+		response.setCancelRemarks(vo.getCancelRemarks());
+		response.setCreatedBy(vo.getCreatedBy());
+
+		// Details Response
+		List<MachineToolsScrapNoteDetailsResponseDTO> detailsList = new ArrayList<>();
+
+		if (vo.getMachineToolsScrapNoteDetailsVO() != null && !vo.getMachineToolsScrapNoteDetailsVO().isEmpty()) {
+
+			for (MachineToolsScrapNoteDetailsVO detailsVO : vo.getMachineToolsScrapNoteDetailsVO()) {
+
+				MachineToolsScrapNoteDetailsResponseDTO detailsResponse = new MachineToolsScrapNoteDetailsResponseDTO();
+
+				if (detailsVO.getItem() != null) {
+
+					ItemResponse1DTO itemResponse = new ItemResponse1DTO();
+
+					itemResponse.setId(detailsVO.getItem().getId());
+					itemResponse.setItemCode(detailsVO.getItem().getItemCode());
+					itemResponse.setItemDescription(detailsVO.getItem().getItemDescription());
+
+					detailsResponse.setItem(itemResponse);
+				}
+
+				detailsResponse.setStock(detailsVO.getStock());
+				detailsResponse.setQuantity(detailsVO.getQuantity());
+				detailsResponse.setRate(detailsVO.getRate());
+				detailsResponse.setValue(detailsVO.getValue());
+
+				detailsList.add(detailsResponse);
+			}
+		}
+
+		response.setMachineToolsScrapNoteDetailsResponseDTO(detailsList);
+
+		// Attachment Response
+		List<MachineToolScrapNoteAttachmentResponseDTO> attachmentList = new ArrayList<>();
+
+		if (vo.getMachineToolScrapNoteAttachmentVO() != null && !vo.getMachineToolScrapNoteAttachmentVO().isEmpty()) {
+
+			for (MachineToolScrapNoteAttachmentVO attachmentVO : vo.getMachineToolScrapNoteAttachmentVO()) {
+
+				MachineToolScrapNoteAttachmentResponseDTO attachmentDTO = new MachineToolScrapNoteAttachmentResponseDTO();
+
+				attachmentDTO.setId(attachmentVO.getId());
+				attachmentDTO.setName(attachmentVO.getName());
+				attachmentDTO.setFileName(attachmentVO.getFileName());
+				attachmentDTO.setFilePath(attachmentVO.getFilePath());
+				attachmentDTO.setFileSize(attachmentVO.getFileSize());
+				attachmentDTO.setContentType(attachmentVO.getContentType());
+				attachmentDTO.setUploadOn(attachmentVO.getUploadOn());
+
+				attachmentList.add(attachmentDTO);
+			}
+		}
+
+		response.setMachineToolsScrapNoteAttachmentResponseDTO(attachmentList);
+
+		return response;
+	}
+
+	/*
+	 * / ============================================================ VIEW FILE
+	 * ============================================================
+	 */
+
+	@Override
+	public ResponseEntity<byte[]> viewMachineToolsScrapNoteFile(HttpServletRequest request) throws IOException {
+
+		return serveMachineToolsScrapNoteFile(request, "/api/vendorComplaintEntry/machineToolsScrapNote/viewFile/",
+				machineToolsScrapNoteUploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveMachineToolsScrapNoteFile(HttpServletRequest request, String apiPrefix,
+			String uploadBasePath) throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		/*
+		 * Prevent path traversal
+		 */
+		if (!filePath.startsWith(baseDir)) {
+
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		/*
+		 * File not found
+		 */
+		if (!Files.exists(filePath)) {
+
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+
+	/*
+	 * ============================================================ CREATE DIRECTORY
+	 * ============================================================
+	 */
+
+	private void createDirectory11(Path path) throws IOException {
+
+		if (!Files.exists(path)) {
+
+			Files.createDirectories(path);
+		}
+	}
+
+	@Override
+	public String getMachineToolsScrapNoteDocId(Long orgId, String financialYear) throws ApplicationException {
+
+		String screenCode = "MTSN";
+
+		String docId = machineToolsScrapNoteRepo.getMachineToolsScrapNoteDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+
+			throw new ApplicationException("Machine Tools Scrap Note DocId Not Found");
+		}
+
+		return docId;
+	}
+
+	@Override
+	public Map<String, Object> getMachineToolsScrapNoteById(Long id) throws ApplicationException {
+
+		MachineToolsScrapNoteVO machineToolsScrapNoteVO = machineToolsScrapNoteRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Machine Tools Scrap Note Details"));
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("machineToolsScrapNoteVO", machineToolsScrapNoteResponse(machineToolsScrapNoteVO));
+
+		return responseObjectsMap;
+	}
+
+	@Override
+	public List<MachineToolsScrapNoteResponseDTO> getMachineToolsScrapNoteByOrgId(Long orgId,Long branch)
+			throws ApplicationException {
+
+		List<MachineToolsScrapNoteVO> machineToolsScrapNoteList = machineToolsScrapNoteRepo
+				.getMachineToolsScrapNoteByOrgId(orgId,branch);
+
+		List<MachineToolsScrapNoteResponseDTO> responseList = new ArrayList<>();
+
+		for (MachineToolsScrapNoteVO machineToolsScrapNoteVO : machineToolsScrapNoteList) {
+
+			responseList.add(machineToolsScrapNoteResponse(machineToolsScrapNoteVO));
+		}
+
+		return responseList;
 	}
 }

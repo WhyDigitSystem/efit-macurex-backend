@@ -1034,7 +1034,7 @@ public class DevelopController extends BaseController {
 	}
 
 	@GetMapping("/getPurchaseOrderAmendmentItemCodeDropdown")
-	public ResponseEntity<ResponseDTO> getPurchaseOrderAmendmentItemCodeDropdown(@RequestParam String docId,
+	public ResponseEntity<ResponseDTO> getPurchaseOrderAmendmentItemCodeDropdown(@RequestParam String purchaseOrderNumber,
 			@RequestParam Long branch, @RequestParam Long orgId) {
 
 		String methodName = "getPurchaseOrderAmendmentItemCodeDropdown()";
@@ -1051,7 +1051,7 @@ public class DevelopController extends BaseController {
 
 		try {
 
-			itemList = developService.getPurchaseOrderAmendmentItemCodeDropdown(docId, branch, orgId);
+			itemList = developService.getPurchaseOrderAmendmentItemCodeDropdown(purchaseOrderNumber,branch,orgId);
 
 		} catch (Exception e) {
 

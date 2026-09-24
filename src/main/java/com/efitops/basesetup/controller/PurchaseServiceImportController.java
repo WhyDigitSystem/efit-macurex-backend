@@ -28,10 +28,14 @@ import com.efitops.basesetup.ResponseDTO.DirectPurchaseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FgTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialIndentForProductionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialTransferReturnNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionBulkIssueResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionIssueResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProductionSchOrderShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionTransferSlipResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderDeliveryScheduleShortCloseResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ScrapNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
@@ -42,11 +46,15 @@ import com.efitops.basesetup.dto.FgTransferSlipDTO;
 import com.efitops.basesetup.dto.MaterialIndentForProductionDTO;
 import com.efitops.basesetup.dto.MaterialTransferReturnNoteDTO;
 import com.efitops.basesetup.dto.PoType;
+import com.efitops.basesetup.dto.ProductionBulkIssueDTO;
+import com.efitops.basesetup.dto.ProductionIssueDTO;
+import com.efitops.basesetup.dto.ProductionSchOrderShortCloseDTO;
 import com.efitops.basesetup.dto.ProductionScheduleOrderDTO;
 import com.efitops.basesetup.dto.ProductionTransferSlipDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDTO;
 import com.efitops.basesetup.dto.PurchaseOrderDeliveryScheduleShortCloseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
+import com.efitops.basesetup.dto.ScrapNoteDTO;
 import com.efitops.basesetup.dto.StockTransferDTO;
 import com.efitops.basesetup.service.PurchaseServiceImport;
 
@@ -2826,6 +2834,1039 @@ public class PurchaseServiceImportController extends BaseController {
 
 			responseDTO = createServiceResponseError(responseObjectsMap,
 					"Failed to retrieve Schedule number item details", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// Note
+
+	@GetMapping("/getScrapNoteById")
+	public ResponseEntity<ResponseDTO> getScrapNoteById(@RequestParam Long id) {
+
+		String methodName = "getScrapNoteById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ScrapNoteResponseDTO scrapNoteResponseDTO = purchaseOrderService.getScrapNoteById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Scrap Note information retrieved successfully");
+
+			responseObjectsMap.put("scrapNoteResponseVO", scrapNoteResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Scrap Note retrieval failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getScrapNoteDocId")
+	public ResponseEntity<ResponseDTO> getScrapNoteDocId(@RequestParam Long orgId, @RequestParam String financialYear) {
+
+		String methodName = "getScrapNoteDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = purchaseOrderService.getScrapNoteDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Scrap Note DocId information retrieved successfully");
+
+			responseObjectsMap.put("scrapNoteDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Scrap Note DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping("/createUpdateScrapNote")
+	public ResponseEntity<ResponseDTO> createUpdateScrapNote(@RequestBody ScrapNoteDTO scrapNoteDTO) {
+
+		String methodName = "createUpdateScrapNote()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> scrapNoteVO = purchaseOrderService.createUpdateScrapNote(scrapNoteDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, scrapNoteVO.get("message"));
+
+			responseObjectsMap.put("scrapNoteVO", scrapNoteVO.get("scrapNoteVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getScrapNoteByOrgId")
+	public ResponseEntity<ResponseDTO> getScrapNoteByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getScrapNoteByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<ScrapNoteResponseDTO> scrapNoteResponseDTO = purchaseOrderService.getScrapNoteByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Scrap Note information retrieved successfully");
+
+			responseObjectsMap.put("scrapNoteResponseVO", scrapNoteResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Scrap Note information retrieval failed",
+					e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getSchNoFromScrapNote")
+	public ResponseEntity<ResponseDTO> getSchNoFromScrapNote(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getSchNoFromScrapNote()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getSchNoFromScrapNote(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "schNo retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve schNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getScrapPartNo")
+	public ResponseEntity<ResponseDTO> getScrapPartNo(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getScrapPartNo()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getScrapPartNo(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "scrapPartNo retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve scrapPartNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getBomNoFromScrapNote")
+	public ResponseEntity<ResponseDTO> getBomNoFromScrapNote(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getBomNoFromScrapNote()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getBomNoFromScrapNote(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "bomNo retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve bomNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getScrapNoteItemDetails")
+	public ResponseEntity<ResponseDTO> getScrapNoteItemDetails(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long bom) {
+
+		String methodName = "getScrapNoteItemDetails()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getScrapNoteItemDetails(orgId, branch, bom);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "scrapNoteItemDetails retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve scrapNoteItemDetails",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	//
+
+	@GetMapping("/getProductionSchOrderShortCloseById")
+	public ResponseEntity<ResponseDTO> getProductionSchOrderShortCloseById(@RequestParam Long id) {
+
+		String methodName = "getProductionSchOrderShortCloseById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ProductionSchOrderShortCloseResponseDTO productionSchOrderShortCloseResponseDTO = purchaseOrderService
+					.getProductionSchOrderShortCloseById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Schedule Order Short Close information retrieved successfully");
+
+			responseObjectsMap.put("productionSchOrderShortCloseResponseVO", productionSchOrderShortCloseResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Production Schedule Order Short Close retrieval failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getProductionSchOrderShortCloseDocId")
+	public ResponseEntity<ResponseDTO> getProductionSchOrderShortCloseDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getProductionSchOrderShortCloseDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = purchaseOrderService.getProductionSchOrderShortCloseDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Schedule Order Short Close DocId information retrieved successfully");
+
+			responseObjectsMap.put("productionSchOrderShortCloseDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Production Schedule Order Short Close DocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping("/createUpdateProductionSchOrderShortClose")
+	public ResponseEntity<ResponseDTO> createUpdateProductionSchOrderShortClose(
+			@RequestBody ProductionSchOrderShortCloseDTO productionSchOrderShortCloseDTO) {
+
+		String methodName = "createUpdateProductionSchOrderShortClose()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> productionSchOrderShortCloseVO = purchaseOrderService
+					.createUpdateProductionSchOrderShortClose(productionSchOrderShortCloseDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, productionSchOrderShortCloseVO.get("message"));
+
+			responseObjectsMap.put("productionSchOrderShortCloseVO",
+					productionSchOrderShortCloseVO.get("productionSchOrderShortCloseVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getProductionSchOrderShortCloseByOrgId")
+	public ResponseEntity<ResponseDTO> getProductionSchOrderShortCloseByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getProductionSchOrderShortCloseByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<ProductionSchOrderShortCloseResponseDTO> productionSchOrderShortCloseResponseDTO = purchaseOrderService
+					.getProductionSchOrderShortCloseByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Schedule Order Short Close information retrieved successfully");
+
+			responseObjectsMap.put("productionSchOrderShortCloseResponseVO", productionSchOrderShortCloseResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Production Schedule Order Short Close information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getItemDetailsFromProductionShortClose")
+	public ResponseEntity<ResponseDTO> getItemDetailsFromProductionShortClose(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getItemDetailsFromProductionShortClose()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getItemDetailsFromProductionShortClose(orgId, branch);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "ItemDetails retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve ItemDetails", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSchOrderNoProductionShortClose")
+	public ResponseEntity<ResponseDTO> getSchOrderNoProductionShortClose(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getSchOrderNoProductionShortClose()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+			mapp = purchaseOrderService.getSchOrderNoProductionShortClose(orgId, branch);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "schOrderNo retrieved successfully");
+			responseObjectsMap.put("mapp", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve schOrderNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	//
+	@GetMapping("/getProductionIssueById")
+	public ResponseEntity<ResponseDTO> getProductionIssueById(@RequestParam Long id) {
+
+		String methodName = "getProductionIssueById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ProductionIssueResponseDTO productionIssueResponseDTO = purchaseOrderService.getProductionIssueById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Issue information retrieved successfully");
+
+			responseObjectsMap.put("productionIssueResponseVO", productionIssueResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Production Issue retrieval failed", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getProductionIssueDocId")
+	public ResponseEntity<ResponseDTO> getProductionIssueDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getProductionIssueDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = purchaseOrderService.getProductionIssueDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Issue DocId information retrieved successfully");
+
+			responseObjectsMap.put("productionIssueDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Production Issue DocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping("/createUpdateProductionIssue")
+	public ResponseEntity<ResponseDTO> createUpdateProductionIssue(@RequestBody ProductionIssueDTO productionIssueDTO) {
+
+		String methodName = "createUpdateProductionIssue()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> productionIssueVO = purchaseOrderService
+					.createUpdateProductionIssue(productionIssueDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, productionIssueVO.get("message"));
+
+			responseObjectsMap.put("productionIssueVO", productionIssueVO.get("productionIssueVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getProductionIssueByOrgId")
+	public ResponseEntity<ResponseDTO> getProductionIssueByOrgId(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getProductionIssueByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<ProductionIssueResponseDTO> productionIssueResponseDTO = purchaseOrderService
+					.getProductionIssueByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Issue information retrieved successfully");
+
+			responseObjectsMap.put("productionIssueResponseVO", productionIssueResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Production Issue information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getIndentNoForProductionIssue")
+	public ResponseEntity<ResponseDTO> getIndentNoForProductionIssue(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long fgItem) {
+
+		String methodName = "getIndentNoForProductionIssue()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getIndentNoForProductionIssue(orgId, branch, fgItem);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "IndentNo retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve IndentNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getGrnNoForProductionIssue")
+	public ResponseEntity<ResponseDTO> getGrnNoForProductionIssue(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long item) {
+
+		String methodName = "getGrnNoForProductionIssue()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getGrnNoForProductionIssue(orgId, branch, item);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "GrnNo retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve GrnNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getIndentNoDetailsForProductionIssue")
+	public ResponseEntity<ResponseDTO> getIndentNoDetailsForProductionIssue(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam String indentNo) {
+
+		String methodName = "getIndentNoDetailsForProductionIssue()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getIndentNoDetailsForProductionIssue(orgId, branch, indentNo);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "IndentNo details retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve IndentNo details",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// productionBulk
+
+	@GetMapping("/getProductionBulkIssueById")
+	public ResponseEntity<ResponseDTO> getProductionBulkIssueById(@RequestParam Long id) {
+
+		String methodName = "getProductionBulkIssueById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			ProductionBulkIssueResponseDTO productionBulkIssueResponseDTO = purchaseOrderService
+					.getProductionBulkIssueById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Bulk Issue information retrieved successfully");
+
+			responseObjectsMap.put("productionBulkIssueResponseVO", productionBulkIssueResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Production Bulk Issue retrieval failed",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getProductionBulkIssueDocId")
+	public ResponseEntity<ResponseDTO> getProductionBulkIssueDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getProductionBulkIssueDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+
+			mapp = purchaseOrderService.getProductionBulkIssueDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Bulk Issue DocId information retrieved successfully");
+
+			responseObjectsMap.put("productionBulkIssueDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Production Bulk Issue DocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PutMapping("/createUpdateProductionBulkIssue")
+	public ResponseEntity<ResponseDTO> createUpdateProductionBulkIssue(
+			@RequestBody ProductionBulkIssueDTO productionBulkIssueDTO) {
+
+		String methodName = "createUpdateProductionBulkIssue()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			Map<String, Object> productionBulkIssueVO = purchaseOrderService
+					.createUpdateProductionBulkIssue(productionBulkIssueDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, productionBulkIssueVO.get("message"));
+
+			responseObjectsMap.put("productionBulkIssueVO", productionBulkIssueVO.get("productionBulkIssueVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getProductionBulkIssueByOrgId")
+	public ResponseEntity<ResponseDTO> getProductionBulkIssueByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getProductionBulkIssueByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			List<ProductionBulkIssueResponseDTO> productionBulkIssueResponseDTO = purchaseOrderService
+					.getProductionBulkIssueByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Production Bulk Issue information retrieved successfully");
+
+			responseObjectsMap.put("productionBulkIssueResponseVO", productionBulkIssueResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Production Bulk Issue information retrieval failed", e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getIndentNoForProductionBulkIssue")
+	public ResponseEntity<ResponseDTO> getIndentNoForProductionBulkIssue(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long fgItem) {
+
+		String methodName = "getIndentNoForProductionBulkIssue()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getIndentNoForProductionBulkIssue(orgId, branch, fgItem);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "IndentNo retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve IndentNo", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

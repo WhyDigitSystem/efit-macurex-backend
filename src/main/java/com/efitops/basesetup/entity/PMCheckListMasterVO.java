@@ -52,9 +52,8 @@ public class PMCheckListMasterVO {
 	@JoinColumn(name = "department")
 	private DepartmentVO department;
 	
-	@ManyToOne
 	@JoinColumn(name = "pm_check_list_for")
-	private ListOfValuesDetailsVO pmCheckListFor;
+	private String pmCheckListFor;
 	
 	@Column(name = "pm_check_list_no")
 	private String pmCheckListNo;

@@ -6284,7 +6284,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 			map.put("unitMasterId", ch[3] != null ? ((Number) ch[3]).longValue() : null);
 
-			map.put("unitMasterDescri	ption", ch[4] != null ? ch[4].toString() : "");
+			map.put("unitMasterDescription", ch[4] != null ? ch[4].toString() : "");
 
 			list.add(map);
 		}

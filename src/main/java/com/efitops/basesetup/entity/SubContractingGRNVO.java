@@ -2,7 +2,6 @@ package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,6 +176,13 @@ public class SubContractingGRNVO {
     @JsonManagedReference
     private List<SubContractingGRNTaxDetailsVO> taxDetails = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "subContractingGRNVO",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JsonManagedReference
+    private List<SubContractingGRNAttachmentVO> attachments = new ArrayList<>();
+    
     @Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 }

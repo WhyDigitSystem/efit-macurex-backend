@@ -2633,11 +2633,11 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 				Map<String, Object> supplierMap = new HashMap<>();
 
-				supplierMap.put("supplierName", obj[0] != null ? obj[0].toString() : null);
+				supplierMap.put("supplierId", obj[0] != null ? ((Number) obj[0]).longValue() : null);
 
 				supplierMap.put("supplierCode", obj[1] != null ? obj[1].toString() : null);
 
-				supplierMap.put("supplierId", obj[2] != null ? ((Number) obj[2]).longValue() : null);
+				supplierMap.put("supplierName", obj[2] != null ? obj[2].toString() : null);
 
 				supplierMap.put("eccType", obj[3] != null ? obj[3].toString() : null);
 

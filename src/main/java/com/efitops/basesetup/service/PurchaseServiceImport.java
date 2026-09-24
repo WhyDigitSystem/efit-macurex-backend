@@ -288,6 +288,12 @@ public interface PurchaseServiceImport {
 
 	List<ProductionIssueResponseDTO> getProductionIssueByOrgId(Long orgId, Long branch) throws ApplicationException;
 
+	List<Map<String, Object>> getIndentNoForProductionIssue(Long orgId, Long branch, Long fgItem);
+
+	List<Map<String, Object>> getGrnNoForProductionIssue(Long orgId, Long branch, Long item);
+
+	List<Map<String, Object>> getIndentNoDetailsForProductionIssue(Long orgId, Long branch, String indentNo);
+
 	// Bulk
 
 	Map<String, Object> createUpdateProductionBulkIssue(ProductionBulkIssueDTO dto) throws ApplicationException;
@@ -299,4 +305,5 @@ public interface PurchaseServiceImport {
 	List<ProductionBulkIssueResponseDTO> getProductionBulkIssueByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
 
+	List<Map<String, Object>> getIndentNoForProductionBulkIssue(Long orgId, Long branch, Long fgItem);
 }

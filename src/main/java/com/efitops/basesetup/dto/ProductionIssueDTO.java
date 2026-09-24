@@ -1,7 +1,6 @@
 package com.efitops.basesetup.dto;
 
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,7 +22,6 @@ public class ProductionIssueDTO {
     private String type;
     private Long fromLocation;
     private Long toLocation;
-    private BigDecimal totalValue;
     private String narration;
     private Long orgId;
     private String financialYear;

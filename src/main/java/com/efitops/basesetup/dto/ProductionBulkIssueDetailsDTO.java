@@ -17,8 +17,7 @@ public class ProductionBulkIssueDetailsDTO {
 	private Long unit;
 	private BigDecimal availableQty;
 	private BigDecimal indReqQty;
-	private BigDecimal indPendQty;
 	private BigDecimal issueQty;
 	private BigDecimal rate;
-	private BigDecimal amount;
+	private BigDecimal totalQty;
 }

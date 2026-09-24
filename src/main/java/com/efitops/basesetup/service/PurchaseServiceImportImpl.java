@@ -6284,7 +6284,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 			map.put("unitMasterId", ch[3] != null ? ((Number) ch[3]).longValue() : null);
 
-			map.put("unitMasterDescription", ch[4] != null ? ch[4].toString() : "");
+			map.put("unitMasterDescri	ption", ch[4] != null ? ch[4].toString() : "");
 
 			list.add(map);
 		}
@@ -6371,7 +6371,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setIssueDate(dto.getIssueDate());
 		vo.setSchOrderNo(dto.getSchOrderNo());
 		vo.setType(dto.getType());
-		vo.setTotalValue(dto.getTotalValue());
 		vo.setNarration(dto.getNarration());
 		vo.setActive(dto.isActive());
 		vo.setCancel(dto.isCancel());
@@ -6410,6 +6409,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			}
 		}
 
+		BigDecimal totalValueIssue = BigDecimal.ZERO;
 		List<ProductionIssueDetailsVO> detailsList = new ArrayList<>();
 		if (dto.getItemDetails() != null) {
 			for (ProductionIssueDetailsDTO d : dto.getItemDetails()) {
@@ -6419,11 +6419,12 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailsVO.setGrnNo(d.getGrnNo());
 				detailsVO.setGrnDate(d.getGrnDate());
 				detailsVO.setIntReqQty(d.getIntReqQty());
-				detailsVO.setIntPendQty(d.getIntPendQty());
+				detailsVO.setIntPendQty(d.getAvailableQty().subtract(d.getIntReqQty()));
 				detailsVO.setIssueQty(d.getIssueQty());
 				detailsVO.setItemMinQty(d.getItemMinQty());
 				detailsVO.setRate(d.getRate());
-				detailsVO.setAmount(d.getAmount() != null ? d.getAmount() : BigDecimal.ZERO);
+				detailsVO.setAmount(d.getRate().multiply(d.getIssueQty()));
+				totalValueIssue = totalValueIssue.add(detailsVO.getAmount());
 
 				if (d.getItem() != null && d.getItem() != 0) {
 					ItemMasterVO item = itemMasterRepo.findById(d.getItem())
@@ -6442,6 +6443,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			}
 		}
 		vo.setItemDetails(detailsList);
+		vo.setTotalValue(totalValueIssue);
+
 	}
 
 	private ProductionIssueResponseDTO buildProductionIssueResponse(ProductionIssueVO vo) {
@@ -6476,14 +6479,14 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		}
 
 		if (vo.getFromLocation() != null) {
-			LocationResponseDTO locDTO = new LocationResponseDTO();
+			LocationMasterResponseDTO locDTO = new LocationMasterResponseDTO();
 			locDTO.setId(vo.getFromLocation().getId());
 			locDTO.setLocationName(vo.getFromLocation().getLocationName());
 			responseDTO.setFromLocation(locDTO);
 		}
 
 		if (vo.getToLocation() != null) {
-			LocationResponseDTO locDTO = new LocationResponseDTO();
+			LocationMasterResponseDTO locDTO = new LocationMasterResponseDTO();
 			locDTO.setId(vo.getToLocation().getId());
 			locDTO.setLocationName(vo.getToLocation().getLocationName());
 			responseDTO.setToLocation(locDTO);
@@ -6562,6 +6565,87 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			responseList.add(buildProductionIssueResponse(vo));
 		}
 		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getIndentNoForProductionIssue(Long orgId, Long branch, Long fgItem) {
+
+		Set<Object[]> chType = productionIssueRepo.getIndentNoForProductionIssue(orgId, branch, fgItem);
+
+		return getIndentNoForProductionIssue(chType);
+	}
+
+	private List<Map<String, Object>> getIndentNoForProductionIssue(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("schOrderNo", ch[0] != null ? ch[0].toString() : "");
+			map.put("docId", ch[1] != null ? ch[1].toString() : "");
+			map.put("docDate", ch[2] != null ? ch[2].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getGrnNoForProductionIssue(Long orgId, Long branch, Long item) {
+
+		Set<Object[]> chType = productionIssueRepo.getGrnNoForProductionIssue(orgId, branch, item);
+
+		return getGrnNoForProductionIssue(chType);
+	}
+
+	private List<Map<String, Object>> getGrnNoForProductionIssue(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+			map.put("acceptQty", ch[2] != null ? new BigDecimal(ch[2].toString()) : BigDecimal.ZERO);
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getIndentNoDetailsForProductionIssue(Long orgId, Long branch, String indentNo) {
+
+		Set<Object[]> chType = productionIssueRepo.getIndentNoDetailsForProductionIssue(orgId, branch, indentNo);
+
+		return getIndentNoDetailsForProductionIssue(chType);
+	}
+
+	private List<Map<String, Object>> getIndentNoDetailsForProductionIssue(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("requiredQty", ch[3] != null ? new BigDecimal(ch[3].toString()) : BigDecimal.ZERO);
+			map.put("unit", ch[4] != null ? ((Number) ch[4]).longValue() : null);
+			map.put("unitDescription", ch[5] != null ? ch[5].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
 	}
 
 	// bulk
@@ -6661,13 +6745,13 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			for (ProductionBulkIssueDetailsDTO d : dto.getProductionBulkIssueDetailsDTO()) {
 				ProductionBulkIssueDetailsVO detailsVO = new ProductionBulkIssueDetailsVO();
 
-				detailsVO.setAvailableQty(d.getAvailableQty() != null ? d.getAvailableQty() : BigDecimal.ZERO);
-				detailsVO.setIndReqQty(d.getIndReqQty() != null ? d.getIndReqQty() : BigDecimal.ZERO);
-				detailsVO.setIndPendQty(d.getIndPendQty() != null ? d.getIndPendQty() : BigDecimal.ZERO);
-				detailsVO.setIssueQty(d.getIssueQty() != null ? d.getIssueQty() : BigDecimal.ZERO);
-				detailsVO.setRate(d.getRate() != null ? d.getRate() : BigDecimal.ZERO);
-				detailsVO.setAmount(d.getAmount() != null ? d.getAmount() : BigDecimal.ZERO);
-
+				detailsVO.setAvailableQty(d.getAvailableQty());
+				detailsVO.setIndReqQty(d.getIndReqQty());
+				detailsVO.setIndPendQty(d.getAvailableQty().subtract(d.getIndReqQty()));
+				detailsVO.setIssueQty(d.getIssueQty());
+				detailsVO.setRate(d.getRate());
+				detailsVO.setAmount(d.getRate().multiply(d.getIssueQty()));
+				detailsVO.setTotalQty(d.getTotalQty());
 				if (d.getItem() != null && d.getItem() != 0) {
 					ItemMasterVO item = itemMasterRepo.findById(d.getItem())
 							.orElseThrow(() -> new ApplicationException("Item Not Found in Details"));
@@ -6803,6 +6887,31 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			responseList.add(buildProductionBulkIssueResponse(vo));
 		}
 		return responseList;
+	}
+
+	@Override
+	public List<Map<String, Object>> getIndentNoForProductionBulkIssue(Long orgId, Long branch, Long fgItem) {
+
+		Set<Object[]> chType = productionBulkIssueRepo.getIndentNoForProductionBulkIssue(orgId, branch, fgItem);
+
+		return getIndentNoForProductionBulkIssue(chType);
+	}
+
+	private List<Map<String, Object>> getIndentNoForProductionBulkIssue(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
 	}
 
 }

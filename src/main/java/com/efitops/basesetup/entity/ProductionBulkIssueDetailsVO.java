@@ -56,6 +56,9 @@ public class ProductionBulkIssueDetailsVO {
 
 	@Column(name = "amount", precision = 10, scale = 3)
 	private BigDecimal amount;
+	
+	@Column(name = "total_qty", precision = 10, scale = 3)
+	private BigDecimal totalQty;
 
 	@ManyToOne
 	@JoinColumn(name = "production_bulk_issue_basic_id")

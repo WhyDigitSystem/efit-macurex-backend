@@ -37,8 +37,8 @@ public class ProductionIssueResponseDTO {
     private String financialYear;
 
     private ItemMasterDetailsResponseImportDTO fgItem;
-    private LocationResponseDTO fromLocation;
-    private LocationResponseDTO toLocation;
+    private LocationMasterResponseDTO fromLocation;
+    private LocationMasterResponseDTO toLocation;
     private BranchResponseDTO branch;
 
   

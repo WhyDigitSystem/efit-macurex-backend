@@ -3556,7 +3556,131 @@ public class PurchaseServiceImportController extends BaseController {
 		return ResponseEntity.ok(responseDTO);
 	}
 
-	// production
+	@GetMapping("/getIndentNoForProductionIssue")
+	public ResponseEntity<ResponseDTO> getIndentNoForProductionIssue(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long fgItem) {
+
+		String methodName = "getIndentNoForProductionIssue()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getIndentNoForProductionIssue(orgId, branch, fgItem);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "IndentNo retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve IndentNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getGrnNoForProductionIssue")
+	public ResponseEntity<ResponseDTO> getGrnNoForProductionIssue(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long item) {
+
+		String methodName = "getGrnNoForProductionIssue()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getGrnNoForProductionIssue(orgId, branch, item);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "GrnNo retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve GrnNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getIndentNoDetailsForProductionIssue")
+	public ResponseEntity<ResponseDTO> getIndentNoDetailsForProductionIssue(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam String indentNo) {
+
+		String methodName = "getIndentNoDetailsForProductionIssue()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getIndentNoDetailsForProductionIssue(orgId, branch, indentNo);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "IndentNo details retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve IndentNo details",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	// productionBulk
 
 	@GetMapping("/getProductionBulkIssueById")
 	public ResponseEntity<ResponseDTO> getProductionBulkIssueById(@RequestParam Long id) {
@@ -3707,5 +3831,46 @@ public class PurchaseServiceImportController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getIndentNoForProductionBulkIssue")
+	public ResponseEntity<ResponseDTO> getIndentNoForProductionBulkIssue(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long fgItem) {
+
+		String methodName = "getIndentNoForProductionBulkIssue()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getIndentNoForProductionBulkIssue(orgId, branch, fgItem);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "IndentNo retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve IndentNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
 	}
 }

@@ -1,5 +1,6 @@
 package com.efitops.basesetup.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,28 +25,37 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.AuthorizationForBreakdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DailyInspectionCumRejectionDataResponseDTO;
 import com.efitops.basesetup.ResponseDTO.FlashNCReportResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineToolBreakdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineToolsScrapNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PMCheckListMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierChangeRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.AuthorizationForBreakdownDTO;
 import com.efitops.basesetup.dto.CategoryMasterDTO;
 import com.efitops.basesetup.dto.CauseMasterDTO;
 import com.efitops.basesetup.dto.DailyInspectionCumRejectionDataDTO;
 import com.efitops.basesetup.dto.FlashNCReportDTO;
 import com.efitops.basesetup.dto.InstrumentCalibrationDTO;
+import com.efitops.basesetup.dto.MachineToolBreakdownDTO;
+import com.efitops.basesetup.dto.MachineToolRectificationDTO;
+import com.efitops.basesetup.dto.MachineToolsScrapNoteDTO;
 import com.efitops.basesetup.dto.PMCheckListMasterDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
+import com.efitops.basesetup.entity.MachineToolRectificationResponseDTO;
 import com.efitops.basesetup.service.VendorComplaintService;
 
 @CrossOrigin
@@ -2255,5 +2265,969 @@ public class VendorComplaintController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 		return responseDTO;
+	}
+
+	@GetMapping("/getPMCheckListMasterById")
+	public ResponseEntity<ResponseDTO> getPMCheckListMasterById(@RequestParam Long id) {
+
+		String methodName = "getPMCheckListMasterById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			PMCheckListMasterResponseDTO response = vendorComplaintService.getPMCheckListMasterById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "PM Check List Master Retrieved Successfully");
+
+			responseObjectsMap.put("pmCheckListMasterVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getPMCheckListMasterByOrgId")
+	public ResponseEntity<ResponseDTO> getPMCheckListMasterByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getPMCheckListMasterByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<PMCheckListMasterResponseDTO> response = vendorComplaintService.getPMCheckListMasterByOrgId(orgId,
+					branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "PM Check List Master Retrieved Successfully");
+
+			responseObjectsMap.put("pmCheckListMasterVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getToolMachineCategoryForPMCheckListMaster")
+	public ResponseEntity<ResponseDTO> getToolMachineCategoryForPMCheckListMaster(@RequestParam Long orgId,
+			@RequestParam String pmCheckListFor) {
+
+		String methodName = "getToolMachineCategoryForPMCheckListMaster()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService
+					.getToolMachineCategoryForPMCheckListMaster(orgId, pmCheckListFor);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Tool Machine Category Retrieved Successfully");
+
+			responseObjectsMap.put("toolMachineCategory", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getActivityForPMCheckListMaster")
+	public ResponseEntity<ResponseDTO> getActivityForPMCheckListMaster(@RequestParam Long department,
+			@RequestParam Long orgId) {
+
+		String methodName = "getActivityForPMCheckListMaster()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService.getActivityForPMCheckListMaster(department,
+					orgId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Activity Retrieved Successfully");
+
+			responseObjectsMap.put("activity", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	machineTool breakdown
+
+	@PostMapping(value = "/updateCreateMachineToolBreakdown", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseDTO updateCreateMachineToolBreakdown(
+			@RequestPart("machineToolBreakdownVO") MachineToolBreakdownDTO machineToolBreakdownDTO,
+//			@RequestBody MachineToolBreakdownDTO machineToolBreakdownDTO,
+
+			@RequestPart(value = "files", required = false) MultipartFile[] files,
+			@RequestPart(value = "images", required = false) MultipartFile[] images) {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> response = vendorComplaintService
+					.updateCreateMachineToolBreakdown(machineToolBreakdownDTO, files, images);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, response.get("message"));
+
+			responseObjectsMap.put("machineToolBreakdownVO", response.get("machineToolBreakdownVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return responseDTO;
+	}
+
+	/*
+	 * Get Machine Tool Breakdown By ID
+	 */
+	@GetMapping("/getMachineToolBreakdownById")
+	public ResponseEntity<ResponseDTO> getMachineToolBreakdownById(@RequestParam Long id) {
+
+		String methodName = "getMachineToolBreakdownById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			MachineToolBreakdownResponseDTO response = vendorComplaintService.getMachineToolBreakdownById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Machine Tool Breakdown Retrieved Successfully");
+
+			responseObjectsMap.put("machineToolBreakdownVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	/*
+	 * Get Machine Tool Breakdown By Organization And Branch
+	 */
+	@GetMapping("/getMachineToolBreakdownByOrgId")
+	public ResponseEntity<ResponseDTO> getMachineToolBreakdownByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getMachineToolBreakdownByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			List<MachineToolBreakdownResponseDTO> response = vendorComplaintService
+					.getMachineToolBreakdownByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Machine Tool Breakdown Details Retrieved Successfully");
+
+			responseObjectsMap.put("machineToolBreakdownList", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	/*
+	 * Get Machine Tool Breakdown Doc ID
+	 */
+	@GetMapping("/getMachineToolBreakdownDocId")
+	public ResponseEntity<ResponseDTO> getMachineToolBreakdownDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getMachineToolBreakdownDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String response = null;
+
+		try {
+
+			response = vendorComplaintService.getMachineToolBreakdownDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Machine Tool Breakdown DocId Retrieved Successfully");
+
+			responseObjectsMap.put("docId", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Machine Tool Breakdown DocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	/*
+	 * View Machine Tool Breakdown File
+	 */
+	@GetMapping("/machineToolBreakdown/viewFile/**")
+	public ResponseEntity<byte[]> viewMachineToolBreakdownFile(HttpServletRequest request) {
+
+		String methodName = "viewMachineToolBreakdownFile()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		try {
+
+			return vendorComplaintService.viewMachineToolBreakdownFile(request);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			return ResponseEntity.status(500).build();
+		}
+	}
+
+	@GetMapping("/getMachineToolForBreakdown")
+	public ResponseEntity<ResponseDTO> getMachineToolForBreakdown(@RequestParam Long toolCategoryId,
+			@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getMachineToolForBreakdown()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService.getMachineToolForBreakdown(toolCategoryId,
+					orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Machine/Tool Retrieved Successfully");
+
+			responseObjectsMap.put("machineToolList", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	machine tool rectification
+
+	@PutMapping("/updateCreateMachineToolRectification")
+	public ResponseEntity<ResponseDTO> updateCreateMachineToolRectification(
+			@RequestBody MachineToolRectificationDTO dto) {
+
+		String methodName = "updateCreateMachineToolRectification()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.updateCreateMachineToolRectification(dto);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMachineToolRectificationDocId")
+	public ResponseEntity<ResponseDTO> getMachineToolRectificationDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getMachineToolRectificationDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			String docId = vendorComplaintService.getMachineToolRectificationDocId(orgId, financialYear);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Machine Tool Rectification DocId Retrieved Successfully");
+
+			responseObjectsMap.put("docId", docId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMachineToolRectificationByOrgId")
+	public ResponseEntity<ResponseDTO> getMachineToolRectificationByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getMachineToolRectificationByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			List<MachineToolRectificationResponseDTO> response = vendorComplaintService
+					.getMachineToolRectificationByOrgId(orgId, branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Machine Tool Rectification Details Retrieved Successfully");
+
+			responseObjectsMap.put("machineToolRectificationList", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMachineToolRectificationById")
+	public ResponseEntity<ResponseDTO> getMachineToolRectificationById(@RequestParam Long id) {
+
+		String methodName = "getMachineToolRectificationById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			MachineToolRectificationResponseDTO response = vendorComplaintService.getMachineToolRectificationById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Machine Tool Rectification Details Retrieved Successfully");
+
+			responseObjectsMap.put("machineToolRectificationVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getBreakdownDetailsForRectification")
+	public ResponseEntity<ResponseDTO> getBreakdownDetailsForRectification(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getBreakdownDetailsForRectification()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService.getBreakdownDetailsForRectification(orgId,
+					branch);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Breakdown Details Retrieved Successfully");
+
+			responseObjectsMap.put("breakdownDetails", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getPrepareByForMachineToolRectification")
+	public ResponseEntity<ResponseDTO> getPrepareByForMachineToolRectification(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long department) {
+
+		String methodName = "getPrepareByForMachineToolRectification()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService.getPrepareByForMachineToolRectification(orgId,
+					branch, department);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Prepare By Employee Retrieved Successfully");
+
+			responseObjectsMap.put("prepareBy", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	Authorization for breakdown
+
+	@PutMapping("/updateCreateAuthorizationForBreakdown")
+	public ResponseEntity<ResponseDTO> updateCreateAuthorizationForBreakdown(
+			@RequestBody AuthorizationForBreakdownDTO dto) {
+
+		String methodName = "updateCreateAuthorizationForBreakdown()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.updateCreateAuthorizationForBreakdown(dto);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getAuthorizationForBreakdownDocId")
+	public ResponseEntity<ResponseDTO> getAuthorizationForBreakdownDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getAuthorizationForBreakdownDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			String docId = vendorComplaintService.getAuthorizationForBreakdownDocId(orgId, financialYear);
+
+			responseObjectsMap.put("docId", docId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getAuthorizationForBreakdownById")
+	public ResponseEntity<ResponseDTO> getAuthorizationForBreakdownById(@RequestParam Long id) {
+
+		String methodName = "getAuthorizationForBreakdownById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			AuthorizationForBreakdownResponseDTO response = vendorComplaintService.getAuthorizationForBreakdownById(id);
+
+			responseObjectsMap.put("authorizationForBreakdownVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getAuthorizationForBreakdownByOrgId")
+	public ResponseEntity<ResponseDTO> getAuthorizationForBreakdownByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getAuthorizationForBreakdownByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<AuthorizationForBreakdownResponseDTO> response = vendorComplaintService
+					.getAuthorizationForBreakdownByOrgId(orgId, branch);
+
+			responseObjectsMap.put("authorizationForBreakdownVO", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMachineToolRectificationDetails")
+	public ResponseEntity<ResponseDTO> getMachineToolRectificationDetails(@RequestParam Long branch,
+			@RequestParam Long orgId) {
+
+		String methodName = "getMachineToolRectificationDetails()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<Map<String, Object>> response = vendorComplaintService
+					.getMachineToolRectificationDetailsForAuthorizationBreakdown(branch, orgId);
+
+			responseObjectsMap.put("machineToolRectificationDetails", response);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getPMCheckListMasterDocId")
+	public ResponseEntity<ResponseDTO> getPMCheckListMasterDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getPMCheckListMasterDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			String docId = vendorComplaintService.getPMCheckListMasterDocId(orgId, financialYear);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "PM Check List Master DocId Retrieved Successfully");
+
+			responseObjectsMap.put("docId", docId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMachineToolsScrapNoteDocId")
+	public ResponseEntity<ResponseDTO> getMachineToolsScrapNoteDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getMachineToolsScrapNoteDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			String docId = vendorComplaintService.getMachineToolsScrapNoteDocId(orgId, financialYear);
+
+			responseObjectsMap.put("docId", docId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@PostMapping(value = "/updateCreateMachineToolsScrapNote", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ResponseDTO> updateCreateMachineToolsScrapNote(
+			@RequestPart("machineToolsScrapNoteDTO") MachineToolsScrapNoteDTO machineToolsScrapNoteDTO,
+
+			@RequestPart(value = "files", required = false) MultipartFile[] files) {
+
+		String methodName = "updateCreateMachineToolsScrapNote()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.updateCreateMachineToolsScrapNote(machineToolsScrapNoteDTO,
+					files);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/machineToolsScrapNote/viewFile/**")
+	public ResponseEntity<byte[]> viewMachineToolsScrapNoteFile(HttpServletRequest request) throws IOException {
+
+		String methodName = "viewMachineToolsScrapNoteFile()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		ResponseEntity<byte[]> response;
+
+		try {
+
+			response = vendorComplaintService.viewMachineToolsScrapNoteFile(request);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+
+			return ResponseEntity.notFound().build();
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return response;
+	}
+
+	@GetMapping("/getMachineToolsScrapNoteById")
+	public ResponseEntity<ResponseDTO> getMachineToolsScrapNoteById(@RequestParam Long id) {
+
+		String methodName = "getMachineToolsScrapNoteById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getMachineToolsScrapNoteById(id);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMachineToolsScrapNoteByOrgId")
+	public ResponseEntity<List<MachineToolsScrapNoteResponseDTO>> getMachineToolsScrapNoteByOrgId(
+			@RequestParam Long orgId,@RequestParam Long branch) {
+
+		String methodName = "getMachineToolsScrapNoteByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		List<MachineToolsScrapNoteResponseDTO> responseList = new ArrayList<>();
+
+		try {
+
+			responseList = vendorComplaintService.getMachineToolsScrapNoteByOrgId(orgId,branch);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseList);
 	}
 }

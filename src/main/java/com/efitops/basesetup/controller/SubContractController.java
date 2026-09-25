@@ -30,6 +30,7 @@ import com.efitops.basesetup.ResponseDTO.BulkIssueIndentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCapitalItemsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InprocessInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InspectionRequisitionNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
@@ -40,6 +41,7 @@ import com.efitops.basesetup.ResponseDTO.ProcessValidationEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionBulkIssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ReconcileConsumptionStockResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractingGRNResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
@@ -52,6 +54,7 @@ import com.efitops.basesetup.dto.BulkIssueIndentDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCapitalItemsDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
+import com.efitops.basesetup.dto.InprocessInspectionDTO;
 import com.efitops.basesetup.dto.InspectionRequisitionNoteDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
@@ -63,6 +66,7 @@ import com.efitops.basesetup.dto.ProductionBulkIssuesDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.ReconcileConsumptionStockDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
+import com.efitops.basesetup.dto.StockOrderDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SubContractingGRNDTO;
 import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
@@ -4145,4 +4149,462 @@ public class SubContractController extends BaseController {
 
 	    return ResponseEntity.ok().body(responseDTO);
 	}
+	
+	@PutMapping("/createUpdateInprocessInspection")
+	public ResponseEntity<ResponseDTO> createUpdateInprocessInspection(
+	        @RequestBody InprocessInspectionDTO inprocessInspectionDTO) {
+
+	    String methodName = "createUpdateInprocessInspection()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        Map<String, Object> responseMap =
+	        		subContractService
+	                        .createUpdateInprocessInspection(
+	                                inprocessInspectionDTO);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                responseMap.get("message"));
+
+	        responseObjectsMap.put(
+	                "inprocessInspectionVO",
+	                responseMap.get("inprocessInspectionVO"));
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to create/update Inprocess Inspection",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getInprocessInspectionById")
+	public ResponseEntity<ResponseDTO> getInprocessInspectionById(
+	        @RequestParam Long id) {
+
+	    String methodName = "getInprocessInspectionById()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        InprocessInspectionResponseDTO response =
+	        		subContractService
+	                        .getInprocessInspectionById(id);
+
+	        responseObjectsMap.put(
+	                "inprocessInspection",
+	                response);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Inprocess Inspection",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getAllInprocessInspectionByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getAllInprocessInspectionByOrgIdAndBranch(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName =
+	            "getAllInprocessInspectionByOrgIdAndBranch()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        List<InprocessInspectionResponseDTO> responseList =
+	        		subContractService
+	                        .getAllInprocessInspectionByOrgIdAndBranch(
+	                                orgId,
+	                                branch);
+
+	        responseObjectsMap.put(
+	                "inprocessInspection",
+	                responseList);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Inprocess Inspection information",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getInprocessInspectionDocId")
+	public ResponseEntity<ResponseDTO> getInprocessInspectionDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName =
+	            "getInprocessInspectionDocId()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        String docId =
+	        		subContractService
+	                        .getInprocessInspectionDocId(
+	                                orgId,
+	                                financialYear);
+
+	        responseObjectsMap.put(
+	                "docId",
+	                docId);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Inprocess Inspection Doc Id",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+	@PutMapping("/createUpdateStockOrder")
+	public ResponseEntity<ResponseDTO> createUpdateStockOrder(
+	        @RequestBody StockOrderDTO stockOrderDTO) {
+
+	    String methodName = "createUpdateStockOrder()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        Map<String, Object> responseMap =
+	        		subContractService
+	                        .createUpdateStockOrder(
+	                                stockOrderDTO);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                responseMap.get("message"));
+
+	        responseObjectsMap.put(
+	                "stockOrderVO",
+	                responseMap.get("stockOrderVO"));
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to create/update Stock Order",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getStockOrderById")
+	public ResponseEntity<ResponseDTO> getStockOrderById(
+	        @RequestParam Long id) {
+
+	    String methodName = "getStockOrderById()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        StockOrderResponseDTO response =
+	        		subContractService
+	                        .getStockOrderById(id);
+
+	        responseObjectsMap.put(
+	                "stockOrderVO",
+	                response);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to get Stock Order",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getAllStockOrderByOrgIdAndBranch")
+	public ResponseEntity<ResponseDTO> getAllStockOrderByOrgIdAndBranch(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName =
+	            "getAllStockOrderByOrgIdAndBranch()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        List<StockOrderResponseDTO> response =
+	        		subContractService
+	                        .getAllStockOrderByOrgIdAndBranch(
+	                                orgId,
+	                                branch);
+
+	        responseObjectsMap.put(
+	                "stockOrderList",
+	                response);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to get Stock Order List",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getStockOrderDocId")
+	public ResponseEntity<ResponseDTO> getStockOrderDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName = "getStockOrderDocId()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        String docId =
+	        		subContractService.getStockOrderDocId(
+	                        orgId,
+	                        financialYear);
+
+	        responseObjectsMap.put(
+	                "docId",
+	                docId);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to get Stock Order DocId",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
 }

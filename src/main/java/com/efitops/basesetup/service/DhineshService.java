@@ -10,6 +10,7 @@ import com.efitops.basesetup.ResponseDTO.QuotationDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.QuotationItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractResponseDTO;
+import com.efitops.basesetup.dto.InprocessInspectionDTO;
 import com.efitops.basesetup.dto.SalesContractDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
@@ -31,5 +32,6 @@ public interface DhineshService {
 	List<SalesContractResponseDTO> getSalesContractByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
 
 	String getSalesContractDocId(Long orgId, String financialYear, String screenCode);
+
 
 }

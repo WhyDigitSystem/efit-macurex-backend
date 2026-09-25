@@ -16,6 +16,7 @@ import com.efitops.basesetup.ResponseDTO.BulkIssueIndentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCapitalItemsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanCumGatePassResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DeliveryChallanSubcontractingResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InprocessInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InspectionRequisitionNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderAmendmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.JobOrderResponseDTO;
@@ -26,6 +27,7 @@ import com.efitops.basesetup.ResponseDTO.ProcessValidationEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionBulkIssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ReconcileConsumptionStockResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractingGRNResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierRateContractAmendmentResponseDTO;
@@ -36,6 +38,7 @@ import com.efitops.basesetup.dto.BulkIssueIndentDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCapitalItemsDTO;
 import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
+import com.efitops.basesetup.dto.InprocessInspectionDTO;
 import com.efitops.basesetup.dto.InspectionRequisitionNoteDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
 import com.efitops.basesetup.dto.JobOrderDTO;
@@ -46,6 +49,7 @@ import com.efitops.basesetup.dto.ProcessValidationEntryDTO;
 import com.efitops.basesetup.dto.ProductionBulkIssuesDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.ReconcileConsumptionStockDTO;
+import com.efitops.basesetup.dto.StockOrderDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SubContractingGRNDTO;
 import com.efitops.basesetup.dto.SupplierRateContractAmendmentDTO;
@@ -297,5 +301,22 @@ public interface SubContractService {
 	String getProductionBulkIssuesDocId(Long orgId, String financialYear) throws ApplicationException;
 
 	List<Map<String, Object>> getIndentByItemForProductionBulkIssues(Long itemId, Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> createUpdateInprocessInspection(InprocessInspectionDTO inprocessInspectionDTO)
+			throws ApplicationException;
+
+	InprocessInspectionResponseDTO getInprocessInspectionById(Long id) throws ApplicationException;
+
+	String getInprocessInspectionDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	List<InprocessInspectionResponseDTO> getAllInprocessInspectionByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> createUpdateStockOrder(StockOrderDTO stockOrderDTO) throws ApplicationException;
+
+	List<StockOrderResponseDTO> getAllStockOrderByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+	StockOrderResponseDTO getStockOrderById(Long id) throws ApplicationException;
+
+	String getStockOrderDocId(Long orgId, String financialYear) throws ApplicationException;
 
 }

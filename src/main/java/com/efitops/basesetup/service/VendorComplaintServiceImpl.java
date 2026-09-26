@@ -3,13 +3,17 @@ package com.efitops.basesetup.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.efitops.basesetup.ResponseDTO.ActivitiesCarriedOutComponentDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ActivitiesCarriedOutDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ActivitiesCarriedOutResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ActivityResponseDTO;
 import com.efitops.basesetup.ResponseDTO.AuthorizationForBreakdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
@@ -56,6 +63,10 @@ import com.efitops.basesetup.ResponseDTO.MachineToolsScrapNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PMCheckListDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PMCheckListMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PMCheckListResponseDTO;
+import com.efitops.basesetup.ResponseDTO.QualityScrapNoteDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.QualityScrapNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ScrapMaterialReturnRejectionDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ScrapMaterialReturnRejectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalParametersDetailsResponeDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
@@ -66,9 +77,13 @@ import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailRepo;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
+import com.efitops.basesetup.dto.ActivitiesCarriedOutComponentDetailsDTO;
+import com.efitops.basesetup.dto.ActivitiesCarriedOutDTO;
+import com.efitops.basesetup.dto.ActivitiesCarriedOutDetailsDTO;
 import com.efitops.basesetup.dto.AuthorizationForBreakdownDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CategoryMasterDTO;
@@ -86,14 +101,22 @@ import com.efitops.basesetup.dto.MachineToolsScrapNoteDTO;
 import com.efitops.basesetup.dto.MachineToolsScrapNoteDetailsDTO;
 import com.efitops.basesetup.dto.PMCheckListDetailsDTO;
 import com.efitops.basesetup.dto.PMCheckListMasterDTO;
+import com.efitops.basesetup.dto.QualityScrapNoteDTO;
+import com.efitops.basesetup.dto.QualityScrapNoteDetailsDTO;
+import com.efitops.basesetup.dto.ScrapMaterialReturnRejectionDTO;
+import com.efitops.basesetup.dto.ScrapMaterialReturnRejectionDetailsDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDetailsDTO;
 import com.efitops.basesetup.dto.SetUpApprovalParametersDetailsDTO;
 import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDetailsDTO;
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.dto.VendorComplaintDetailsDTO;
 import com.efitops.basesetup.dto.VendorComplaintEntryDTO;
+import com.efitops.basesetup.entity.ActivitiesCarriedOutComponentDetailsVO;
+import com.efitops.basesetup.entity.ActivitiesCarriedOutDetailsVO;
+import com.efitops.basesetup.entity.ActivitiesCarriedOutVO;
 import com.efitops.basesetup.entity.ActivityMasterVO;
 import com.efitops.basesetup.entity.AuthorizationForBreakdownVO;
 import com.efitops.basesetup.entity.BranchVO;
@@ -122,6 +145,10 @@ import com.efitops.basesetup.entity.MachineToolsScrapNoteDetailsVO;
 import com.efitops.basesetup.entity.MachineToolsScrapNoteVO;
 import com.efitops.basesetup.entity.PMCheckListDetailsVO;
 import com.efitops.basesetup.entity.PMCheckListMasterVO;
+import com.efitops.basesetup.entity.QualityScrapNoteDetailsVO;
+import com.efitops.basesetup.entity.QualityScrapNoteVO;
+import com.efitops.basesetup.entity.ScrapMaterialReturnRejectionDetailsVO;
+import com.efitops.basesetup.entity.ScrapMaterialReturnRejectionVO;
 import com.efitops.basesetup.entity.SetUpApprovalDetailsVO;
 import com.efitops.basesetup.entity.SetUpApprovalParametersDetailsVO;
 import com.efitops.basesetup.entity.SetUpApprovalVO;
@@ -131,9 +158,13 @@ import com.efitops.basesetup.entity.SupplierResponseEntryDetailsVO;
 import com.efitops.basesetup.entity.SupplierResponseEntryVO;
 import com.efitops.basesetup.entity.ToolCategoryDetailVO;
 import com.efitops.basesetup.entity.ToolCategoryVO;
+import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.entity.VendorComplaintDetailsVO;
 import com.efitops.basesetup.entity.VendorComplaintEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.ActivitiesCarriedOutComponentDetailsRepo;
+import com.efitops.basesetup.repository.ActivitiesCarriedOutDetailsRepo;
+import com.efitops.basesetup.repository.ActivitiesCarriedOutRepo;
 import com.efitops.basesetup.repository.ActivityMasterRepo;
 import com.efitops.basesetup.repository.AuthorizationForBreakdownRepo;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -159,7 +190,13 @@ import com.efitops.basesetup.repository.MachineToolRectificationRepo;
 import com.efitops.basesetup.repository.MachineToolsScrapNoteAttachmentRepo;
 import com.efitops.basesetup.repository.MachineToolsScrapNoteDetailsRepo;
 import com.efitops.basesetup.repository.MachineToolsScrapNoteRepo;
+import com.efitops.basesetup.repository.OrderAcceptanceRepo;
 import com.efitops.basesetup.repository.PMCheckListMasterRepo;
+import com.efitops.basesetup.repository.QualityScrapNoteDetailsRepo;
+import com.efitops.basesetup.repository.QualityScrapNoteRepo;
+import com.efitops.basesetup.repository.SalesContractRepo;
+import com.efitops.basesetup.repository.ScrapMaterialReturnRejectionDetailsRepo;
+import com.efitops.basesetup.repository.ScrapMaterialReturnRejectionRepo;
 import com.efitops.basesetup.repository.SetUpApprovalDetailsRepo;
 import com.efitops.basesetup.repository.SetUpApprovalParametersDetailsRepo;
 import com.efitops.basesetup.repository.SetUpApprovalRepo;
@@ -168,6 +205,7 @@ import com.efitops.basesetup.repository.SupplierChangeRequestRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryDetailsRepo;
 import com.efitops.basesetup.repository.SupplierResponseEntryRepo;
 import com.efitops.basesetup.repository.ToolCategoryRepo;
+import com.efitops.basesetup.repository.UnitMasterRepo;
 import com.efitops.basesetup.repository.VendorComplaintDetailsRepo;
 import com.efitops.basesetup.repository.VendorComplaintEntryRepo;
 
@@ -285,6 +323,36 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private MachineToolsScrapNoteAttachmentRepo machineToolScrapNoteAttachmentRepo;
+
+	@Autowired
+	private ActivitiesCarriedOutRepo activitiesCarriedOutRepo;
+
+	@Autowired
+	private ActivitiesCarriedOutDetailsRepo activitiesCarriedOutDetailsRepo;
+
+	@Autowired
+	private ActivitiesCarriedOutComponentDetailsRepo activitiesCarriedOutComponentDetailsRepo;
+
+	@Autowired
+	private QualityScrapNoteRepo qualityScrapNoteRepo;
+
+	@Autowired
+	private QualityScrapNoteDetailsRepo qualityScrapNoteDetailsRepo;
+
+	@Autowired
+	private ScrapMaterialReturnRejectionRepo scrapMaterialReturnRejectionRepo;
+
+	@Autowired
+	private ScrapMaterialReturnRejectionDetailsRepo scrapMaterialReturnRejectionDetailsRepo;
+
+	@Autowired
+	private UnitMasterRepo unitMasterRepo;
+
+	@Autowired
+	private OrderAcceptanceRepo orderAcceptanceRepo;
+	
+	@Autowired
+	private SalesContractRepo salesContractRepo;
 
 	@Override
 	@Transactional
@@ -6669,11 +6737,11 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	}
 
 	@Override
-	public List<MachineToolsScrapNoteResponseDTO> getMachineToolsScrapNoteByOrgId(Long orgId,Long branch)
+	public List<MachineToolsScrapNoteResponseDTO> getMachineToolsScrapNoteByOrgId(Long orgId, Long branch)
 			throws ApplicationException {
 
 		List<MachineToolsScrapNoteVO> machineToolsScrapNoteList = machineToolsScrapNoteRepo
-				.getMachineToolsScrapNoteByOrgId(orgId,branch);
+				.getMachineToolsScrapNoteByOrgId(orgId, branch);
 
 		List<MachineToolsScrapNoteResponseDTO> responseList = new ArrayList<>();
 
@@ -6684,4 +6752,1489 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		return responseList;
 	}
+
+//	Activities carried out
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateActivitiesCarriedOut(ActivitiesCarriedOutDTO dto)
+			throws ApplicationException {
+
+		String screenCode = "ACO";
+
+		ActivitiesCarriedOutVO activitiesCarriedOutVO;
+		String message;
+
+		if (dto.getId() != null) {
+
+			activitiesCarriedOutVO = activitiesCarriedOutRepo.findById(dto.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Activities Carried Out Details"));
+
+			activitiesCarriedOutVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Activities Carried Out Updated Successfully";
+
+		} else {
+
+			activitiesCarriedOutVO = new ActivitiesCarriedOutVO();
+
+			String docId = activitiesCarriedOutRepo.getActivitiesCarriedOutDocId(dto.getOrgId(), dto.getFinancialYear(),
+					screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Activities Carried Out DocId Not Found");
+			}
+
+			activitiesCarriedOutVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdScreenCode(dto.getOrgId(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			activitiesCarriedOutVO.setCreatedBy(dto.getCreatedBy());
+			activitiesCarriedOutVO.setUpdatedBy(dto.getCreatedBy());
+
+			message = "Activities Carried Out Created Successfully";
+		}
+
+		createUpdateActivitiesCarriedOutVO(activitiesCarriedOutVO, dto);
+
+		activitiesCarriedOutVO = activitiesCarriedOutRepo.save(activitiesCarriedOutVO);
+
+		saveActivitiesCarriedOutDetails(activitiesCarriedOutVO, dto.getActivitiesCarriedOutDetailsDTO());
+
+		saveActivitiesCarriedOutComponentDetails(activitiesCarriedOutVO,
+				dto.getActivitiesCarriedOutComponentDetailsDTO());
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put(CommonConstant.STRING_MESSAGE, message);
+
+		responseObjectsMap.put("activitiesCarriedOutVO", activitiesCarriedOutResponse(activitiesCarriedOutVO));
+
+		responseObjectsMap.put("docId", activitiesCarriedOutVO.getDocId());
+
+		responseObjectsMap.put("docDate", activitiesCarriedOutVO.getDocDate());
+
+		return responseObjectsMap;
+	}
+
+	private void createUpdateActivitiesCarriedOutVO(ActivitiesCarriedOutVO vo, ActivitiesCarriedOutDTO dto)
+			throws ApplicationException {
+
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Invalid Branch Details"));
+
+			vo.setBranch(branchVO);
+		}
+
+		if (dto.getDepartment() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Invalid Department Details"));
+
+			vo.setDepartment(departmentVO);
+		}
+
+		if (dto.getCheckedBy() != null) {
+
+			EmployeeMasterVO employeeMasterVO = employeeMasterRepo.findById(dto.getCheckedBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Checked By Details"));
+
+			vo.setCheckedBy(employeeMasterVO);
+		}
+
+		if (dto.getSelectMachineToolInst() != null) {
+
+			ToolCategoryVO toolCategoryVO = toolCategoryRepo.findById(dto.getSelectMachineToolInst())
+					.orElseThrow(() -> new ApplicationException("Invalid Machine Tool Instrument Details"));
+
+			vo.setSelectMachineToolInst(toolCategoryVO);
+		}
+
+		vo.setMachineToolInstNo(dto.getMachineToolInstNo());
+
+		vo.setLocation(dto.getLocation());
+
+		if (dto.getPmCheckListNo() != null) {
+
+			PMCheckListMasterVO pmCheckListMasterVO = pmCheckListMasterRepo.findById(dto.getPmCheckListNo())
+					.orElseThrow(() -> new ApplicationException("Invalid PM Check List Details"));
+
+			vo.setPmCheckListNo(pmCheckListMasterVO);
+		}
+
+		if (dto.getMaintenanceType() != null) {
+
+			ListOfValuesDetailsVO maintenanceTypeVO = listOfValuesDetailsRepo.findById(dto.getMaintenanceType())
+					.orElseThrow(() -> new ApplicationException("Invalid Maintenance Type Details"));
+
+			vo.setMaintenanceType(maintenanceTypeVO);
+		}
+
+		if (dto.getFromLocation() != null) {
+
+			LocationVO locationVO = locationRepo.findById(dto.getFromLocation())
+					.orElseThrow(() -> new ApplicationException("Invalid From Location Details"));
+
+			vo.setFromLocation(locationVO);
+		}
+
+		vo.setOrgId(dto.getOrgId());
+		vo.setFinancialYear(dto.getFinancialYear());
+		vo.setActive(dto.isActive());
+		vo.setCancelRemarks(dto.getCancelRemarks());
+	}
+
+	private void saveActivitiesCarriedOutDetails(ActivitiesCarriedOutVO activitiesCarriedOutVO,
+			List<ActivitiesCarriedOutDetailsDTO> detailsDTOList) throws ApplicationException {
+
+		if (detailsDTOList == null || detailsDTOList.isEmpty()) {
+			return;
+		}
+
+		List<ActivitiesCarriedOutDetailsVO> detailsList = new ArrayList<>();
+
+		for (ActivitiesCarriedOutDetailsDTO detailsDTO : detailsDTOList) {
+
+			ActivitiesCarriedOutDetailsVO detailsVO = new ActivitiesCarriedOutDetailsVO();
+
+			detailsVO.setScheduledActivity(detailsDTO.getScheduledActivity());
+
+			if (detailsDTO.getItem() != null) {
+
+				ItemMasterVO itemVO = itemRepo.findById(detailsDTO.getItem())
+						.orElseThrow(() -> new ApplicationException("Invalid Item Details"));
+
+				detailsVO.setItem(itemVO);
+			}
+
+			detailsVO.setFromTime(detailsDTO.getFromTime());
+			detailsVO.setToTime(detailsDTO.getToTime());
+
+			detailsVO.setCheckingPoints(detailsDTO.getCheckingPoints());
+
+			detailsVO.setParameter(detailsDTO.getParameter());
+
+			detailsVO.setActivitiesCarriedOut(detailsDTO.getActivitiesCarriedOut());
+
+			detailsVO.setStatus(detailsDTO.getStatus());
+
+			detailsVO.setDate(detailsDTO.getDate());
+
+			detailsVO.setNextActivity(detailsDTO.getNextActivity());
+
+			/*
+			 * Calculate No Of Hours To Time - From Time
+			 */
+			if (detailsDTO.getFromTime() != null && detailsDTO.getToTime() != null) {
+
+				LocalTime fromTime = detailsDTO.getFromTime();
+
+				LocalTime toTime = detailsDTO.getToTime();
+
+				long minutes = Duration.between(fromTime, toTime).toMinutes();
+
+				/*
+				 * Handles activity crossing midnight
+				 */
+				if (minutes < 0) {
+					minutes = minutes + (24 * 60);
+				}
+
+				BigDecimal noOfHours = BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2,
+						RoundingMode.HALF_UP);
+
+				detailsVO.setNoOfHrs(noOfHours);
+
+			} else {
+
+				detailsVO.setNoOfHrs(BigDecimal.ZERO);
+			}
+
+			detailsVO.setFrequency(detailsDTO.getFrequency());
+
+			detailsVO.setNextScheduleDate(detailsDTO.getNextScheduleDate());
+
+			detailsVO.setActivitiesCarriedOutVO(activitiesCarriedOutVO);
+
+			detailsList.add(detailsVO);
+		}
+
+		activitiesCarriedOutDetailsRepo.saveAll(detailsList);
+
+		activitiesCarriedOutVO.setActivitiesCarriedOutDetailsVO(detailsList);
+	}
+
+	private void saveActivitiesCarriedOutComponentDetails(ActivitiesCarriedOutVO activitiesCarriedOutVO,
+			List<ActivitiesCarriedOutComponentDetailsDTO> componentDTOList) throws ApplicationException {
+
+		if (componentDTOList == null || componentDTOList.isEmpty()) {
+			return;
+		}
+
+		List<ActivitiesCarriedOutComponentDetailsVO> componentList = new ArrayList<>();
+
+		for (ActivitiesCarriedOutComponentDetailsDTO componentDTO : componentDTOList) {
+
+			ActivitiesCarriedOutComponentDetailsVO componentVO = new ActivitiesCarriedOutComponentDetailsVO();
+
+			if (componentDTO.getItem() != null) {
+
+				ItemMasterVO itemVO = itemRepo.findById(componentDTO.getItem())
+						.orElseThrow(() -> new ApplicationException("Invalid Item Details"));
+
+				componentVO.setItem(itemVO);
+			}
+
+			componentVO.setReqQty(componentDTO.getReqQty());
+
+			componentVO.setRate(componentDTO.getRate());
+
+			/*
+			 * Calculate Amount Req Qty * Rate
+			 */
+			if (componentDTO.getReqQty() != null && componentDTO.getRate() != null) {
+
+				BigDecimal amount = componentDTO.getReqQty().multiply(componentDTO.getRate());
+
+				componentVO.setAmount(amount);
+
+			} else {
+
+				componentVO.setAmount(BigDecimal.ZERO);
+			}
+
+			componentVO.setRemarks(componentDTO.getRemarks());
+
+			componentVO.setActivitiesCarriedOutVO(activitiesCarriedOutVO);
+
+			componentList.add(componentVO);
+		}
+
+		activitiesCarriedOutComponentDetailsRepo.saveAll(componentList);
+
+		activitiesCarriedOutVO.setActivitiesCarriedOutComponentDetailsVO(componentList);
+	}
+
+	private ActivitiesCarriedOutResponseDTO activitiesCarriedOutResponse(ActivitiesCarriedOutVO vo) {
+
+		ActivitiesCarriedOutResponseDTO response = new ActivitiesCarriedOutResponseDTO();
+
+		response.setId(vo.getId());
+
+		// Branch
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponse = new BranchResponseDTO();
+
+			branchResponse.setId(vo.getBranch().getId());
+
+			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+
+			branchResponse.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponse);
+		}
+
+		// Department
+		if (vo.getDepartment() != null) {
+
+			DepartmentResponseDTO departmentResponse = new DepartmentResponseDTO();
+
+			departmentResponse.setId(vo.getDepartment().getId());
+
+			departmentResponse.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+
+			departmentResponse.setDepartmentName(vo.getDepartment().getDepartmentName());
+
+			response.setDepartment(departmentResponse);
+		}
+
+		// Checked By
+		if (vo.getCheckedBy() != null) {
+
+			EmployeeMasterResponseDetailsDTO checkedBy = new EmployeeMasterResponseDetailsDTO();
+
+			checkedBy.setId(vo.getCheckedBy().getId());
+
+			checkedBy.setEmployeeName(vo.getCheckedBy().getEmployeeName());
+
+			response.setCheckedBy(checkedBy);
+		}
+
+		// Machine Tool Instrument
+		if (vo.getSelectMachineToolInst() != null) {
+
+			ToolCategoryResponse1DTO toolCategoryResponse = new ToolCategoryResponse1DTO();
+
+			toolCategoryResponse.setId(vo.getSelectMachineToolInst().getId());
+
+			toolCategoryResponse.setApplicableFor(vo.getSelectMachineToolInst().getApllicableFor());
+
+			response.setSelectMachineToolInst(toolCategoryResponse);
+		}
+
+		response.setMachineToolInstNo(vo.getMachineToolInstNo());
+
+		response.setLocation(vo.getLocation());
+
+		// PM Check List
+		if (vo.getPmCheckListNo() != null) {
+
+			PMCheckListResponseDTO pmCheckListResponse = new PMCheckListResponseDTO();
+
+			pmCheckListResponse.setId(vo.getPmCheckListNo().getId());
+
+			pmCheckListResponse.setPmCheckListNo(vo.getPmCheckListNo()
+					.getPmCheckListNo()); /*
+											 * Add the fields available in your PMCheckListResponseDTO here.
+											 */
+
+			response.setPmCheckListNo(pmCheckListResponse);
+		}
+
+		// Maintenance Type
+		if (vo.getMaintenanceType() != null) {
+
+			ListOfValuesDetailsResponseDTO maintenanceType = new ListOfValuesDetailsResponseDTO();
+
+			maintenanceType.setId(vo.getMaintenanceType().getId());
+
+			maintenanceType.setCode(vo.getMaintenanceType().getValueCode());
+
+			maintenanceType.setDescription(vo.getMaintenanceType().getValueDescription());
+
+			response.setMaintenanceType(maintenanceType);
+		}
+
+		// From Location
+		if (vo.getFromLocation() != null) {
+
+			LocationMasterResponseDTO fromLocation = new LocationMasterResponseDTO();
+
+			fromLocation.setId(vo.getFromLocation().getId());
+
+			fromLocation.setLocationName(vo.getFromLocation().getLocationName());
+
+			response.setFromLocation(fromLocation);
+		}
+
+		response.setOrgId(vo.getOrgId());
+		response.setFinancialYear(vo.getFinancialYear());
+		response.setActive(vo.getActive());
+		response.setCancelRemarks(vo.getCancelRemarks());
+		response.setCreatedBy(vo.getCreatedBy());
+
+		// Details Response
+		List<ActivitiesCarriedOutDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+
+		if (vo.getActivitiesCarriedOutDetailsVO() != null && !vo.getActivitiesCarriedOutDetailsVO().isEmpty()) {
+
+			for (ActivitiesCarriedOutDetailsVO detailsVO : vo.getActivitiesCarriedOutDetailsVO()) {
+
+				ActivitiesCarriedOutDetailsResponseDTO detailsResponse = new ActivitiesCarriedOutDetailsResponseDTO();
+
+				detailsResponse.setScheduledActivity(detailsVO.getScheduledActivity());
+
+				if (detailsVO.getItem() != null) {
+
+					ItemResponse1DTO itemResponse = new ItemResponse1DTO();
+
+					itemResponse.setId(detailsVO.getItem().getId());
+
+					itemResponse.setItemCode(detailsVO.getItem().getItemCode());
+
+					itemResponse.setItemDescription(detailsVO.getItem().getItemDescription());
+
+					if (detailsVO.getItem().getPrimaryUnit() != null) {
+
+						UnitMasterResponseDTO unitResponse = new UnitMasterResponseDTO();
+
+						unitResponse.setId(detailsVO.getItem().getPrimaryUnit().getId());
+
+						unitResponse.setUnitId(detailsVO.getItem().getPrimaryUnit().getUnitId());
+
+						unitResponse.setUnitDescription(detailsVO.getItem().getPrimaryUnit().getDescription());
+
+						itemResponse.setUnit(unitResponse);
+					}
+
+					detailsResponse.setItem(itemResponse);
+				}
+				detailsResponse.setFromTime(detailsVO.getFromTime());
+
+				detailsResponse.setToTime(detailsVO.getToTime());
+
+				detailsResponse.setCheckingPoints(detailsVO.getCheckingPoints());
+
+				detailsResponse.setParameter(detailsVO.getParameter());
+
+				detailsResponse.setActivitiesCarriedOut(detailsVO.getActivitiesCarriedOut());
+
+				detailsResponse.setStatus(detailsVO.getStatus());
+
+				detailsResponse.setDate(detailsVO.getDate());
+
+				detailsResponse.setNextActivity(detailsVO.getNextActivity());
+
+				detailsResponse.setNoOfHrs(detailsVO.getNoOfHrs());
+
+				detailsResponse.setFrequency(detailsVO.getFrequency());
+
+				detailsResponse.setNextScheduleDate(detailsVO.getNextScheduleDate());
+
+				detailsResponseList.add(detailsResponse);
+			}
+		}
+
+		response.setActivitiesCarriedOutDetailsResponseDTO(detailsResponseList);
+
+		// Component Details Response
+		List<ActivitiesCarriedOutComponentDetailsResponseDTO> componentResponseList = new ArrayList<>();
+
+		if (vo.getActivitiesCarriedOutComponentDetailsVO() != null
+				&& !vo.getActivitiesCarriedOutComponentDetailsVO().isEmpty()) {
+
+			for (ActivitiesCarriedOutComponentDetailsVO componentVO : vo.getActivitiesCarriedOutComponentDetailsVO()) {
+
+				ActivitiesCarriedOutComponentDetailsResponseDTO componentResponse = new ActivitiesCarriedOutComponentDetailsResponseDTO();
+
+				if (componentVO.getItem() != null) {
+
+					ItemResponse1DTO itemResponse = new ItemResponse1DTO();
+
+					itemResponse.setId(componentVO.getItem().getId());
+
+					itemResponse.setItemCode(componentVO.getItem().getItemCode());
+
+					itemResponse.setItemDescription(componentVO.getItem().getItemDescription());
+
+					if (componentVO.getItem().getPrimaryUnit() != null) {
+
+						UnitMasterResponseDTO unitResponse = new UnitMasterResponseDTO();
+
+						unitResponse.setId(componentVO.getItem().getPrimaryUnit().getId());
+
+						unitResponse.setUnitId(componentVO.getItem().getPrimaryUnit().getUnitId());
+
+						unitResponse.setUnitDescription(componentVO.getItem().getPrimaryUnit().getDescription());
+
+						itemResponse.setUnit(unitResponse);
+					}
+
+					componentResponse.setItem(itemResponse);
+				}
+				componentResponse.setReqQty(componentVO.getReqQty());
+
+				componentResponse.setRate(componentVO.getRate());
+
+				componentResponse.setAmount(componentVO.getAmount());
+
+				componentResponse.setRemarks(componentVO.getRemarks());
+
+				componentResponseList.add(componentResponse);
+			}
+		}
+
+		response.setActivitiesCarriedOutComponentDetailsResponseDTO(componentResponseList);
+
+		return response;
+	}
+
+	@Override
+	public Map<String, Object> getActivitiesCarriedOutById(Long id) throws ApplicationException {
+
+		ActivitiesCarriedOutVO activitiesCarriedOutVO = activitiesCarriedOutRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Activities Carried Out Details"));
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("activitiesCarriedOutVO", activitiesCarriedOutResponse(activitiesCarriedOutVO));
+
+		return responseObjectsMap;
+	}
+
+	@Override
+	public List<ActivitiesCarriedOutResponseDTO> getActivitiesCarriedOutByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<ActivitiesCarriedOutVO> activitiesCarriedOutList = activitiesCarriedOutRepo.findByOrgId(orgId, branch);
+
+		List<ActivitiesCarriedOutResponseDTO> responseList = new ArrayList<>();
+
+		for (ActivitiesCarriedOutVO vo : activitiesCarriedOutList) {
+
+			responseList.add(activitiesCarriedOutResponse(vo));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public Map<String, Object> getActivitiesCarriedOutDocId(Long orgId, String financialYear)
+			throws ApplicationException {
+
+		String screenCode = "ACO";
+
+		String docId = activitiesCarriedOutRepo.getActivitiesCarriedOutDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("Activities Carried Out DocId Not Found");
+		}
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("docId", docId);
+
+		return responseObjectsMap;
+	}
+
+//	quality scrap note
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateQualityScrapNote(QualityScrapNoteDTO qualityScrapNoteDTO)
+			throws ApplicationException {
+
+		String screenCode = "QSN";
+
+		QualityScrapNoteVO qualityScrapNoteVO;
+		String message;
+
+		if (qualityScrapNoteDTO.getId() != null) {
+
+			qualityScrapNoteVO = qualityScrapNoteRepo.findById(qualityScrapNoteDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Quality Scrap Note Details"));
+
+			qualityScrapNoteVO.setUpdatedBy(qualityScrapNoteDTO.getCreatedBy());
+
+			message = "Quality Scrap Note Updated Successfully";
+
+		} else {
+
+			qualityScrapNoteVO = new QualityScrapNoteVO();
+
+			String docId = qualityScrapNoteRepo.getQualityScrapNoteDocId(qualityScrapNoteDTO.getOrgId(),
+					qualityScrapNoteDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Quality Scrap Note DocId Not Found");
+			}
+
+			qualityScrapNoteVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdScreenCode(qualityScrapNoteDTO.getOrgId(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			qualityScrapNoteVO.setCreatedBy(qualityScrapNoteDTO.getCreatedBy());
+
+			qualityScrapNoteVO.setUpdatedBy(qualityScrapNoteDTO.getCreatedBy());
+
+			message = "Quality Scrap Note Created Successfully";
+		}
+
+		createUpdateQualityScrapNoteVO(qualityScrapNoteVO, qualityScrapNoteDTO);
+
+		qualityScrapNoteVO = qualityScrapNoteRepo.save(qualityScrapNoteVO);
+
+		/*
+		 * Save Details
+		 */
+		if (qualityScrapNoteDTO.getQualityScrapNoteDetailsDTO() != null) {
+
+			saveQualityScrapNoteDetails(qualityScrapNoteVO, qualityScrapNoteDTO.getQualityScrapNoteDetailsDTO());
+		}
+
+		/*
+		 * Reload parent with saved details
+		 */
+		qualityScrapNoteVO = qualityScrapNoteRepo.findById(qualityScrapNoteVO.getId())
+				.orElseThrow(() -> new ApplicationException("Quality Scrap Note Not Found"));
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put(CommonConstant.STRING_MESSAGE, message);
+
+		responseObjectsMap.put("qualityScrapNoteVO", qualityScrapNoteResponse(qualityScrapNoteVO));
+		responseObjectsMap.put("docId", qualityScrapNoteVO.getDocId());
+
+		responseObjectsMap.put("docDate", qualityScrapNoteVO.getDocDate());
+
+		return responseObjectsMap;
+	}
+
+	private void createUpdateQualityScrapNoteVO(QualityScrapNoteVO qualityScrapNoteVO,
+			QualityScrapNoteDTO qualityScrapNoteDTO) throws ApplicationException {
+
+		if (qualityScrapNoteDTO.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(qualityScrapNoteDTO.getBranch())
+					.orElseThrow(() -> new ApplicationException("Invalid Branch"));
+
+			qualityScrapNoteVO.setBranch(branchVO);
+		}
+
+		if (qualityScrapNoteDTO.getBelongsTo() != null) {
+
+			ListOfValuesDetailsVO belongsTo = listOfValuesDetailsRepo.findById(qualityScrapNoteDTO.getBelongsTo())
+					.orElseThrow(() -> new ApplicationException("Invalid Belongs To"));
+
+			qualityScrapNoteVO.setBelongsTo(belongsTo);
+		}
+
+		if (qualityScrapNoteDTO.getDepartment() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(qualityScrapNoteDTO.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Invalid Department"));
+
+			qualityScrapNoteVO.setDepartment(departmentVO);
+		}
+
+		if (qualityScrapNoteDTO.getFromLocation() != null) {
+
+			LocationVO fromLocation = locationRepo.findById(qualityScrapNoteDTO.getFromLocation())
+					.orElseThrow(() -> new ApplicationException("Invalid From Location"));
+
+			qualityScrapNoteVO.setFromLocation(fromLocation);
+		}
+
+		if (qualityScrapNoteDTO.getToLocation() != null) {
+
+			LocationVO toLocation = locationRepo.findById(qualityScrapNoteDTO.getToLocation())
+					.orElseThrow(() -> new ApplicationException("Invalid To Location"));
+
+			qualityScrapNoteVO.setToLocation(toLocation);
+		}
+
+		if (qualityScrapNoteDTO.getPreparedBy() != null) {
+
+			EmployeeMasterVO preparedBy = employeeMasterRepo.findById(qualityScrapNoteDTO.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Prepared By"));
+
+			qualityScrapNoteVO.setPreparedBy(preparedBy);
+		}
+
+		if (qualityScrapNoteDTO.getAuthorizedBy() != null) {
+
+			EmployeeMasterVO authorizedBy = employeeMasterRepo.findById(qualityScrapNoteDTO.getAuthorizedBy())
+					.orElseThrow(() -> new ApplicationException("Invalid Authorized By"));
+
+			qualityScrapNoteVO.setAuthorizedBy(authorizedBy);
+		}
+
+		qualityScrapNoteVO.setTime(qualityScrapNoteDTO.getTime());
+
+		// DO NOT SET totalScrapValue FROM DTO
+		// It will be calculated from quantity × rate
+		// qualityScrapNoteVO.setTotalScrapValue(
+		// qualityScrapNoteDTO.getTotalScrapValue());
+
+		qualityScrapNoteVO.setQualityApproval(qualityScrapNoteDTO.getQualityApproval());
+
+		qualityScrapNoteVO.setNarration(qualityScrapNoteDTO.getNarration());
+
+		qualityScrapNoteVO.setOrgId(qualityScrapNoteDTO.getOrgId());
+
+		qualityScrapNoteVO.setFinancialYear(qualityScrapNoteDTO.getFinancialYear());
+
+		qualityScrapNoteVO.setActive(qualityScrapNoteDTO.isActive());
+
+		qualityScrapNoteVO.setCancelRemarks(qualityScrapNoteDTO.getCancelRemarks());
+
+		qualityScrapNoteVO.setScreenCode("QSN");
+
+		qualityScrapNoteVO.setScreenName("QUALITY SCRAP NOTE");
+	}
+
+	private void saveQualityScrapNoteDetails(QualityScrapNoteVO qualityScrapNoteVO,
+			List<QualityScrapNoteDetailsDTO> detailsDTOList) throws ApplicationException {
+
+		List<QualityScrapNoteDetailsVO> detailsList = new ArrayList<>();
+
+		BigDecimal totalScrapValue = BigDecimal.ZERO;
+
+		for (QualityScrapNoteDetailsDTO detailsDTO : detailsDTOList) {
+
+			QualityScrapNoteDetailsVO detailsVO = new QualityScrapNoteDetailsVO();
+
+			if (detailsDTO.getItem() != null) {
+
+				ItemMasterVO itemVO = itemRepo.findById(detailsDTO.getItem())
+						.orElseThrow(() -> new ApplicationException("Invalid Item"));
+
+				detailsVO.setItem(itemVO);
+			}
+
+			detailsVO.setStock(detailsDTO.getStock());
+
+			detailsVO.setQuantity(detailsDTO.getQuantity());
+
+			detailsVO.setRate(detailsDTO.getRate());
+
+			/*
+			 * Value = Quantity × Rate
+			 */
+			BigDecimal value = BigDecimal.ZERO;
+
+			if (detailsDTO.getQuantity() != null && detailsDTO.getRate() != null) {
+
+				value = detailsDTO.getQuantity().multiply(detailsDTO.getRate());
+			}
+
+			detailsVO.setValue(value);
+
+			/*
+			 * Add child value to header total
+			 */
+			totalScrapValue = totalScrapValue.add(value);
+
+			detailsVO.setQualityScrapNoteVO(qualityScrapNoteVO);
+
+			detailsList.add(detailsVO);
+		}
+
+		/*
+		 * Set calculated total value in header
+		 */
+		qualityScrapNoteVO.setTotalScrapValue(totalScrapValue);
+
+		/*
+		 * Set details to parent
+		 */
+		qualityScrapNoteVO.setQualityScrapNoteDetailsVO(detailsList);
+	}
+
+	private QualityScrapNoteResponseDTO qualityScrapNoteResponse(QualityScrapNoteVO vo) {
+
+		QualityScrapNoteResponseDTO response = new QualityScrapNoteResponseDTO();
+
+		response.setId(vo.getId());
+
+		// Branch
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponse = new BranchResponseDTO();
+
+			branchResponse.setId(vo.getBranch().getId());
+			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+			branchResponse.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponse);
+		}
+
+		response.setTime(vo.getTime());
+
+		// Belongs To
+		if (vo.getBelongsTo() != null) {
+
+			ListOfValuesDetailsResponseDTO belongsTo = new ListOfValuesDetailsResponseDTO();
+
+			belongsTo.setId(vo.getBelongsTo().getId());
+
+			belongsTo.setCode(vo.getBelongsTo().getValueCode());
+
+			belongsTo.setDescription(vo.getBelongsTo().getValueDescription());
+
+			response.setBelongsTo(belongsTo);
+		}
+
+		// Department
+		if (vo.getDepartment() != null) {
+
+			DepartmentResponseDTO department = new DepartmentResponseDTO();
+
+			department.setId(vo.getDepartment().getId());
+
+			department.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+
+			department.setDepartmentName(vo.getDepartment().getDepartmentName());
+
+			response.setDepartment(department);
+		}
+
+		// From Location
+		if (vo.getFromLocation() != null) {
+
+			LocationMasterResponseDTO fromLocation = new LocationMasterResponseDTO();
+
+			fromLocation.setId(vo.getFromLocation().getId());
+
+//			fromLocation.setLocationCode(vo.getFromLocation().getLocationCode());
+
+			fromLocation.setLocationName(vo.getFromLocation().getLocationName());
+
+			response.setFromLocation(fromLocation);
+		}
+
+		// To Location
+		if (vo.getToLocation() != null) {
+
+			LocationMasterResponseDTO toLocation = new LocationMasterResponseDTO();
+
+			toLocation.setId(vo.getToLocation().getId());
+
+//			toLocation.setLocationCode(vo.getToLocation().getLocationCode());
+
+			toLocation.setLocationName(vo.getToLocation().getLocationName());
+
+			response.setToLocation(toLocation);
+		}
+
+		// Prepared By
+		if (vo.getPreparedBy() != null) {
+
+			EmployeeMasterDetailsReponseDTO preparedBy = new EmployeeMasterDetailsReponseDTO();
+
+			preparedBy.setId(vo.getPreparedBy().getId());
+
+//			spreparedBy.setEmployeeCode(vo.getPreparedBy().getEmployeeCode());
+
+			preparedBy.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+
+			response.setPreparedBy(preparedBy);
+		}
+
+		// Authorized By
+		if (vo.getAuthorizedBy() != null) {
+
+			EmployeeMasterDetailsReponseDTO authorizedBy = new EmployeeMasterDetailsReponseDTO();
+
+			authorizedBy.setId(vo.getAuthorizedBy().getId());
+
+//			authorizedBy.setEmployeeCode(vo.getAuthorizedBy().getEmployeeCode());
+
+			authorizedBy.setEmployeeName(vo.getAuthorizedBy().getEmployeeName());
+
+			response.setAuthorizedBy(authorizedBy);
+		}
+
+		response.setTotalScrapValue(vo.getTotalScrapValue());
+
+		response.setQualityApproval(vo.getQualityApproval());
+
+		response.setNarration(vo.getNarration());
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setActive(vo.getActive());
+
+		response.setCancelRemarks(vo.getCancelRemarks());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		// Details
+		List<QualityScrapNoteDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+
+		if (vo.getQualityScrapNoteDetailsVO() != null && !vo.getQualityScrapNoteDetailsVO().isEmpty()) {
+
+			for (QualityScrapNoteDetailsVO detailsVO : vo.getQualityScrapNoteDetailsVO()) {
+
+				QualityScrapNoteDetailsResponseDTO detailsResponse = new QualityScrapNoteDetailsResponseDTO();
+
+				// Item
+				if (detailsVO.getItem() != null) {
+
+					ItemResponse1DTO itemResponse = new ItemResponse1DTO();
+
+					itemResponse.setId(detailsVO.getItem().getId());
+
+					itemResponse.setItemCode(detailsVO.getItem().getItemCode());
+
+					itemResponse.setItemDescription(detailsVO.getItem().getItemDescription());
+
+					// Unit
+					if (detailsVO.getItem().getPrimaryUnit() != null) {
+
+						UnitMasterResponseDTO unitResponse = new UnitMasterResponseDTO();
+
+						unitResponse.setId(detailsVO.getItem().getPrimaryUnit().getId());
+
+						unitResponse.setUnitId(detailsVO.getItem().getPrimaryUnit().getUnitId());
+
+						unitResponse.setUnitDescription(detailsVO.getItem().getPrimaryUnit().getDescription());
+
+						itemResponse.setUnit(unitResponse);
+					}
+
+					detailsResponse.setItem(itemResponse);
+				}
+
+				detailsResponse.setStock(detailsVO.getStock());
+
+				detailsResponse.setQuantity(detailsVO.getQuantity());
+
+				detailsResponse.setRate(detailsVO.getRate());
+
+				detailsResponse.setValue(detailsVO.getValue());
+
+				detailsResponseList.add(detailsResponse);
+			}
+		}
+
+		response.setQualityScrapNoteDetailsResponseDTO(detailsResponseList);
+
+		return response;
+	}
+
+	@Override
+	public Map<String, Object> getQualityScrapNoteById(Long id) throws ApplicationException {
+
+		QualityScrapNoteVO qualityScrapNoteVO = qualityScrapNoteRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Invalid Quality Scrap Note Details"));
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("qualityScrapNoteVO", qualityScrapNoteResponse(qualityScrapNoteVO));
+
+		responseObjectsMap.put("docId", qualityScrapNoteVO.getDocId());
+
+		responseObjectsMap.put("docDate", qualityScrapNoteVO.getDocDate());
+
+		return responseObjectsMap;
+	}
+
+	@Override
+	public List<QualityScrapNoteResponseDTO> getQualityScrapNoteByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<QualityScrapNoteVO> qualityScrapNoteList = qualityScrapNoteRepo.findByOrgId(orgId, branch);
+
+		List<QualityScrapNoteResponseDTO> responseList = new ArrayList<>();
+
+		for (QualityScrapNoteVO vo : qualityScrapNoteList) {
+
+			responseList.add(qualityScrapNoteResponse(vo));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public Map<String, Object> getQualityScrapNoteDocId(Long orgId, String financialYear) throws ApplicationException {
+
+		String screenCode = "QSN";
+
+		String docId = qualityScrapNoteRepo.getQualityScrapNoteDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("Quality Scrap Note DocId Not Found");
+		}
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("docId", docId);
+
+		return responseObjectsMap;
+	}
+
+//	Scrap material return rejecttion
+
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateScrapMaterialReturnRejection(
+			ScrapMaterialReturnRejectionDTO scrapMaterialReturnRejectionDTO) throws ApplicationException {
+
+		String screenCode = "SMRR";
+
+		ScrapMaterialReturnRejectionVO scrapMaterialReturnRejectionVO;
+		String message;
+
+		if (scrapMaterialReturnRejectionDTO.getId() != null) {
+
+			scrapMaterialReturnRejectionVO = scrapMaterialReturnRejectionRepo
+					.findById(scrapMaterialReturnRejectionDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Scrap Material Return Rejection Details"));
+
+			scrapMaterialReturnRejectionVO.setUpdatedBy(scrapMaterialReturnRejectionDTO.getCreatedBy());
+
+			message = "Scrap Material Return Rejection Updated Successfully";
+
+		} else {
+
+			scrapMaterialReturnRejectionVO = new ScrapMaterialReturnRejectionVO();
+
+			String docId = scrapMaterialReturnRejectionRepo.getScrapMaterialReturnRejectionDocId(
+					scrapMaterialReturnRejectionDTO.getOrgId(), scrapMaterialReturnRejectionDTO.getFinancialYear(),
+					screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+
+				throw new ApplicationException("Scrap Material Return Rejection DocId Not Found");
+			}
+
+			scrapMaterialReturnRejectionVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdScreenCode(scrapMaterialReturnRejectionDTO.getOrgId(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			scrapMaterialReturnRejectionVO.setCreatedBy(scrapMaterialReturnRejectionDTO.getCreatedBy());
+
+			scrapMaterialReturnRejectionVO.setUpdatedBy(scrapMaterialReturnRejectionDTO.getCreatedBy());
+
+			message = "Scrap Material Return Rejection Created Successfully";
+		}
+
+		createUpdateScrapMaterialReturnRejectionVO(scrapMaterialReturnRejectionVO, scrapMaterialReturnRejectionDTO);
+
+		if (scrapMaterialReturnRejectionDTO.getScrapMaterialReturnRejectionDetailsDTO() != null
+				&& !scrapMaterialReturnRejectionDTO.getScrapMaterialReturnRejectionDetailsDTO().isEmpty()) {
+
+			saveScrapMaterialReturnRejectionDetails(scrapMaterialReturnRejectionVO,
+					scrapMaterialReturnRejectionDTO.getScrapMaterialReturnRejectionDetailsDTO());
+		}
+
+		scrapMaterialReturnRejectionVO = scrapMaterialReturnRejectionRepo.save(scrapMaterialReturnRejectionVO);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put(CommonConstant.STRING_MESSAGE, message);
+
+		responseObjectsMap.put("scrapMaterialReturnRejectionVO",
+				scrapMaterialReturnRejectionResponse(scrapMaterialReturnRejectionVO));
+
+		responseObjectsMap.put("docId", scrapMaterialReturnRejectionVO.getDocId());
+
+		responseObjectsMap.put("docDate", scrapMaterialReturnRejectionVO.getDocDate());
+
+		return responseObjectsMap;
+	}
+
+	private void createUpdateScrapMaterialReturnRejectionVO(
+			ScrapMaterialReturnRejectionVO scrapMaterialReturnRejectionVO,
+			ScrapMaterialReturnRejectionDTO scrapMaterialReturnRejectionDTO) throws ApplicationException {
+
+		if (scrapMaterialReturnRejectionDTO.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(scrapMaterialReturnRejectionDTO.getBranch())
+					.orElseThrow(() -> new ApplicationException("Invalid Branch"));
+
+			scrapMaterialReturnRejectionVO.setBranch(branchVO);
+		}
+
+		if (scrapMaterialReturnRejectionDTO.getEntryFor() != null) {
+
+			ListOfValuesDetailsVO entryFor = listOfValuesDetailsRepo
+					.findById(scrapMaterialReturnRejectionDTO.getEntryFor())
+					.orElseThrow(() -> new ApplicationException("Invalid Entry For"));
+
+			scrapMaterialReturnRejectionVO.setEntryFor(entryFor);
+		}
+
+		if (scrapMaterialReturnRejectionDTO.getVendorId() != null) {
+
+			CustomerVO vendor = customerRepo.findById(scrapMaterialReturnRejectionDTO.getVendorId())
+					.orElseThrow(() -> new ApplicationException("Invalid Vendor"));
+
+			scrapMaterialReturnRejectionVO.setVendorId(vendor);
+		}
+
+		if (scrapMaterialReturnRejectionDTO.getToLocation() != null) {
+
+			LocationVO toLocation = locationRepo.findById(scrapMaterialReturnRejectionDTO.getToLocation())
+					.orElseThrow(() -> new ApplicationException("Invalid To Location"));
+
+			scrapMaterialReturnRejectionVO.setToLocation(toLocation);
+		}
+
+		if (scrapMaterialReturnRejectionDTO.getVendorLocation() != null) {
+
+			LocationVO vendorLocation = locationRepo.findById(scrapMaterialReturnRejectionDTO.getVendorLocation())
+					.orElseThrow(() -> new ApplicationException("Invalid Vendor Location"));
+
+			scrapMaterialReturnRejectionVO.setVendorLocation(vendorLocation);
+		}
+
+		scrapMaterialReturnRejectionVO.setEntryType(scrapMaterialReturnRejectionDTO.getEntryType());
+
+		scrapMaterialReturnRejectionVO.setDocNo(scrapMaterialReturnRejectionDTO.getDocNo());
+
+		scrapMaterialReturnRejectionVO.setDocumentDate(scrapMaterialReturnRejectionDTO.getDocumentDate());
+
+		scrapMaterialReturnRejectionVO.setApprovalByQc(scrapMaterialReturnRejectionDTO.getApprovalByQc());
+
+		scrapMaterialReturnRejectionVO.setReasonForRejection(scrapMaterialReturnRejectionDTO.getReasonForRejection());
+
+		scrapMaterialReturnRejectionVO.setApprovalByPurchase(scrapMaterialReturnRejectionDTO.getApprovalByPurchase());
+
+		scrapMaterialReturnRejectionVO.setOrgId(scrapMaterialReturnRejectionDTO.getOrgId());
+
+		scrapMaterialReturnRejectionVO.setFinancialYear(scrapMaterialReturnRejectionDTO.getFinancialYear());
+
+		scrapMaterialReturnRejectionVO.setActive(scrapMaterialReturnRejectionDTO.isActive());
+
+		scrapMaterialReturnRejectionVO.setCancelRemarks(scrapMaterialReturnRejectionDTO.getCancelRemarks());
+
+		scrapMaterialReturnRejectionVO.setScreenCode("SMRR");
+
+		scrapMaterialReturnRejectionVO.setScreenName("SCRAP MATERIAL RETURN REJECTION");
+	}
+
+	private void saveScrapMaterialReturnRejectionDetails(ScrapMaterialReturnRejectionVO scrapMaterialReturnRejectionVO,
+			List<ScrapMaterialReturnRejectionDetailsDTO> detailsDTOList) throws ApplicationException {
+
+		List<ScrapMaterialReturnRejectionDetailsVO> detailsList = new ArrayList<>();
+
+		for (ScrapMaterialReturnRejectionDetailsDTO detailsDTO : detailsDTOList) {
+
+			ScrapMaterialReturnRejectionDetailsVO detailsVO = new ScrapMaterialReturnRejectionDetailsVO();
+
+			if (detailsDTO.getItem() != null) {
+
+				ItemMasterVO itemVO = itemRepo.findById(detailsDTO.getItem())
+						.orElseThrow(() -> new ApplicationException("Invalid Item"));
+
+				detailsVO.setItem(itemVO);
+			}
+
+			if (detailsDTO.getUnit() != null) {
+
+				UnitMasterVO unitVO = unitMasterRepo.findById(detailsDTO.getUnit())
+						.orElseThrow(() -> new ApplicationException("Invalid Unit"));
+
+				detailsVO.setUnit(unitVO);
+			}
+
+			detailsVO.setAvailableStock(detailsDTO.getAvailableStock());
+
+			detailsVO.setRecQty(detailsDTO.getRecQty());
+
+			detailsVO.setCostRate(detailsDTO.getCostRate());
+
+			/*
+			 * Amount = Received Quantity × Cost Rate
+			 */
+			BigDecimal amount = BigDecimal.ZERO;
+
+			if (detailsDTO.getRecQty() != null && detailsDTO.getCostRate() != null) {
+
+				amount = detailsDTO.getRecQty().multiply(detailsDTO.getCostRate());
+			}
+
+			detailsVO.setAmount(amount);
+
+			detailsVO.setNote(detailsDTO.getNote());
+
+			detailsVO.setScrapMaterialReturnRejectionVO(scrapMaterialReturnRejectionVO);
+
+			detailsList.add(detailsVO);
+		}
+
+		scrapMaterialReturnRejectionVO.setScrapMaterialReturnRejectionDetailsVO(detailsList);
+	}
+
+	private ScrapMaterialReturnRejectionResponseDTO scrapMaterialReturnRejectionResponse(
+			ScrapMaterialReturnRejectionVO vo) {
+
+		ScrapMaterialReturnRejectionResponseDTO response = new ScrapMaterialReturnRejectionResponseDTO();
+
+		response.setId(vo.getId());
+
+// Branch
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponse = new BranchResponseDTO();
+
+			branchResponse.setId(vo.getBranch().getId());
+
+			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+
+			branchResponse.setBranchName(vo.getBranch().getBranchName());
+
+			response.setBranch(branchResponse);
+		}
+
+// Entry For
+		if (vo.getEntryFor() != null) {
+
+			ListOfValuesDetailsResponseDTO entryFor = new ListOfValuesDetailsResponseDTO();
+
+			entryFor.setId(vo.getEntryFor().getId());
+
+			entryFor.setCode(vo.getEntryFor().getValueCode());
+
+			entryFor.setDescription(vo.getEntryFor().getValueDescription());
+
+			response.setEntryFor(entryFor);
+		}
+
+// Vendor
+		if (vo.getVendorId() != null) {
+
+			CustomerResponse1DTO vendor = new CustomerResponse1DTO();
+
+			vendor.setId(vo.getVendorId().getId());
+
+//			vendor.setCustomerCode(vo.getVendorId().getCustomerCode());
+
+			vendor.setCustomerName(vo.getVendorId().getCustomerName());
+
+			response.setVendorId(vendor);
+		}
+
+// To Location
+		if (vo.getToLocation() != null) {
+
+			LocationMasterResponseDTO toLocation = new LocationMasterResponseDTO();
+
+			toLocation.setId(vo.getToLocation().getId());
+
+			toLocation.setLocationName(vo.getToLocation().getLocationName());
+
+			response.setToLocation(toLocation);
+		}
+
+// Vendor Location
+		if (vo.getVendorLocation() != null) {
+
+			LocationMasterResponseDTO vendorLocation = new LocationMasterResponseDTO();
+
+			vendorLocation.setId(vo.getVendorLocation().getId());
+
+			vendorLocation.setLocationName(vo.getVendorLocation().getLocationName());
+
+			response.setVendorLocation(vendorLocation);
+		}
+
+		response.setEntryType(vo.getEntryType());
+
+		response.setDocNo(vo.getDocNo());
+
+		response.setDocumentDate(vo.getDocumentDate());
+
+		response.setApprovalByQc(vo.getApprovalByQc());
+
+		response.setReasonForRejection(vo.getReasonForRejection());
+
+		response.setApprovalByPurchase(vo.getApprovalByPurchase());
+
+		response.setOrgId(vo.getOrgId());
+
+		response.setFinancialYear(vo.getFinancialYear());
+
+		response.setActive(vo.getActive());
+
+		response.setCancelRemarks(vo.getCancelRemarks());
+
+		response.setCreatedBy(vo.getCreatedBy());
+
+		/*
+		 * Details
+		 */
+		List<ScrapMaterialReturnRejectionDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+
+		if (vo.getScrapMaterialReturnRejectionDetailsVO() != null
+				&& !vo.getScrapMaterialReturnRejectionDetailsVO().isEmpty()) {
+
+			for (ScrapMaterialReturnRejectionDetailsVO detailsVO : vo.getScrapMaterialReturnRejectionDetailsVO()) {
+
+				ScrapMaterialReturnRejectionDetailsResponseDTO detailsResponse = new ScrapMaterialReturnRejectionDetailsResponseDTO();
+
+				detailsResponse.setId(detailsVO.getId());
+
+				// Item
+				if (detailsVO.getItem() != null) {
+
+					ItemResponse1DTO itemResponse = new ItemResponse1DTO();
+
+					itemResponse.setId(detailsVO.getItem().getId());
+
+					itemResponse.setItemCode(detailsVO.getItem().getItemCode());
+
+					itemResponse.setItemDescription(detailsVO.getItem().getItemDescription());
+
+					if (detailsVO.getItem().getPrimaryUnit() != null) {
+
+						UnitMasterResponseDTO unitResponse = new UnitMasterResponseDTO();
+
+						unitResponse.setId(detailsVO.getItem().getPrimaryUnit().getId());
+
+						unitResponse.setUnitId(detailsVO.getItem().getPrimaryUnit().getUnitId());
+
+						unitResponse.setUnitDescription(detailsVO.getItem().getPrimaryUnit().getDescription());
+
+						itemResponse.setUnit(unitResponse);
+					}
+
+					detailsResponse.setItem(itemResponse);
+				}
+
+				// Unit
+				if (detailsVO.getUnit() != null) {
+
+					UnitResponseDTO unitResponse = new UnitResponseDTO();
+
+					unitResponse.setId(detailsVO.getUnit().getId());
+
+					unitResponse.setUnitId(detailsVO.getUnit().getUnitId());
+
+//					unitResponse.setDescription(detailsVO.getUnit().getDescription());
+
+					detailsResponse.setUnit(unitResponse);
+				}
+
+				detailsResponse.setAvailableStock(detailsVO.getAvailableStock());
+
+				detailsResponse.setRecQty(detailsVO.getRecQty());
+
+				detailsResponse.setCostRate(detailsVO.getCostRate());
+
+				detailsResponse.setAmount(detailsVO.getAmount());
+
+				detailsResponse.setNote(detailsVO.getNote());
+
+				detailsResponseList.add(detailsResponse);
+			}
+		}
+
+		response.setScrapMaterialReturnRejectionDetailsResponseDTO(detailsResponseList);
+
+		return response;
+	}
+
+	@Override
+	public Map<String, Object> getScrapMaterialReturnRejectionById(Long id) throws ApplicationException {
+
+		ScrapMaterialReturnRejectionVO scrapMaterialReturnRejectionVO = scrapMaterialReturnRejectionRepo.findById(id)
+				.orElseThrow(() -> new ApplicationException("Scrap Material Return Rejection Not Found"));
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("scrapMaterialReturnRejectionVO",
+				scrapMaterialReturnRejectionResponse(scrapMaterialReturnRejectionVO));
+
+		return responseObjectsMap;
+	}
+
+	@Override
+	public List<ScrapMaterialReturnRejectionResponseDTO> getScrapMaterialReturnRejectionByOrgId(Long orgId, Long branch)
+			throws ApplicationException {
+
+		List<ScrapMaterialReturnRejectionVO> scrapMaterialReturnRejectionList = scrapMaterialReturnRejectionRepo
+				.findByOrgIdAndBranch(orgId, branch);
+
+		List<ScrapMaterialReturnRejectionResponseDTO> responseList = new ArrayList<>();
+
+		for (ScrapMaterialReturnRejectionVO vo : scrapMaterialReturnRejectionList) {
+
+			responseList.add(scrapMaterialReturnRejectionResponse(vo));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public Map<String, Object> getScrapMaterialReturnRejectionDocId(Long orgId, String financialYear)
+			throws ApplicationException {
+
+		String screenCode = "SMRR";
+
+		String docId = scrapMaterialReturnRejectionRepo.getScrapMaterialReturnRejectionDocId(orgId, financialYear,
+				screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+
+			throw new ApplicationException("Scrap Material Return Rejection DocId Not Found");
+		}
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("docId", docId);
+
+		return responseObjectsMap;
+	}
+
+//	OrderAcceptanceForapprovalreports
+	@Override
+	public Map<String, Object> getOrderAcceptanceForGstApprovalReport(String fromDate, String toDate, Long orgId,
+			Long branch) throws ApplicationException {
+
+		List<Object[]> resultList = orderAcceptanceRepo.getOrderAcceptanceForGstApproval(fromDate, toDate, orgId,
+				branch);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("docId", obj[0]);
+			data.put("docDate", obj[1]);
+			data.put("customerId", obj[2]);
+			data.put("customerName", obj[3]);
+			data.put("Approved", obj[4]);
+			data.put("orderAcceptanceBasicId", obj[5]);
+			data.put("note", obj[6]);
+
+			responseList.add(data);
+		}
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("orderAcceptanceList", responseList);
+
+		return responseObjectsMap;
+	}
+
+//	SalesContractApprovalReport
+
+	@Override
+	public Map<String, Object> getSalesContractForApproval(Long branch, Long orgId, String fromDate,
+			String toDate) throws ApplicationException {
+
+		List<Object[]> resultList = salesContractRepo.getSalesContractForApproval(branch, orgId, fromDate, toDate);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("docId", obj[0]);
+			data.put("docDate", obj[1]);
+			data.put("customerPurchaseOrderDate", obj[2]);
+			data.put("customerId", obj[3]);
+			data.put("customerName", obj[4]);
+			data.put("approval", obj[5]);
+			data.put("salesContractId", obj[6]);
+			data.put("notes", obj[7]);
+			data.put("customerontractNo",obj[8]);
+
+			responseList.add(data);
+		}
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("salesContractList", responseList);
+
+		return responseObjectsMap;
+	}
+
 }

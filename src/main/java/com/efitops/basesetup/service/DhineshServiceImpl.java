@@ -249,6 +249,7 @@ public class DhineshServiceImpl implements DhineshService {
 		salesContractVO.setFinancialYear(dto.getFinancialYear());
 
 		salesContractVO.setCancelRemarks(dto.getCancelRemarks());
+		salesContractVO.setApproval(dto.getApproval());
 		salesContractVO.setActive(dto.isActive());
 
 		salesContractVO.setTotalAmount(dto.getTotalAmount());

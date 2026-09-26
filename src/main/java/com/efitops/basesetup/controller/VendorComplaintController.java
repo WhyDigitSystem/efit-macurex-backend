@@ -1,6 +1,7 @@
 package com.efitops.basesetup.controller;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.ActivitiesCarriedOutResponseDTO;
 import com.efitops.basesetup.ResponseDTO.AuthorizationForBreakdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
@@ -34,12 +36,15 @@ import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineToolBreakdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineToolsScrapNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PMCheckListMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.QualityScrapNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ScrapMaterialReturnRejectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierChangeRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
+import com.efitops.basesetup.dto.ActivitiesCarriedOutDTO;
 import com.efitops.basesetup.dto.AuthorizationForBreakdownDTO;
 import com.efitops.basesetup.dto.CategoryMasterDTO;
 import com.efitops.basesetup.dto.CauseMasterDTO;
@@ -50,7 +55,9 @@ import com.efitops.basesetup.dto.MachineToolBreakdownDTO;
 import com.efitops.basesetup.dto.MachineToolRectificationDTO;
 import com.efitops.basesetup.dto.MachineToolsScrapNoteDTO;
 import com.efitops.basesetup.dto.PMCheckListMasterDTO;
+import com.efitops.basesetup.dto.QualityScrapNoteDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
+import com.efitops.basesetup.dto.ScrapMaterialReturnRejectionDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
@@ -3209,7 +3216,7 @@ public class VendorComplaintController extends BaseController {
 
 	@GetMapping("/getMachineToolsScrapNoteByOrgId")
 	public ResponseEntity<List<MachineToolsScrapNoteResponseDTO>> getMachineToolsScrapNoteByOrgId(
-			@RequestParam Long orgId,@RequestParam Long branch) {
+			@RequestParam Long orgId, @RequestParam Long branch) {
 
 		String methodName = "getMachineToolsScrapNoteByOrgId()";
 
@@ -3219,7 +3226,7 @@ public class VendorComplaintController extends BaseController {
 
 		try {
 
-			responseList = vendorComplaintService.getMachineToolsScrapNoteByOrgId(orgId,branch);
+			responseList = vendorComplaintService.getMachineToolsScrapNoteByOrgId(orgId, branch);
 
 		} catch (Exception e) {
 
@@ -3230,4 +3237,460 @@ public class VendorComplaintController extends BaseController {
 
 		return ResponseEntity.ok().body(responseList);
 	}
+
+//	activities carried out
+	@PutMapping("/updateCreateActivitiesCarriedOut")
+	public ResponseEntity<ResponseDTO> updateCreateActivitiesCarriedOut(
+			@RequestBody ActivitiesCarriedOutDTO activitiesCarriedOutDTO) {
+
+		String methodName = "updateCreateActivitiesCarriedOut()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.updateCreateActivitiesCarriedOut(activitiesCarriedOutDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getActivitiesCarriedOutByOrgId")
+	public ResponseEntity<List<ActivitiesCarriedOutResponseDTO>> getActivitiesCarriedOutByOrgId(
+			@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getActivitiesCarriedOutByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		List<ActivitiesCarriedOutResponseDTO> responseList = new ArrayList<>();
+
+		try {
+
+			responseList = vendorComplaintService.getActivitiesCarriedOutByOrgId(orgId, branch);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseList);
+	}
+
+	@GetMapping("/getActivitiesCarriedOutById")
+	public ResponseEntity<ResponseDTO> getActivitiesCarriedOutById(@RequestParam Long id) {
+
+		String methodName = "getActivitiesCarriedOutById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getActivitiesCarriedOutById(id);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getActivitiesCarriedOutDocId")
+	public ResponseEntity<ResponseDTO> getActivitiesCarriedOutDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getActivitiesCarriedOutDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getActivitiesCarriedOutDocId(orgId, financialYear);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+//	quality scrap note
+
+	@PutMapping("/updateCreateQualityScrapNote")
+	public ResponseEntity<ResponseDTO> updateCreateQualityScrapNote(
+			@RequestBody QualityScrapNoteDTO qualityScrapNoteDTO) {
+
+		String methodName = "updateCreateQualityScrapNote()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.updateCreateQualityScrapNote(qualityScrapNoteDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getQualityScrapNoteById")
+	public ResponseEntity<ResponseDTO> getQualityScrapNoteById(@RequestParam Long id) {
+
+		String methodName = "getQualityScrapNoteById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getQualityScrapNoteById(id);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getQualityScrapNoteByOrgId")
+	public ResponseEntity<List<QualityScrapNoteResponseDTO>> getQualityScrapNoteByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getQualityScrapNoteByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		List<QualityScrapNoteResponseDTO> responseList = new ArrayList<>();
+
+		try {
+
+			responseList = vendorComplaintService.getQualityScrapNoteByOrgId(orgId, branch);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseList);
+	}
+
+	@GetMapping("/getQualityScrapNoteDocId")
+	public ResponseEntity<ResponseDTO> getQualityScrapNoteDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getQualityScrapNoteDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getQualityScrapNoteDocId(orgId, financialYear);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	Scrap material return rejection
+
+	@PutMapping("/updateCreateScrapMaterialReturnRejection")
+	public ResponseEntity<ResponseDTO> updateCreateScrapMaterialReturnRejection(
+			@RequestBody ScrapMaterialReturnRejectionDTO scrapMaterialReturnRejectionDTO) {
+
+		String methodName = "updateCreateScrapMaterialReturnRejection()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService
+					.updateCreateScrapMaterialReturnRejection(scrapMaterialReturnRejectionDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getScrapMaterialReturnRejectionByOrgId")
+	public ResponseEntity<ResponseDTO> getScrapMaterialReturnRejectionByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getScrapMaterialReturnRejectionByOrgId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			List<ScrapMaterialReturnRejectionResponseDTO> responseList = vendorComplaintService
+					.getScrapMaterialReturnRejectionByOrgId(orgId, branch);
+
+			responseObjectsMap.put("scrapMaterialReturnRejectionList", responseList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getScrapMaterialReturnRejectionById")
+	public ResponseEntity<ResponseDTO> getScrapMaterialReturnRejectionById(@RequestParam Long id) {
+
+		String methodName = "getScrapMaterialReturnRejectionById()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getScrapMaterialReturnRejectionById(id);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getScrapMaterialReturnRejectionDocId")
+	public ResponseEntity<ResponseDTO> getScrapMaterialReturnRejectionDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getScrapMaterialReturnRejectionDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getScrapMaterialReturnRejectionDocId(orgId, financialYear);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	order Acceptance approval report
+
+	@GetMapping("/getOrderAcceptanceForGstApprovalReport")
+	public ResponseEntity<ResponseDTO> getOrderAcceptanceForGstApprovalReport(@RequestParam String fromDate,
+			@RequestParam String toDate, Long orgId, Long branch) {
+
+		String methodName = "getOrderAcceptanceForGstApprovalReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getOrderAcceptanceForGstApprovalReport(fromDate, toDate, orgId,
+					branch);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	salescontractapproval report
+
+	@GetMapping("/getSalesContractForApprovalReport")
+	public ResponseEntity<ResponseDTO> getSalesContractForApproval(@RequestParam Long branch, @RequestParam Long orgId,
+			@RequestParam String fromDate, @RequestParam String toDate) {
+
+		String methodName = "getSalesContractForApproval()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getSalesContractForApproval(branch, orgId, fromDate, toDate);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
 }

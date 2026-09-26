@@ -1,5 +1,6 @@
 package com.efitops.basesetup.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -71,4 +72,27 @@ public interface OrderAcceptanceRepo extends JpaRepository<OrderAcceptanceVO, Lo
 
 	 @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
 	String getOrderAcceptanceDocId(Long orgId, String financialYear, String screenCode);
+	 
+//	 order acceptance approval report
+	 
+	 @Query(value = """
+				SELECT
+				    ob.doc_id AS docId,
+				    ob.doc_date AS docDate,
+				    p.customer_id AS customerId,
+				    p.customer_name AS customerName,
+				    ob.approved AS approved,
+				    ob.order_acceptance_basic_id AS orderAcceptanceBasicId,
+				    ob.note AS note
+				FROM order_acceptance_basic ob
+				INNER JOIN customer_header p
+				    ON ob.customer = p.customer_id
+				WHERE LOWER(ob.gst_approval) = 'no'
+				  AND ob.doc_date BETWEEN :fromDate AND :toDate
+				  AND ob.org_id = :orgId
+				  AND ob.branch = :branch
+				""", nativeQuery = true)
+		List<Object[]> getOrderAcceptanceForGstApproval(@Param("fromDate") String fromDate,
+				@Param("toDate") String toDate, @Param("orgId") Long orgId, @Param("branch") Long branch);
+
 }

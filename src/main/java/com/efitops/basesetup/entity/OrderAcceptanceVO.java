@@ -104,6 +104,9 @@ public class OrderAcceptanceVO {
 
 	@Column(name = "gst_approval")
 	private String gstApproval;
+	
+	@Column(name = "approved")
+	private String approved;
 
 	// Common Fields
 

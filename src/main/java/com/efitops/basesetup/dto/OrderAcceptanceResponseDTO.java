@@ -78,6 +78,8 @@ public class OrderAcceptanceResponseDTO {
 	private String specification;
 
 	private String note;
+	
+	private String approved;
 
 	private List<OrderAcceptanceDetailsResponseDTO> orderAcceptanceDetailsResponseDTO;
 

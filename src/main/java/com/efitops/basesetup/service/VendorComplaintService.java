@@ -1,6 +1,7 @@
 package com.efitops.basesetup.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.efitops.basesetup.ResponseDTO.ActivitiesCarriedOutResponseDTO;
 import com.efitops.basesetup.ResponseDTO.AuthorizationForBreakdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CategoryMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CauseMasterResponseDTO;
@@ -18,10 +20,13 @@ import com.efitops.basesetup.ResponseDTO.InstrumentCalibrationResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineToolBreakdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineToolsScrapNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PMCheckListMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.QualityScrapNoteResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ScrapMaterialReturnRejectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SetUpApprovalResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierChangeRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SupplierResponseEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.VendorComplaintEntryResponseDTO;
+import com.efitops.basesetup.dto.ActivitiesCarriedOutDTO;
 import com.efitops.basesetup.dto.AuthorizationForBreakdownDTO;
 import com.efitops.basesetup.dto.CategoryMasterDTO;
 import com.efitops.basesetup.dto.CauseMasterDTO;
@@ -32,6 +37,8 @@ import com.efitops.basesetup.dto.MachineToolBreakdownDTO;
 import com.efitops.basesetup.dto.MachineToolRectificationDTO;
 import com.efitops.basesetup.dto.MachineToolsScrapNoteDTO;
 import com.efitops.basesetup.dto.PMCheckListMasterDTO;
+import com.efitops.basesetup.dto.QualityScrapNoteDTO;
+import com.efitops.basesetup.dto.ScrapMaterialReturnRejectionDTO;
 import com.efitops.basesetup.dto.SetUpApprovalDTO;
 import com.efitops.basesetup.dto.SupplierChangeRequestDTO;
 import com.efitops.basesetup.dto.SupplierResponseEntryDTO;
@@ -256,6 +263,48 @@ public interface VendorComplaintService {
 
 
 	List<MachineToolsScrapNoteResponseDTO> getMachineToolsScrapNoteByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> updateCreateActivitiesCarriedOut(ActivitiesCarriedOutDTO dto) throws ApplicationException;
+
+//	List<ActivitiesCarriedOutResponseDTO> getActivitiesCarriedOutByOrgId(Long orgId) throws ApplicationException;
+
+	Map<String, Object> getActivitiesCarriedOutById(Long id) throws ApplicationException;
+
+	List<ActivitiesCarriedOutResponseDTO> getActivitiesCarriedOutByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	//quality scrap note
+	
+	Map<String, Object> updateCreateQualityScrapNote(QualityScrapNoteDTO dto) throws ApplicationException;
+
+	Map<String, Object> getQualityScrapNoteById(Long id) throws ApplicationException;
+
+	List<QualityScrapNoteResponseDTO> getQualityScrapNoteByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> getQualityScrapNoteDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	Map<String, Object> getActivitiesCarriedOutDocId(Long orgId, String financialYear) throws ApplicationException;
+
+//	scrapt material return rejection 
+	Map<String, Object> updateCreateScrapMaterialReturnRejection(
+			ScrapMaterialReturnRejectionDTO scrapMaterialReturnRejectionDTO) throws ApplicationException;
+
+	List<ScrapMaterialReturnRejectionResponseDTO> getScrapMaterialReturnRejectionByOrgId(Long orgId,Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> getScrapMaterialReturnRejectionById(Long id) throws ApplicationException;
+
+	Map<String, Object> getScrapMaterialReturnRejectionDocId(Long orgId, String financialYear)
+			throws ApplicationException;
+
+
+	Map<String, Object> getOrderAcceptanceForGstApprovalReport(String fromDate, String toDate, Long orgId, Long branch)
+			throws ApplicationException;
+
+	
+
+	Map<String, Object> getSalesContractForApproval(Long branch, Long orgId, String fromDate, String toDate)
 			throws ApplicationException;
 
 	

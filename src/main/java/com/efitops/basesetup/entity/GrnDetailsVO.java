@@ -156,7 +156,7 @@ public class GrnDetailsVO {
 	private BigDecimal landedValue;
 	
 	@Column(name = "hand_charge", precision = 10, scale = 2)
-	private BigDecimal handCharge;
+	private BigDecimal handCharge;																																																																																																																																																																																																																																																																																																																														
 	
 	@Column(name = "challan_qty", precision = 10, scale = 2)
 	private BigDecimal challanQty;

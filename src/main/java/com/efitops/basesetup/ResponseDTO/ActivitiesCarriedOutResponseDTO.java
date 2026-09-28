@@ -1,5 +1,6 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
@@ -16,6 +17,10 @@ public class ActivitiesCarriedOutResponseDTO {
 	private Long id;
 
 	private BranchResponseDTO branch;
+	
+	private String docId;
+	
+	private LocalDate docDate;
 
 	private DepartmentResponseDTO department;
 

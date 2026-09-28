@@ -3,6 +3,7 @@ package com.efitops.basesetup.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -180,7 +181,7 @@ public class GrnServiceImpl implements GrnService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackOn  = Exception.class)
 	public Map<String, Object> createUpdateGrn(GrnDTO grnDTO, MultipartFile[] files) throws ApplicationException {
 		GrnVO grnVO;
 		String message;
@@ -642,8 +643,16 @@ public class GrnServiceImpl implements GrnService {
 				detailVO.setTotalValueINR(detailVO.getFobValueINR().add(detailVO.getFreightInd()));
 				detailVO.setLandingValue(totalValue);
 				totalLandValueINR = totalLandValueINR.add(detailVO.getLandingValue());
-				detailVO.setLandingCostINR(detailVO.getLandingValue().divide(detailDTO.getReceivedQty()));
-				totalLandCostINR = totalLandCostINR.add(detailVO.getLandingCostINR());
+				if (detailDTO.getReceivedQty() != null
+				        && detailDTO.getReceivedQty().compareTo(BigDecimal.ZERO) > 0) {
+
+				    detailVO.setLandingCostINR(
+				            detailVO.getLandingValue()
+				                    .divide(detailDTO.getReceivedQty(), 6, RoundingMode.HALF_UP)
+				    );
+
+				    totalLandCostINR = totalLandCostINR.add(detailVO.getLandingCostINR());
+				}
 				detailVO.setGrnVO(vo);
 
 				itemDetailsLists.add(detailVO);

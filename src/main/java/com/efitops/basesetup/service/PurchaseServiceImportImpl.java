@@ -6910,7 +6910,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 			list.add(map);
 		}
-
 		return list;
 	}
 

@@ -91,6 +91,9 @@ public class MaintenanceServiceRequestVO {
 	   
 	@Column(name = "org_id")
 	private Long orgId;
+	
+	@Column(name = "financial_year")
+	private String financialYear;
 
 	@Column(name = "created_by")
 	private String createdBy;

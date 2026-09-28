@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 public class MaintenanceServiceRequestResponseDTO {
 
     private Long id;
+    
+    private String docId;
 
     private ListOfValuesDetailsResponseDTO belongTo;
 
@@ -44,6 +46,8 @@ public class MaintenanceServiceRequestResponseDTO {
     private boolean active;
 
     private Long orgId;
+    
+    private String financialYear;
 
     private String createdBy;
 

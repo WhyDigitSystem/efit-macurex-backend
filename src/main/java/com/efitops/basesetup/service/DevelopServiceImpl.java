@@ -10855,10 +10855,17 @@ public class DevelopServiceImpl implements DevelopService {
 	        maintenanceServiceRequestVO.setUpdatedBy(
 	                maintenanceServiceRequestDTO.getCreatedBy());
 
+	        // Generate Doc ID
+	        String docId = getMaintenanceServiceRequestDocId(
+	                maintenanceServiceRequestDTO.getOrgId(),
+	                maintenanceServiceRequestDTO.getFinancialYear());
+
+	        maintenanceServiceRequestVO.setDocId(docId);
+
 	        message =
 	                "Maintenance Service Request Created Successfully";
 	    }
-
+	    
 	    // =========================
 	    // Basic Mapping
 	    // =========================
@@ -11042,6 +11049,9 @@ MaintenanceServiceRequestResponseDTO responseDTO =
 
 responseDTO.setId(
         maintenanceServiceRequestVO.getId());
+
+responseDTO.setDocId(
+        maintenanceServiceRequestVO.getDocId());
 
 responseDTO.setMailId(
         maintenanceServiceRequestVO.getMailId());

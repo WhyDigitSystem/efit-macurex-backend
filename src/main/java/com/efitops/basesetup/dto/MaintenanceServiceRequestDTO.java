@@ -15,7 +15,7 @@ public class MaintenanceServiceRequestDTO {
 	
 	    private Long id;
 
-//	    private String docId;
+	    private String docId;
 
 //	    private LocalDate docDate;
 
@@ -48,6 +48,8 @@ public class MaintenanceServiceRequestDTO {
 	    private boolean active;
 
 	    private Long orgId;
+	    
+	    private String financialYear;
 
 	    private String createdBy;
 

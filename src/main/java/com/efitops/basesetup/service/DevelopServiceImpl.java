@@ -11276,6 +11276,24 @@ return responseDTO;
 	} 
 	
 	
+	@Override
+	public String getMaintenanceServiceRequestDocId(
+	        Long orgId,
+	        String financialYear) {
+
+	    String screenCode = "MSR";
+
+	    String result =
+	            maintenanceServiceRequestRepo
+	                    .getMaintenanceServiceRequestDocId(
+	                            orgId,
+	                            financialYear,
+	                            screenCode);
+
+	    return result;
+	}
+	
+	
 	//transferorder
 	
 	
@@ -11945,7 +11963,7 @@ return responseDTO;
 	 
 	 vo.setDocId(dto.getDocId());
 	 
-//	 vo.setDocDate(dto.getDocDate());
+	 vo.setDocDate(dto.getDocDate());
 	 
 	 vo.setBreakDownNo(dto.getBreakDownNo());
 	 
@@ -12054,9 +12072,9 @@ return responseDTO;
 	    responseDTO.setBreakDown(
 	            vo.getBreakDown());
 
-//	    responseDTO.setDocdate(
-//	            vo.get());
-//	    
+	    responseDTO.setDocdate(
+	            vo.getDocDate());
+	    
 	    responseDTO.setBreakDownNo(
 	            vo.getBreakDownNo());
 
@@ -12257,6 +12275,70 @@ return responseDTO;
 
 	    return responseDTO;
 	}
+	
+	@Override
+	public List<GateOutwardEntryResponseDTO> getGateOutwardEntryByOrgId(Long orgId)
+	        throws ApplicationException {
+
+	    List<GateOutwardEntryVO> gateOutwardEntryList =
+	            gateOutwardEntryRepo.findByOrgIdAndCancelFalse(orgId);
+
+	    if (gateOutwardEntryList == null
+	            || gateOutwardEntryList.isEmpty()) {
+
+	        throw new ApplicationException(
+	                "Gate Outward Entry Not Found");
+	    }
+
+	    List<GateOutwardEntryResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (GateOutwardEntryVO gateOutwardEntryVO :
+	            gateOutwardEntryList) {
+
+	        responseList.add(
+	                buildGateOutwardEntryResponse(
+	                        gateOutwardEntryVO));
+	    }
+
+	    return responseList;
+	}
+	
+	@Override
+	public GateOutwardEntryResponseDTO getGateOutwardEntryById(Long id)
+	        throws ApplicationException {
+
+	    GateOutwardEntryVO gateOutwardEntryVO =
+	            gateOutwardEntryRepo.findById(id)
+	                    .orElse(null);
+
+	    if (gateOutwardEntryVO == null) {
+
+	        throw new ApplicationException(
+	                "Gate Outward Entry Not Found");
+	    }
+
+	    return buildGateOutwardEntryResponse(
+	            gateOutwardEntryVO);
+	}
+	
+	@Override
+	public String getGateOutwardEntryDocId(
+	        Long orgId,
+	        String financialYear) {
+
+	    String screenCode = "GOE";
+
+	    String result =
+	            gateOutwardEntryRepo
+	                    .getGateOutwardEntryDocId(
+	                            orgId,
+	                            financialYear,
+	                            screenCode);
+
+	    return result;
+	}
+	
 	
 	
 	

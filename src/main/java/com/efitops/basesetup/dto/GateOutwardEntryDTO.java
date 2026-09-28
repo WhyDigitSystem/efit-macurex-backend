@@ -26,8 +26,8 @@ public class GateOutwardEntryDTO {
 
 	    private String breakDown;
 
-	    private LocalDate docdate;
-
+	    private LocalDate docDate;
+	    
 	    private String breakDownNo;
 
 	    private LocalTime outwardTime;

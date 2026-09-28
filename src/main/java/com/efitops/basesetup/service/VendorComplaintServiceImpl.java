@@ -5975,9 +5975,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			response.setAuthorizedBy(employeeResponse);
 		}
-		
+
 		response.setDocId(vo.getDocId());
-		
+
 		response.setDocDate(vo.getDocDate());
 		response.setRectificationNo(vo.getRectificationNo());
 
@@ -6571,7 +6571,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		// Normal Fields
-		
+
 		response.setTime(vo.getTime());
 		response.setProductionApproval(vo.getProductionApproval());
 		response.setQualityApproval(vo.getQualityApproval());

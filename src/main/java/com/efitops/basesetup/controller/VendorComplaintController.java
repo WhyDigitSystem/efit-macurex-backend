@@ -3126,7 +3126,7 @@ public class VendorComplaintController extends BaseController {
 	@PostMapping(value = "/updateCreateMachineToolsScrapNote", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreateMachineToolsScrapNote(
 			@RequestPart("machineToolsScrapNoteDTO") MachineToolsScrapNoteDTO machineToolsScrapNoteDTO,
-
+//			@RequestBody MachineToolsScrapNoteDTO machineToolsScrapNoteDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		String methodName = "updateCreateMachineToolsScrapNote()";
@@ -3215,27 +3215,38 @@ public class VendorComplaintController extends BaseController {
 	}
 
 	@GetMapping("/getMachineToolsScrapNoteByOrgId")
-	public ResponseEntity<List<MachineToolsScrapNoteResponseDTO>> getMachineToolsScrapNoteByOrgId(
-			@RequestParam Long orgId, @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getMachineToolsScrapNoteByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
 		String methodName = "getMachineToolsScrapNoteByOrgId()";
 
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		List<MachineToolsScrapNoteResponseDTO> responseList = new ArrayList<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
 
 		try {
 
-			responseList = vendorComplaintService.getMachineToolsScrapNoteByOrgId(orgId, branch);
+			List<MachineToolsScrapNoteResponseDTO> responseList = vendorComplaintService
+					.getMachineToolsScrapNoteByOrgId(orgId, branch);
+
+			responseObjectsMap.put("machineToolsScrapNoteList", responseList);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
 
 		} catch (Exception e) {
 
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		return ResponseEntity.ok().body(responseList);
+		return ResponseEntity.ok().body(responseDTO);
 	}
 
 //	activities carried out

@@ -350,7 +350,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private OrderAcceptanceRepo orderAcceptanceRepo;
-	
+
 	@Autowired
 	private SalesContractRepo salesContractRepo;
 
@@ -8206,8 +8206,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 //	SalesContractApprovalReport
 
 	@Override
-	public Map<String, Object> getSalesContractForApproval(Long branch, Long orgId, String fromDate,
-			String toDate) throws ApplicationException {
+	public Map<String, Object> getSalesContractForApproval(Long branch, Long orgId, String fromDate, String toDate)
+			throws ApplicationException {
 
 		List<Object[]> resultList = salesContractRepo.getSalesContractForApproval(branch, orgId, fromDate, toDate);
 
@@ -8225,7 +8225,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			data.put("approval", obj[5]);
 			data.put("salesContractId", obj[6]);
 			data.put("notes", obj[7]);
-			data.put("customerontractNo",obj[8]);
+			data.put("customerontractNo", obj[8]);
 
 			responseList.add(data);
 		}
@@ -8237,4 +8237,46 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		return responseObjectsMap;
 	}
 
+	@Override
+	public Map<String, Object> getSalesOrderReport(String fromDate, String toDate, Long branch, Long orgId,
+			String customerName) throws ApplicationException {
+
+		List<Object[]> resultList = orderAcceptanceRepo.getSalesOrderReport(fromDate, toDate, branch, orgId,
+				customerName);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("orderAcceptanceBasicId", obj[0]);
+			data.put("docDate", obj[1]);
+			data.put("docId", obj[2]);
+			data.put("soType", obj[3]);
+			data.put("customerPurchaseOrderNo", obj[4]);
+			data.put("customerPurchaseOrderDate", obj[5]);
+			data.put("customerPartNo", obj[6]);
+			data.put("item", obj[7]);
+			data.put("quantity", obj[8]);
+			data.put("quantityRate", obj[9]);
+			data.put("amount", obj[10]);
+			data.put("lastInvoiceDate", obj[11]);
+			data.put("quotationDocId", obj[12]);
+			data.put("quotationDocDate", obj[13]);
+			data.put("itemCode", obj[14]);
+			data.put("itemDescription", obj[15]);
+			data.put("hsnCode", obj[16]);
+			data.put("customerCode", obj[17]);
+			data.put("customerName", obj[18]);
+
+			responseList.add(data);
+		}
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("salesOrderReport", responseList);
+
+		return responseObjectsMap;
+	}
 }

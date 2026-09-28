@@ -307,6 +307,9 @@ public interface VendorComplaintService {
 	Map<String, Object> getSalesContractForApproval(Long branch, Long orgId, String fromDate, String toDate)
 			throws ApplicationException;
 
+	Map<String, Object> getSalesOrderReport(String fromDate, String toDate, Long branch, Long orgId,
+			String customerName) throws ApplicationException;
+
 	
 
 

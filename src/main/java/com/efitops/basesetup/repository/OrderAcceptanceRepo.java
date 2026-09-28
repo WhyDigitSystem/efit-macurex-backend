@@ -35,64 +35,104 @@ public interface OrderAcceptanceRepo extends JpaRepository<OrderAcceptanceVO, Lo
 			+ "		ORDER BY i.item_code", nativeQuery = true)
 	List<Object[]> getOrderAcceptanceItemDetails(Long orgId, Long branch);
 
+	@Query(value = """
+			    SELECT
+			        d.item,
+			        i.item_code,
+			        i.item_description,
+			        soa.new_qty,
+			        soa.new_delivery_date,
+			        soa.new_rate
+			    FROM order_acceptance_detail d
+			    INNER JOIN item i
+			        ON i.item_id = d.item
+			    INNER JOIN order_acceptance_basic o
+			        ON o.order_acceptance_basic_id = d.order_acceptance_basic_id
+			    LEFT JOIN sales_order_amendment_basic soab
+			ON soab.salesorder_no = o.doc_id
+			       AND soab.org_id = o.org_id
+			       AND soab.branch = o.branch
+			       AND soab.active = true
+			       AND soab.cancel = false
+			    LEFT JOIN sales_order_amendment_detail soa
+			        ON soa.sales_order_amendment_id = soab.sales_order_amendment_id
+			       AND soa.item = d.item
+			    WHERE o.doc_id = :docId
+			      AND o.org_id = :orgId
+			      AND o.branch = :branch
+			      AND o.cancel = false
+			      AND o.active = true
+			    ORDER BY i.item_code
+			    """, nativeQuery = true)
+	List<Object[]> getOrderAcceptanceItemsWithAmendment(@Param("docId") String docId, @Param("orgId") Long orgId,
+			@Param("branch") Long branch);
+
+	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
+	String getOrderAcceptanceDocId(Long orgId, String financialYear, String screenCode);
+
+//	 order acceptance approval report
 
 	@Query(value = """
-	        SELECT
-	            d.item,
-	            i.item_code,
-	            i.item_description,
-	            soa.new_qty,
-	            soa.new_delivery_date,
-	            soa.new_rate
-	        FROM order_acceptance_detail d
-	        INNER JOIN item i
-	            ON i.item_id = d.item
-	        INNER JOIN order_acceptance_basic o
-	            ON o.order_acceptance_basic_id = d.order_acceptance_basic_id
-	        LEFT JOIN sales_order_amendment_basic soab
-					ON soab.salesorder_no = o.doc_id
-	           AND soab.org_id = o.org_id
-	           AND soab.branch = o.branch
-	           AND soab.active = true
-	           AND soab.cancel = false
-	        LEFT JOIN sales_order_amendment_detail soa
-	            ON soa.sales_order_amendment_id = soab.sales_order_amendment_id
-	           AND soa.item = d.item
-	        WHERE o.doc_id = :docId
-	          AND o.org_id = :orgId
-	          AND o.branch = :branch
-	          AND o.cancel = false
-	          AND o.active = true
-	        ORDER BY i.item_code
-	        """, nativeQuery = true)
-	List<Object[]> getOrderAcceptanceItemsWithAmendment(
-	        @Param("docId") String docId,
-	        @Param("orgId") Long orgId,
-	        @Param("branch") Long branch);
+			SELECT
+			    ob.doc_id AS docId,
+			    ob.doc_date AS docDate,
+			    p.customer_id AS customerId,
+			    p.customer_name AS customerName,
+			    ob.approved AS approved,
+			    ob.order_acceptance_basic_id AS orderAcceptanceBasicId,
+			    ob.note AS note
+			FROM order_acceptance_basic ob
+			INNER JOIN customer_header p
+			    ON ob.customer = p.customer_id
+			WHERE LOWER(ob.gst_approval) = 'no'
+			  AND ob.doc_date BETWEEN :fromDate AND :toDate
+			  AND ob.org_id = :orgId
+			  AND ob.branch = :branch
+			""", nativeQuery = true)
+	List<Object[]> getOrderAcceptanceForGstApproval(@Param("fromDate") String fromDate, @Param("toDate") String toDate,
+			@Param("orgId") Long orgId, @Param("branch") Long branch);
 
-	 @Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
-	String getOrderAcceptanceDocId(Long orgId, String financialYear, String screenCode);
-	 
-//	 order acceptance approval report
-	 
-	 @Query(value = """
-				SELECT
-				    ob.doc_id AS docId,
-				    ob.doc_date AS docDate,
-				    p.customer_id AS customerId,
-				    p.customer_name AS customerName,
-				    ob.approved AS approved,
-				    ob.order_acceptance_basic_id AS orderAcceptanceBasicId,
-				    ob.note AS note
-				FROM order_acceptance_basic ob
-				INNER JOIN customer_header p
-				    ON ob.customer = p.customer_id
-				WHERE LOWER(ob.gst_approval) = 'no'
-				  AND ob.doc_date BETWEEN :fromDate AND :toDate
-				  AND ob.org_id = :orgId
-				  AND ob.branch = :branch
-				""", nativeQuery = true)
-		List<Object[]> getOrderAcceptanceForGstApproval(@Param("fromDate") String fromDate,
-				@Param("toDate") String toDate, @Param("orgId") Long orgId, @Param("branch") Long branch);
+//		sales order report
+
+	@Query(value = """
+			SELECT
+			    ob.order_acceptance_basic_id AS orderAcceptanceBasicId,
+			    ob.doc_date AS docDate,
+			    ob.doc_id AS docId,
+			    ob.so_type AS soType,
+			    ob.customer_purchase_order_no AS customerPurchaseOrderNo,
+			    ob.customer_purchase_order_date AS customerPurchaseOrderDate,
+			    od.customer_part_no AS customerPartNo,
+			    od.item AS item,
+			    od.quantity AS quantity,
+			    od.quantity_rate AS quantityRate,
+			    od.amount AS amount,
+			    od.last_invoice_date AS lastInvoiceDate,
+			    q.doc_id AS quotationDocId,
+			    q.doc_date AS quotationDocDate,
+			    i.item_code AS itemCode,
+			    i.item_description AS itemDescription,
+			    i.hsn_code AS hsnCode,
+			    c.customer_code AS customerCode,
+			    c.customer_name AS customerName
+			FROM order_acceptance_basic ob
+			INNER JOIN order_acceptance_detail od
+			    ON od.order_acceptance_basic_id =
+			       ob.order_acceptance_basic_id
+			INNER JOIN quotation_header q
+			    ON q.doc_id = ob.quotation_no
+			INNER JOIN item i
+			    ON i.item_id = od.item
+			INNER JOIN branch b
+			    ON b.branch_id = ob.branch
+			INNER JOIN customer_header c
+			    ON c.customer_id = ob.customer
+			WHERE ob.doc_date BETWEEN :fromDate AND :toDate
+			  AND ob.branch = :branch
+			  AND ob.org_id = :orgId
+			  AND c.customer_name = :customerName
+			""", nativeQuery = true)
+	List<Object[]> getSalesOrderReport(@Param("fromDate") String fromDate, @Param("toDate") String toDate,
+			@Param("branch") Long branch, @Param("orgId") Long orgId, @Param("customerName") String customerName);
 
 }

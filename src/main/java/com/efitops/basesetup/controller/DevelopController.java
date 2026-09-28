@@ -24,6 +24,7 @@ import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DrawingAttachmentsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.GateOutwardEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialStageInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
@@ -4088,6 +4089,73 @@ public class DevelopController extends BaseController {
 	    return ResponseEntity.ok(responseDTO);
 	}
 	
+	@GetMapping("/getMaintenanceServiceRequestDocId")
+	public ResponseEntity<ResponseDTO> getMaintenanceServiceRequestDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName =
+	            "getMaintenanceServiceRequestDocId()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String mapp = "";
+
+	    try {
+
+	        mapp = developService.getMaintenanceServiceRequestDocId(
+	                orgId,
+	                financialYear);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Maintenance Service Request DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "maintenanceServiceRequestDocId",
+	                mapp);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } else {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Maintenance Service Request DocId",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
 	
 	
 	//transferorder
@@ -4415,6 +4483,190 @@ public class DevelopController extends BaseController {
 	                e.getMessage(),
 	                e.getMessage());
 	    }
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+	@GetMapping("/getGateOutwardEntryByOrgId")
+	public ResponseEntity<ResponseDTO> getGateOutwardEntryByOrgId(
+	        @RequestParam Long orgId) {
+
+	    String methodName =
+	            "getGateOutwardEntryByOrgId()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        List<GateOutwardEntryResponseDTO>
+	                gateOutwardEntryResponseDTO =
+	                        developService
+	                                .getGateOutwardEntryByOrgId(
+	                                        orgId);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Gate Outward Entry information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "gateOutwardEntryResponseVO",
+	                gateOutwardEntryResponseDTO);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e.getMessage());
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Gate Outward Entry information retrieval failed",
+	                        e.getMessage());
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getGateOutwardEntryById")
+	public ResponseEntity<ResponseDTO> getGateOutwardEntryById(
+	        @RequestParam Long id) {
+
+	    String methodName =
+	            "getGateOutwardEntryById()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        GateOutwardEntryResponseDTO
+	                gateOutwardEntryResponseDTO =
+	                        developService
+	                                .getGateOutwardEntryById(
+	                                        id);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Gate Outward Entry information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "gateOutwardEntryResponseVO",
+	                gateOutwardEntryResponseDTO);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e.getMessage());
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Gate Outward Entry information retrieval failed",
+	                        e.getMessage());
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getGateOutwardEntryDocId")
+	public ResponseEntity<ResponseDTO> getGateOutwardEntryDocId(
+	        @RequestParam Long orgId,
+	        @RequestParam String financialYear) {
+
+	    String methodName =
+	            "getGateOutwardEntryDocId()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String mapp = "";
+
+	    try {
+
+	        mapp = developService.getGateOutwardEntryDocId(
+	                orgId,
+	                financialYear);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+	    }
+
+	    if (StringUtils.isBlank(errorMsg)) {
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Gate Outward Entry DocId information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "gateOutwardEntryDocId",
+	                mapp);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } else {
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Failed to retrieve Gate Outward Entry DocId",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
 
 	    return ResponseEntity.ok().body(responseDTO);
 	}

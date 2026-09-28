@@ -12,6 +12,7 @@ import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DrawingAttachmentsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.GateOutwardEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialStageInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
@@ -345,6 +346,14 @@ public interface DevelopService {
 
 	Map<String, Object> createUpdateGateOutwardEntry(GateOutwardEntryDTO gateOutwardEntryDTO)
 			throws ApplicationException;
+
+	List<GateOutwardEntryResponseDTO> getGateOutwardEntryByOrgId(Long orgId) throws ApplicationException;
+
+	GateOutwardEntryResponseDTO getGateOutwardEntryById(Long id) throws ApplicationException;
+
+	String getGateOutwardEntryDocId(Long orgId, String financialYear);
+
+	String getMaintenanceServiceRequestDocId(Long orgId, String financialYear);
 
 	
 	

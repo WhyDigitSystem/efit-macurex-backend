@@ -6582,7 +6582,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		response.setActive(vo.getActive());
 		response.setCancelRemarks(vo.getCancelRemarks());
 		response.setCreatedBy(vo.getCreatedBy());
-
+		response.setDocId(vo.getDocId());
+		response.setDocDate(vo.getDocDate());
 		// Details Response
 		List<MachineToolsScrapNoteDetailsResponseDTO> detailsList = new ArrayList<>();
 
@@ -7138,6 +7139,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		response.setActive(vo.getActive());
 		response.setCancelRemarks(vo.getCancelRemarks());
 		response.setCreatedBy(vo.getCreatedBy());
+		response.setDocId(vo.getDocId());
+		response.setDocDate(vo.getDocDate());
 
 		// Details Response
 		List<ActivitiesCarriedOutDetailsResponseDTO> detailsResponseList = new ArrayList<>();

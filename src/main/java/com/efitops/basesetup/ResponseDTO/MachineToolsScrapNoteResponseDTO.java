@@ -1,5 +1,6 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -17,6 +18,10 @@ public class MachineToolsScrapNoteResponseDTO {
 	private Long id;
 	
 	private BranchResponseDTO branch;
+	
+	private String docId;
+	
+	private LocalDate docDate;
 	
 	private ListOfValuesDetailsResponseDTO belongsTo;
 	

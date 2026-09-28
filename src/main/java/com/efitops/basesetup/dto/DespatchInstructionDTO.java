@@ -17,6 +17,7 @@ public class DespatchInstructionDTO {
 	private Long branch;
 //	private String docId;
 //	private LocalDate docDate;
+	private String financialYear;
 	private Long customer;
 	private String schduleNo;
 	private String invoiceType;

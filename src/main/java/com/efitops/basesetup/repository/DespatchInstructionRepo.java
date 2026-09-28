@@ -544,5 +544,22 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 	        String docId,
 	        Long orgId,
 	        Long branch);
+	
+	
+	@Query(value = """
+
+	        SELECT CONCAT(
+	            dtmd.prefix,
+	            LPAD(dtmd.last_no + 1, 5, '0')
+	        )
+	        FROM documenttypemapping_details dtmd
+	        WHERE dtmd.org_id = :orgId
+	          AND dtmd.fin_year = :financialYear
+	          AND dtmd.screen_code = :screenCode
+	        """, nativeQuery = true)
+	String getDespatchInstructionDocId(
+	        @Param("orgId") Long orgId,
+	        @Param("financialYear") String financialYear,
+	        @Param("screenCode") String screenCode);
 
 }

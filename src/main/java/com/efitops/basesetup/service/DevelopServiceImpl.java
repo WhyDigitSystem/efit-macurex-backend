@@ -31,6 +31,7 @@ import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DrawingAttachmentDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DrawingAttachmentsResponseDTO;
@@ -44,6 +45,8 @@ import com.efitops.basesetup.ResponseDTO.EightDiscipline7DetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDiscipline8DetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
+import com.efitops.basesetup.ResponseDTO.GateOutwardEntryDetailResponseDTO;
+import com.efitops.basesetup.ResponseDTO.GateOutwardEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialStageInspectionDetailResponseDTO;
@@ -60,6 +63,7 @@ import com.efitops.basesetup.ResponseDTO.MachineMasterAttachmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineSpareDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaintenanceServiceRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OperationMasterResponseforPSCRDTO;
 import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
@@ -82,6 +86,8 @@ import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailRepo;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.TransferOrderDetailResponseDTO;
+import com.efitops.basesetup.ResponseDTO.TransferOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ZeroEntryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
@@ -110,6 +116,8 @@ import com.efitops.basesetup.dto.EnquiryDetailsReponseDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
 import com.efitops.basesetup.dto.EnquiryTermsandCondDTO;
 import com.efitops.basesetup.dto.EnquiryTermsandCondResponseDTO;
+import com.efitops.basesetup.dto.GateOutwardEntryDTO;
+import com.efitops.basesetup.dto.GateOutwardEntryDetailDTO;
 import com.efitops.basesetup.dto.GradeMasterResponseDTO;
 import com.efitops.basesetup.dto.InitialSampleInspectionDTO;
 import com.efitops.basesetup.dto.InitialSampleInspectionDetailDTO;
@@ -122,6 +130,7 @@ import com.efitops.basesetup.dto.LocationResponseDTO;
 import com.efitops.basesetup.dto.MachineHistoryDTO;
 import com.efitops.basesetup.dto.MachineMasterDTO;
 import com.efitops.basesetup.dto.MachineSpareDetailsDTO;
+import com.efitops.basesetup.dto.MaintenanceServiceRequestDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
 import com.efitops.basesetup.dto.ParameterMasterDTO;
 import com.efitops.basesetup.dto.ProcessSheetCompRoutingDTO;
@@ -140,6 +149,8 @@ import com.efitops.basesetup.dto.SalesOrderAmendmentDetailsResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.ToolCategoryDTO;
 import com.efitops.basesetup.dto.ToolCategoryDetailDTO;
+import com.efitops.basesetup.dto.TransferOrderDTO;
+import com.efitops.basesetup.dto.TransferOrderDetailDTO;
 import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.dto.ZeroEntryDetailDTO;
 import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
@@ -171,6 +182,8 @@ import com.efitops.basesetup.entity.EnquiryAttachmentVO;
 import com.efitops.basesetup.entity.EnquiryDetailsVO;
 import com.efitops.basesetup.entity.EnquiryTermsandCondVO;
 import com.efitops.basesetup.entity.EnquiryVO;
+import com.efitops.basesetup.entity.GateOutwardEntryDetailVO;
+import com.efitops.basesetup.entity.GateOutwardEntryVO;
 import com.efitops.basesetup.entity.GradeMasterVO;
 import com.efitops.basesetup.entity.InitialSampleInspectionDetailVO;
 import com.efitops.basesetup.entity.InitialSampleInspectionVO;
@@ -185,6 +198,7 @@ import com.efitops.basesetup.entity.MachineHistoryVO;
 import com.efitops.basesetup.entity.MachineMasterAttachmentVO;
 import com.efitops.basesetup.entity.MachineMasterVO;
 import com.efitops.basesetup.entity.MachineSpareDetailsVO;
+import com.efitops.basesetup.entity.MaintenanceServiceRequestVO;
 import com.efitops.basesetup.entity.OpenStockEntryVO;
 import com.efitops.basesetup.entity.ParameterMasterVO;
 import com.efitops.basesetup.entity.ProcessSheetCompRoutingDetailVO;
@@ -204,6 +218,8 @@ import com.efitops.basesetup.entity.SalesOrderAmendmentVO;
 import com.efitops.basesetup.entity.ToolCategoryDetailVO;
 import com.efitops.basesetup.entity.ToolCategoryVO;
 import com.efitops.basesetup.entity.ToolMasterVO;
+import com.efitops.basesetup.entity.TransferOrderDetailVO;
+import com.efitops.basesetup.entity.TransferOrderVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.entity.ZeroEntryDetailVO;
 import com.efitops.basesetup.entity.ZeroKmFailureEntryVO;
@@ -237,6 +253,8 @@ import com.efitops.basesetup.repository.EnquiryAttachmentRepo;
 import com.efitops.basesetup.repository.EnquiryDetailsRepo;
 import com.efitops.basesetup.repository.EnquiryRepo;
 import com.efitops.basesetup.repository.EnquiryTermsandCondRepo;
+import com.efitops.basesetup.repository.GateOutwardEntryDetailRepo;
+import com.efitops.basesetup.repository.GateOutwardEntryRepo;
 import com.efitops.basesetup.repository.GradeMasterRepo;
 import com.efitops.basesetup.repository.GstRateMasterRepo;
 import com.efitops.basesetup.repository.InitialSampleInspectionDetailRepo;
@@ -253,6 +271,7 @@ import com.efitops.basesetup.repository.MachineHistoryRepo;
 import com.efitops.basesetup.repository.MachineMasterAttachmentRepo;
 import com.efitops.basesetup.repository.MachineMasterRepo;
 import com.efitops.basesetup.repository.MachineSpareDetailsRepo;
+import com.efitops.basesetup.repository.MaintenanceServiceRequestRepo;
 import com.efitops.basesetup.repository.OpenStockEntryRepo;
 import com.efitops.basesetup.repository.OperationMasterRepo;
 import com.efitops.basesetup.repository.OrderAcceptanceRepo;
@@ -282,6 +301,8 @@ import com.efitops.basesetup.repository.SalesOrderAmendmentRepo;
 import com.efitops.basesetup.repository.SalesReturnRepo;
 import com.efitops.basesetup.repository.ToolCategoryRepo;
 import com.efitops.basesetup.repository.ToolMasterRepo;
+import com.efitops.basesetup.repository.TransferOrderDetailRepo;
+import com.efitops.basesetup.repository.TransferOrderRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 import com.efitops.basesetup.repository.ZeroEntryDetailRepo;
 import com.efitops.basesetup.repository.ZeroKmFailureEntryRepo;
@@ -497,6 +518,13 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	private DrawingAttachmentDetailRepo drawingAttachmentDetailRepo;
+	
+	
+	@Autowired
+	private GateOutwardEntryRepo gateOutwardEntryRepo;
+	
+	@Autowired
+	private GateOutwardEntryDetailRepo gateOutwardEntryDetailRepo;
 
 	@Value("${purchase.contract.amendment.upload.path}")
 	private String uploadPath1;
@@ -533,6 +561,15 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	private ZeroEntryDetailRepo zeroEntryDetailRepo;
+	
+	@Autowired
+	private MaintenanceServiceRequestRepo maintenanceServiceRequestRepo;
+	
+	@Autowired
+	private TransferOrderRepo transferOrderRepo;
+	
+	@Autowired
+	private TransferOrderDetailRepo transferOrderDetailRepo;
 
 //	@Override
 //	@Transactional
@@ -10769,4 +10806,1460 @@ public class DevelopServiceImpl implements DevelopService {
 
 		return responseList;
 	}
+	
+	
+	//MaintenanceServiceRequest
+	
+	
+	@Override
+	@Transactional
+	public Map<String, Object> updateCreateMaintenanceServiceRequest(
+	        MaintenanceServiceRequestDTO maintenanceServiceRequestDTO)
+	        throws ApplicationException {
+
+	    MaintenanceServiceRequestVO maintenanceServiceRequestVO =
+	            new MaintenanceServiceRequestVO();
+
+	    String message;
+
+	    // =========================
+	    // Update
+	    // =========================
+
+	    if (ObjectUtils.isNotEmpty(
+	            maintenanceServiceRequestDTO.getId())) {
+
+	        maintenanceServiceRequestVO =
+	                maintenanceServiceRequestRepo
+	                        .findById(
+	                                maintenanceServiceRequestDTO.getId())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Invalid Maintenance Service Request"));
+
+	        maintenanceServiceRequestVO.setUpdatedBy(
+	                maintenanceServiceRequestDTO.getCreatedBy());
+
+	        message =
+	                "Maintenance Service Request Updated Successfully";
+
+	    } else {
+
+	        // =========================
+	        // Create
+	        // =========================
+
+	        maintenanceServiceRequestVO.setCreatedBy(
+	                maintenanceServiceRequestDTO.getCreatedBy());
+
+	        maintenanceServiceRequestVO.setUpdatedBy(
+	                maintenanceServiceRequestDTO.getCreatedBy());
+
+	        message =
+	                "Maintenance Service Request Created Successfully";
+	    }
+
+	    // =========================
+	    // Basic Mapping
+	    // =========================
+
+	    createUpdateMaintenanceServiceRequestVO(
+	            maintenanceServiceRequestDTO,
+	            maintenanceServiceRequestVO);
+
+	    // =========================
+	    // Save
+	    // =========================
+
+	    MaintenanceServiceRequestVO savedVO =
+	            maintenanceServiceRequestRepo.save(
+	                    maintenanceServiceRequestVO);
+
+	    // =========================
+	    // Response
+	    // =========================
+
+	    Map<String, Object> response =
+	            new HashMap<>();
+
+	    response.put(
+	            "message",
+	            message);
+
+	    response.put(
+	            "maintenanceServiceRequestVO",
+	            maintenanceServiceRequestResponse(savedVO));
+
+	    return response;
+	}
+	private void createUpdateMaintenanceServiceRequestVO(
+	        MaintenanceServiceRequestDTO maintenanceServiceRequestDTO,
+	        MaintenanceServiceRequestVO maintenanceServiceRequestVO)
+	        throws ApplicationException {
+
+	    // =========================
+	    // Basic Fields
+	    // =========================
+
+	    maintenanceServiceRequestVO.setMailId(
+	            maintenanceServiceRequestDTO.getMailId());
+
+	    maintenanceServiceRequestVO.setReportedTime(
+	            maintenanceServiceRequestDTO.getReportedTime());
+
+	    maintenanceServiceRequestVO.setPhoneNo(
+	            maintenanceServiceRequestDTO.getPhoneNo());
+
+	    maintenanceServiceRequestVO.setCompleted(
+	            maintenanceServiceRequestDTO.getCompleted());
+
+	    maintenanceServiceRequestVO.setClosingDate(
+	            maintenanceServiceRequestDTO.getClosingDate());
+
+	    maintenanceServiceRequestVO.setApprovedBy(
+	            maintenanceServiceRequestDTO.getApprovedBy());
+
+	    maintenanceServiceRequestVO.setServiceRequired(
+	            maintenanceServiceRequestDTO.getServiceRequired());
+
+	    maintenanceServiceRequestVO.setRemarks(
+	            maintenanceServiceRequestDTO.getRemarks());
+
+	    maintenanceServiceRequestVO.setActive(
+	            maintenanceServiceRequestDTO.isActive());
+
+	    maintenanceServiceRequestVO.setOrgId(
+	            maintenanceServiceRequestDTO.getOrgId());
+
+	    maintenanceServiceRequestVO.setCancel(
+	            maintenanceServiceRequestDTO.isCancel());
+
+	    maintenanceServiceRequestVO.setCancelRemarks(
+	            maintenanceServiceRequestDTO.getCancelRemarks());
+
+	    // =========================
+	    // Belong To
+	    // List Of Values
+	    // =========================
+
+	    if (ObjectUtils.isNotEmpty(
+	            maintenanceServiceRequestDTO.getBelongTo())) {
+
+	        maintenanceServiceRequestVO.setBelongTo(
+	                listOfValuesDetailsRepo
+	                        .findById(
+	                                maintenanceServiceRequestDTO
+	                                        .getBelongTo())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Belong To Not Found")));
+	    }
+
+	    // =========================
+	    // Department
+	    // =========================
+
+	    if (ObjectUtils.isNotEmpty(
+	            maintenanceServiceRequestDTO.getDepartment())) {
+
+	        maintenanceServiceRequestVO.setDepartment(
+	                departmentRepo
+	                        .findById(
+	                                maintenanceServiceRequestDTO
+	                                        .getDepartment())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Department Not Found")));
+	    }
+
+	    // =========================
+	    // Priority
+	    // List Of Values
+	    // =========================
+
+	    if (ObjectUtils.isNotEmpty(
+	            maintenanceServiceRequestDTO.getPriority())) {
+
+	        maintenanceServiceRequestVO.setPriority(
+	                listOfValuesDetailsRepo
+	                        .findById(
+	                                maintenanceServiceRequestDTO
+	                                        .getPriority())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Priority Not Found")));
+	    }
+
+	    // =========================
+	    // Requested By
+	    // Employee Master
+	    // =========================
+
+	    if (ObjectUtils.isNotEmpty(
+	            maintenanceServiceRequestDTO.getRequestedBy())) {
+
+	        maintenanceServiceRequestVO.setRequestedBy(
+	                employeeMasterRepo
+	                        .findById(
+	                                maintenanceServiceRequestDTO
+	                                        .getRequestedBy())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Requested By Not Found")));
+	    }
+
+	    // =========================
+	    // Prepared By
+	    // Employee Master
+	    // =========================
+
+	    if (ObjectUtils.isNotEmpty(
+	            maintenanceServiceRequestDTO.getPreparedBy())) {
+
+	        maintenanceServiceRequestVO.setPreparedBy(
+	                employeeMasterRepo
+	                        .findById(
+	                                maintenanceServiceRequestDTO
+	                                        .getPreparedBy())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Prepared By Not Found")));
+	    }
+	    
+	    
+	}
+	
+	private MaintenanceServiceRequestResponseDTO
+    maintenanceServiceRequestResponse(
+            MaintenanceServiceRequestVO maintenanceServiceRequestVO) {
+
+MaintenanceServiceRequestResponseDTO responseDTO =
+        new MaintenanceServiceRequestResponseDTO();
+
+// =========================
+// Basic Fields
+// =========================
+
+responseDTO.setId(
+        maintenanceServiceRequestVO.getId());
+
+responseDTO.setMailId(
+        maintenanceServiceRequestVO.getMailId());
+
+responseDTO.setReportedTime(
+        maintenanceServiceRequestVO.getReportedTime());
+
+responseDTO.setPhoneNo(
+        maintenanceServiceRequestVO.getPhoneNo());
+
+responseDTO.setCompleted(
+        maintenanceServiceRequestVO.getCompleted());
+
+responseDTO.setClosingDate(
+        maintenanceServiceRequestVO.getClosingDate());
+
+responseDTO.setApprovedBy(
+        maintenanceServiceRequestVO.getApprovedBy());
+
+responseDTO.setServiceRequired(
+        maintenanceServiceRequestVO.getServiceRequired());
+
+responseDTO.setRemarks(
+        maintenanceServiceRequestVO.getRemarks());
+
+responseDTO.setActive(
+        maintenanceServiceRequestVO.isActive());
+
+responseDTO.setOrgId(
+        maintenanceServiceRequestVO.getOrgId());
+
+responseDTO.setCreatedBy(
+        maintenanceServiceRequestVO.getCreatedBy());
+
+responseDTO.setUpdatedBy(
+        maintenanceServiceRequestVO.getUpdatedBy());
+
+responseDTO.setCancel(
+        maintenanceServiceRequestVO.isCancel());
+
+responseDTO.setCancelRemarks(
+        maintenanceServiceRequestVO.getCancelRemarks());
+
+// =========================
+// Belong To
+// =========================
+
+if (ObjectUtils.isNotEmpty(
+        maintenanceServiceRequestVO.getBelongTo())) {
+
+    ListOfValuesDetailsResponseDTO belongToDTO =
+            new ListOfValuesDetailsResponseDTO();
+
+    belongToDTO.setId(
+            maintenanceServiceRequestVO
+                    .getBelongTo()
+                    .getId());
+
+    belongToDTO.setCode(
+            maintenanceServiceRequestVO
+                    .getBelongTo()
+                    .getValueCode());
+
+    belongToDTO.setDescription(
+            maintenanceServiceRequestVO
+                    .getBelongTo()
+                    .getValueDescription());
+
+    responseDTO.setBelongTo(belongToDTO);
+}
+
+// =========================
+// Department
+// =========================
+
+if (ObjectUtils.isNotEmpty(
+        maintenanceServiceRequestVO.getDepartment())) {
+
+    DepartmentResponseDTO departmentDTO =
+            new DepartmentResponseDTO();
+
+    departmentDTO.setId(
+            maintenanceServiceRequestVO
+                    .getDepartment()
+                    .getId());
+
+    departmentDTO.setDepartmentCode(
+            maintenanceServiceRequestVO
+                    .getDepartment()
+                    .getDepartmentCode());
+
+    departmentDTO.setDepartmentName(
+            maintenanceServiceRequestVO
+                    .getDepartment()
+                    .getDepartmentName());
+
+    responseDTO.setDepartment(departmentDTO);
+}
+
+// =========================
+// Priority
+// =========================
+
+if (ObjectUtils.isNotEmpty(
+        maintenanceServiceRequestVO.getPriority())) {
+
+    ListOfValuesDetailsResponseDTO priorityDTO =
+            new ListOfValuesDetailsResponseDTO();
+
+    priorityDTO.setId(
+            maintenanceServiceRequestVO
+                    .getPriority()
+                    .getId());
+
+    
+    priorityDTO.setCode(
+            maintenanceServiceRequestVO
+                    .getPriority()
+                    .getValueCode());
+
+    priorityDTO.setDescription(
+            maintenanceServiceRequestVO
+                    .getPriority()
+                    .getValueDescription());
+
+    responseDTO.setPriority(priorityDTO);
+}
+
+//=========================
+//Requested By
+//=========================
+
+if (ObjectUtils.isNotEmpty(
+     maintenanceServiceRequestVO.getRequestedBy())) {
+
+ EmployeeResponseDTO employeeDTO =
+         new EmployeeResponseDTO();
+
+ employeeDTO.setId(
+         maintenanceServiceRequestVO
+                 .getRequestedBy()
+                 .getId());
+
+ employeeDTO.setEmployeeName(
+         maintenanceServiceRequestVO
+                 .getRequestedBy()
+                 .getEmployeeName());
+
+ responseDTO.setRequestedBy(employeeDTO);
+}
+
+//=========================
+//Prepared By
+//=========================
+
+if (ObjectUtils.isNotEmpty(
+     maintenanceServiceRequestVO.getPreparedBy())) {
+
+ EmployeeResponseDTO employeeDTO =
+         new EmployeeResponseDTO();
+
+ employeeDTO.setId(
+         maintenanceServiceRequestVO
+                 .getPreparedBy()
+                 .getId());
+
+ employeeDTO.setEmployeeName(
+         maintenanceServiceRequestVO
+                 .getPreparedBy()
+                 .getEmployeeName());
+
+ responseDTO.setPreparedBy(employeeDTO);
+ 
+}
+
+return responseDTO;
+}
+	
+	
+	@Override
+	public List<MaintenanceServiceRequestResponseDTO>
+	        getMaintenanceServiceRequestByOrgId(Long orgId)
+	        throws ApplicationException {
+
+	    List<MaintenanceServiceRequestVO>
+	            maintenanceServiceRequestList =
+	                    maintenanceServiceRequestRepo
+	                            .findByOrgIdAndCancelFalse(orgId);
+
+	    if (maintenanceServiceRequestList == null
+	            || maintenanceServiceRequestList.isEmpty()) {
+
+	        throw new ApplicationException(
+	                "Maintenance Service Request Not Found");
+	    }
+
+	    List<MaintenanceServiceRequestResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (MaintenanceServiceRequestVO
+	            maintenanceServiceRequestVO :
+	                maintenanceServiceRequestList) {
+
+	        responseList.add(
+	                maintenanceServiceRequestResponse(
+	                        maintenanceServiceRequestVO));
+	    }
+
+	    return responseList;
+	}
+	
+	
+	@Override
+	public MaintenanceServiceRequestResponseDTO
+	        getMaintenanceServiceRequestById(Long id)
+	        throws ApplicationException {
+
+	    MaintenanceServiceRequestVO
+	            maintenanceServiceRequestVO =
+	                    maintenanceServiceRequestRepo
+	                            .findById(id)
+	                            .orElse(null);
+
+	    if (maintenanceServiceRequestVO == null) {
+
+	        throw new ApplicationException(
+	                "Maintenance Service Request Not Found");
+	    }
+
+	    return maintenanceServiceRequestResponse(
+	            maintenanceServiceRequestVO);
+	} 
+	
+	
+	//transferorder
+	
+	
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateTransferOrder(
+	        TransferOrderDTO transferOrderDTO) throws ApplicationException {
+
+	    TransferOrderVO transferOrderVO;
+	    String message;
+
+	    // ============================================================
+	    // CREATE / UPDATE
+	    // ============================================================
+
+	    if (ObjectUtils.isNotEmpty(transferOrderDTO.getId())) {
+
+	        // UPDATE
+
+	        transferOrderVO = transferOrderRepo.findById(transferOrderDTO.getId())
+	                .orElseThrow(() -> new ApplicationException("Transfer Order Not Found"));
+
+	        transferOrderVO.setUpdatedBy(transferOrderDTO.getCreatedBy());
+
+	        // DELETE OLD DETAILS
+	        transferOrderDetailRepo.deleteAll(
+	                transferOrderDetailRepo.findByTransferOrderVOId(
+	                        transferOrderVO.getId()));
+
+	        message = "Transfer Order Updated Successfully";
+
+	    } else {
+
+	        // CREATE
+
+	        transferOrderVO = new TransferOrderVO();
+
+	        transferOrderVO.setCreatedBy(transferOrderDTO.getCreatedBy());
+	        transferOrderVO.setUpdatedBy(transferOrderDTO.getCreatedBy());
+
+	        message = "Transfer Order Created Successfully";
+	    }
+
+	    // ============================================================
+	    // HEADER MAPPING
+	    // ============================================================
+
+	    createUpdateTransferOrderVOByDTO(
+	            transferOrderDTO,
+	            transferOrderVO);
+
+	    // ============================================================
+	    // DETAIL MAPPING
+	    // ============================================================
+
+	    if (transferOrderDTO.getTransferOrderDetailDTO() != null) {
+
+	        List<TransferOrderDetailVO> detailList = new ArrayList<>();
+
+	        for (TransferOrderDetailDTO detailDTO :
+	                transferOrderDTO.getTransferOrderDetailDTO()) {
+
+	            TransferOrderDetailVO detailVO =
+	                    new TransferOrderDetailVO();
+
+	            // ====================================================
+	            // BASIC DETAILS
+	            // ====================================================
+
+	            detailVO.setOrderDate(detailDTO.getOrderDate());
+
+	            detailVO.setItemDescription(
+	                    detailDTO.getItemDescription());
+
+	            detailVO.setScheduleDate(
+	                    detailDTO.getScheduleDate());
+
+	            detailVO.setQty(detailDTO.getQty());
+
+	            detailVO.setUnit(detailDTO.getUnit());
+
+	            detailVO.setPurQty(detailDTO.getPurQty());
+
+	            detailVO.setPurUnit(detailDTO.getPurUnit());
+
+	            detailVO.setSupplierName(
+	                    detailDTO.getSupplierName());
+
+	            detailVO.setType(detailDTO.getType());
+
+	            detailVO.setCombineWith(
+	                    detailDTO.getCombineWith());
+
+	            detailVO.setTransId(detailDTO.getTransId());
+
+	            detailVO.setContractNo(detailDTO.getContractNo());
+
+	            // ====================================================
+	            // ITEM
+	            // ====================================================
+
+	            if (detailDTO.getItemCode() != null) {
+
+	                ItemMasterVO itemMasterVO =
+	                        itemMasterRepo.findById(detailDTO.getItemCode())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Item Master Not Found"));
+
+	                detailVO.setItemCode(itemMasterVO);
+
+	                // Auto fill item description
+	                detailVO.setItemDescription(
+	                        itemMasterVO.getItemDescription());
+	            }
+
+	            // ====================================================
+	            // SUPPLIER
+	            // ====================================================
+
+	            if (detailDTO.getSupplierId() != null) {
+
+	                CustomerVO customerVO =
+	                        customerRepo.findById(detailDTO.getSupplierId())
+	                                .orElseThrow(() ->
+	                                        new ApplicationException(
+	                                                "Customer Not Found"));
+
+	                detailVO.setSupplierId(customerVO);
+
+	                // Auto fill supplier name
+	                detailVO.setSupplierName(
+	                        customerVO.getCustomerName());
+	            }
+
+	            // ====================================================
+	            // SET HEADER
+	            // ====================================================
+
+	            detailVO.setTransferOrderVO(transferOrderVO);
+
+	            detailList.add(detailVO);
+	        }
+
+	        transferOrderVO.setTransferOrderDetailVO(detailList);
+	    }
+
+	    // ============================================================
+	    // SAVE
+	    // ============================================================
+
+	    transferOrderVO = transferOrderRepo.save(transferOrderVO);
+
+	    // ============================================================
+	    // RESPONSE
+	    // ============================================================
+
+	    TransferOrderResponseDTO responseDTO =
+	            buildTransferOrderResponse(transferOrderVO);
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    response.put("message", message);
+	    response.put("transferOrderVO", responseDTO);
+
+	    return response;
+	}
+	
+	private void createUpdateTransferOrderVOByDTO(
+	        TransferOrderDTO dto,
+	        TransferOrderVO vo) throws ApplicationException {
+
+	    // ============================================================
+	    // ORDER TYPE
+	    // ============================================================
+
+	    if (dto.getOrderType() != null) {
+
+	        ListOfValuesDetailsVO orderTypeVO =
+	                listOfValuesDetailsRepo.findById(dto.getOrderType())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Order Type Not Found"));
+
+	        vo.setOrderType(orderTypeVO);
+	    }
+
+	    // ============================================================
+	    // BASIC DETAILS
+	    // ============================================================
+
+	    vo.setDocId(dto.getDocId());
+
+	    vo.setDocDate(dto.getDocDate());
+
+	    // ============================================================
+	    // COMMON FIELDS
+	    // ============================================================
+
+	    vo.setActive(dto.isActive());
+
+	    vo.setOrgId(dto.getOrgId());
+
+	    vo.setFinancialYear(dto.getFinancialYear());
+
+	    vo.setCreatedBy(dto.getCreatedBy());
+
+	    vo.setUpdatedBy(dto.getUpdatedBy());
+
+	    vo.setCancel(dto.isCancel());
+
+	    vo.setCancelRemarks(dto.getCancelRemarks());
+
+	    // ============================================================
+	    // SCREEN DETAILS
+	    // ============================================================
+
+	    vo.setScreenName("TRANSFERORDER");
+
+	    vo.setScreenCode("TO");
+	}
+	private TransferOrderResponseDTO buildTransferOrderResponse(
+	        TransferOrderVO vo) {
+
+	    TransferOrderResponseDTO responseDTO =
+	            new TransferOrderResponseDTO();
+
+	    // ============================================================
+	    // HEADER RESPONSE
+	    // ============================================================
+
+	    responseDTO.setId(vo.getId());
+
+	    responseDTO.setDocId(vo.getDocId());
+
+	    responseDTO.setDocDate(vo.getDocDate());
+
+	    responseDTO.setActive(vo.isActive());
+
+	    responseDTO.setOrgId(vo.getOrgId());
+
+	    responseDTO.setFinancialYear(vo.getFinancialYear());
+
+	    responseDTO.setCreatedBy(vo.getCreatedBy());
+
+	    responseDTO.setUpdatedBy(vo.getUpdatedBy());
+
+	    responseDTO.setCancel(vo.isCancel());
+
+	    responseDTO.setCancelRemarks(vo.getCancelRemarks());
+
+	 // ============================================================
+	 // ORDER TYPE
+	 // ============================================================
+
+	 if (vo.getOrderType() != null) {
+
+	     ListOfValuesDetailsResponseDTO orderTypeResponseDTO =
+	             new ListOfValuesDetailsResponseDTO();
+
+	     orderTypeResponseDTO.setId(
+	             vo.getOrderType().getId());
+
+	     orderTypeResponseDTO.setCode(
+	             vo.getOrderType().getValueCode());
+
+	     orderTypeResponseDTO.setDescription(
+	             vo.getOrderType().getValueDescription());
+
+	     responseDTO.setOrderType(orderTypeResponseDTO);
+	 }
+	 
+	    // ============================================================
+	    // DETAIL RESPONSE
+	    // ============================================================
+
+	    if (vo.getTransferOrderDetailVO() != null) {
+
+	        List<TransferOrderDetailResponseDTO> detailList =
+	                new ArrayList<>();
+
+	        for (TransferOrderDetailVO detailVO :
+	                vo.getTransferOrderDetailVO()) {
+
+	            TransferOrderDetailResponseDTO detailDTO =
+	                    new TransferOrderDetailResponseDTO();
+
+	            // ====================================================
+	            // BASIC DETAILS
+	            // ====================================================
+
+	            detailDTO.setId(detailVO.getId());
+
+	            detailDTO.setOrderDate(
+	                    detailVO.getOrderDate());
+
+	            detailDTO.setItemDescription(
+	                    detailVO.getItemDescription());
+
+	            detailDTO.setScheduleDate(
+	                    detailVO.getScheduleDate());
+
+	            detailDTO.setQty(detailVO.getQty());
+
+	            detailDTO.setUnit(detailVO.getUnit());
+
+	            detailDTO.setPurQty(detailVO.getPurQty());
+
+	            detailDTO.setPurUnit(detailVO.getPurUnit());
+
+	            detailDTO.setSupplierName(
+	                    detailVO.getSupplierName());
+
+	            detailDTO.setType(detailVO.getType());
+
+	            detailDTO.setCombineWith(
+	                    detailVO.getCombineWith());
+
+	            detailDTO.setTransId(
+	                    detailVO.getTransId());
+
+	            detailDTO.setContractNo(
+	                    detailVO.getContractNo());
+
+	            // ====================================================
+	            // ITEM RESPONSE
+	            // ====================================================
+
+	            if (detailVO.getItemCode() != null) {
+
+	                ItemResponse1DTO itemResponseDTO =
+	                        new ItemResponse1DTO();
+
+	                itemResponseDTO.setId(
+	                        detailVO.getItemCode().getId());
+
+	                itemResponseDTO.setItemCode(
+	                        detailVO.getItemCode().getItemCode());
+
+	                itemResponseDTO.setItemDescription(
+	                        detailVO.getItemCode().getItemDescription());
+
+	                detailDTO.setItemCode(itemResponseDTO);
+	            }
+
+	         // ============================================================
+	         // SUPPLIER RESPONSE
+	         // ============================================================
+
+	         if (detailVO.getSupplierId() != null) {
+
+	             CustomerResponse1DTO customerResponseDTO =
+	                     new CustomerResponse1DTO();
+
+	             customerResponseDTO.setId(
+	                     detailVO.getSupplierId().getId());
+
+	             customerResponseDTO.setCustomerName(
+	                     detailVO.getSupplierId().getCustomerName());
+
+	             detailDTO.setSupplierId(
+	                     customerResponseDTO);
+	         }
+
+	            detailList.add(detailDTO);
+	        }
+
+	        responseDTO.setTransferOrderDetailResponseDTO(detailList);
+	    }
+
+	    return responseDTO;
+	}
+	
+	
+	@Override
+	public List<TransferOrderResponseDTO> getTransferOrderByOrgId(Long orgId)
+	        throws ApplicationException {
+
+	    List<TransferOrderVO> transferOrderList =
+	            transferOrderRepo.findByOrgIdAndCancelFalse(orgId);
+
+	    if (transferOrderList == null
+	            || transferOrderList.isEmpty()) {
+
+	        throw new ApplicationException(
+	                "Transfer Order Not Found");
+	    }
+
+	    List<TransferOrderResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (TransferOrderVO transferOrderVO :
+	            transferOrderList) {
+
+	        responseList.add(
+	                buildTransferOrderResponse(
+	                        transferOrderVO));
+	    }
+
+	    return responseList;
+	}
+	
+	
+	@Override
+	public TransferOrderResponseDTO getTransferOrderById(Long id)
+	        throws ApplicationException {
+
+	    TransferOrderVO transferOrderVO =
+	            transferOrderRepo.findById(id)
+	                    .orElse(null);
+
+	    if (transferOrderVO == null) {
+
+	        throw new ApplicationException(
+	                "Transfer Order Not Found");
+	    }
+
+	    return buildTransferOrderResponse(
+	            transferOrderVO);
+	}
+	
+	
+	@Override
+	public String getTransferOrderDocId(
+	        Long orgId,
+	        String financialYear) {
+
+	    String screenCode = "TO";
+
+	    String result =
+	            transferOrderRepo
+	                    .getTransferOrderDocId(
+	                            orgId,
+	                            financialYear,
+	                            screenCode);
+
+	    return result;
+	}
+	
+	//TransferOrderItemDropdown
+	
+	@Override
+	public List<Map<String, Object>> getTransferOrderItemDropdown(
+	        Long orgId) throws ApplicationException {
+
+	    List<Object[]> itemList =
+	            transferOrderRepo.getTransferOrderItemDropdown(orgId);
+
+	    if (itemList == null || itemList.isEmpty()) {
+
+	        throw new ApplicationException(
+	                "Transfer Order Item Not Found");
+	    }
+
+	    List<Map<String, Object>> responseList =
+	            new ArrayList<>();
+
+	    for (Object[] obj : itemList) {
+
+	        Map<String, Object> response =
+	                new HashMap<>();
+
+	        response.put("id", obj[0]);
+	        response.put("name", obj[1]);
+	        response.put("description", obj[2]);
+	        response.put("unitId", obj[3]);
+	        response.put("unitCode", obj[4]);
+	        response.put("unitDescription", obj[5]);
+
+	        responseList.add(response);
+	    }
+
+	    return responseList;
+	}
+	
+	
+	
+	//gateoutwardentry
+	
+	
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateGateOutwardEntry(
+	        GateOutwardEntryDTO gateOutwardEntryDTO) throws ApplicationException {
+
+	    GateOutwardEntryVO gateOutwardEntryVO;
+	    String message;
+
+	    // ============================================================
+	    // CREATE / UPDATE
+	    // ============================================================
+
+	    if (ObjectUtils.isNotEmpty(gateOutwardEntryDTO.getId())) {
+
+	        // UPDATE
+
+	        gateOutwardEntryVO = gateOutwardEntryRepo
+	                .findById(gateOutwardEntryDTO.getId())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Gate Outward Entry Not Found"));
+
+	        gateOutwardEntryVO.setUpdatedBy(
+	                gateOutwardEntryDTO.getCreatedBy());
+
+	        // DELETE OLD DETAILS
+
+	        gateOutwardEntryDetailRepo.deleteAll(
+	                gateOutwardEntryDetailRepo
+	                        .findByGateOutwardEntryVOId(
+	                                gateOutwardEntryVO.getId()));
+
+	        message = "Gate Outward Entry Updated Successfully";
+
+	    } else {
+
+	        // CREATE
+
+	        gateOutwardEntryVO = new GateOutwardEntryVO();
+
+	        gateOutwardEntryVO.setCreatedBy(
+	                gateOutwardEntryDTO.getCreatedBy());
+
+	        gateOutwardEntryVO.setUpdatedBy(
+	                gateOutwardEntryDTO.getCreatedBy());
+
+	        message = "Gate Outward Entry Created Successfully";
+	    }
+
+	    // ============================================================
+	    // HEADER MAPPING
+	    // ============================================================
+
+	    createUpdateGateOutwardEntryVOByDTO(
+	            gateOutwardEntryDTO,
+	            gateOutwardEntryVO);
+
+	    // ============================================================
+	    // DETAIL MAPPING
+	    // ============================================================
+
+	    if (gateOutwardEntryDTO.getGateOutwardEntryDetailDTO() != null) {
+
+	        List<GateOutwardEntryDetailVO> detailList =
+	                new ArrayList<>();
+
+	        for (GateOutwardEntryDetailDTO detailDTO :
+	                gateOutwardEntryDTO.getGateOutwardEntryDetailDTO()) {
+
+	            GateOutwardEntryDetailVO detailVO =
+	                    new GateOutwardEntryDetailVO();
+
+	            // ====================================================
+	            // BASIC DETAILS
+	            // ====================================================
+
+	            detailVO.setToolMachineInstrumentNo(
+	                    detailDTO.getToolMachineInstrumentNo());
+
+	            detailVO.setToolMachineInstrumentNoDesc(
+	                    detailDTO.getToolMachineInstrumentNoDesc());
+
+	            detailVO.setQuantity(
+	                    detailDTO.getQuantity());
+
+	            // ====================================================
+	            // ITEM
+	            // ====================================================
+
+	            if (detailDTO.getItemCode() != null) {
+
+	                ItemMasterVO itemMasterVO =
+	                        itemMasterRepo.findById(
+	                                detailDTO.getItemCode())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Item Master Not Found"));
+
+	                detailVO.setItemCode(itemMasterVO);
+
+	                // Auto fill Item Description
+
+	                detailVO.setItemDescription(
+	                        itemMasterVO.getItemDescription());
+	            }
+
+	            // ====================================================
+	            // UNIT
+	            // ====================================================
+
+	            if (detailDTO.getUnit() != null) {
+
+	                UnitMasterVO unitMasterVO =
+	                        unitMasterRepo.findById(
+	                                detailDTO.getUnit())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Unit Master Not Found"));
+
+	                detailVO.setUnit(unitMasterVO);
+	            }
+
+	            // ====================================================
+	            // SET HEADER
+	            // ====================================================
+
+	            detailVO.setGateOutwardEntryVO(
+	                    gateOutwardEntryVO);
+
+	            detailList.add(detailVO);
+	        }
+
+	        gateOutwardEntryVO.setGateOutwardEntryDetailVO(
+	                detailList);
+	    }
+
+	    // ============================================================
+	    // SAVE
+	    // ============================================================
+
+	    gateOutwardEntryVO =
+	            gateOutwardEntryRepo.save(gateOutwardEntryVO);
+
+	    // ============================================================
+	    // RESPONSE
+	    // ============================================================
+
+	    GateOutwardEntryResponseDTO responseDTO =
+	            buildGateOutwardEntryResponse(
+	                    gateOutwardEntryVO);
+
+	    Map<String, Object> response =
+	            new HashMap<>();
+
+	    response.put("message", message);
+	    response.put("gateOutwardEntryVO", responseDTO);
+
+	    return response;
+	}
+	
+	
+	private void createUpdateGateOutwardEntryVOByDTO(
+	        GateOutwardEntryDTO dto,
+	        GateOutwardEntryVO vo) throws ApplicationException {
+
+	    // ============================================================
+	    // PLANT
+	    // ============================================================
+
+	    if (dto.getPlantId() != null) {
+
+	        BranchVO branchVO =
+	                branchRepo.findById(dto.getPlantId())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Branch Not Found"));
+
+	        vo.setPlantId(branchVO);
+	    }
+
+	    // ============================================================
+	 // ============================================================
+	 // BASIC DETAILS
+	 // ============================================================
+
+	 vo.setBreakDown(dto.getBreakDown());
+	 
+	 vo.setDocId(dto.getDocId());
+	 
+//	 vo.setDocDate(dto.getDocDate());
+	 
+	 vo.setBreakDownNo(dto.getBreakDownNo());
+	 
+	 vo.setOutwardTime(dto.getOutwardTime());
+	 
+	 vo.setChallanNo(dto.getChallanNo());
+	 
+	 vo.setVehicleNo(dto.getVehicleNo());
+	 
+	 vo.setRemarks(dto.getRemarks());
+	    // ============================================================
+	    // MATERIAL TYPE
+	    // ============================================================
+
+	    if (dto.getMaterialType() != null) {
+
+	        ToolCategoryVO toolCategoryVO =
+	                toolCategoryRepo.findById(
+	                        dto.getMaterialType())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Tool Category Not Found"));
+
+	        vo.setMaterialType(toolCategoryVO);
+	    }
+
+	    // ============================================================
+	    // MATERIAL TAKEN OUT BY
+	    // ============================================================
+
+	    if (dto.getMaterialTakenOutBy() != null) {
+
+	        EmployeeMasterVO employeeMasterVO =
+	                employeeMasterRepo.findById(
+	                        dto.getMaterialTakenOutBy())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Employee Master Not Found"));
+
+	        vo.setMaterialTakenOutBy(
+	                employeeMasterVO);
+	    }
+
+	    // ============================================================
+	    // MATERIAL SENT TO
+	    // ============================================================
+
+	    if (dto.getMaterialSentTo() != null) {
+
+	        CustomerVO customerVO =
+	                customerRepo.findById(
+	                        dto.getMaterialSentTo())
+	                .orElseThrow(() ->
+	                        new ApplicationException(
+	                                "Customer Not Found"));
+
+	        vo.setMaterialSentTo(customerVO);
+	    }
+
+	    // ============================================================
+	    // COMMON FIELDS
+	    // ============================================================
+
+	    vo.setActive(dto.isActive());
+
+	    vo.setOrgId(dto.getOrgId());
+
+	    vo.setFinancialYear(
+	            dto.getFinancialYear());
+
+	    vo.setCreatedBy(
+	            dto.getCreatedBy());
+
+	    vo.setUpdatedBy(
+	            dto.getUpdatedBy());
+
+	    vo.setCancel(dto.isCancel());
+
+	    vo.setCancelRemarks(
+	            dto.getCancelRemarks());
+
+	    // ============================================================
+	    // SCREEN DETAILS
+	    // ============================================================
+
+	    vo.setScreenName("GATEOUTWARDENTRY");
+
+	    vo.setScreenCode("GOE");
+	}
+	
+	private GateOutwardEntryResponseDTO buildGateOutwardEntryResponse(
+	        GateOutwardEntryVO vo) {
+
+	    GateOutwardEntryResponseDTO responseDTO =
+	            new GateOutwardEntryResponseDTO();
+
+	    // ============================================================
+	    // HEADER RESPONSE
+	    // ============================================================
+
+	    responseDTO.setId(vo.getId());
+
+	    responseDTO.setSerialNo(
+	            vo.getSerialNo());
+
+	    responseDTO.setBreakDown(
+	            vo.getBreakDown());
+
+//	    responseDTO.setDocdate(
+//	            vo.get());
+//	    
+	    responseDTO.setBreakDownNo(
+	            vo.getBreakDownNo());
+
+	    responseDTO.setOutwardTime(
+	            vo.getOutwardTime());
+
+	    responseDTO.setChallanNo(
+	            vo.getChallanNo());
+
+	    responseDTO.setVehicleNo(
+	            vo.getVehicleNo());
+
+	    responseDTO.setRemarks(
+	            vo.getRemarks());
+
+	    responseDTO.setActive(
+	            vo.isActive());
+
+	    responseDTO.setOrgId(
+	            vo.getOrgId());
+
+	    responseDTO.setFinancialYear(
+	            vo.getFinancialYear());
+
+	    responseDTO.setCreatedBy(
+	            vo.getCreatedBy());
+
+	    responseDTO.setUpdatedBy(
+	            vo.getUpdatedBy());
+
+	    responseDTO.setCancel(
+	            vo.isCancel());
+
+	    responseDTO.setCancelRemarks(
+	            vo.getCancelRemarks());
+
+	    // ============================================================
+	    // PLANT RESPONSE
+	    // ============================================================
+
+	    if (vo.getPlantId() != null) {
+
+	        BranchResponseDTO branchResponseDTO =
+	                new BranchResponseDTO();
+
+	        branchResponseDTO.setId(
+	                vo.getPlantId().getId());
+
+	        // Add the other BranchResponseDTO fields
+	        // according to your existing BranchResponseDTO.
+
+	        responseDTO.setPlantId(
+	                branchResponseDTO);
+	    }
+
+	    // ============================================================
+	    // MATERIAL TYPE RESPONSE
+	    // ============================================================
+
+	    if (vo.getMaterialType() != null) {
+
+	        ToolCategoryDetailResponseDTO
+	                materialTypeResponseDTO =
+	                new ToolCategoryDetailResponseDTO();
+
+	        materialTypeResponseDTO.setId(
+	                vo.getMaterialType().getId());
+
+	        // Set the remaining ToolCategory fields
+	        // according to your ToolCategoryDetailResponseDTO.
+
+	        responseDTO.setMaterialType(
+	                materialTypeResponseDTO);
+	    }
+
+	    // ============================================================
+	    // EMPLOYEE RESPONSE
+	    // ============================================================
+
+	    if (vo.getMaterialTakenOutBy() != null) {
+
+	        EmployeeResponseDTO employeeResponseDTO =
+	                new EmployeeResponseDTO();
+
+	        employeeResponseDTO.setId(
+	                vo.getMaterialTakenOutBy().getId());
+
+	        // Set the remaining employee fields
+	        // according to your EmployeeResponseDTO.
+
+	        responseDTO.setMaterialTakenOutBy(
+	                employeeResponseDTO);
+	    }
+
+	    // ============================================================
+	    // CUSTOMER RESPONSE
+	    // ============================================================
+
+	    if (vo.getMaterialSentTo() != null) {
+
+	        CustomerResponse1DTO customerResponseDTO =
+	                new CustomerResponse1DTO();
+
+	        customerResponseDTO.setId(
+	                vo.getMaterialSentTo().getId());
+
+	        customerResponseDTO.setCustomerName(
+	                vo.getMaterialSentTo().getCustomerName());
+
+	        responseDTO.setMaterialSentTo(
+	                customerResponseDTO);
+	    }
+
+	    // ============================================================
+	    // DETAIL RESPONSE
+	    // ============================================================
+
+	    if (vo.getGateOutwardEntryDetailVO() != null) {
+
+	        List<GateOutwardEntryDetailResponseDTO>
+	                detailList = new ArrayList<>();
+
+	        for (GateOutwardEntryDetailVO detailVO :
+	                vo.getGateOutwardEntryDetailVO()) {
+
+	            GateOutwardEntryDetailResponseDTO
+	                    detailDTO =
+	                    new GateOutwardEntryDetailResponseDTO();
+
+	            // ====================================================
+	            // BASIC DETAILS
+	            // ====================================================
+
+	            detailDTO.setId(
+	                    detailVO.getId());
+
+	            detailDTO.setItemDescription(
+	                    detailVO.getItemDescription());
+
+	            detailDTO.setToolMachineInstrumentNo(
+	                    detailVO.getToolMachineInstrumentNo());
+
+	            detailDTO.setToolMachineInstrumentNoDesc(
+	                    detailVO.getToolMachineInstrumentNoDesc());
+
+	            detailDTO.setQuantity(
+	                    detailVO.getQuantity());
+
+	            // ====================================================
+	            // ITEM RESPONSE
+	            // ====================================================
+
+	            if (detailVO.getItemCode() != null) {
+
+	                ItemMasterDetailsResponseImportDTO
+	                        itemResponseDTO =
+	                        new ItemMasterDetailsResponseImportDTO();
+
+	                itemResponseDTO.setId(
+	                        detailVO.getItemCode().getId());
+
+	                itemResponseDTO.setItemCode(
+	                        detailVO.getItemCode().getItemCode());
+
+	                itemResponseDTO.setItemDescription(
+	                        detailVO.getItemCode()
+	                                .getItemDescription());
+
+	                detailDTO.setItemCode(
+	                        itemResponseDTO);
+	            }
+
+	            // ====================================================
+	            // UNIT RESPONSE
+	            // ====================================================
+
+	            if (detailVO.getUnit() != null) {
+
+	                UnitResponseDTO unitResponseDTO =
+	                        new UnitResponseDTO();
+
+	                unitResponseDTO.setId(
+	                        detailVO.getUnit().getId());
+
+	                // Set the remaining UnitResponseDTO fields
+	                // according to your existing UnitResponseDTO.
+
+	                detailDTO.setUnit(
+	                        unitResponseDTO);
+	            }
+
+	            detailList.add(detailDTO);
+	        }
+
+	        responseDTO.setGateOutwardEntryDetailResponseDTO(
+	                detailList);
+	    }
+
+	    return responseDTO;
+	}
+	
+	
+	
+	
+	
 }

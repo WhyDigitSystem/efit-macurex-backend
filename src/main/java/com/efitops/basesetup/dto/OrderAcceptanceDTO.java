@@ -39,6 +39,8 @@ public class OrderAcceptanceDTO {
 	private Long customer;
 
 	private boolean active;
+	
+	private String approved;
 
 	// Common Fields
 

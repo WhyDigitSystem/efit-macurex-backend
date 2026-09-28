@@ -197,4 +197,26 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
 	String getSalesContractDocId(Long orgId, String financialYear, String screenCode);
 
+	@Query(value = """
+			SELECT
+			    sc.doc_id AS docId,
+			    sc.doc_date AS docDate,
+			    sc.customer_purchase_order_date AS customerPurchaseOrderDate,
+			    c.customer_id AS customerId,
+			    c.customer_name AS customerName,
+			    sc.approval AS approval,
+			    sc.salescontract_id AS salesContractId,
+			    sc.notes AS notes,
+			    sc.customer_contract_no
+			FROM sales_contract_basic sc
+			INNER JOIN customer_header c
+			    ON c.customer_id = sc.customer
+			WHERE LOWER(sc.approval) = 'no'
+			  AND sc.branch = :branch
+			  AND sc.org_id = :orgId
+			  AND sc.doc_date BETWEEN :fromDate AND :toDate
+			""", nativeQuery = true)
+	List<Object[]> getSalesContractForApproval(@Param("branch") Long branch, @Param("orgId") Long orgId,
+			@Param("fromDate") String fromDate, @Param("toDate") String toDate);
+
 }

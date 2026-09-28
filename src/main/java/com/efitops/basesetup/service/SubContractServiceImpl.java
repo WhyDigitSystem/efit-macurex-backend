@@ -56,6 +56,8 @@ import com.efitops.basesetup.ResponseDTO.EmployeeDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.GSTStateMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.HsnResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InprocessInspectionDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InprocessInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InspectionRequisitionNoteResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
@@ -73,6 +75,8 @@ import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineSettingPlanDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineSettingPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaterialPlanningResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationDropdownResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OperationMachineDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OperationMasterResponseforPSCRDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingResponseDetails;
 import com.efitops.basesetup.ResponseDTO.ProcessValidationEntryDetailsResponseDTO;
@@ -84,6 +88,9 @@ import com.efitops.basesetup.ResponseDTO.ProductionScheduleForNextThreeMonthResp
 import com.efitops.basesetup.ResponseDTO.ReconcileConsumptionStockDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ReconcileConsumptionStockResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ServiceAccMasterResponse1DTO;
+import com.efitops.basesetup.ResponseDTO.ShiftResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockOrderDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.StockOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleItemDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SubContractSupplyScheduleResponseDTO;
@@ -112,6 +119,8 @@ import com.efitops.basesetup.dto.DeliveryChallanCumGatePassDetailsDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDTO;
 import com.efitops.basesetup.dto.DeliveryChallanSubcontractingDetailsDTO;
 import com.efitops.basesetup.dto.EmployeeResponseDTO;
+import com.efitops.basesetup.dto.InprocessInspectionDTO;
+import com.efitops.basesetup.dto.InprocessInspectionDetailsDTO;
 import com.efitops.basesetup.dto.InspectionRequisitionNoteDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
 import com.efitops.basesetup.dto.JobOrderAmendmentDTO;
@@ -132,6 +141,8 @@ import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDTO;
 import com.efitops.basesetup.dto.ProductionScheduleForNextThreeMonthDetailsDTO;
 import com.efitops.basesetup.dto.ReconcileConsumptionStockDTO;
 import com.efitops.basesetup.dto.ReconcileConsumptionStockDetailsDTO;
+import com.efitops.basesetup.dto.StockOrderDTO;
+import com.efitops.basesetup.dto.StockOrderDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleDetailsDTO;
 import com.efitops.basesetup.dto.SubContractSupplyScheduleItemDetailsDTO;
@@ -166,6 +177,8 @@ import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
 import com.efitops.basesetup.entity.HsnVO;
+import com.efitops.basesetup.entity.InprocessInspectionDetailsVO;
+import com.efitops.basesetup.entity.InprocessInspectionVO;
 import com.efitops.basesetup.entity.InspectionRequisitionNoteVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.JobOrderAmendmentDetailsVO;
@@ -177,9 +190,12 @@ import com.efitops.basesetup.entity.JobOrderShortCloseVO;
 import com.efitops.basesetup.entity.JobOrderTaxDetailsVO;
 import com.efitops.basesetup.entity.JobOrderVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.MachineMasterVO;
 import com.efitops.basesetup.entity.MachineSettingPlanDetailsVO;
 import com.efitops.basesetup.entity.MachineSettingPlanVO;
 import com.efitops.basesetup.entity.MaterialPlanningVO;
+import com.efitops.basesetup.entity.OperationMasterMachineDetailsVO;
+import com.efitops.basesetup.entity.OperationMasterVO;
 import com.efitops.basesetup.entity.ProcessSheetCompRoutingDetailVO;
 import com.efitops.basesetup.entity.ProcessSheetCompRoutingVO;
 import com.efitops.basesetup.entity.ProcessValidationEntryDetailsVO;
@@ -191,6 +207,9 @@ import com.efitops.basesetup.entity.ProductionScheduleForNextThreeMonthVO;
 import com.efitops.basesetup.entity.ReconcileConsumptionStockDetailsVO;
 import com.efitops.basesetup.entity.ReconcileConsumptionStockVO;
 import com.efitops.basesetup.entity.ServiceAccMasterVO;
+import com.efitops.basesetup.entity.ShiftVO;
+import com.efitops.basesetup.entity.StockOrderDetailsVO;
+import com.efitops.basesetup.entity.StockOrderVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleDetailsVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleItemDetailsVO;
 import com.efitops.basesetup.entity.SubContractSupplyScheduleVO;
@@ -229,6 +248,8 @@ import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.GSTStateMasterRepo;
 import com.efitops.basesetup.repository.GateInwardEntryRepo;
 import com.efitops.basesetup.repository.HsnRepo;
+import com.efitops.basesetup.repository.InprocessInspectionDetailsRepo;
+import com.efitops.basesetup.repository.InprocessInspectionRepo;
 import com.efitops.basesetup.repository.InspectionRequisitionNoteRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.JobOrderAmendmentDetailsRepo;
@@ -241,9 +262,11 @@ import com.efitops.basesetup.repository.JobOrderShortCloseRepo;
 import com.efitops.basesetup.repository.JobOrderTaxDetailsRepo;
 import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.MachineMasterRepo;
 import com.efitops.basesetup.repository.MachineSettingPlanDetailsRepo;
 import com.efitops.basesetup.repository.MachineSettingPlanRepo;
 import com.efitops.basesetup.repository.MaterialPlanningRepo;
+import com.efitops.basesetup.repository.OperationMasterRepo;
 import com.efitops.basesetup.repository.ProcessSheetCompRoutingRepo;
 import com.efitops.basesetup.repository.ProcessValidationEntryDetailsRepo;
 import com.efitops.basesetup.repository.ProcessValidationEntryRepo;
@@ -254,6 +277,9 @@ import com.efitops.basesetup.repository.ProductionScheduleForNextThreeMonthRepo;
 import com.efitops.basesetup.repository.ReconcileConsumptionStockDetailsRepo;
 import com.efitops.basesetup.repository.ReconcileConsumptionStockRepo;
 import com.efitops.basesetup.repository.ServiceAccMasterRepo;
+import com.efitops.basesetup.repository.ShiftRepo;
+import com.efitops.basesetup.repository.StockOrderDetailsRepo;
+import com.efitops.basesetup.repository.StockOrderRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleDetailsRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleItemDetailsRepo;
 import com.efitops.basesetup.repository.SubContractSupplyScheduleRepo;
@@ -472,7 +498,28 @@ public class SubContractServiceImpl implements SubContractService {
 
 	@Autowired
 	ProductionBulkIssuesDetailsRepo productionBulkIssuesDetailsRepo;
+	
+	@Autowired
+	InprocessInspectionRepo inprocessInspectionRepo;
+	
+	@Autowired
+	InprocessInspectionDetailsRepo inprocessInspectionDetailsRepo;
+	
+	@Autowired
+	OperationMasterRepo operationMasterRepo;
 
+	@Autowired
+	MachineMasterRepo machineMasterRepo;
+	
+	@Autowired
+	ShiftRepo shiftRepo;
+	
+	@Autowired
+	StockOrderRepo stockOrderRepo;
+	
+	@Autowired
+	StockOrderDetailsRepo stockOrderDetailsRepo;
+	
 	@Override
 	@Transactional
 	public Map<String, Object> createUpdateSupplierRateContract(SupplierRateContractDTO dto)
@@ -10861,4 +10908,1106 @@ public class SubContractServiceImpl implements SubContractService {
 		return details;
 	}
 
+	
+	@Override
+	@Transactional(rollbackOn = Exception.class)
+	public Map<String, Object> createUpdateInprocessInspection(
+	        InprocessInspectionDTO inprocessInspectionDTO)
+	        throws ApplicationException {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    InprocessInspectionVO inprocessInspectionVO = null;
+
+	    String message = null;
+
+	    if (ObjectUtils.isEmpty(inprocessInspectionDTO.getId())) {
+
+	        inprocessInspectionVO = new InprocessInspectionVO();
+
+	        String screenCode = "IPI";
+
+	        String docId =
+	                inprocessInspectionRepo.getInprocessInspectionDocId(
+	                        inprocessInspectionDTO.getOrgId(),
+	                        inprocessInspectionDTO.getFinancialYear(),
+	                        screenCode);
+
+	        inprocessInspectionVO.setDocId(docId);
+
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo
+	                        .findByOrgIdAndFinYearAndScreenCode(
+	                                inprocessInspectionDTO.getOrgId(),
+	                                inprocessInspectionDTO.getFinancialYear(),
+	                                screenCode);
+
+	        if (documentTypeMappingDetailsVO != null) {
+
+	            documentTypeMappingDetailsVO.setLastNo(
+	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+
+	            documentTypeMappingDetailsRepo
+	                    .save(documentTypeMappingDetailsVO);
+	        }
+
+	        inprocessInspectionVO.setCreatedBy(
+	                inprocessInspectionDTO.getCreatedBy());
+
+	        inprocessInspectionVO.setUpdatedBy(
+	                inprocessInspectionDTO.getCreatedBy());
+
+	        message = "Inprocess Inspection created successfully";
+
+	    } else {
+
+	        inprocessInspectionVO =
+	                inprocessInspectionRepo
+	                        .findById(inprocessInspectionDTO.getId())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Inprocess Inspection Not Found"));
+
+	        List<InprocessInspectionDetailsVO> oldDetails =
+	                inprocessInspectionDetailsRepo
+	                        .findByInprocessInspectionVO(
+	                                inprocessInspectionVO);
+
+	        if (oldDetails != null && !oldDetails.isEmpty()) {
+
+	            inprocessInspectionDetailsRepo.deleteAll(oldDetails);
+
+	            inprocessInspectionDetailsRepo.flush();
+	        }
+
+	        inprocessInspectionVO.getDetails().clear();
+
+	        inprocessInspectionVO.setUpdatedBy(
+	                inprocessInspectionDTO.getCreatedBy());
+
+	        message = "Inprocess Inspection updated successfully";
+	    }
+
+	    inprocessInspectionVO =
+	            getInprocessInspectionVOFromDTO(
+	                    inprocessInspectionDTO,
+	                    inprocessInspectionVO);
+
+	    InprocessInspectionVO savedVO =
+	            inprocessInspectionRepo.saveAndFlush(
+	                    inprocessInspectionVO);
+
+	    response.put("message", message);
+
+	    response.put(
+	            "inprocessInspectionVO",
+	            convertToResponse(savedVO));
+
+	    return response;
+	}
+	
+	private InprocessInspectionVO getInprocessInspectionVOFromDTO(
+	        InprocessInspectionDTO dto,
+	        InprocessInspectionVO vo)
+	        throws ApplicationException {
+
+	    vo.setSpecification(dto.getSpecification());
+
+	    vo.setStock(dto.getStock());
+
+	    vo.setActive(dto.isActive());
+
+	    vo.setProducedQty(dto.getProducedQty());
+
+	    vo.setAcceptedQty(dto.getAcceptedQty());
+
+	    vo.setRejectedQty(dto.getRejectedQty());
+
+	    vo.setRewQty(dto.getRewQty());
+
+	    vo.setNcDetail(dto.getNcDetail());
+
+	    vo.setActionTaken(dto.getActionTaken());
+
+	    vo.setOrgId(dto.getOrgId());
+
+	    vo.setFinancialYear(dto.getFinancialYear());
+
+
+	    // Branch
+	    if (dto.getBranch() != null) {
+
+	        BranchVO branch =
+	                branchRepo.findById(dto.getBranch())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Branch Not Found"));
+
+	        vo.setBranch(branch);
+	    }
+
+
+	    // Department
+	    if (dto.getDepartment() != null) {
+
+	        DepartmentVO department =
+	                departmentRepo.findById(dto.getDepartment())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Department Not Found"));
+
+	        vo.setDepartment(department);
+	    }
+
+
+	    // Control Plan
+	    if (dto.getControlPlan() != null) {
+
+	        ControlPlanVO controlPlan =
+	                controlPlanRepo.findById(dto.getControlPlan())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Control Plan Not Found"));
+
+	        vo.setControlPlan(controlPlan);
+	    }
+
+
+	    // Customer
+	    if (dto.getCustomer() != null) {
+
+	        CustomerVO customer =
+	                customerRepo.findById(dto.getCustomer())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Customer Not Found"));
+
+	        vo.setCustomer(customer);
+	    }
+
+
+	    // Operation
+	    if (dto.getOperationNo() != null) {
+
+	        OperationMasterVO operation =
+	                operationMasterRepo.findById(
+	                                dto.getOperationNo())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Operation Not Found"));
+
+	        vo.setOperationNo(operation);
+	    }
+
+
+	    // Part / Item
+	    if (dto.getPartNo() != null) {
+
+	        ItemMasterVO item =
+	                itemMasterRepo.findById(dto.getPartNo())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Item Not Found"));
+
+	        vo.setPartNo(item);
+	    }
+
+
+	    // From Location
+	    if (dto.getFromLocation() != null) {
+
+	        LocationVO fromLocation =
+	                locationRepo.findById(dto.getFromLocation())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "From Location Not Found"));
+
+	        vo.setFromLocation(fromLocation);
+	    }
+
+
+	    // Machine
+	    if (dto.getMachineNo() != null) {
+
+	        MachineMasterVO machine =
+	                machineMasterRepo.findById(dto.getMachineNo())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Machine Not Found"));
+
+	        vo.setMachineNo(machine);
+	    }
+
+
+	    // Shift
+	    if (dto.getShift() != null) {
+
+	        ShiftVO shift =
+	                shiftRepo.findById(dto.getShift())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Shift Not Found"));
+
+	        vo.setShift(shift);
+	    }
+
+
+	    // Inspected By
+	    if (dto.getInspectedBy() != null) {
+
+	        EmployeeMasterVO inspectedBy =
+	                employeeMasterRepo.findById(
+	                                dto.getInspectedBy())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Inspected By Employee Not Found"));
+
+	        vo.setInspectedBy(inspectedBy);
+	    }
+
+
+	    // Verified By
+	    if (dto.getVerifiedBy() != null) {
+
+	        EmployeeMasterVO verifiedBy =
+	                employeeMasterRepo.findById(
+	                                dto.getVerifiedBy())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "Verified By Employee Not Found"));
+
+	        vo.setVerifiedBy(verifiedBy);
+	    }
+
+
+	    // To Location
+	    if (dto.getToLocation() != null) {
+
+	        LocationVO toLocation =
+	                locationRepo.findById(dto.getToLocation())
+	                        .orElseThrow(() ->
+	                                new ApplicationException(
+	                                        "To Location Not Found"));
+
+	        vo.setToLocation(toLocation);
+	    }
+
+
+	    // Details
+	    if (dto.getDetails() != null) {
+
+	        for (InprocessInspectionDetailsDTO detailsDTO :
+	                dto.getDetails()) {
+
+	            InprocessInspectionDetailsVO detailsVO =
+	                    new InprocessInspectionDetailsVO();
+
+	            detailsVO.setParameterType(
+	                    detailsDTO.getParameterType());
+
+	            detailsVO.setParameter(
+	                    detailsDTO.getParameter());
+
+	            detailsVO.setTol(
+	                    detailsDTO.getTol());
+
+	            detailsVO.setDate(
+	                    detailsDTO.getDate());
+
+	            detailsVO.setTime1(
+	                    detailsDTO.getTime1());
+
+	            detailsVO.setObs1(
+	                    detailsDTO.getObs1());
+
+	            detailsVO.setObs2(
+	                    detailsDTO.getObs2());
+
+	            detailsVO.setObs3(
+	                    detailsDTO.getObs3());
+
+	            detailsVO.setObs4(
+	                    detailsDTO.getObs4());
+
+	            detailsVO.setObs5(
+	                    detailsDTO.getObs5());
+
+	            detailsVO.setDeviationObserved(
+	                    detailsDTO.getDeviationObserved());
+
+	            detailsVO.setCorrectiveAction(
+	                    detailsDTO.getCorrectiveAction());
+
+	            detailsVO.setRemarks(
+	                    detailsDTO.getRemarks());
+
+	            detailsVO.setInprocessInspectionVO(vo);
+
+	            vo.getDetails().add(detailsVO);
+	        }
+	    }
+
+	    return vo;
+	}
+	
+	
+	
+	private InprocessInspectionResponseDTO convertToResponse(
+	        InprocessInspectionVO vo) {
+
+	    InprocessInspectionResponseDTO response =
+	            new InprocessInspectionResponseDTO();
+
+	    response.setId(vo.getId());
+	    response.setDocId(vo.getDocId());
+	    response.setDocDate(vo.getDocDate());
+
+	    response.setSpecification(vo.getSpecification());
+	    response.setStock(vo.getStock());
+
+	    response.setProducedQty(vo.getProducedQty());
+	    response.setAcceptedQty(vo.getAcceptedQty());
+	    response.setRejectedQty(vo.getRejectedQty());
+	    response.setRewQty(vo.getRewQty());
+
+	    response.setNcDetail(vo.getNcDetail());
+	    response.setActionTaken(vo.getActionTaken());
+
+	    response.setCreatedBy(vo.getCreatedBy());
+	    response.setActive(vo.isActive());
+	    response.setCancel(vo.isCancel());
+	    response.setUpdatedBy(vo.getUpdatedBy());
+	    response.setCancelRemarks(vo.getCancelRemarks());
+
+	    response.setScreenName(vo.getScreenName());
+	    response.setScreenCode(vo.getScreenCode());
+
+	    response.setOrgId(vo.getOrgId());
+	    response.setFinancialYear(vo.getFinancialYear());
+
+
+	    // Branch
+	    if (vo.getBranch() != null) {
+
+	        BranchResponseDTO branch =
+	                new BranchResponseDTO();
+
+	        branch.setId(vo.getBranch().getId());
+	        branch.setBranchCode(
+	                vo.getBranch().getBranchCode());
+	        branch.setBranchName(
+	                vo.getBranch().getBranchName());
+
+	        response.setBranch(branch);
+	    }
+
+
+	    // Department
+	    if (vo.getDepartment() != null) {
+
+	        DepartmentResponseDTO department =
+	                new DepartmentResponseDTO();
+
+	        department.setId(vo.getDepartment().getId());
+	        department.setDepartmentCode(
+	                vo.getDepartment().getDepartmentCode());
+	        department.setDepartmentName(
+	                vo.getDepartment().getDepartmentName());
+
+	        response.setDepartment(department);
+	    }
+
+
+	    // Control Plan
+	    if (vo.getControlPlan() != null) {
+
+	        ControlPlanResponseDetailsDTO controlPlan =
+	                new ControlPlanResponseDetailsDTO();
+
+	        controlPlan.setId(
+	                vo.getControlPlan().getId());
+
+	        controlPlan.setPlanNo(
+	                vo.getControlPlan().getPlanNo());
+
+	        response.setControlPlan(controlPlan);
+	    }
+
+
+	    // Customer
+	    if (vo.getCustomer() != null) {
+
+	        CustomerDropdownResponseDTO customer =
+	                new CustomerDropdownResponseDTO();
+
+	        customer.setCustomerId(
+	                vo.getCustomer().getId());
+
+	        customer.setCustomerCode(
+	                vo.getCustomer().getCustomerCode());
+
+	        customer.setCustomerName(
+	                vo.getCustomer().getCustomerName());
+
+	        customer.setAddress(
+	                vo.getCustomer().getAddress());
+
+	        customer.setGstState(
+	                vo.getCustomer().getGstState().getStateName());
+
+	        customer.setGstNo(
+	                vo.getCustomer().getGstNo());
+
+	        customer.setIgstApplicable(
+	                vo.getCustomer().isGstApplicable());
+
+	        customer.setGstType(
+	                vo.getCustomer().getGstType());
+
+	        response.setCustomer(customer);
+	    }
+
+
+	    // Operation
+	    if (vo.getOperationNo() != null) {
+
+	        OperationDropdownResponseDTO operation =
+	                new OperationDropdownResponseDTO();
+
+	        operation.setId(
+	                vo.getOperationNo().getId());
+
+	        operation.setOperationId(
+	                vo.getOperationNo().getOperationId());
+
+	        operation.setDescription(
+	                vo.getOperationNo().getDescription());
+
+	        List<OperationMachineDropdownResponseDTO>
+	                machineList = new ArrayList<>();
+
+	        if (vo.getOperationNo()
+	                .getOperationMasterMachineDetailsVO() != null) {
+
+	            for (OperationMasterMachineDetailsVO machineDetails :
+	                    vo.getOperationNo()
+	                            .getOperationMasterMachineDetailsVO()) {
+
+	                if (machineDetails.getMachine() != null) {
+
+	                    OperationMachineDropdownResponseDTO machine =
+	                            new OperationMachineDropdownResponseDTO();
+
+	                    machine.setId(
+	                            machineDetails.getMachine().getId());
+
+	                    machine.setMachineInstrumentNo(
+	                            machineDetails.getMachine()
+	                                    .getMachineInstrumentNo());
+
+	                    machine.setMachineInstrumentName(
+	                            machineDetails.getMachine()
+	                                    .getMachineInstrumentName());
+
+	                    machineList.add(machine);
+	                }
+	            }
+	        }
+
+	        operation.setMachines(machineList);
+
+	        response.setOperationNo(operation);
+	    }
+
+
+	    // Part No / Item
+	    if (vo.getPartNo() != null) {
+
+	        ItemResponse1DTO item =
+	                new ItemResponse1DTO();
+
+	        item.setId(
+	                vo.getPartNo().getId());
+
+	        item.setItemCode(
+	                vo.getPartNo().getItemCode());
+
+	        item.setItemDescription(
+	                vo.getPartNo().getItemDescription());
+
+	        if (vo.getPartNo().getPurchaseUnit() != null) {
+
+	            UnitMasterResponseDTO unit =
+	                    new UnitMasterResponseDTO();
+
+	            unit.setId(
+	                    vo.getPartNo().getPurchaseUnit().getId());
+
+	            unit.setUnitId(
+	                    vo.getPartNo().getPurchaseUnit().getUnitId());
+
+	            unit.setUnitDescription(
+	                    vo.getPartNo().getPurchaseUnit().getDescription());
+
+	            item.setUnit(unit);
+	        }
+
+	        response.setPartNo(item);
+	    }
+
+
+	    // From Location
+	    if (vo.getFromLocation() != null) {
+
+	        LocationMasterResponseDTO location =
+	                new LocationMasterResponseDTO();
+
+	        location.setId(
+	                vo.getFromLocation().getId());
+
+	        location.setLocationName(
+	                vo.getFromLocation().getLocationName());
+
+	        response.setFromLocation(location);
+	    }
+
+
+	    // Machine
+	    if (vo.getMachineNo() != null) {
+
+	        OperationMachineDropdownResponseDTO machine =
+	                new OperationMachineDropdownResponseDTO();
+
+	        machine.setId(
+	                vo.getMachineNo().getId());
+
+	        machine.setMachineInstrumentNo(
+	                vo.getMachineNo()
+	                        .getMachineInstrumentNo());
+
+	        machine.setMachineInstrumentName(
+	                vo.getMachineNo()
+	                        .getMachineInstrumentName());
+
+	        response.setMachineNo(machine);
+	    }
+
+
+	    // Shift
+	    if (vo.getShift() != null) {
+
+	        ShiftResponseDTO shift =
+	                new ShiftResponseDTO();
+
+	        shift.setId(
+	                vo.getShift().getId());
+
+	        shift.setShiftCode(
+	                vo.getShift().getShiftCode());
+
+	        shift.setShiftName(
+	                vo.getShift().getShiftName());
+
+	        response.setShift(shift);
+	    }
+
+
+	    // Inspected By
+	    if (vo.getInspectedBy() != null) {
+
+	        EmployeeDropdownResponseDTO employee =
+	                new EmployeeDropdownResponseDTO();
+
+	        employee.setEmployeeId(
+	                vo.getInspectedBy().getId());
+
+	        employee.setEmployeeCode(
+	                vo.getInspectedBy().getEmployeeId());
+
+	        employee.setEmployeeName(
+	                vo.getInspectedBy().getEmployeeName());
+
+	        employee.setEmail(
+	                vo.getInspectedBy().getEmail());
+
+	        response.setInspectedBy(employee);
+	    }
+
+
+	    // Verified By
+	    if (vo.getVerifiedBy() != null) {
+
+	        EmployeeDropdownResponseDTO employee =
+	                new EmployeeDropdownResponseDTO();
+
+	        employee.setEmployeeId(
+	                vo.getVerifiedBy().getId());
+
+	        employee.setEmployeeCode(
+	                vo.getVerifiedBy().getEmployeeId());
+
+	        employee.setEmployeeName(
+	                vo.getVerifiedBy().getEmployeeName());
+
+	        employee.setEmail(
+	                vo.getVerifiedBy().getEmail());
+
+	        response.setVerifiedBy(employee);
+	    }
+
+
+	    // To Location
+	    if (vo.getToLocation() != null) {
+
+	        LocationMasterResponseDTO location =
+	                new LocationMasterResponseDTO();
+
+	        location.setId(
+	                vo.getToLocation().getId());
+
+	        location.setLocationName(
+	                vo.getToLocation().getLocationName());
+
+	        response.setToLocation(location);
+	    }
+
+
+	    // Details
+	    List<InprocessInspectionDetailsResponseDTO>
+	            detailsList = new ArrayList<>();
+
+	    if (vo.getDetails() != null &&
+	            !vo.getDetails().isEmpty()) {
+
+	        for (InprocessInspectionDetailsVO detailsVO :
+	                vo.getDetails()) {
+
+	            InprocessInspectionDetailsResponseDTO
+	                    detailsResponse =
+	                    new InprocessInspectionDetailsResponseDTO();
+
+	            detailsResponse.setId(
+	                    detailsVO.getId());
+
+	            detailsResponse.setParameterType(
+	                    detailsVO.getParameterType());
+
+	            detailsResponse.setParameter(
+	                    detailsVO.getParameter());
+
+	            detailsResponse.setTol(
+	                    detailsVO.getTol());
+
+	            detailsResponse.setDate(
+	                    detailsVO.getDate());
+
+	            detailsResponse.setTime1(
+	                    detailsVO.getTime1());
+
+	            detailsResponse.setObs1(
+	                    detailsVO.getObs1());
+
+	            detailsResponse.setObs2(
+	                    detailsVO.getObs2());
+
+	            detailsResponse.setObs3(
+	                    detailsVO.getObs3());
+
+	            detailsResponse.setObs4(
+	                    detailsVO.getObs4());
+
+	            detailsResponse.setObs5(
+	                    detailsVO.getObs5());
+
+	            detailsResponse.setDeviationObserved(
+	                    detailsVO.getDeviationObserved());
+
+	            detailsResponse.setCorrectiveAction(
+	                    detailsVO.getCorrectiveAction());
+
+	            detailsResponse.setRemarks(
+	                    detailsVO.getRemarks());
+
+	            detailsList.add(detailsResponse);
+	        }
+	    }
+
+	    response.setDetails(detailsList);
+
+	    return response;
+	}
+	
+	@Override
+	public InprocessInspectionResponseDTO getInprocessInspectionById(
+	        Long id) throws ApplicationException {
+
+	    InprocessInspectionVO inprocessInspectionVO =
+	            inprocessInspectionRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Inprocess Inspection Not Found"));
+
+	    return convertToResponse(inprocessInspectionVO);
+	}
+	
+	@Override
+	public List<InprocessInspectionResponseDTO>
+	        getAllInprocessInspectionByOrgIdAndBranch(
+	                Long orgId,
+	                Long branch)
+	                throws ApplicationException {
+
+	    List<InprocessInspectionVO> inprocessInspectionList =
+	            inprocessInspectionRepo.findByOrgIdAndBranch(
+	                    orgId,
+	                    branch);
+
+	    List<InprocessInspectionResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (InprocessInspectionVO inprocessInspectionVO :
+	            inprocessInspectionList) {
+
+	        responseList.add(
+	                convertToResponse(inprocessInspectionVO));
+	    }
+
+	    return responseList;
+	}
+	
+	@Override
+	public String getInprocessInspectionDocId(
+	        Long orgId,
+	        String financialYear)
+	        throws ApplicationException {
+
+	    String screenCode = "IPI";
+
+	    return inprocessInspectionRepo
+	            .getInprocessInspectionDocId(
+	                    orgId,
+	                    financialYear,
+	                    screenCode);
+	}
+	
+	
+	@Override
+	@Transactional(rollbackOn = Exception.class)
+	public Map<String, Object> createUpdateStockOrder(StockOrderDTO stockOrderDTO) throws ApplicationException {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    StockOrderVO stockOrderVO = null;
+	    String message = null;
+
+	    if (ObjectUtils.isEmpty(stockOrderDTO.getId())) {
+
+	        stockOrderVO = new StockOrderVO();
+
+	        String screenCode = "SO";
+
+	        String docId = stockOrderRepo.getStockOrderDocId(
+	                stockOrderDTO.getOrgId(),
+	                stockOrderDTO.getFinancialYear(),
+	                screenCode
+	        );
+
+	        stockOrderVO.setDocId(docId);
+
+	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+	                        stockOrderDTO.getOrgId(),
+	                        stockOrderDTO.getFinancialYear(),
+	                        screenCode
+	                );
+
+	        if (documentTypeMappingDetailsVO != null) {
+	            documentTypeMappingDetailsVO.setLastNo(
+	                    documentTypeMappingDetailsVO.getLastNo() + 1
+	            );
+
+	            documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+	        }
+
+	        stockOrderVO.setCreatedBy(stockOrderDTO.getCreatedBy());
+	        stockOrderVO.setUpdatedBy(stockOrderDTO.getCreatedBy());
+
+	        message = "Stock Order created successfully";
+
+	    } else {
+
+	        stockOrderVO = stockOrderRepo.findById(stockOrderDTO.getId())
+	                .orElseThrow(() -> new ApplicationException("Stock Order Not Found"));
+
+	        List<StockOrderDetailsVO> oldDetails =
+	                stockOrderDetailsRepo.findByStockOrderVO(stockOrderVO);
+
+	        if (oldDetails != null && !oldDetails.isEmpty()) {
+
+	            stockOrderDetailsRepo.deleteAll(oldDetails);
+	            stockOrderDetailsRepo.flush();
+	        }
+
+	        stockOrderVO.getDetails().clear();
+
+	        stockOrderVO.setUpdatedBy(stockOrderDTO.getCreatedBy());
+
+	        message = "Stock Order updated successfully";
+	    }
+
+	    stockOrderVO = getStockOrderVOFromDTO(stockOrderDTO, stockOrderVO);
+
+	    StockOrderVO savedVO = stockOrderRepo.saveAndFlush(stockOrderVO);
+
+	    response.put("message", message);
+	    response.put("stockOrderVO", convertToResponse(savedVO));
+
+	    return response;
+	}
+	
+	private StockOrderVO getStockOrderVOFromDTO(
+	        StockOrderDTO stockOrderDTO,
+	        StockOrderVO stockOrderVO) throws ApplicationException {
+
+	    if (stockOrderDTO.getBranch() != null) {
+	        BranchVO branchVO = branchRepo.findById(stockOrderDTO.getBranch())
+	                .orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+	        stockOrderVO.setBranch(branchVO);
+	    }
+
+	    stockOrderVO.setRemarks(stockOrderDTO.getRemarks());
+	    stockOrderVO.setOrgId(stockOrderDTO.getOrgId());
+	    stockOrderVO.setFinancialYear(stockOrderDTO.getFinancialYear());
+	    stockOrderVO.setActive(stockOrderDTO.isActive());
+
+	    if (stockOrderDTO.getDetails() != null) {
+
+	        for (StockOrderDetailsDTO detailsDTO : stockOrderDTO.getDetails()) {
+
+	            StockOrderDetailsVO detailsVO = new StockOrderDetailsVO();
+
+	            if (detailsDTO.getItem() != null) {
+
+	                ItemMasterVO itemMasterVO = itemMasterRepo
+	                        .findById(detailsDTO.getItem())
+	                        .orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+	                detailsVO.setItem(itemMasterVO);
+	            }
+
+	            if (detailsDTO.getUnit() != null) {
+
+	                UnitMasterVO unitMasterVO = unitMasterRepo
+	                        .findById(detailsDTO.getUnit())
+	                        .orElseThrow(() -> new ApplicationException("Unit Not Found"));
+
+	                detailsVO.setUnit(unitMasterVO);
+	            }
+
+	            detailsVO.setRequiredQty(detailsDTO.getRequiredQty());
+	            detailsVO.setRate(detailsDTO.getRate());
+
+	            BigDecimal requiredQty = detailsDTO.getRequiredQty() != null
+	                    ? detailsDTO.getRequiredQty()
+	                    : BigDecimal.ZERO;
+
+	            BigDecimal rate = detailsDTO.getRate() != null
+	                    ? detailsDTO.getRate()
+	                    : BigDecimal.ZERO;
+
+	            BigDecimal amount = requiredQty.multiply(rate)
+	                    .setScale(5, RoundingMode.HALF_UP);
+
+	            detailsVO.setAmount(amount);
+
+	            detailsVO.setStockOrderVO(stockOrderVO);
+
+	            stockOrderVO.getDetails().add(detailsVO);
+	        }
+	    }
+
+	    BigDecimal totalAmount = BigDecimal.ZERO;
+
+	    if (stockOrderVO.getDetails() != null) {
+
+	        for (StockOrderDetailsVO detailsVO : stockOrderVO.getDetails()) {
+
+	            if (detailsVO.getAmount() != null) {
+	                totalAmount = totalAmount.add(detailsVO.getAmount());
+	            }
+	        }
+	    }
+
+	    stockOrderVO.setTotalAmount(
+	            totalAmount.setScale(5, RoundingMode.HALF_UP)
+	    );
+
+	    return stockOrderVO;
+	}
+	
+	private StockOrderResponseDTO convertToResponse(StockOrderVO stockOrderVO) {
+
+	    StockOrderResponseDTO responseDTO = new StockOrderResponseDTO();
+
+	    responseDTO.setId(stockOrderVO.getId());
+	    responseDTO.setDocId(stockOrderVO.getDocId());
+	    responseDTO.setDocDate(stockOrderVO.getDocDate());
+	    responseDTO.setTotalAmount(stockOrderVO.getTotalAmount());
+	    responseDTO.setRemarks(stockOrderVO.getRemarks());
+
+	    responseDTO.setCreatedBy(stockOrderVO.getCreatedBy());
+	    responseDTO.setActive(stockOrderVO.isActive());
+	    responseDTO.setCancel(stockOrderVO.isCancel());
+	    responseDTO.setUpdatedBy(stockOrderVO.getUpdatedBy());
+	    responseDTO.setCancelRemarks(stockOrderVO.getCancelRemarks());
+
+	    responseDTO.setScreenName(stockOrderVO.getScreenName());
+	    responseDTO.setScreenCode(stockOrderVO.getScreenCode());
+	    responseDTO.setOrgId(stockOrderVO.getOrgId());
+	    responseDTO.setFinancialYear(stockOrderVO.getFinancialYear());
+
+	    // Branch
+	    if (stockOrderVO.getBranch() != null) {
+
+	        BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+
+	        branchResponseDTO.setId(stockOrderVO.getBranch().getId());
+	        branchResponseDTO.setBranchCode(
+	                stockOrderVO.getBranch().getBranchCode()
+	        );
+	        branchResponseDTO.setBranchName(
+	                stockOrderVO.getBranch().getBranchName()
+	        );
+
+	        responseDTO.setBranch(branchResponseDTO);
+	    }
+
+	    // Details
+	    List<StockOrderDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+
+	    if (stockOrderVO.getDetails() != null) {
+
+	        for (StockOrderDetailsVO detailsVO : stockOrderVO.getDetails()) {
+
+	            StockOrderDetailsResponseDTO detailsResponseDTO =
+	                    new StockOrderDetailsResponseDTO();
+
+	            detailsResponseDTO.setId(detailsVO.getId());
+	            detailsResponseDTO.setRequiredQty(detailsVO.getRequiredQty());
+	            detailsResponseDTO.setRate(detailsVO.getRate());
+	            detailsResponseDTO.setAmount(detailsVO.getAmount());
+
+	            // Item
+	            if (detailsVO.getItem() != null) {
+
+	                ItemResponse1DTO itemResponseDTO = new ItemResponse1DTO();
+
+	                itemResponseDTO.setId(detailsVO.getItem().getId());
+	                itemResponseDTO.setItemCode(
+	                        detailsVO.getItem().getItemCode()
+	                );
+	                itemResponseDTO.setItemDescription(
+	                        detailsVO.getItem().getItemDescription()
+	                );
+
+	                // Unit inside Item
+	                if (detailsVO.getItem().getPurchaseUnit() != null) {
+
+	                    UnitMasterResponseDTO unitResponseDTO =
+	                            new UnitMasterResponseDTO();
+
+	                    unitResponseDTO.setId(
+	                            detailsVO.getItem().getPurchaseUnit().getId()
+	                    );
+	                    unitResponseDTO.setUnitId(
+	                            detailsVO.getItem().getPurchaseUnit().getUnitId()
+	                    );
+	                    unitResponseDTO.setUnitDescription(
+	                            detailsVO.getItem().getPurchaseUnit().getDescription()
+	                    );
+
+	                    itemResponseDTO.setUnit(unitResponseDTO);
+	                }
+
+	                detailsResponseDTO.setItem(itemResponseDTO);
+	            }
+
+	            // Unit
+	            if (detailsVO.getUnit() != null) {
+
+	                UnitMasterResponseDTO unitResponseDTO =
+	                        new UnitMasterResponseDTO();
+
+	                unitResponseDTO.setId(detailsVO.getUnit().getId());
+	                unitResponseDTO.setUnitId(
+	                        detailsVO.getUnit().getUnitId()
+	                );
+	                unitResponseDTO.setUnitDescription(
+	                        detailsVO.getUnit().getDescription()
+	                );
+
+	                detailsResponseDTO.setUnit(unitResponseDTO);
+	            }
+
+	            detailsResponseList.add(detailsResponseDTO);
+	        }
+	    }
+
+	    responseDTO.setDetails(detailsResponseList);
+
+	    return responseDTO;
+	}
+	
+	@Override
+	public StockOrderResponseDTO getStockOrderById(Long id)
+	        throws ApplicationException {
+
+	    StockOrderVO stockOrderVO =
+	            stockOrderRepo.findById(id)
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Stock Order Not Found"));
+
+	    return convertToResponse(stockOrderVO);
+	}
+	
+	@Override
+	public List<StockOrderResponseDTO> getAllStockOrderByOrgIdAndBranch(
+	        Long orgId,
+	        Long branch) throws ApplicationException {
+
+	    List<StockOrderVO> stockOrderList =
+	            stockOrderRepo.findByOrgIdAndBranch(
+	                    orgId,
+	                    branch);
+
+	    List<StockOrderResponseDTO> responseList =
+	            new ArrayList<>();
+
+	    for (StockOrderVO stockOrderVO : stockOrderList) {
+
+	        responseList.add(
+	                convertToResponse(stockOrderVO));
+	    }
+
+	    return responseList;
+	}
+	
+	
+	@Override
+	public String getStockOrderDocId(
+	        Long orgId,
+	        String financialYear) throws ApplicationException {
+
+	    String screenCode = "SO";
+
+	    return stockOrderRepo.getStockOrderDocId(
+	            orgId,
+	            financialYear,
+	            screenCode);
+	}
+	
+	
+	
 }

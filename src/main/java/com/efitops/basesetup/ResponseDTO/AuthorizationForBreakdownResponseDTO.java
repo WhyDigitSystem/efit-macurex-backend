@@ -1,5 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import java.time.LocalDate;
+
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.EmployeeResponseDTO;
 
@@ -15,6 +17,10 @@ public class AuthorizationForBreakdownResponseDTO {
 	private Long id;
 
 	private BranchResponseDTO branch;
+	
+	private String docId;
+	
+	private LocalDate docDate;
 
 	private DepartmentResponseDTO department;
 

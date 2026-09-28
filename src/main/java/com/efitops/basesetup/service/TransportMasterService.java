@@ -113,6 +113,8 @@ public interface TransportMasterService {
 
 	String getCustomerComplaintDocId(Long orgId, String financialYear, String screenCode);
 
+	String getDespatchInstructionDocId(Long orgId, String financialYear) throws ApplicationException;
+
 
 
 //	Map<String, Object> getDespatchPendingQty(Long itemId, String month, Long branch, Long orgId, Long customerId)

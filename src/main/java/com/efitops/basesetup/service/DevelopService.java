@@ -12,10 +12,12 @@ import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DrawingAttachmentsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.GateOutwardEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialStageInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaintenanceServiceRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingResponseDTO;
@@ -27,6 +29,7 @@ import com.efitops.basesetup.ResponseDTO.RootCauseAnalysisResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.TransferOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
@@ -37,10 +40,12 @@ import com.efitops.basesetup.dto.DrawingAttachmentsDTO;
 import com.efitops.basesetup.dto.EightDisciplineEntryDTO;
 import com.efitops.basesetup.dto.EnquiryDTO;
 import com.efitops.basesetup.dto.EnquiryResponseDTO;
+import com.efitops.basesetup.dto.GateOutwardEntryDTO;
 import com.efitops.basesetup.dto.InitialSampleInspectionDTO;
 import com.efitops.basesetup.dto.InitialStageInspectionDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.MachineMasterDTO;
+import com.efitops.basesetup.dto.MaintenanceServiceRequestDTO;
 import com.efitops.basesetup.dto.OpenStockEntryDto;
 import com.efitops.basesetup.dto.ParameterMasterDTO;
 import com.efitops.basesetup.dto.ProcessSheetCompRoutingDTO;
@@ -54,6 +59,7 @@ import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.ToolCategoryDTO;
+import com.efitops.basesetup.dto.TransferOrderDTO;
 import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
 import com.efitops.basesetup.exception.ApplicationException;
 
@@ -319,6 +325,35 @@ public interface DevelopService {
 	DrawingAttachmentsResponseDTO getDrawingAttachmentsById(Long id) throws ApplicationException;
 
 	List<DrawingAttachmentsResponseDTO> getDrawingAttachmentsByOrgId(Long orgId) throws ApplicationException;
+
+	Map<String, Object> updateCreateMaintenanceServiceRequest(MaintenanceServiceRequestDTO maintenanceServiceRequestDTO)
+			throws ApplicationException;
+
+	List<MaintenanceServiceRequestResponseDTO> getMaintenanceServiceRequestByOrgId(Long orgId)
+			throws ApplicationException;
+
+	MaintenanceServiceRequestResponseDTO getMaintenanceServiceRequestById(Long id) throws ApplicationException;
+
+	Map<String, Object> createUpdateTransferOrder(TransferOrderDTO transferOrderDTO) throws ApplicationException;
+
+	List<TransferOrderResponseDTO> getTransferOrderByOrgId(Long orgId) throws ApplicationException;
+
+	TransferOrderResponseDTO getTransferOrderById(Long id) throws ApplicationException;
+
+	String getTransferOrderDocId(Long orgId, String financialYear);
+
+	List<Map<String, Object>> getTransferOrderItemDropdown(Long orgId) throws ApplicationException;
+
+	Map<String, Object> createUpdateGateOutwardEntry(GateOutwardEntryDTO gateOutwardEntryDTO)
+			throws ApplicationException;
+
+	List<GateOutwardEntryResponseDTO> getGateOutwardEntryByOrgId(Long orgId) throws ApplicationException;
+
+	GateOutwardEntryResponseDTO getGateOutwardEntryById(Long id) throws ApplicationException;
+
+	String getGateOutwardEntryDocId(Long orgId, String financialYear);
+
+	String getMaintenanceServiceRequestDocId(Long orgId, String financialYear);
 
 	
 	

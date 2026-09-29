@@ -313,6 +313,9 @@ public interface VendorComplaintService {
 	Map<String, Object> getPMCheckListDropdownForActivitiesCarriedOut(String MACNO, Long orgId, Long branch)
 			throws ApplicationException;
 
+	Map<String, Object> getScheduleWiseDespatchQtyReport(String mon, Long under, String party)
+			throws ApplicationException;
+
 	
 
 

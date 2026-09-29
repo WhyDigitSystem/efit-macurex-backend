@@ -195,6 +195,7 @@ import com.efitops.basesetup.repository.PMCheckListMasterRepo;
 import com.efitops.basesetup.repository.QualityScrapNoteDetailsRepo;
 import com.efitops.basesetup.repository.QualityScrapNoteRepo;
 import com.efitops.basesetup.repository.SalesContractRepo;
+import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
 import com.efitops.basesetup.repository.ScrapMaterialReturnRejectionDetailsRepo;
 import com.efitops.basesetup.repository.ScrapMaterialReturnRejectionRepo;
 import com.efitops.basesetup.repository.SetUpApprovalDetailsRepo;
@@ -353,6 +354,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private SalesContractRepo salesContractRepo;
+
+	@Autowired
+	private SalesDeliveryScheduleRepo salesDeliveryScheduleRepo;
 
 	@Override
 	@Transactional
@@ -8420,19 +8424,52 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		List<Object[]> pmCheckListList = activitiesCarriedOutRepo.getPMCheckListDropdownForActivitiesCarriedOut(MACNO,
 				orgId, branch);
 
-		List<String[]> responseList = new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
 		for (Object[] obj : pmCheckListList) {
 
-			String[] data = new String[2];
+			Map<String, Object> data = new HashMap<>();
 
-			data[0] = obj[0] != null ? obj[0].toString() : "";
-			data[1] = obj[1] != null ? obj[1].toString() : "";
+			data.put("id", obj[0]);
+			data.put("name", obj[1]);
 
 			responseList.add(data);
 		}
 
 		responseObjectsMap.put("pmCheckListDropdown", responseList);
+
+		return responseObjectsMap;
+	}
+
+	@Override
+	public Map<String, Object> getScheduleWiseDespatchQtyReport(String mon, Long under, String party)
+			throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> reportList = salesDeliveryScheduleRepo.getSalesDeliveryPendingReport(mon, under, party);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : reportList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("dlvNo", obj[0]);
+			data.put("dlvDate", obj[1]);
+			data.put("monthOfSchedule", obj[2]);
+			data.put("customerId", obj[3]);
+			data.put("customerName", obj[4]);
+			data.put("itemId", obj[5]);
+			data.put("itemDescription", obj[6]);
+			data.put("plQty", obj[7]);
+			data.put("sqty", obj[8]);
+			data.put("pqty", obj[9]);
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("salesDeliveryPendingReport", responseList);
 
 		return responseObjectsMap;
 	}

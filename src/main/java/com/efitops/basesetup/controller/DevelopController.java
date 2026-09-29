@@ -3380,28 +3380,66 @@ public class DevelopController extends BaseController {
 	}
 	
 	
+	// getControlPlanDetailsByItemIdForInitialStageInspection
+
 	@GetMapping("/getControlPlanDetailsByItemIdForInitialStageInspection")
-	public ResponseEntity<?> getControlPlanDetailsByItemIdForInitialStageInspection(
-	        @RequestParam Long itemId) throws ApplicationException {
+	public ResponseEntity<ResponseDTO> getControlPlanDetailsByItemIdForInitialStageInspection(
+	        @RequestParam Long itemId) {
 
-	    List<Object[]> list =
-	            developService.getControlPlanDetailsByItemIdForInitialStageInspection(itemId);
+	    String methodName =
+	            "getControlPlanDetailsByItemIdForInitialStageInspection()";
 
-	    List<Map<String, Object>> response = new ArrayList<>();
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
 
-	    for (Object[] obj : list) {
+	    String errorMsg = null;
 
-	        Map<String, Object> map = new HashMap<>();
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
 
-	        map.put("operationNo", obj[0]);
-	        map.put("mark", obj[1]);
-	        map.put("parametersToBeChecked", obj[2]);
-	        map.put("specification", obj[3]);
+	    ResponseDTO responseDTO = null;
 
-	        response.add(map);
+	    try {
+
+	        List<Map<String, Object>> controlPlanDetailsList =
+	                developService
+	                        .getControlPlanDetailsByItemIdForInitialStageInspection(
+	                                itemId);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Control Plan Details information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "controlPlanDetailsList",
+	                controlPlanDetailsList);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Control Plan Details information retrieval failed",
+	                        errorMsg);
 	    }
 
-	    return ResponseEntity.ok(response);
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
 	}
 	
 	//getProcessSheetNoDropdownForInitialStageInspection

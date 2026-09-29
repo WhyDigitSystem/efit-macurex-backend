@@ -366,10 +366,9 @@ public interface DevelopService {
 	List<Map<String, Object>> getProcessSheetNoDropdownForInitialStageInspection(Long orgId, Long branch, Long itemId)
 			throws ApplicationException;
 
-	List<Object[]> getControlPlanDetailsByItemIdForInitialStageInspection(Long itemId) throws ApplicationException;
+	List<Map<String, Object>> getControlPlanDetailsByItemIdForInitialStageInspection(Long itemId)
+			throws ApplicationException;
 
-	
-	
 	
 	
 

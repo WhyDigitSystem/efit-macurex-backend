@@ -9575,13 +9575,36 @@ public class DevelopServiceImpl implements DevelopService {
 		return responseList;
 	}
 	
-	//getControlPlanDetailsByItemIdForInitialStageInspection
-	
-	@Override
-	public List<Object[]> getControlPlanDetailsByItemIdForInitialStageInspection(Long itemId)
-	        throws ApplicationException {
+	// getControlPlanDetailsByItemIdForInitialStageInspection
 
-	    return initialStageInspectionRepo.getControlPlanDetailsByItemIdForInitialStageInspection(itemId);
+	@Override
+	public List<Map<String, Object>> getControlPlanDetailsByItemIdForInitialStageInspection(
+	        Long itemId) throws ApplicationException {
+
+	    List<Object[]> controlPlanList =
+	            initialStageInspectionRepo
+	                    .getControlPlanDetailsByItemIdForInitialStageInspection(
+	                            itemId);
+
+	    if (controlPlanList == null || controlPlanList.isEmpty()) {
+	        throw new ApplicationException("Control Plan Details Not Found");
+	    }
+
+	    List<Map<String, Object>> responseList = new ArrayList<>();
+
+	    for (Object[] obj : controlPlanList) {
+
+	        Map<String, Object> response = new HashMap<>();
+
+	        response.put("operationNo", obj[0]);
+	        response.put("mark", obj[1]);
+	        response.put("parametersToBeChecked", obj[2]);
+	        response.put("specification", obj[3]);
+
+	        responseList.add(response);
+	    }
+
+	    return responseList;
 	}
 	
 	

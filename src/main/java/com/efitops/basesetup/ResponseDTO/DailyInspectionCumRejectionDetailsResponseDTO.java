@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DailyInspectionCumRejectionDetailsResponseDTO {
 	
-	private Long fgItem;
+	private ItemResponse1DTO fgItem;
 
 	private BigDecimal stock;
 

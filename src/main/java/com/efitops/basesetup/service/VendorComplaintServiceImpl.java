@@ -1672,91 +1672,202 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 	}
 
-	/*
-	 * RESPONSE DTO
-	 */
 	private DailyInspectionCumRejectionDataResponseDTO dailyInspectionCumRejectionDataResponse(
 			DailyInspectionCumRejectionDataVO vo) {
 
 		DailyInspectionCumRejectionDataResponseDTO responseDTO = new DailyInspectionCumRejectionDataResponseDTO();
 
+		// ========================================================
+		// BASIC RESPONSE
+		// ========================================================
+
 		responseDTO.setId(vo.getId());
 
-		/*
-		 * Branch
-		 */
-		if (vo.getBranch() != null) {
-			responseDTO.setBranch(vo.getBranch().getId());
-		}
+		responseDTO.setDocId(vo.getDocId());
 
-		/*
-		 * Belongs To
-		 */
-		if (vo.getBelongsTo() != null) {
-			responseDTO.setBelongsTo(vo.getBelongsTo().getId());
-		}
-
-		/*
-		 * Prepared By
-		 */
-		if (vo.getPreparedBy() != null) {
-			responseDTO.setPreparedBy(vo.getPreparedBy().getId());
-		}
-
-		/*
-		 * Locations
-		 */
-		if (vo.getFromLocation() != null) {
-			responseDTO.setFromLocation(vo.getFromLocation().getId());
-		}
-
-		if (vo.getReworkLocation() != null) {
-			responseDTO.setReworkLocation(vo.getReworkLocation().getId());
-		}
-
-		if (vo.getRejectionLocation() != null) {
-			responseDTO.setRejectionLocation(vo.getRejectionLocation().getId());
-		}
-
-		if (vo.getScrapLocation() != null) {
-			responseDTO.setScrapLocation(vo.getScrapLocation().getId());
-		}
-
-		if (vo.getToLocation() != null) {
-			responseDTO.setToLocation(vo.getToLocation().getId());
-		}
+		responseDTO.setDocDate(vo.getDocDate());
 
 		responseDTO.setActive(vo.getActive());
 
 		responseDTO.setOrgId(vo.getOrgId());
+
 		responseDTO.setFinancialYear(vo.getFinancialYear());
+
 		responseDTO.setCreatedBy(vo.getCreatedBy());
+
 		responseDTO.setCancelRemarks(vo.getCancelRemarks());
 
-		/*
-		 * Details Response
-		 */
+		// ========================================================
+		// BRANCH
+		// ========================================================
+
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branch = new BranchResponseDTO();
+
+			branch.setId(vo.getBranch().getId());
+
+			branch.setBranchName(vo.getBranch().getBranchName());
+
+			responseDTO.setBranch(branch);
+		}
+
+		// ========================================================
+		// BELONGS TO
+		// ========================================================
+
+		if (vo.getBelongsTo() != null) {
+
+			ListOfValuesDetailsResponseDTO belongsTo = new ListOfValuesDetailsResponseDTO();
+
+			belongsTo.setId(vo.getBelongsTo().getId());
+
+			belongsTo.setCode(vo.getBelongsTo().getValueCode());
+
+			belongsTo.setDescription(vo.getBelongsTo().getValueDescription());
+
+			responseDTO.setBelongsTo(belongsTo);
+		}
+
+		// ========================================================
+		// PREPARED BY
+		// ========================================================
+
+		if (vo.getPreparedBy() != null) {
+
+			EmployeeDropdownResponseDTO preparedBy = new EmployeeDropdownResponseDTO();
+
+			preparedBy.setEmployeeId(vo.getPreparedBy().getId());
+
+			preparedBy.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+
+			responseDTO.setPreparedBy(preparedBy);
+		}
+
+		// ========================================================
+		// FROM LOCATION
+		// ========================================================
+
+		if (vo.getFromLocation() != null) {
+
+			LocationMasterResponseDTO fromLocation = new LocationMasterResponseDTO();
+
+			fromLocation.setId(vo.getFromLocation().getId());
+
+			fromLocation.setLocationName(vo.getFromLocation().getLocationName());
+
+			responseDTO.setFromLocation(fromLocation);
+		}
+
+		// ========================================================
+		// REWORK LOCATION
+		// ========================================================
+
+		if (vo.getReworkLocation() != null) {
+
+			LocationMasterResponseDTO reworkLocation = new LocationMasterResponseDTO();
+
+			reworkLocation.setId(vo.getReworkLocation().getId());
+
+			reworkLocation.setLocationName(vo.getReworkLocation().getLocationName());
+
+			responseDTO.setReworkLocation(reworkLocation);
+		}
+
+		// ========================================================
+		// REJECTION LOCATION
+		// ========================================================
+
+		if (vo.getRejectionLocation() != null) {
+
+			LocationMasterResponseDTO rejectionLocation = new LocationMasterResponseDTO();
+
+			rejectionLocation.setId(vo.getRejectionLocation().getId());
+
+			rejectionLocation.setLocationName(vo.getRejectionLocation().getLocationName());
+
+			responseDTO.setRejectionLocation(rejectionLocation);
+		}
+
+		// ========================================================
+		// SCRAP LOCATION
+		// ========================================================
+
+		if (vo.getScrapLocation() != null) {
+
+			LocationMasterResponseDTO scrapLocation = new LocationMasterResponseDTO();
+
+			scrapLocation.setId(vo.getScrapLocation().getId());
+
+			scrapLocation.setLocationName(vo.getScrapLocation().getLocationName());
+
+			responseDTO.setScrapLocation(scrapLocation);
+		}
+
+		// ========================================================
+		// TO LOCATION
+		// ========================================================
+
+		if (vo.getToLocation() != null) {
+
+			LocationMasterResponseDTO toLocation = new LocationMasterResponseDTO();
+
+			toLocation.setId(vo.getToLocation().getId());
+
+			toLocation.setLocationName(vo.getToLocation().getLocationName());
+
+			responseDTO.setToLocation(toLocation);
+		}
+
+		// ========================================================
+		// DETAILS RESPONSE
+		// ========================================================
+
 		List<DailyInspectionCumRejectionDetailsResponseDTO> detailsResponseList = new ArrayList<>();
 
-		if (vo.getDailyInspectionCumRejectionDetailsVO() != null) {
+		if (vo.getDailyInspectionCumRejectionDetailsVO() != null
+				&& !vo.getDailyInspectionCumRejectionDetailsVO().isEmpty()) {
 
-			for (DailyInspectionCumRejectionDetailsVO detailsVO : vo.getDailyInspectionCumRejectionDetailsVO()) {
+			for (DailyInspectionCumRejectionDetailsVO detailVO : vo.getDailyInspectionCumRejectionDetailsVO()) {
 
-				DailyInspectionCumRejectionDetailsResponseDTO detailsResponseDTO = new DailyInspectionCumRejectionDetailsResponseDTO();
+				DailyInspectionCumRejectionDetailsResponseDTO detailResponseDTO = new DailyInspectionCumRejectionDetailsResponseDTO();
 
-				if (detailsVO.getFgItem() != null) {
-					detailsResponseDTO.setFgItem(detailsVO.getFgItem().getId());
+				// ====================================================
+				// FG ITEM
+				// ====================================================
+
+				if (detailVO.getFgItem() != null) {
+
+					ItemResponse1DTO fgItem = new ItemResponse1DTO();
+
+					fgItem.setId(detailVO.getFgItem().getId());
+
+					fgItem.setItemCode(detailVO.getFgItem().getItemCode());
+
+					fgItem.setItemDescription(detailVO.getFgItem().getItemDescription());
+
+					detailResponseDTO.setFgItem(fgItem);
 				}
 
-				detailsResponseDTO.setStock(detailsVO.getStock());
-				detailsResponseDTO.setRate(detailsVO.getRate());
-				detailsResponseDTO.setInspectionQty(detailsVO.getInspectionQty());
-				detailsResponseDTO.setAcceptedQty(detailsVO.getAcceptedQty());
-				detailsResponseDTO.setReworkQty(detailsVO.getReworkQty());
-				detailsResponseDTO.setRejectionQty(detailsVO.getRejectionQty());
-				detailsResponseDTO.setScrapQty(detailsVO.getScrapQty());
+				// ====================================================
+				// STOCK / RATE / QUANTITIES
+				// ====================================================
 
-				detailsResponseList.add(detailsResponseDTO);
+				detailResponseDTO.setStock(detailVO.getStock());
+
+				detailResponseDTO.setRate(detailVO.getRate());
+
+				detailResponseDTO.setInspectionQty(detailVO.getInspectionQty());
+
+				detailResponseDTO.setAcceptedQty(detailVO.getAcceptedQty());
+
+				detailResponseDTO.setReworkQty(detailVO.getReworkQty());
+
+				detailResponseDTO.setRejectionQty(detailVO.getRejectionQty());
+
+				detailResponseDTO.setScrapQty(detailVO.getScrapQty());
+
+				detailsResponseList.add(detailResponseDTO);
 			}
 		}
 

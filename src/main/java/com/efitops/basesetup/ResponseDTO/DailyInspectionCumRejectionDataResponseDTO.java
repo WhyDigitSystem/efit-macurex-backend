@@ -1,6 +1,9 @@
 package com.efitops.basesetup.ResponseDTO;
 
+import java.time.LocalDate;
 import java.util.List;
+
+import com.efitops.basesetup.dto.BranchResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,22 +14,26 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DailyInspectionCumRejectionDataResponseDTO {
 	private Long id;
+	
+	private String docId;
+	
+	private LocalDate docDate;
 
-	private Long branch;
+	private BranchResponseDTO branch;
 
-	private Long belongsTo;
+	private ListOfValuesDetailsResponseDTO belongsTo;
 
-	private Long preparedBy;
+	private EmployeeDropdownResponseDTO preparedBy;
 
-	private Long fromLocation;
+	private LocationMasterResponseDTO fromLocation;
 
-	private Long reworkLocation;
+	private LocationMasterResponseDTO reworkLocation;
 
-	private Long rejectionLocation;
+	private LocationMasterResponseDTO rejectionLocation;
 
-	private Long scrapLocation;
+	private LocationMasterResponseDTO scrapLocation;
 
-	private Long toLocation;
+	private LocationMasterResponseDTO toLocation;
 
 	private String active;
 

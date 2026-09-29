@@ -3757,8 +3757,43 @@ public class VendorComplaintController extends BaseController {
 
 		try {
 
-			responseObjectsMap = vendorComplaintService.getPMCheckListDropdownForActivitiesCarriedOut(MACNO,
-					orgId, branch);
+			responseObjectsMap = vendorComplaintService.getPMCheckListDropdownForActivitiesCarriedOut(MACNO, orgId,
+					branch);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	schedulewisedespatch report
+	@GetMapping("/getScheduleWiseDespatchQtyReport")
+	public ResponseEntity<ResponseDTO> getScheduleWiseDespatchQtyReport(@RequestParam String mon, @RequestParam Long under,
+			@RequestParam String party) {
+
+		String methodName = "getScheduleWiseDespatchQtyReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getScheduleWiseDespatchQtyReport(mon, under, party);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 

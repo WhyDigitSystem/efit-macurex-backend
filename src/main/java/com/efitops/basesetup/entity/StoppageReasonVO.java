@@ -47,11 +47,10 @@ public class StoppageReasonVO {
     @Column(name = "tot_time_in_mins", precision = 10, scale = 2)
     private BigDecimal totTimeInMins;
 
-    @Column(name = "reason")
-    private String reason;
+    @ManyToOne
+    @JoinColumn(name = "reason")
+    private ReasonMasterVO reason;
 
-    @Column(name = "description")
-    private String description;
 
     @Column(name = "stoppage_mc_cost", precision = 10, scale = 2)
     private BigDecimal stoppageMcCost;

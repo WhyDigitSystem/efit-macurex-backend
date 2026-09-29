@@ -31,8 +31,9 @@ public class ReworkReasonVO {
 	@Column(name = "rework_reason_id")
 	private Long id;
 
-	@Column(name = "reason")
-	private String reason;
+    @ManyToOne
+    @JoinColumn(name = "reason")
+	private ReasonMasterVO reason;
 
 	@Column(name = "reason_description")
 	private String reasonDescription;

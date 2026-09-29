@@ -21,7 +21,10 @@ public interface ProductionEntryService {
 
 	List<Map<String, Object>> getSchNoFromProductionEntry(Long orgId, Long branch, Long fgItem);
 
-	List<Map<String, Object>> getBomNoFromProductionEntry(Long orgId, Long branch);
+	List<Map<String, Object>> getProcessSheetProductionEntry(Long orgId, Long branch, Long fgItem);
+
+	List<Map<String, Object>> getProcessSheetOpreationDetailsProductionEntry(Long orgId, Long branch,
+			String processSheet);
 
 	// Pre order
 
@@ -41,4 +44,7 @@ public interface ProductionEntryService {
 	List<Map<String, Object>> getInitialPlanningNo(Long orgId, Long item);
 
 	List<Map<String, Object>> getInspectionDetailsFromFgTransferSlipNo(Long orgId, Long item, String transferSlipNo);
+
+	List<Map<String, Object>> getBomNoFromProductionEntry(Long orgId, Long branch, Long fgItem);
+
 }

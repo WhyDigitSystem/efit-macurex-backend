@@ -16,15 +16,19 @@ import org.springframework.transaction.annotation.Transactional;
 import com.efitops.basesetup.ResponseDTO.BillOfMaterialDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
 import com.efitops.basesetup.ResponseDTO.ItemMasterDetailsResponseImportDTO;
+import com.efitops.basesetup.ResponseDTO.ListOfValuesDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.LocationMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PreDeliveryInspectionDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PreDeliveryInspectionResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionEntryDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProductionEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ReasonResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ReworkReasonResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ScrapDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StoppageReasonResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolDetailsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ToolMasterResponseMasterDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.PreDeliveryInspectionDTO;
@@ -40,15 +44,19 @@ import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.ItemMasterVO;
+import com.efitops.basesetup.entity.ListOfValuesDetailsVO;
 import com.efitops.basesetup.entity.LocationVO;
+import com.efitops.basesetup.entity.MachineMasterVO;
 import com.efitops.basesetup.entity.PreDeliveryInspectionDetailsVO;
 import com.efitops.basesetup.entity.PreDeliveryInspectionVO;
 import com.efitops.basesetup.entity.ProductionEntryDetailsVO;
 import com.efitops.basesetup.entity.ProductionEntryVO;
+import com.efitops.basesetup.entity.ReasonMasterVO;
 import com.efitops.basesetup.entity.ReworkReasonVO;
 import com.efitops.basesetup.entity.ScrapDetailsVO;
 import com.efitops.basesetup.entity.StoppageReasonVO;
 import com.efitops.basesetup.entity.ToolDetailsVO;
+import com.efitops.basesetup.entity.ToolMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BillOfMaterialRepo;
@@ -56,15 +64,19 @@ import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.EmployeeMasterRepo;
 import com.efitops.basesetup.repository.ItemMasterRepo;
+import com.efitops.basesetup.repository.ListOfValuesDetailsRepo;
 import com.efitops.basesetup.repository.LocationRepo;
+import com.efitops.basesetup.repository.MachineMasterRepo;
 import com.efitops.basesetup.repository.PreDeliveryInspectionDetailsRepo;
 import com.efitops.basesetup.repository.PreDeliveryInspectionRepo;
 import com.efitops.basesetup.repository.ProductionEntryDetailsRepo;
 import com.efitops.basesetup.repository.ProductionEntryRepo;
+import com.efitops.basesetup.repository.ReasonMasterRepo;
 import com.efitops.basesetup.repository.ReworkReasonRepo;
 import com.efitops.basesetup.repository.ScrapDetailsRepo;
 import com.efitops.basesetup.repository.StoppageReasonRepo;
 import com.efitops.basesetup.repository.ToolDetailsRepo;
+import com.efitops.basesetup.repository.ToolMasterRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
@@ -103,6 +115,18 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 
 	@Autowired
 	private UnitMasterRepo unitMasterRepo;
+
+	@Autowired
+	private MachineMasterRepo machineMasterRepo;
+
+	@Autowired
+	private ReasonMasterRepo reasonMasterRepo;
+
+	@Autowired
+	private ToolMasterRepo toolMasterRepo;
+
+	@Autowired
+	private ListOfValuesDetailsRepo listOfValuesDetailsRepo;
 
 	@Override
 	@Transactional
@@ -152,10 +176,6 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 		vo.setShiftTimeTo(LocalTime.parse(dto.getShiftTimeTo()));
 		vo.setSchOrderNo(dto.getSchOrderNo());
 		vo.setProcessSheetNo(dto.getProcessSheetNo());
-		vo.setTotalLabourCost(dto.getTotalLabourCost());
-		vo.setTotalMachineCost(dto.getTotalMachineCost());
-		vo.setTotalToolCost(dto.getTotalToolCost());
-		vo.setTotalConsumablesCost(dto.getTotalConsumablesCost());
 		vo.setNarration(dto.getNarration());
 		vo.setActive(dto.isActive());
 		vo.setCancelRemarks(dto.getCancelRemarks());
@@ -246,40 +266,75 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 			}
 		}
 
+		BigDecimal totalLabourCost = BigDecimal.ZERO;
+
+		BigDecimal totalMachineCost = BigDecimal.ZERO;
+
+		BigDecimal totalToolCost = BigDecimal.ZERO;
+
+		BigDecimal totalConsumablesCost = BigDecimal.ZERO;
+
 		List<ProductionEntryDetailsVO> prodDetailsList = new ArrayList<>();
 		if (dto.getProductionEntryDetailsDTO() != null) {
 			for (ProductionEntryDetailsDTO d : dto.getProductionEntryDetailsDTO()) {
 				ProductionEntryDetailsVO detailsVO = new ProductionEntryDetailsVO();
 				detailsVO.setOperationNo(d.getOperationNo());
-				detailsVO.setMachine(d.getMachine());
-				detailsVO.setMachineName(d.getMachineName());
+				if (d.getMachine() != null && d.getMachine() != 0) {
+
+					MachineMasterVO branch = machineMasterRepo.findById(d.getMachine())
+							.orElseThrow(() -> new ApplicationException("MachineMaster Not Found"));
+
+					detailsVO.setMachine(branch);
+				}
+
 				detailsVO.setMachineHourRate(d.getMachineHourRate());
 				detailsVO.setLabourHourRate(d.getLabourHourRate());
 				detailsVO.setOperationName(d.getOperationName());
 				detailsVO.setFrTimeHrs(d.getFrTimeHrs());
 				detailsVO.setFrTimeMins(d.getFrTimeMins());
 				detailsVO.setToTimeHrs(d.getToTimeHrs());
-				detailsVO.setTotTimeMins(d.getTotTimeMins());
+				detailsVO.setToTimeMins(d.getToTimeMins());
+				detailsVO.setLunchTimeMins(d.getLunchTimeMins());
+				detailsVO.setTotTimeMins(d.getFrTimeMins().add(d.getToTimeMins()).add(d.getLunchTimeMins()));
 				detailsVO.setStoppageTimeMins(d.getStoppageTimeMins());
-				detailsVO.setProductiveHrsMins(d.getProductiveHrsMins());
+				detailsVO.setProductiveHrsMins(detailsVO.getTotTimeMins().subtract(d.getStoppageTimeMins()));
 				detailsVO.setQtyProduced(d.getQtyProduced());
 				detailsVO.setQtyPassed(d.getQtyPassed());
-				detailsVO.setQtyRejected(d.getQtyRejected());
-				detailsVO.setReason(d.getReason());
+				detailsVO.setQtyRejected(d.getQtyProduced().subtract(d.getQtyPassed()));
+
+				if (d.getReason() != null && d.getReason() != 0) {
+
+					ReasonMasterVO branch = reasonMasterRepo.findById(d.getReason())
+							.orElseThrow(() -> new ApplicationException("ReasonMaster Not Found"));
+
+					detailsVO.setReason(branch);
+				}
+
 				detailsVO.setQtyRework(d.getQtyRework());
 				detailsVO.setNoOfTools(d.getNoOfTools());
 				detailsVO.setQtyScrap(d.getQtyScrap());
-				detailsVO.setOperationBy(d.getOperationBy());
+				if (d.getOperationBy() != null && d.getOperationBy() != 0) {
+
+					EmployeeMasterVO preparedBy = employeeMasterRepo.findById(d.getOperationBy())
+							.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+					detailsVO.setOperationBy(preparedBy);
+				}
+
 				detailsVO.setRemarks(d.getRemarks());
 				detailsVO.setStdRunTimePcsInSec(d.getStdRunTimePcsInSec());
 				detailsVO.setStdLabourCost(d.getStdLabourCost());
 				detailsVO.setStdMcCost(d.getStdMcCost());
 				detailsVO.setRunningActCostLabour(d.getRunningActCostLabour());
+				totalLabourCost = totalLabourCost.add(detailsVO.getRunningActCostLabour());
 				detailsVO.setRunningActCostMc(d.getRunningActCostMc());
+				totalMachineCost = totalMachineCost.add(detailsVO.getRunningActCostMc());
 				detailsVO.setStdToolCost(d.getStdToolCost());
 				detailsVO.setRunningActCostTool(d.getRunningActCostTool());
+				totalToolCost = totalToolCost.add(detailsVO.getRunningActCostTool());
 				detailsVO.setStdConsumCost(d.getStdConsumCost());
 				detailsVO.setRunningActCostConsum(d.getRunningActCostConsum());
+				totalConsumablesCost = totalConsumablesCost.add(detailsVO.getRunningActCostConsum());
 				detailsVO.setProductionEntryVO(vo);
 				prodDetailsList.add(detailsVO);
 			}
@@ -291,18 +346,23 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 		if (dto.getToolDetailsDTO() != null) {
 			for (ToolDetailsDTO d : dto.getToolDetailsDTO()) {
 				ToolDetailsVO detailsVO = new ToolDetailsVO();
-				detailsVO.setToolNo(d.getToolNo());
-				detailsVO.setToolName(d.getToolName());
+
+				if (d.getToolNo() != null && d.getToolNo() != 0) {
+
+					ToolMasterVO preparedBy = toolMasterRepo.findById(d.getToolNo())
+							.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+					detailsVO.setToolNo(preparedBy);
+				}
 				detailsVO.setStrokes(d.getStrokes());
 				detailsVO.setStrokesRate(d.getStrokesRate());
-				detailsVO.setToolValue(d.getToolValue());
+				detailsVO.setToolValue(d.getStrokes().multiply(d.getStrokesRate()));
 				detailsVO.setProductionEntryVO(vo);
 				toolDetailsList.add(detailsVO);
 			}
 		}
 		vo.setToolDetailsVO(toolDetailsList);
 
-		// 3. Map Stoppage Reason
 		List<StoppageReasonVO> stoppageList = new ArrayList<>();
 		if (dto.getStoppageReasonDTO() != null) {
 			for (StoppageReasonDTO d : dto.getStoppageReasonDTO()) {
@@ -312,8 +372,14 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				detailsVO.setToTimeHrs(d.getToTimeHrs());
 				detailsVO.setToTimeMins(d.getToTimeMins());
 				detailsVO.setTotTimeInMins(d.getTotTimeInMins());
-				detailsVO.setReason(d.getReason());
-				detailsVO.setDescription(d.getDescription());
+				if (d.getReason() != null && d.getReason() != 0) {
+
+					ReasonMasterVO branch = reasonMasterRepo.findById(d.getReason())
+							.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+					detailsVO.setReason(branch);
+				}
+
 				detailsVO.setStoppageMcCost(d.getStoppageMcCost());
 				detailsVO.setStoppageLabourCost(d.getStoppageLabourCost());
 				detailsVO.setRemarks(d.getRemarks());
@@ -328,7 +394,13 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 		if (dto.getReworkReasonDTO() != null) {
 			for (ReworkReasonDTO d : dto.getReworkReasonDTO()) {
 				ReworkReasonVO detailsVO = new ReworkReasonVO();
-				detailsVO.setReason(d.getReason());
+				if (d.getReason() != null && d.getReason() != 0) {
+
+					ReasonMasterVO branch = reasonMasterRepo.findById(d.getReason())
+							.orElseThrow(() -> new ApplicationException("ReasonMaster Not Found"));
+
+					detailsVO.setReason(branch);
+				}
 				detailsVO.setReasonDescription(d.getReasonDescription());
 				detailsVO.setQty(d.getQty());
 				detailsVO.setTimePerQty(d.getTimePerQty());
@@ -347,7 +419,7 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				ScrapDetailsVO detailsVO = new ScrapDetailsVO();
 				if (d.getScrap() != null && d.getScrap() != 0) {
 
-					ItemMasterVO item = itemMasterRepo.findById(d.getScrap())
+					ListOfValuesDetailsVO item = listOfValuesDetailsRepo.findById(d.getScrap())
 							.orElseThrow(() -> new ApplicationException("Scrap Not Found"));
 
 					detailsVO.setScrap(item);
@@ -359,6 +431,10 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 			}
 		}
 		vo.setScrapDetailsVO(scrapList);
+		vo.setTotalLabourCost(totalLabourCost);
+		vo.setTotalMachineCost(totalMachineCost);
+		vo.setTotalToolCost(totalToolCost);
+		vo.setTotalConsumablesCost(totalConsumablesCost);
 	}
 
 	private ProductionEntryResponseDTO buildProductionEntryResponse(ProductionEntryVO vo) {
@@ -436,8 +512,14 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				ProductionEntryDetailsResponseDTO rDto = new ProductionEntryDetailsResponseDTO();
 				rDto.setId(d.getId());
 				rDto.setOperationNo(d.getOperationNo());
-				rDto.setMachine(d.getMachine());
-				rDto.setMachineName(d.getMachineName());
+
+				if (d.getMachine() != null) {
+					MachineResponseDTO unitDTO = new MachineResponseDTO();
+					unitDTO.setId(d.getMachine().getId());
+					unitDTO.setMachineName(d.getMachine().getMachineInstrumentName());
+					rDto.setMachine(unitDTO);
+				}
+
 				rDto.setMachineHourRate(d.getMachineHourRate());
 				rDto.setLabourHourRate(d.getLabourHourRate());
 				rDto.setOperationName(d.getOperationName());
@@ -450,11 +532,24 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				rDto.setQtyProduced(d.getQtyProduced());
 				rDto.setQtyPassed(d.getQtyPassed());
 				rDto.setQtyRejected(d.getQtyRejected());
-				rDto.setReason(d.getReason());
+				if (d.getReason() != null) {
+					ReasonResponseDTO unitDTO = new ReasonResponseDTO();
+					unitDTO.setId(d.getReason().getId());
+					unitDTO.setReasonCode(d.getReason().getReasonCode());
+					unitDTO.setReasonDescription(d.getReason().getReasonDescription());
+					rDto.setReason(unitDTO);
+				}
 				rDto.setQtyRework(d.getQtyRework());
 				rDto.setNoOfTools(d.getNoOfTools());
 				rDto.setQtyScrap(d.getQtyScrap());
-				rDto.setOperationBy(d.getOperationBy());
+				if (d.getOperationBy() != null) {
+					EmployeeMasterResponseDetailsDTO preparedByDTO = new EmployeeMasterResponseDetailsDTO();
+					preparedByDTO.setId(d.getOperationBy().getId());
+					preparedByDTO.setEmployeeCode(d.getOperationBy().getEmployeeId());
+					preparedByDTO.setEmployeeName(d.getOperationBy().getEmployeeName());
+					rDto.setOperationBy(preparedByDTO);
+				}
+
 				rDto.setRemarks(d.getRemarks());
 				rDto.setStdRunTimePcsInSec(d.getStdRunTimePcsInSec());
 				rDto.setStdLabourCost(d.getStdLabourCost());
@@ -476,8 +571,15 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 			for (ToolDetailsVO d : vo.getToolDetailsVO()) {
 				ToolDetailsResponseDTO rDto = new ToolDetailsResponseDTO();
 				rDto.setId(d.getId());
-				rDto.setToolNo(d.getToolNo());
-				rDto.setToolName(d.getToolName());
+
+				if (d.getToolNo() != null) {
+					ToolMasterResponseMasterDTO preparedByDTO = new ToolMasterResponseMasterDTO();
+					preparedByDTO.setId(d.getToolNo().getId());
+					preparedByDTO.setToolName(d.getToolNo().getToolName());
+					preparedByDTO.setToolDescription(d.getToolNo().getToolDescription());
+					rDto.setToolNo(preparedByDTO);
+				}
+
 				rDto.setStrokes(d.getStrokes());
 				rDto.setStrokesRate(d.getStrokesRate());
 				rDto.setToolValue(d.getToolValue());
@@ -496,8 +598,13 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				rDto.setToTimeHrs(d.getToTimeHrs());
 				rDto.setToTimeMins(d.getToTimeMins());
 				rDto.setTotTimeInMins(d.getTotTimeInMins());
-				rDto.setReason(d.getReason());
-				rDto.setDescription(d.getDescription());
+				if (d.getReason() != null) {
+					ReasonResponseDTO unitDTO = new ReasonResponseDTO();
+					unitDTO.setId(d.getReason().getId());
+					unitDTO.setReasonCode(d.getReason().getReasonCode());
+					unitDTO.setReasonDescription(d.getReason().getReasonDescription());
+					rDto.setReason(unitDTO);
+				}
 				rDto.setStoppageMcCost(d.getStoppageMcCost());
 				rDto.setStoppageLabourCost(d.getStoppageLabourCost());
 				rDto.setRemarks(d.getRemarks());
@@ -511,8 +618,14 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 			for (ReworkReasonVO d : vo.getReworkReasonVO()) {
 				ReworkReasonResponseDTO rDto = new ReworkReasonResponseDTO();
 				rDto.setId(d.getId());
-				rDto.setReason(d.getReason());
-				rDto.setReasonDescription(d.getReasonDescription());
+				if (d.getReason() != null) {
+					ReasonResponseDTO unitDTO = new ReasonResponseDTO();
+					unitDTO.setId(d.getReason().getId());
+					unitDTO.setReasonCode(d.getReason().getReasonCode());
+					unitDTO.setReasonDescription(d.getReason().getReasonDescription());
+					rDto.setReason(unitDTO);
+				}
+
 				rDto.setQty(d.getQty());
 				rDto.setTimePerQty(d.getTimePerQty());
 				rDto.setReworkProdHrs(d.getReworkProdHrs());
@@ -530,11 +643,10 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				ScrapDetailsResponseDTO rDto = new ScrapDetailsResponseDTO();
 				rDto.setId(d.getId());
 				if (d.getScrap() != null) {
-					ItemMasterDetailsResponseImportDTO dto = new ItemMasterDetailsResponseImportDTO();
-					dto.setId(d.getScrap().getId());
-					dto.setItemCode(d.getScrap().getItemCode());
-					dto.setItemDescription(d.getScrap().getItemDescription());
-					rDto.setScrap(dto);
+					ListOfValuesDetailsResponseDTO lovDto = new ListOfValuesDetailsResponseDTO();
+					lovDto.setId(d.getScrap().getId());
+					lovDto.setDescription(d.getScrap().getValueDescription());
+					rDto.setScrap(lovDto);
 				}
 				rDto.setWeight(d.getWeight());
 				rDto.setQty(d.getQty());
@@ -597,9 +709,9 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getBomNoFromProductionEntry(Long orgId, Long branch) {
+	public List<Map<String, Object>> getBomNoFromProductionEntry(Long orgId, Long branch, Long fgItem) {
 
-		Set<Object[]> chType = productionEntryRepo.getBomNoFromProductionEntry(orgId, branch);
+		Set<Object[]> chType = productionEntryRepo.getBomNoFromProductionEntry(orgId, branch, fgItem);
 
 		return getBomNoFromProductionEntry(chType);
 
@@ -624,6 +736,61 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 
 		return list;
 
+	}
+
+	@Override
+	public List<Map<String, Object>> getProcessSheetProductionEntry(Long orgId, Long branch, Long fgItem) {
+
+		Set<Object[]> chType = productionEntryRepo.getProcessSheetProductionEntry(orgId, branch, fgItem);
+
+		return getProcessSheetProductionEntry(chType);
+	}
+
+	private List<Map<String, Object>> getProcessSheetProductionEntry(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("docId", ch[0] != null ? ch[0].toString() : "");
+			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getProcessSheetOpreationDetailsProductionEntry(Long orgId, Long branch,
+			String processSheet) {
+
+		Set<Object[]> chType = productionEntryRepo.getProcessSheetOpreationDetailsProductionEntry(orgId, branch,
+				processSheet);
+
+		return getProcessSheetOpreationDetailsProductionEntry(chType);
+	}
+
+	private List<Map<String, Object>> getProcessSheetOpreationDetailsProductionEntry(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("operation", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("description", ch[1] != null ? ch[1].toString() : "");
+			map.put("machineEquipmentsMasterId", ch[2] != null ? ((Number) ch[2]).longValue() : null);
+			map.put("machineInstrumentName", ch[3] != null ? ch[3].toString() : "");
+			map.put("machineInstrumentNo", ch[4] != null ? ch[4].toString() : "");
+
+			list.add(map);
+		}
+
+		return list;
 	}
 
 	// Pre

@@ -31,15 +31,12 @@ public class ProductionEntryDetailsVO {
 	@Column(name = "production_entry_details_id")
 	private Long id;
 
-
 	@Column(name = "operation_no")
 	private String operationNo;
 
-	@Column(name = "machine")
-	private String machine;
-
-	@Column(name = "machine_name")
-	private String machineName;
+	@ManyToOne
+	@JoinColumn(name = "machine")
+	private MachineMasterVO machine;
 
 	@Column(name = "machine_hour_rate", precision = 10, scale = 2)
 	private BigDecimal machineHourRate;
@@ -59,6 +56,12 @@ public class ProductionEntryDetailsVO {
 	@Column(name = "to_time_hrs", precision = 10, scale = 2)
 	private BigDecimal toTimeHrs;
 
+	@Column(name = "to_time_mins", precision = 10, scale = 2)
+	private BigDecimal toTimeMins;
+
+	@Column(name = "lunch_time_mins", precision = 10, scale = 2)
+	private BigDecimal lunchTimeMins;
+
 	@Column(name = "tot_time_mins", precision = 10, scale = 2)
 	private BigDecimal totTimeMins;
 
@@ -77,8 +80,9 @@ public class ProductionEntryDetailsVO {
 	@Column(name = "qty_rejected", precision = 10, scale = 2)
 	private BigDecimal qtyRejected;
 
-	@Column(name = "reason")
-	private String reason;
+	@ManyToOne
+	@JoinColumn(name = "reason")
+	private ReasonMasterVO reason;
 
 	@Column(name = "qty_rework", precision = 10, scale = 2)
 	private BigDecimal qtyRework;
@@ -89,8 +93,9 @@ public class ProductionEntryDetailsVO {
 	@Column(name = "qty_scrap", precision = 10, scale = 2)
 	private BigDecimal qtyScrap;
 
-	@Column(name = "operation_by")
-	private String operationBy;
+	@ManyToOne
+	@JoinColumn(name = "operation_by")
+	private EmployeeMasterVO operationBy;
 
 	@Column(name = "remarks")
 	private String remarks;

@@ -33,7 +33,7 @@ public class ScrapDetailsVO {
 
 	@ManyToOne
 	@JoinColumn(name = "scrap")
-	private ItemMasterVO scrap;
+	private ListOfValuesDetailsVO scrap;
 
 	@Column(name = "weight", precision = 10, scale = 3)
 	private BigDecimal weight;

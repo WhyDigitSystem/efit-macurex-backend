@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductionEntryDTO {
-
 	private Long id;
-
 	private String belongsTo;
 	private String shiftTimeFrom;
 	private String shiftTimeTo;
@@ -28,11 +26,6 @@ public class ProductionEntryDTO {
 	private Long approvedBy;
 	private Long bom;
 
-	// Summary Fields
-	private BigDecimal totalLabourCost;
-	private BigDecimal totalMachineCost;
-	private BigDecimal totalToolCost;
-	private BigDecimal totalConsumablesCost;
 	private String narration;
 
 	// Audit & Context

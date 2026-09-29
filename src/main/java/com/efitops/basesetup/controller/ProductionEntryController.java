@@ -229,8 +229,8 @@ public class ProductionEntryController extends BaseController {
 	}
 
 	@GetMapping("/getBomNoFromProductionEntry")
-	public ResponseEntity<ResponseDTO> getBomNoFromProductionEntry(@RequestParam Long orgId,
-			@RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getBomNoFromProductionEntry(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long fgItem) {
 
 		String methodName = "getBomNoFromProductionEntry()";
 
@@ -246,7 +246,7 @@ public class ProductionEntryController extends BaseController {
 
 		try {
 
-			mapp = productionEntryService.getBomNoFromProductionEntry(orgId, branch);
+			mapp = productionEntryService.getBomNoFromProductionEntry(orgId, branch, fgItem);
 
 		} catch (Exception e) {
 
@@ -616,6 +616,100 @@ public class ProductionEntryController extends BaseController {
 
 			responseDTO = createServiceResponseError(responseObjectsMap,
 					"Failed to retrieve inspection details from FgTransferSlipNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getProcessSheetProductionEntry")
+	public ResponseEntity<ResponseDTO> getProcessSheetProductionEntry(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long fgItem) {
+
+		String methodName = "getProcessSheetProductionEntry()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = productionEntryService.getProcessSheetProductionEntry(orgId, branch, fgItem);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Process Sheet retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Process Sheet", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getProcessSheetOpreationDetailsProductionEntry")
+	public ResponseEntity<ResponseDTO> getProcessSheetOpreationDetailsProductionEntry(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam String processSheet) {
+
+		String methodName = "getProcessSheetOpreationDetailsProductionEntry()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = productionEntryService.getProcessSheetOpreationDetailsProductionEntry(orgId, branch, processSheet);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Process Sheet Operation Details retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Process Sheet Operation Details", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

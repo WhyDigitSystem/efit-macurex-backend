@@ -5,9 +5,7 @@ import lombok.Data;
 
 @Data
 public class ToolDetailsDTO {
-    private String toolNo;
-    private String toolName;
-    private BigDecimal strokes;
-    private BigDecimal strokesRate;
-    private BigDecimal toolValue;
+	private Long toolNo;
+	private BigDecimal strokes;
+	private BigDecimal strokesRate;
 }

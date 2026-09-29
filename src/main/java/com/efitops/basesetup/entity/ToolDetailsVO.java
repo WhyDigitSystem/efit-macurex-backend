@@ -32,11 +32,10 @@ public class ToolDetailsVO {
     @Column(name = "tool_details_id")
     private Long id;
 
-    @Column(name = "tool_no")
-    private String toolNo;
+    @ManyToOne
+    @JoinColumn(name = "tool_no")
+    private ToolMasterVO toolNo;
 
-    @Column(name = "tool_name")
-    private String toolName;
 
     @Column(name = "strokes", precision = 10, scale = 2)
     private BigDecimal strokes;

@@ -7,7 +7,7 @@ import lombok.Data;
 public class ProductionEntryDetailsResponseDTO {
     private Long id;
     private String operationNo;
-    private String machine;
+    private MachineResponseDTO machine;
     private String machineName;
     private BigDecimal machineHourRate;
     private BigDecimal labourHourRate;
@@ -21,11 +21,11 @@ public class ProductionEntryDetailsResponseDTO {
     private BigDecimal qtyProduced;
     private BigDecimal qtyPassed;
     private BigDecimal qtyRejected;
-    private String reason;
+    private ReasonResponseDTO reason;
     private BigDecimal qtyRework;
     private Integer noOfTools;
     private BigDecimal qtyScrap;
-    private String operationBy;
+    private EmployeeMasterResponseDetailsDTO operationBy;
     private String remarks;
     private BigDecimal stdRunTimePcsInSec;
     private BigDecimal stdLabourCost;

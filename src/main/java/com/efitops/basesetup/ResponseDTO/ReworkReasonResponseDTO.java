@@ -7,8 +7,7 @@ import lombok.Data;
 @Data
 public class ReworkReasonResponseDTO {
     private Long id;
-    private String reason;
-    private String reasonDescription;
+    private ReasonResponseDTO reason;
     private BigDecimal qty;
     private BigDecimal timePerQty;
     private BigDecimal reworkProdHrs;

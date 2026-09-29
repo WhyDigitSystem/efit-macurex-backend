@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class ScrapDetailsResponseDTO {
 	private Long id;
-	private ItemMasterDetailsResponseImportDTO scrap;
+	private ListOfValuesDetailsResponseDTO scrap;
 	private BigDecimal weight;
 	private BigDecimal qty;
 }

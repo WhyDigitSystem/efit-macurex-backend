@@ -25,6 +25,18 @@ public interface ProductionEntryRepo extends JpaRepository<ProductionEntryVO, Lo
 			+ " fg_item=?3  and active=1 and cancel=0 group by doc_id,doc_date")
 	Set<Object[]> getSchNoFromProductionEntry(Long orgId, Long branch, Long fgItem);
 
-	@Query(nativeQuery = true, value = "select doc_id,doc_date,bill_of_material_id from bill_of_material where org_id=?1 and branch=?2")
-	Set<Object[]> getBomNoFromProductionEntry(Long orgId, Long branch);
+	@Query(nativeQuery = true, value = "select doc_id,doc_date,bill_of_material_id from bill_of_material where org_id=?1 and branch=?2 and \r\n"
+			+ "fg_item=?3  group by doc_id,doc_date,bill_of_material_id order by doc_date desc")
+	Set<Object[]> getBomNoFromProductionEntry(Long orgId, Long branch,Long fgItem);
+	
+	@Query(nativeQuery = true, value = "select doc_id,doc_date from process_sheet_comp_routing_basic where org_id=?1 and branch=?2 \r\n"
+			+ "and fg_sfg_item_code=?3 and active=1 and cancel=0")
+	Set<Object[]> getProcessSheetProductionEntry(Long orgId, Long branch,Long fgItem);
+	
+	@Query(nativeQuery = true, value = "select p1.operation,o.description,m.machine_equipments_master_id,m.machine_instrument_name,m.machine_instrument_no from process_sheet_comp_routing_basic p join process_sheet_comp_routing_detail p1\r\n"
+			+ " on p.process_sheet_comp_routing_basic_id=p1.process_sheet_comp_routing_basic_id  left join \r\n"
+			+ " operation_master_basic o on o.operation_master_basic_id=p1.operation join  operation_master_machine_details o1 on o1.operation_master_basic_id=o.operation_master_basic_id\r\n"
+			+ " left join machine_equipments_master m on m.machine_equipments_master_id=o1.operation_master_machine_details_id where \r\n"
+			+ " p.org_id=?1 and p.branch=?2 and p.doc_id=?3")
+	Set<Object[]> getProcessSheetOpreationDetailsProductionEntry(Long orgId, Long branch,String processSheet);
 }

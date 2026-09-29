@@ -12,8 +12,7 @@ public class StoppageReasonResponseDTO {
     private BigDecimal toTimeHrs;
     private BigDecimal toTimeMins;
     private BigDecimal totTimeInMins;
-    private String reason;
-    private String description;
+    private ReasonResponseDTO reason;
     private BigDecimal stoppageMcCost;
     private BigDecimal stoppageLabourCost;
     private String remarks;

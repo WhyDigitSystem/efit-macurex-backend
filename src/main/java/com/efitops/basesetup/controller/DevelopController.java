@@ -4447,6 +4447,71 @@ public class DevelopController extends BaseController {
 	    return ResponseEntity.ok(responseDTO);
 	}
 	
+	
+	// getTypeDropdownByOrderTypeForTransferOrder
+
+	@GetMapping("/getTypeDropdownByOrderTypeForTransferOrder")
+	public ResponseEntity<ResponseDTO> getTypeDropdownByOrderTypeForTransferOrder(
+	        @RequestParam String orderType,
+	        @RequestParam Long orgId) {
+
+	    String methodName =
+	            "getTypeDropdownByOrderTypeForTransferOrder()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        List<Map<String, Object>> typeList =
+	                developService
+	                        .getTypeDropdownByOrderTypeForTransferOrder(
+	                                orderType,
+	                                orgId);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Type information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "typeList",
+	                typeList);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Type information retrieval failed",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
+	}
+	
 	//gateoutwardentry
 	
 	@PutMapping("/createUpdateGateOutwardEntry")
@@ -4669,6 +4734,71 @@ public class DevelopController extends BaseController {
 	            methodName);
 
 	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+//	 getBreakdownNoDropdownForGateOutwardEntry
+	
+	@GetMapping("/getBreakdownNoDropdownForGateOutwardEntry")
+	public ResponseEntity<ResponseDTO> getBreakdownNoDropdownForGateOutwardEntry(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch) {
+
+	    String methodName =
+	            "getBreakdownNoDropdownForGateOutwardEntry()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        List<Map<String, Object>> breakdownNoList =
+	                developService
+	                        .getBreakdownNoDropdownForGateOutwardEntry(
+	                                orgId,
+	                                branch);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Breakdown No information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "breakdownNoList",
+	                breakdownNoList);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Breakdown No information retrieval failed",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
 	}
 	
 

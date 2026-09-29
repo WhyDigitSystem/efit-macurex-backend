@@ -235,6 +235,7 @@ import com.efitops.basesetup.repository.CountryRepo;
 import com.efitops.basesetup.repository.CustomerComplaintRepo;
 import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
+import com.efitops.basesetup.repository.DeliveryChallanSubcontractingRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
 import com.efitops.basesetup.repository.DrawingAttachmentDetailRepo;
@@ -271,6 +272,7 @@ import com.efitops.basesetup.repository.MachineHistoryRepo;
 import com.efitops.basesetup.repository.MachineMasterAttachmentRepo;
 import com.efitops.basesetup.repository.MachineMasterRepo;
 import com.efitops.basesetup.repository.MachineSpareDetailsRepo;
+import com.efitops.basesetup.repository.MachineToolBreakdownRepo;
 import com.efitops.basesetup.repository.MaintenanceServiceRequestRepo;
 import com.efitops.basesetup.repository.OpenStockEntryRepo;
 import com.efitops.basesetup.repository.OperationMasterRepo;
@@ -570,6 +572,13 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	@Autowired
 	private TransferOrderDetailRepo transferOrderDetailRepo;
+	
+	@Autowired
+	private MachineToolBreakdownRepo machineToolBreakdownRepo;
+	
+	@Autowired
+	private DeliveryChallanSubcontractingRepo deliveryChallanSubcontractingRepo;
+
 
 //	@Override
 //	@Transactional
@@ -11780,6 +11789,41 @@ return responseDTO;
 	}
 	
 	
+	@Override
+	public List<Map<String, Object>> getTypeDropdownByOrderTypeForTransferOrder(
+	        String orderType,
+	        Long orgId) throws ApplicationException {
+
+	    List<Object[]> typeList =
+	            transferOrderRepo.getTypeDropdownByOrderTypeForTransferOrder(
+	                    orderType,
+	                    orgId);
+
+	    if (typeList == null || typeList.isEmpty()) {
+	        throw new ApplicationException("Type Not Found");
+	    }
+
+	    List<Map<String, Object>> responseList =
+	            new ArrayList<>();
+
+	    for (Object[] obj : typeList) {
+
+	        Map<String, Object> response =
+	                new HashMap<>();
+
+	        response.put("id", obj[0]);
+	        response.put("name", obj[1]);
+
+	        responseList.add(response);
+	    }
+
+	    return responseList;
+	}
+	
+	
+	
+	
+	
 	
 	//gateoutwardentry
 	
@@ -12350,6 +12394,77 @@ return responseDTO;
 	}
 	
 	
+//	 getBreakdownNoDropdownForGateOutwardEntry
+	
+	@Override
+	public List<Map<String, Object>> getBreakdownNoDropdownForGateOutwardEntry(
+	        Long orgId,
+	        Long branch) throws ApplicationException {
+
+	    List<Object[]> breakdownList =
+	    		machineToolBreakdownRepo
+	                    .getBreakdownNoDropdownForGateOutwardEntry(
+	                            orgId,
+	                            branch);
+
+	    if (breakdownList == null || breakdownList.isEmpty()) {
+
+	        throw new ApplicationException(
+	                "Breakdown No Not Found");
+	    }
+
+	    List<Map<String, Object>> responseList =
+	            new ArrayList<>();
+
+	    for (Object[] obj : breakdownList) {
+
+	        Map<String, Object> response =
+	                new HashMap<>();
+
+	        response.put("id", obj[0]);
+	        response.put("name", obj[1]);
+
+	        responseList.add(response);
+	    }
+
+	    return responseList;
+	}
+	
+	
+	// getChallanNoDropdownForGateOutwardEntry
+
+	@Override
+	public List<Map<String, Object>> getSubcontractChallanNoForGateOutwardEntry(
+	        Long orgId,
+	        Long branch) throws ApplicationException {
+
+	    List<Object[]> challanList =
+	    		deliveryChallanSubcontractingRepo
+	                    .getSubcontractChallanNoForGateOutwardEntry(
+	                            orgId,
+	                            branch);
+
+	    if (challanList == null || challanList.isEmpty()) {
+	        throw new ApplicationException(
+	                "Challan No Not Found");
+	    }
+
+	    List<Map<String, Object>> responseList =
+	            new ArrayList<>();
+
+	    for (Object[] obj : challanList) {
+
+	        Map<String, Object> response =
+	                new HashMap<>();
+
+	        response.put("id", obj[0]);
+	        response.put("name", obj[1]);
+
+	        responseList.add(response);
+	    }
+
+	    return responseList;
+	}
 	
 	
 	

@@ -355,6 +355,15 @@ public interface DevelopService {
 
 	String getMaintenanceServiceRequestDocId(Long orgId, String financialYear);
 
+	List<Map<String, Object>> getBreakdownNoDropdownForGateOutwardEntry(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getSubcontractChallanNoForGateOutwardEntry(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getTypeDropdownByOrderTypeForTransferOrder(String orderType, Long orgId)
+			throws ApplicationException;
+
+	
 	
 	
 	

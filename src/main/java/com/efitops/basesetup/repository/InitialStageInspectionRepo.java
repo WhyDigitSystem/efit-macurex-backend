@@ -41,5 +41,47 @@ public interface InitialStageInspectionRepo extends JpaRepository<InitialStageIn
 	        Long orgId,
 	        Long branch,
 	        Long partyId);
+	
+	
+	@Query(nativeQuery = true, value = """
+	        SELECT
+	            ps.process_sheet_comp_routing_basic_id AS id,
+	            ps.doc_id AS name
+	        FROM process_sheet_comp_routing_basic ps
+	        WHERE ps.org_id = ?1
+	          AND ps.branch = ?2
+	          AND ps.fg_sfg_item_code = ?3
+	          AND ps.active = TRUE
+	          AND ps.cancel = FALSE
+	          AND ps.doc_id IS NOT NULL
+	        ORDER BY ps.process_sheet_comp_routing_basic_id DESC
+	        """)
+	List<Object[]> getProcessSheetNoDropdownForInitialStageInspection(
+	        Long orgId,
+	        Long branch,
+	        Long itemId);
+	
+	
+	@Query(nativeQuery = true, value =
+		       "SELECT "
+		     + "cpd.operation_no AS operationNo, "
+		     + "'' AS mark, "
+		     + "pmb.parameter_description AS parametersToBeChecked, "
+		     + "cpd.specification AS specification "
+		     + "FROM control_plan_basic cpb "
+		     + "INNER JOIN control_plan_detail cpd "
+		     + "ON cpd.control_plan_basic_id = cpb.control_plan_basic_id "
+		     + "INNER JOIN control_plan_parameter cpp "
+		     + "ON cpp.control_plan_basic_id = cpb.control_plan_basic_id "
+		     + "INNER JOIN parameter_master_basic pmb "
+		     + "ON pmb.parameter_master_basic_id = cpp.parameter "
+		     + "WHERE cpb.fg_item_code = ?1 "
+		     + "AND cpb.active = TRUE "
+		     + "AND cpb.cancel = FALSE "
+		     + "ORDER BY cpd.control_plan_detail_id")
+		List<Object[]> getControlPlanDetailsByItemIdForInitialStageInspection(Long itemId);
+		
+		
+		
 
 }

@@ -68,6 +68,7 @@ import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.ToolCategoryDTO;
 import com.efitops.basesetup.dto.TransferOrderDTO;
 import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
+import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.service.DevelopService;
 
 @CrossOrigin
@@ -3376,6 +3377,97 @@ public class DevelopController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
 		return ResponseEntity.ok(responseDTO);
+	}
+	
+	
+	@GetMapping("/getControlPlanDetailsByItemIdForInitialStageInspection")
+	public ResponseEntity<?> getControlPlanDetailsByItemIdForInitialStageInspection(
+	        @RequestParam Long itemId) throws ApplicationException {
+
+	    List<Object[]> list =
+	            developService.getControlPlanDetailsByItemIdForInitialStageInspection(itemId);
+
+	    List<Map<String, Object>> response = new ArrayList<>();
+
+	    for (Object[] obj : list) {
+
+	        Map<String, Object> map = new HashMap<>();
+
+	        map.put("operationNo", obj[0]);
+	        map.put("mark", obj[1]);
+	        map.put("parametersToBeChecked", obj[2]);
+	        map.put("specification", obj[3]);
+
+	        response.add(map);
+	    }
+
+	    return ResponseEntity.ok(response);
+	}
+	
+	//getProcessSheetNoDropdownForInitialStageInspection
+	
+	@GetMapping("/getProcessSheetNoDropdownForInitialStageInspection")
+	public ResponseEntity<ResponseDTO> getProcessSheetNoDropdownForInitialStageInspection(
+	        @RequestParam Long orgId,
+	        @RequestParam Long branch,
+	        @RequestParam Long itemId) {
+
+	    String methodName =
+	            "getProcessSheetNoDropdownForInitialStageInspection()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    String errorMsg = null;
+
+	    Map<String, Object> responseObjectsMap =
+	            new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    try {
+
+	        List<Map<String, Object>> processSheetNoList =
+	                developService
+	                        .getProcessSheetNoDropdownForInitialStageInspection(
+	                                orgId,
+	                                branch,
+	                                itemId);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                "Process Sheet No information retrieved successfully");
+
+	        responseObjectsMap.put(
+	                "processSheetNoList",
+	                processSheetNoList);
+
+	        responseDTO =
+	                createServiceResponse(
+	                        responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        "Process Sheet No information retrieval failed",
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(
+	            CommonConstant.ENDING_METHOD,
+	            methodName);
+
+	    return ResponseEntity.ok(responseDTO);
 	}
 
 	// InitialSampleInspection

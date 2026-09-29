@@ -82,6 +82,7 @@ import com.efitops.basesetup.ResponseDTO.PurchaseOrderAmendmentDtailsItemRespons
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderAmendmentResponceDTO;
 import com.efitops.basesetup.ResponseDTO.RootCauseAnalysisDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.RootCauseAnalysisResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ShiftResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailRepo;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
@@ -215,6 +216,7 @@ import com.efitops.basesetup.entity.RootCauseAnalysisDetailsVO;
 import com.efitops.basesetup.entity.RootCauseAnalysisVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentDetailsVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentVO;
+import com.efitops.basesetup.entity.ShiftVO;
 import com.efitops.basesetup.entity.ToolCategoryDetailVO;
 import com.efitops.basesetup.entity.ToolCategoryVO;
 import com.efitops.basesetup.entity.ToolMasterVO;
@@ -301,6 +303,7 @@ import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
 import com.efitops.basesetup.repository.SalesOrderAmendmentDetailsRepo;
 import com.efitops.basesetup.repository.SalesOrderAmendmentRepo;
 import com.efitops.basesetup.repository.SalesReturnRepo;
+import com.efitops.basesetup.repository.ShiftRepo;
 import com.efitops.basesetup.repository.ToolCategoryRepo;
 import com.efitops.basesetup.repository.ToolMasterRepo;
 import com.efitops.basesetup.repository.TransferOrderDetailRepo;
@@ -527,6 +530,10 @@ public class DevelopServiceImpl implements DevelopService {
 	
 	@Autowired
 	private GateOutwardEntryDetailRepo gateOutwardEntryDetailRepo;
+	
+	@Autowired
+	private ShiftRepo shiftRepo;
+
 
 	@Value("${purchase.contract.amendment.upload.path}")
 	private String uploadPath1;
@@ -9164,8 +9171,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		vo.setDocDate(dto.getDocDate());
 
-		vo.setShift(dto.getShift());
-
 		vo.setPartyDrawingNo(dto.getPartyDrawingNo());
 
 		vo.setDrawingNo(dto.getDrawingNo());
@@ -9175,6 +9180,17 @@ public class DevelopServiceImpl implements DevelopService {
 		vo.setWorkOrderNo(dto.getWorkOrderNo());
 
 		vo.setProcessSheetNo(dto.getProcessSheetNo());
+		
+		
+		if (dto.getShift() != null) {
+
+		    ShiftVO shiftVO = shiftRepo
+		            .findById(dto.getShift())
+		            .orElseThrow(() ->
+		                    new ApplicationException("Shift Not Found"));
+
+		    vo.setShift(shiftVO);
+		}
 
 		// ============================================================
 		// ITEM
@@ -9293,8 +9309,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		responseDTO.setDocDate(vo.getDocDate());
 
-		responseDTO.setShift(vo.getShift());
-
 		responseDTO.setPartyDrawingNo(vo.getPartyDrawingNo());
 
 		responseDTO.setDrawingNo(vo.getDrawingNo());
@@ -9308,7 +9322,19 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setWorkOrderNo(vo.getWorkOrderNo());
 
 		responseDTO.setProcessSheetNo(vo.getProcessSheetNo());
+		
+		
+		if (vo.getShift() != null) {
 
+		    ShiftResponseDTO shiftResponseDTO = new ShiftResponseDTO();
+
+		    shiftResponseDTO.setId(vo.getShift().getId());
+		    shiftResponseDTO.setShiftCode(vo.getShift().getShiftCode());
+		    shiftResponseDTO.setShiftName(vo.getShift().getShiftName());
+
+		    responseDTO.setShift(shiftResponseDTO);
+		}
+		
 		// ============================================================
 		// BRANCH
 		// ============================================================
@@ -9547,6 +9573,48 @@ public class DevelopServiceImpl implements DevelopService {
 		}
 
 		return responseList;
+	}
+	
+	//getControlPlanDetailsByItemIdForInitialStageInspection
+	
+	@Override
+	public List<Object[]> getControlPlanDetailsByItemIdForInitialStageInspection(Long itemId)
+	        throws ApplicationException {
+
+	    return initialStageInspectionRepo.getControlPlanDetailsByItemIdForInitialStageInspection(itemId);
+	}
+	
+	
+	//getProcessSheetNoDropdownForInitialStageInspection
+	
+	@Override
+	public List<Map<String, Object>> getProcessSheetNoDropdownForInitialStageInspection(
+	        Long orgId, Long branch, Long itemId) throws ApplicationException {
+
+	    List<Object[]> processSheetList =
+	            initialStageInspectionRepo
+	                    .getProcessSheetNoDropdownForInitialStageInspection(
+	                            orgId,
+	                            branch,
+	                            itemId);
+
+	    if (processSheetList == null || processSheetList.isEmpty()) {
+	        throw new ApplicationException("Process Sheet No Not Found");
+	    }
+
+	    List<Map<String, Object>> responseList = new ArrayList<>();
+
+	    for (Object[] obj : processSheetList) {
+
+	        Map<String, Object> response = new HashMap<>();
+
+	        response.put("id", obj[0]);
+	        response.put("name", obj[1]);
+
+	        responseList.add(response);
+	    }
+
+	    return responseList;
 	}
 
 	// InitialSampleInspection

@@ -26,7 +26,7 @@ public class InitialStageInspectionResponseDTO {
 
 	    private LocalDate docDate;
 
-	    private String shift;
+	    private ShiftResponseDTO  shift;
 
 	    private ItemMasterResponseDetailsDTO itemCode;
 

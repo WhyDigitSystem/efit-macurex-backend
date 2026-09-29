@@ -11,9 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -6923,9 +6923,19 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 				detailsVO.setItem(itemVO);
 			}
 
-			detailsVO.setFromTime(detailsDTO.getFromTime());
-			detailsVO.setToTime(detailsDTO.getToTime());
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
+			if (detailsDTO.getFromTime() != null && !detailsDTO.getFromTime().isEmpty()) {
+			    detailsVO.setFromTime(
+			        LocalTime.parse(detailsDTO.getFromTime(), formatter)
+			    );
+			}
+
+			if (detailsDTO.getToTime() != null && !detailsDTO.getToTime().isEmpty()) {
+			    detailsVO.setToTime(
+			        LocalTime.parse(detailsDTO.getToTime(), formatter)
+			    );
+			}
 			detailsVO.setCheckingPoints(detailsDTO.getCheckingPoints());
 
 			detailsVO.setParameter(detailsDTO.getParameter());
@@ -6943,24 +6953,25 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			 */
 			if (detailsDTO.getFromTime() != null && detailsDTO.getToTime() != null) {
 
-				LocalTime fromTime = detailsDTO.getFromTime();
+			    DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm");
 
-				LocalTime toTime = detailsDTO.getToTime();
+			    LocalTime fromTime = LocalTime.parse(detailsDTO.getFromTime(), formatter1);
+			    LocalTime toTime = LocalTime.parse(detailsDTO.getToTime(), formatter1);
 
-				long minutes = Duration.between(fromTime, toTime).toMinutes();
+			    long minutes = Duration.between(fromTime, toTime).toMinutes();
 
-				/*
-				 * Handles activity crossing midnight
-				 */
-				if (minutes < 0) {
-					minutes = minutes + (24 * 60);
-				}
+			    /*
+			     * Handles activity crossing midnight
+			     */
+			    if (minutes < 0) {
+			        minutes = minutes + (24 * 60);
+			    }
 
-				BigDecimal noOfHours = BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2,
-						RoundingMode.HALF_UP);
+			    BigDecimal noOfHours = BigDecimal.valueOf(minutes)
+			            .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
 
-				detailsVO.setNoOfHrs(noOfHours);
-
+			    detailsVO.setNoOfHrs(noOfHours);
+			
 			} else {
 
 				detailsVO.setNoOfHrs(BigDecimal.ZERO);
@@ -7178,9 +7189,13 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 					detailsResponse.setItem(itemResponse);
 				}
-				detailsResponse.setFromTime(detailsVO.getFromTime());
+				detailsResponse.setFromTime(
+				        detailsVO.getFromTime() != null ? detailsVO.getFromTime().toString() : null
+				);
 
-				detailsResponse.setToTime(detailsVO.getToTime());
+				detailsResponse.setToTime(
+				        detailsVO.getToTime() != null ? detailsVO.getToTime().toString() : null
+				);
 
 				detailsResponse.setCheckingPoints(detailsVO.getCheckingPoints());
 

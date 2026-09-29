@@ -17,9 +17,9 @@ public class ActivitiesCarriedOutDetailsResponseDTO {
 
 	private ItemResponse1DTO item;
 	
-	private LocalTime fromTime;
+	private String  fromTime;
 	
-	private LocalTime toTime;
+	private String toTime;
 	
 	private String checkingPoints;
 

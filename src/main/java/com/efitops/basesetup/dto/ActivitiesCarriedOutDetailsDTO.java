@@ -18,9 +18,9 @@ public class ActivitiesCarriedOutDetailsDTO {
 
 	private Long item;
 	
-	private LocalTime fromTime;
+	private String fromTime;
 	
-	private LocalTime toTime;
+	private String toTime;
 	
 	private String checkingPoints;
 

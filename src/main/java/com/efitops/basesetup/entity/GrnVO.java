@@ -129,10 +129,10 @@ public class GrnVO {
 	private String cancelRemarks;
 
 	@Column(name = "screen_name")
-	private String screenName = "OrderAcceptance";
+	private String screenName = "Good Received Note";
 
 	@Column(name = "screen_code")
-	private String screenCode = "OA";
+	private String screenCode = "GRN";
 
 	@Column(name = "org_id")
 	private Long orgId;

@@ -2,6 +2,7 @@ package com.efitops.basesetup.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +78,7 @@ import com.efitops.basesetup.entity.SalesRejectionInvoiceVO;
 import com.efitops.basesetup.entity.SalesReturnDetailsVO;
 import com.efitops.basesetup.entity.SalesReturnTaxDetailsVO;
 import com.efitops.basesetup.entity.SalesReturnVO;
+import com.efitops.basesetup.entity.StockValuationVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -105,6 +107,7 @@ import com.efitops.basesetup.repository.SalesRejectionInvoiceTaxDetailsRepo;
 import com.efitops.basesetup.repository.SalesReturnDetailsRepo;
 import com.efitops.basesetup.repository.SalesReturnRepo;
 import com.efitops.basesetup.repository.SalesReturnTaxDetailsRepo;
+import com.efitops.basesetup.repository.StockValuationRepo;
 import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
@@ -193,6 +196,10 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	HsnRepo hsnRepo;
+	
+	@Autowired
+	StockValuationRepo stockValuationRepo;
+	
 	// salesdeliveryschedule
 
 	@Override
@@ -1269,6 +1276,13 @@ public class TransactionServiceImpl implements TransactionService {
 		// Save Header
 		salesRejectionInvoiceVO = salesRejectionInvoiceRepo.save(salesRejectionInvoiceVO);
 
+		if (ObjectUtils.isEmpty(salesRejectionInvoiceDTO.getId())
+		        && salesRejectionInvoiceDTO.isStockPosting()) {
+
+		    createStockForSalesRejectionInvoice(
+		            salesRejectionInvoiceVO);
+		}
+		
 		// Response
 		SalesRejectionInvoiceResponseDTO responseDTO = buildSalesRejectionInvoiceResponse(salesRejectionInvoiceVO);
 
@@ -1900,6 +1914,113 @@ public class TransactionServiceImpl implements TransactionService {
 		return dto;
 	}
 
+	
+	private void createStockForSalesRejectionInvoice(
+	        SalesRejectionInvoiceVO vo) throws ApplicationException {
+
+	    if (vo.getDetails() == null
+	            || vo.getDetails().isEmpty()) {
+	        return;
+	    }
+
+	    for (SalesRejectionInvoiceDetailsVO detailVO : vo.getDetails()) {
+
+	        if (detailVO.getItem() == null
+	                || detailVO.getDespatchQty() == null
+	                || detailVO.getDespatchQty()
+	                        .compareTo(BigDecimal.ZERO) <= 0) {
+	            continue;
+	        }
+
+	        StockValuationVO stockVO =
+	                new StockValuationVO();
+
+	        // Rejection = stock IN
+	        // Invoice / Other Sales Invoice = stock OUT
+	        if ("Rejection".equalsIgnoreCase(vo.getDocType())) {
+	            stockVO.setPlusOrMinus("p");
+	        } else {
+	            stockVO.setPlusOrMinus("m");
+	        }
+
+	        // Item
+	        stockVO.setStockPartNo(
+	                detailVO.getItem());
+
+	        // Location
+	        if (vo.getLocation() != null) {
+	            stockVO.setLocDetailsId(
+	                    vo.getLocation());
+	        }
+
+	        // Document
+	        stockVO.setDocId(vo.getDocId());
+	        stockVO.setDocDate(vo.getDocDate());
+	        stockVO.setDocTime(LocalTime.now());
+
+	        // Quantity
+	        stockVO.setQuantity(
+	                detailVO.getDespatchQty());
+
+	        // Rate
+	        stockVO.setRate(
+	                detailVO.getNewRate() != null
+	                        ? detailVO.getNewRate()
+	                        : BigDecimal.ZERO);
+
+	        // Stock Value
+	        stockVO.setStockValue(
+	                detailVO.getAmountInRs() != null
+	                        ? detailVO.getAmountInRs()
+	                        : BigDecimal.ZERO);
+
+	        // Branch
+	        if (vo.getBranch() != null) {
+	            stockVO.setBranchVO(
+	                    vo.getBranch());
+	        }
+
+	        // Organization
+	        stockVO.setOrgId(
+	                vo.getOrgId());
+
+	        // Narration
+	        stockVO.setNarration(
+	                vo.getNarration());
+
+	        // Audit
+	        stockVO.setCreatedBy(
+	                vo.getCreatedBy());
+
+	        stockVO.setUpdatedBy(
+	                vo.getUpdatedBy());
+
+	        stockVO.setActive(true);
+	        stockVO.setCancel(false);
+
+	        // Source
+	        stockVO.setSourceScreenName(
+	                vo.getDocType());
+
+	        
+	        String screenCode;
+
+			if ("Other Sales Invoice".equals(vo.getDocType())) {
+				screenCode = "SOI";
+			} else if ("Invoice".equals(vo.getDocType())) {
+				screenCode = "DCI";
+			} else if ("Rejection".equals(vo.getDocType())) {
+				screenCode = "RI";
+			} else {
+				throw new ApplicationException("Invalid Document Type");
+			}
+			
+	        stockVO.setSourceScreenCode(
+	                screenCode);
+
+	        stockValuationRepo.save(stockVO);
+	    }
+	}
 	// DespatchInstructiondropdown
 
 	@Override

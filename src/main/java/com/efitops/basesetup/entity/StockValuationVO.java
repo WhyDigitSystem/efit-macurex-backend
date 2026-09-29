@@ -2,6 +2,7 @@ package com.efitops.basesetup.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -9,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -37,10 +40,14 @@ public class StockValuationVO {
 	   
 	    @Column(name = "plus_or_minus")
 	    private String plusOrMinus;
+	    
+	    @ManyToOne
+	    @JoinColumn(name = "stock_part_no")
+	    private ItemMasterVO stockPartNo;
 
-	    @Column(name = "stock_part_no")
-	    private String stockPartNo;
-
+	    @Column(name = "doc_id")
+	    private String docId;
+	    
 	    @Column(name = "doc_date")
 	    private LocalDate docDate;
 
@@ -54,25 +61,21 @@ public class StockValuationVO {
 	    private BigDecimal stockValue;
 
 	    @Column(name = "doc_time")
-	    private String docTime;
-
+	    private LocalTime docTime;
+	   	    	
 	    @Column(name = "lot_no")
 	    private String lotNo;
 
-	    @Column(name = "doc_id")
-	    private String docId;
-
 	    @Column(name = "narration")
-	    private String narration;
+	    private String narration; 
+	    
+	    @ManyToOne
+	    @JoinColumn(name = "locdetails_id")
+	    private LocationVO locDetailsId;
 
-	    @Column(name = "locinvdetailid")
-	    private Long locInvDetailId;
-
-	    @Column(name = "locdetailsid")
-	    private Long locDetailsId;
-
-	    @Column(name = "plantid")
-	    private Long plantId;
+	    @ManyToOne
+	    @JoinColumn(name = "branch_id")
+	    private BranchVO branchVO;
 	    
 	    
 	    @Column(name = "active")
@@ -90,10 +93,10 @@ public class StockValuationVO {
 		private boolean cancel = false;
 		@Column(name = "cancel_remarks")
 		private String cancelRemarks;
-		@Column(name = "screen_name")
-		private String screenName = "STOCKVALUATION";
-		@Column(name = "screen_code")
-		private String screenCode = "SV";
+		@Column(name = "source_screen_name")
+		private String sourceScreenName;
+		@Column(name = "source_screen_code")
+		private String sourceScreenCode;
 		
 		@JsonGetter("activeStatus")
 		public String getActiveStatus() {

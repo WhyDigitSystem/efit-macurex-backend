@@ -68,6 +68,8 @@ public class SalesContractDTO {
    	private String terms;
    	
    	private String notes;
+   	
+   	private String approval;
     
     private List<SalesContractDetailsDTO> details;
     

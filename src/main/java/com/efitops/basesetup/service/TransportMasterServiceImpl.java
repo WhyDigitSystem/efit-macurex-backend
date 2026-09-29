@@ -18,6 +18,7 @@ import java.util.UUID;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -557,31 +558,31 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	@Override
 	public Map<String, Object> getCustomerDetails(Long orgId, Long branch) throws ApplicationException {
 
-	    List<Object[]> list = customerRepo.getCustomerDetails(orgId, branch);
+		List<Object[]> list = customerRepo.getCustomerDetails(orgId, branch);
 
-	    if (list.isEmpty()) {
-	        throw new ApplicationException("Customer Not Found");
-	    }
+		if (list.isEmpty()) {
+			throw new ApplicationException("Customer Not Found");
+		}
 
-	    List<Map<String, Object>> customerDetails = new ArrayList<>();
+		List<Map<String, Object>> customerDetails = new ArrayList<>();
 
-	    for (Object[] obj : list) {
+		for (Object[] obj : list) {
 
-	        Map<String, Object> customerMap = new HashMap<>();
+			Map<String, Object> customerMap = new HashMap<>();
 
-	        customerMap.put("customerId", obj[0]);
-	        customerMap.put("customerCode", obj[1]);
-	        customerMap.put("customerName", obj[2]);
-	        customerMap.put("gstNo", obj[3]);
-	        customerMap.put("isGstApplicable", obj[4]);
+			customerMap.put("customerId", obj[0]);
+			customerMap.put("customerCode", obj[1]);
+			customerMap.put("customerName", obj[2]);
+			customerMap.put("gstNo", obj[3]);
+			customerMap.put("isGstApplicable", obj[4]);
 
-	        customerDetails.add(customerMap);
-	    }
+			customerDetails.add(customerMap);
+		}
 
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("customerDetails", customerDetails);
+		Map<String, Object> response = new HashMap<>();
+		response.put("customerDetails", customerDetails);
 
-	    return response;
+		return response;
 	}
 	// Sales Contract amendment
 
@@ -848,6 +849,8 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 		DespatchInstructionVO despatchInstructionVO = new DespatchInstructionVO();
 
+		String screenCode = "DI";
+
 		String message;
 
 		if (ObjectUtils.isNotEmpty(despatchInstructionDTO.getId())) {
@@ -861,13 +864,33 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 
 		} else {
 
-			despatchInstructionVO.setCreatedBy(despatchInstructionDTO.getCreatedBy());
+			despatchInstructionVO = new DespatchInstructionVO();
 
+			String docId = despatchInstructionRepo.getDespatchInstructionDocId(despatchInstructionDTO.getOrgId(),
+					despatchInstructionDTO.getFinancialYear(), screenCode);
+
+			if (StringUtils.isBlank(docId)) {
+				throw new ApplicationException("Despatch Instruction DocId Not Found");
+			}
+
+			despatchInstructionVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdScreenCode(despatchInstructionDTO.getOrgId(), screenCode);
+
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			despatchInstructionVO.setCreatedBy(despatchInstructionDTO.getCreatedBy());
 			despatchInstructionVO.setUpdated_By(despatchInstructionDTO.getCreatedBy());
 
 			message = "Despatch Instruction Created Successfully";
 		}
-
 		createUpdateDespatchInstructionVO(despatchInstructionDTO, despatchInstructionVO);
 
 		DespatchInstructionVO savedDespatchInstruction = despatchInstructionRepo.save(despatchInstructionVO);
@@ -2090,5 +2113,19 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		String screenCode1 = "CCE";
 		String result = customerComplaintRepo.getCustomerComplaintDocId(orgId, financialYear, screenCode1);
 		return result;
+	}
+
+	@Override
+	public String getDespatchInstructionDocId(Long orgId, String financialYear) throws ApplicationException {
+
+		String screenCode = "DI";
+
+		String docId = despatchInstructionRepo.getDespatchInstructionDocId(orgId, financialYear, screenCode);
+
+		if (StringUtils.isBlank(docId)) {
+			throw new ApplicationException("Despatch Instruction DocId Not Found");
+		}
+
+		return docId;
 	}
 }

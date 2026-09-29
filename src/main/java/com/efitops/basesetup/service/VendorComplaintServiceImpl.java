@@ -2987,6 +2987,10 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * Normal Fields
 		 */
+
+		response.setDocId(vo.getDocId());
+
+		response.setDocDate(vo.getDocDate());
 		response.setDescription(vo.getDescription());
 
 		response.setDrawingNo(vo.getDrawingNo());
@@ -6926,15 +6930,11 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
 			if (detailsDTO.getFromTime() != null && !detailsDTO.getFromTime().isEmpty()) {
-			    detailsVO.setFromTime(
-			        LocalTime.parse(detailsDTO.getFromTime(), formatter)
-			    );
+				detailsVO.setFromTime(LocalTime.parse(detailsDTO.getFromTime(), formatter));
 			}
 
 			if (detailsDTO.getToTime() != null && !detailsDTO.getToTime().isEmpty()) {
-			    detailsVO.setToTime(
-			        LocalTime.parse(detailsDTO.getToTime(), formatter)
-			    );
+				detailsVO.setToTime(LocalTime.parse(detailsDTO.getToTime(), formatter));
 			}
 			detailsVO.setCheckingPoints(detailsDTO.getCheckingPoints());
 
@@ -6953,25 +6953,25 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			 */
 			if (detailsDTO.getFromTime() != null && detailsDTO.getToTime() != null) {
 
-			    DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm");
+				DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm");
 
-			    LocalTime fromTime = LocalTime.parse(detailsDTO.getFromTime(), formatter1);
-			    LocalTime toTime = LocalTime.parse(detailsDTO.getToTime(), formatter1);
+				LocalTime fromTime = LocalTime.parse(detailsDTO.getFromTime(), formatter1);
+				LocalTime toTime = LocalTime.parse(detailsDTO.getToTime(), formatter1);
 
-			    long minutes = Duration.between(fromTime, toTime).toMinutes();
+				long minutes = Duration.between(fromTime, toTime).toMinutes();
 
-			    /*
-			     * Handles activity crossing midnight
-			     */
-			    if (minutes < 0) {
-			        minutes = minutes + (24 * 60);
-			    }
+				/*
+				 * Handles activity crossing midnight
+				 */
+				if (minutes < 0) {
+					minutes = minutes + (24 * 60);
+				}
 
-			    BigDecimal noOfHours = BigDecimal.valueOf(minutes)
-			            .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+				BigDecimal noOfHours = BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2,
+						RoundingMode.HALF_UP);
 
-			    detailsVO.setNoOfHrs(noOfHours);
-			
+				detailsVO.setNoOfHrs(noOfHours);
+
 			} else {
 
 				detailsVO.setNoOfHrs(BigDecimal.ZERO);
@@ -7189,13 +7189,10 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 					detailsResponse.setItem(itemResponse);
 				}
-				detailsResponse.setFromTime(
-				        detailsVO.getFromTime() != null ? detailsVO.getFromTime().toString() : null
-				);
+				detailsResponse
+						.setFromTime(detailsVO.getFromTime() != null ? detailsVO.getFromTime().toString() : null);
 
-				detailsResponse.setToTime(
-				        detailsVO.getToTime() != null ? detailsVO.getToTime().toString() : null
-				);
+				detailsResponse.setToTime(detailsVO.getToTime() != null ? detailsVO.getToTime().toString() : null);
 
 				detailsResponse.setCheckingPoints(detailsVO.getCheckingPoints());
 
@@ -8298,6 +8295,33 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 
 		responseObjectsMap.put("salesOrderReport", responseList);
+
+		return responseObjectsMap;
+	}
+
+//	dropdown for activities carried out 
+	@Override
+	public Map<String, Object> getPMCheckListDropdownForActivitiesCarriedOut(String MACNO, Long orgId, Long branch)
+			throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> pmCheckListList = activitiesCarriedOutRepo.getPMCheckListDropdownForActivitiesCarriedOut(MACNO,
+				orgId, branch);
+
+		List<String[]> responseList = new ArrayList<>();
+
+		for (Object[] obj : pmCheckListList) {
+
+			String[] data = new String[2];
+
+			data[0] = obj[0] != null ? obj[0].toString() : "";
+			data[1] = obj[1] != null ? obj[1].toString() : "";
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("pmCheckListDropdown", responseList);
 
 		return responseObjectsMap;
 	}

@@ -310,6 +310,9 @@ public interface VendorComplaintService {
 	Map<String, Object> getSalesOrderReport(String fromDate, String toDate, Long branch, Long orgId,
 			String customerName) throws ApplicationException;
 
+	Map<String, Object> getPMCheckListDropdownForActivitiesCarriedOut(String MACNO, Long orgId, Long branch)
+			throws ApplicationException;
+
 	
 
 

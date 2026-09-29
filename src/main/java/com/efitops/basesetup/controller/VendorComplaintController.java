@@ -3740,4 +3740,39 @@ public class VendorComplaintController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 	}
+
+	@GetMapping("/getPMCheckListDropdownForActivitiesCarriedOut")
+	public ResponseEntity<ResponseDTO> getPMCheckListDropdownForActivitiesCarriedOut(@RequestParam String MACNO,
+			@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getPMCheckListDropdownForActivitiesCarriedOut()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getPMCheckListDropdownForActivitiesCarriedOut(MACNO,
+					orgId, branch);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
 }

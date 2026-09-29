@@ -69,5 +69,22 @@ public interface MachineToolBreakdownRepo extends JpaRepository<MachineToolBreak
 			""", nativeQuery = true)
 	List<Object[]> getMachineToolForBreakdown(@Param("toolCategoryId") Long toolCategoryId, @Param("orgId") Long orgId,
 			@Param("branch") Long branch);
+	
+	 @Query(value = """
+	            SELECT
+	                mtb.machine_tool_breakdown_basic_id AS id,
+	                mtb.doc_id AS name
+	            FROM machine_tool_breakdown_basic mtb
+	            WHERE mtb.org_id = :orgId
+	              AND mtb.branch = :branch
+	              AND mtb.active = TRUE
+	              AND mtb.cancel = FALSE
+	            ORDER BY mtb.machine_tool_breakdown_basic_id DESC
+	            """, nativeQuery = true)
+	    List<Object[]> getBreakdownNoDropdownForGateOutwardEntry(
+	            @Param("orgId") Long orgId,
+	            @Param("branch") Long branch);
+	    
+	    
 
 }

@@ -18,4 +18,20 @@ public interface DeliveryChallanSubcontractingRepo extends JpaRepository<Deliver
 
 	@Query(" SELECT d FROM DeliveryChallanSubcontractingVO d WHERE d.orgId = :orgId AND d.branch.id = :branch  and cancel=0 ORDER BY d.id DESC ") 
 	List<DeliveryChallanSubcontractingVO> findAllByOrgIdAndBranch( @Param("orgId") Long orgId, @Param("branch") Long branch);
+	
+	
+	 @Query(value = """
+	            SELECT 
+	                sc.deliverychallan_subcontracting_id AS id,
+	                sc.doc_id AS name
+	            FROM deliverychallan_subcontracting sc
+	            WHERE sc.org_id = :orgId
+	              AND sc.branch = :branch
+	              AND sc.active = TRUE
+	              AND sc.cancel = FALSE
+	            ORDER BY sc.deliverychallan_subcontracting_id DESC
+	            """, nativeQuery = true)
+	    List<Object[]> getSubcontractChallanNoForGateOutwardEntry(
+	            @Param("orgId") Long orgId,
+	            @Param("branch") Long branch);
 }

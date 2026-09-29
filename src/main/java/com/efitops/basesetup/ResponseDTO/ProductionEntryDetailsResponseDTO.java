@@ -8,7 +8,6 @@ public class ProductionEntryDetailsResponseDTO {
     private Long id;
     private String operationNo;
     private MachineResponseDTO machine;
-    private String machineName;
     private BigDecimal machineHourRate;
     private BigDecimal labourHourRate;
     private String operationName;

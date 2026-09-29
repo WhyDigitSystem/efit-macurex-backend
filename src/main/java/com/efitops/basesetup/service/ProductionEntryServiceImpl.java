@@ -350,7 +350,7 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				if (d.getToolNo() != null && d.getToolNo() != 0) {
 
 					ToolMasterVO preparedBy = toolMasterRepo.findById(d.getToolNo())
-							.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+							.orElseThrow(() -> new ApplicationException("ToolMaster Not Found"));
 
 					detailsVO.setToolNo(preparedBy);
 				}

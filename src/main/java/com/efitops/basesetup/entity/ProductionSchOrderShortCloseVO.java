@@ -33,7 +33,7 @@ public class ProductionSchOrderShortCloseVO {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "production_sch_order_short_close_basicgen")
-	@SequenceGenerator(name = "production_short_close_basicgen", sequenceName = "production_sch_order_short_close_basicseq", initialValue = 1000000001, allocationSize = 1)
+	@SequenceGenerator(name = "production_sch_order_short_close_basicgen", sequenceName = "production_sch_order_short_close_basicseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "production_sch_order_short_close_basic_id", columnDefinition = "BIGINT DEFAULT 0")
 	private Long id;
 

@@ -3421,10 +3421,10 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long listOfValuesId, Long fromDept)
+	public List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport( Long fromDept)
 			throws ApplicationException {
 
-		List<Object[]> departmentList = flashNCReportRepo.getToDepartmentDropdownForFlashNCReport(listOfValuesId,
+		List<Object[]> departmentList = flashNCReportRepo.getToDepartmentDropdownForFlashNCReport(
 				fromDept);
 
 		if (departmentList == null || departmentList.isEmpty()) {
@@ -7042,8 +7042,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 				detailsVO.setItem(itemVO);
 			}
 
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 			if (detailsDTO.getFromTime() != null && !detailsDTO.getFromTime().isEmpty()) {
 				detailsVO.setFromTime(LocalTime.parse(detailsDTO.getFromTime(), formatter));
 			}
@@ -7063,15 +7062,36 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			detailsVO.setNextActivity(detailsDTO.getNextActivity());
 
+			DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+			if (detailsDTO.getFromTime() != null && !detailsDTO.getFromTime().isEmpty()) {
+
+				detailsVO.setFromTime(LocalTime.parse(detailsDTO.getFromTime(), formatter1));
+			}
+
+			if (detailsDTO.getToTime() != null && !detailsDTO.getToTime().isEmpty()) {
+
+				detailsVO.setToTime(LocalTime.parse(detailsDTO.getToTime(), formatter1));
+			}
+
+			detailsVO.setCheckingPoints(detailsDTO.getCheckingPoints());
+			detailsVO.setParameter(detailsDTO.getParameter());
+			detailsVO.setActivitiesCarriedOut(detailsDTO.getActivitiesCarriedOut());
+			detailsVO.setStatus(detailsDTO.getStatus());
+			detailsVO.setDate(detailsDTO.getDate());
+			detailsVO.setNextActivity(detailsDTO.getNextActivity());
+
 			/*
 			 * Calculate No Of Hours To Time - From Time
 			 */
+
 			if (detailsDTO.getFromTime() != null && detailsDTO.getToTime() != null) {
 
-				DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm");
+				DateTimeFormatter formatter11 = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-				LocalTime fromTime = LocalTime.parse(detailsDTO.getFromTime(), formatter1);
-				LocalTime toTime = LocalTime.parse(detailsDTO.getToTime(), formatter1);
+				LocalTime fromTime = LocalTime.parse(detailsDTO.getFromTime(), formatter11);
+
+				LocalTime toTime = LocalTime.parse(detailsDTO.getToTime(), formatter11);
 
 				long minutes = Duration.between(fromTime, toTime).toMinutes();
 
@@ -8470,6 +8490,45 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		responseObjectsMap.put("salesDeliveryPendingReport", responseList);
+
+		return responseObjectsMap;
+	}
+//	sales order pending itemwise
+
+	@Override
+	public Map<String, Object> getSalesOrderPendingItemWiseReport(Long plant, Long division, String asondt)
+			throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> resultList = orderAcceptanceRepo.getSalesOrderPendingItemWiseReport(plant, division, asondt);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("branchId", obj[0]);
+			data.put("orderAcceptanceBasicId", obj[1]);
+			data.put("docId", obj[2]);
+			data.put("docDate", obj[3]);
+			data.put("customerPurchaseOrderNo", obj[4]);
+			data.put("customerPurchaseOrderDate", obj[5]);
+			data.put("customerId", obj[6]);
+			data.put("customerName", obj[7]);
+			data.put("itemId", obj[8]);
+			data.put("itemDescription", obj[9]);
+			data.put("quantity", obj[10]);
+			data.put("sqty", obj[11]);
+			data.put("pqty", obj[12]);
+			data.put("amount", obj[13]);
+			data.put("specification", obj[14]);
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("salesOrderPendingItemWiseReport", responseList);
 
 		return responseObjectsMap;
 	}

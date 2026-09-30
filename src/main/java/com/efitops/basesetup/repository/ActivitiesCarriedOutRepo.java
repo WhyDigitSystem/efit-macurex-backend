@@ -37,5 +37,41 @@ public interface ActivitiesCarriedOutRepo extends JpaRepository<ActivitiesCarrie
 	List<ActivitiesCarriedOutVO> findByOrgId(
 	        @Param("orgId") Long orgId,
 	        @Param ("branch") Long branch);
+	
+	@Query(value = """
+	        SELECT 
+	            P.pm_check_list_master_basic_id,
+	            P.pm_check_list_no
+	        FROM pm_check_list_master_basic P
+	        INNER JOIN machine_equipments_master M 
+	            ON M.pm_checklist_no = P.pm_check_list_no
+	        WHERE M.machine_instrument_no = :MACNO
+	          AND P.org_id = :orgId
+	          AND P.branch = :branch
+	          AND P.active = TRUE
+	          AND P.cancel = FALSE
+
+	        UNION
+
+	        SELECT 
+	            P.pm_check_list_master_basic_id,
+	            P.pm_check_list_no
+	        FROM pm_check_list_master_basic P
+	        INNER JOIN tool_master_basic M 
+	            ON M.pm_checklist_no = P.pm_check_list_no
+	        WHERE M.tool_no = :MACNO
+	          AND P.org_id = :orgId
+	          AND P.branch = :branch
+	          AND P.active = TRUE
+	          AND P.cancel = FALSE
+
+	        ORDER BY pm_check_list_no
+	        """, nativeQuery = true)
+	List<Object[]> getPMCheckListDropdownForActivitiesCarriedOut(
+	        @Param("MACNO") String MACNO,
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch);
+
+//	List<Object[]> getPMCheckListDropdownForActivitiesCarriedOut(String mACNO, Long orgId, Long branch);
 
 }

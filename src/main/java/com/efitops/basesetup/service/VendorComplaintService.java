@@ -143,8 +143,8 @@ public interface VendorComplaintService {
 
 	List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long listOfValuesId) throws ApplicationException;
 
-	List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long listOfValuesId, Long fromDept)
-			throws ApplicationException;
+//	List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long listOfValuesId, Long fromDept)
+//			throws ApplicationException;
 
 	List<Map<String, Object>> getMRINGRNDropdownForFlashNCReport(Long orgId, Long branch) throws ApplicationException;
 
@@ -309,6 +309,17 @@ public interface VendorComplaintService {
 
 	Map<String, Object> getSalesOrderReport(String fromDate, String toDate, Long branch, Long orgId,
 			String customerName) throws ApplicationException;
+
+	Map<String, Object> getPMCheckListDropdownForActivitiesCarriedOut(String MACNO, Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> getScheduleWiseDespatchQtyReport(String mon, Long under, String party)
+			throws ApplicationException;
+
+	Map<String, Object> getSalesOrderPendingItemWiseReport(Long plant, Long division, String asondt)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long fromDept) throws ApplicationException;
 
 	
 

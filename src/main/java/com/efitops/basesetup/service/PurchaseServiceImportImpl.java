@@ -524,9 +524,29 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setDeliveryTerms(dto.getDeliveryTerms());
 		vo.setNotes(dto.getNotes());
 
-		vo.setPreparedBy(dto.getPreparedBy());
-		vo.setCheckedBy(dto.getCheckedBy());
-		vo.setAuthorisedBy(dto.getAuthorisedBy());
+		if (dto.getPreparedBy() != null && dto.getPreparedBy() > 0) {
+
+			EmployeeMasterVO preparedBy = employeeMasterRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+			vo.setPreparedBy(preparedBy);
+		}
+
+		if (dto.getCheckedBy() != null && dto.getCheckedBy() > 0) {
+
+			EmployeeMasterVO checkedBy = employeeMasterRepo.findById(dto.getCheckedBy())
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+			vo.setCheckedBy(checkedBy);
+		}
+
+		if (dto.getAuthorisedBy() != null && dto.getAuthorisedBy() > 0) {
+
+			EmployeeMasterVO authorisedBy = employeeMasterRepo.findById(dto.getAuthorisedBy())
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+			vo.setAuthorisedBy(authorisedBy);
+		}
 
 		vo.setIsReverseCharge(dto.getIsReverseCharge());
 		vo.setIndentRequired(dto.getIndentRequired());
@@ -556,9 +576,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setSurCharges(dto.getSurCharges());
 		vo.setTotalPoValueInr(dto.getTotalPoValueInr());
 		vo.setAmountInWord(dto.getAmountInWord());
-		vo.setPreparedBy(dto.getPreparedBy());
-		vo.setCheckedBy(dto.getCheckedBy());
-		vo.setAuthorisedBy(dto.getAuthorisedBy());
 
 		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
@@ -900,9 +917,40 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setPaymentTerms(vo.getPaymentTerms());
 		responseDTO.setDeliveryTerms(vo.getDeliveryTerms());
 		responseDTO.setNotes(vo.getNotes());
-		responseDTO.setPreparedBy(vo.getPreparedBy());
-		responseDTO.setCheckedBy(vo.getCheckedBy());
-		responseDTO.setAuthorisedBy(vo.getAuthorisedBy());
+
+		if (vo.getPreparedBy() != null) {
+
+			EmployeeMasterResponseDetailsDTO preparedByDTO = new EmployeeMasterResponseDetailsDTO();
+
+			preparedByDTO.setId(vo.getPreparedBy().getId());
+			preparedByDTO.setEmployeeCode(vo.getPreparedBy().getEmployeeId());
+			preparedByDTO.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+
+			responseDTO.setPreparedBy(preparedByDTO);
+		}
+
+		if (vo.getCheckedBy() != null) {
+
+			EmployeeMasterResponseDetailsDTO checkedByDTO = new EmployeeMasterResponseDetailsDTO();
+
+			checkedByDTO.setId(vo.getCheckedBy().getId());
+			checkedByDTO.setEmployeeCode(vo.getCheckedBy().getEmployeeId());
+			checkedByDTO.setEmployeeName(vo.getCheckedBy().getEmployeeName());
+
+			responseDTO.setCheckedBy(checkedByDTO);
+		}
+
+		if (vo.getAuthorisedBy() != null) {
+
+			EmployeeMasterResponseDetailsDTO authorisedByDTO = new EmployeeMasterResponseDetailsDTO();
+
+			authorisedByDTO.setId(vo.getAuthorisedBy().getId());
+			authorisedByDTO.setEmployeeCode(vo.getAuthorisedBy().getEmployeeId());
+			authorisedByDTO.setEmployeeName(vo.getAuthorisedBy().getEmployeeName());
+
+			responseDTO.setAuthorisedBy(authorisedByDTO);
+		}
+
 		responseDTO.setTotalAmount(vo.getTotalAmount());
 		responseDTO.setAmountInWord(vo.getAmountInWord());
 

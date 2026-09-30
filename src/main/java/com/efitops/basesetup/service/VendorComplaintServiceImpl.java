@@ -195,6 +195,7 @@ import com.efitops.basesetup.repository.PMCheckListMasterRepo;
 import com.efitops.basesetup.repository.QualityScrapNoteDetailsRepo;
 import com.efitops.basesetup.repository.QualityScrapNoteRepo;
 import com.efitops.basesetup.repository.SalesContractRepo;
+import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
 import com.efitops.basesetup.repository.ScrapMaterialReturnRejectionDetailsRepo;
 import com.efitops.basesetup.repository.ScrapMaterialReturnRejectionRepo;
 import com.efitops.basesetup.repository.SetUpApprovalDetailsRepo;
@@ -353,6 +354,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private SalesContractRepo salesContractRepo;
+
+	@Autowired
+	private SalesDeliveryScheduleRepo salesDeliveryScheduleRepo;
 
 	@Override
 	@Transactional
@@ -1672,91 +1676,202 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 	}
 
-	/*
-	 * RESPONSE DTO
-	 */
 	private DailyInspectionCumRejectionDataResponseDTO dailyInspectionCumRejectionDataResponse(
 			DailyInspectionCumRejectionDataVO vo) {
 
 		DailyInspectionCumRejectionDataResponseDTO responseDTO = new DailyInspectionCumRejectionDataResponseDTO();
 
+		// ========================================================
+		// BASIC RESPONSE
+		// ========================================================
+
 		responseDTO.setId(vo.getId());
 
-		/*
-		 * Branch
-		 */
-		if (vo.getBranch() != null) {
-			responseDTO.setBranch(vo.getBranch().getId());
-		}
+		responseDTO.setDocId(vo.getDocId());
 
-		/*
-		 * Belongs To
-		 */
-		if (vo.getBelongsTo() != null) {
-			responseDTO.setBelongsTo(vo.getBelongsTo().getId());
-		}
-
-		/*
-		 * Prepared By
-		 */
-		if (vo.getPreparedBy() != null) {
-			responseDTO.setPreparedBy(vo.getPreparedBy().getId());
-		}
-
-		/*
-		 * Locations
-		 */
-		if (vo.getFromLocation() != null) {
-			responseDTO.setFromLocation(vo.getFromLocation().getId());
-		}
-
-		if (vo.getReworkLocation() != null) {
-			responseDTO.setReworkLocation(vo.getReworkLocation().getId());
-		}
-
-		if (vo.getRejectionLocation() != null) {
-			responseDTO.setRejectionLocation(vo.getRejectionLocation().getId());
-		}
-
-		if (vo.getScrapLocation() != null) {
-			responseDTO.setScrapLocation(vo.getScrapLocation().getId());
-		}
-
-		if (vo.getToLocation() != null) {
-			responseDTO.setToLocation(vo.getToLocation().getId());
-		}
+		responseDTO.setDocDate(vo.getDocDate());
 
 		responseDTO.setActive(vo.getActive());
 
 		responseDTO.setOrgId(vo.getOrgId());
+
 		responseDTO.setFinancialYear(vo.getFinancialYear());
+
 		responseDTO.setCreatedBy(vo.getCreatedBy());
+
 		responseDTO.setCancelRemarks(vo.getCancelRemarks());
 
-		/*
-		 * Details Response
-		 */
+		// ========================================================
+		// BRANCH
+		// ========================================================
+
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branch = new BranchResponseDTO();
+
+			branch.setId(vo.getBranch().getId());
+
+			branch.setBranchName(vo.getBranch().getBranchName());
+
+			responseDTO.setBranch(branch);
+		}
+
+		// ========================================================
+		// BELONGS TO
+		// ========================================================
+
+		if (vo.getBelongsTo() != null) {
+
+			ListOfValuesDetailsResponseDTO belongsTo = new ListOfValuesDetailsResponseDTO();
+
+			belongsTo.setId(vo.getBelongsTo().getId());
+
+			belongsTo.setCode(vo.getBelongsTo().getValueCode());
+
+			belongsTo.setDescription(vo.getBelongsTo().getValueDescription());
+
+			responseDTO.setBelongsTo(belongsTo);
+		}
+
+		// ========================================================
+		// PREPARED BY
+		// ========================================================
+
+		if (vo.getPreparedBy() != null) {
+
+			EmployeeDropdownResponseDTO preparedBy = new EmployeeDropdownResponseDTO();
+
+			preparedBy.setEmployeeId(vo.getPreparedBy().getId());
+
+			preparedBy.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+
+			responseDTO.setPreparedBy(preparedBy);
+		}
+
+		// ========================================================
+		// FROM LOCATION
+		// ========================================================
+
+		if (vo.getFromLocation() != null) {
+
+			LocationMasterResponseDTO fromLocation = new LocationMasterResponseDTO();
+
+			fromLocation.setId(vo.getFromLocation().getId());
+
+			fromLocation.setLocationName(vo.getFromLocation().getLocationName());
+
+			responseDTO.setFromLocation(fromLocation);
+		}
+
+		// ========================================================
+		// REWORK LOCATION
+		// ========================================================
+
+		if (vo.getReworkLocation() != null) {
+
+			LocationMasterResponseDTO reworkLocation = new LocationMasterResponseDTO();
+
+			reworkLocation.setId(vo.getReworkLocation().getId());
+
+			reworkLocation.setLocationName(vo.getReworkLocation().getLocationName());
+
+			responseDTO.setReworkLocation(reworkLocation);
+		}
+
+		// ========================================================
+		// REJECTION LOCATION
+		// ========================================================
+
+		if (vo.getRejectionLocation() != null) {
+
+			LocationMasterResponseDTO rejectionLocation = new LocationMasterResponseDTO();
+
+			rejectionLocation.setId(vo.getRejectionLocation().getId());
+
+			rejectionLocation.setLocationName(vo.getRejectionLocation().getLocationName());
+
+			responseDTO.setRejectionLocation(rejectionLocation);
+		}
+
+		// ========================================================
+		// SCRAP LOCATION
+		// ========================================================
+
+		if (vo.getScrapLocation() != null) {
+
+			LocationMasterResponseDTO scrapLocation = new LocationMasterResponseDTO();
+
+			scrapLocation.setId(vo.getScrapLocation().getId());
+
+			scrapLocation.setLocationName(vo.getScrapLocation().getLocationName());
+
+			responseDTO.setScrapLocation(scrapLocation);
+		}
+
+		// ========================================================
+		// TO LOCATION
+		// ========================================================
+
+		if (vo.getToLocation() != null) {
+
+			LocationMasterResponseDTO toLocation = new LocationMasterResponseDTO();
+
+			toLocation.setId(vo.getToLocation().getId());
+
+			toLocation.setLocationName(vo.getToLocation().getLocationName());
+
+			responseDTO.setToLocation(toLocation);
+		}
+
+		// ========================================================
+		// DETAILS RESPONSE
+		// ========================================================
+
 		List<DailyInspectionCumRejectionDetailsResponseDTO> detailsResponseList = new ArrayList<>();
 
-		if (vo.getDailyInspectionCumRejectionDetailsVO() != null) {
+		if (vo.getDailyInspectionCumRejectionDetailsVO() != null
+				&& !vo.getDailyInspectionCumRejectionDetailsVO().isEmpty()) {
 
-			for (DailyInspectionCumRejectionDetailsVO detailsVO : vo.getDailyInspectionCumRejectionDetailsVO()) {
+			for (DailyInspectionCumRejectionDetailsVO detailVO : vo.getDailyInspectionCumRejectionDetailsVO()) {
 
-				DailyInspectionCumRejectionDetailsResponseDTO detailsResponseDTO = new DailyInspectionCumRejectionDetailsResponseDTO();
+				DailyInspectionCumRejectionDetailsResponseDTO detailResponseDTO = new DailyInspectionCumRejectionDetailsResponseDTO();
 
-				if (detailsVO.getFgItem() != null) {
-					detailsResponseDTO.setFgItem(detailsVO.getFgItem().getId());
+				// ====================================================
+				// FG ITEM
+				// ====================================================
+
+				if (detailVO.getFgItem() != null) {
+
+					ItemResponse1DTO fgItem = new ItemResponse1DTO();
+
+					fgItem.setId(detailVO.getFgItem().getId());
+
+					fgItem.setItemCode(detailVO.getFgItem().getItemCode());
+
+					fgItem.setItemDescription(detailVO.getFgItem().getItemDescription());
+
+					detailResponseDTO.setFgItem(fgItem);
 				}
 
-				detailsResponseDTO.setStock(detailsVO.getStock());
-				detailsResponseDTO.setRate(detailsVO.getRate());
-				detailsResponseDTO.setInspectionQty(detailsVO.getInspectionQty());
-				detailsResponseDTO.setAcceptedQty(detailsVO.getAcceptedQty());
-				detailsResponseDTO.setReworkQty(detailsVO.getReworkQty());
-				detailsResponseDTO.setRejectionQty(detailsVO.getRejectionQty());
-				detailsResponseDTO.setScrapQty(detailsVO.getScrapQty());
+				// ====================================================
+				// STOCK / RATE / QUANTITIES
+				// ====================================================
 
-				detailsResponseList.add(detailsResponseDTO);
+				detailResponseDTO.setStock(detailVO.getStock());
+
+				detailResponseDTO.setRate(detailVO.getRate());
+
+				detailResponseDTO.setInspectionQty(detailVO.getInspectionQty());
+
+				detailResponseDTO.setAcceptedQty(detailVO.getAcceptedQty());
+
+				detailResponseDTO.setReworkQty(detailVO.getReworkQty());
+
+				detailResponseDTO.setRejectionQty(detailVO.getRejectionQty());
+
+				detailResponseDTO.setScrapQty(detailVO.getScrapQty());
+
+				detailsResponseList.add(detailResponseDTO);
 			}
 		}
 
@@ -2987,6 +3102,10 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * Normal Fields
 		 */
+
+		response.setDocId(vo.getDocId());
+
+		response.setDocDate(vo.getDocDate());
 		response.setDescription(vo.getDescription());
 
 		response.setDrawingNo(vo.getDrawingNo());
@@ -3302,10 +3421,10 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long listOfValuesId, Long fromDept)
+	public List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport( Long fromDept)
 			throws ApplicationException {
 
-		List<Object[]> departmentList = flashNCReportRepo.getToDepartmentDropdownForFlashNCReport(listOfValuesId,
+		List<Object[]> departmentList = flashNCReportRepo.getToDepartmentDropdownForFlashNCReport(
 				fromDept);
 
 		if (departmentList == null || departmentList.isEmpty()) {
@@ -6923,18 +7042,13 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 				detailsVO.setItem(itemVO);
 			}
 
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 			if (detailsDTO.getFromTime() != null && !detailsDTO.getFromTime().isEmpty()) {
-			    detailsVO.setFromTime(
-			        LocalTime.parse(detailsDTO.getFromTime(), formatter)
-			    );
+				detailsVO.setFromTime(LocalTime.parse(detailsDTO.getFromTime(), formatter));
 			}
 
 			if (detailsDTO.getToTime() != null && !detailsDTO.getToTime().isEmpty()) {
-			    detailsVO.setToTime(
-			        LocalTime.parse(detailsDTO.getToTime(), formatter)
-			    );
+				detailsVO.setToTime(LocalTime.parse(detailsDTO.getToTime(), formatter));
 			}
 			detailsVO.setCheckingPoints(detailsDTO.getCheckingPoints());
 
@@ -6948,30 +7062,51 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			detailsVO.setNextActivity(detailsDTO.getNextActivity());
 
+			DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+			if (detailsDTO.getFromTime() != null && !detailsDTO.getFromTime().isEmpty()) {
+
+				detailsVO.setFromTime(LocalTime.parse(detailsDTO.getFromTime(), formatter1));
+			}
+
+			if (detailsDTO.getToTime() != null && !detailsDTO.getToTime().isEmpty()) {
+
+				detailsVO.setToTime(LocalTime.parse(detailsDTO.getToTime(), formatter1));
+			}
+
+			detailsVO.setCheckingPoints(detailsDTO.getCheckingPoints());
+			detailsVO.setParameter(detailsDTO.getParameter());
+			detailsVO.setActivitiesCarriedOut(detailsDTO.getActivitiesCarriedOut());
+			detailsVO.setStatus(detailsDTO.getStatus());
+			detailsVO.setDate(detailsDTO.getDate());
+			detailsVO.setNextActivity(detailsDTO.getNextActivity());
+
 			/*
 			 * Calculate No Of Hours To Time - From Time
 			 */
+
 			if (detailsDTO.getFromTime() != null && detailsDTO.getToTime() != null) {
 
-			    DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("HH:mm");
+				DateTimeFormatter formatter11 = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-			    LocalTime fromTime = LocalTime.parse(detailsDTO.getFromTime(), formatter1);
-			    LocalTime toTime = LocalTime.parse(detailsDTO.getToTime(), formatter1);
+				LocalTime fromTime = LocalTime.parse(detailsDTO.getFromTime(), formatter11);
 
-			    long minutes = Duration.between(fromTime, toTime).toMinutes();
+				LocalTime toTime = LocalTime.parse(detailsDTO.getToTime(), formatter11);
 
-			    /*
-			     * Handles activity crossing midnight
-			     */
-			    if (minutes < 0) {
-			        minutes = minutes + (24 * 60);
-			    }
+				long minutes = Duration.between(fromTime, toTime).toMinutes();
 
-			    BigDecimal noOfHours = BigDecimal.valueOf(minutes)
-			            .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+				/*
+				 * Handles activity crossing midnight
+				 */
+				if (minutes < 0) {
+					minutes = minutes + (24 * 60);
+				}
 
-			    detailsVO.setNoOfHrs(noOfHours);
-			
+				BigDecimal noOfHours = BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2,
+						RoundingMode.HALF_UP);
+
+				detailsVO.setNoOfHrs(noOfHours);
+
 			} else {
 
 				detailsVO.setNoOfHrs(BigDecimal.ZERO);
@@ -7189,13 +7324,10 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 					detailsResponse.setItem(itemResponse);
 				}
-				detailsResponse.setFromTime(
-				        detailsVO.getFromTime() != null ? detailsVO.getFromTime().toString() : null
-				);
+				detailsResponse
+						.setFromTime(detailsVO.getFromTime() != null ? detailsVO.getFromTime().toString() : null);
 
-				detailsResponse.setToTime(
-				        detailsVO.getToTime() != null ? detailsVO.getToTime().toString() : null
-				);
+				detailsResponse.setToTime(detailsVO.getToTime() != null ? detailsVO.getToTime().toString() : null);
 
 				detailsResponse.setCheckingPoints(detailsVO.getCheckingPoints());
 
@@ -8298,6 +8430,105 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 
 		responseObjectsMap.put("salesOrderReport", responseList);
+
+		return responseObjectsMap;
+	}
+
+//	dropdown for activities carried out 
+	@Override
+	public Map<String, Object> getPMCheckListDropdownForActivitiesCarriedOut(String MACNO, Long orgId, Long branch)
+			throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> pmCheckListList = activitiesCarriedOutRepo.getPMCheckListDropdownForActivitiesCarriedOut(MACNO,
+				orgId, branch);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : pmCheckListList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("id", obj[0]);
+			data.put("name", obj[1]);
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("pmCheckListDropdown", responseList);
+
+		return responseObjectsMap;
+	}
+
+	@Override
+	public Map<String, Object> getScheduleWiseDespatchQtyReport(String mon, Long under, String party)
+			throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> reportList = salesDeliveryScheduleRepo.getSalesDeliveryPendingReport(mon, under, party);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : reportList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("dlvNo", obj[0]);
+			data.put("dlvDate", obj[1]);
+			data.put("monthOfSchedule", obj[2]);
+			data.put("customerId", obj[3]);
+			data.put("customerName", obj[4]);
+			data.put("itemId", obj[5]);
+			data.put("itemDescription", obj[6]);
+			data.put("plQty", obj[7]);
+			data.put("sqty", obj[8]);
+			data.put("pqty", obj[9]);
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("salesDeliveryPendingReport", responseList);
+
+		return responseObjectsMap;
+	}
+//	sales order pending itemwise
+
+	@Override
+	public Map<String, Object> getSalesOrderPendingItemWiseReport(Long plant, Long division, String asondt)
+			throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> resultList = orderAcceptanceRepo.getSalesOrderPendingItemWiseReport(plant, division, asondt);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("branchId", obj[0]);
+			data.put("orderAcceptanceBasicId", obj[1]);
+			data.put("docId", obj[2]);
+			data.put("docDate", obj[3]);
+			data.put("customerPurchaseOrderNo", obj[4]);
+			data.put("customerPurchaseOrderDate", obj[5]);
+			data.put("customerId", obj[6]);
+			data.put("customerName", obj[7]);
+			data.put("itemId", obj[8]);
+			data.put("itemDescription", obj[9]);
+			data.put("quantity", obj[10]);
+			data.put("sqty", obj[11]);
+			data.put("pqty", obj[12]);
+			data.put("amount", obj[13]);
+			data.put("specification", obj[14]);
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("salesOrderPendingItemWiseReport", responseList);
 
 		return responseObjectsMap;
 	}

@@ -1,3 +1,4 @@
+
 package com.efitops.basesetup.repository;
 
 import java.util.List;
@@ -45,5 +46,48 @@ public interface TransferOrderRepo extends JpaRepository<TransferOrderVO, Long> 
 	            """, nativeQuery = true)
 	    List<Object[]> getTransferOrderItemDropdown(
 	            @Param("orgId") Long orgId);
+	    
+	    @Query(value = """
+	            SELECT
+	                mtb.machine_tool_breakdown_basic_id AS id,
+	                mtb.doc_id AS name
+	            FROM machine_tool_breakdown_basic mtb
+	            WHERE mtb.org_id = :orgId
+	              AND mtb.branch = :branch
+	              AND mtb.active = TRUE
+	              AND mtb.cancel = FALSE
+	            ORDER BY mtb.machine_tool_breakdown_basic_id DESC
+	            """, nativeQuery = true)
+	    List<Object[]> getBreakdownNoDropdownForGateOutwardEntry(
+	            @Param("orgId") Long orgId,
+	            @Param("branch") Long branch);
+	    
+	    
+	    @Query(value = """
+	            SELECT 'SS' AS id, 'SS' AS name
+	            FROM dual
+	            WHERE :orderType = 'Sub Contracted'
+	              AND :orgId IS NOT NULL
+
+	            UNION ALL
+
+	            SELECT 'Production' AS id, 'Production' AS name
+	            FROM dual
+	            WHERE :orderType = 'Manufactured'
+	              AND :orgId IS NOT NULL
+
+	            UNION ALL
+
+	            SELECT 'PO' AS id, 'PO' AS name
+	            FROM dual
+	            WHERE :orderType = 'Bought Out'
+	              AND :orgId IS NOT NULL
+	            """, nativeQuery = true)
+	    List<Object[]> getTypeDropdownByOrderTypeForTransferOrder(
+	            @Param("orderType") String orderType,
+	            @Param("orgId") Long orgId);
+	    
+	    
+	    
 
 }

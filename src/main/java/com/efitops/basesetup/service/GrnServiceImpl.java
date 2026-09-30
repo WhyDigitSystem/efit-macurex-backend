@@ -3,6 +3,7 @@ package com.efitops.basesetup.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +71,7 @@ import com.efitops.basesetup.entity.LocationVO;
 import com.efitops.basesetup.entity.StockTransferGrnDetailsVO;
 import com.efitops.basesetup.entity.StockTransferGrnFileUploadDetailsVO;
 import com.efitops.basesetup.entity.StockTransferGrnVO;
+import com.efitops.basesetup.entity.StockValuationVO;
 import com.efitops.basesetup.entity.TransportMasterVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
@@ -86,6 +89,7 @@ import com.efitops.basesetup.repository.LocationRepo;
 import com.efitops.basesetup.repository.StockTransferGrnDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferGrnFileUploadDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferGrnRepo;
+import com.efitops.basesetup.repository.StockValuationRepo;
 import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
@@ -145,6 +149,9 @@ public class GrnServiceImpl implements GrnService {
 	@Autowired
 	ImportGrnDetailsRepo importGrnDetailsRepo;
 
+	@Autowired
+	private StockValuationRepo stockValuationRepo;
+	
 	@Override
 	public GrnResponseDTO getGrnById(Long id) throws ApplicationException {
 		GrnVO grnVO = grnRepo.getGrnById(id);
@@ -174,7 +181,7 @@ public class GrnServiceImpl implements GrnService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackOn  = Exception.class)
 	public Map<String, Object> createUpdateGrn(GrnDTO grnDTO, MultipartFile[] files) throws ApplicationException {
 		GrnVO grnVO;
 		String message;
@@ -232,7 +239,10 @@ public class GrnServiceImpl implements GrnService {
 		setGrnValues(grnDTO, grnVO);
 
 		grnVO = grnRepo.save(grnVO);
-
+		
+		if (ObjectUtils.isEmpty(grnDTO.getId())) {
+		    createStockForGrn(grnVO);
+		}
 		saveAttachments(files, grnVO);
 
 		GrnResponseDTO grnResponse = buildGrnResponse(grnVO);
@@ -633,8 +643,16 @@ public class GrnServiceImpl implements GrnService {
 				detailVO.setTotalValueINR(detailVO.getFobValueINR().add(detailVO.getFreightInd()));
 				detailVO.setLandingValue(totalValue);
 				totalLandValueINR = totalLandValueINR.add(detailVO.getLandingValue());
-				detailVO.setLandingCostINR(detailVO.getLandingValue().divide(detailDTO.getReceivedQty()));
-				totalLandCostINR = totalLandCostINR.add(detailVO.getLandingCostINR());
+				if (detailDTO.getReceivedQty() != null
+				        && detailDTO.getReceivedQty().compareTo(BigDecimal.ZERO) > 0) {
+
+				    detailVO.setLandingCostINR(
+				            detailVO.getLandingValue()
+				                    .divide(detailDTO.getReceivedQty(), 6, RoundingMode.HALF_UP)
+				    );
+
+				    totalLandCostINR = totalLandCostINR.add(detailVO.getLandingCostINR());
+				}
 				detailVO.setGrnVO(vo);
 
 				itemDetailsLists.add(detailVO);
@@ -1062,6 +1080,156 @@ public class GrnServiceImpl implements GrnService {
 
 		return responseDTO;
 	}
+	
+	
+	private void createStockForGrn(GrnVO grnVO) throws ApplicationException {
+
+
+	    if (grnVO.getGrnDetailsVO() != null
+	            && !grnVO.getGrnDetailsVO().isEmpty()) {
+	    	
+	    
+	    for (GrnDetailsVO detailVO : grnVO.getGrnDetailsVO()) {
+
+	        // Stock should be created only when inspectionable is NO
+	    	if (detailVO.getInspectionable() != null
+	    	        && "NO".equalsIgnoreCase(detailVO.getInspectionable())
+	    	        && detailVO.getReceivedQty() != null
+	    	        && detailVO.getReceivedQty().compareTo(BigDecimal.ZERO) != 0) {
+
+	            StockValuationVO stockVO = new StockValuationVO();
+
+	            stockVO.setPlusOrMinus("p");
+
+	            // Item
+	            if (detailVO.getItem() != null) {
+	                stockVO.setStockPartNo(detailVO.getItem());
+	            }
+	            
+	            if (grnVO.getLocation() != null) {
+	                stockVO.setLocDetailsId(grnVO.getLocation());
+	            }
+
+	            // GRN document
+	            stockVO.setDocId(grnVO.getDocId());
+
+	            // GRN date
+	            stockVO.setDocDate(grnVO.getDocDate());
+
+	            // GRN time
+	            stockVO.setDocTime(LocalTime.now());
+
+	            // Accepted quantity
+	            BigDecimal quantity = detailVO.getReceivedQty() != null
+	                    ? detailVO.getReceivedQty()
+	                    : BigDecimal.ZERO;
+
+	            stockVO.setQuantity(quantity);
+
+	            // Rate
+	            BigDecimal rate = detailVO.getPoRate() != null
+	                    ? detailVO.getPoRate()
+	                    : BigDecimal.ZERO;
+
+	            stockVO.setRate(rate);
+
+	            // Rate
+	            BigDecimal amount = detailVO.getAmount() != null
+	                    ? detailVO.getAmount()
+	                    : BigDecimal.ZERO;
+
+	            stockVO.setStockValue(amount);
+
+	            // Branch
+	            if (grnVO.getBranch() != null) {
+	            stockVO.setBranchVO(grnVO.getBranch());
+	            }
+	            
+	      
+	            // Organization
+	            stockVO.setOrgId(grnVO.getOrgId());
+	            
+	            stockVO.setNarration(grnVO.getRemarks());
+
+	            // Audit fields
+	            stockVO.setCreatedBy(grnVO.getCreatedBy());
+	            stockVO.setUpdatedBy(grnVO.getUpdatedBy());
+
+	            stockVO.setActive(true);
+	            stockVO.setCancel(false);
+
+	            stockVO.setSourceScreenName(grnVO.getScreenName());
+	            stockVO.setSourceScreenCode(grnVO.getScreenCode());
+
+	            stockValuationRepo.save(stockVO);
+	        }
+	    }
+	    }
+	    
+	    // =========================
+	    // IMPORT GRN
+	    // =========================
+	    
+	    if (grnVO.getImportGrnDetailsVO() != null
+	            && !grnVO.getImportGrnDetailsVO().isEmpty()) {
+
+	        for (ImportGrnDetailsVO detailVO : grnVO.getImportGrnDetailsVO()) {
+
+	            if (detailVO.getInspectionable() != null
+	                    && "NO".equalsIgnoreCase(detailVO.getInspectionable())
+	                    && detailVO.getReceivedQty() != null
+	                    && detailVO.getReceivedQty().compareTo(BigDecimal.ZERO) > 0) {
+
+	                StockValuationVO stockVO = new StockValuationVO();
+
+	                stockVO.setPlusOrMinus("p");
+
+	                if (detailVO.getItem() != null) {
+	                    stockVO.setStockPartNo(detailVO.getItem());
+	                }
+
+	                if (grnVO.getLocation() != null) {
+	                    stockVO.setLocDetailsId(grnVO.getLocation());
+	                }
+
+	                stockVO.setDocId(grnVO.getDocId());
+	                stockVO.setDocDate(grnVO.getDocDate());
+	                stockVO.setDocTime(LocalTime.now());
+
+	                stockVO.setQuantity(detailVO.getReceivedQty());
+
+	                stockVO.setRate(detailVO.getLandingCostINR() != null
+	                        ? detailVO.getLandingCostINR()
+	                        : BigDecimal.ZERO);
+
+	                stockVO.setStockValue(detailVO.getLandingValue() != null
+	                        ? detailVO.getLandingValue()
+	                        : BigDecimal.ZERO);
+
+	                if (grnVO.getBranch() != null) {
+	                    stockVO.setBranchVO(grnVO.getBranch());
+	                }
+
+	                stockVO.setOrgId(grnVO.getOrgId());
+	                stockVO.setNarration(grnVO.getRemarks());
+
+	                stockVO.setCreatedBy(grnVO.getCreatedBy());
+	                stockVO.setUpdatedBy(grnVO.getUpdatedBy());
+
+	                stockVO.setActive(true);
+	                stockVO.setCancel(false);
+
+	                stockVO.setSourceScreenName(grnVO.getScreenName());
+	                stockVO.setSourceScreenCode(grnVO.getScreenCode());
+
+	                stockValuationRepo.save(stockVO);
+	            }
+	        }
+	    }
+
+	}
+	
+	
 
 	@Value("${grn.upload.path}")
 	private String uploadPath;

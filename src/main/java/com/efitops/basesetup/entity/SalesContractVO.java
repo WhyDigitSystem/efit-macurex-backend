@@ -97,7 +97,10 @@ public class SalesContractVO {
 
     @Column(name = "is_igst_applicable")
     private String isIgstApplicable;
-
+    
+    @Column(name = "approval")
+    private String approval;
+    
 
     @Column(name = "org_id")
     private Long orgId;

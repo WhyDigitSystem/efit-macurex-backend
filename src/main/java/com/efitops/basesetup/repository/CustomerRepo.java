@@ -281,9 +281,9 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 			  AND c.active = 1
 			  AND c.cancel = 0
 			  AND (
-			        UPPER(a.value_description) = 'CUSTOMER'
-			        OR UPPER(b.value_description) = 'CUSTOMER'
-			        OR UPPER(cc.value_description) = 'CUSTOMER'
+			        UPPER(a.value_description) = 'CUSTOMERS'
+			        OR UPPER(b.value_description) = 'CUSTOMERS'
+			        OR UPPER(cc.value_description) = 'CUSTOMERS'
 			      )
 
 			ORDER BY c.customer_name

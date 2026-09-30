@@ -36,869 +36,715 @@ import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.StockTransferChallanDTO;
+import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.service.TransportMasterService;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/api/dev")
-public class DevController extends BaseController{
+public class DevController extends BaseController {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(DevController.class);
 	@Autowired
 	TransportMasterService transportMasterService;
-	
-	//customer complaint master
-	@PutMapping(
-	        value = "/updateCreateCustomerComplaint",
-	        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
+	// customer complaint master
+	@PutMapping(value = "/updateCreateCustomerComplaint", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreateCustomerComplaint(
 //	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
-	        @RequestBody CustomerComplaintDTO customerComplaintDTO,
-	        @RequestPart(value = "images", required = false) MultipartFile[] images) {
+			@RequestBody CustomerComplaintDTO customerComplaintDTO,
+			@RequestPart(value = "images", required = false) MultipartFile[] images) {
 
-	    String methodName = "updateCreateCustomerComplaint";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "updateCreateCustomerComplaint";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> responseMap =
-	                transportMasterService.updateCreateCustomerComplaint(customerComplaintDTO, images);
+			Map<String, Object> responseMap = transportMasterService.updateCreateCustomerComplaint(customerComplaintDTO,
+					images);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                responseMap.get("message"));
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
 
-	        responseObjectsMap.put(
-	                "customerComplaintEntryVO",
-	                responseMap.get("customerComplaintEntryVO"));
+			responseObjectsMap.put("customerComplaintEntryVO", responseMap.get("customerComplaintEntryVO"));
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                e.getMessage(),
-	                e);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
-	 @GetMapping("/getCustomerComplaintById")
-	 public ResponseEntity<ResponseDTO> getCustomerComplaintById(@RequestParam Long id) {
 
-	     String methodName = "getCustomerComplaintById()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+	@GetMapping("/getCustomerComplaintById")
+	public ResponseEntity<ResponseDTO> getCustomerComplaintById(@RequestParam Long id) {
 
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
+		String methodName = "getCustomerComplaintById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	     try {
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
 
-	    	 CustomerComplaintResponseDTO customerComplaintEntryVO = transportMasterService.getCustomerComplaintById(id);
+		try {
 
-	         responseObjectsMap.put("customerComplaintEntryVO", customerComplaintEntryVO);
+			CustomerComplaintResponseDTO customerComplaintEntryVO = transportMasterService.getCustomerComplaintById(id);
 
-	         responseDTO = createServiceResponse(responseObjectsMap);
+			responseObjectsMap.put("customerComplaintEntryVO", customerComplaintEntryVO);
 
-	     } catch (Exception e) {
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		} catch (Exception e) {
 
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
 
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 @GetMapping("/getCustomerComplaintByOrgId")
-	 public ResponseEntity<ResponseDTO> getCustomerComplaintByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	     String methodName = "getCustomerComplaintByOrgId()";
-	     LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
 
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     String errorMsg = null;
-	     ResponseDTO responseDTO = null;
+	@GetMapping("/getCustomerComplaintByOrgId")
+	public ResponseEntity<ResponseDTO> getCustomerComplaintByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	     try {
+		String methodName = "getCustomerComplaintByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	         List<CustomerComplaintResponseDTO> customerComplaintEntryVO = transportMasterService.getCustomerComplaintByOrgId(orgId,branch);
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
 
-	         responseObjectsMap.put("customerComplaintEntryVO", customerComplaintEntryVO);
+		try {
 
-	         responseDTO = createServiceResponse(responseObjectsMap);
+			List<CustomerComplaintResponseDTO> customerComplaintEntryVO = transportMasterService
+					.getCustomerComplaintByOrgId(orgId, branch);
 
-	     } catch (Exception e) {
+			responseObjectsMap.put("customerComplaintEntryVO", customerComplaintEntryVO);
 
-	         errorMsg = e.getMessage();
-	         LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	         responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-	     }
+		} catch (Exception e) {
 
-	     LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-	     return ResponseEntity.ok().body(responseDTO);
-	 }
-	 
-	 //dropdown for preparedby
-	 
-	 @GetMapping("/getPreparedBy")
-	 public ResponseEntity<ResponseDTO> getPreparedBy(@RequestParam Long orgId,
-	                                                  @RequestParam Long branch,
-	                                                  @RequestParam Long departmentId) {
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
 
-	     String methodName = "getPreparedBy()";
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     ResponseDTO responseDTO;
+		return ResponseEntity.ok().body(responseDTO);
+	}
 
-	     try {
+	// dropdown for preparedby
 
-	         Map<String, Object> preparedBy =
-	                 transportMasterService.getPreparedBy(orgId, branch, departmentId);
+	@GetMapping("/getPreparedBy")
+	public ResponseEntity<ResponseDTO> getPreparedBy(@RequestParam Long orgId, @RequestParam Long branch,
+			@RequestParam Long departmentId) {
 
-	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                 "Prepared By Fetched Successfully");
+		String methodName = "getPreparedBy()";
 
-	         responseObjectsMap.putAll(preparedBy);
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	         responseDTO = createServiceResponse(responseObjectsMap);
+		try {
 
-	     } catch (Exception e) {
+			Map<String, Object> preparedBy = transportMasterService.getPreparedBy(orgId, branch, departmentId);
 
-	         responseDTO = createServiceResponseError(
-	                 responseObjectsMap,
-	                 e.getMessage(),
-	                 e.getMessage());
-	     }
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Prepared By Fetched Successfully");
 
-	     return ResponseEntity.ok(responseDTO);
-	 }
-	 
+			responseObjectsMap.putAll(preparedBy);
 
-	 @GetMapping("/getCustomerComplaintItemDetails")
-	 public ResponseEntity<ResponseDTO> getCustomerComplaintItemDetails(@RequestParam Long orgId,@RequestParam Long branch) {
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	     String methodName = "getCustomerComplaintItemDetails()";
+		} catch (Exception e) {
 
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     ResponseDTO responseDTO;
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-	     try {
+		return ResponseEntity.ok(responseDTO);
+	}
 
-	         Map<String, Object> itemDetails =
-	                 transportMasterService.getCustomerComplaintItemDetails(orgId, branch);
+	@GetMapping("/getCustomerComplaintItemDetails")
+	public ResponseEntity<ResponseDTO> getCustomerComplaintItemDetails(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                 "Item Details Fetched Successfully");
+		String methodName = "getCustomerComplaintItemDetails()";
 
-	         responseObjectsMap.put("itemDetails", itemDetails);
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	         responseDTO = createServiceResponse(responseObjectsMap);
+		try {
 
-	     } catch (Exception e) {
+			Map<String, Object> itemDetails = transportMasterService.getCustomerComplaintItemDetails(orgId, branch);
 
-	         responseDTO = createServiceResponseError(
-	                 responseObjectsMap,
-	                 e.getMessage(),
-	                 e.getMessage());
-	     }
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item Details Fetched Successfully");
 
-	     return ResponseEntity.ok(responseDTO);
-	 }
-	
+			responseObjectsMap.put("itemDetails", itemDetails);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
 	// branch dropdown
-	 @GetMapping("/getAllBranch")
-	 public ResponseEntity<ResponseDTO> getAllBranch(@RequestParam Long orgId) {
+	@GetMapping("/getAllBranch")
+	public ResponseEntity<ResponseDTO> getAllBranch(@RequestParam Long orgId) {
 
-	     String methodName = "getAllBranch()";
+		String methodName = "getAllBranch()";
 
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	     try {
+		try {
 
-	         Map<String, Object> branch =
-	                 transportMasterService.getAllBranch(orgId);
+			Map<String, Object> branch = transportMasterService.getAllBranch(orgId);
 
-	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                 "Branch Fetched Successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Branch Fetched Successfully");
 
-	         responseObjectsMap.putAll(branch);
+			responseObjectsMap.putAll(branch);
 
-	         responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	     } catch (Exception e) {
+		} catch (Exception e) {
 
-	         responseDTO = createServiceResponseError(
-	                 responseObjectsMap,
-	                 e.getMessage(),
-	                 e.getMessage());
-	     }
-
-	     return ResponseEntity.ok(responseDTO);
-	 }
-	
-	 
-	 @GetMapping("/getCustomerDetails")
-	 public ResponseEntity<ResponseDTO> getCustomerDetails(@RequestParam Long orgId,
-	                                                       @RequestParam Long branch) {
-
-	     String methodName = "getCustomerDetails()";
-
-	     Map<String, Object> responseObjectsMap = new HashMap<>();
-	     ResponseDTO responseDTO;
-
-	     try {
-
-	         Map<String, Object> customerDetails =
-	                 transportMasterService.getCustomerDetails(orgId, branch);
-
-	         responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                 "Customer Details Fetched Successfully");
-
-	         responseObjectsMap.putAll(customerDetails);
-
-	         responseDTO = createServiceResponse(responseObjectsMap);
-
-	     } catch (Exception e) {
-
-	         responseDTO = createServiceResponseError(
-	                 responseObjectsMap,
-	                 e.getMessage(),
-	                 e.getMessage());
-	     }
-
-	     return ResponseEntity.ok(responseDTO);
-	 }
-		
-		//Despatch Instruction
-		
-		@PostMapping("/updateCreateDespatchIntruction")
-		public ResponseEntity<ResponseDTO> updateCreateDespatchIntruction(
-				@RequestBody DespatchInstructionDTO despatchInstructionDTO) {
-
-			String methodName = "updateCreateDespatchIntruction()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			String errorMsg = null;
-			ResponseDTO responseDTO = null;
-
-			try {
-
-				Map<String, Object> responseMap = transportMasterService.updateCreateDespatchInstruction(despatchInstructionDTO);
-
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
-				responseObjectsMap.put("despatchInstructionVO",
-						responseMap.get("despatchInstructionVO"));
-
-				responseDTO = createServiceResponse(responseObjectsMap);
-
-			} catch (Exception e) {
-
-				errorMsg = e.getMessage();
-
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-
-				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-			}
-
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-			return ResponseEntity.ok().body(responseDTO);
-		}
-		
-		@GetMapping("/getDespatchIntructionById")
-		public ResponseEntity<ResponseDTO> getDespatchIntructionById(@RequestParam Long id) {
-
-			String methodName = "getDespatchIntructionById()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-
-			DespatchInstructionResponseDTO despatchInstructionResponseDTO = null;
-
-			try {
-
-				despatchInstructionResponseDTO = transportMasterService.getDespatchInstructionById(id);
-			} catch (Exception e) {
-
-				errorMsg = e.getMessage();
-
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-			}
-
-			if (StringUtils.isBlank(errorMsg))  {
-
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-						"despatch instructions  retrieved successfully");
-
-				responseObjectsMap.put("despatchInstructionResponseDTO",
-						despatchInstructionResponseDTO);
-
-				responseDTO = createServiceResponse(responseObjectsMap);
-
-			} else {
-
-				responseDTO = createServiceResponseError(responseObjectsMap,
-						"Despatch Instructions retrieval failed",
-						errorMsg);
-			}
-
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-			return ResponseEntity.ok().body(responseDTO);
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
 		}
 
-		@GetMapping("/getDespatchIntructionByOrgId")
-		public ResponseEntity<ResponseDTO> getDespatchIntructionByOrgId(@RequestParam Long orgId,@RequestParam Long branch) {
+		return ResponseEntity.ok(responseDTO);
+	}
 
-			String methodName = "getDespatchIntructionByOrgId()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+	@GetMapping("/getCustomerDetails")
+	public ResponseEntity<ResponseDTO> getCustomerDetails(@RequestParam Long orgId, @RequestParam Long branch) {
 
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
+		String methodName = "getCustomerDetails()";
 
-			List<DespatchInstructionResponseDTO> despatchInstructionResponseDTO = new ArrayList<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-			try {
+		try {
 
-				despatchInstructionResponseDTO = transportMasterService.getDespatchInstructionByOrgId(orgId, branch);
+			Map<String, Object> customerDetails = transportMasterService.getCustomerDetails(orgId, branch);
 
-			} catch (Exception e) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Customer Details Fetched Successfully");
 
-				errorMsg = e.getMessage();
+			responseObjectsMap.putAll(customerDetails);
 
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-			}
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-			if (StringUtils.isBlank(errorMsg)) {
+		} catch (Exception e) {
 
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-						" Despatch instructions retrieved successfully");
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
 
-				responseObjectsMap.put("despatchInstructionResponseDTO",
-						despatchInstructionResponseDTO);
+		return ResponseEntity.ok(responseDTO);
+	}
 
-				responseDTO = createServiceResponse(responseObjectsMap);
+	// Despatch Instruction
 
-			} else {
+	@PostMapping("/updateCreateDespatchIntruction")
+	public ResponseEntity<ResponseDTO> updateCreateDespatchIntruction(
+			@RequestBody DespatchInstructionDTO despatchInstructionDTO) {
 
-				responseDTO = createServiceResponseError(responseObjectsMap,
-						" Despatch instructions retrieval failed",
-						errorMsg);
-			}
+		String methodName = "updateCreateDespatchIntruction()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
 
-			return ResponseEntity.ok().body(responseDTO);
+		try {
+
+			Map<String, Object> responseMap = transportMasterService
+					.updateCreateDespatchInstruction(despatchInstructionDTO);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+			responseObjectsMap.put("despatchInstructionVO", responseMap.get("despatchInstructionVO"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getDespatchIntructionById")
+	public ResponseEntity<ResponseDTO> getDespatchIntructionById(@RequestParam Long id) {
+
+		String methodName = "getDespatchIntructionById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		DespatchInstructionResponseDTO despatchInstructionResponseDTO = null;
+
+		try {
+
+			despatchInstructionResponseDTO = transportMasterService.getDespatchInstructionById(id);
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "despatch instructions  retrieved successfully");
+
+			responseObjectsMap.put("despatchInstructionResponseDTO", despatchInstructionResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Despatch Instructions retrieval failed",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getDespatchIntructionByOrgId")
+	public ResponseEntity<ResponseDTO> getDespatchIntructionByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
+
+		String methodName = "getDespatchIntructionByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		List<DespatchInstructionResponseDTO> despatchInstructionResponseDTO = new ArrayList<>();
+
+		try {
+
+			despatchInstructionResponseDTO = transportMasterService.getDespatchInstructionByOrgId(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, " Despatch instructions retrieved successfully");
+
+			responseObjectsMap.put("despatchInstructionResponseDTO", despatchInstructionResponseDTO);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, " Despatch instructions retrieval failed",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
 
 	}
-		
-	
-		//Stock Tranfer Challan
-		@PostMapping("/updateCreateStockTransferChallan")
-		public ResponseEntity<ResponseDTO> updateCreateStockTransferChallan(
-		        @RequestBody StockTransferChallanDTO stockTransferChallanDTO) {
 
-			String methodName = "updateCreateStockTransferChallan()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+	// Stock Tranfer Challan
+	@PostMapping("/updateCreateStockTransferChallan")
+	public ResponseEntity<ResponseDTO> updateCreateStockTransferChallan(
+			@RequestBody StockTransferChallanDTO stockTransferChallanDTO) {
 
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			String errorMsg = null;
-			ResponseDTO responseDTO = null;
+		String methodName = "updateCreateStockTransferChallan()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-			try {
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		String errorMsg = null;
+		ResponseDTO responseDTO = null;
 
-				Map<String, Object> responseMap = transportMasterService
-						.updateCreateStockTransferChallan(stockTransferChallanDTO);
+		try {
 
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
-				responseObjectsMap.put("stockTransferChallanVO",
-						responseMap.get("stockTransferChallanVO"));
+			Map<String, Object> responseMap = transportMasterService
+					.updateCreateStockTransferChallan(stockTransferChallanDTO);
 
-				responseDTO = createServiceResponse(responseObjectsMap);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+			responseObjectsMap.put("stockTransferChallanVO", responseMap.get("stockTransferChallanVO"));
 
-			} catch (Exception e) {
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-				errorMsg = e.getMessage();
+		} catch (Exception e) {
 
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+			errorMsg = e.getMessage();
 
-				responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-			}
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-			return ResponseEntity.ok().body(responseDTO);
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
 		}
-		
-		
-		@GetMapping("/getStockTransferChallanById")
-		public ResponseEntity<ResponseDTO> getStockTransferChallanById(
-		        @RequestParam Long id) {
 
-		    String methodName = "getStockTransferChallanById()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		    String errorMsg = null;
+		return ResponseEntity.ok().body(responseDTO);
+	}
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
+	@GetMapping("/getStockTransferChallanById")
+	public ResponseEntity<ResponseDTO> getStockTransferChallanById(@RequestParam Long id) {
 
-		    ResponseDTO responseDTO = null;
+		String methodName = "getStockTransferChallanById()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		    StockTransferChallanResponseDTO stockTransferChallanResponseDTO = null;
+		String errorMsg = null;
 
-		    try {
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-		    	stockTransferChallanResponseDTO =
-		                transportMasterService.getStockTransferChallanById(id);
+		ResponseDTO responseDTO = null;
 
-		    } catch (Exception e) {
+		StockTransferChallanResponseDTO stockTransferChallanResponseDTO = null;
 
-		        errorMsg = e.getMessage();
+		try {
 
-		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                errorMsg);
-		    }
+			stockTransferChallanResponseDTO = transportMasterService.getStockTransferChallanById(id);
 
-		    if (StringUtils.isBlank(errorMsg)) {
+		} catch (Exception e) {
 
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                " Stock Transfer retrieved successfully");
+			errorMsg = e.getMessage();
 
-		        responseObjectsMap.put(
-		                "stockTransferChallanResponseDTO",
-		                stockTransferChallanResponseDTO);
-
-		        responseDTO =
-		                createServiceResponse(responseObjectsMap);
-
-		    } else {
-
-		        responseDTO =
-		                createServiceResponseError(
-		                        responseObjectsMap,
-		                        " stock Transfer Challan retrieval failed",
-		                        errorMsg);
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok().body(responseDTO);
-
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
-		
-		@GetMapping("/getStockTransferChallanByOrgId")
-		public ResponseEntity<ResponseDTO> getStockTransferChallanByOrgId(
-		        @RequestParam Long orgId,
-		        @RequestParam Long branch) {
 
-		    String methodName = "getStockTransferChallanByOrgId()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		if (StringUtils.isBlank(errorMsg)) {
 
-		    String errorMsg = null;
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, " Stock Transfer retrieved successfully");
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
+			responseObjectsMap.put("stockTransferChallanResponseDTO", stockTransferChallanResponseDTO);
 
-		    ResponseDTO responseDTO = null;
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-		    List<StockTransferChallanResponseDTO> stockTransferChallanResponseDTO =
-		            new ArrayList<>();
+		} else {
 
-		    try {
-
-		    	stockTransferChallanResponseDTO =
-		                transportMasterService.getStockTransferChallanByOrgId(
-		                        orgId,
-		                        branch);
-
-		    } catch (Exception e) {
-
-		        errorMsg = e.getMessage();
-
-		        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                errorMsg);
-		    }
-
-		    if (StringUtils.isBlank(errorMsg)) {
-
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                " Stock Transfer Challan retrieved successfully");
-
-		        responseObjectsMap.put(
-		                "stockTransferChallanResponseDTO",
-		                stockTransferChallanResponseDTO);
-
-		        responseDTO =
-		                createServiceResponse(responseObjectsMap);
-
-		    } else {
-
-		        responseDTO =
-		                createServiceResponseError(
-		                        responseObjectsMap,
-		                        "Stock transfer challan retrieval failed",
-		                        errorMsg);
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok().body(responseDTO);
-
+			responseDTO = createServiceResponseError(responseObjectsMap, " stock Transfer Challan retrieval failed",
+					errorMsg);
 		}
-		//dropdown getstocktransfercustomer
-		@GetMapping("/getCustomerForStockTransferChallan")
-		public ResponseEntity<ResponseDTO> getCustomerForStockTransferChallan(@RequestParam Long branch,@RequestParam Long orgId) {
 
-		    String methodName = "getCustomerForStockTransferChallan()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO;
+		return ResponseEntity.ok().body(responseDTO);
 
-		    try {
+	}
 
-		        Map<String, Object> responseMap =
-		                transportMasterService.getCustomerForStockTransferChallan(branch,orgId);
+	@GetMapping("/getStockTransferChallanByOrgId")
+	public ResponseEntity<ResponseDTO> getStockTransferChallanByOrgId(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                responseMap.get("message"));
+		String methodName = "getStockTransferChallanByOrgId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		        responseObjectsMap.put(
-		                "customerList",
-		                responseMap.get("customerList"));
+		String errorMsg = null;
 
-		        responseDTO = createServiceResponse(responseObjectsMap);
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-		    } catch (Exception e) {
+		ResponseDTO responseDTO = null;
 
-		        LOGGER.error(
-		                UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                e.getMessage(),
-		                e);
+		List<StockTransferChallanResponseDTO> stockTransferChallanResponseDTO = new ArrayList<>();
 
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap,
-		                e.getMessage(),
-		                e.getMessage());
-		    }
+		try {
 
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			stockTransferChallanResponseDTO = transportMasterService.getStockTransferChallanByOrgId(orgId, branch);
 
-		    return ResponseEntity.ok(responseDTO);
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 		}
-		//despatch instruction schedule no dropdown
-		@GetMapping("/getScheduleNoDropdownForDespatchInstruction")
-		public ResponseEntity<ResponseDTO> getScheduleNoDropdownForDespatchInstruction(
-		        @RequestParam Long customer,
-		        @RequestParam String monthYear,
-		        @RequestParam Long branch,
-		        @RequestParam Long orgId) {
 
-		    String methodName = "getScheduleNoDropdownForDespatchInstruction()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		if (StringUtils.isBlank(errorMsg)) {
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO;
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, " Stock Transfer Challan retrieved successfully");
 
-		    try {
+			responseObjectsMap.put("stockTransferChallanResponseDTO", stockTransferChallanResponseDTO);
 
-		        Map<String, Object> responseMap =
-		                transportMasterService.getScheduleNoDropdownForDespatchInstruction(
-		                        customer,
-		                        monthYear,
-		                        branch,
-		                        orgId);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                responseMap.get("message"));
+		} else {
 
-		        responseObjectsMap.put(
-		                "scheduleBalanceList",
-		                responseMap.get("scheduleBalanceList"));
-
-		        responseDTO = createServiceResponse(responseObjectsMap);
-
-		    } catch (Exception e) {
-
-		        LOGGER.error(
-		                UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                e.getMessage(),
-		                e);
-
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap,
-		                e.getMessage(),
-		                e.getMessage());
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok(responseDTO);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Stock transfer challan retrieval failed",
+					errorMsg);
 		}
-		//despatch dropdown for customer
-		@GetMapping("/getCustomerDropdownForDespatchInstructions")
-		public ResponseEntity<ResponseDTO> getCustomerDropdownForDespatchInstructions(
-				@RequestParam Long branch,
-				 @RequestParam Long orgId) {
 
-		    String methodName = "getCustomerDropdownForDespatchInstructions()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO;
+		return ResponseEntity.ok().body(responseDTO);
 
-		    try {
+	}
 
-		        Map<String, Object> responseMap =
-		                transportMasterService.getCustomerDropdownForDespatchInstructions(branch,orgId);
+	// dropdown getstocktransfercustomer
+	@GetMapping("/getCustomerForStockTransferChallan")
+	public ResponseEntity<ResponseDTO> getCustomerForStockTransferChallan(@RequestParam Long branch,
+			@RequestParam Long orgId) {
 
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                responseMap.get("message"));
+		String methodName = "getCustomerForStockTransferChallan()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		        responseObjectsMap.put(
-		                "customerList",
-		                responseMap.get("customerList"));
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-		        responseDTO = createServiceResponse(responseObjectsMap);
+		try {
 
-		    } catch (Exception e) {
+			Map<String, Object> responseMap = transportMasterService.getCustomerForStockTransferChallan(branch, orgId);
 
-		        LOGGER.error(
-		                UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                e.getMessage(),
-		                e);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
 
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap,
-		                e.getMessage(),
-		                e.getMessage());
-		    }
+			responseObjectsMap.put("customerList", responseMap.get("customerList"));
 
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-		    return ResponseEntity.ok(responseDTO);
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
 		}
-		//Despatch orderacceptanceandsalesContract Dropdown
-		@GetMapping("/getOrderAndSalesContractDropdownFromDespatchInstruction")
-		public ResponseEntity<ResponseDTO> getOrderAndSalesContractDropdownFromDespatchInstruction(
-		        @RequestParam Long customerId,@RequestParam Long branch,@RequestParam Long orgId) {
 
-		    String methodName = "getOrderAndSalesContractDropdownFromDespatchInstruction()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO;
+		return ResponseEntity.ok(responseDTO);
+	}
 
-		    try {
+	// despatch instruction schedule no dropdown
+	@GetMapping("/getScheduleNoDropdownForDespatchInstruction")
+	public ResponseEntity<ResponseDTO> getScheduleNoDropdownForDespatchInstruction(@RequestParam Long customer,
+			@RequestParam String monthYear, @RequestParam Long branch, @RequestParam Long orgId) {
 
-		        Map<String, Object> responseMap =
-		                transportMasterService.getOrderAndSalesContractDropdownFromDespatchInstruction(customerId,branch,orgId);
+		String methodName = "getScheduleNoDropdownForDespatchInstruction()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                responseMap.get("message"));
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-		        responseObjectsMap.put(
-		                "salesContractList",
-		                responseMap.get("salesContractList"));
+		try {
 
-		        responseDTO = createServiceResponse(responseObjectsMap);
+			Map<String, Object> responseMap = transportMasterService
+					.getScheduleNoDropdownForDespatchInstruction(customer, monthYear, branch, orgId);
 
-		    } catch (Exception e) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
 
-		        LOGGER.error(
-		                UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                e.getMessage(),
-		                e);
+			responseObjectsMap.put("scheduleBalanceList", responseMap.get("scheduleBalanceList"));
 
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap,
-		                e.getMessage(),
-		                e.getMessage());
-		    }
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		} catch (Exception e) {
 
-		    return ResponseEntity.ok(responseDTO);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
 		}
-		//despatch instruction items
-		@GetMapping("/getItemsFromDespatchInstruction")
-		public ResponseEntity<ResponseDTO> getItemsFromDespatchInstruction(@RequestParam Long item_type,@RequestParam Long branch,@RequestParam Long orgId) {
 
-		    String methodName = "getItemsFromDespatchInstruction()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO;
+		return ResponseEntity.ok(responseDTO);
+	}
 
-		    try {
+	// despatch dropdown for customer
+	@GetMapping("/getCustomerDropdownForDespatchInstructions")
+	public ResponseEntity<ResponseDTO> getCustomerDropdownForDespatchInstructions(@RequestParam Long branch,
+			@RequestParam Long orgId) {
 
-		        Map<String, Object> responseMap =
-		                transportMasterService.getItemsFromDespatchInstruction(item_type,branch,orgId);
+		String methodName = "getCustomerDropdownForDespatchInstructions()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                responseMap.get("message"));
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-		        responseObjectsMap.put(
-		                "itemList",
-		                responseMap.get("itemList"));
+		try {
 
-		        responseDTO = createServiceResponse(responseObjectsMap);
+			Map<String, Object> responseMap = transportMasterService.getCustomerDropdownForDespatchInstructions(branch,
+					orgId);
 
-		    } catch (Exception e) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
 
-		        LOGGER.error(
-		                UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                e.getMessage(),
-		                e);
+			responseObjectsMap.put("customerList", responseMap.get("customerList"));
 
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap,
-		                e.getMessage(),
-		                e.getMessage());
-		    }
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		} catch (Exception e) {
 
-		    return ResponseEntity.ok(responseDTO);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
 		}
-		
-		//Despatch schedule month 
-		@GetMapping("/getScheduleMonthForDespatchInstruction")
-		public ResponseEntity<ResponseDTO> getScheduleMonthForDespatchInstruction(
-		        @RequestParam Long item,
-		        @RequestParam String dlvno,
-		        @RequestParam Long branch,
-		        @RequestParam Long orgId) {
 
-		    String methodName = "getScheduleMonthForDespatchInstruction()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO;
+		return ResponseEntity.ok(responseDTO);
+	}
 
-		    try {
+	// Despatch orderacceptanceandsalesContract Dropdown
+	@GetMapping("/getOrderAndSalesContractDropdownFromDespatchInstruction")
+	public ResponseEntity<ResponseDTO> getOrderAndSalesContractDropdownFromDespatchInstruction(
+			@RequestParam Long customerId, @RequestParam Long branch, @RequestParam Long orgId) {
 
-		        Map<String, Object> responseMap =
-		                transportMasterService.getScheduleMonthForDespatchInstruction(item,dlvno, branch, orgId);
+		String methodName = "getOrderAndSalesContractDropdownFromDespatchInstruction()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                responseMap.get("message"));
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-		        responseObjectsMap.put(
-		                "scheduleMonthList",
-		                responseMap.get("scheduleMonthList"));
+		try {
 
-		        responseDTO = createServiceResponse(responseObjectsMap);
+			Map<String, Object> responseMap = transportMasterService
+					.getOrderAndSalesContractDropdownFromDespatchInstruction(customerId, branch, orgId);
 
-		    } catch (Exception e) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
 
-		        LOGGER.error(
-		                UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                e.getMessage(),
-		                e);
+			responseObjectsMap.put("salesContractList", responseMap.get("salesContractList"));
 
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap,
-		                e.getMessage(),
-		                e.getMessage());
-		    }
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		} catch (Exception e) {
 
-		    return ResponseEntity.ok(responseDTO);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
 		}
-		
-		//despatch instruction planned qty
-		@GetMapping("/getPlannedQtyForDespatchInstruction")
-		public ResponseEntity<ResponseDTO> getPlannedQtyForDespatchInstruction(
-		        @RequestParam Long item,
-		        @RequestParam Long branch,
-		        @RequestParam Long orgId) {
 
-		    String methodName = "getPlannedQtyForDespatchInstruction()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO;
+		return ResponseEntity.ok(responseDTO);
+	}
 
-		    try {
+	// despatch instruction items
+	@GetMapping("/getItemsFromDespatchInstruction")
+	public ResponseEntity<ResponseDTO> getItemsFromDespatchInstruction(@RequestParam Long item_type,
+			@RequestParam Long branch, @RequestParam Long orgId) {
 
-		        Map<String, Object> responseMap =
-		                transportMasterService.getPlannedQtyForDespatchInstruction(
-		                        item,
-		                        branch,
-		                        orgId);
+		String methodName = "getItemsFromDespatchInstruction()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                responseMap.get("message"));
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-		        responseObjectsMap.put(
-		                "plannedQty",
-		                responseMap.get("plannedQty"));
+		try {
 
-		        responseDTO = createServiceResponse(responseObjectsMap);
+			Map<String, Object> responseMap = transportMasterService.getItemsFromDespatchInstruction(item_type, branch,
+					orgId);
 
-		    } catch (Exception e) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
 
-		        LOGGER.error(
-		                UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                e.getMessage(),
-		                e);
+			responseObjectsMap.put("itemList", responseMap.get("itemList"));
 
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap,
-		                e.getMessage(),
-		                e.getMessage());
-		    }
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		} catch (Exception e) {
 
-		    return ResponseEntity.ok(responseDTO);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
 		}
-		
-		// despatch pending qty
-		
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	// Despatch schedule month
+	@GetMapping("/getScheduleMonthForDespatchInstruction")
+	public ResponseEntity<ResponseDTO> getScheduleMonthForDespatchInstruction(@RequestParam Long item,
+			@RequestParam String dlvno, @RequestParam Long branch, @RequestParam Long orgId) {
+
+		String methodName = "getScheduleMonthForDespatchInstruction()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> responseMap = transportMasterService.getScheduleMonthForDespatchInstruction(item, dlvno,
+					branch, orgId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+
+			responseObjectsMap.put("scheduleMonthList", responseMap.get("scheduleMonthList"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	// despatch instruction planned qty
+	@GetMapping("/getPlannedQtyForDespatchInstruction")
+	public ResponseEntity<ResponseDTO> getPlannedQtyForDespatchInstruction(@RequestParam Long item,
+			@RequestParam Long branch, @RequestParam Long orgId) {
+
+		String methodName = "getPlannedQtyForDespatchInstruction()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
+
+		try {
+
+			Map<String, Object> responseMap = transportMasterService.getPlannedQtyForDespatchInstruction(item, branch,
+					orgId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+
+			responseObjectsMap.put("plannedQty", responseMap.get("plannedQty"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	// despatch pending qty
+
 //		@GetMapping("/getDespatchPendingQty")
 //		public ResponseEntity<ResponseDTO> getDespatchPendingQty(
 //		        @RequestParam Long itemId,
@@ -951,179 +797,168 @@ public class DevController extends BaseController{
 //
 //		    return ResponseEntity.ok(responseDTO);
 //		}
-		
-		
+
 //   fillgrid api for despatch instruction 
-		
-		@GetMapping("/getFillGridItemsForDespatchInstruction")
-		public ResponseEntity<ResponseDTO> getFillGridItemsForDespatchInstruction(
-		        @RequestParam Long customerId,
-		        @RequestParam Long sdvBasicId,
-		        @RequestParam Long branch,
-		        @RequestParam Long orgId) {
 
-		    String methodName = "getFillGridItemsForDespatchInstruction()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+	@GetMapping("/getFillGridItemsForDespatchInstruction")
+	public ResponseEntity<ResponseDTO> getFillGridItemsForDespatchInstruction(@RequestParam Long customerId,
+			@RequestParam Long sdvBasicId, @RequestParam Long branch, @RequestParam Long orgId) {
 
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO;
+		String methodName = "getFillGridItemsForDespatchInstruction()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		    try {
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-		        List<Map<String, Object>> itemList =
-		                transportMasterService.getFillGridItemsForDespatchInstruction(
-		                        customerId,
-		                        sdvBasicId,
-		                        branch,
-		                        orgId);
+		try {
 
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                "Despatch Instruction Grid Fetched Successfully");
+			List<Map<String, Object>> itemList = transportMasterService
+					.getFillGridItemsForDespatchInstruction(customerId, sdvBasicId, branch, orgId);
 
-		        responseObjectsMap.put(
-		                "itemList",
-		                itemList);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Despatch Instruction Grid Fetched Successfully");
 
-		        responseDTO = createServiceResponse(responseObjectsMap);
+			responseObjectsMap.put("itemList", itemList);
 
-		    } catch (Exception e) {
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-		        LOGGER.error(
-		                UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                e.getMessage(),
-		                e);
+		} catch (Exception e) {
 
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap,
-		                e.getMessage(),
-		                e.getMessage());
-		    }
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
 
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok(responseDTO);
-		}
-		
-		//item drop down for stocktransfer challan
-		@GetMapping("/getItemsForStockTransferChallan")
-		public ResponseEntity<ResponseDTO> getItemsForStockTransferChallan(
-		        @RequestParam Long branch,
-		        @RequestParam Long orgId) {
-
-		    String methodName = "getItemsForStockTransferChallan()";
-		    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-
-		    Map<String, Object> responseObjectsMap = new HashMap<>();
-		    ResponseDTO responseDTO;
-
-		    try {
-
-		        Map<String, Object> responseMap =
-		                transportMasterService.getItemsForStockTransferChallan(
-		                        branch,
-		                        orgId);
-
-		        responseObjectsMap.put(
-		                CommonConstant.STRING_MESSAGE,
-		                responseMap.get("message"));
-
-		        responseObjectsMap.put(
-		                "itemList",
-		                responseMap.get("itemList"));
-
-		        responseDTO = createServiceResponse(responseObjectsMap);
-
-		    } catch (Exception e) {
-
-		        LOGGER.error(
-		                UserConstants.ERROR_MSG_METHOD_NAME,
-		                methodName,
-		                e.getMessage(),
-		                e);
-
-		        responseDTO = createServiceResponseError(
-		                responseObjectsMap,
-		                e.getMessage(),
-		                e.getMessage());
-		    }
-
-		    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-
-		    return ResponseEntity.ok(responseDTO);
-		}
-		
-  	@GetMapping("/getStockTransferChallanDocId")
-		public ResponseEntity<ResponseDTO> getStockTransferChallanDocId(@RequestParam Long orgId,
-				@RequestParam String financialYear, @RequestParam String screenCode) {
-
-			String methodName = "getStockTransferChallanDocId()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			String mapp = "";
-
-			try {
-				mapp = transportMasterService.getStockTransferChallanDocId(orgId, financialYear, screenCode);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-			}
-
-			if (StringUtils.isBlank(errorMsg)) {
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-						"StockTransferChallan DocId information retrieved successfully");
-				responseObjectsMap.put("StockTransferChallan DocId", mapp);
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} else {
-				responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Proforma getStockTransferChallan DocId",
-						errorMsg);
-			}
-
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
 		}
 
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
+		return ResponseEntity.ok(responseDTO);
+	}
 
-    @GetMapping("/getCustomerComplaintDocId")
-		public ResponseEntity<ResponseDTO> getCustomerComplaintDocId(@RequestParam Long orgId,
-				@RequestParam String financialYear, @RequestParam String screenCode) {
+	// item drop down for stocktransfer challan
+	@GetMapping("/getItemsForStockTransferChallan")
+	public ResponseEntity<ResponseDTO> getItemsForStockTransferChallan(@RequestParam Long branch,
+			@RequestParam Long orgId) {
 
-			String methodName = "getCustomerComplaintDocId()";
-			LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
-			String errorMsg = null;
-			Map<String, Object> responseObjectsMap = new HashMap<>();
-			ResponseDTO responseDTO = null;
-			String mapp = "";
+		String methodName = "getItemsForStockTransferChallan()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-			try {
-				mapp = transportMasterService.getCustomerComplaintDocId(orgId, financialYear, screenCode);
-			} catch (Exception e) {
-				errorMsg = e.getMessage();
-				LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
-			}
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-			if (StringUtils.isBlank(errorMsg)) {
-				responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-						"CustmerDocId DocId information retrieved successfully");
-				responseObjectsMap.put("invoiceDocId", mapp);
-				responseDTO = createServiceResponse(responseObjectsMap);
-			} else {
-				responseDTO = createServiceResponseError(responseObjectsMap,
-						"Failed to retrieve Proforma CustmerDocId", errorMsg);
-			}
+		try {
 
-			LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-			return ResponseEntity.ok().body(responseDTO);
+			Map<String, Object> responseMap = transportMasterService.getItemsForStockTransferChallan(branch, orgId);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+
+			responseObjectsMap.put("itemList", responseMap.get("itemList"));
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage(), e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
 		}
-		
 
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@GetMapping("/getStockTransferChallanDocId")
+	public ResponseEntity<ResponseDTO> getStockTransferChallanDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear, @RequestParam String screenCode) {
+
+		String methodName = "getStockTransferChallanDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+			mapp = transportMasterService.getStockTransferChallanDocId(orgId, financialYear, screenCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"StockTransferChallan DocId information retrieved successfully");
+			responseObjectsMap.put("StockTransferChallan DocId", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Proforma getStockTransferChallan DocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getCustomerComplaintDocId")
+	public ResponseEntity<ResponseDTO> getCustomerComplaintDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear, @RequestParam String screenCode) {
+
+		String methodName = "getCustomerComplaintDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+			mapp = transportMasterService.getCustomerComplaintDocId(orgId, financialYear, screenCode);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"CustmerDocId DocId information retrieved successfully");
+			responseObjectsMap.put("invoiceDocId", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Proforma CustmerDocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getDespatchInstructionDocId")
+	public ResponseEntity<ResponseDTO> getDespatchInstructionDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear, @RequestParam String screenCode) {
+
+		String methodName = "getDespatchInstructionDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
+
+		try {
+			mapp = transportMasterService.getDespatchInstructionDocId(orgId, financialYear);
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"  despatch instructions DocId  retrieved successfully");
+			responseObjectsMap.put("despatchDocId", mapp);
+			responseDTO = createServiceResponse(responseObjectsMap);
+		} else {
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Proforma CustmerDocId",
+					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok().body(responseDTO);
+	}
 }
-
-
-		
-
-

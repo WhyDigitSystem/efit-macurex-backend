@@ -271,6 +271,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		orderAcceptanceVO.setCancelRemarks(orderAcceptanceDTO.getCancelRemarks());
 
 		orderAcceptanceVO.setOrgId(orderAcceptanceDTO.getOrgId());
+		orderAcceptanceVO.setApproved(orderAcceptanceDTO.getApproved());
 
 		orderAcceptanceVO.setDestination(orderAcceptanceDTO.getDestination());
 		orderAcceptanceVO.setModeOfTransport(orderAcceptanceDTO.getModeOfTransport());
@@ -591,6 +592,7 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 		responseDTO.setCustomerPurchaseOrderDate(orderAcceptanceVO.getCustomerPurchaseOrderDate());
 		responseDTO.setPostRate(orderAcceptanceVO.getPostRate());
 		responseDTO.setCreatedBy(orderAcceptanceVO.getCreatedBy());
+		responseDTO.setApproved(orderAcceptanceVO.getApproved());
 		responseDTO.setInvoiceType(orderAcceptanceVO.getInvoiceType());
 //		responseDTO.setActive(orderAcceptanceVO.isActive());
 //		responseDTO.setCancel(orderAcceptanceVO.isCancel());

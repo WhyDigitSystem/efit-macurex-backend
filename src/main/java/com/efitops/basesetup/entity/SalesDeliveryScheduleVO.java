@@ -10,11 +10,15 @@ import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "sdvbasic")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SalesDeliveryScheduleVO {
 
 	@Id

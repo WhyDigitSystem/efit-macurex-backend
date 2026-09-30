@@ -59,6 +59,8 @@ public class SalesContractResponseDTO {
 
     private boolean active;
     
+    private String approval;
+    
     
     //summary
     

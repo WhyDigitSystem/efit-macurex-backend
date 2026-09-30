@@ -42,7 +42,7 @@ public class PurchaseBillDTO {
 	private BigDecimal dutyPerUnit;
 	private Long postingCategory;
 	private Boolean modvatCopyReceived;
-	private Long eccType;
+//	private Long eccType;
 	private String supplierDcInvNo;
 	private LocalDate supplierDcInvDate;
 	

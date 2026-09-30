@@ -4,7 +4,9 @@ package com.efitops.basesetup.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -13,11 +15,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -52,19 +56,17 @@ public class ProductionEntryVO {
     private LocalTime shiftTimeTo;
 
     @Column(name = "shift")
-    private String shift; // Shift
+    private String shift; 
 
     @ManyToOne
-    @JoinColumn(name = "fg_item_code")
-    private ItemMasterVO fgItemCode; // FG Item Code
+    @JoinColumn(name = "fg_item")
+    private ItemMasterVO fgItem; // FG Item Code
 
-    @Column(name = "fg_item_description")
-    private String fgItemDescription; // FG Item Description
 
     @ManyToOne
     @JoinColumn(name = "location")
-    private LocationVO location; // Location
-
+    private LocationVO location; 
+    
     @Column(name = "production_qty", precision = 10, scale = 2)
     private BigDecimal productionQty; // Production QTY
 
@@ -83,10 +85,9 @@ public class ProductionEntryVO {
     private EmployeeMasterVO approvedBy; // Approved By
 
     @ManyToOne
-    @JoinColumn(name = "bom_id")
-    private BillOfMaterialVO bomId; // Bomid
+    @JoinColumn(name = "bom")
+    private BillOfMaterialVO bom; // Bomid
 
-    // Production Summary Fields
     @Column(name = "total_labour_cost", precision = 10, scale = 2)
     private BigDecimal totalLabourCost;
 
@@ -134,25 +135,25 @@ public class ProductionEntryVO {
     @JoinColumn(name = "branch")
     private BranchVO branch;
 
-//    @OneToMany(mappedBy = "productionEntryVO", cascade = CascadeType.ALL)
-//    @JsonManagedReference
-//    private List<ProductionEntryDetailsVO> productionEntryDetailsVO;
-//
-//    @OneToMany(mappedBy = "productionEntryVO", cascade = CascadeType.ALL)
-//    @JsonManagedReference
-//    private List<ToolDetailsVO> toolDetailsVO;
-//
-//    @OneToMany(mappedBy = "productionEntryVO", cascade = CascadeType.ALL)
-//    @JsonManagedReference
-//    private List<StoppageReasonVO> stoppageReasonVO;
-//
-//    @OneToMany(mappedBy = "productionEntryVO", cascade = CascadeType.ALL)
-//    @JsonManagedReference
-//    private List<ReworkReasonVO> reworkReasonVO;
-//
-//    @OneToMany(mappedBy = "productionEntryVO", cascade = CascadeType.ALL)
-//    @JsonManagedReference
-//    private List<ScrapDetailsVO> scrapDetailsVO;
+    @OneToMany(mappedBy = "productionEntryVO", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<ProductionEntryDetailsVO> productionEntryDetailsVO;
+
+    @OneToMany(mappedBy = "productionEntryVO", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<ToolDetailsVO> toolDetailsVO;
+
+    @OneToMany(mappedBy = "productionEntryVO", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<StoppageReasonVO> stoppageReasonVO;
+
+    @OneToMany(mappedBy = "productionEntryVO", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<ReworkReasonVO> reworkReasonVO;
+
+    @OneToMany(mappedBy = "productionEntryVO", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<ScrapDetailsVO> scrapDetailsVO;
 
     @JsonGetter("active")
     public String getActive() {

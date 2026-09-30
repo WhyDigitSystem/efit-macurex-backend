@@ -36,13 +36,9 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 			+ "ORDER BY customer_name ASC", nativeQuery = true)
 	Set<Object[]> getParty(Long category, Long orgId, Long branch);
 
-	@Query(value = "SELECT customer_id, customer_code, customer_name, gst_no, is_gst_applicable " +
-	        "FROM customer_header " +
-	        "WHERE org_id = ?1 " +
-	        "AND branch = ?2 " +
-	        "AND cancel = 0 " +
-	        "AND active = 1",
-	        nativeQuery = true)
+	@Query(value = "SELECT customer_id, customer_code, customer_name, gst_no, is_gst_applicable "
+			+ "FROM customer_header " + "WHERE org_id = ?1 " + "AND branch = ?2 " + "AND cancel = 0 "
+			+ "AND active = 1", nativeQuery = true)
 	List<Object[]> getCustomerDetails(Long orgId, Long branch);
 
 //	@Query(value = """
@@ -95,118 +91,142 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 //			ORDER BY customer_code
 //			""", nativeQuery = true)
 	@Query(value = """
-			SELECT
-			    c.customer_id,
-			    c.customer_code,
-			    c.customer_name,
-			    c.address AS add1,
-			    g.state_name AS GSTState,
-			    c.gst_no,
-			    c.is_gst_applicable,
-			    c.gst_type
+						SELECT
+						    c.customer_id,
+						    c.customer_code,
+						    c.customer_name,
+						    c.address AS add1,
+						    g.state_name AS GSTState,
+						    c.gst_no,
+						    c.is_gst_applicable,
+						    c.gst_type
 
-			FROM customer_header c
+						FROM customer_header c
 
-			INNER JOIN quotation_header q
-			    ON q.customer = c.customer_id
+						INNER JOIN quotation_header q
+						    ON q.customer = c.customer_id
 
-			INNER JOIN gststatemaster g
-			    ON g.gststatemaster_id = c.gst_state
+						INNER JOIN gststatemaster g
+						    ON g.gststatemaster_id = c.gst_state
 
-			WHERE c.cancel = 0
-			  AND c.active = 1
-			  AND ?1 = 'Flow'
-			  AND q.org_id = ?2
-			  AND q.branch = ?3
+						WHERE c.cancel = 0
+						  AND c.active = 1
+						  AND ?1 = 'Flow'
+						  AND q.org_id = ?2
+						  AND q.branch = ?3
 
-			  AND NOT EXISTS (
-			        SELECT 1
-			        FROM sales_contract_basic sc
-			        WHERE sc.customer = c.customer_id
-			          AND sc.quotation_no = q.doc_id
-			  )
+						  AND NOT EXISTS (
+						        SELECT 1
+						        FROM sales_contract_basic sc
+						        WHERE sc.customer = c.customer_id
+						          AND sc.quotation_no = q.doc_id
+						  )
 
-			UNION
+						UNION
 
-			SELECT
-			    c.customer_id,
-			    c.customer_code,
-			    c.customer_name,
-			    c.address AS add1,
-			    g.state_name AS GSTState,
-			    c.gst_no,
-			    c.is_gst_applicable,
-			    c.gst_type
+						SELECT
+						    c.customer_id,
+						    c.customer_code,
+						    c.customer_name,
+						    c.address AS add1,
+						    g.state_name AS GSTState,
+						    c.gst_no,
+						    c.is_gst_applicable,
+						    c.gst_type
 
-			FROM customer_header c
+						FROM customer_header c
 
-			INNER JOIN gststatemaster g
-			    ON g.gststatemaster_id = c.gst_state
+						INNER JOIN gststatemaster g
+						    ON g.gststatemaster_id = c.gst_state
 
-			LEFT JOIN listofvaluesdetails a
-			    ON c.customer_category = a.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails a
+						    ON c.customer_category = a.listofvaluesdetails_id
 
-			LEFT JOIN listofvaluesdetails b
-			    ON c.customer_category1 = b.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails b
+						    ON c.customer_category1 = b.listofvaluesdetails_id
 
-			LEFT JOIN listofvaluesdetails cc
-			    ON c.customer_category2 = cc.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails cc
+						    ON c.customer_category2 = cc.listofvaluesdetails_id
 
-			WHERE c.cancel = 0
-			  AND c.active = 1
-			  AND ?1 = 'Direct'
-			  AND c.org_id = ?2
-			  AND c.branch = ?3
+						WHERE c.cancel = 0
+						  AND c.active = 1
+						  AND ?1 = 'Direct'
+						  AND c.org_id = ?2
+						  AND c.branch = ?3
 
-			  AND (
-			        a.value_description = 'CUSTOMER'
-			        OR b.value_description = 'CUSTOMER'
-			        OR cc.value_description = 'CUSTOMER'
-			  )
+						  AND (
+			       a.value_code LIKE 'CUSTOMER%'
+			    OR b.value_code LIKE 'CUSTOMER%'
+			    OR cc.value_code LIKE 'CUSTOMER%'
+			)
 
-			ORDER BY customer_code
-			""", nativeQuery = true)
+						ORDER BY customer_code
+						""", nativeQuery = true)
 	List<Object[]> getCustomerDropdown(String ctype, Long orgId, Long branch);
 
 	// getstocktransfercustomer
-	@Query(value = "SELECT " + "c.customer_id, " + "c.customer_code, " + "c.customer_name, " + "c.account_name, "
-			+ "g.gststatemaster_id, " + "g.state_code, " + "g.state_name, " + "g.gst_state_id, "
-			+ "c.is_gst_applicable, " + "c.gst_no " + "FROM customer_header c "
-			+ "INNER JOIN gststatemaster g ON c.gst_state = g.gststatemaster_id " + "WHERE c.cancel = false "
-			+ "AND c.active = true " + "AND LOWER(c.customer_type)='customer' " + "AND c.branch = ?1 "
-			+ "AND c.org_id = ?2 " + "ORDER BY c.customer_code", nativeQuery = true)
+	@Query(value = "SELECT "
+	        + "c.customer_id, "
+	        + "c.customer_code, "
+	        + "c.customer_name, "
+	        + "c.account_name, "
+	        + "g.gststatemaster_id, "
+	        + "g.state_code, "
+	        + "g.state_name, "
+	        + "g.gst_state_id, "
+	        + "c.is_gst_applicable, "
+	        + "c.gst_no "
+	        + "FROM customer_header c "
+	        + "INNER JOIN gststatemaster g "
+	        + "    ON c.gst_state = g.gststatemaster_id "
+	        + "LEFT JOIN listofvaluesdetails a "
+	        + "    ON c.customer_category = a.listofvaluesdetails_id "
+	        + "LEFT JOIN listofvaluesdetails b "
+	        + "    ON c.customer_category1 = b.listofvaluesdetails_id "
+	        + "LEFT JOIN listofvaluesdetails cc "
+	        + "    ON c.customer_category2 = cc.listofvaluesdetails_id "
+	        + "WHERE c.cancel = false "
+	        + "AND c.active = true "
+	        + "AND ("
+	        + "       UPPER(a.value_description) LIKE '%CUSTOMER%' "
+	        + "    OR UPPER(b.value_description) LIKE '%CUSTOMER%' "
+	        + "    OR UPPER(cc.value_description) LIKE '%CUSTOMER%' "
+	        + ") "
+	        + "AND c.branch = ?1 "
+	        + "AND c.org_id = ?2 "
+	        + "ORDER BY c.customer_code",
+	        nativeQuery = true)
 	List<Object[]> getCustomerForStockTransferChallan(Long branch, Long orgId);
 
 	// despatch instruction customer dropdown
 	@Query(value = """
-			SELECT
-			    c.customer_id,
-			    c.customer_code,
-			    c.customer_name,
-			    c.account_name
-			FROM customer_header c
+						SELECT
+						    c.customer_id,
+						    c.customer_code,
+						    c.customer_name,
+						    c.account_name
+						FROM customer_header c
 
-			LEFT JOIN listofvaluesdetails a
-			    ON c.customer_category = a.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails a
+						    ON c.customer_category = a.listofvaluesdetails_id
 
-			LEFT JOIN listofvaluesdetails b
-			    ON c.customer_category1 = b.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails b
+						    ON c.customer_category1 = b.listofvaluesdetails_id
 
-			LEFT JOIN listofvaluesdetails cc
-			    ON c.customer_category2 = cc.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails cc
+						    ON c.customer_category2 = cc.listofvaluesdetails_id
 
-			WHERE c.cancel = FALSE
-			  AND c.active = TRUE
-			  AND c.branch = :branch
-			  AND c.org_id = :orgId
-			  AND (
-			        a.value_code = 'CUSTOMER'
-			     OR b.value_code = 'CUSTOMER'
-			     OR cc.value_code = 'CUSTOMER'
-			  )
-
-			ORDER BY c.customer_code
-			""", nativeQuery = true)
+						WHERE c.cancel = FALSE
+						  AND c.active = TRUE
+						  AND c.branch = :branch
+						  AND c.org_id = :orgId
+						  AND (
+			       a.value_code LIKE 'CUSTOMER%'
+			    OR b.value_code LIKE 'CUSTOMER%'
+			    OR cc.value_code LIKE 'CUSTOMER%'
+			)
+						ORDER BY c.customer_code
+						""", nativeQuery = true)
 	List<Object[]> getCustomerDropdownForDespatchInstructions(@Param("branch") Long branch, @Param("orgId") Long orgId);
 
 	@Query(value = """
@@ -216,7 +236,7 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 			    customer_code AS customerCode
 			FROM customer_header
 			WHERE org_id = ?1
-			  AND branch = ?2 
+			  AND branch = ?2
 			  AND active = 1
 			  AND cancel = 0
 			ORDER BY customer_name
@@ -235,92 +255,94 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 			+ "			    ON c.customer_category2 = cc.listofvaluesdetails_id\r\n"
 			+ "			WHERE c.cancel = FALSE\r\n" + "			  AND c.active = TRUE\r\n"
 			+ "			  AND c.branch = :branch\r\n" + "			  AND c.org_id = :orgId\r\n"
-			+ "			  AND (a.value_description = 'Supplier'\r\n"
-			+ "			        OR b.value_description = 'Supplier'\r\n"
-			+ "			        OR cc.value_description = 'Supplier'\r\n" + "			      )\r\n"
+			+ "AND ("
+			+ "    UPPER(a.value_description) LIKE '%SUPPLIER%' "
+			+ " OR UPPER(b.value_description) LIKE '%SUPPLIER%' "
+			+ " OR UPPER(cc.value_description) LIKE '%SUPPLIER%' "
+			+ ")"
 			+ "			ORDER BY c.customer_code", nativeQuery = true)
 	List<Object[]> getSupplierDropdownForPurchaseDeliverySchedule(@Param("branch") Long branch,
 			@Param("orgId") Long orgId);
 
 	@Query(value = """
-						SELECT
-			    c.customer_id AS customerId,
-			    c.customer_code AS customerCode,
-			    c.customer_name AS customerName,
-			    gs.state_name AS gstState,
-			    c.gst_no AS gstNo,
-			    c.is_gst_applicable AS igstApplicable,
-			    c.gst_type AS gstType,
-			    cs.shipping_address AS shippingAddress,
-			    city.city AS shippingCity,
-			    cs.shipping_pincode AS shippingPincode
-			FROM customer_header c
+									SELECT
+						    c.customer_id AS customerId,
+						    c.customer_code AS customerCode,
+						    c.customer_name AS customerName,
+						    gs.state_name AS gstState,
+						    c.gst_no AS gstNo,
+						    c.is_gst_applicable AS igstApplicable,
+						    c.gst_type AS gstType,
+						    cs.shipping_address AS shippingAddress,
+						    city.city AS shippingCity,
+						    cs.shipping_pincode AS shippingPincode
+						FROM customer_header c
 
-			LEFT JOIN gststatemaster gs
-			    ON gs.gststatemaster_id = c.gst_state
-			    AND gs.active = 1
-			    AND gs.cancel = 0
+						LEFT JOIN gststatemaster gs
+						    ON gs.gststatemaster_id = c.gst_state
+						    AND gs.active = 1
+						    AND gs.cancel = 0
 
-			LEFT JOIN customer_shipping_details cs
-			    ON cs.customer_id = c.customer_id
+						LEFT JOIN customer_shipping_details cs
+						    ON cs.customer_id = c.customer_id
 
-			LEFT JOIN city city
-			    ON city.city_id = cs.shipping_city
+						LEFT JOIN city city
+						    ON city.city_id = cs.shipping_city
 
-			LEFT JOIN listofvaluesdetails a
-			    ON c.customer_category = a.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails a
+						    ON c.customer_category = a.listofvaluesdetails_id
 
-			LEFT JOIN listofvaluesdetails b
-			    ON c.customer_category1 = b.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails b
+						    ON c.customer_category1 = b.listofvaluesdetails_id
 
-			LEFT JOIN listofvaluesdetails cc
-			    ON c.customer_category2 = cc.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails cc
+						    ON c.customer_category2 = cc.listofvaluesdetails_id
 
-			WHERE c.org_id = ?1
-			  AND c.branch = ?2
-			  AND c.active = 1
-			  AND c.cancel = 0
-			  AND (
-			        UPPER(a.value_description) = 'CUSTOMERS'
-			        OR UPPER(b.value_description) = 'CUSTOMERS'
-			        OR UPPER(cc.value_description) = 'CUSTOMERS'
-			      )
+						WHERE c.org_id = ?1
+						  AND c.branch = ?2
+						  AND c.active = 1
+						  AND c.cancel = 0
+						 AND (
+			       a.value_code LIKE 'CUSTOMER%'
+			    OR b.value_code LIKE 'CUSTOMER%'
+			    OR cc.value_code LIKE 'CUSTOMER%'
+			)
 
-			ORDER BY c.customer_name
-						""", nativeQuery = true)
+						ORDER BY c.customer_name
+									""", nativeQuery = true)
 	Set<Object[]> getCustomerDetailsforSalesRejectionInvoice(Long orgId, Long branch);
 
 	@Query(value = """
-			SELECT
-			    c.customer_id,
-			    c.customer_code,
-			    c.customer_name,
-			    c.address AS add1,
-			    g.state_name AS GSTState,
-			    c.gst_no,
-			    c.is_gst_applicable,
-			    c.gst_type,
-			    g.gststatemaster_id
-			FROM customer_header c
-			INNER JOIN gststatemaster g
-			    ON g.gststatemaster_id = c.gst_state
-			LEFT JOIN listofvaluesdetails a
-			    ON c.customer_category = a.listofvaluesdetails_id
-			LEFT JOIN listofvaluesdetails b
-			    ON c.customer_category1 = b.listofvaluesdetails_id
-			LEFT JOIN listofvaluesdetails cc
-			    ON c.customer_category2 = cc.listofvaluesdetails_id
-			WHERE c.cancel = 0
-			  AND c.active = 1
-			  AND c.branch = :branch
-			  AND c.org_id = :orgId
-			  AND (
-			        UPPER(a.value_description) = 'SUB CONTRACT'
-			        OR UPPER(b.value_description) = 'SUB CONTRACT'
-			        OR UPPER(cc.value_description) = 'SUB CONTRACT'
-			      )
-			ORDER BY c.customer_code
-			""", nativeQuery = true)
+						SELECT
+						    c.customer_id,
+						    c.customer_code,
+						    c.customer_name,
+						    c.address AS add1,
+						    g.state_name AS GSTState,
+						    c.gst_no,
+						    c.is_gst_applicable,
+						    c.gst_type,
+						    g.gststatemaster_id
+						FROM customer_header c
+						INNER JOIN gststatemaster g
+						    ON g.gststatemaster_id = c.gst_state
+						LEFT JOIN listofvaluesdetails a
+						    ON c.customer_category = a.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails b
+						    ON c.customer_category1 = b.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails cc
+						    ON c.customer_category2 = cc.listofvaluesdetails_id
+						WHERE c.cancel = 0
+						  AND c.active = 1
+						  AND c.branch = :branch
+						  AND c.org_id = :orgId
+						  AND (
+			       UPPER(a.value_description) LIKE 'SUB CONTRACT%'
+			    OR UPPER(b.value_description) LIKE 'SUB CONTRACT%'
+			    OR UPPER(cc.value_description) LIKE 'SUB CONTRACT%'
+			)
+						ORDER BY c.customer_code
+						""", nativeQuery = true)
 	Set<Object[]> getCustomerForSupplierRateContract(@Param("orgId") Long orgId, @Param("branch") Long branch);
 
 }

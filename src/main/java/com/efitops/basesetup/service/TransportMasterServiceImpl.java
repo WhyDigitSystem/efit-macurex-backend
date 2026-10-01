@@ -1707,7 +1707,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	}
 
 	@Override
-	public String getStockTransferChallanDocId(Long orgId, String financialYear, String screenCode) {
+	public String getStockTransferChallanDocId(Long orgId, String financialYear) {
 		String screenCode1 = "STC";
 		String result = stockTransferChallanRepo.getStockTransferChallanDocId(orgId, financialYear, screenCode1);
 		return result;

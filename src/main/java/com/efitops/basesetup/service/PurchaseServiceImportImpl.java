@@ -2037,7 +2037,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 		if (dto.getItemCategory() != null && dto.getItemCategory() != 0) {
 
-			ItemMasterVO itemCategory = itemMasterRepo.findByItemType(dto.getItemCategory())
+			ItemMasterVO itemCategory = itemMasterRepo.findById(dto.getItemCategory())
 					.orElseThrow(() -> new ApplicationException("Item Category Not Found"));
 
 			vo.setItemCategory(itemCategory);

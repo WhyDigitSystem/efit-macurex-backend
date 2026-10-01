@@ -171,7 +171,7 @@ public class PurchaseOrderVO {
 
 	@Column(name = "notes")
 	private String notes;
-	
+
 	@Column(name = "freight")
 	private String freight;
 
@@ -219,14 +219,17 @@ public class PurchaseOrderVO {
 	@Column(name = "amount_in_word")
 	private String amountInWord;
 
-	@Column(name = "prepared_by")
-	private String preparedBy;
+	@ManyToOne
+	@JoinColumn(name = "prepared_by")
+	private EmployeeMasterVO preparedBy;
 
-	@Column(name = "checked_by")
-	private String checkedBy;
+	@ManyToOne
+	@JoinColumn(name = "checked_by")
+	private EmployeeMasterVO checkedBy;
 
-	@Column(name = "authorised_by")
-	private String authorisedBy;
+	@ManyToOne
+	@JoinColumn(name = "authorised_by")
+	private EmployeeMasterVO authorisedBy;
 
 	//
 

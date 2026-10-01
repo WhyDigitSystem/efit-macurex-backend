@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +22,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.efitops.basesetup.ResponseDTO.LocalPurchaseOrderResponseDTO;
-import com.efitops.basesetup.ResponseDTO.PurchaseBillResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseIndentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseShortCloseResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
-import com.efitops.basesetup.dto.LocalPurchaseOrderDTO;
-import com.efitops.basesetup.dto.PurchaseBillDTO;
 import com.efitops.basesetup.dto.PurchaseIndentDTO;
 import com.efitops.basesetup.dto.PurchaseShortCloseDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
@@ -52,7 +50,7 @@ public class PurchaseController extends BaseController {
 	@PostMapping(value = "/createUpdatePurchaseIndent", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdatePurchaseIndent(
 			@RequestPart("purchaseIndent") PurchaseIndentDTO purchaseIndentDTO,
-
+//			@RequestBody PurchaseIndentDTO purchaseIndentDTO,
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -77,7 +75,6 @@ public class PurchaseController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
-	
 
 	// ==================================================================
 	// PURCHASE CONTRACT — original paths: /api/purchaseContract/**
@@ -344,198 +341,165 @@ public class PurchaseController extends BaseController {
 
 		return ResponseEntity.ok(responseDTO);
 	}
-	
-	
+
 	@GetMapping("/getPurchaseIndentDocId")
-	public ResponseEntity<ResponseDTO> getPurchaseIndentDocId(
-	        @RequestParam Long orgId,
-	        @RequestParam String financialYear) {
+	public ResponseEntity<ResponseDTO> getPurchaseIndentDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
 
-	    String methodName = "getPurchaseIndentDocId()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getPurchaseIndentDocId()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    String errorMsg = null;
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO = null;
-	    String mapp = "";
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String mapp = "";
 
-	    try {
+		try {
 
-	        mapp = purchaseService.getPurchaseIndentDocId(
-	                orgId,
-	                financialYear);
+			mapp = purchaseService.getPurchaseIndentDocId(orgId, financialYear);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        errorMsg = e.getMessage();
+			errorMsg = e.getMessage();
 
-	        LOGGER.error(
-	                UserConstants.ERROR_MSG_METHOD_NAME,
-	                methodName,
-	                errorMsg);
-	    }
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
 
-	    if (StringUtils.isBlank(errorMsg)) {
+		if (StringUtils.isBlank(errorMsg)) {
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                "Purchase Indent DocId information retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Purchase Indent DocId information retrieved successfully");
 
-	        responseObjectsMap.put(
-	                "purchaseIndentDocId",
-	                mapp);
+			responseObjectsMap.put("purchaseIndentDocId", mapp);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } else {
+		} else {
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Failed to retrieve Purchase Indent DocId",
-	                errorMsg);
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Purchase Indent DocId",
+					errorMsg);
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-	    return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok().body(responseDTO);
 	}
-	
+
 //	prepared by dropdown
 	@GetMapping("/getPurchaseIndentPreparedByDropdown")
-	public ResponseEntity<ResponseDTO> getPurchaseIndentPreparedByDropdown(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getPurchaseIndentPreparedByDropdown(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    String methodName = "getPurchaseIndentPreparedByDropdown()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getPurchaseIndentPreparedByDropdown()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
-	        List<Map<String, Object>> response =
-	                purchaseService.getPurchaseIndentPreparedByDropdown(orgId, branch);
+		try {
+			List<Map<String, Object>> response = purchaseService.getPurchaseIndentPreparedByDropdown(orgId, branch);
 
-	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                "Prepared By dropdown retrieved successfully");
-	        responseObjectsMap.put("preparedByDropdown", response);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Prepared By dropdown retrieved successfully");
+			responseObjectsMap.put("preparedByDropdown", response);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
-	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+		} catch (Exception e) {
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Prepared By dropdown retrieval failed",
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Prepared By dropdown retrieval failed",
+					e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-	    return ResponseEntity.ok(responseDTO);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	@GetMapping("/getPurchaseIndentItemDropdown")
-	public ResponseEntity<ResponseDTO> getPurchaseIndentItemDropdown(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch) {
+	public ResponseEntity<ResponseDTO> getPurchaseIndentItemDropdown(@RequestParam Long orgId,
+			@RequestParam Long branch) {
 
-	    String methodName = "getPurchaseIndentItemDropdown()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getPurchaseIndentItemDropdown()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
-	        List<Map<String, Object>> response =
-	                purchaseService.getPurchaseIndentItemDropdown(orgId, branch);
+		try {
+			List<Map<String, Object>> response = purchaseService.getPurchaseIndentItemDropdown(orgId, branch);
 
-	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                "Item dropdown retrieved successfully");
-	        responseObjectsMap.put("itemDropdown", response);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Item dropdown retrieved successfully");
+			responseObjectsMap.put("itemDropdown", response);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
-	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+		} catch (Exception e) {
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Item dropdown retrieval failed",
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Item dropdown retrieval failed",
+					e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-	    return ResponseEntity.ok(responseDTO);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	@GetMapping("/getPurchaseIndentConversionFactorDropdown")
-	public ResponseEntity<ResponseDTO> getPurchaseIndentConversionFactorDropdown(
-	        @RequestParam Long orgId,
-	        @RequestParam Long branch,
-	        @RequestParam Long fromUnit,
-	        @RequestParam Long toUnit) {
+	public ResponseEntity<ResponseDTO> getPurchaseIndentConversionFactorDropdown(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam Long fromUnit, @RequestParam Long toUnit) {
 
-	    String methodName = "getPurchaseIndentConversionFactorDropdown()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getPurchaseIndentConversionFactorDropdown()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
-	        List<Map<String, Object>> response =
-	                purchaseService.getPurchaseIndentConversionFactorDropdown(orgId, branch,fromUnit,toUnit);
+		try {
+			List<Map<String, Object>> response = purchaseService.getPurchaseIndentConversionFactorDropdown(orgId,
+					branch, fromUnit, toUnit);
 
-	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                "Conversion Factor dropdown retrieved successfully");
-	        responseObjectsMap.put("conversionFactorDropdown", response);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Conversion Factor dropdown retrieved successfully");
+			responseObjectsMap.put("conversionFactorDropdown", response);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
-	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+		} catch (Exception e) {
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Conversion Factor dropdown retrieval failed",
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Conversion Factor dropdown retrieval failed",
+					e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-	    return ResponseEntity.ok(responseDTO);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok(responseDTO);
 	}
-	
+
 	@GetMapping("/getPurchaseIndentDepartmentDropdown")
-	public ResponseEntity<ResponseDTO> getPurchaseIndentDepartmentDropdown(
-	        @RequestParam Long orgId) {
+	public ResponseEntity<ResponseDTO> getPurchaseIndentDepartmentDropdown(@RequestParam Long orgId) {
 
-	    String methodName = "getPurchaseIndentDepartmentDropdown()";
-	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+		String methodName = "getPurchaseIndentDepartmentDropdown()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
-	        List<Map<String, Object>> response =
-	                purchaseService.getPurchaseIndentDepartmentDropdown(orgId);
+		try {
+			List<Map<String, Object>> response = purchaseService.getPurchaseIndentDepartmentDropdown(orgId);
 
-	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
-	                "Department dropdown retrieved successfully");
-	        responseObjectsMap.put("departmentDropdown", response);
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Department dropdown retrieved successfully");
+			responseObjectsMap.put("departmentDropdown", response);
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	    } catch (Exception e) {
-	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+		} catch (Exception e) {
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                "Department dropdown retrieval failed",
-	                e.getMessage());
-	    }
+			responseDTO = createServiceResponseError(responseObjectsMap, "Department dropdown retrieval failed",
+					e.getMessage());
+		}
 
-	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
-	    return ResponseEntity.ok(responseDTO);
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+		return ResponseEntity.ok(responseDTO);
 	}
 //    
 //    
@@ -786,4 +750,23 @@ public class PurchaseController extends BaseController {
 //		}
 //		return ResponseEntity.ok(responseDTO);
 //	}
+
+	@GetMapping("/viewPurchaseIndentFile/**")
+	public ResponseEntity<byte[]> viewPurchaseIndentFile(HttpServletRequest request) {
+
+		String methodName = "viewPurchaseIndentFile()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		try {
+
+			return purchaseService.viewPurchaseIndentFile(request);
+
+		} catch (Exception e) {
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+
+			return ResponseEntity.status(500).build();
+		}
+	}
 }

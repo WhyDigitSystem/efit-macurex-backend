@@ -276,7 +276,8 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 		customerVO.setCustomerCategory1(customerCategory1);
 		customerVO.setCustomerCategory2(customerCategory2);
 		customerVO.setSupplierType(supplierType);
-		
+		customerVO.setPrimaryCurrency(currency);
+
 	    customerVO.setBranch(branch);
 	    customerVO.setGstState(gstState);
 	    customerVO.setCity(city);

@@ -2603,7 +2603,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			Map<String, Object> map = new HashMap<>();
 			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
 			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
-
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
 			list.add(map);
 		}
 		return list;

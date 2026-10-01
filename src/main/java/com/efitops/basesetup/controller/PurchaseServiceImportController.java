@@ -826,8 +826,7 @@ public class PurchaseServiceImportController extends BaseController {
 	}
 
 	@GetMapping("/getItemType")
-	public ResponseEntity<ResponseDTO> getItemType(@RequestParam Long orgId, @RequestParam Long branch,
-			@RequestParam Long itemType) {
+	public ResponseEntity<ResponseDTO> getItemType(@RequestParam Long orgId, @RequestParam Long branch) {
 		String methodName = "getItemType()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -836,7 +835,7 @@ public class PurchaseServiceImportController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = purchaseOrderService.getItemType(orgId, branch, itemType);
+			mapp = purchaseOrderService.getItemType(orgId, branch);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);

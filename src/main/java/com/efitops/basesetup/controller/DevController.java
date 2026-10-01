@@ -51,8 +51,8 @@ public class DevController extends BaseController {
 	// customer complaint master
 	@PutMapping(value = "/updateCreateCustomerComplaint", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreateCustomerComplaint(
-//	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
-			@RequestBody CustomerComplaintDTO customerComplaintDTO,
+	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
+//			@RequestBody CustomerComplaintDTO customerComplaintDTO,
 			@RequestPart(value = "images", required = false) MultipartFile[] images) {
 
 		String methodName = "updateCreateCustomerComplaint";
@@ -932,7 +932,7 @@ public class DevController extends BaseController {
 
 	@GetMapping("/getDespatchInstructionDocId")
 	public ResponseEntity<ResponseDTO> getDespatchInstructionDocId(@RequestParam Long orgId,
-			@RequestParam String financialYear, @RequestParam String screenCode) {
+			@RequestParam String financialYear) {
 
 		String methodName = "getDespatchInstructionDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);

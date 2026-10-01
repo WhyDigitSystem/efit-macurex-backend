@@ -1912,7 +1912,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			dto.setItemCode(obj[1] != null ? obj[1].toString() : "");
 			dto.setItemDescription(obj[2] != null ? obj[2].toString() : "");
 			if (obj[3] != null) {
-				UnitResponseDTO unit = new UnitResponseDTO();
+				UnitMasterResponseDTO unit = new UnitMasterResponseDTO();
 				unit.setId(((Number) obj[3]).longValue());
 				dto.setUnit(unit);
 			}

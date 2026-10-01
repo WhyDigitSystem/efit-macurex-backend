@@ -97,8 +97,8 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			(
 			SELECT DISTINCT
 			    sb.sdvbasic_id,
-			    sb.dlv_no,
-			    sb.dlv_date,
+			     sb.doc_id,
+         		 sb.doc_date,
 			    sb.month_of_schedule,
 			    sd.invoicetype
 
@@ -106,12 +106,12 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			INNER JOIN sdvdet sd
 			    ON sb.sdvbasic_id = sd.sdvbasic_id
 			INNER JOIN sales_contract_basic scb
-			    ON scb.doc_id = sd.so_nocontractno
+			    ON scb.doc_id = sd.so_no_contractno
 			INNER JOIN customer_header c
 			    ON sb.customer_id = c.customer_id
 			WHERE sb.cancel = FALSE
 			  AND c.customer_id = :customer
-			  AND sb.branch_id = :branch
+			  AND sb.branch = :branch
 			  AND sb.org_id = :orgId
 			  AND NOT EXISTS (
 			        SELECT 1
@@ -119,7 +119,7 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			        INNER JOIN despatch_detail dd
 			            ON db.despatch_basic_id = dd.despatch_basic_id
 			        WHERE db.cancel = FALSE
-			          AND db.schdule_no = sb.dlv_no
+			          AND db.schdule_no = sb.doc_id
 			          AND db.custumer = c.customer_id
 			          AND dd.item = sd.item_id
 			  )
@@ -130,8 +130,8 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			(
 			SELECT DISTINCT
 			    sb.sdvbasic_id,
-			    sb.dlv_no,
-			    sb.dlv_date,
+			    sb.doc_id,
+         		 sb.doc_date,
 			    sb.month_of_schedule,
 			    sd.invoicetype
 
@@ -141,11 +141,11 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			INNER JOIN customer_header ch
 			    ON sb.customer_id = ch.customer_id
 			INNER JOIN order_acceptance_basic ob
-			    ON sd.so_nocontractno = ob.doc_id
+			    ON sd.so_no_contractno = ob.doc_id
 			WHERE sb.cancel = FALSE
 			  AND ch.customer_id = :customer
 			  AND sb.month_year = :monthYear
-			  AND sb.branch_id = :branch
+			  AND sb.branch = :branch
 			  AND sb.org_id = :orgId
 			  AND NOT EXISTS (
 			        SELECT 1
@@ -159,7 +159,7 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			  )
 			)
 
-			ORDER BY dlv_no
+			ORDER BY doc_id
 			""", nativeQuery = true)
 	List<Object[]> getScheduleNoDropdownForDespatchInstruction(@Param("customer") Long customer,
 			@Param("monthYear") String monthYear, @Param("branch") Long branch, @Param("orgId") Long orgId);

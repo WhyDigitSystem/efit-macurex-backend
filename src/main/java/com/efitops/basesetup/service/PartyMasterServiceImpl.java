@@ -26,13 +26,13 @@ import com.efitops.basesetup.ResponseDTO.ItemResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PartyCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesZoneResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StateResponseDTO;
-import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.CustomerContactDetailsDTO;
 import com.efitops.basesetup.dto.CustomerDTO;
 import com.efitops.basesetup.dto.CustomerItemDetailsDTO;
 import com.efitops.basesetup.dto.CustomerShippingDetailsDTO;
 import com.efitops.basesetup.dto.EmployeeResponseDTO;
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CityVO;
 import com.efitops.basesetup.entity.CountryVO;
@@ -779,11 +779,15 @@ public class PartyMasterServiceImpl implements PartyMasterService {
 
 	                if (itemMaster.getPrimaryUnit() != null) {
 
-	                    UnitResponseDTO unitDTO = new UnitResponseDTO();
+	                    UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
 
 	                    unitDTO.setId(itemMaster.getPrimaryUnit().getId());
 	                    unitDTO.setUnitId(itemMaster.getPrimaryUnit().getUnitId());
 
+	                    unitDTO.setUnitDescription(
+	                    	    itemMaster.getPrimaryUnit().getDescription()
+	                    	);
+	                    
 	                    itemDTO.setUnit(unitDTO);
 	                }
 

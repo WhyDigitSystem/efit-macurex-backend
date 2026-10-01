@@ -2590,8 +2590,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 	}
 
 	@Override
-	public List<Map<String, Object>> getItemType(Long orgId, Long branch, Long itemType) {
-		Set<Object[]> chType = directPurchaseRepo.getItemType(orgId, branch, itemType);
+	public List<Map<String, Object>> getItemType(Long orgId, Long branch) {
+		Set<Object[]> chType = directPurchaseRepo.getItemType(orgId, branch);
 		return getItemType(chType);
 	}
 

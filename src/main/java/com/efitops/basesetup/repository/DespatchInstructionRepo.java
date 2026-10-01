@@ -208,8 +208,8 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			    ON a.sdvbasic_id = d.sdvbasic_id
 			WHERE a.cancel = FALSE
 			  AND d.item_id = :item
-			  AND a.dlv_no = :dlvNo
-			  AND a.branch_id = :branch
+			  AND a.doc_id = :dlvNo
+			  AND a.branch = :branch
 			  AND a.org_id = :orgId
 			GROUP BY
 			    a.sdvbasic_id,
@@ -232,7 +232,7 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 			    ON i.item_id = sdsd.item_id
 
 			LEFT JOIN despatch_basic db
-			    ON db.schdule_no = sds.dlv_no
+			    ON db.schdule_no = sds.doc_id
 
 			LEFT JOIN despatch_detail dd
 			    ON dd.despatch_basic_id = db.despatch_basic_id
@@ -240,7 +240,7 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 
 			WHERE sds.cancel = FALSE
 			  AND i.item_id = :item
-			  AND sds.branch_id = :branch
+			  AND sds.branch = :branch
 			  AND sds.org_id = :orgId
 			""", nativeQuery = true)
 	BigDecimal getPlannedQtyForDespatchInstruction(@Param("item") Long item, @Param("branch") Long branch,

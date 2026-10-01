@@ -25,7 +25,7 @@ public class DespatchInstructionResponseDTO {
 	private String schduleDate;
 	private LocationMasterResponseDTO location;
 	private Long orgId;
-	private Boolean active;
+	private String active;
 	private String createdBy;
 	private String cancelRemarks;
 	private String paymentTerms;

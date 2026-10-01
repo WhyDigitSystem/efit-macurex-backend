@@ -46,7 +46,6 @@ import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferChallanTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferCustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferItemResponseDTO;
-import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CustomerComplaintDTO;
 import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
@@ -924,6 +923,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		responseDTO.setOrgId(despatchInstructionVO.getOrgId());
 		responseDTO.setCreatedBy(despatchInstructionVO.getCreatedBy());
 		responseDTO.setCancelRemarks(despatchInstructionVO.getCancelRemarks());
+		responseDTO.setActive(despatchInstructionVO.getActive());
 
 		if (despatchInstructionVO.getBranch() != null) {
 

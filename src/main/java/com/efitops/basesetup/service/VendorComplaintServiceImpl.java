@@ -196,6 +196,7 @@ import com.efitops.basesetup.repository.QualityScrapNoteDetailsRepo;
 import com.efitops.basesetup.repository.QualityScrapNoteRepo;
 import com.efitops.basesetup.repository.SalesContractRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
+import com.efitops.basesetup.repository.SalesRejectionInvoiceRepo;
 import com.efitops.basesetup.repository.ScrapMaterialReturnRejectionDetailsRepo;
 import com.efitops.basesetup.repository.ScrapMaterialReturnRejectionRepo;
 import com.efitops.basesetup.repository.SetUpApprovalDetailsRepo;
@@ -357,6 +358,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	@Autowired
 	private SalesDeliveryScheduleRepo salesDeliveryScheduleRepo;
+
+	@Autowired
+	private SalesRejectionInvoiceRepo salesRejectionInvoiceRepo;
 
 	@Override
 	@Transactional
@@ -3421,11 +3425,10 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport( Long fromDept)
+	public List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long fromDept)
 			throws ApplicationException {
 
-		List<Object[]> departmentList = flashNCReportRepo.getToDepartmentDropdownForFlashNCReport(
-				fromDept);
+		List<Object[]> departmentList = flashNCReportRepo.getToDepartmentDropdownForFlashNCReport(fromDept);
 
 		if (departmentList == null || departmentList.isEmpty()) {
 
@@ -8529,6 +8532,164 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		responseObjectsMap.put("salesOrderPendingItemWiseReport", responseList);
+
+		return responseObjectsMap;
+	}
+
+//	sales register product wise
+	@Override
+	public Map<String, Object> getSalesRegisterProductWiseReport(String customerName, String itemCode, String fromDate,
+			String toDate, Long branch, Long orgId) throws ApplicationException {
+
+		List<Object[]> resultList = salesRejectionInvoiceRepo.getSalesRegisterProductWiseReport(customerName, itemCode,
+				fromDate, toDate, branch, orgId);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("docId", obj[0]);
+			data.put("docDate", obj[1]);
+			data.put("despatchQty", obj[2]);
+			data.put("customerId", obj[3]);
+			data.put("customerCode", obj[4]);
+			data.put("customerName", obj[5]);
+			data.put("itemCode", obj[6]);
+			data.put("itemDescription", obj[7]);
+			data.put("orderAcceptanceNo", obj[8]);
+			data.put("unitmasterId", obj[9]);
+			data.put("purchaseOrder", obj[10]);
+			data.put("purchaseOrderDate", obj[11]);
+			data.put("city", obj[12]);
+			data.put("netAmount", obj[13]);
+			data.put("totalAssVal", obj[14]);
+
+			responseList.add(data);
+		}
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("salesRegisterProductWiseReport", responseList);
+
+		return responseObjectsMap;
+	}
+//	sales rejection location wise
+
+	@Override
+	public Map<String, Object> getSalesRegisterLocationWiseReport(String location, String itemCode, String fromDate,
+			String toDate, Long branch, Long orgId) throws ApplicationException {
+
+		List<Object[]> resultList = salesRejectionInvoiceRepo.getSalesRegisterLocationWiseReport(location, itemCode,
+				fromDate, toDate, branch, orgId);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("docId", obj[0]);
+			data.put("docDate", obj[1]);
+			data.put("despatchQty", obj[2]);
+			data.put("customerId", obj[3]);
+			data.put("customerCode", obj[4]);
+			data.put("customerName", obj[5]);
+			data.put("itemCode", obj[6]);
+			data.put("itemDescription", obj[7]);
+			data.put("orderAcceptanceNo", obj[8]);
+			data.put("unitmasterId", obj[9]);
+			data.put("city", obj[10]);
+			data.put("totalAssVal", obj[11]);
+			data.put("netAmount", obj[12]);
+			data.put("rate", obj[13]);
+
+			responseList.add(data);
+		}
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("salesRegisterLocationWiseReport", responseList);
+
+		return responseObjectsMap;
+	}
+
+//	sales contract Register report
+	@Override
+	public Map<String, Object> getSalesContractRegisterReport(String fromDate, String toDate, Long branch, Long orgId,
+			String belongsTo) throws ApplicationException {
+
+		List<Object[]> resultList = salesContractRepo.getSalesContractRegisterReport(fromDate, toDate, branch,
+				belongsTo);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("salesContractId", obj[0]);
+			data.put("docId", obj[1]);
+			data.put("docDate", obj[2]);
+			data.put("customerContractNo", obj[3]);
+			data.put("contractDate", obj[4]);
+			data.put("quotationNo", obj[5]);
+			data.put("quotationDate", obj[6]);
+			data.put("customerName", obj[7]);
+			data.put("customerCode", obj[8]);
+			data.put("effectiveFrom", obj[9]);
+			data.put("effectiveTo", obj[10]);
+			data.put("orderRate", obj[11]);
+			data.put("amount", obj[12]);
+			data.put("item", obj[13]);
+			data.put("hsn", obj[14]);
+
+			responseList.add(data);
+		}
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		responseObjectsMap.put("salesContractRegisterReport", responseList);
+
+		return responseObjectsMap;
+	}
+
+//	salesCustomerPartnocuml
+
+	@Override
+	public Map<String, Object> getSalesCustomerPartNoCumlReport(Long branch, Long orgId, String fromDate, String toDate,
+			String customerName) throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> resultList = salesRejectionInvoiceRepo.getSalesCustomerPartNoCumlReport(branch, orgId, fromDate,
+				toDate, customerName);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("docId", obj[0]);
+			data.put("docDate", obj[1]);
+			data.put("customerCode", obj[2]);
+			data.put("customerName", obj[3]);
+			data.put("itemCode", obj[4]);
+			data.put("itemDescription", obj[5]);
+			data.put("customerPartNo", obj[6]);
+			data.put("unitId", obj[7]);
+			data.put("despatchQty", obj[8]);
+			data.put("totalAssVal", obj[9]);
+			data.put("igst", obj[10]);
+			data.put("cgst", obj[11]);
+			data.put("sgst", obj[12]);
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("salesCustomerPartNoCumlReport", responseList);
 
 		return responseObjectsMap;
 	}

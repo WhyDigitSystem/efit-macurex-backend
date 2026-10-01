@@ -321,6 +321,18 @@ public interface VendorComplaintService {
 
 	List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long fromDept) throws ApplicationException;
 
+	Map<String, Object> getSalesRegisterProductWiseReport(String customerName, String itemCode, String fromDate,
+			String toDate, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getSalesRegisterLocationWiseReport(String location, String itemCode, String fromDate,
+			String toDate, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getSalesContractRegisterReport(String fromDate, String toDate, Long branch, Long orgId,
+			String belongsTo) throws ApplicationException;
+
+	Map<String, Object> getSalesCustomerPartNoCumlReport(Long branch, Long orgId, String fromDate, String toDate,
+			String customerName) throws ApplicationException;
+
 	
 
 

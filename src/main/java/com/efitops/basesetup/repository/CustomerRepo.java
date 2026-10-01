@@ -153,12 +153,12 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 						  AND ?1 = 'Direct'
 						  AND c.org_id = ?2
 						  AND c.branch = ?3
-
-						  AND (
-			       a.value_code LIKE 'CUSTOMER%'
-			    OR b.value_code LIKE 'CUSTOMER%'
-			    OR cc.value_code LIKE 'CUSTOMER%'
-			)
+						
+			AND (
+	              UPPER(a.value_description) LIKE '%CUSTOMER%' 
+	           OR UPPER(b.value_description) LIKE '%CUSTOMER%' 
+	           OR UPPER(cc.value_description) LIKE '%CUSTOMER%' 
+	        ) 
 
 						ORDER BY customer_code
 						""", nativeQuery = true)
@@ -221,9 +221,9 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 						  AND c.branch = :branch
 						  AND c.org_id = :orgId
 						  AND (
-			       a.value_code LIKE 'CUSTOMER%'
-			    OR b.value_code LIKE 'CUSTOMER%'
-			    OR cc.value_code LIKE 'CUSTOMER%'
+			       a.value_description LIKE 'CUSTOMER%'
+			    OR b.value_description LIKE 'CUSTOMER%'
+			    OR cc.value_description LIKE 'CUSTOMER%'
 			)
 						ORDER BY c.customer_code
 						""", nativeQuery = true)
@@ -303,9 +303,9 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 						  AND c.active = 1
 						  AND c.cancel = 0
 						 AND (
-			       a.value_code LIKE 'CUSTOMER%'
-			    OR b.value_code LIKE 'CUSTOMER%'
-			    OR cc.value_code LIKE 'CUSTOMER%'
+			       a.value_description LIKE 'CUSTOMER%'
+			    OR b.value_description LIKE 'CUSTOMER%'
+			    OR cc.value_description LIKE 'CUSTOMER%'
 			)
 
 						ORDER BY c.customer_name

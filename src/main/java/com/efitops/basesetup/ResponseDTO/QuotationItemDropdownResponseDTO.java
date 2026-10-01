@@ -23,6 +23,8 @@ public class QuotationItemDropdownResponseDTO {
     private Long unitMasterId;
     private String unitId;
     private Long gstRateMasterId;
+    private BigDecimal quotationRate;
+    private BigDecimal qty;
 
 
 }

@@ -365,8 +365,8 @@ public class PurchaseDeliverySchController extends BaseController {
 	@PostMapping(value = "/updateCreatePurchaseContract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreatePurchaseContract(
 
-			@RequestPart("purchaseContractVO") PurchaseContractDTO purchaseContractDTO,
-//			@RequestBody PurchaseContractDTO purchaseContractDTO,
+//			@RequestPart("purchaseContractVO") PurchaseContractDTO purchaseContractDTO,
+			@RequestBody PurchaseContractDTO purchaseContractDTO,
 
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 

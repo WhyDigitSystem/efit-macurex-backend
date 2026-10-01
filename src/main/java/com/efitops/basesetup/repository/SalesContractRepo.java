@@ -73,7 +73,9 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			    gr.igst,
 			    u.unitmaster_id,
 			    u.unit_id,
-			    gr.gstratemaster_id
+			    gr.gstratemaster_id,
+			    qd.basic_price,
+			    qd.qty_offered
 			FROM quotation_header q
 			INNER JOIN quotation_detail qd
 			    ON q.quotation_id = qd.quotation_id

@@ -46,7 +46,6 @@ import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferChallanTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferCustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferItemResponseDTO;
-import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CustomerComplaintDTO;
 import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
@@ -924,6 +923,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 		responseDTO.setOrgId(despatchInstructionVO.getOrgId());
 		responseDTO.setCreatedBy(despatchInstructionVO.getCreatedBy());
 		responseDTO.setCancelRemarks(despatchInstructionVO.getCancelRemarks());
+		responseDTO.setActive(despatchInstructionVO.getActive());
 
 		if (despatchInstructionVO.getBranch() != null) {
 
@@ -1707,7 +1707,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	}
 
 	@Override
-	public String getStockTransferChallanDocId(Long orgId, String financialYear, String screenCode) {
+	public String getStockTransferChallanDocId(Long orgId, String financialYear) {
 		String screenCode1 = "STC";
 		String result = stockTransferChallanRepo.getStockTransferChallanDocId(orgId, financialYear, screenCode1);
 		return result;
@@ -1912,7 +1912,7 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 			dto.setItemCode(obj[1] != null ? obj[1].toString() : "");
 			dto.setItemDescription(obj[2] != null ? obj[2].toString() : "");
 			if (obj[3] != null) {
-				UnitResponseDTO unit = new UnitResponseDTO();
+				UnitMasterResponseDTO unit = new UnitMasterResponseDTO();
 				unit.setId(((Number) obj[3]).longValue());
 				dto.setUnit(unit);
 			}

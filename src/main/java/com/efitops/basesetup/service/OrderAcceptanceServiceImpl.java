@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.GSTRateResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OrderAcceptanceResponsesDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CustomerResponseGstDetailsDTO;
@@ -925,6 +926,26 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			responseDTO.setCustomerId(customerDTO);
 		}
 
+
+			if (salesOrderShortCloseVO.getSaleOrderNo() != null) {
+			
+			    OrderAcceptanceResponsesDTO orderAcceptanceDTO =
+			            new OrderAcceptanceResponsesDTO();
+			
+			    orderAcceptanceDTO.setId(
+			            salesOrderShortCloseVO.getSaleOrderNo().getId()
+			    );
+			
+			    orderAcceptanceDTO.setDocId(
+			            salesOrderShortCloseVO.getSaleOrderNo().getDocId()
+			    );
+			
+			    orderAcceptanceDTO.setDocDate(
+			            salesOrderShortCloseVO.getSaleOrderNo().getDocDate()
+			    );
+			
+			    responseDTO.setOrderAcceptance(orderAcceptanceDTO);
+			}
 		if (salesOrderShortCloseVO.getBranch() != null) {
 
 			BranchResponseDTO branch = new BranchResponseDTO();

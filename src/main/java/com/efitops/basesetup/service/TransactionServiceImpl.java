@@ -34,7 +34,6 @@ import com.efitops.basesetup.ResponseDTO.SalesReturnDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesReturnResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesReturnTaxDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransportResponseDTO;
-import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
@@ -514,13 +513,17 @@ public class TransactionServiceImpl implements TransactionService {
 
 					if (detailVO.getItem().getPrimaryUnit() != null) {
 
-						UnitResponseDTO unit = new UnitResponseDTO();
+					    UnitMasterResponseDTO unit = new UnitMasterResponseDTO();
 
-						unit.setId(detailVO.getItem().getPrimaryUnit().getId());
+					    unit.setId(detailVO.getItem().getPrimaryUnit().getId());
 
-						unit.setUnitId(detailVO.getItem().getPrimaryUnit().getDescription());
+					    unit.setUnitId(detailVO.getItem().getPrimaryUnit().getUnitId());
 
-						item.setUnit(unit);
+					    unit.setUnitDescription(
+					        detailVO.getItem().getPrimaryUnit().getDescription()
+					    );
+
+					    item.setUnit(unit);
 					}
 
 					detailResponse.setItem(item);
@@ -604,6 +607,7 @@ public class TransactionServiceImpl implements TransactionService {
 			map.put("orderQty", obj[4] != null ? obj[4] : null);
 			map.put("itemId", obj[5] != null ? obj[5] : null);
 			map.put("unitId", obj[6] != null ? obj[6] : null);
+			map.put("unitDesc", obj[7] != null ? obj[7] : null);
 
 			responseList.add(map);
 		}

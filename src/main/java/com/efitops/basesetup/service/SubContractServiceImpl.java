@@ -2879,12 +2879,15 @@ public class SubContractServiceImpl implements SubContractService {
 			// If ItemMasterVO has Unit
 			if (vo.getIncomingItem().getPrimaryUnit() != null) {
 
-				UnitResponseDTO unit = new UnitResponseDTO();
+				UnitMasterResponseDTO unit = new UnitMasterResponseDTO();
 
 				unit.setId(vo.getIncomingItem().getPrimaryUnit().getId());
 
-				unit.setUnitId(vo.getIncomingItem().getPrimaryUnit().getDescription());
+				unit.setUnitId(vo.getIncomingItem().getPrimaryUnit().getUnitId());
 
+				unit.setUnitDescription(vo.getIncomingItem().getPrimaryUnit().getDescription());
+
+				
 				item.setUnit(unit);
 			}
 
@@ -3029,11 +3032,12 @@ public class SubContractServiceImpl implements SubContractService {
 					// Item Unit
 					if (detailVO.getOutgoingItem().getPrimaryUnit() != null) {
 
-						UnitResponseDTO itemUnit = new UnitResponseDTO();
+						UnitMasterResponseDTO itemUnit = new UnitMasterResponseDTO();
 
 						itemUnit.setId(detailVO.getOutgoingItem().getPrimaryUnit().getId());
 
-						itemUnit.setUnitId(detailVO.getOutgoingItem().getPrimaryUnit().getDescription());
+						itemUnit.setUnitId(detailVO.getOutgoingItem().getPrimaryUnit().getUnitId());
+						itemUnit.setUnitDescription(detailVO.getOutgoingItem().getPrimaryUnit().getDescription());
 
 						item.setUnit(itemUnit);
 					}

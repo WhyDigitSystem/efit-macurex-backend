@@ -69,12 +69,10 @@ public class PurchaseOrderAmendmentVO {
 //
 //	@Column(name = "ref_date")
 //	private String refDate;
-	
-	@ManyToOne
-	@JoinColumn(name = "exchange_rate")
-	private DailyExchangeRateVO exchangeRate;
 
-	
+	@Column(name = "exchange_rate", precision = 10, scale = 2)
+	private BigDecimal exchangeRate;
+
 	@Column(name = "revision_no")
 	private int revisionNo;
 
@@ -116,6 +114,9 @@ public class PurchaseOrderAmendmentVO {
 	private String screenName = "PURCHASEORDERAMENDMENT";
 	@Column(name = "screen_code")
 	private String screenCode = "POA";
+
+	@Column(name = "financial_year")
+	private String financialYear;
 
 	@OneToMany(mappedBy = "purchaseOrderAmendmentVO", cascade = CascadeType.ALL)
 	@JsonManagedReference

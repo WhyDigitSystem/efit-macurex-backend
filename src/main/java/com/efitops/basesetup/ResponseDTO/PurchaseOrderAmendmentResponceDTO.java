@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
-import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.service.CustomerResponseDetailsDTO;
 
 import lombok.AllArgsConstructor;
@@ -17,57 +16,53 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PurchaseOrderAmendmentResponceDTO {
-	
-	 private Long id;
-	 
-	 private BranchResponseDTO branch;
-	 
-	 private String belongsTo;
-	 
-	 private String docId;
-	 private LocalDate docDate;
-	 
-	 private CustomerResponseDetailsDTO customer;
-	 
-     private String purchaseordernumber;
-	 
-	 private CurrencyResponseDTO  currency;
-	 
-//	 private String refNo;
-//	 
-//	 private String refDate;
-	 
-	 private PurchaseOrderAmendmentExcahngeRateResponseDTO exchangeRate;
-	 
-	 private int revisionNo;
-	 
-	 private boolean active;
-	 
-	 
-	 private String freightType;
-	 
-	 private String packingType;
-	 
-	 private BigDecimal insuranceAmount;
-	 
-	 private String modeOfDespatch;
-	 
-	 private String taxDescription;
-	 
-	 private String remarks;
-	 
-	 
-	 private Long orgId;
 
-	 private String createdBy;
-	 
-	 private String cancelRemarks;
-	 
-	 private String screenName;
-	 private String screenCode;
-	 
-	 private List<PurchaseOrderAmendmentDetailsResponseDTO> details;
+	private Long id;
 
-	 private List<PurchaseOrderAmendmentAttachmentResponseDTO> attachments;
+	private BranchResponseDTO branch;
+
+	private String belongsTo;
+
+	private String docId;
+	private LocalDate docDate;
+
+	private BigDecimal exchangeRate;
+
+	private CustomerResponseDetailsDTO customer;
+
+	private String purchaseordernumber;
+
+	private CurrencyResponseDTO currency;
+//
+//	private ExchangeRateResponseDTO exchangeRate;
+
+	private int revisionNo;
+
+	private boolean active;
+
+	private String freightType;
+
+	private String packingType;
+
+	private BigDecimal insuranceAmount;
+
+	private String modeOfDespatch;
+
+	private String taxDescription;
+
+	private String remarks;
+
+	private Long orgId;
+
+	private String createdBy;
+
+	private String cancelRemarks;
+
+	private String screenName;
+	private String screenCode;
+
+	private List<PurchaseOrderAmendmentDetailsResponseDTO> details;
+
+	private List<PurchaseOrderAmendmentAttachmentResponseDTO> attachments;
 
 }

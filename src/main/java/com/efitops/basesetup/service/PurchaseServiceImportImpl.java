@@ -2018,6 +2018,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setAfterDiscountTotalAmount(dto.getAfterDiscountTotalAmount());
 		vo.setBasicAmount(dto.getBasicAmount());
 		vo.setTotalAmount(dto.getTotalAmount());
+		vo.setSupplierCode(dto.getSupplierCode());
+		vo.setTallyRefNo(dto.getTallyRefNo());
 
 		if (dto.getBranch() != null && dto.getBranch() != 0) {
 

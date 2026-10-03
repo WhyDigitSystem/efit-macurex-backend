@@ -75,6 +75,11 @@ public class DirectPurchaseDTO {
 	private BigDecimal afterDiscountTotalAmount;
 
 	private BigDecimal totalAmount;
+	
+	private String supplierCode;
+	
+	private String tallyRefNo;
+
 
 	private List<DirectPurchaseCashDetailsDTO> directPurchaseCashDetailsDTO;
 

@@ -53,6 +53,12 @@ public class DirectPurchaseVO {
 
 	@Column(name = "supplier_name")
 	private String supplierName;
+	
+	@Column(name = "supplier_code")
+	private String supplierCode;
+	
+	@Column(name = "tally_ref_no")
+	private String tallyRefNo;
 
 	@Column(name = "inv_date")
 	private LocalDate invDate;

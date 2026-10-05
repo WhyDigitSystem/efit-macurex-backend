@@ -3567,7 +3567,7 @@ public class SubContractServiceImpl implements SubContractService {
 
 						unit.setUnitId(itemVO.getItem().getPrimaryUnit().getUnitId());
 
-						unit.setUnitId(itemVO.getItem().getPrimaryUnit().getDescription());
+						unit.setUnitDescription(itemVO.getItem().getPrimaryUnit().getDescription());
 
 						item.setUnit(unit);
 					}

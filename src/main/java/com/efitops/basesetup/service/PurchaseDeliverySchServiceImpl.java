@@ -1814,6 +1814,8 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		vo.setActive(dto.isActive());
 
 		vo.setCancelRemarks(dto.getCancelRemarks());
+		
+		vo.setPostingCategory(dto.getPostingCategory());
 
 		// ======================================================
 		// Branch
@@ -2335,6 +2337,9 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		response.setPurchaseorderNo(purchaseBillVO.getPurchaseorderNumber());
 		response.setPurchaseorderDate(purchaseBillVO.getPurchaseorderDate());
 		response.setPurchaseorderType(purchaseBillVO.getPurchaseorderType());
+		response.setPostingCategory(purchaseBillVO.getPostingCategory());
+		response.setSupplierDcInvNo(purchaseBillVO.getSupplierDcInvNo());
+		response.setSupplierDcInvDate(purchaseBillVO.getSupplierDcInvDate());
 		response.setStatutoryForms(purchaseBillVO.getStatutoryForms());
 		response.setTaxStructureName(purchaseBillVO.getTaxStructureName());
 

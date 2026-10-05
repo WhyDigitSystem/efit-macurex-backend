@@ -3573,10 +3573,11 @@ public class DevelopServiceImpl implements DevelopService {
 			response.put("qty", obj[4]);
 			response.put("rate", obj[5]);
 			response.put("deliveryDate", obj[6]);
-			response.put("oldRate", obj[7]);
-			response.put("oldQty", obj[8]);
-			response.put("oldDeliveryDate", obj[9]);
-
+			response.put("itemDescription", obj[7]);
+			response.put("unitDescription", obj[8]);			
+			response.put("oldRate", obj[9]);
+			response.put("oldQty", obj[10]);
+			response.put("oldDeliveryDate", obj[11]);
 			responseList.add(response);
 		}
 

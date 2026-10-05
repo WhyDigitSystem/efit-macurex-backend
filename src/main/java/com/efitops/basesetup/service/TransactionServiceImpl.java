@@ -109,6 +109,8 @@ import com.efitops.basesetup.repository.SalesReturnTaxDetailsRepo;
 import com.efitops.basesetup.repository.StockValuationRepo;
 import com.efitops.basesetup.repository.TransportRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -2260,94 +2262,511 @@ public class TransactionServiceImpl implements TransactionService {
 
 	// salesReturn
 
+//	@Transactional(rollbackOn = Exception.class)
+//	@Override
+//	public Map<String, Object> createUpdateSalesReturn(SalesReturnDTO dto) throws ApplicationException {
+//
+//		String screenCode = "SR";
+//
+//		Map<String, Object> response = new HashMap<>();
+//
+//		String message;
+//		SalesReturnVO salesReturnVO;
+//
+//		// =========================================================
+//		// CREATE
+//		// =========================================================
+//
+//		if (ObjectUtils.isEmpty(dto.getId())) {
+//
+//			salesReturnVO = new SalesReturnVO();
+//
+//			// Generate Document ID
+//			String docId = salesReturnRepo.getSalesReturnDocId(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+//
+//			salesReturnVO.setDocId(docId);
+//
+//			// Update document last number
+//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+//					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+//
+//			if (documentTypeMappingDetailsVO != null) {
+//				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//			}
+//
+//			salesReturnVO.setCreatedBy(dto.getCreatedBy());
+//			salesReturnVO.setUpdatedBy(dto.getCreatedBy());
+//
+//			message = "Sales Return Created Successfully";
+//
+//		} else {
+//
+//			// =====================================================
+//			// UPDATE
+//			// =====================================================
+//
+//			salesReturnVO = salesReturnRepo.findById(dto.getId())
+//					.orElseThrow(() -> new ApplicationException("Sales Return Not Found"));
+//
+//			// Delete old detail records
+//			List<SalesReturnDetailsVO> oldDetails = salesReturnDetailsRepo.findBySalesReturnId(salesReturnVO.getId());
+//
+//			if (oldDetails != null && !oldDetails.isEmpty()) {
+//				salesReturnDetailsRepo.deleteAll(oldDetails);
+//			}
+//
+//			// Delete old tax records
+//			List<SalesReturnTaxDetailsVO> oldTaxDetails = salesReturnTaxDetailsRepo
+//					.findBySalesReturnId(salesReturnVO.getId());
+//
+//			if (oldTaxDetails != null && !oldTaxDetails.isEmpty()) {
+//				salesReturnTaxDetailsRepo.deleteAll(oldTaxDetails);
+//			}
+//
+//			salesReturnVO.setUpdatedBy(dto.getCreatedBy());
+//
+//			message = "Sales Return Updated Successfully";
+//		}
+//
+//		// =========================================================
+//		// HEADER + CHILD MAPPING
+//		// =========================================================
+//
+//		getSalesReturnVOFromDTO(dto, salesReturnVO);
+//
+//		// =========================================================
+//		// SAVE
+//		// =========================================================
+//
+//		salesReturnVO = salesReturnRepo.saveAndFlush(salesReturnVO);
+//
+//		// =========================================================
+//		// RESPONSE
+//		// =========================================================
+//
+//		response.put("message", message);
+//		response.put("salesReturnVO", convertToResponse(salesReturnVO));
+//
+//		return response;
+//	}
+//	
 	@Transactional(rollbackOn = Exception.class)
 	@Override
-	public Map<String, Object> createUpdateSalesReturn(SalesReturnDTO dto) throws ApplicationException {
+	public Map<String, Object> createUpdateSalesReturn(SalesReturnDTO dto)
+	        throws ApplicationException {
 
-		String screenCode = "SR";
+	    String screenCode = "SR";
 
-		Map<String, Object> response = new HashMap<>();
+	    Map<String, Object> response = new HashMap<>();
+	    String message;
+	    SalesReturnVO salesReturnVO;
 
-		String message;
-		SalesReturnVO salesReturnVO;
+	    try {
 
-		// =========================================================
-		// CREATE
-		// =========================================================
+	        // =========================================================
+	        // START
+	        // =========================================================
 
-		if (ObjectUtils.isEmpty(dto.getId())) {
+	        System.out.println("\n");
+	        System.out.println("==============================================");
+	        System.out.println("        SALES RETURN START");
+	        System.out.println("==============================================");
 
-			salesReturnVO = new SalesReturnVO();
+	        System.out.println("ID            : [" + dto.getId() + "]");
+	        System.out.println("Org ID        : [" + dto.getOrgId() + "]");
+	        System.out.println("Branch        : [" + dto.getBranch() + "]");
+	        System.out.println("Customer      : [" + dto.getCustomer() + "]");
+	        System.out.println("Location      : [" + dto.getLocation() + "]");
+	        System.out.println("Currency      : [" + dto.getCurrency() + "]");
+	        System.out.println("Exchange Rate : [" + dto.getExchangeRate() + "]");
+	        System.out.println("Financial Year: [" + dto.getFinancialYear() + "]");
+	        System.out.println("Invoice No    : [" + dto.getInvoiceNo() + "]");
+	        System.out.println("Net Amount    : [" + dto.getNetAmount() + "]");
 
-			// Generate Document ID
-			String docId = salesReturnRepo.getSalesReturnDocId(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+	        // =========================================================
+	        // PRINT DETAILS
+	        // =========================================================
 
-			salesReturnVO.setDocId(docId);
+	        if (dto.getSalesReturnDetails() != null) {
 
-			// Update document last number
-			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+	            System.out.println("----------------------------------------------");
+	            System.out.println("SALES RETURN DETAILS");
+	            System.out.println("----------------------------------------------");
 
-			if (documentTypeMappingDetailsVO != null) {
-				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+	            int detailIndex = 0;
 
-				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
-			}
+	            for (SalesReturnDetailsDTO detail :
+	                    dto.getSalesReturnDetails()) {
 
-			salesReturnVO.setCreatedBy(dto.getCreatedBy());
-			salesReturnVO.setUpdatedBy(dto.getCreatedBy());
+	                System.out.println("DETAIL INDEX : " + detailIndex);
+	                System.out.println("Item         : [" + detail.getItem() + "]");
+	                System.out.println("HSN/SAC      : [" + detail.getHsnSacCode() + "]");
+	                System.out.println("Unit         : [" + detail.getUnit() + "]");
+	                System.out.println("Stock        : [" + detail.getStock() + "]");
+	                System.out.println("Qty Sold     : [" + detail.getQtySold() + "]");
+	                System.out.println("Received Qty : [" + detail.getReceivedQty() + "]");
+	                System.out.println("Rate         : [" + detail.getRate() + "]");
+	                System.out.println("Rate Currency: [" + detail.getRateInSelectedCurrency() + "]");
+	                System.out.println("Amount       : [" + detail.getAmountInSelectedCurrency() + "]");
+	                System.out.println("CGST Rate    : [" + detail.getCgstRate() + "]");
+	                System.out.println("SGST Rate    : [" + detail.getSgstRate() + "]");
+	                System.out.println("IGST Rate    : [" + detail.getIgstRate() + "]");
+	                System.out.println("Tax %        : [" + detail.getTaxPercentage() + "]");
+	                System.out.println("Tax Type     : [" + detail.getTaxType() + "]");
 
-			message = "Sales Return Created Successfully";
+	                detailIndex++;
+	            }
+	        }
 
-		} else {
+	        // =========================================================
+	        // CREATE
+	        // =========================================================
 
-			// =====================================================
-			// UPDATE
-			// =====================================================
+	        if (ObjectUtils.isEmpty(dto.getId())) {
 
-			salesReturnVO = salesReturnRepo.findById(dto.getId())
-					.orElseThrow(() -> new ApplicationException("Sales Return Not Found"));
+	            System.out.println("----------------------------------------------");
+	            System.out.println("CREATE SALES RETURN");
+	            System.out.println("----------------------------------------------");
 
-			// Delete old detail records
-			List<SalesReturnDetailsVO> oldDetails = salesReturnDetailsRepo.findBySalesReturnId(salesReturnVO.getId());
+	            salesReturnVO = new SalesReturnVO();
 
-			if (oldDetails != null && !oldDetails.isEmpty()) {
-				salesReturnDetailsRepo.deleteAll(oldDetails);
-			}
+	            System.out.println("Generating Sales Return Document ID...");
 
-			// Delete old tax records
-			List<SalesReturnTaxDetailsVO> oldTaxDetails = salesReturnTaxDetailsRepo
-					.findBySalesReturnId(salesReturnVO.getId());
+	            String docId = salesReturnRepo.getSalesReturnDocId(
+	                    dto.getOrgId(),
+	                    dto.getFinancialYear(),
+	                    screenCode
+	            );
 
-			if (oldTaxDetails != null && !oldTaxDetails.isEmpty()) {
-				salesReturnTaxDetailsRepo.deleteAll(oldTaxDetails);
-			}
+	            System.out.println("Generated Doc ID : [" + docId + "]");
 
-			salesReturnVO.setUpdatedBy(dto.getCreatedBy());
+	            salesReturnVO.setDocId(docId);
 
-			message = "Sales Return Updated Successfully";
-		}
+	            // =====================================================
+	            // DOCUMENT NUMBER
+	            // =====================================================
 
-		// =========================================================
-		// HEADER + CHILD MAPPING
-		// =========================================================
+	            System.out.println("Finding Document Type Mapping...");
 
-		getSalesReturnVOFromDTO(dto, salesReturnVO);
+	            DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+	                    documentTypeMappingDetailsRepo
+	                            .findByOrgIdAndFinYearAndScreenCode(
+	                                    dto.getOrgId(),
+	                                    dto.getFinancialYear(),
+	                                    screenCode
+	                            );
 
-		// =========================================================
-		// SAVE
-		// =========================================================
+	            if (documentTypeMappingDetailsVO != null) {
 
-		salesReturnVO = salesReturnRepo.saveAndFlush(salesReturnVO);
+	                System.out.println(
+	                        "Current Last Number : "
+	                                + documentTypeMappingDetailsVO.getLastNo()
+	                );
 
-		// =========================================================
-		// RESPONSE
-		// =========================================================
+	                documentTypeMappingDetailsVO.setLastNo(
+	                        documentTypeMappingDetailsVO.getLastNo() + 1
+	                );
 
-		response.put("message", message);
-		response.put("salesReturnVO", convertToResponse(salesReturnVO));
+	                documentTypeMappingDetailsRepo.save(
+	                        documentTypeMappingDetailsVO
+	                );
 
-		return response;
+	                System.out.println(
+	                        "Updated Last Number : "
+	                                + documentTypeMappingDetailsVO.getLastNo()
+	                );
+
+	            } else {
+
+	                System.out.println(
+	                        "WARNING: Document Type Mapping NOT FOUND"
+	                );
+	            }
+
+	            salesReturnVO.setCreatedBy(dto.getCreatedBy());
+	            salesReturnVO.setUpdatedBy(dto.getCreatedBy());
+
+	            message = "Sales Return Created Successfully";
+
+	        } else {
+
+	            // =====================================================
+	            // UPDATE
+	            // =====================================================
+
+	            System.out.println("----------------------------------------------");
+	            System.out.println("UPDATE SALES RETURN");
+	            System.out.println("----------------------------------------------");
+
+	            System.out.println(
+	                    "Searching Sales Return ID : ["
+	                            + dto.getId() + "]"
+	            );
+
+	            salesReturnVO = salesReturnRepo.findById(dto.getId())
+	                    .orElseThrow(() ->
+	                            new ApplicationException(
+	                                    "Sales Return Not Found"
+	                            )
+	                    );
+
+	            System.out.println(
+	                    "Sales Return Found. DB ID : ["
+	                            + salesReturnVO.getId() + "]"
+	            );
+
+	            // =====================================================
+	            // DELETE OLD DETAILS
+	            // =====================================================
+
+	            System.out.println("Finding old Sales Return Details...");
+
+	            List<SalesReturnDetailsVO> oldDetails =
+	                    salesReturnDetailsRepo.findBySalesReturnId(
+	                            salesReturnVO.getId()
+	                    );
+
+	            if (oldDetails != null && !oldDetails.isEmpty()) {
+
+	                System.out.println(
+	                        "Old Details Count : "
+	                                + oldDetails.size()
+	                );
+
+	                salesReturnDetailsRepo.deleteAll(oldDetails);
+
+	                System.out.println("Old Details Deleted.");
+
+	            } else {
+
+	                System.out.println("No old Details found.");
+	            }
+
+	            // =====================================================
+	            // DELETE OLD TAX DETAILS
+	            // =====================================================
+
+	            System.out.println("Finding old Tax Details...");
+
+	            List<SalesReturnTaxDetailsVO> oldTaxDetails =
+	                    salesReturnTaxDetailsRepo.findBySalesReturnId(
+	                            salesReturnVO.getId()
+	                    );
+
+	            if (oldTaxDetails != null && !oldTaxDetails.isEmpty()) {
+
+	                System.out.println(
+	                        "Old Tax Details Count : "
+	                                + oldTaxDetails.size()
+	                );
+
+	                salesReturnTaxDetailsRepo.deleteAll(oldTaxDetails);
+
+	                System.out.println("Old Tax Details Deleted.");
+
+	            } else {
+
+	                System.out.println("No old Tax Details found.");
+	            }
+
+	            salesReturnVO.setUpdatedBy(dto.getCreatedBy());
+
+	            message = "Sales Return Updated Successfully";
+	        }
+
+	        // =========================================================
+	        // MAPPING
+	        // =========================================================
+
+	        System.out.println("----------------------------------------------");
+	        System.out.println("START getSalesReturnVOFromDTO()");
+	        System.out.println("----------------------------------------------");
+
+	        getSalesReturnVOFromDTO(dto, salesReturnVO);
+
+	        System.out.println("----------------------------------------------");
+	        System.out.println("getSalesReturnVOFromDTO() COMPLETED");
+	        System.out.println("----------------------------------------------");
+
+	        // =========================================================
+	        // SAVE
+	        // =========================================================
+
+	        System.out.println("Saving Sales Return...");
+
+	        salesReturnVO =
+	                salesReturnRepo.saveAndFlush(salesReturnVO);
+
+	        System.out.println(
+	                "Sales Return Saved Successfully."
+	        );
+
+	        System.out.println(
+	                "Generated Sales Return ID : ["
+	                        + salesReturnVO.getId() + "]"
+	        );
+
+	        // =========================================================
+	        // RESPONSE
+	        // =========================================================
+
+	        response.put("message", message);
+
+	        response.put(
+	                "salesReturnVO",
+	                convertToResponse(salesReturnVO)
+	        );
+
+	        System.out.println("==============================================");
+	        System.out.println("        SALES RETURN SUCCESS");
+	        System.out.println("==============================================");
+
+	        return response;
+
+	    } catch (Exception e) {
+
+	        // =========================================================
+	        // ERROR
+	        // =========================================================
+
+	        System.out.println("\n");
+	        System.out.println("==============================================");
+	        System.out.println("        SALES RETURN ERROR");
+	        System.out.println("==============================================");
+
+	        System.out.println(
+	                "Exception Type : "
+	                        + e.getClass().getName()
+	        );
+
+	        System.out.println(
+	                "Error Message  : "
+	                        + e.getMessage()
+	        );
+
+	        System.out.println("----------------------------------------------");
+
+	        System.out.println("REQUEST VALUES");
+	        System.out.println("----------------------------------------------");
+
+	        System.out.println(
+	                "ID            : [" + dto.getId() + "]"
+	        );
+
+	        System.out.println(
+	                "Org ID        : [" + dto.getOrgId() + "]"
+	        );
+
+	        System.out.println(
+	                "Branch        : [" + dto.getBranch() + "]"
+	        );
+
+	        System.out.println(
+	                "Customer      : [" + dto.getCustomer() + "]"
+	        );
+
+	        System.out.println(
+	                "Location      : [" + dto.getLocation() + "]"
+	        );
+
+	        System.out.println(
+	                "Currency      : [" + dto.getCurrency() + "]"
+	        );
+
+	        System.out.println(
+	                "Exchange Rate : [" + dto.getExchangeRate() + "]"
+	        );
+
+	        System.out.println(
+	                "Financial Year: [" + dto.getFinancialYear() + "]"
+	        );
+
+	        // =========================================================
+	        // DETAIL VALUES
+	        // =========================================================
+
+	        if (dto.getSalesReturnDetails() != null) {
+
+	            System.out.println("----------------------------------------------");
+	            System.out.println("DETAIL VALUES AT ERROR");
+	            System.out.println("----------------------------------------------");
+
+	            int index = 0;
+
+	            for (SalesReturnDetailsDTO detail :
+	                    dto.getSalesReturnDetails()) {
+
+	                System.out.println(
+	                        "DETAIL [" + index + "]"
+	                );
+
+	                System.out.println(
+	                        "item       = [" + detail.getItem() + "]"
+	                );
+
+	                System.out.println(
+	                        "hsnSacCode = [" + detail.getHsnSacCode() + "]"
+	                );
+
+	                System.out.println(
+	                        "unit       = [" + detail.getUnit() + "]"
+	                );
+
+	                System.out.println(
+	                        "stock      = [" + detail.getStock() + "]"
+	                );
+
+	                System.out.println(
+	                        "qtySold    = [" + detail.getQtySold() + "]"
+	                );
+
+	                System.out.println(
+	                        "receivedQty= [" + detail.getReceivedQty() + "]"
+	                );
+
+	                System.out.println(
+	                        "rate       = [" + detail.getRate() + "]"
+	                );
+
+	                System.out.println(
+	                        "taxPercent = [" + detail.getTaxPercentage() + "]"
+	                );
+
+	                System.out.println(
+	                        "taxType    = [" + detail.getTaxType() + "]"
+	                );
+
+	                index++;
+	            }
+	        }
+
+	        // =========================================================
+	        // FULL STACK TRACE
+	        // =========================================================
+
+	        System.out.println("----------------------------------------------");
+	        System.out.println("FULL STACK TRACE");
+	        System.out.println("----------------------------------------------");
+
+	        e.printStackTrace();
+
+	        System.out.println("==============================================");
+	        System.out.println("        SALES RETURN ERROR END");
+	        System.out.println("==============================================");
+
+	        // =========================================================
+	        // THROW ERROR
+	        // =========================================================
+
+	        throw new ApplicationException(
+	                "Sales Return failed: "
+	                        + (e.getMessage() != null
+	                                ? e.getMessage()
+	                                : e.getClass().getSimpleName())
+	        );
+	    }
 	}
 
 	private void getSalesReturnVOFromDTO(SalesReturnDTO dto, SalesReturnVO salesReturnVO) throws ApplicationException {
@@ -2409,13 +2828,13 @@ public class TransactionServiceImpl implements TransactionService {
 
 			salesReturnVO.setCurrency(currency);
 		}
-
-		if (dto.getExchangeRate() != null) {
-			DailyExchangeRateVO exchangeRate = dailyExchangeRateRepo.findById(dto.getExchangeRate())
-					.orElseThrow(() -> new ApplicationException("Exchange Rate Not Found"));
-
-			salesReturnVO.setExchangeRate(exchangeRate);
-		}
+//
+//		if (dto.getExchangeRate() != null) {
+//			DailyExchangeRateVO exchangeRate = dailyExchangeRateRepo.findById(dto.getExchangeRate())
+//					.orElseThrow(() -> new ApplicationException("Exchange Rate Not Found"));
+//
+//			salesReturnVO.setExchangeRate(exchangeRate);
+//		}
 
 		salesReturnVO.setInvoiceReferenceType(dto.getInvoiceReferenceType());
 
@@ -2478,26 +2897,26 @@ public class TransactionServiceImpl implements TransactionService {
 				detailVO.setReceivedQty(child.getReceivedQty());
 				detailVO.setRate(child.getRate());
 
-				BigDecimal rateInSelectedCurrency = BigDecimal.ZERO;
-				BigDecimal amountInSelectedCurrency = BigDecimal.ZERO;
+//				BigDecimal rateInSelectedCurrency = BigDecimal.ZERO;
+//				BigDecimal amountInSelectedCurrency = BigDecimal.ZERO;
+//
+//				DailyExchangeRateVO exchangeRate = dailyExchangeRateRepo.findById(dto.getExchangeRate())
+//						.orElseThrow(() -> new ApplicationException("Exchange Rate Not Found"));
 
-				DailyExchangeRateVO exchangeRate = dailyExchangeRateRepo.findById(dto.getExchangeRate())
-						.orElseThrow(() -> new ApplicationException("Exchange Rate Not Found"));
-
-				BigDecimal exchangeRateValue = BigDecimal.valueOf(exchangeRate.getBuyingExRate());
-
-				if (exchangeRateValue != null && exchangeRateValue.compareTo(BigDecimal.ZERO) != 0
-						&& child.getRate() != null) {
-
-					rateInSelectedCurrency = child.getRate().divide(exchangeRateValue, 2, RoundingMode.HALF_UP);
-
-					if (child.getReceivedQty() != null) {
-						amountInSelectedCurrency = child.getReceivedQty().multiply(rateInSelectedCurrency);
-					}
-				}
-
-				detailVO.setRateInSelectedCurrency(rateInSelectedCurrency);
-				detailVO.setAmountInSelectedCurrency(amountInSelectedCurrency);
+//				BigDecimal exchangeRateValue = BigDecimal.valueOf(exchangeRate.getBuyingExRate());
+//
+//				if (exchangeRateValue != null && exchangeRateValue.compareTo(BigDecimal.ZERO) != 0
+//						&& child.getRate() != null) {
+//
+//					rateInSelectedCurrency = child.getRate().divide(exchangeRateValue, 2, RoundingMode.HALF_UP);
+//
+//					if (child.getReceivedQty() != null) {
+//						amountInSelectedCurrency = child.getReceivedQty().multiply(rateInSelectedCurrency);
+//					}
+//				}
+//
+//				detailVO.setRateInSelectedCurrency(rateInSelectedCurrency);
+//				detailVO.setAmountInSelectedCurrency(amountInSelectedCurrency);
 
 				// =================================================
 				// AMOUNT CALCULATION
@@ -2889,6 +3308,40 @@ public class TransactionServiceImpl implements TransactionService {
 		return dto;
 	}
 
+	
+	private Long parseLongWithLog(String fieldName, Object value) {
+
+	    System.out.println("========================================");
+	    System.out.println("FIELD       : " + fieldName);
+	    System.out.println("VALUE       : [" + value + "]");
+	    System.out.println("VALUE TYPE  : " +
+	            (value != null ? value.getClass().getName() : "null"));
+
+	    try {
+
+	        if (value == null) {
+	            System.out.println("VALUE IS NULL");
+	            return null;
+	        }
+
+	        Long result = Long.parseLong(value.toString().trim());
+
+	        System.out.println("PARSED VALUE: " + result);
+
+	        return result;
+
+	    } catch (NumberFormatException e) {
+
+	        System.out.println("!!! NUMBER FORMAT ERROR !!!");
+	        System.out.println("FIELD       : " + fieldName);
+	        System.out.println("BAD VALUE   : [" + value + "]");
+
+	        e.printStackTrace();
+
+	        throw e;
+	    }
+	}
+	
 	@Override
 	public List<Map<String, Object>> getSalesRejectionInvoiceforSalesReturn(Long orgId, Long branch) {
 

@@ -39,7 +39,7 @@ public class PurchaseBillDTO {
 	private LocalDate voucherPostingDate;
 	private LocalDate date;
 	private BigDecimal dutyPerUnit;
-	private Long postingCategory;
+	private String postingCategory;
 	private Boolean modvatCopyReceived;
 //	private Long eccType;
 	private String supplierDcInvNo;
@@ -58,6 +58,7 @@ public class PurchaseBillDTO {
 	private boolean active;
 	private String cancelRemarks;
 	private String createdBy;
+	
 
 	// -------- children --------
 	private List<PurchaseBillDetailsDTO> purchaseDetails;

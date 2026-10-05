@@ -2353,7 +2353,7 @@ public class DevelopServiceImpl implements DevelopService {
 	public Map<String, Object> createUpdatePurchaseContractAmendment(
 			PurchaseContractAmendmentDto purchaseContractAmendmentDto, MultipartFile[] files)
 			throws ApplicationException {
-		String screenCode="PCA";
+		String screenCode = "PCA";
 
 		PurchaseContractAmendmentVO purchaseContractAmendmentVO;
 		String message;
@@ -2370,9 +2370,10 @@ public class DevelopServiceImpl implements DevelopService {
 		} else {
 
 			purchaseContractAmendmentVO = new PurchaseContractAmendmentVO();
-			
+
 			String docId = purchaseContractAmendmentRepo.getPurchaseContractAmendmentDocId(
-					purchaseContractAmendmentDto.getOrgId(), purchaseContractAmendmentDto.getFinancialYear(), screenCode);
+					purchaseContractAmendmentDto.getOrgId(), purchaseContractAmendmentDto.getFinancialYear(),
+					screenCode);
 
 			purchaseContractAmendmentVO.setDocId(docId);
 
@@ -2380,7 +2381,7 @@ public class DevelopServiceImpl implements DevelopService {
 					.findByOrgIdAndFinYearAndScreenCode(purchaseContractAmendmentDto.getOrgId(),
 							purchaseContractAmendmentDto.getFinancialYear(), screenCode);
 			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);			
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			purchaseContractAmendmentVO.setCreatedBy(purchaseContractAmendmentDto.getCreatedBy());
 
@@ -2396,7 +2397,7 @@ public class DevelopServiceImpl implements DevelopService {
 		purchaseContractAmendmentVO = purchaseContractAmendmentRepo.save(purchaseContractAmendmentVO);
 
 		// Save Attachments
-		saveAttachments(files, purchaseContractAmendmentVO);
+		saveAttachmentPurchaseContract(files, purchaseContractAmendmentVO);
 
 		// Response
 		PurchaseContractAmendmentResponseDto responseDTO = purchaseContractAmendmentResponse(
@@ -2413,14 +2414,14 @@ public class DevelopServiceImpl implements DevelopService {
 
 	private void createUpdatePurchaseContractAmendmentVOByDTO(PurchaseContractAmendmentDto dto,
 			PurchaseContractAmendmentVO vo) throws ApplicationException {
-		if (dto.getBranch() != null) {
+		if (dto.getBranch() != null  && dto.getBranch() !=0) {
 
 			BranchVO branchVO = branchRepo.findById(dto.getBranch())
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 			vo.setBranch(branchVO);
 		}
-		if (dto.getCustomer() != null) {
+		if (dto.getCustomer() != null && dto.getBranch() !=0) {
 
 			CustomerVO customerVO = customerRepo.findById(dto.getCustomer())
 					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
@@ -2429,10 +2430,6 @@ public class DevelopServiceImpl implements DevelopService {
 		}
 
 		vo.setBelongsTo(dto.getBelongsTo());
-
-		// vo.setDocId(dto.getDocId());
-		// vo.setDocDate(dto.getDocDate());
-
 		vo.setContractNo(dto.getContractNo());
 		vo.setContractDate(dto.getContractDate());
 
@@ -2440,10 +2437,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		vo.setRefNo(dto.getRefNo());
 		vo.setRefDate(dto.getRefDate());
-
-		// =========================
-		// Summary
-		// =========================
 
 		vo.setFreightType(dto.getFreightType());
 		vo.setPackingType(dto.getPackingType());
@@ -2454,26 +2447,20 @@ public class DevelopServiceImpl implements DevelopService {
 		vo.setAuthorisedBy(dto.getAuthorisedBy());
 		vo.setRemarks(dto.getRemarks());
 
-		// =========================
-		// Common
-		// =========================
-
 		vo.setOrgId(dto.getOrgId());
 		vo.setActive(dto.isActive());
 		vo.setCancelRemarks(dto.getCancelRemarks());
 
-		// =========================
-		// Delete Old Details
-		// =========================
 
 		if (vo.getId() != null) {
+			
+			List<PurchaseContractAmendmentDetailsVO> details = purchaseContractAmendmentDetailsRepo
+					.findByPurchaseContractAmendmentVO(vo);
 
-			purchaseContractAmendmentDetailsRepo.deleteByPurchaseContractAmendmentVO(vo);
+			purchaseContractAmendmentDetailsRepo.deleteAll(details);
+
 		}
 
-		// =========================
-		// Save Grid
-		// =========================
 
 		List<PurchaseContractAmendmentDetailsVO> detailsList = new ArrayList<>();
 
@@ -2534,10 +2521,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		responseDto.setId(vo.getId());
 
-		// =========================
-		// Branch
-		// =========================
-
 		if (vo.getBranch() != null) {
 
 			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
@@ -2548,11 +2531,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 			responseDto.setBranch(branchResponseDTO);
 		}
-
-		// =========================
-		// Party
-		// =========================
-
+		
 		if (vo.getCustomer() != null) {
 
 			PurchaseContractAmendmentCustomerResponceDto customerResponseDTO = new PurchaseContractAmendmentCustomerResponceDto();
@@ -2574,10 +2553,9 @@ public class DevelopServiceImpl implements DevelopService {
 
 		responseDto.setRefNo(vo.getRefNo());
 		responseDto.setRefDate(vo.getRefDate());
-
-		// =========================
-		// Summary
-		// =========================
+		
+		responseDto.setScreenCode(vo.getScreenCode());
+		responseDto.setScreenName(vo.getScreenName());
 
 		responseDto.setFreightType(vo.getFreightType());
 		responseDto.setPackingType(vo.getPackingType());
@@ -2668,16 +2646,11 @@ public class DevelopServiceImpl implements DevelopService {
 
 				fileDTO.setFileName(fileVO.getFileName());
 
-				String urlPath = uploadPath.replace("C:/", "/").replace("\\", "/");
-
-				fileDTO.setFilePath(serverBaseUrl + urlPath + fileVO.getFileName());
+				fileDTO.setFilePath(fileVO.getFilePath());
 
 				fileDTO.setFileSize(fileVO.getFileSize());
 
 				fileDTO.setContentType(fileVO.getContentType());
-
-				fileDTO.setUploadOn(fileVO.getUploadOn());
-
 				attachmentResponseList.add(fileDTO);
 			}
 		}
@@ -2688,52 +2661,35 @@ public class DevelopServiceImpl implements DevelopService {
 
 	}
 
-	private void saveAttachments(MultipartFile[] files, PurchaseContractAmendmentVO purchaseContractAmendmentVO)
-			throws ApplicationException {
+	@Value("${purchasecontractamendment.upload.path}")
+	private String purchaseContractAmendmentUploadPath;
 
-		// If no new files are uploaded, keep existing files
+	private void saveAttachmentPurchaseContract(MultipartFile[] files,
+			PurchaseContractAmendmentVO purchaseContractAmendmentVO) throws ApplicationException {
+
 		if (files == null || files.length == 0) {
 			return;
 		}
 
 		try {
 
-			File folder = new File(uploadPath1);
+			// Store inside a sub-folder by amendment ID
+			Path purchaseContractAmendmentFolder = Paths.get(purchaseContractAmendmentUploadPath,
+					"purchaseContractAmendment", purchaseContractAmendmentVO.getId().toString());
 
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
+			createDirectoryContract(purchaseContractAmendmentFolder);
 
-			// ==========================================
-			// Delete Existing Attachments
-			// ==========================================
+			// Delete old DB records if updating
+			if (ObjectUtils.isNotEmpty(purchaseContractAmendmentVO.getId())) {
 
-			List<PurchaseContractAmendmentAttachmentVO> oldAttachments = purchaseContractAmendmentAttachmentRepo
-					.findByPurchaseContractAmendmentVO(purchaseContractAmendmentVO);
+				List<PurchaseContractAmendmentAttachmentVO> existingAttachments = purchaseContractAmendmentAttachmentRepo
+						.findByPurchaseContractAmendmentVO(purchaseContractAmendmentVO);
 
-			for (PurchaseContractAmendmentAttachmentVO oldAttachment : oldAttachments) {
+				if (existingAttachments != null && !existingAttachments.isEmpty()) {
 
-				// Delete physical file
-				if (oldAttachment.getFilePath() != null) {
-
-					File oldFile = new File(oldAttachment.getFilePath());
-
-					if (oldFile.exists()) {
-						oldFile.delete();
-					}
+					purchaseContractAmendmentAttachmentRepo.deleteAll(existingAttachments);
 				}
 			}
-
-			// Delete old attachment records from DB
-			if (!oldAttachments.isEmpty()) {
-
-				purchaseContractAmendmentAttachmentRepo
-						.deleteByPurchaseContractAmendmentVO(purchaseContractAmendmentVO);
-			}
-
-			// ==========================================
-			// Save New Attachments
-			// ==========================================
 
 			List<PurchaseContractAmendmentAttachmentVO> attachmentList = new ArrayList<>();
 
@@ -2743,52 +2699,137 @@ public class DevelopServiceImpl implements DevelopService {
 					continue;
 				}
 
-				String originalFileName = file.getOriginalFilename();
+				String originalName = file.getOriginalFilename();
 
-				String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
+				if (originalName == null) {
+					originalName = "file";
+				}
 
-				Path path = Paths.get(uploadPath1, uniqueFileName);
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+
+					extension = originalName.substring(originalName.lastIndexOf("."));
+
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				// Unique filename using amendment ID
+				String fileName = originalName + "_" + purchaseContractAmendmentVO.getId() + extension;
+
+				Path filePath = purchaseContractAmendmentFolder.resolve(fileName);
 
 				try (InputStream inputStream = file.getInputStream()) {
 
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
 				}
+
+				// Build public URL - FIXED: Construct relative path manually
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/develop/viewPurchaseContractAmendmentFile/").toUriString();
+
+				// Manually build the relative path exactly matching the folder structure
+				String relativePath = "purchaseContractAmendment/" + purchaseContractAmendmentVO.getId() + "/"
+						+ fileName;
+				String publicUrl = baseUrl + relativePath;
 
 				PurchaseContractAmendmentAttachmentVO attachment = new PurchaseContractAmendmentAttachmentVO();
 
 				attachment.setPurchaseContractAmendmentVO(purchaseContractAmendmentVO);
 
-				attachment.setName(originalFileName);
-
-				attachment.setFileName(uniqueFileName);
-
-				attachment.setFilePath(path.toString());
-
+				attachment.setName(file.getOriginalFilename());
+				attachment.setFileName(fileName);
+				attachment.setFilePath(publicUrl);
 				attachment.setFileSize(file.getSize());
-
-				attachment.setContentType(file.getContentType());
-
-				attachment.setUploadOn(LocalDateTime.now());
-
 				attachmentList.add(attachment);
 			}
 
-			// Save new attachment records
-			List<PurchaseContractAmendmentAttachmentVO> savedAttachments = purchaseContractAmendmentAttachmentRepo
-					.saveAll(attachmentList);
+			if (!attachmentList.isEmpty()) {
 
-			purchaseContractAmendmentVO.setPurchaseContractAmendmentAttachment(savedAttachments);
+				List<PurchaseContractAmendmentAttachmentVO> saved = purchaseContractAmendmentAttachmentRepo
+						.saveAll(attachmentList);
+
+				purchaseContractAmendmentVO.setPurchaseContractAmendmentAttachment(saved);
+			}
 
 		} catch (IOException e) {
 
 			throw new ApplicationException("File Upload Failed : " + e.getMessage());
 		}
 	}
-	
+
+	private void createDirectoryContract(Path path) throws IOException {
+
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
+	@Override
+	public ResponseEntity<byte[]> viewPurchaseContractAmendmentFile(HttpServletRequest request) throws IOException {
+
+		return servePurchaseContractAmendmentFile(request, "/api/develop/viewPurchaseContractAmendmentFile/",
+				purchaseContractAmendmentUploadPath);
+	}
+
+	private ResponseEntity<byte[]> servePurchaseContractAmendmentFile(HttpServletRequest request, String apiPrefix,
+			String uploadBasePath) throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+
+		if (relativePath.startsWith("/")) {
+			relativePath = relativePath.substring(1);
+		}
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+		
+		int index = relativePath.indexOf("purchaseContractAmendment/");
+		if (index > 0) {
+			relativePath = relativePath.substring(index);
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		// Security - prevent path traversal
+		if (!filePath.startsWith(baseDir)) {
+
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath)) {
+
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+
+			contentType = guessContentType(filePath.getFileName().toString());
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+
 	@Override
 	public String getPurchaseContractAmendmentDocId(Long orgId, String financialYear) {
 		String screenCode1 = "PCA";
-		String result = purchaseContractAmendmentRepo.getPurchaseContractAmendmentDocId(orgId, financialYear, screenCode1);
+		String result = purchaseContractAmendmentRepo.getPurchaseContractAmendmentDocId(orgId, financialYear,
+				screenCode1);
 
 		return result;
 	}
@@ -3049,7 +3090,6 @@ public class DevelopServiceImpl implements DevelopService {
 //
 //			vo.setExchangeRate(customer);
 //		}
-
 
 		if (ObjectUtils.isNotEmpty(vo.getId())) {
 
@@ -3533,10 +3573,11 @@ public class DevelopServiceImpl implements DevelopService {
 			response.put("qty", obj[4]);
 			response.put("rate", obj[5]);
 			response.put("deliveryDate", obj[6]);
-			response.put("oldRate", obj[7]);
-			response.put("oldQty", obj[8]);
-			response.put("oldDeliveryDate", obj[9]);
-
+			response.put("itemDescription", obj[7]);
+			response.put("unitDescription", obj[8]);			
+			response.put("oldRate", obj[9]);
+			response.put("oldQty", obj[10]);
+			response.put("oldDeliveryDate", obj[11]);
 			responseList.add(response);
 		}
 
@@ -4142,16 +4183,7 @@ public class DevelopServiceImpl implements DevelopService {
 				// =========================
 
 				detailVO.setIndentQty(detailDTO.getIndentQty());
-
-				// =========================
-				// Previously Issued Quantity
-				// =========================
-
 				detailVO.setPreviouslyIssuedQty(detailDTO.getPreviouslyIssuedQty());
-
-				// =========================
-				// Pending Quantity
-				// =========================
 
 				detailVO.setPendingQty(detailDTO.getPendingQty());
 

@@ -252,7 +252,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 	@Autowired
 	private PurchaseContractTaxDetailsRepo purchaseContractTaxDetailsRepo;
-	
+
 	@Autowired
 	private PurchaseContractAttachmentRepo purchaseContractAttachmentRepo;
 
@@ -1112,7 +1112,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 					.findByPurchaseContractVO(vo);
 
 			purchaseContractTaxDetailsRepo.deleteAll(oldTaxDetails);
-			
+
 			List<PurchaseContractAttachmentVO> oldTaxDetailsRepo = purchaseContractAttachmentRepo
 					.findByPurchaseContractVO(vo);
 
@@ -1292,7 +1292,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 				attachmentVO.setFileSize(file.getSize());
 
-				attachmentVO.setUploadOn(LocalDateTime.now());
+//				attachmentVO.setUploadOn(LocalDateTime.now());
 
 				attachmentVO.setPurchaseContractVO(purchaseContractVO);
 
@@ -1814,6 +1814,8 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		vo.setActive(dto.isActive());
 
 		vo.setCancelRemarks(dto.getCancelRemarks());
+		
+		vo.setPostingCategory(dto.getPostingCategory());
 
 		// ======================================================
 		// Branch
@@ -2335,6 +2337,9 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		response.setPurchaseorderNo(purchaseBillVO.getPurchaseorderNumber());
 		response.setPurchaseorderDate(purchaseBillVO.getPurchaseorderDate());
 		response.setPurchaseorderType(purchaseBillVO.getPurchaseorderType());
+		response.setPostingCategory(purchaseBillVO.getPostingCategory());
+		response.setSupplierDcInvNo(purchaseBillVO.getSupplierDcInvNo());
+		response.setSupplierDcInvDate(purchaseBillVO.getSupplierDcInvDate());
 		response.setStatutoryForms(purchaseBillVO.getStatutoryForms());
 		response.setTaxStructureName(purchaseBillVO.getTaxStructureName());
 

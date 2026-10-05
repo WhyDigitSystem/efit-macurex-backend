@@ -2884,6 +2884,8 @@ public class DevelopServiceImpl implements DevelopService {
 
 			contract.put("contractNo", obj[1] != null ? obj[1].toString() : null);
 
+			contract.put("contractDate", obj[2] != null ? obj[2].toString() : null);
+
 			contractList.add(contract);
 		}
 

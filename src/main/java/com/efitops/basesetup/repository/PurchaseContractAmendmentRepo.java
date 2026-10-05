@@ -41,7 +41,7 @@ public interface PurchaseContractAmendmentRepo
     @Query(value = """
             SELECT
                 p.purchase_contract_basic_id,
-                p.doc_id
+                p.doc_id,p.doc_date
             FROM purchase_contract_basic p
             WHERE p.org_id = :orgId
               AND p.branch = :branch

@@ -52,7 +52,6 @@ import com.efitops.basesetup.ResponseDTO.EightDiscipline7DetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDiscipline8DetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EmployeeMasterResponseDetailsDTO;
-import com.efitops.basesetup.ResponseDTO.ExchangeRateResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GateOutwardEntryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GateOutwardEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionDetailResponseDTO;
@@ -174,7 +173,6 @@ import com.efitops.basesetup.entity.CountryVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
 import com.efitops.basesetup.entity.CustomerVO;
-import com.efitops.basesetup.entity.DailyExchangeRateVO;
 import com.efitops.basesetup.entity.DepartmentVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.DrawingAttachmentDetailVO;
@@ -2355,6 +2353,7 @@ public class DevelopServiceImpl implements DevelopService {
 	public Map<String, Object> createUpdatePurchaseContractAmendment(
 			PurchaseContractAmendmentDto purchaseContractAmendmentDto, MultipartFile[] files)
 			throws ApplicationException {
+		String screenCode="PCA";
 
 		PurchaseContractAmendmentVO purchaseContractAmendmentVO;
 		String message;
@@ -2371,6 +2370,17 @@ public class DevelopServiceImpl implements DevelopService {
 		} else {
 
 			purchaseContractAmendmentVO = new PurchaseContractAmendmentVO();
+			
+			String docId = purchaseContractAmendmentRepo.getPurchaseContractAmendmentDocId(
+					purchaseContractAmendmentDto.getOrgId(), purchaseContractAmendmentDto.getFinancialYear(), screenCode);
+
+			purchaseContractAmendmentVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(purchaseContractAmendmentDto.getOrgId(),
+							purchaseContractAmendmentDto.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);			
 
 			purchaseContractAmendmentVO.setCreatedBy(purchaseContractAmendmentDto.getCreatedBy());
 
@@ -2403,11 +2413,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 	private void createUpdatePurchaseContractAmendmentVOByDTO(PurchaseContractAmendmentDto dto,
 			PurchaseContractAmendmentVO vo) throws ApplicationException {
-
-		// =========================
-		// Branch
-		// =========================
-
 		if (dto.getBranch() != null) {
 
 			BranchVO branchVO = branchRepo.findById(dto.getBranch())
@@ -2415,11 +2420,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 			vo.setBranch(branchVO);
 		}
-
-		// =========================
-		// Customer
-		// =========================
-
 		if (dto.getCustomer() != null) {
 
 			CustomerVO customerVO = customerRepo.findById(dto.getCustomer())
@@ -2427,10 +2427,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 			vo.setCustomer(customerVO);
 		}
-
-		// =========================
-		// Header
-		// =========================
 
 		vo.setBelongsTo(dto.getBelongsTo());
 
@@ -2566,10 +2562,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 			responseDto.setCustomer(customerResponseDTO);
 		}
-
-		// =========================
-		// Header
-		// =========================
 
 		responseDto.setBelongsTo(vo.getBelongsTo());
 		responseDto.setDocId(vo.getDocId());
@@ -2791,6 +2783,14 @@ public class DevelopServiceImpl implements DevelopService {
 
 			throw new ApplicationException("File Upload Failed : " + e.getMessage());
 		}
+	}
+	
+	@Override
+	public String getPurchaseContractAmendmentDocId(Long orgId, String financialYear) {
+		String screenCode1 = "PCA";
+		String result = purchaseContractAmendmentRepo.getPurchaseContractAmendmentDocId(orgId, financialYear, screenCode1);
+
+		return result;
 	}
 
 	@Override

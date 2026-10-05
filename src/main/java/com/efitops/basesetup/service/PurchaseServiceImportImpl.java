@@ -2456,6 +2456,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setDiscount(vo.getDiscount());
 		responseDTO.setAfterDiscountTotalAmount(vo.getAfterDiscountTotalAmount());
 		responseDTO.setTotalAmount(vo.getTotalAmount());
+		responseDTO.setSupplierCode(vo.getSupplierCode());
+		responseDTO.setTallyRefNo(vo.getTallyRefNo());
 
 		if (vo.getBranch() != null) {
 			BranchResponseDTO branchDTO = new BranchResponseDTO();

@@ -50,7 +50,7 @@ public class PurchaseBillDTO {
 
 //	---------import purchase bill
 	private String creditAcc;
-	private Long statutoryForms;
+	private String statutoryForms;
 	private String supplierInvValue;
 
 	// -------- audit / org --------

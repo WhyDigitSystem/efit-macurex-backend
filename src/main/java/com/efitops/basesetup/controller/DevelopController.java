@@ -617,9 +617,9 @@ public class DevelopController extends BaseController {
 
 	@PutMapping(value = "/createUpdatePurchaseContractAmendment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
-//			@RequestPart("purchaseContractAmendment") PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+		@RequestPart("purchaseContractAmendment") PurchaseContractAmendmentDto purchaseContractAmendmentDto,
 
-			@RequestBody PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+//			@RequestBody PurchaseContractAmendmentDto purchaseContractAmendmentDto,
 
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
@@ -4478,6 +4478,53 @@ public class DevelopController extends BaseController {
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
 			return ResponseEntity.status(500).build();
 		}
+	}
+	
+	@GetMapping("/getPurchaseContractAmendmentDocId")
+	public ResponseEntity<ResponseDTO> getPurchaseContractAmendmentDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getPurchaseOrderAmendmentDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = developService.getPurchaseContractAmendmentDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"Purchase Contract Amendment DocId information retrieved successfully");
+
+			responseObjectsMap.put("purchaseContractAmendmentDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Purchase Contract Amendment DocId", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
 	}
 
 }

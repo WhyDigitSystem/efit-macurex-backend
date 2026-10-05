@@ -2018,6 +2018,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setAfterDiscountTotalAmount(dto.getAfterDiscountTotalAmount());
 		vo.setBasicAmount(dto.getBasicAmount());
 		vo.setTotalAmount(dto.getTotalAmount());
+		vo.setSupplierCode(dto.getSupplierCode());
+		vo.setTallyRefNo(dto.getTallyRefNo());
 
 		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
@@ -2037,7 +2039,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 		if (dto.getItemCategory() != null && dto.getItemCategory() != 0) {
 
-			ItemMasterVO itemCategory = itemMasterRepo.findByItemType(dto.getItemCategory())
+			ItemMasterVO itemCategory = itemMasterRepo.findById(dto.getItemCategory())
 					.orElseThrow(() -> new ApplicationException("Item Category Not Found"));
 
 			vo.setItemCategory(itemCategory);
@@ -2454,6 +2456,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setDiscount(vo.getDiscount());
 		responseDTO.setAfterDiscountTotalAmount(vo.getAfterDiscountTotalAmount());
 		responseDTO.setTotalAmount(vo.getTotalAmount());
+		responseDTO.setSupplierCode(vo.getSupplierCode());
+		responseDTO.setTallyRefNo(vo.getTallyRefNo());
 
 		if (vo.getBranch() != null) {
 			BranchResponseDTO branchDTO = new BranchResponseDTO();

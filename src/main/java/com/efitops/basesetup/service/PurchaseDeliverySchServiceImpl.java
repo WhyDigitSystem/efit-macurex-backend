@@ -85,6 +85,9 @@ import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
+import com.efitops.basesetup.entity.DirectPurchaseCashDetailsVO;
+import com.efitops.basesetup.entity.DirectPurchaseFileUploadDetailsVO;
+import com.efitops.basesetup.entity.DirectPurchaseTaxDetailsVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
@@ -137,7 +140,10 @@ import com.efitops.basesetup.repository.PurchaseBillChargesSummaryRepo;
 import com.efitops.basesetup.repository.PurchaseBillDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseBillRepo;
 import com.efitops.basesetup.repository.PurchaseBillTaxGridRepo;
+import com.efitops.basesetup.repository.PurchaseContractAttachmentRepo;
+import com.efitops.basesetup.repository.PurchaseContractDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseContractRepo;
+import com.efitops.basesetup.repository.PurchaseContractTaxDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleLineRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleRepo;
@@ -240,6 +246,15 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 	@Autowired
 	private ImportPurchaseBillChargesSummaryRepo importPurchaseBillChargesSummaryRepo;
+
+	@Autowired
+	private PurchaseContractDetailsRepo purchaseContractDetailsRepo;
+
+	@Autowired
+	private PurchaseContractTaxDetailsRepo purchaseContractTaxDetailsRepo;
+	
+	@Autowired
+	private PurchaseContractAttachmentRepo purchaseContractAttachmentRepo;
 
 	@Override
 	@Transactional
@@ -684,11 +699,11 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 			itemMap.put("itemDesc", obj[4] != null ? obj[4].toString() : "");
 
 			itemMap.put("itemId", obj[5] != null ? ((Number) obj[5]).longValue() : null);
-			
+
 			itemMap.put("primaryUniId", obj[6] != null ? ((Number) obj[6]).longValue() : null);
-			
+
 			itemMap.put("purchaseUnitDescription", obj[7] != null ? obj[7].toString() : "");
-			
+
 			itemMap.put("purchaseUnitId", obj[8] != null ? ((Number) obj[8]).longValue() : null);
 
 			responseList.add(itemMap);
@@ -1081,7 +1096,29 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		vo.setCancelRemarks(dto.getCancelRemarks());
 
-		vo.getPurchaseContractDetailsVO().clear();
+		vo.setSupplierRefNo(dto.getSupplierRefNo());
+
+		vo.setRefDate(dto.getRefDate());
+
+//		vo.getPurchaseContractDetailsVO().clear();
+
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+
+			List<PurchaseContractDetailsVO> oldCashDetails = purchaseContractDetailsRepo.findByPurchaseContractVO(vo);
+
+			purchaseContractDetailsRepo.deleteAll(oldCashDetails);
+
+			List<PurchaseContractTaxDetailsVO> oldTaxDetails = purchaseContractTaxDetailsRepo
+					.findByPurchaseContractVO(vo);
+
+			purchaseContractTaxDetailsRepo.deleteAll(oldTaxDetails);
+			
+			List<PurchaseContractAttachmentVO> oldTaxDetailsRepo = purchaseContractAttachmentRepo
+					.findByPurchaseContractVO(vo);
+
+			purchaseContractAttachmentRepo.deleteAll(oldTaxDetailsRepo);
+
+		}
 
 		if (dto.getDetails() != null) {
 
@@ -1321,6 +1358,16 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 			dto.setGstState(gstDTO);
 		}
 
+		if (vo.getCurrency() != null) {
+
+			CurrencyResponseDTO gstDTO = new CurrencyResponseDTO();
+
+			gstDTO.setId(vo.getCurrency().getId());
+			gstDTO.setCurrencyName(vo.getCurrency().getCurrency());
+
+			dto.setCurrency(gstDTO);
+		}
+
 		dto.setValidFrom(vo.getValidFrom());
 
 		dto.setValidTo(vo.getValidTo());
@@ -1369,6 +1416,16 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		dto.setCancelRemarks(vo.getCancelRemarks());
 
+		dto.setDocId(vo.getDocId());
+
+		dto.setDocDate(vo.getDocDate());
+
+		dto.setBelongsTo(vo.getBelongsTo());
+
+		dto.setSupplierRefNo(vo.getSupplierRefNo());
+
+		dto.setRefDate(vo.getRefDate());
+
 		List<PurchaseContractDetailsResponseDTO> detailsList = new ArrayList<>();
 
 		if (vo.getPurchaseContractDetailsVO() != null) {
@@ -1388,6 +1445,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 				}
 				detailDTO.setHsnCode(detailVO.getHscCode());
+				detailDTO.setId(detailVO.getId());
 
 				detailDTO.setTaxType(detailVO.getTaxType());
 
@@ -1645,28 +1703,21 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 			purchaseBillVO = new PurchaseBillVO();
 
-	        String docId = purchaseBillRepo.getPurchaseBillDocId(
-	                purchaseBillDTO.getOrgId(),
-	                purchaseBillDTO.getFinancialYear(),
-	                screenCode);
+			String docId = purchaseBillRepo.getPurchaseBillDocId(purchaseBillDTO.getOrgId(),
+					purchaseBillDTO.getFinancialYear(), screenCode);
 
-	        purchaseBillVO.setDocId(docId);
+			purchaseBillVO.setDocId(docId);
 
-	        DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
-	                documentTypeMappingDetailsRepo
-	                        .findByOrgIdAndFinYearAndScreenCode(
-	                                purchaseBillDTO.getOrgId(),
-	                                purchaseBillDTO.getFinancialYear(),
-	                                screenCode);
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(purchaseBillDTO.getOrgId(), purchaseBillDTO.getFinancialYear(),
+							screenCode);
 
-	        if (documentTypeMappingDetailsVO != null) {
+			if (documentTypeMappingDetailsVO != null) {
 
-	            documentTypeMappingDetailsVO.setLastNo(
-	                    documentTypeMappingDetailsVO.getLastNo() + 1);
+				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
 
-	            documentTypeMappingDetailsRepo.save(
-	                    documentTypeMappingDetailsVO);
-	        }
+				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			}
 
 			purchaseBillVO.setCreatedBy(purchaseBillDTO.getCreatedBy());
 
@@ -2238,6 +2289,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		response.setBelongsTo(purchaseBillVO.getBelongsTo());
 		response.setDocDate(purchaseBillVO.getDocDate());
+		response.setDocId(purchaseBillVO.getDocId());
 
 		if (purchaseBillVO.getSupplier() != null) {
 
@@ -2713,16 +2765,13 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 	@Override
 	public String getPurchaseBillDocId(Long orgId, String financialYear) {
 
-	    String screenCode = "PB";
+		String screenCode = "PB";
 
-	    String result = purchaseBillRepo.getPurchaseBillDocId(
-	            orgId,
-	            financialYear,
-	            screenCode
-	    );
+		String result = purchaseBillRepo.getPurchaseBillDocId(orgId, financialYear, screenCode);
 
-	    return result;
+		return result;
 	}
+
 //	 grnno dropdown
 	@Override
 	public Map<String, Object> getGrnNoDropdownforPurchaseBill(Long orgId, Long branch, Long supplier)

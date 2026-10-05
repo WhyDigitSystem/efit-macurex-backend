@@ -51,7 +51,7 @@ public class PurchaseBillVO {
 	private String belongsTo;
 
 	@Column(name = "doc_date")
-	private LocalDate docDate;
+	private LocalDate docDate=LocalDate.now();
 
 	@ManyToOne
 	@JoinColumn(name = "supplier")

@@ -25,50 +25,46 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ImportPurchaseBillChargesSummaryVO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "import_purchase_bill_charges_summary_seq")
-    @SequenceGenerator(
-            name = "import_purchase_bill_charges_summary_seq",
-            sequenceName = "import_purchase_bill_charges_summary_seq",
-            initialValue = 1000000001,
-            allocationSize = 1)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "import_purchase_bill_charges_summarygen")
+	@SequenceGenerator(name = "import_purchase_bill_charges_summarygen", sequenceName = "import_purchase_bill_charges_summary_seq", initialValue = 1000000001, allocationSize = 1)
+	private Long id;
 
-    @Column(name = "tot_fob_value_fc")
-    private BigDecimal totFobValueFc;
+	@Column(name = "tot_fob_value_fc")
+	private BigDecimal totFobValueFc;
 
-    @Column(name = "tot_fob_value_inr")
-    private BigDecimal totFobValueInr;
+	@Column(name = "tot_fob_value_inr")
+	private BigDecimal totFobValueInr;
 
-    @Column(name = "net_amount")
-    private BigDecimal netAmount;
+	@Column(name = "net_amount")
+	private BigDecimal netAmount;
 
-    @Column(name = "tot_fri_ins_fc")
-    private BigDecimal totFriInsFc;
+	@Column(name = "tot_fri_ins_fc")
+	private BigDecimal totFriInsFc;
 
-    @Column(name = "tot_duty_inr")
-    private BigDecimal totDutyInr;
+	@Column(name = "tot_duty_inr")
+	private BigDecimal totDutyInr;
 
-    @Column(name = "post_voucher")
-    private Boolean postVoucher;
+	@Column(name = "post_voucher")
+	private Boolean postVoucher;
 
-    @Column(name = "total_value_fc")
-    private BigDecimal totalValueFc;
+	@Column(name = "total_value_fc")
+	private BigDecimal totalValueFc;
 
-    @Column(name = "tot_fre_ins_inr")
-    private BigDecimal totFreInsInr;
+	@Column(name = "tot_fre_ins_inr")
+	private BigDecimal totFreInsInr;
 
-    @Column(name = "tot_land_cost")
-    private BigDecimal totLandCost;
+	@Column(name = "tot_land_cost")
+	private BigDecimal totLandCost;
 
-    @Column(name = "amount_in_words")
-    private String amountInWords;
+	@Column(name = "amount_in_words")
+	private String amountInWords;
 
-    @Column(name = "narration")
-    private String narration;
+	@Column(name = "narration")
+	private String narration;
 
-    @ManyToOne
-    @JoinColumn(name = "purchasebill_id")
-    @JsonBackReference
-    private PurchaseBillVO purchaseBillVO;
+	@ManyToOne
+	@JoinColumn(name = "purchase_bill_basic_id")
+	@JsonBackReference
+	private PurchaseBillVO purchaseBillVO;
 }

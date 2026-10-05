@@ -53,7 +53,13 @@ public class PurchaseContractVO {
 
 	@Column(name = "doc_date")
 	private LocalDate docDate = LocalDate.now();
+	
+	@Column(name = "supplier_refno")
+	private String supplierRefNo;
 
+	@Column(name = "ref_date")
+	private LocalDate refDate ;
+	
 	@ManyToOne
 	@JoinColumn(name = "department")
 	private DepartmentVO department;

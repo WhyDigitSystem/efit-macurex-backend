@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.Column;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,9 +27,6 @@ public class PurchaseContractAmendmentDto {
 	    // Belongs To
 	    private String belongsTo;
 
-	    // Amendment
-//	    private String docId;
-//	    private LocalDate docDate;
 
 	    // Party
 	    private Long customer;
@@ -72,6 +71,8 @@ public class PurchaseContractAmendmentDto {
 	    private String authorisedBy;
 
 	    private String remarks;
+	    
+		private String financialYear;
 	    
 	    
 	    private List<PurchaseContractAmendmentDetailsDto> details;

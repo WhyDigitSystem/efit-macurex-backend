@@ -333,6 +333,9 @@ public interface VendorComplaintService {
 	Map<String, Object> getSalesCustomerPartNoCumlReport(Long branch, Long orgId, String fromDate, String toDate,
 			String customerName) throws ApplicationException;
 
+	Map<String, Object> getSalesRegisterCustomerWiseReport(Long belongsTo, String fromDate, String toDate,
+			String customerName, Long branch, Long orgId) throws ApplicationException;
+
 	
 
 

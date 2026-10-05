@@ -176,7 +176,95 @@ public interface SalesRejectionInvoiceRepo extends JpaRepository<SalesRejectionI
 			    sd.despatch_qty,
 			    sr.total_ass_val
 			""", nativeQuery = true)
-	List<Object[]> getSalesCustomerPartNoCumlReport(@Param("branch") Long branch, Long orgId, @Param("fromDate") String fromDate,
-			@Param("toDate") String toDate, @Param("customerName") String customerName);
+	List<Object[]> getSalesCustomerPartNoCumlReport(@Param("branch") Long branch, Long orgId,
+			@Param("fromDate") String fromDate, @Param("toDate") String toDate,
+			@Param("customerName") String customerName);
+
+//	sales register customerwise
+
+	@Query(value = """
+			SELECT
+			    srb.doc_id,
+			    srb.doc_date,
+			    srb.cancel,
+			    srb.cancel_remarks,
+			    srb.purchase_order,
+			    c.customer_name,
+			    c.customer_code,
+			    i.item_code,
+			    i.item_description,
+			    srd.customer_part_no,
+			    u.unit_id,
+
+			    CASE
+			        WHEN srb.cancel = FALSE
+			        THEN srd.despatch_qty
+			        ELSE 0
+			    END AS qty,
+
+			    CASE
+			        WHEN srd.new_rate = 0
+			        THEN srd.rate_in_selected_currency
+			        ELSE srd.new_rate
+			    END AS rate,
+
+			    CASE
+			        WHEN srb.cancel = FALSE
+			        THEN srb.total_ass_val
+			        ELSE 0
+			    END AS amtInRs,
+
+			    CASE
+			        WHEN srb.cancel = FALSE
+			        THEN srb.net_amount
+			        ELSE 0
+			    END AS vatVal,
+
+			    SUM(srd.sgst_amount) AS sgst,
+			    SUM(srd.cgst_amount) AS cgst,
+			    SUM(srd.igst_amount) AS igst
+
+			FROM sales_rejection_invoice_basic srb
+
+			INNER JOIN customer_header c
+			    ON c.customer_id = srb.customer
+
+			INNER JOIN sales_rejection_invoice_detail srd
+			    ON srd.sales_rejection_invoice_basic_id =
+			       srb.sales_rejection_invoice_basic_id
+
+			INNER JOIN item i
+			    ON i.item_id = srd.item
+
+			INNER JOIN unitmaster u
+			    ON u.unitmaster_id = i.primary_unit
+
+			WHERE srb.belongs_to = :belongsTo
+			  AND srb.doc_date BETWEEN :fromDate AND :toDate
+			  AND c.customer_name = :customerName
+			  AND srb.branch = :branch
+			  AND srb.org_id = :orgId
+
+			GROUP BY
+			    srb.doc_id,
+			    srb.doc_date,
+			    srb.cancel,
+			    srb.cancel_remarks,
+			    srb.purchase_order,
+			    c.customer_name,
+			    c.customer_code,
+			    i.item_code,
+			    i.item_description,
+			    srd.customer_part_no,
+			    u.unit_id,
+			    srb.total_ass_val,
+			    srb.net_amount,
+			    srd.despatch_qty,
+			    srd.new_rate,
+			    srd.rate_in_selected_currency
+			""", nativeQuery = true)
+	List<Object[]> getSalesRegisterCustomerWiseReport(@Param("belongsTo") Long belongsTo, @Param("fromDate") String fromDate,
+			@Param("toDate") String toDate, @Param("customerName") String customerName, @Param("branch") Long branch,
+			@Param("orgId") Long orgId);
 
 }

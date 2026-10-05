@@ -7961,6 +7961,14 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		createUpdateScrapMaterialReturnRejectionVO(scrapMaterialReturnRejectionVO, scrapMaterialReturnRejectionDTO);
 
+		
+		// Delete existing child details during update
+		if (scrapMaterialReturnRejectionDTO.getId() != null) {
+
+		    scrapMaterialReturnRejectionDetailsRepo
+		            .deleteByScrapMaterialReturnRejectionVO(scrapMaterialReturnRejectionVO);
+		}
+		
 		if (scrapMaterialReturnRejectionDTO.getScrapMaterialReturnRejectionDetailsDTO() != null
 				&& !scrapMaterialReturnRejectionDTO.getScrapMaterialReturnRejectionDetailsDTO().isEmpty()) {
 
@@ -8200,6 +8208,11 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		response.setCancelRemarks(vo.getCancelRemarks());
 
+		
+		response.setDocId(vo.getDocId());
+
+		response.setDocDate(vo.getDocDate());
+
 		response.setCreatedBy(vo.getCreatedBy());
 
 		/*
@@ -8274,6 +8287,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		response.setScrapMaterialReturnRejectionDetailsResponseDTO(detailsResponseList);
 
 		return response;
+		
 	}
 
 	@Override
@@ -8620,7 +8634,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	public Map<String, Object> getSalesContractRegisterReport(String fromDate, String toDate, Long branch, Long orgId,
 			String belongsTo) throws ApplicationException {
 
-		List<Object[]> resultList = salesContractRepo.getSalesContractRegisterReport(fromDate, toDate, branch,
+		List<Object[]> resultList = salesContractRepo.getSalesContractRegisterReport(fromDate, toDate, branch, orgId,
 				belongsTo);
 
 		List<Map<String, Object>> responseList = new ArrayList<>();
@@ -8690,6 +8704,50 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		responseObjectsMap.put("salesCustomerPartNoCumlReport", responseList);
+
+		return responseObjectsMap;
+	}
+
+//	sales register customer wise
+
+	@Override
+	public Map<String, Object> getSalesRegisterCustomerWiseReport(Long belongsTo, String fromDate, String toDate,
+			String customerName, Long branch, Long orgId) throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> resultList = salesRejectionInvoiceRepo.getSalesRegisterCustomerWiseReport(belongsTo, fromDate,
+				toDate, customerName, branch, orgId);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("docId", obj[0]);
+			data.put("docDate", obj[1]);
+			data.put("cancel", obj[2]);
+			data.put("cancelRemarks", obj[3]);
+			data.put("purchaseOrder", obj[4]);
+			data.put("customerName", obj[5]);
+			data.put("customerCode", obj[6]);
+			data.put("itemCode", obj[7]);
+			data.put("itemDescription", obj[8]);
+			data.put("customerPartNo", obj[9]);
+			data.put("unitId", obj[10]);
+			data.put("qty", obj[11]);
+			data.put("rate", obj[12]);
+			data.put("amtInRs", obj[13]);
+			data.put("vatVal", obj[14]);
+			data.put("sgst", obj[15]);
+			data.put("cgst", obj[16]);
+			data.put("igst", obj[17]);
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("salesRegisterCustomerWiseReport", responseList);
 
 		return responseObjectsMap;
 	}

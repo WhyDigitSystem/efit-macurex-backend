@@ -3985,4 +3985,39 @@ public class VendorComplaintController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 	}
+
+//	sales Register customer wise report
+	@GetMapping("/getSalesRegisterCustomerWiseReport")
+	public ResponseEntity<ResponseDTO> getSalesRegisterCustomerWiseReport(@RequestParam Long belongsTo,
+			@RequestParam String fromDate, @RequestParam String toDate, @RequestParam String customerName,
+			@RequestParam Long branch, @RequestParam Long orgId) {
+
+		String methodName = "getSalesRegisterCustomerWiseReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getSalesRegisterCustomerWiseReport(belongsTo, fromDate,
+					toDate, customerName, branch, orgId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
 }

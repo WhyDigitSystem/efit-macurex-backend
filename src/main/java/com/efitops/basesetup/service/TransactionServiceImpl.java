@@ -196,10 +196,10 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	HsnRepo hsnRepo;
-	
+
 	@Autowired
 	StockValuationRepo stockValuationRepo;
-	
+
 	// salesdeliveryschedule
 
 	@Override
@@ -665,11 +665,40 @@ public class TransactionServiceImpl implements TransactionService {
 	public Map<String, Object> updateCreateSalesContractAmendment(SalesContractAmendmentDTO salesContractAmendmentDTO)
 			throws ApplicationException {
 
-		SalesContractAmendmentVO salesContractAmendmentVO = new SalesContractAmendmentVO();
+		String screenCode = "SCA";
+
+		Map<String, Object> response = new HashMap<>();
 
 		String message;
 
-		if (salesContractAmendmentDTO.getId() != null) {
+		SalesContractAmendmentVO salesContractAmendmentVO;
+
+		if (salesContractAmendmentDTO.getId() == null) {
+
+			salesContractAmendmentVO = new SalesContractAmendmentVO();
+
+			// Generate Doc ID
+			String docId = salesContractAmendmentRepo.getSalesContractAmendmentDocId(
+					salesContractAmendmentDTO.getOrgId(), salesContractAmendmentDTO.getFinancialYear(), screenCode);
+
+			salesContractAmendmentVO.setDocId(docId);
+
+			// Update Last Number
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(salesContractAmendmentDTO.getOrgId(),
+							salesContractAmendmentDTO.getFinancialYear(), screenCode);
+
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			salesContractAmendmentVO.setCreatedBy(salesContractAmendmentDTO.getCreatedBy());
+
+			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
+
+			message = "Sales Contract Amendment Created Successfully";
+
+		} else {
 
 			salesContractAmendmentVO = salesContractAmendmentRepo.findById(salesContractAmendmentDTO.getId())
 					.orElseThrow(() -> new ApplicationException("Invalid Sales Contract Amendment Details"));
@@ -677,21 +706,15 @@ public class TransactionServiceImpl implements TransactionService {
 			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
 
 			message = "Sales Contract Amendment Updated Successfully";
-
-		} else {
-
-			salesContractAmendmentVO.setCreatedBy(salesContractAmendmentDTO.getCreatedBy());
-			salesContractAmendmentVO.setUpdated_By(salesContractAmendmentDTO.getCreatedBy());
-
-			message = "Sales Contract Amendment Created Successfully";
 		}
+
 		createUpdateSalesContractAmendmentVO(salesContractAmendmentDTO, salesContractAmendmentVO);
 
 		SalesContractAmendmentVO savedSalesContractAmendment = salesContractAmendmentRepo
 				.save(salesContractAmendmentVO);
 
-		Map<String, Object> response = new HashMap<>();
 		response.put("message", message);
+
 		response.put("salesContractAmendmentVO", salesContractResponseResponse(savedSalesContractAmendment));
 
 		return response;
@@ -713,6 +736,8 @@ public class TransactionServiceImpl implements TransactionService {
 		responseDTO.setCustPoDate(salesContractAmendmentVO.getCustPoDate());
 		responseDTO.setRevisionNo(salesContractAmendmentVO.getRevisionNo());
 		responseDTO.setRemarks(salesContractAmendmentVO.getRemarks());
+//		responseDTO.setDocId(salesContractAmendmentVO.getDocId());
+//		responseDTO.setDocDate(salesContractAmendmentVO.getDocDate());
 
 		if (salesContractAmendmentVO.getBranch() != null) {
 
@@ -746,6 +771,19 @@ public class TransactionServiceImpl implements TransactionService {
 					itemDTO.setId(detailVO.getItem().getId());
 					itemDTO.setItemCode(detailVO.getItem().getItemCode());
 					itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
+
+					if (detailVO.getItem().getPrimaryUnit() != null) {
+
+						UnitMasterResponseDTO unitDTO = new UnitMasterResponseDTO();
+
+						unitDTO.setId(detailVO.getItem().getPrimaryUnit().getId());
+
+						unitDTO.setUnitId(detailVO.getItem().getPrimaryUnit().getUnitId());
+
+//						unitDTO.setUnitDescription(detailVO.getItem().getPrimaryUnit().getUnitDescriptio());
+
+						itemDTO.setUnit(unitDTO);
+					}
 
 					detailDTO.setItem(itemDTO);
 				}
@@ -1276,13 +1314,11 @@ public class TransactionServiceImpl implements TransactionService {
 		// Save Header
 		salesRejectionInvoiceVO = salesRejectionInvoiceRepo.save(salesRejectionInvoiceVO);
 
-		if (ObjectUtils.isEmpty(salesRejectionInvoiceDTO.getId())
-		        && salesRejectionInvoiceDTO.isStockPosting()) {
+		if (ObjectUtils.isEmpty(salesRejectionInvoiceDTO.getId()) && salesRejectionInvoiceDTO.isStockPosting()) {
 
-		    createStockForSalesRejectionInvoice(
-		            salesRejectionInvoiceVO);
+			createStockForSalesRejectionInvoice(salesRejectionInvoiceVO);
 		}
-		
+
 		// Response
 		SalesRejectionInvoiceResponseDTO responseDTO = buildSalesRejectionInvoiceResponse(salesRejectionInvoiceVO);
 
@@ -1914,96 +1950,74 @@ public class TransactionServiceImpl implements TransactionService {
 		return dto;
 	}
 
-	
-	private void createStockForSalesRejectionInvoice(
-	        SalesRejectionInvoiceVO vo) throws ApplicationException {
+	private void createStockForSalesRejectionInvoice(SalesRejectionInvoiceVO vo) throws ApplicationException {
 
-	    if (vo.getDetails() == null
-	            || vo.getDetails().isEmpty()) {
-	        return;
-	    }
+		if (vo.getDetails() == null || vo.getDetails().isEmpty()) {
+			return;
+		}
 
-	    for (SalesRejectionInvoiceDetailsVO detailVO : vo.getDetails()) {
+		for (SalesRejectionInvoiceDetailsVO detailVO : vo.getDetails()) {
 
-	        if (detailVO.getItem() == null
-	                || detailVO.getDespatchQty() == null
-	                || detailVO.getDespatchQty()
-	                        .compareTo(BigDecimal.ZERO) <= 0) {
-	            continue;
-	        }
+			if (detailVO.getItem() == null || detailVO.getDespatchQty() == null
+					|| detailVO.getDespatchQty().compareTo(BigDecimal.ZERO) <= 0) {
+				continue;
+			}
 
-	        StockValuationVO stockVO =
-	                new StockValuationVO();
+			StockValuationVO stockVO = new StockValuationVO();
 
-	        // Rejection = stock IN
-	        // Invoice / Other Sales Invoice = stock OUT
-	        if ("Rejection".equalsIgnoreCase(vo.getDocType())) {
-	            stockVO.setPlusOrMinus("p");
-	        } else {
-	            stockVO.setPlusOrMinus("m");
-	        }
+			// Rejection = stock IN
+			// Invoice / Other Sales Invoice = stock OUT
+			if ("Rejection".equalsIgnoreCase(vo.getDocType())) {
+				stockVO.setPlusOrMinus("p");
+			} else {
+				stockVO.setPlusOrMinus("m");
+			}
 
-	        // Item
-	        stockVO.setStockPartNo(
-	                detailVO.getItem());
+			// Item
+			stockVO.setStockPartNo(detailVO.getItem());
 
-	        // Location
-	        if (vo.getLocation() != null) {
-	            stockVO.setLocDetailsId(
-	                    vo.getLocation());
-	        }
+			// Location
+			if (vo.getLocation() != null) {
+				stockVO.setLocDetailsId(vo.getLocation());
+			}
 
-	        // Document
-	        stockVO.setDocId(vo.getDocId());
-	        stockVO.setDocDate(vo.getDocDate());
-	        stockVO.setDocTime(LocalTime.now());
+			// Document
+			stockVO.setDocId(vo.getDocId());
+			stockVO.setDocDate(vo.getDocDate());
+			stockVO.setDocTime(LocalTime.now());
 
-	        // Quantity
-	        stockVO.setQuantity(
-	                detailVO.getDespatchQty());
+			// Quantity
+			stockVO.setQuantity(detailVO.getDespatchQty());
 
-	        // Rate
-	        stockVO.setRate(
-	                detailVO.getNewRate() != null
-	                        ? detailVO.getNewRate()
-	                        : BigDecimal.ZERO);
+			// Rate
+			stockVO.setRate(detailVO.getNewRate() != null ? detailVO.getNewRate() : BigDecimal.ZERO);
 
-	        // Stock Value
-	        stockVO.setStockValue(
-	                detailVO.getAmountInRs() != null
-	                        ? detailVO.getAmountInRs()
-	                        : BigDecimal.ZERO);
+			// Stock Value
+			stockVO.setStockValue(detailVO.getAmountInRs() != null ? detailVO.getAmountInRs() : BigDecimal.ZERO);
 
-	        // Branch
-	        if (vo.getBranch() != null) {
-	            stockVO.setBranchVO(
-	                    vo.getBranch());
-	        }
+			// Branch
+			if (vo.getBranch() != null) {
+				stockVO.setBranchVO(vo.getBranch());
+			}
 
-	        // Organization
-	        stockVO.setOrgId(
-	                vo.getOrgId());
+			// Organization
+			stockVO.setOrgId(vo.getOrgId());
 
-	        // Narration
-	        stockVO.setNarration(
-	                vo.getNarration());
+			// Narration
+			stockVO.setNarration(vo.getNarration());
 
-	        // Audit
-	        stockVO.setCreatedBy(
-	                vo.getCreatedBy());
+			// Audit
+			stockVO.setCreatedBy(vo.getCreatedBy());
 
-	        stockVO.setUpdatedBy(
-	                vo.getUpdatedBy());
+			stockVO.setUpdatedBy(vo.getUpdatedBy());
 
-	        stockVO.setActive(true);
-	        stockVO.setCancel(false);
+			stockVO.setActive(true);
+			stockVO.setCancel(false);
 
-	        // Source
-	        stockVO.setSourceScreenName(
-	                vo.getDocType());
+			// Source
+			stockVO.setSourceScreenName(vo.getDocType());
 
-	        
-	        String screenCode;
+			String screenCode;
 
 			if ("Other Sales Invoice".equals(vo.getDocType())) {
 				screenCode = "SOI";
@@ -2014,12 +2028,11 @@ public class TransactionServiceImpl implements TransactionService {
 			} else {
 				throw new ApplicationException("Invalid Document Type");
 			}
-			
-	        stockVO.setSourceScreenCode(
-	                screenCode);
 
-	        stockValuationRepo.save(stockVO);
-	    }
+			stockVO.setSourceScreenCode(screenCode);
+
+			stockValuationRepo.save(stockVO);
+		}
 	}
 	// DespatchInstructiondropdown
 
@@ -3077,4 +3090,15 @@ public class TransactionServiceImpl implements TransactionService {
 
 		return result;
 	}
+
+	@Override
+	public String getSalesContractAmendmentDocId(Long orgId, String financialYear) {
+
+		String screenCode = "SCA";
+
+		String result = salesContractAmendmentRepo.getSalesContractAmendmentDocId(orgId, financialYear, screenCode);
+
+		return result;
+	}
+
 }

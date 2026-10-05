@@ -264,6 +264,7 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 	        @Param("fromDate") String fromDate,
 	        @Param("toDate") String toDate,
 	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId,
 	        @Param("belongsTo") String belongsTo);
 
 }

@@ -1,6 +1,5 @@
 package com.efitops.basesetup.dto;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -15,67 +14,52 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-
-
 public class PurchaseContractAmendmentDto {
-	
-	 private Long id;
 
-	    // Plant
-	    private Long branch;
+	private Long id;
 
-	    // Belongs To
-	    private String belongsTo;
+	private Long branch;
 
+	private String belongsTo;
 
-	    // Party
-	    private Long customer;
-	    
+	private Long customer;
 
-	    // Purchase Contract
-	    private String contractNo;
-	    private LocalDate contractDate;
+	private String contractNo;
+	private LocalDate contractDate;
 
-	    // Revision
-	    private int revisionNo;
+	// Revision
+	private int revisionNo;
 
-	    // Reference
-	    private String refNo;
-	    private LocalDate refDate;
+	// Reference
+	private String refNo;
+	private LocalDate refDate;
 
-	    // Organization
-	    private Long orgId;
+	private Long orgId;
 
-	    // Audit
-	    private String createdBy;
-	    private String updatedBy;
+	private String createdBy;
 
-	    // Status
-	    private boolean active;
-	    private boolean cancel;
-	    private String cancelRemarks;
-	    
-	    
-	    private String freightType;
+	private boolean active;
+	private boolean cancel;
+	private String cancelRemarks;
 
-	    private String packingType;
+	private String freightType;
 
-	    private BigDecimal insuranceAmount;
+	private String packingType;
 
-	    private String modeOfDespatch;
+	private BigDecimal insuranceAmount;
 
-	    private String taxDescription;
+	private String modeOfDespatch;
 
-	    private String preparedBy;
+	private String taxDescription;
 
-	    private String authorisedBy;
+	private String preparedBy;
 
-	    private String remarks;
-	    
-		private String financialYear;
-	    
-	    
-	    private List<PurchaseContractAmendmentDetailsDto> details;
+	private String authorisedBy;
 
+	private String remarks;
+
+	private String financialYear;
+
+	private List<PurchaseContractAmendmentDetailsDto> details;
 
 }

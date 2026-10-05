@@ -617,7 +617,7 @@ public class DevelopController extends BaseController {
 
 	@PutMapping(value = "/createUpdatePurchaseContractAmendment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
-		@RequestPart("purchaseContractAmendment") PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+			@RequestPart("purchaseContractAmendment") PurchaseContractAmendmentDto purchaseContractAmendmentDto,
 
 //			@RequestBody PurchaseContractAmendmentDto purchaseContractAmendmentDto,
 
@@ -4479,7 +4479,7 @@ public class DevelopController extends BaseController {
 			return ResponseEntity.status(500).build();
 		}
 	}
-	
+
 	@GetMapping("/getPurchaseContractAmendmentDocId")
 	public ResponseEntity<ResponseDTO> getPurchaseContractAmendmentDocId(@RequestParam Long orgId,
 			@RequestParam String financialYear) {
@@ -4527,4 +4527,18 @@ public class DevelopController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
+	@GetMapping("/viewPurchaseContractAmendmentFile/**")
+	public ResponseEntity<byte[]> viewPurchaseContractAmendmentFile(HttpServletRequest request) {
+
+		String methodName = "viewPurchaseContractAmendmentFile()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		try {
+			return developService.viewPurchaseContractAmendmentFile(request);
+
+		} catch (Exception e) {
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, e.getMessage());
+			return ResponseEntity.status(500).build();
+		}
+	}
 }

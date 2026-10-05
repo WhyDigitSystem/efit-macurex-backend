@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PurchaseContractAmendmentResponseDto {
-	
-	
+
 	private Long id;
 	private BranchResponseDTO branch;
 
@@ -50,13 +49,9 @@ public class PurchaseContractAmendmentResponseDto {
 
 	private String screenName;
 	private String screenCode;
-	
+
 	private List<PurchaseContractAmendmentDetailsResponseDto> details;
-	
-	
+
 	private List<PurchaseContractAmendmentAttachmentResponseDto> attachments;
-
-
-
 
 }

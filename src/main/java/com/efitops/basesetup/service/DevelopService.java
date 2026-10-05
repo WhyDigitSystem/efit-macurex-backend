@@ -343,4 +343,6 @@ public interface DevelopService {
 
 	String getPurchaseContractAmendmentDocId(Long orgId, String financialYear);
 
+	ResponseEntity<byte[]> viewPurchaseContractAmendmentFile(HttpServletRequest request) throws IOException;
+
 }

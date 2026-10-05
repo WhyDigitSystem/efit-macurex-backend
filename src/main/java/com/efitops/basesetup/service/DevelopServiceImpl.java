@@ -2553,10 +2553,9 @@ public class DevelopServiceImpl implements DevelopService {
 
 		responseDto.setRefNo(vo.getRefNo());
 		responseDto.setRefDate(vo.getRefDate());
-
-		// =========================
-		// Summary
-		// =========================
+		
+		responseDto.setScreenCode(vo.getScreenCode());
+		responseDto.setScreenName(vo.getScreenName());
 
 		responseDto.setFreightType(vo.getFreightType());
 		responseDto.setPackingType(vo.getPackingType());

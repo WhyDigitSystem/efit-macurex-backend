@@ -4182,16 +4182,7 @@ public class DevelopServiceImpl implements DevelopService {
 				// =========================
 
 				detailVO.setIndentQty(detailDTO.getIndentQty());
-
-				// =========================
-				// Previously Issued Quantity
-				// =========================
-
 				detailVO.setPreviouslyIssuedQty(detailDTO.getPreviouslyIssuedQty());
-
-				// =========================
-				// Pending Quantity
-				// =========================
 
 				detailVO.setPendingQty(detailDTO.getPendingQty());
 

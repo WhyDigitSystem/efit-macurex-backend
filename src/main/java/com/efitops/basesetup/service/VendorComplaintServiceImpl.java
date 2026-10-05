@@ -8197,6 +8197,11 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		response.setCancelRemarks(vo.getCancelRemarks());
 
+		
+		response.setDocId(vo.getDocId());
+
+		response.setDocDate(vo.getDocDate());
+
 		response.setCreatedBy(vo.getCreatedBy());
 
 		/*

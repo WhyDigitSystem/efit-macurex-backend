@@ -15,6 +15,10 @@ public class ScrapMaterialReturnRejectionResponseDTO {
 
 	private Long id;
 	
+	private String docId;
+	
+	private LocalDate docDate;
+	
 	private BranchResponseDTO branch;
 	
 	private ListOfValuesDetailsResponseDTO entryFor;

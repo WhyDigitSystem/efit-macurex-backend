@@ -29,7 +29,6 @@ public class PurchaseBillDTO {
 
 	private String vendorDcNo;
 	private BigDecimal exchangeRate;
-	private Long dealerType;
 	private String purchaseorderType;
 	private String purchaseorderNumber;
 	private LocalDate purchaseorderDate;

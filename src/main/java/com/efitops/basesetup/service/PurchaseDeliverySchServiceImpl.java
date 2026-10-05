@@ -2289,6 +2289,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		response.setBelongsTo(purchaseBillVO.getBelongsTo());
 		response.setDocDate(purchaseBillVO.getDocDate());
+		response.setDocId(purchaseBillVO.getDocId());
 
 		if (purchaseBillVO.getSupplier() != null) {
 

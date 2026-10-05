@@ -1209,7 +1209,7 @@ public class RejectionInvoiceServiceImpl implements RejectionInvoiceService {
 	}
 
 	@Override
-	public String getProformaInvoiceDocId(Long orgId, String financialYear, String screenCode) {
+	public String getProformaInvoiceDocId(Long orgId, String financialYear) {
 		String screenCode1 = "PI";
 		String result = proformaInvoiceRepo.getProformaInvoiceDocId(orgId, financialYear, screenCode1);
 		return result;

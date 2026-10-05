@@ -107,7 +107,7 @@ public interface PurchaseServiceImport {
 
 	List<Map<String, Object>> getIssueTo(Long orgId, Long branch);
 
-	List<Map<String, Object>> getItemType(Long orgId, Long branch, Long itemType);
+	List<Map<String, Object>> getItemType(Long orgId, Long branch);
 
 	// Applic
 

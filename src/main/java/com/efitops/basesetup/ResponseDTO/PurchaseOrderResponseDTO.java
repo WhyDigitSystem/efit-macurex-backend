@@ -39,9 +39,9 @@ public class PurchaseOrderResponseDTO {
 	private String paymentTerms;
 	private String deliveryTerms;
 	private String notes;
-	private String preparedBy;
-	private String checkedBy;
-	private String authorisedBy;
+	private EmployeeMasterResponseDetailsDTO preparedBy;
+	private EmployeeMasterResponseDetailsDTO checkedBy;
+	private EmployeeMasterResponseDetailsDTO authorisedBy;
 	private BigDecimal totalAmount;
 	private String amountInWord;
 

@@ -571,7 +571,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 					for (PurchaseDeliveryScheduleLineVO lineVO : detailVO.getPurchaseDeliveryScheduleLineVO()) {
 
 						PurchaseDeliveryScheduleLineResponseDTO lineDTO = new PurchaseDeliveryScheduleLineResponseDTO();
-
+						lineDTO.setId(lineVO.getId());
 						lineDTO.setPlanDate(lineVO.getPlanDate());
 						lineDTO.setWeekNo(lineVO.getWeekNo());
 						lineDTO.setScheduleQty(lineVO.getScheduleQty());
@@ -677,15 +677,19 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 			itemMap.put("supplier", obj[1] != null ? ((Number) obj[1]).longValue() : null);
 
-			itemMap.put("primaryUnit", obj[2] != null ? obj[2].toString() : "");
-
-			itemMap.put("purchaseUnit", obj[2] != null ? obj[2].toString() : "");
+			itemMap.put("primaryUnitDescription", obj[2] != null ? obj[2].toString() : "");
 
 			itemMap.put("itemCode", obj[3] != null ? obj[3].toString() : "");
 
 			itemMap.put("itemDesc", obj[4] != null ? obj[4].toString() : "");
 
 			itemMap.put("itemId", obj[5] != null ? ((Number) obj[5]).longValue() : null);
+			
+			itemMap.put("primaryUniId", obj[6] != null ? ((Number) obj[6]).longValue() : null);
+			
+			itemMap.put("purchaseUnitDescription", obj[7] != null ? obj[7].toString() : "");
+			
+			itemMap.put("purchaseUnitId", obj[8] != null ? ((Number) obj[8]).longValue() : null);
 
 			responseList.add(itemMap);
 		}

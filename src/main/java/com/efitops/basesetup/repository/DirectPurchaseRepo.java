@@ -28,9 +28,8 @@ public interface DirectPurchaseRepo extends JpaRepository<DirectPurchaseVO, Long
 	Set<Object[]> getIssueTo(Long orgId, Long branch);
 
 	
-	@Query(nativeQuery = true, value = "select item_id,item_code from item\r\n"
-			+ "where org_id=?1 and branch=?2 and item_type=?3\r\n"
-			+ "order by 1")
-	Set<Object[]> getItemType(Long orgId, Long branch, Long itemType);
+	@Query(nativeQuery = true, value = "select i.item_id,i.item_code,i.item_description from item i left join listofvaluesdetails l on l.listofvaluesdetails_id=i.item_type\r\n"
+			+ "			where org_id=?1 and branch=?2 and l.value_description='Group'")
+	Set<Object[]> getItemType(Long orgId, Long branch);
 
 }

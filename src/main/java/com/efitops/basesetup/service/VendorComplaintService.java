@@ -141,7 +141,7 @@ public interface VendorComplaintService {
 	Map<String, Object> updateCreateFlashNCReport(FlashNCReportDTO flashNCReportDTO, MultipartFile[] files,
 			MultipartFile[] images) throws ApplicationException;
 
-	List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long listOfValuesId) throws ApplicationException;
+	List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long branch,Long orgId) throws ApplicationException;
 
 //	List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long listOfValuesId, Long fromDept)
 //			throws ApplicationException;
@@ -335,6 +335,15 @@ public interface VendorComplaintService {
 
 	Map<String, Object> getSalesRegisterCustomerWiseReport(Long belongsTo, String fromDate, String toDate,
 			String customerName, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getMonthlyScheduleRevDetails(String belongsTo, String myear, Long branch, Long orgId,
+			String fromDate, String toDate) throws ApplicationException;
+
+	Map<String, Object> getDeliveryScheduleOthersReport(String monthYear, Long belongsTo, String itemCode,
+			Long branchId, Long orgId, String fromDate, String toDate) throws ApplicationException;
+
+	Map<String, Object> getDeliveryScheduleDayWiseReport(String monthYear, String fromDate, String toDate,
+			Long branchId, Long orgId) throws ApplicationException;
 
 	
 

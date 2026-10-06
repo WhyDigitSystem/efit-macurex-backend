@@ -3398,10 +3398,10 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long listOfValuesId)
+	public List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long branch,Long orgId)
 			throws ApplicationException {
 
-		List<Object[]> departmentList = flashNCReportRepo.getFromDeptDropdownForFlashNCReport(listOfValuesId);
+		List<Object[]> departmentList = flashNCReportRepo.getFromDepartmentForFlashNCReport(branch,orgId);
 
 		if (departmentList == null || departmentList.isEmpty()) {
 
@@ -3415,9 +3415,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			Map<String, Object> departmentMap = new HashMap<>();
 
 			departmentMap.put("id", obj[0]);
-			departmentMap.put("valueCode", obj[1]);
-			departmentMap.put("valueDescription", obj[2]);
-
+			departmentMap.put("name", obj[1]);
+			
 			responseList.add(departmentMap);
 		}
 
@@ -3472,12 +3471,22 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			mrinGrnMap.put("supplierCode", obj[1]);
 			mrinGrnMap.put("supplierName", obj[2]);
 			mrinGrnMap.put("invoiceNo", obj[3]);
-			mrinGrnMap.put("item", obj[4]);
-			mrinGrnMap.put("itemDescription", obj[5]);
-			mrinGrnMap.put("mrinGrnDate", obj[6]);
-			mrinGrnMap.put("poNo", obj[7]);
-			mrinGrnMap.put("qty", obj[8]);
-			mrinGrnMap.put("sourceType", obj[9]);
+			mrinGrnMap.put("mrinGrnDate", obj[4]);
+			mrinGrnMap.put("poNo", obj[5]);
+			mrinGrnMap.put("qty", obj[6]);
+			mrinGrnMap.put("sourceType", obj[7]);
+			
+			List<Map<String, Object>> itemList = new ArrayList<>();
+
+			Map<String, Object> itemData = new HashMap<>();
+
+			itemData.put("itemCode", obj[4]);
+			itemData.put("itemDescription", obj[5]);
+			
+
+			itemList.add(itemData);
+
+			mrinGrnMap.put("items", itemList);
 
 			responseList.add(mrinGrnMap);
 		}
@@ -7961,14 +7970,13 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		createUpdateScrapMaterialReturnRejectionVO(scrapMaterialReturnRejectionVO, scrapMaterialReturnRejectionDTO);
 
-		
 		// Delete existing child details during update
 		if (scrapMaterialReturnRejectionDTO.getId() != null) {
 
-		    scrapMaterialReturnRejectionDetailsRepo
-		            .deleteByScrapMaterialReturnRejectionVO(scrapMaterialReturnRejectionVO);
+			scrapMaterialReturnRejectionDetailsRepo
+					.deleteByScrapMaterialReturnRejectionVO(scrapMaterialReturnRejectionVO);
 		}
-		
+
 		if (scrapMaterialReturnRejectionDTO.getScrapMaterialReturnRejectionDetailsDTO() != null
 				&& !scrapMaterialReturnRejectionDTO.getScrapMaterialReturnRejectionDetailsDTO().isEmpty()) {
 
@@ -8208,7 +8216,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		response.setCancelRemarks(vo.getCancelRemarks());
 
-		
 		response.setDocId(vo.getDocId());
 
 		response.setDocDate(vo.getDocDate());
@@ -8287,7 +8294,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		response.setScrapMaterialReturnRejectionDetailsResponseDTO(detailsResponseList);
 
 		return response;
-		
+
 	}
 
 	@Override
@@ -8748,6 +8755,167 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		responseObjectsMap.put("salesRegisterCustomerWiseReport", responseList);
+
+		return responseObjectsMap;
+	}
+
+//	//	monthly sch. Rev. details
+
+	@Override
+	public Map<String, Object> getMonthlyScheduleRevDetails(String belongsTo, String myear, Long branch, Long orgId,
+			String fromDate, String toDate) throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> resultList = salesDeliveryScheduleRepo.getMonthlyScheduleRevDetails(belongsTo, myear, branch,
+				orgId, fromDate, toDate);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("modifiedDate", obj[0]);
+			data.put("docDt", obj[1]);
+			data.put("itemId", obj[2]);
+			data.put("itemDescription", obj[3]);
+			data.put("partyName", obj[4]);
+			data.put("belong", obj[5]);
+			data.put("oldValue", obj[6]);
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("monthlyScheduleRevDetails", responseList);
+
+		return responseObjectsMap;
+	}
+
+//	delivery schedule - others report
+
+	@Override
+	public Map<String, Object> getDeliveryScheduleOthersReport(String monthYear, Long belongsTo, String itemCode,
+			Long branchId, Long orgId, String fromDate, String toDate) throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> resultList = salesDeliveryScheduleRepo.getDeliveryScheduleOthersReport(monthYear, belongsTo,
+				itemCode, branchId, orgId, fromDate, toDate);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("itemId", obj[0]);
+			data.put("itemCode", obj[1]);
+			data.put("itemDescription", obj[2]);
+			data.put("ndivno", obj[3]);
+			data.put("divdt", obj[4]);
+			data.put("customerCode", obj[5]);
+			data.put("customerName", obj[6]);
+
+			data.put("d1", obj[7]);
+			data.put("d2", obj[8]);
+			data.put("d3", obj[9]);
+			data.put("d4", obj[10]);
+			data.put("d5", obj[11]);
+			data.put("d6", obj[12]);
+			data.put("d7", obj[13]);
+			data.put("d8", obj[14]);
+			data.put("d9", obj[15]);
+			data.put("d10", obj[16]);
+			data.put("d11", obj[17]);
+			data.put("d12", obj[18]);
+			data.put("d13", obj[19]);
+			data.put("d14", obj[20]);
+			data.put("d15", obj[21]);
+			data.put("d16", obj[22]);
+			data.put("d17", obj[23]);
+			data.put("d18", obj[24]);
+			data.put("d19", obj[25]);
+			data.put("d20", obj[26]);
+			data.put("d21", obj[27]);
+			data.put("d22", obj[28]);
+			data.put("d23", obj[29]);
+			data.put("d24", obj[30]);
+			data.put("d25", obj[31]);
+			data.put("d26", obj[32]);
+			data.put("d27", obj[33]);
+			data.put("d28", obj[34]);
+			data.put("d29", obj[35]);
+			data.put("d30", obj[36]);
+			data.put("d31", obj[37]);
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("deliveryScheduleOthersReport", responseList);
+
+		return responseObjectsMap;
+	}
+
+//	deliveryschedule - daywise
+	@Override
+	public Map<String, Object> getDeliveryScheduleDayWiseReport(String monthYear, String fromDate, String toDate,
+			Long branchId, Long orgId) throws ApplicationException {
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		List<Object[]> resultList = salesDeliveryScheduleRepo.getDeliveryScheduleDayWiseReport(monthYear, fromDate, toDate,
+				branchId, orgId);
+
+		List<Map<String, Object>> responseList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+
+			Map<String, Object> data = new HashMap<>();
+
+			data.put("itemId", obj[0]);
+			data.put("itemDescription", obj[1]);
+			data.put("ndivno", obj[2]);
+			data.put("divdt", obj[3]);
+			data.put("partyId", obj[4]);
+			data.put("partyName", obj[5]);
+
+			data.put("d1", obj[6]);
+			data.put("d2", obj[7]);
+			data.put("d3", obj[8]);
+			data.put("d4", obj[9]);
+			data.put("d5", obj[10]);
+			data.put("d6", obj[11]);
+			data.put("d7", obj[12]);
+			data.put("d8", obj[13]);
+			data.put("d9", obj[14]);
+			data.put("d10", obj[15]);
+			data.put("d11", obj[16]);
+			data.put("d12", obj[17]);
+			data.put("d13", obj[18]);
+			data.put("d14", obj[19]);
+			data.put("d15", obj[20]);
+			data.put("d16", obj[21]);
+			data.put("d17", obj[22]);
+			data.put("d18", obj[23]);
+			data.put("d19", obj[24]);
+			data.put("d20", obj[25]);
+			data.put("d21", obj[26]);
+			data.put("d22", obj[27]);
+			data.put("d23", obj[28]);
+			data.put("d24", obj[29]);
+			data.put("d25", obj[30]);
+			data.put("d26", obj[31]);
+			data.put("d27", obj[32]);
+			data.put("d28", obj[33]);
+			data.put("d29", obj[34]);
+			data.put("d30", obj[35]);
+			data.put("d31", obj[36]);
+
+			responseList.add(data);
+		}
+
+		responseObjectsMap.put("deliveryScheduleDayWiseReport", responseList);
 
 		return responseObjectsMap;
 	}

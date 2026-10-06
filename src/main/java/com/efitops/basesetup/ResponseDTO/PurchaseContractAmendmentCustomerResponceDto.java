@@ -4,10 +4,8 @@ import lombok.Data;
 
 @Data
 public class PurchaseContractAmendmentCustomerResponceDto {
-	
-	
-	
-	 private Long id;
+
+	private Long id;
 	private String customerName;
 
 }

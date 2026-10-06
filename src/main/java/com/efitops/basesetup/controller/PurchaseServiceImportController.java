@@ -3872,4 +3872,44 @@ public class PurchaseServiceImportController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 	}
+
+	@GetMapping("/getFgItemCodeDetails")
+	public ResponseEntity<ResponseDTO> getFgItemCodeDetails(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getFgItemCodeDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getFgItemCodeDetails(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "FgTransfer retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve FgTransfer", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
 }

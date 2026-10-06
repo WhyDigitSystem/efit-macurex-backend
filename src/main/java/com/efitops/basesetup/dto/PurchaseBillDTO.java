@@ -29,7 +29,6 @@ public class PurchaseBillDTO {
 
 	private String vendorDcNo;
 	private BigDecimal exchangeRate;
-	private Long dealerType;
 	private String purchaseorderType;
 	private String purchaseorderNumber;
 	private LocalDate purchaseorderDate;
@@ -40,7 +39,7 @@ public class PurchaseBillDTO {
 	private LocalDate voucherPostingDate;
 	private LocalDate date;
 	private BigDecimal dutyPerUnit;
-	private Long postingCategory;
+	private String postingCategory;
 	private Boolean modvatCopyReceived;
 //	private Long eccType;
 	private String supplierDcInvNo;
@@ -50,7 +49,7 @@ public class PurchaseBillDTO {
 
 //	---------import purchase bill
 	private String creditAcc;
-	private Long statutoryForms;
+	private String statutoryForms;
 	private String supplierInvValue;
 
 	// -------- audit / org --------
@@ -59,6 +58,7 @@ public class PurchaseBillDTO {
 	private boolean active;
 	private String cancelRemarks;
 	private String createdBy;
+	
 
 	// -------- children --------
 	private List<PurchaseBillDetailsDTO> purchaseDetails;

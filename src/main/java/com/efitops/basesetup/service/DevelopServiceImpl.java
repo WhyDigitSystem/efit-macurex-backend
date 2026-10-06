@@ -5,17 +5,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -24,14 +28,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
-import com.efitops.basesetup.ResponseDTO.CustomerResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DrawingAttachmentDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DrawingAttachmentsResponseDTO;
@@ -98,6 +106,7 @@ import com.efitops.basesetup.dto.ControlPlanDetailDTO;
 import com.efitops.basesetup.dto.ControlPlanMachineFixtureDTO;
 import com.efitops.basesetup.dto.ControlPlanParameterDTO;
 import com.efitops.basesetup.dto.ControlPlanSampleDTO;
+import com.efitops.basesetup.dto.CurrencyResponseDTO;
 import com.efitops.basesetup.dto.DrawingAttachmentsDTO;
 import com.efitops.basesetup.dto.EightDiscipline1DetailDTO;
 import com.efitops.basesetup.dto.EightDiscipline2DetailDTO;
@@ -162,6 +171,7 @@ import com.efitops.basesetup.entity.ControlPlanParameterVO;
 import com.efitops.basesetup.entity.ControlPlanSampleVO;
 import com.efitops.basesetup.entity.ControlPlanVO;
 import com.efitops.basesetup.entity.CountryVO;
+import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerComplaintEntryVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
@@ -232,9 +242,11 @@ import com.efitops.basesetup.repository.ControlPlanParameterRepo;
 import com.efitops.basesetup.repository.ControlPlanRepo;
 import com.efitops.basesetup.repository.ControlPlanSampleRepo;
 import com.efitops.basesetup.repository.CountryRepo;
+import com.efitops.basesetup.repository.CurrencyRepo;
 import com.efitops.basesetup.repository.CustomerComplaintRepo;
 import com.efitops.basesetup.repository.CustomerContactDetailsRepo;
 import com.efitops.basesetup.repository.CustomerRepo;
+import com.efitops.basesetup.repository.DailyExchangeRateRepo;
 import com.efitops.basesetup.repository.DeliveryChallanSubcontractingRepo;
 import com.efitops.basesetup.repository.DepartmentRepo;
 import com.efitops.basesetup.repository.DocumentTypeMappingDetailsRepo;
@@ -520,11 +532,10 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	private DrawingAttachmentDetailRepo drawingAttachmentDetailRepo;
-	
-	
+
 	@Autowired
 	private GateOutwardEntryRepo gateOutwardEntryRepo;
-	
+
 	@Autowired
 	private GateOutwardEntryDetailRepo gateOutwardEntryDetailRepo;
 
@@ -563,22 +574,27 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	private ZeroEntryDetailRepo zeroEntryDetailRepo;
-	
+
 	@Autowired
 	private MaintenanceServiceRequestRepo maintenanceServiceRequestRepo;
-	
+
 	@Autowired
 	private TransferOrderRepo transferOrderRepo;
-	
+
 	@Autowired
 	private TransferOrderDetailRepo transferOrderDetailRepo;
-	
+
 	@Autowired
 	private MachineToolBreakdownRepo machineToolBreakdownRepo;
-	
+
 	@Autowired
 	private DeliveryChallanSubcontractingRepo deliveryChallanSubcontractingRepo;
 
+	@Autowired
+	private CurrencyRepo currencyRepo;
+
+	@Autowired
+	private DailyExchangeRateRepo dailyExchangeRateRepo;
 
 //	@Override
 //	@Transactional
@@ -2338,6 +2354,7 @@ public class DevelopServiceImpl implements DevelopService {
 	public Map<String, Object> createUpdatePurchaseContractAmendment(
 			PurchaseContractAmendmentDto purchaseContractAmendmentDto, MultipartFile[] files)
 			throws ApplicationException {
+		String screenCode = "PCA";
 
 		PurchaseContractAmendmentVO purchaseContractAmendmentVO;
 		String message;
@@ -2355,6 +2372,18 @@ public class DevelopServiceImpl implements DevelopService {
 
 			purchaseContractAmendmentVO = new PurchaseContractAmendmentVO();
 
+			String docId = purchaseContractAmendmentRepo.getPurchaseContractAmendmentDocId(
+					purchaseContractAmendmentDto.getOrgId(), purchaseContractAmendmentDto.getFinancialYear(),
+					screenCode);
+
+			purchaseContractAmendmentVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(purchaseContractAmendmentDto.getOrgId(),
+							purchaseContractAmendmentDto.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
 			purchaseContractAmendmentVO.setCreatedBy(purchaseContractAmendmentDto.getCreatedBy());
 
 			purchaseContractAmendmentVO.setUpdatedBy(purchaseContractAmendmentDto.getCreatedBy());
@@ -2369,7 +2398,7 @@ public class DevelopServiceImpl implements DevelopService {
 		purchaseContractAmendmentVO = purchaseContractAmendmentRepo.save(purchaseContractAmendmentVO);
 
 		// Save Attachments
-		saveAttachments(files, purchaseContractAmendmentVO);
+		saveAttachmentPurchaseContract(files, purchaseContractAmendmentVO);
 
 		// Response
 		PurchaseContractAmendmentResponseDto responseDTO = purchaseContractAmendmentResponse(
@@ -2386,24 +2415,14 @@ public class DevelopServiceImpl implements DevelopService {
 
 	private void createUpdatePurchaseContractAmendmentVOByDTO(PurchaseContractAmendmentDto dto,
 			PurchaseContractAmendmentVO vo) throws ApplicationException {
-
-		// =========================
-		// Branch
-		// =========================
-
-		if (dto.getBranch() != null) {
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
 			BranchVO branchVO = branchRepo.findById(dto.getBranch())
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 			vo.setBranch(branchVO);
 		}
-
-		// =========================
-		// Customer
-		// =========================
-
-		if (dto.getCustomer() != null) {
+		if (dto.getCustomer() != null && dto.getBranch() != 0) {
 
 			CustomerVO customerVO = customerRepo.findById(dto.getCustomer())
 					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
@@ -2411,15 +2430,7 @@ public class DevelopServiceImpl implements DevelopService {
 			vo.setCustomer(customerVO);
 		}
 
-		// =========================
-		// Header
-		// =========================
-
 		vo.setBelongsTo(dto.getBelongsTo());
-
-		// vo.setDocId(dto.getDocId());
-		// vo.setDocDate(dto.getDocDate());
-
 		vo.setContractNo(dto.getContractNo());
 		vo.setContractDate(dto.getContractDate());
 
@@ -2427,10 +2438,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		vo.setRefNo(dto.getRefNo());
 		vo.setRefDate(dto.getRefDate());
-
-		// =========================
-		// Summary
-		// =========================
 
 		vo.setFreightType(dto.getFreightType());
 		vo.setPackingType(dto.getPackingType());
@@ -2441,26 +2448,18 @@ public class DevelopServiceImpl implements DevelopService {
 		vo.setAuthorisedBy(dto.getAuthorisedBy());
 		vo.setRemarks(dto.getRemarks());
 
-		// =========================
-		// Common
-		// =========================
-
 		vo.setOrgId(dto.getOrgId());
 		vo.setActive(dto.isActive());
 		vo.setCancelRemarks(dto.getCancelRemarks());
 
-		// =========================
-		// Delete Old Details
-		// =========================
-
 		if (vo.getId() != null) {
 
-			purchaseContractAmendmentDetailsRepo.deleteByPurchaseContractAmendmentVO(vo);
-		}
+			List<PurchaseContractAmendmentDetailsVO> details = purchaseContractAmendmentDetailsRepo
+					.findByPurchaseContractAmendmentVO(vo);
 
-		// =========================
-		// Save Grid
-		// =========================
+			purchaseContractAmendmentDetailsRepo.deleteAll(details);
+
+		}
 
 		List<PurchaseContractAmendmentDetailsVO> detailsList = new ArrayList<>();
 
@@ -2521,10 +2520,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		responseDto.setId(vo.getId());
 
-		// =========================
-		// Branch
-		// =========================
-
 		if (vo.getBranch() != null) {
 
 			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
@@ -2536,10 +2531,6 @@ public class DevelopServiceImpl implements DevelopService {
 			responseDto.setBranch(branchResponseDTO);
 		}
 
-		// =========================
-		// Party
-		// =========================
-
 		if (vo.getCustomer() != null) {
 
 			PurchaseContractAmendmentCustomerResponceDto customerResponseDTO = new PurchaseContractAmendmentCustomerResponceDto();
@@ -2549,10 +2540,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 			responseDto.setCustomer(customerResponseDTO);
 		}
-
-		// =========================
-		// Header
-		// =========================
 
 		responseDto.setBelongsTo(vo.getBelongsTo());
 		responseDto.setDocId(vo.getDocId());
@@ -2566,9 +2553,8 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDto.setRefNo(vo.getRefNo());
 		responseDto.setRefDate(vo.getRefDate());
 
-		// =========================
-		// Summary
-		// =========================
+		responseDto.setScreenCode(vo.getScreenCode());
+		responseDto.setScreenName(vo.getScreenName());
 
 		responseDto.setFreightType(vo.getFreightType());
 		responseDto.setPackingType(vo.getPackingType());
@@ -2659,16 +2645,11 @@ public class DevelopServiceImpl implements DevelopService {
 
 				fileDTO.setFileName(fileVO.getFileName());
 
-				String urlPath = uploadPath.replace("C:/", "/").replace("\\", "/");
-
-				fileDTO.setFilePath(serverBaseUrl + urlPath + fileVO.getFileName());
+				fileDTO.setFilePath(fileVO.getFilePath());
 
 				fileDTO.setFileSize(fileVO.getFileSize());
 
 				fileDTO.setContentType(fileVO.getContentType());
-
-				fileDTO.setUploadOn(fileVO.getUploadOn());
-
 				attachmentResponseList.add(fileDTO);
 			}
 		}
@@ -2679,52 +2660,35 @@ public class DevelopServiceImpl implements DevelopService {
 
 	}
 
-	private void saveAttachments(MultipartFile[] files, PurchaseContractAmendmentVO purchaseContractAmendmentVO)
-			throws ApplicationException {
+	@Value("${purchasecontractamendment.upload.path}")
+	private String purchaseContractAmendmentUploadPath;
 
-		// If no new files are uploaded, keep existing files
+	private void saveAttachmentPurchaseContract(MultipartFile[] files,
+			PurchaseContractAmendmentVO purchaseContractAmendmentVO) throws ApplicationException {
+
 		if (files == null || files.length == 0) {
 			return;
 		}
 
 		try {
 
-			File folder = new File(uploadPath1);
+			// Store inside a sub-folder by amendment ID
+			Path purchaseContractAmendmentFolder = Paths.get(purchaseContractAmendmentUploadPath,
+					"purchaseContractAmendment", purchaseContractAmendmentVO.getId().toString());
 
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
+			createDirectoryContract(purchaseContractAmendmentFolder);
 
-			// ==========================================
-			// Delete Existing Attachments
-			// ==========================================
+			// Delete old DB records if updating
+			if (ObjectUtils.isNotEmpty(purchaseContractAmendmentVO.getId())) {
 
-			List<PurchaseContractAmendmentAttachmentVO> oldAttachments = purchaseContractAmendmentAttachmentRepo
-					.findByPurchaseContractAmendmentVO(purchaseContractAmendmentVO);
+				List<PurchaseContractAmendmentAttachmentVO> existingAttachments = purchaseContractAmendmentAttachmentRepo
+						.findByPurchaseContractAmendmentVO(purchaseContractAmendmentVO);
 
-			for (PurchaseContractAmendmentAttachmentVO oldAttachment : oldAttachments) {
+				if (existingAttachments != null && !existingAttachments.isEmpty()) {
 
-				// Delete physical file
-				if (oldAttachment.getFilePath() != null) {
-
-					File oldFile = new File(oldAttachment.getFilePath());
-
-					if (oldFile.exists()) {
-						oldFile.delete();
-					}
+					purchaseContractAmendmentAttachmentRepo.deleteAll(existingAttachments);
 				}
 			}
-
-			// Delete old attachment records from DB
-			if (!oldAttachments.isEmpty()) {
-
-				purchaseContractAmendmentAttachmentRepo
-						.deleteByPurchaseContractAmendmentVO(purchaseContractAmendmentVO);
-			}
-
-			// ==========================================
-			// Save New Attachments
-			// ==========================================
 
 			List<PurchaseContractAmendmentAttachmentVO> attachmentList = new ArrayList<>();
 
@@ -2734,46 +2698,138 @@ public class DevelopServiceImpl implements DevelopService {
 					continue;
 				}
 
-				String originalFileName = file.getOriginalFilename();
+				String originalName = file.getOriginalFilename();
 
-				String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
+				if (originalName == null) {
+					originalName = "file";
+				}
 
-				Path path = Paths.get(uploadPath1, uniqueFileName);
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				if (originalName.contains(".")) {
+
+					extension = originalName.substring(originalName.lastIndexOf("."));
+
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				// Unique filename using amendment ID
+				String fileName = originalName + "_" + purchaseContractAmendmentVO.getId() + extension;
+
+				Path filePath = purchaseContractAmendmentFolder.resolve(fileName);
 
 				try (InputStream inputStream = file.getInputStream()) {
 
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
 				}
+
+				// Build public URL - FIXED: Construct relative path manually
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/develop/viewPurchaseContractAmendmentFile/").toUriString();
+
+				// Manually build the relative path exactly matching the folder structure
+				String relativePath = "purchaseContractAmendment/" + purchaseContractAmendmentVO.getId() + "/"
+						+ fileName;
+				String publicUrl = baseUrl + relativePath;
 
 				PurchaseContractAmendmentAttachmentVO attachment = new PurchaseContractAmendmentAttachmentVO();
 
 				attachment.setPurchaseContractAmendmentVO(purchaseContractAmendmentVO);
 
-				attachment.setName(originalFileName);
-
-				attachment.setFileName(uniqueFileName);
-
-				attachment.setFilePath(path.toString());
-
+				attachment.setName(file.getOriginalFilename());
+				attachment.setFileName(fileName);
+				attachment.setFilePath(publicUrl);
 				attachment.setFileSize(file.getSize());
-
-				attachment.setContentType(file.getContentType());
-
-				attachment.setUploadOn(LocalDateTime.now());
-
 				attachmentList.add(attachment);
 			}
 
-			// Save new attachment records
-			List<PurchaseContractAmendmentAttachmentVO> savedAttachments = purchaseContractAmendmentAttachmentRepo
-					.saveAll(attachmentList);
+			if (!attachmentList.isEmpty()) {
 
-			purchaseContractAmendmentVO.setPurchaseContractAmendmentAttachment(savedAttachments);
+				List<PurchaseContractAmendmentAttachmentVO> saved = purchaseContractAmendmentAttachmentRepo
+						.saveAll(attachmentList);
+
+				purchaseContractAmendmentVO.setPurchaseContractAmendmentAttachment(saved);
+			}
 
 		} catch (IOException e) {
 
 			throw new ApplicationException("File Upload Failed : " + e.getMessage());
 		}
+	}
+
+	private void createDirectoryContract(Path path) throws IOException {
+
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
+	@Override
+	public ResponseEntity<byte[]> viewPurchaseContractAmendmentFile(HttpServletRequest request) throws IOException {
+
+		return servePurchaseContractAmendmentFile(request, "/api/develop/viewPurchaseContractAmendmentFile/",
+				purchaseContractAmendmentUploadPath);
+	}
+
+	private ResponseEntity<byte[]> servePurchaseContractAmendmentFile(HttpServletRequest request, String apiPrefix,
+			String uploadBasePath) throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("/")) {
+			relativePath = relativePath.substring(1);
+		}
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		int index = relativePath.indexOf("purchaseContractAmendment/");
+		if (index > 0) {
+			relativePath = relativePath.substring(index);
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		// Security - prevent path traversal
+		if (!filePath.startsWith(baseDir)) {
+
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath)) {
+
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+
+			contentType = guessContentType(filePath.getFileName().toString());
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+
+	@Override
+	public String getPurchaseContractAmendmentDocId(Long orgId, String financialYear) {
+		String screenCode1 = "PCA";
+		String result = purchaseContractAmendmentRepo.getPurchaseContractAmendmentDocId(orgId, financialYear,
+				screenCode1);
+
+		return result;
 	}
 
 	@Override
@@ -2829,6 +2885,8 @@ public class DevelopServiceImpl implements DevelopService {
 
 			contract.put("contractNo", obj[1] != null ? obj[1].toString() : null);
 
+			contract.put("contractDate", obj[2] != null ? obj[2].toString() : null);
+
 			contractList.add(contract);
 		}
 
@@ -2865,7 +2923,9 @@ public class DevelopServiceImpl implements DevelopService {
 
 			itemCode.put("itemDescription", obj[2] != null ? obj[2].toString() : null);
 
-			itemCode.put("unitId", obj[3] != null ? ((Number) obj[3]).longValue() : null);
+			itemCode.put("unitDescription", obj[3] != null ? obj[3].toString() : null);
+
+			itemCode.put("unitId", obj[4] != null ? ((Number) obj[4]).longValue() : null);
 
 			itemCodeList.add(itemCode);
 		}
@@ -2914,6 +2974,17 @@ public class DevelopServiceImpl implements DevelopService {
 		} else {
 
 			purchaseOrderAmendmentVO = new PurchaseOrderAmendmentVO();
+
+			String docId = purchaseOrderAmendmentRepo.getPurchaseOrderAmendmentDocId(
+					purchaseOrderAmendmentDTO.getOrgId(), purchaseOrderAmendmentDTO.getFinancialYear(), screenCode);
+
+			purchaseOrderAmendmentVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(purchaseOrderAmendmentDTO.getOrgId(),
+							purchaseOrderAmendmentDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			purchaseOrderAmendmentVO.setCreatedBy(purchaseOrderAmendmentDTO.getCreatedBy());
 
@@ -2975,33 +3046,23 @@ public class DevelopServiceImpl implements DevelopService {
 	private void createUpdatePurchaseOrderAmendmentVO(PurchaseOrderAmendmentDTO dto, PurchaseOrderAmendmentVO vo)
 			throws ApplicationException {
 
-		// ======================================================
-		// Header Mapping
-		// ======================================================
-
 		vo.setBelongsTo(dto.getBelongsTo());
 		vo.setPurchaseordernumber(dto.getPurchaseordernumber());
-//    vo.setCurrency(dto.getCurrency());
-//    vo.setRefNo(dto.getRefNo());
-//    vo.setRefDate(dto.getRefDate());
-//    vo.setExchangeRate(dto.getExchangeRate());
+		vo.setFinancialYear(dto.getFinancialYear());
 		vo.setRevisionNo(dto.getRevisionNo());
-
 		vo.setFreightType(dto.getFreightType());
 		vo.setPackingType(dto.getPackingType());
 		vo.setInsuranceAmount(dto.getInsuranceAmount());
 		vo.setModeOfDespatch(dto.getModeOfDespatch());
 		vo.setTaxDescription(dto.getTaxDescription());
+		vo.setExchangeRate(dto.getExchangeRate());
 		vo.setRemarks(dto.getRemarks());
-
+		vo.setRefNo(dto.getRefNo());
+		vo.setRefDate(dto.getRefDate());
 		vo.setOrgId(dto.getOrgId());
 		vo.setActive(dto.isActive());
 		vo.setCancelRemarks(dto.getCancelRemarks());
 		vo.setCreatedBy(dto.getCreatedBy());
-		;
-		// ======================================================
-		// Branch
-		// ======================================================
 
 		if (dto.getBranch() != null && dto.getBranch() > 0) {
 
@@ -3011,9 +3072,11 @@ public class DevelopServiceImpl implements DevelopService {
 			vo.setBranch(branch);
 		}
 
-		// ======================================================
-		// Customer
-		// ======================================================
+		if (dto.getCurrency() != null && dto.getCurrency() != 0) {
+			CurrencyVO currency = currencyRepo.findById(dto.getCurrency())
+					.orElseThrow(() -> new ApplicationException("Currency Not Found"));
+			vo.setCurrency(currency);
+		}
 
 		if (dto.getCustomer() != null && dto.getCustomer() > 0) {
 
@@ -3023,9 +3086,13 @@ public class DevelopServiceImpl implements DevelopService {
 			vo.setCustomer(customer);
 		}
 
-		// ======================================================
-		// Update - Delete Old Details & Attachments
-		// ======================================================
+//		if (dto.getExchangeRate() != null && dto.getExchangeRate() > 0) {
+//
+//			DailyExchangeRateVO customer = dailyExchangeRateRepo.findById(dto.getExchangeRate())
+//					.orElseThrow(() -> new ApplicationException("Exchange Not Found"));
+//
+//			vo.setExchangeRate(customer);
+//		}
 
 		if (ObjectUtils.isNotEmpty(vo.getId())) {
 
@@ -3035,10 +3102,6 @@ public class DevelopServiceImpl implements DevelopService {
 			purchaseOrderAmendmentDetailsRepo.deleteAll(details);
 
 		}
-
-		// ======================================================
-		// Details Mapping
-		// ======================================================
 
 		List<PurchaseOrderAmendmentDetailsVO> detailList = new ArrayList<>();
 
@@ -3103,10 +3166,21 @@ public class DevelopServiceImpl implements DevelopService {
 
 		try {
 
-			File folder = new File(purchaseOrderAmendmentUploadPath);
+			// ✅ Store inside a sub-folder by amendment ID (like purchaseOrder pattern)
+			Path purchaseOrderAmendmentFolder = Paths.get(purchaseOrderAmendmentUploadPath, "purchaseOrderAmendment",
+					purchaseOrderAmendmentVO.getId().toString());
 
-			if (!folder.exists()) {
-				folder.mkdirs();
+			createDirectory(purchaseOrderAmendmentFolder);
+
+			// Delete old DB records if updating
+			if (ObjectUtils.isNotEmpty(purchaseOrderAmendmentVO.getId())) {
+
+				List<PurchaseOrderAmendmentAttachmentVO> existingAttachments = purchaseOrderAmendmentAttachmentRepo
+						.findByPurchaseOrderAmendmentVO(purchaseOrderAmendmentVO);
+
+				if (existingAttachments != null && !existingAttachments.isEmpty()) {
+					purchaseOrderAmendmentAttachmentRepo.deleteAll(existingAttachments);
+				}
 			}
 
 			List<PurchaseOrderAmendmentAttachmentVO> attachmentList = new ArrayList<>();
@@ -3117,45 +3191,126 @@ public class DevelopServiceImpl implements DevelopService {
 					continue;
 				}
 
-				String originalFileName = file.getOriginalFilename();
+				String originalName = file.getOriginalFilename();
 
-				String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
-
-				Path path = Paths.get(purchaseOrderAmendmentUploadPath, uniqueFileName);
-
-				try (InputStream inputStream = file.getInputStream()) {
-
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+				if (originalName == null) {
+					originalName = "file";
 				}
 
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+				if (originalName.contains(".")) {
+					extension = originalName.substring(originalName.lastIndexOf("."));
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				// Unique filename (like PO pattern)
+				String fileName = originalName + "_" + purchaseOrderAmendmentVO.getId() + extension;
+
+				Path filePath = purchaseOrderAmendmentFolder.resolve(fileName);
+
+				try (InputStream inputStream = file.getInputStream()) {
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				// ✅ Build URL the same way as Purchase Order
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/develop/viewFile/")
+						.toUriString();
+
+				String relativePath = purchaseOrderAmendmentUploadPath.replace("\\", "/");
+
+				relativePath = filePath.toString().replace("\\", "/").replace(relativePath + "/", "");
+
+				String publicUrl = baseUrl + relativePath;
+
 				PurchaseOrderAmendmentAttachmentVO attachment = new PurchaseOrderAmendmentAttachmentVO();
-
 				attachment.setPurchaseOrderAmendmentVO(purchaseOrderAmendmentVO);
-
-				attachment.setName(originalFileName);
-
-				attachment.setFileName(uniqueFileName);
-
-				attachment.setFilePath(path.toString());
-
+				attachment.setName(file.getOriginalFilename());
+				attachment.setFileName(fileName);
+				attachment.setFilePath(publicUrl); // ✅ URL is saved now
 				attachment.setFileSize(file.getSize());
-
-				attachment.setUploadOn(LocalDateTime.now());
+//				attachment.setContentType(file.getContentType());
+//				attachment.setUploadOn(LocalDateTime.now());
 
 				attachmentList.add(attachment);
-
 			}
 
-			List<PurchaseOrderAmendmentAttachmentVO> savedAttachments = purchaseOrderAmendmentAttachmentRepo
-					.saveAll(attachmentList);
-
-			purchaseOrderAmendmentVO.setAttachments(savedAttachments);
+			if (!attachmentList.isEmpty()) {
+				List<PurchaseOrderAmendmentAttachmentVO> saved = purchaseOrderAmendmentAttachmentRepo
+						.saveAll(attachmentList);
+				purchaseOrderAmendmentVO.setAttachments(saved);
+			}
 
 		} catch (IOException e) {
-
 			throw new ApplicationException("File Upload Failed : " + e.getMessage());
-
 		}
+	}
+
+	private void createDirectory(Path path) throws IOException {
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
+	@Override
+	public ResponseEntity<byte[]> viewPurchaseOrderAmendmentFile(HttpServletRequest request) throws IOException {
+
+		return servePurchaseOrderAmendmentFile(request, "/api/develop/viewFile/", purchaseOrderAmendmentUploadPath);
+	}
+
+	private ResponseEntity<byte[]> servePurchaseOrderAmendmentFile(HttpServletRequest request, String apiPrefix,
+			String uploadBasePath) throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		// Security — prevent path traversal
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+		if (contentType == null) {
+			contentType = guessContentType(filePath.getFileName().toString());
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+
+	private String guessContentType(String name) {
+		String lower = name.toLowerCase();
+		if (lower.endsWith(".jpg") || lower.endsWith(".jpeg"))
+			return "image/jpeg";
+		if (lower.endsWith(".png"))
+			return "image/png";
+		if (lower.endsWith(".gif"))
+			return "image/gif";
+		if (lower.endsWith(".webp"))
+			return "image/webp";
+		if (lower.endsWith(".bmp"))
+			return "image/bmp";
+		if (lower.endsWith(".pdf"))
+			return "application/pdf";
+		if (lower.endsWith(".txt"))
+			return "text/plain";
+		return "application/octet-stream";
 	}
 
 	private PurchaseOrderAmendmentResponceDTO buildPurchaseOrderAmendmentResponse(PurchaseOrderAmendmentVO vo) {
@@ -3168,23 +3323,24 @@ public class DevelopServiceImpl implements DevelopService {
 
 		dto.setBelongsTo(vo.getBelongsTo());
 		dto.setPurchaseordernumber(vo.getPurchaseordernumber());
-//        dto.setCurrency(vo.getCurrency());
-//       dto.setRefNo(vo.getRefNo());
-//       dto.setRefDate(vo.getRefDate());
-//        dto.setExchangeRate(vo.getExchangeRate());
+
 		dto.setRevisionNo(vo.getRevisionNo());
 
 		dto.setFreightType(vo.getFreightType());
+		dto.setExchangeRate(vo.getExchangeRate());
 		dto.setPackingType(vo.getPackingType());
 		dto.setInsuranceAmount(vo.getInsuranceAmount());
 		dto.setModeOfDespatch(vo.getModeOfDespatch());
 		dto.setTaxDescription(vo.getTaxDescription());
 		dto.setRemarks(vo.getRemarks());
+		dto.setRefNo(vo.getRefNo());
+		dto.setRefDate(vo.getRefDate());
 
 		dto.setOrgId(vo.getOrgId());
 		dto.setCreatedBy(vo.getCreatedBy());
 		dto.setCancelRemarks(vo.getCancelRemarks());
 		dto.setActive(vo.isActive());
+		dto.setExchangeRate(vo.getExchangeRate());
 
 		dto.setScreenCode(vo.getScreenCode());
 		dto.setScreenName(vo.getScreenName());
@@ -3201,6 +3357,26 @@ public class DevelopServiceImpl implements DevelopService {
 
 			dto.setBranch(branchDTO);
 		}
+
+		if (vo.getCurrency() != null) {
+
+			CurrencyResponseDTO branchDTO = new CurrencyResponseDTO();
+
+			branchDTO.setId(vo.getCurrency().getId());
+			branchDTO.setCurrencyName(vo.getCurrency().getCurrency());
+			dto.setCurrency(branchDTO);
+
+		}
+
+//		if (vo.getExchangeRate() != null) {
+//
+//			ExchangeRateResponseDTO branchDTO = new ExchangeRateResponseDTO();
+//
+//			branchDTO.setId(vo.getExchangeRate().getId());
+//			branchDTO.setExchangeRate(vo.getExchangeRate().getSellingExRate());
+//			dto.setExchangeRate(branchDTO);
+//
+//		}
 
 		// customer
 		if (vo.getCustomer() != null) {
@@ -3276,12 +3452,13 @@ public class DevelopServiceImpl implements DevelopService {
 				attachmentDTO.setName(attachmentVO.getName());
 				attachmentDTO.setFileName(attachmentVO.getFileName());
 
-				String urlPath = purchaseOrderAmendmentUploadPath.replace("C:/", "/").replace("\\", "/");
+				// ✅ Build the URL that matches the @GetMapping("/viewFile/**")
+				String fileUrl = serverBaseUrl + "/api/develop/viewFile/" + attachmentVO.getFileName();
 
-				attachmentDTO.setFilePath(serverBaseUrl + urlPath + attachmentVO.getFileName());
+				attachmentDTO.setFilePath(attachmentVO.getFilePath());
 
 				attachmentDTO.setFileSize(attachmentVO.getFileSize());
-				attachmentDTO.setUploadOn(attachmentVO.getUploadOn());
+//				attachmentDTO.setUploadOn(attachmentVO.getUploadOn());
 
 				attachmentList.add(attachmentDTO);
 			}
@@ -3401,10 +3578,11 @@ public class DevelopServiceImpl implements DevelopService {
 			response.put("qty", obj[4]);
 			response.put("rate", obj[5]);
 			response.put("deliveryDate", obj[6]);
-			response.put("oldRate", obj[7]);
-			response.put("oldQty", obj[8]);
-			response.put("oldDeliveryDate", obj[9]);
-
+			response.put("itemDescription", obj[7]);
+			response.put("unitDescription", obj[8]);
+			response.put("oldRate", obj[9]);
+			response.put("oldQty", obj[10]);
+			response.put("oldDeliveryDate", obj[11]);
 			responseList.add(response);
 		}
 
@@ -3443,10 +3621,8 @@ public class DevelopServiceImpl implements DevelopService {
 	}
 
 	@Override
-	public String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear, String screenCode) {
-
+	public String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear) {
 		String screenCode1 = "POA";
-
 		String result = purchaseOrderAmendmentRepo.getPurchaseOrderAmendmentDocId(orgId, financialYear, screenCode1);
 
 		return result;
@@ -3486,6 +3662,7 @@ public class DevelopServiceImpl implements DevelopService {
 	@Transactional
 	public Map<String, Object> createUpdateOpenStockEntry(OpenStockEntryDto openStockEntryDto)
 			throws ApplicationException {
+		String screenCode = "OSE";
 
 		OpenStockEntryVO openStockEntryVO;
 		String message;
@@ -3502,6 +3679,17 @@ public class DevelopServiceImpl implements DevelopService {
 		} else {
 
 			openStockEntryVO = new OpenStockEntryVO();
+
+			String docId = openStockEntryRepo.getOpenStockEntryDocId(openStockEntryDto.getOrgId(),
+					openStockEntryDto.getFinancialYear(), screenCode);
+
+			openStockEntryVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(openStockEntryDto.getOrgId(),
+							openStockEntryDto.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			openStockEntryVO.setCreatedBy(openStockEntryDto.getCreatedBy());
 
@@ -3604,6 +3792,10 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setCreatedBy(openStockEntryVO.getCreatedBy());
 
 		responseDTO.setCancelRemarks(openStockEntryVO.getCancelRemarks());
+
+		responseDTO.setDocId(openStockEntryVO.getDocId());
+
+		responseDTO.setDocDate(openStockEntryVO.getDocDate());
 
 		// Branch
 		if (openStockEntryVO.getBranch() != null) {
@@ -3736,11 +3928,11 @@ public class DevelopServiceImpl implements DevelopService {
 	}
 
 	@Override
-	public String getOpenStockEntryDocId(Long orgId, String financialYear, String screenCode) {
+	public String getOpenStockEntryDocId(Long orgId, String financialYear) {
 
 		String screenCode1 = "OSE";
 
-		String result = openStockEntryRepo.getOpenStockEntryDocId(orgId, financialYear, screenCode);
+		String result = openStockEntryRepo.getOpenStockEntryDocId(orgId, financialYear, screenCode1);
 
 		return result;
 	}
@@ -3757,15 +3949,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		String message;
 
-		// =========================
-		// Create / Update
-		// =========================
-
 		if (ObjectUtils.isNotEmpty(issuesDto.getId())) {
-
-			// =========================
-			// Update
-			// =========================
 
 			issuesVO = issuesRepo.findById(issuesDto.getId())
 					.orElseThrow(() -> new ApplicationException("Issues Not Found"));
@@ -3783,10 +3967,6 @@ public class DevelopServiceImpl implements DevelopService {
 			String docId = issuesRepo.getIssuesDocId(issuesDto.getOrgId(), issuesDto.getFinancialYear(), screenCode);
 
 			issuesVO.setDocId(docId);
-
-			// =========================
-			// Document Type Mapping
-			// =========================
 
 			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
 					.findByOrgIdAndFinYearAndScreenCode(issuesDto.getOrgId(), issuesDto.getFinancialYear(), screenCode);
@@ -3874,15 +4054,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		issuesVO.setBelongsTo(dto.getBelongsTo());
 
-		// =========================
-		// Time
-		// =========================
-
-		issuesVO.setTime(dto.getTime());
-
-		// =========================
-		// Reference No
-		// =========================
+		issuesVO.setTime(LocalTime.parse(dto.getTime()));
 
 		issuesVO.setRefNo(dto.getRefNo());
 
@@ -3952,18 +4124,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		issuesVO.setCancelRemarks(dto.getCancelRemarks());
 
-		// =========================
-		// Screen Details
-		// =========================
-
-		issuesVO.setScreenCode("ISU");
-
-		issuesVO.setScreenName("ISSUES");
-
-		// =====================================================
-		// Delete Existing Details During Update
-		// =====================================================
-
 		if (dto.getId() != null) {
 
 			List<IssuesDetailsVO> oldDetails = issuesDetailsRepo.findByIssuesVO(issuesVO);
@@ -4012,16 +4172,7 @@ public class DevelopServiceImpl implements DevelopService {
 				// =========================
 
 				detailVO.setIndentQty(detailDTO.getIndentQty());
-
-				// =========================
-				// Previously Issued Quantity
-				// =========================
-
 				detailVO.setPreviouslyIssuedQty(detailDTO.getPreviouslyIssuedQty());
-
-				// =========================
-				// Pending Quantity
-				// =========================
 
 				detailVO.setPendingQty(detailDTO.getPendingQty());
 
@@ -4841,7 +4992,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 			attachment.setName(originalFileName);
 
-			attachment.setUploadOn(LocalDateTime.now());
+//			attachment.setUploadOn(LocalDateTime.now());
 
 			// =====================================================
 			// ADD TO LIST
@@ -10815,1658 +10966,1263 @@ public class DevelopServiceImpl implements DevelopService {
 
 		return responseList;
 	}
-	
-	
-	//MaintenanceServiceRequest
-	
-	
+
+	// MaintenanceServiceRequest
+
 	@Override
 	@Transactional
 	public Map<String, Object> updateCreateMaintenanceServiceRequest(
-	        MaintenanceServiceRequestDTO maintenanceServiceRequestDTO)
-	        throws ApplicationException {
+			MaintenanceServiceRequestDTO maintenanceServiceRequestDTO) throws ApplicationException {
 
-	    MaintenanceServiceRequestVO maintenanceServiceRequestVO =
-	            new MaintenanceServiceRequestVO();
+		MaintenanceServiceRequestVO maintenanceServiceRequestVO = new MaintenanceServiceRequestVO();
 
-	    String message;
+		String message;
 
-	    // =========================
-	    // Update
-	    // =========================
+		// =========================
+		// Update
+		// =========================
 
-	    if (ObjectUtils.isNotEmpty(
-	            maintenanceServiceRequestDTO.getId())) {
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestDTO.getId())) {
 
-	        maintenanceServiceRequestVO =
-	                maintenanceServiceRequestRepo
-	                        .findById(
-	                                maintenanceServiceRequestDTO.getId())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Invalid Maintenance Service Request"));
+			maintenanceServiceRequestVO = maintenanceServiceRequestRepo.findById(maintenanceServiceRequestDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Invalid Maintenance Service Request"));
 
-	        maintenanceServiceRequestVO.setUpdatedBy(
-	                maintenanceServiceRequestDTO.getCreatedBy());
+			maintenanceServiceRequestVO.setUpdatedBy(maintenanceServiceRequestDTO.getCreatedBy());
 
-	        message =
-	                "Maintenance Service Request Updated Successfully";
+			message = "Maintenance Service Request Updated Successfully";
 
-	    } else {
+		} else {
 
-	        // =========================
-	        // Create
-	        // =========================
+			// =========================
+			// Create
+			// =========================
 
-	        maintenanceServiceRequestVO.setCreatedBy(
-	                maintenanceServiceRequestDTO.getCreatedBy());
+			maintenanceServiceRequestVO.setCreatedBy(maintenanceServiceRequestDTO.getCreatedBy());
 
-	        maintenanceServiceRequestVO.setUpdatedBy(
-	                maintenanceServiceRequestDTO.getCreatedBy());
+			maintenanceServiceRequestVO.setUpdatedBy(maintenanceServiceRequestDTO.getCreatedBy());
 
-	        // Generate Doc ID
-	        String docId = getMaintenanceServiceRequestDocId(
-	                maintenanceServiceRequestDTO.getOrgId(),
-	                maintenanceServiceRequestDTO.getFinancialYear());
+			// Generate Doc ID
+			String docId = getMaintenanceServiceRequestDocId(maintenanceServiceRequestDTO.getOrgId(),
+					maintenanceServiceRequestDTO.getFinancialYear());
 
-	        maintenanceServiceRequestVO.setDocId(docId);
+			maintenanceServiceRequestVO.setDocId(docId);
 
-	        message =
-	                "Maintenance Service Request Created Successfully";
-	    }
-	    
-	    // =========================
-	    // Basic Mapping
-	    // =========================
+			message = "Maintenance Service Request Created Successfully";
+		}
 
-	    createUpdateMaintenanceServiceRequestVO(
-	            maintenanceServiceRequestDTO,
-	            maintenanceServiceRequestVO);
+		// =========================
+		// Basic Mapping
+		// =========================
 
-	    // =========================
-	    // Save
-	    // =========================
+		createUpdateMaintenanceServiceRequestVO(maintenanceServiceRequestDTO, maintenanceServiceRequestVO);
 
-	    MaintenanceServiceRequestVO savedVO =
-	            maintenanceServiceRequestRepo.save(
-	                    maintenanceServiceRequestVO);
+		// =========================
+		// Save
+		// =========================
 
-	    // =========================
-	    // Response
-	    // =========================
+		MaintenanceServiceRequestVO savedVO = maintenanceServiceRequestRepo.save(maintenanceServiceRequestVO);
 
-	    Map<String, Object> response =
-	            new HashMap<>();
+		// =========================
+		// Response
+		// =========================
 
-	    response.put(
-	            "message",
-	            message);
+		Map<String, Object> response = new HashMap<>();
 
-	    response.put(
-	            "maintenanceServiceRequestVO",
-	            maintenanceServiceRequestResponse(savedVO));
+		response.put("message", message);
 
-	    return response;
+		response.put("maintenanceServiceRequestVO", maintenanceServiceRequestResponse(savedVO));
+
+		return response;
 	}
-	private void createUpdateMaintenanceServiceRequestVO(
-	        MaintenanceServiceRequestDTO maintenanceServiceRequestDTO,
-	        MaintenanceServiceRequestVO maintenanceServiceRequestVO)
-	        throws ApplicationException {
 
-	    // =========================
-	    // Basic Fields
-	    // =========================
+	private void createUpdateMaintenanceServiceRequestVO(MaintenanceServiceRequestDTO maintenanceServiceRequestDTO,
+			MaintenanceServiceRequestVO maintenanceServiceRequestVO) throws ApplicationException {
 
-	    maintenanceServiceRequestVO.setMailId(
-	            maintenanceServiceRequestDTO.getMailId());
+		// =========================
+		// Basic Fields
+		// =========================
 
-	    maintenanceServiceRequestVO.setReportedTime(
-	            maintenanceServiceRequestDTO.getReportedTime());
+		maintenanceServiceRequestVO.setMailId(maintenanceServiceRequestDTO.getMailId());
 
-	    maintenanceServiceRequestVO.setPhoneNo(
-	            maintenanceServiceRequestDTO.getPhoneNo());
+		maintenanceServiceRequestVO.setReportedTime(maintenanceServiceRequestDTO.getReportedTime());
 
-	    maintenanceServiceRequestVO.setCompleted(
-	            maintenanceServiceRequestDTO.getCompleted());
+		maintenanceServiceRequestVO.setPhoneNo(maintenanceServiceRequestDTO.getPhoneNo());
 
-	    maintenanceServiceRequestVO.setClosingDate(
-	            maintenanceServiceRequestDTO.getClosingDate());
+		maintenanceServiceRequestVO.setCompleted(maintenanceServiceRequestDTO.getCompleted());
 
-	    maintenanceServiceRequestVO.setApprovedBy(
-	            maintenanceServiceRequestDTO.getApprovedBy());
+		maintenanceServiceRequestVO.setClosingDate(maintenanceServiceRequestDTO.getClosingDate());
 
-	    maintenanceServiceRequestVO.setServiceRequired(
-	            maintenanceServiceRequestDTO.getServiceRequired());
+		maintenanceServiceRequestVO.setApprovedBy(maintenanceServiceRequestDTO.getApprovedBy());
 
-	    maintenanceServiceRequestVO.setRemarks(
-	            maintenanceServiceRequestDTO.getRemarks());
+		maintenanceServiceRequestVO.setServiceRequired(maintenanceServiceRequestDTO.getServiceRequired());
 
-	    maintenanceServiceRequestVO.setActive(
-	            maintenanceServiceRequestDTO.isActive());
+		maintenanceServiceRequestVO.setRemarks(maintenanceServiceRequestDTO.getRemarks());
 
-	    maintenanceServiceRequestVO.setOrgId(
-	            maintenanceServiceRequestDTO.getOrgId());
+		maintenanceServiceRequestVO.setActive(maintenanceServiceRequestDTO.isActive());
 
-	    maintenanceServiceRequestVO.setCancel(
-	            maintenanceServiceRequestDTO.isCancel());
+		maintenanceServiceRequestVO.setOrgId(maintenanceServiceRequestDTO.getOrgId());
 
-	    maintenanceServiceRequestVO.setCancelRemarks(
-	            maintenanceServiceRequestDTO.getCancelRemarks());
+		maintenanceServiceRequestVO.setCancel(maintenanceServiceRequestDTO.isCancel());
 
-	    // =========================
-	    // Belong To
-	    // List Of Values
-	    // =========================
+		maintenanceServiceRequestVO.setCancelRemarks(maintenanceServiceRequestDTO.getCancelRemarks());
 
-	    if (ObjectUtils.isNotEmpty(
-	            maintenanceServiceRequestDTO.getBelongTo())) {
+		// =========================
+		// Belong To
+		// List Of Values
+		// =========================
 
-	        maintenanceServiceRequestVO.setBelongTo(
-	                listOfValuesDetailsRepo
-	                        .findById(
-	                                maintenanceServiceRequestDTO
-	                                        .getBelongTo())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Belong To Not Found")));
-	    }
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestDTO.getBelongTo())) {
 
-	    // =========================
-	    // Department
-	    // =========================
+			maintenanceServiceRequestVO
+					.setBelongTo(listOfValuesDetailsRepo.findById(maintenanceServiceRequestDTO.getBelongTo())
+							.orElseThrow(() -> new ApplicationException("Belong To Not Found")));
+		}
 
-	    if (ObjectUtils.isNotEmpty(
-	            maintenanceServiceRequestDTO.getDepartment())) {
+		// =========================
+		// Department
+		// =========================
 
-	        maintenanceServiceRequestVO.setDepartment(
-	                departmentRepo
-	                        .findById(
-	                                maintenanceServiceRequestDTO
-	                                        .getDepartment())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Department Not Found")));
-	    }
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestDTO.getDepartment())) {
 
-	    // =========================
-	    // Priority
-	    // List Of Values
-	    // =========================
+			maintenanceServiceRequestVO
+					.setDepartment(departmentRepo.findById(maintenanceServiceRequestDTO.getDepartment())
+							.orElseThrow(() -> new ApplicationException("Department Not Found")));
+		}
 
-	    if (ObjectUtils.isNotEmpty(
-	            maintenanceServiceRequestDTO.getPriority())) {
+		// =========================
+		// Priority
+		// List Of Values
+		// =========================
 
-	        maintenanceServiceRequestVO.setPriority(
-	                listOfValuesDetailsRepo
-	                        .findById(
-	                                maintenanceServiceRequestDTO
-	                                        .getPriority())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Priority Not Found")));
-	    }
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestDTO.getPriority())) {
 
-	    // =========================
-	    // Requested By
-	    // Employee Master
-	    // =========================
+			maintenanceServiceRequestVO
+					.setPriority(listOfValuesDetailsRepo.findById(maintenanceServiceRequestDTO.getPriority())
+							.orElseThrow(() -> new ApplicationException("Priority Not Found")));
+		}
 
-	    if (ObjectUtils.isNotEmpty(
-	            maintenanceServiceRequestDTO.getRequestedBy())) {
+		// =========================
+		// Requested By
+		// Employee Master
+		// =========================
 
-	        maintenanceServiceRequestVO.setRequestedBy(
-	                employeeMasterRepo
-	                        .findById(
-	                                maintenanceServiceRequestDTO
-	                                        .getRequestedBy())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Requested By Not Found")));
-	    }
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestDTO.getRequestedBy())) {
 
-	    // =========================
-	    // Prepared By
-	    // Employee Master
-	    // =========================
+			maintenanceServiceRequestVO
+					.setRequestedBy(employeeMasterRepo.findById(maintenanceServiceRequestDTO.getRequestedBy())
+							.orElseThrow(() -> new ApplicationException("Requested By Not Found")));
+		}
 
-	    if (ObjectUtils.isNotEmpty(
-	            maintenanceServiceRequestDTO.getPreparedBy())) {
+		// =========================
+		// Prepared By
+		// Employee Master
+		// =========================
 
-	        maintenanceServiceRequestVO.setPreparedBy(
-	                employeeMasterRepo
-	                        .findById(
-	                                maintenanceServiceRequestDTO
-	                                        .getPreparedBy())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Prepared By Not Found")));
-	    }
-	    
-	    
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestDTO.getPreparedBy())) {
+
+			maintenanceServiceRequestVO
+					.setPreparedBy(employeeMasterRepo.findById(maintenanceServiceRequestDTO.getPreparedBy())
+							.orElseThrow(() -> new ApplicationException("Prepared By Not Found")));
+		}
+
 	}
-	
-	private MaintenanceServiceRequestResponseDTO
-    maintenanceServiceRequestResponse(
-            MaintenanceServiceRequestVO maintenanceServiceRequestVO) {
 
-MaintenanceServiceRequestResponseDTO responseDTO =
-        new MaintenanceServiceRequestResponseDTO();
+	private MaintenanceServiceRequestResponseDTO maintenanceServiceRequestResponse(
+			MaintenanceServiceRequestVO maintenanceServiceRequestVO) {
+
+		MaintenanceServiceRequestResponseDTO responseDTO = new MaintenanceServiceRequestResponseDTO();
 
 // =========================
 // Basic Fields
 // =========================
 
-responseDTO.setId(
-        maintenanceServiceRequestVO.getId());
+		responseDTO.setId(maintenanceServiceRequestVO.getId());
 
-responseDTO.setDocId(
-        maintenanceServiceRequestVO.getDocId());
+		responseDTO.setDocId(maintenanceServiceRequestVO.getDocId());
 
-responseDTO.setMailId(
-        maintenanceServiceRequestVO.getMailId());
+		responseDTO.setMailId(maintenanceServiceRequestVO.getMailId());
 
-responseDTO.setReportedTime(
-        maintenanceServiceRequestVO.getReportedTime());
+		responseDTO.setReportedTime(maintenanceServiceRequestVO.getReportedTime());
 
-responseDTO.setPhoneNo(
-        maintenanceServiceRequestVO.getPhoneNo());
+		responseDTO.setPhoneNo(maintenanceServiceRequestVO.getPhoneNo());
 
-responseDTO.setCompleted(
-        maintenanceServiceRequestVO.getCompleted());
+		responseDTO.setCompleted(maintenanceServiceRequestVO.getCompleted());
 
-responseDTO.setClosingDate(
-        maintenanceServiceRequestVO.getClosingDate());
+		responseDTO.setClosingDate(maintenanceServiceRequestVO.getClosingDate());
 
-responseDTO.setApprovedBy(
-        maintenanceServiceRequestVO.getApprovedBy());
+		responseDTO.setApprovedBy(maintenanceServiceRequestVO.getApprovedBy());
 
-responseDTO.setServiceRequired(
-        maintenanceServiceRequestVO.getServiceRequired());
+		responseDTO.setServiceRequired(maintenanceServiceRequestVO.getServiceRequired());
 
-responseDTO.setRemarks(
-        maintenanceServiceRequestVO.getRemarks());
+		responseDTO.setRemarks(maintenanceServiceRequestVO.getRemarks());
 
-responseDTO.setActive(
-        maintenanceServiceRequestVO.isActive());
+		responseDTO.setActive(maintenanceServiceRequestVO.isActive());
 
-responseDTO.setOrgId(
-        maintenanceServiceRequestVO.getOrgId());
+		responseDTO.setOrgId(maintenanceServiceRequestVO.getOrgId());
 
-responseDTO.setCreatedBy(
-        maintenanceServiceRequestVO.getCreatedBy());
+		responseDTO.setCreatedBy(maintenanceServiceRequestVO.getCreatedBy());
 
-responseDTO.setUpdatedBy(
-        maintenanceServiceRequestVO.getUpdatedBy());
+		responseDTO.setUpdatedBy(maintenanceServiceRequestVO.getUpdatedBy());
 
-responseDTO.setCancel(
-        maintenanceServiceRequestVO.isCancel());
+		responseDTO.setCancel(maintenanceServiceRequestVO.isCancel());
 
-responseDTO.setCancelRemarks(
-        maintenanceServiceRequestVO.getCancelRemarks());
+		responseDTO.setCancelRemarks(maintenanceServiceRequestVO.getCancelRemarks());
 
 // =========================
 // Belong To
 // =========================
 
-if (ObjectUtils.isNotEmpty(
-        maintenanceServiceRequestVO.getBelongTo())) {
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestVO.getBelongTo())) {
 
-    ListOfValuesDetailsResponseDTO belongToDTO =
-            new ListOfValuesDetailsResponseDTO();
+			ListOfValuesDetailsResponseDTO belongToDTO = new ListOfValuesDetailsResponseDTO();
 
-    belongToDTO.setId(
-            maintenanceServiceRequestVO
-                    .getBelongTo()
-                    .getId());
+			belongToDTO.setId(maintenanceServiceRequestVO.getBelongTo().getId());
 
-    belongToDTO.setCode(
-            maintenanceServiceRequestVO
-                    .getBelongTo()
-                    .getValueCode());
+			belongToDTO.setCode(maintenanceServiceRequestVO.getBelongTo().getValueCode());
 
-    belongToDTO.setDescription(
-            maintenanceServiceRequestVO
-                    .getBelongTo()
-                    .getValueDescription());
+			belongToDTO.setDescription(maintenanceServiceRequestVO.getBelongTo().getValueDescription());
 
-    responseDTO.setBelongTo(belongToDTO);
-}
+			responseDTO.setBelongTo(belongToDTO);
+		}
 
 // =========================
 // Department
 // =========================
 
-if (ObjectUtils.isNotEmpty(
-        maintenanceServiceRequestVO.getDepartment())) {
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestVO.getDepartment())) {
 
-    DepartmentResponseDTO departmentDTO =
-            new DepartmentResponseDTO();
+			DepartmentResponseDTO departmentDTO = new DepartmentResponseDTO();
 
-    departmentDTO.setId(
-            maintenanceServiceRequestVO
-                    .getDepartment()
-                    .getId());
+			departmentDTO.setId(maintenanceServiceRequestVO.getDepartment().getId());
 
-    departmentDTO.setDepartmentCode(
-            maintenanceServiceRequestVO
-                    .getDepartment()
-                    .getDepartmentCode());
+			departmentDTO.setDepartmentCode(maintenanceServiceRequestVO.getDepartment().getDepartmentCode());
 
-    departmentDTO.setDepartmentName(
-            maintenanceServiceRequestVO
-                    .getDepartment()
-                    .getDepartmentName());
+			departmentDTO.setDepartmentName(maintenanceServiceRequestVO.getDepartment().getDepartmentName());
 
-    responseDTO.setDepartment(departmentDTO);
-}
+			responseDTO.setDepartment(departmentDTO);
+		}
 
 // =========================
 // Priority
 // =========================
 
-if (ObjectUtils.isNotEmpty(
-        maintenanceServiceRequestVO.getPriority())) {
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestVO.getPriority())) {
 
-    ListOfValuesDetailsResponseDTO priorityDTO =
-            new ListOfValuesDetailsResponseDTO();
+			ListOfValuesDetailsResponseDTO priorityDTO = new ListOfValuesDetailsResponseDTO();
 
-    priorityDTO.setId(
-            maintenanceServiceRequestVO
-                    .getPriority()
-                    .getId());
+			priorityDTO.setId(maintenanceServiceRequestVO.getPriority().getId());
 
-    
-    priorityDTO.setCode(
-            maintenanceServiceRequestVO
-                    .getPriority()
-                    .getValueCode());
+			priorityDTO.setCode(maintenanceServiceRequestVO.getPriority().getValueCode());
 
-    priorityDTO.setDescription(
-            maintenanceServiceRequestVO
-                    .getPriority()
-                    .getValueDescription());
+			priorityDTO.setDescription(maintenanceServiceRequestVO.getPriority().getValueDescription());
 
-    responseDTO.setPriority(priorityDTO);
-}
+			responseDTO.setPriority(priorityDTO);
+		}
 
 //=========================
 //Requested By
 //=========================
 
-if (ObjectUtils.isNotEmpty(
-     maintenanceServiceRequestVO.getRequestedBy())) {
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestVO.getRequestedBy())) {
 
- EmployeeResponseDTO employeeDTO =
-         new EmployeeResponseDTO();
+			EmployeeResponseDTO employeeDTO = new EmployeeResponseDTO();
 
- employeeDTO.setId(
-         maintenanceServiceRequestVO
-                 .getRequestedBy()
-                 .getId());
+			employeeDTO.setId(maintenanceServiceRequestVO.getRequestedBy().getId());
 
- employeeDTO.setEmployeeName(
-         maintenanceServiceRequestVO
-                 .getRequestedBy()
-                 .getEmployeeName());
+			employeeDTO.setEmployeeName(maintenanceServiceRequestVO.getRequestedBy().getEmployeeName());
 
- responseDTO.setRequestedBy(employeeDTO);
-}
+			responseDTO.setRequestedBy(employeeDTO);
+		}
 
 //=========================
 //Prepared By
 //=========================
 
-if (ObjectUtils.isNotEmpty(
-     maintenanceServiceRequestVO.getPreparedBy())) {
+		if (ObjectUtils.isNotEmpty(maintenanceServiceRequestVO.getPreparedBy())) {
 
- EmployeeResponseDTO employeeDTO =
-         new EmployeeResponseDTO();
+			EmployeeResponseDTO employeeDTO = new EmployeeResponseDTO();
 
- employeeDTO.setId(
-         maintenanceServiceRequestVO
-                 .getPreparedBy()
-                 .getId());
+			employeeDTO.setId(maintenanceServiceRequestVO.getPreparedBy().getId());
 
- employeeDTO.setEmployeeName(
-         maintenanceServiceRequestVO
-                 .getPreparedBy()
-                 .getEmployeeName());
+			employeeDTO.setEmployeeName(maintenanceServiceRequestVO.getPreparedBy().getEmployeeName());
 
- responseDTO.setPreparedBy(employeeDTO);
- 
-}
+			responseDTO.setPreparedBy(employeeDTO);
 
-return responseDTO;
-}
-	
-	
-	@Override
-	public List<MaintenanceServiceRequestResponseDTO>
-	        getMaintenanceServiceRequestByOrgId(Long orgId)
-	        throws ApplicationException {
+		}
 
-	    List<MaintenanceServiceRequestVO>
-	            maintenanceServiceRequestList =
-	                    maintenanceServiceRequestRepo
-	                            .findByOrgIdAndCancelFalse(orgId);
-
-	    if (maintenanceServiceRequestList == null
-	            || maintenanceServiceRequestList.isEmpty()) {
-
-	        throw new ApplicationException(
-	                "Maintenance Service Request Not Found");
-	    }
-
-	    List<MaintenanceServiceRequestResponseDTO> responseList =
-	            new ArrayList<>();
-
-	    for (MaintenanceServiceRequestVO
-	            maintenanceServiceRequestVO :
-	                maintenanceServiceRequestList) {
-
-	        responseList.add(
-	                maintenanceServiceRequestResponse(
-	                        maintenanceServiceRequestVO));
-	    }
-
-	    return responseList;
+		return responseDTO;
 	}
-	
-	
+
 	@Override
-	public MaintenanceServiceRequestResponseDTO
-	        getMaintenanceServiceRequestById(Long id)
-	        throws ApplicationException {
+	public List<MaintenanceServiceRequestResponseDTO> getMaintenanceServiceRequestByOrgId(Long orgId)
+			throws ApplicationException {
 
-	    MaintenanceServiceRequestVO
-	            maintenanceServiceRequestVO =
-	                    maintenanceServiceRequestRepo
-	                            .findById(id)
-	                            .orElse(null);
+		List<MaintenanceServiceRequestVO> maintenanceServiceRequestList = maintenanceServiceRequestRepo
+				.findByOrgIdAndCancelFalse(orgId);
 
-	    if (maintenanceServiceRequestVO == null) {
+		if (maintenanceServiceRequestList == null || maintenanceServiceRequestList.isEmpty()) {
 
-	        throw new ApplicationException(
-	                "Maintenance Service Request Not Found");
-	    }
+			throw new ApplicationException("Maintenance Service Request Not Found");
+		}
 
-	    return maintenanceServiceRequestResponse(
-	            maintenanceServiceRequestVO);
-	} 
-	
-	
-	@Override
-	public String getMaintenanceServiceRequestDocId(
-	        Long orgId,
-	        String financialYear) {
+		List<MaintenanceServiceRequestResponseDTO> responseList = new ArrayList<>();
 
-	    String screenCode = "MSR";
+		for (MaintenanceServiceRequestVO maintenanceServiceRequestVO : maintenanceServiceRequestList) {
 
-	    String result =
-	            maintenanceServiceRequestRepo
-	                    .getMaintenanceServiceRequestDocId(
-	                            orgId,
-	                            financialYear,
-	                            screenCode);
+			responseList.add(maintenanceServiceRequestResponse(maintenanceServiceRequestVO));
+		}
 
-	    return result;
+		return responseList;
 	}
-	
-	
-	//transferorder
-	
-	
+
+	@Override
+	public MaintenanceServiceRequestResponseDTO getMaintenanceServiceRequestById(Long id) throws ApplicationException {
+
+		MaintenanceServiceRequestVO maintenanceServiceRequestVO = maintenanceServiceRequestRepo.findById(id)
+				.orElse(null);
+
+		if (maintenanceServiceRequestVO == null) {
+
+			throw new ApplicationException("Maintenance Service Request Not Found");
+		}
+
+		return maintenanceServiceRequestResponse(maintenanceServiceRequestVO);
+	}
+
+	@Override
+	public String getMaintenanceServiceRequestDocId(Long orgId, String financialYear) {
+
+		String screenCode = "MSR";
+
+		String result = maintenanceServiceRequestRepo.getMaintenanceServiceRequestDocId(orgId, financialYear,
+				screenCode);
+
+		return result;
+	}
+
+	// transferorder
+
 	@Override
 	@Transactional
-	public Map<String, Object> createUpdateTransferOrder(
-	        TransferOrderDTO transferOrderDTO) throws ApplicationException {
+	public Map<String, Object> createUpdateTransferOrder(TransferOrderDTO transferOrderDTO)
+			throws ApplicationException {
 
-	    TransferOrderVO transferOrderVO;
-	    String message;
+		TransferOrderVO transferOrderVO;
+		String message;
 
-	    // ============================================================
-	    // CREATE / UPDATE
-	    // ============================================================
+		// ============================================================
+		// CREATE / UPDATE
+		// ============================================================
 
-	    if (ObjectUtils.isNotEmpty(transferOrderDTO.getId())) {
+		if (ObjectUtils.isNotEmpty(transferOrderDTO.getId())) {
 
-	        // UPDATE
+			// UPDATE
 
-	        transferOrderVO = transferOrderRepo.findById(transferOrderDTO.getId())
-	                .orElseThrow(() -> new ApplicationException("Transfer Order Not Found"));
+			transferOrderVO = transferOrderRepo.findById(transferOrderDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Transfer Order Not Found"));
 
-	        transferOrderVO.setUpdatedBy(transferOrderDTO.getCreatedBy());
+			transferOrderVO.setUpdatedBy(transferOrderDTO.getCreatedBy());
 
-	        // DELETE OLD DETAILS
-	        transferOrderDetailRepo.deleteAll(
-	                transferOrderDetailRepo.findByTransferOrderVOId(
-	                        transferOrderVO.getId()));
+			// DELETE OLD DETAILS
+			transferOrderDetailRepo.deleteAll(transferOrderDetailRepo.findByTransferOrderVOId(transferOrderVO.getId()));
 
-	        message = "Transfer Order Updated Successfully";
+			message = "Transfer Order Updated Successfully";
 
-	    } else {
+		} else {
 
-	        // CREATE
+			// CREATE
 
-	        transferOrderVO = new TransferOrderVO();
+			transferOrderVO = new TransferOrderVO();
 
-	        transferOrderVO.setCreatedBy(transferOrderDTO.getCreatedBy());
-	        transferOrderVO.setUpdatedBy(transferOrderDTO.getCreatedBy());
+			transferOrderVO.setCreatedBy(transferOrderDTO.getCreatedBy());
+			transferOrderVO.setUpdatedBy(transferOrderDTO.getCreatedBy());
 
-	        message = "Transfer Order Created Successfully";
-	    }
+			message = "Transfer Order Created Successfully";
+		}
 
-	    // ============================================================
-	    // HEADER MAPPING
-	    // ============================================================
+		// ============================================================
+		// HEADER MAPPING
+		// ============================================================
 
-	    createUpdateTransferOrderVOByDTO(
-	            transferOrderDTO,
-	            transferOrderVO);
+		createUpdateTransferOrderVOByDTO(transferOrderDTO, transferOrderVO);
 
-	    // ============================================================
-	    // DETAIL MAPPING
-	    // ============================================================
+		// ============================================================
+		// DETAIL MAPPING
+		// ============================================================
 
-	    if (transferOrderDTO.getTransferOrderDetailDTO() != null) {
+		if (transferOrderDTO.getTransferOrderDetailDTO() != null) {
 
-	        List<TransferOrderDetailVO> detailList = new ArrayList<>();
+			List<TransferOrderDetailVO> detailList = new ArrayList<>();
 
-	        for (TransferOrderDetailDTO detailDTO :
-	                transferOrderDTO.getTransferOrderDetailDTO()) {
+			for (TransferOrderDetailDTO detailDTO : transferOrderDTO.getTransferOrderDetailDTO()) {
 
-	            TransferOrderDetailVO detailVO =
-	                    new TransferOrderDetailVO();
+				TransferOrderDetailVO detailVO = new TransferOrderDetailVO();
 
-	            // ====================================================
-	            // BASIC DETAILS
-	            // ====================================================
+				// ====================================================
+				// BASIC DETAILS
+				// ====================================================
 
-	            detailVO.setOrderDate(detailDTO.getOrderDate());
+				detailVO.setOrderDate(detailDTO.getOrderDate());
 
-	            detailVO.setItemDescription(
-	                    detailDTO.getItemDescription());
+				detailVO.setItemDescription(detailDTO.getItemDescription());
 
-	            detailVO.setScheduleDate(
-	                    detailDTO.getScheduleDate());
+				detailVO.setScheduleDate(detailDTO.getScheduleDate());
 
-	            detailVO.setQty(detailDTO.getQty());
+				detailVO.setQty(detailDTO.getQty());
 
-	            detailVO.setUnit(detailDTO.getUnit());
+				detailVO.setUnit(detailDTO.getUnit());
 
-	            detailVO.setPurQty(detailDTO.getPurQty());
+				detailVO.setPurQty(detailDTO.getPurQty());
 
-	            detailVO.setPurUnit(detailDTO.getPurUnit());
+				detailVO.setPurUnit(detailDTO.getPurUnit());
 
-	            detailVO.setSupplierName(
-	                    detailDTO.getSupplierName());
+				detailVO.setSupplierName(detailDTO.getSupplierName());
 
-	            detailVO.setType(detailDTO.getType());
+				detailVO.setType(detailDTO.getType());
 
-	            detailVO.setCombineWith(
-	                    detailDTO.getCombineWith());
+				detailVO.setCombineWith(detailDTO.getCombineWith());
 
-	            detailVO.setTransId(detailDTO.getTransId());
+				detailVO.setTransId(detailDTO.getTransId());
 
-	            detailVO.setContractNo(detailDTO.getContractNo());
+				detailVO.setContractNo(detailDTO.getContractNo());
 
-	            // ====================================================
-	            // ITEM
-	            // ====================================================
+				// ====================================================
+				// ITEM
+				// ====================================================
 
-	            if (detailDTO.getItemCode() != null) {
+				if (detailDTO.getItemCode() != null) {
 
-	                ItemMasterVO itemMasterVO =
-	                        itemMasterRepo.findById(detailDTO.getItemCode())
-	                                .orElseThrow(() ->
-	                                        new ApplicationException(
-	                                                "Item Master Not Found"));
+					ItemMasterVO itemMasterVO = itemMasterRepo.findById(detailDTO.getItemCode())
+							.orElseThrow(() -> new ApplicationException("Item Master Not Found"));
 
-	                detailVO.setItemCode(itemMasterVO);
+					detailVO.setItemCode(itemMasterVO);
 
-	                // Auto fill item description
-	                detailVO.setItemDescription(
-	                        itemMasterVO.getItemDescription());
-	            }
+					// Auto fill item description
+					detailVO.setItemDescription(itemMasterVO.getItemDescription());
+				}
 
-	            // ====================================================
-	            // SUPPLIER
-	            // ====================================================
+				// ====================================================
+				// SUPPLIER
+				// ====================================================
 
-	            if (detailDTO.getSupplierId() != null) {
+				if (detailDTO.getSupplierId() != null) {
 
-	                CustomerVO customerVO =
-	                        customerRepo.findById(detailDTO.getSupplierId())
-	                                .orElseThrow(() ->
-	                                        new ApplicationException(
-	                                                "Customer Not Found"));
+					CustomerVO customerVO = customerRepo.findById(detailDTO.getSupplierId())
+							.orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
-	                detailVO.setSupplierId(customerVO);
+					detailVO.setSupplierId(customerVO);
 
-	                // Auto fill supplier name
-	                detailVO.setSupplierName(
-	                        customerVO.getCustomerName());
-	            }
+					// Auto fill supplier name
+					detailVO.setSupplierName(customerVO.getCustomerName());
+				}
 
-	            // ====================================================
-	            // SET HEADER
-	            // ====================================================
+				// ====================================================
+				// SET HEADER
+				// ====================================================
 
-	            detailVO.setTransferOrderVO(transferOrderVO);
+				detailVO.setTransferOrderVO(transferOrderVO);
 
-	            detailList.add(detailVO);
-	        }
+				detailList.add(detailVO);
+			}
 
-	        transferOrderVO.setTransferOrderDetailVO(detailList);
-	    }
+			transferOrderVO.setTransferOrderDetailVO(detailList);
+		}
 
-	    // ============================================================
-	    // SAVE
-	    // ============================================================
+		// ============================================================
+		// SAVE
+		// ============================================================
 
-	    transferOrderVO = transferOrderRepo.save(transferOrderVO);
+		transferOrderVO = transferOrderRepo.save(transferOrderVO);
 
-	    // ============================================================
-	    // RESPONSE
-	    // ============================================================
+		// ============================================================
+		// RESPONSE
+		// ============================================================
 
-	    TransferOrderResponseDTO responseDTO =
-	            buildTransferOrderResponse(transferOrderVO);
+		TransferOrderResponseDTO responseDTO = buildTransferOrderResponse(transferOrderVO);
 
-	    Map<String, Object> response = new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 
-	    response.put("message", message);
-	    response.put("transferOrderVO", responseDTO);
+		response.put("message", message);
+		response.put("transferOrderVO", responseDTO);
 
-	    return response;
+		return response;
 	}
-	
-	private void createUpdateTransferOrderVOByDTO(
-	        TransferOrderDTO dto,
-	        TransferOrderVO vo) throws ApplicationException {
 
-	    // ============================================================
-	    // ORDER TYPE
-	    // ============================================================
+	private void createUpdateTransferOrderVOByDTO(TransferOrderDTO dto, TransferOrderVO vo)
+			throws ApplicationException {
 
-	    if (dto.getOrderType() != null) {
+		// ============================================================
+		// ORDER TYPE
+		// ============================================================
 
-	        ListOfValuesDetailsVO orderTypeVO =
-	                listOfValuesDetailsRepo.findById(dto.getOrderType())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Order Type Not Found"));
+		if (dto.getOrderType() != null) {
 
-	        vo.setOrderType(orderTypeVO);
-	    }
+			ListOfValuesDetailsVO orderTypeVO = listOfValuesDetailsRepo.findById(dto.getOrderType())
+					.orElseThrow(() -> new ApplicationException("Order Type Not Found"));
 
-	    // ============================================================
-	    // BASIC DETAILS
-	    // ============================================================
+			vo.setOrderType(orderTypeVO);
+		}
 
-	    vo.setDocId(dto.getDocId());
+		// ============================================================
+		// BASIC DETAILS
+		// ============================================================
 
-	    vo.setDocDate(dto.getDocDate());
+		vo.setDocId(dto.getDocId());
 
-	    // ============================================================
-	    // COMMON FIELDS
-	    // ============================================================
+		vo.setDocDate(dto.getDocDate());
 
-	    vo.setActive(dto.isActive());
+		// ============================================================
+		// COMMON FIELDS
+		// ============================================================
 
-	    vo.setOrgId(dto.getOrgId());
+		vo.setActive(dto.isActive());
 
-	    vo.setFinancialYear(dto.getFinancialYear());
+		vo.setOrgId(dto.getOrgId());
 
-	    vo.setCreatedBy(dto.getCreatedBy());
+		vo.setFinancialYear(dto.getFinancialYear());
 
-	    vo.setUpdatedBy(dto.getUpdatedBy());
+		vo.setCreatedBy(dto.getCreatedBy());
 
-	    vo.setCancel(dto.isCancel());
+		vo.setUpdatedBy(dto.getUpdatedBy());
 
-	    vo.setCancelRemarks(dto.getCancelRemarks());
+		vo.setCancel(dto.isCancel());
 
-	    // ============================================================
-	    // SCREEN DETAILS
-	    // ============================================================
+		vo.setCancelRemarks(dto.getCancelRemarks());
 
-	    vo.setScreenName("TRANSFERORDER");
+		// ============================================================
+		// SCREEN DETAILS
+		// ============================================================
 
-	    vo.setScreenCode("TO");
+		vo.setScreenName("TRANSFERORDER");
+
+		vo.setScreenCode("TO");
 	}
-	private TransferOrderResponseDTO buildTransferOrderResponse(
-	        TransferOrderVO vo) {
 
-	    TransferOrderResponseDTO responseDTO =
-	            new TransferOrderResponseDTO();
+	private TransferOrderResponseDTO buildTransferOrderResponse(TransferOrderVO vo) {
 
-	    // ============================================================
-	    // HEADER RESPONSE
-	    // ============================================================
+		TransferOrderResponseDTO responseDTO = new TransferOrderResponseDTO();
 
-	    responseDTO.setId(vo.getId());
+		// ============================================================
+		// HEADER RESPONSE
+		// ============================================================
 
-	    responseDTO.setDocId(vo.getDocId());
+		responseDTO.setId(vo.getId());
 
-	    responseDTO.setDocDate(vo.getDocDate());
+		responseDTO.setDocId(vo.getDocId());
 
-	    responseDTO.setActive(vo.isActive());
+		responseDTO.setDocDate(vo.getDocDate());
 
-	    responseDTO.setOrgId(vo.getOrgId());
+		responseDTO.setActive(vo.isActive());
 
-	    responseDTO.setFinancialYear(vo.getFinancialYear());
+		responseDTO.setOrgId(vo.getOrgId());
 
-	    responseDTO.setCreatedBy(vo.getCreatedBy());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
 
-	    responseDTO.setUpdatedBy(vo.getUpdatedBy());
+		responseDTO.setCreatedBy(vo.getCreatedBy());
 
-	    responseDTO.setCancel(vo.isCancel());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
 
-	    responseDTO.setCancelRemarks(vo.getCancelRemarks());
+		responseDTO.setCancel(vo.isCancel());
 
-	 // ============================================================
-	 // ORDER TYPE
-	 // ============================================================
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
 
-	 if (vo.getOrderType() != null) {
+		// ============================================================
+		// ORDER TYPE
+		// ============================================================
 
-	     ListOfValuesDetailsResponseDTO orderTypeResponseDTO =
-	             new ListOfValuesDetailsResponseDTO();
+		if (vo.getOrderType() != null) {
 
-	     orderTypeResponseDTO.setId(
-	             vo.getOrderType().getId());
+			ListOfValuesDetailsResponseDTO orderTypeResponseDTO = new ListOfValuesDetailsResponseDTO();
 
-	     orderTypeResponseDTO.setCode(
-	             vo.getOrderType().getValueCode());
+			orderTypeResponseDTO.setId(vo.getOrderType().getId());
 
-	     orderTypeResponseDTO.setDescription(
-	             vo.getOrderType().getValueDescription());
+			orderTypeResponseDTO.setCode(vo.getOrderType().getValueCode());
 
-	     responseDTO.setOrderType(orderTypeResponseDTO);
-	 }
-	 
-	    // ============================================================
-	    // DETAIL RESPONSE
-	    // ============================================================
+			orderTypeResponseDTO.setDescription(vo.getOrderType().getValueDescription());
 
-	    if (vo.getTransferOrderDetailVO() != null) {
+			responseDTO.setOrderType(orderTypeResponseDTO);
+		}
 
-	        List<TransferOrderDetailResponseDTO> detailList =
-	                new ArrayList<>();
+		// ============================================================
+		// DETAIL RESPONSE
+		// ============================================================
 
-	        for (TransferOrderDetailVO detailVO :
-	                vo.getTransferOrderDetailVO()) {
+		if (vo.getTransferOrderDetailVO() != null) {
 
-	            TransferOrderDetailResponseDTO detailDTO =
-	                    new TransferOrderDetailResponseDTO();
+			List<TransferOrderDetailResponseDTO> detailList = new ArrayList<>();
 
-	            // ====================================================
-	            // BASIC DETAILS
-	            // ====================================================
+			for (TransferOrderDetailVO detailVO : vo.getTransferOrderDetailVO()) {
 
-	            detailDTO.setId(detailVO.getId());
+				TransferOrderDetailResponseDTO detailDTO = new TransferOrderDetailResponseDTO();
 
-	            detailDTO.setOrderDate(
-	                    detailVO.getOrderDate());
+				// ====================================================
+				// BASIC DETAILS
+				// ====================================================
 
-	            detailDTO.setItemDescription(
-	                    detailVO.getItemDescription());
+				detailDTO.setId(detailVO.getId());
 
-	            detailDTO.setScheduleDate(
-	                    detailVO.getScheduleDate());
+				detailDTO.setOrderDate(detailVO.getOrderDate());
 
-	            detailDTO.setQty(detailVO.getQty());
+				detailDTO.setItemDescription(detailVO.getItemDescription());
 
-	            detailDTO.setUnit(detailVO.getUnit());
+				detailDTO.setScheduleDate(detailVO.getScheduleDate());
 
-	            detailDTO.setPurQty(detailVO.getPurQty());
+				detailDTO.setQty(detailVO.getQty());
 
-	            detailDTO.setPurUnit(detailVO.getPurUnit());
+				detailDTO.setUnit(detailVO.getUnit());
 
-	            detailDTO.setSupplierName(
-	                    detailVO.getSupplierName());
+				detailDTO.setPurQty(detailVO.getPurQty());
 
-	            detailDTO.setType(detailVO.getType());
+				detailDTO.setPurUnit(detailVO.getPurUnit());
 
-	            detailDTO.setCombineWith(
-	                    detailVO.getCombineWith());
+				detailDTO.setSupplierName(detailVO.getSupplierName());
 
-	            detailDTO.setTransId(
-	                    detailVO.getTransId());
+				detailDTO.setType(detailVO.getType());
 
-	            detailDTO.setContractNo(
-	                    detailVO.getContractNo());
+				detailDTO.setCombineWith(detailVO.getCombineWith());
 
-	            // ====================================================
-	            // ITEM RESPONSE
-	            // ====================================================
+				detailDTO.setTransId(detailVO.getTransId());
 
-	            if (detailVO.getItemCode() != null) {
+				detailDTO.setContractNo(detailVO.getContractNo());
 
-	                ItemResponse1DTO itemResponseDTO =
-	                        new ItemResponse1DTO();
+				// ====================================================
+				// ITEM RESPONSE
+				// ====================================================
 
-	                itemResponseDTO.setId(
-	                        detailVO.getItemCode().getId());
+				if (detailVO.getItemCode() != null) {
 
-	                itemResponseDTO.setItemCode(
-	                        detailVO.getItemCode().getItemCode());
+					ItemResponse1DTO itemResponseDTO = new ItemResponse1DTO();
 
-	                itemResponseDTO.setItemDescription(
-	                        detailVO.getItemCode().getItemDescription());
+					itemResponseDTO.setId(detailVO.getItemCode().getId());
 
-	                detailDTO.setItemCode(itemResponseDTO);
-	            }
+					itemResponseDTO.setItemCode(detailVO.getItemCode().getItemCode());
 
-	         // ============================================================
-	         // SUPPLIER RESPONSE
-	         // ============================================================
+					itemResponseDTO.setItemDescription(detailVO.getItemCode().getItemDescription());
 
-	         if (detailVO.getSupplierId() != null) {
+					detailDTO.setItemCode(itemResponseDTO);
+				}
 
-	             CustomerResponse1DTO customerResponseDTO =
-	                     new CustomerResponse1DTO();
+				// ============================================================
+				// SUPPLIER RESPONSE
+				// ============================================================
 
-	             customerResponseDTO.setId(
-	                     detailVO.getSupplierId().getId());
+				if (detailVO.getSupplierId() != null) {
 
-	             customerResponseDTO.setCustomerName(
-	                     detailVO.getSupplierId().getCustomerName());
+					CustomerResponse1DTO customerResponseDTO = new CustomerResponse1DTO();
 
-	             detailDTO.setSupplierId(
-	                     customerResponseDTO);
-	         }
+					customerResponseDTO.setId(detailVO.getSupplierId().getId());
 
-	            detailList.add(detailDTO);
-	        }
+					customerResponseDTO.setCustomerName(detailVO.getSupplierId().getCustomerName());
 
-	        responseDTO.setTransferOrderDetailResponseDTO(detailList);
-	    }
+					detailDTO.setSupplierId(customerResponseDTO);
+				}
 
-	    return responseDTO;
+				detailList.add(detailDTO);
+			}
+
+			responseDTO.setTransferOrderDetailResponseDTO(detailList);
+		}
+
+		return responseDTO;
 	}
-	
-	
+
 	@Override
-	public List<TransferOrderResponseDTO> getTransferOrderByOrgId(Long orgId)
-	        throws ApplicationException {
+	public List<TransferOrderResponseDTO> getTransferOrderByOrgId(Long orgId) throws ApplicationException {
 
-	    List<TransferOrderVO> transferOrderList =
-	            transferOrderRepo.findByOrgIdAndCancelFalse(orgId);
+		List<TransferOrderVO> transferOrderList = transferOrderRepo.findByOrgIdAndCancelFalse(orgId);
 
-	    if (transferOrderList == null
-	            || transferOrderList.isEmpty()) {
+		if (transferOrderList == null || transferOrderList.isEmpty()) {
 
-	        throw new ApplicationException(
-	                "Transfer Order Not Found");
-	    }
+			throw new ApplicationException("Transfer Order Not Found");
+		}
 
-	    List<TransferOrderResponseDTO> responseList =
-	            new ArrayList<>();
+		List<TransferOrderResponseDTO> responseList = new ArrayList<>();
 
-	    for (TransferOrderVO transferOrderVO :
-	            transferOrderList) {
+		for (TransferOrderVO transferOrderVO : transferOrderList) {
 
-	        responseList.add(
-	                buildTransferOrderResponse(
-	                        transferOrderVO));
-	    }
+			responseList.add(buildTransferOrderResponse(transferOrderVO));
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	
+
 	@Override
-	public TransferOrderResponseDTO getTransferOrderById(Long id)
-	        throws ApplicationException {
+	public TransferOrderResponseDTO getTransferOrderById(Long id) throws ApplicationException {
 
-	    TransferOrderVO transferOrderVO =
-	            transferOrderRepo.findById(id)
-	                    .orElse(null);
+		TransferOrderVO transferOrderVO = transferOrderRepo.findById(id).orElse(null);
 
-	    if (transferOrderVO == null) {
+		if (transferOrderVO == null) {
 
-	        throw new ApplicationException(
-	                "Transfer Order Not Found");
-	    }
+			throw new ApplicationException("Transfer Order Not Found");
+		}
 
-	    return buildTransferOrderResponse(
-	            transferOrderVO);
+		return buildTransferOrderResponse(transferOrderVO);
 	}
-	
-	
+
 	@Override
-	public String getTransferOrderDocId(
-	        Long orgId,
-	        String financialYear) {
+	public String getTransferOrderDocId(Long orgId, String financialYear) {
 
-	    String screenCode = "TO";
+		String screenCode = "TO";
 
-	    String result =
-	            transferOrderRepo
-	                    .getTransferOrderDocId(
-	                            orgId,
-	                            financialYear,
-	                            screenCode);
+		String result = transferOrderRepo.getTransferOrderDocId(orgId, financialYear, screenCode);
 
-	    return result;
+		return result;
 	}
-	
-	//TransferOrderItemDropdown
-	
+
+	// TransferOrderItemDropdown
+
 	@Override
-	public List<Map<String, Object>> getTransferOrderItemDropdown(
-	        Long orgId) throws ApplicationException {
+	public List<Map<String, Object>> getTransferOrderItemDropdown(Long orgId) throws ApplicationException {
 
-	    List<Object[]> itemList =
-	            transferOrderRepo.getTransferOrderItemDropdown(orgId);
+		List<Object[]> itemList = transferOrderRepo.getTransferOrderItemDropdown(orgId);
 
-	    if (itemList == null || itemList.isEmpty()) {
+		if (itemList == null || itemList.isEmpty()) {
 
-	        throw new ApplicationException(
-	                "Transfer Order Item Not Found");
-	    }
+			throw new ApplicationException("Transfer Order Item Not Found");
+		}
 
-	    List<Map<String, Object>> responseList =
-	            new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : itemList) {
+		for (Object[] obj : itemList) {
 
-	        Map<String, Object> response =
-	                new HashMap<>();
+			Map<String, Object> response = new HashMap<>();
 
-	        response.put("id", obj[0]);
-	        response.put("name", obj[1]);
-	        response.put("description", obj[2]);
-	        response.put("unitId", obj[3]);
-	        response.put("unitCode", obj[4]);
-	        response.put("unitDescription", obj[5]);
+			response.put("id", obj[0]);
+			response.put("name", obj[1]);
+			response.put("description", obj[2]);
+			response.put("unitId", obj[3]);
+			response.put("unitCode", obj[4]);
+			response.put("unitDescription", obj[5]);
 
-	        responseList.add(response);
-	    }
+			responseList.add(response);
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	
+
 	@Override
-	public List<Map<String, Object>> getTypeDropdownByOrderTypeForTransferOrder(
-	        String orderType,
-	        Long orgId) throws ApplicationException {
+	public List<Map<String, Object>> getTypeDropdownByOrderTypeForTransferOrder(String orderType, Long orgId)
+			throws ApplicationException {
 
-	    List<Object[]> typeList =
-	            transferOrderRepo.getTypeDropdownByOrderTypeForTransferOrder(
-	                    orderType,
-	                    orgId);
+		List<Object[]> typeList = transferOrderRepo.getTypeDropdownByOrderTypeForTransferOrder(orderType, orgId);
 
-	    if (typeList == null || typeList.isEmpty()) {
-	        throw new ApplicationException("Type Not Found");
-	    }
+		if (typeList == null || typeList.isEmpty()) {
+			throw new ApplicationException("Type Not Found");
+		}
 
-	    List<Map<String, Object>> responseList =
-	            new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : typeList) {
+		for (Object[] obj : typeList) {
 
-	        Map<String, Object> response =
-	                new HashMap<>();
+			Map<String, Object> response = new HashMap<>();
 
-	        response.put("id", obj[0]);
-	        response.put("name", obj[1]);
+			response.put("id", obj[0]);
+			response.put("name", obj[1]);
 
-	        responseList.add(response);
-	    }
+			responseList.add(response);
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	
-	
-	
-	
-	
-	//gateoutwardentry
-	
-	
+
+	// gateoutwardentry
+
 	@Override
 	@Transactional
-	public Map<String, Object> createUpdateGateOutwardEntry(
-	        GateOutwardEntryDTO gateOutwardEntryDTO) throws ApplicationException {
+	public Map<String, Object> createUpdateGateOutwardEntry(GateOutwardEntryDTO gateOutwardEntryDTO)
+			throws ApplicationException {
 
-	    GateOutwardEntryVO gateOutwardEntryVO;
-	    String message;
+		GateOutwardEntryVO gateOutwardEntryVO;
+		String message;
 
-	    // ============================================================
-	    // CREATE / UPDATE
-	    // ============================================================
+		// ============================================================
+		// CREATE / UPDATE
+		// ============================================================
 
-	    if (ObjectUtils.isNotEmpty(gateOutwardEntryDTO.getId())) {
+		if (ObjectUtils.isNotEmpty(gateOutwardEntryDTO.getId())) {
 
-	        // UPDATE
+			// UPDATE
 
-	        gateOutwardEntryVO = gateOutwardEntryRepo
-	                .findById(gateOutwardEntryDTO.getId())
-	                .orElseThrow(() ->
-	                        new ApplicationException(
-	                                "Gate Outward Entry Not Found"));
+			gateOutwardEntryVO = gateOutwardEntryRepo.findById(gateOutwardEntryDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Gate Outward Entry Not Found"));
 
-	        gateOutwardEntryVO.setUpdatedBy(
-	                gateOutwardEntryDTO.getCreatedBy());
+			gateOutwardEntryVO.setUpdatedBy(gateOutwardEntryDTO.getCreatedBy());
 
-	        // DELETE OLD DETAILS
+			// DELETE OLD DETAILS
 
-	        gateOutwardEntryDetailRepo.deleteAll(
-	                gateOutwardEntryDetailRepo
-	                        .findByGateOutwardEntryVOId(
-	                                gateOutwardEntryVO.getId()));
+			gateOutwardEntryDetailRepo
+					.deleteAll(gateOutwardEntryDetailRepo.findByGateOutwardEntryVOId(gateOutwardEntryVO.getId()));
 
-	        message = "Gate Outward Entry Updated Successfully";
+			message = "Gate Outward Entry Updated Successfully";
 
-	    } else {
+		} else {
 
-	        // CREATE
+			// CREATE
 
-	        gateOutwardEntryVO = new GateOutwardEntryVO();
+			gateOutwardEntryVO = new GateOutwardEntryVO();
 
-	        gateOutwardEntryVO.setCreatedBy(
-	                gateOutwardEntryDTO.getCreatedBy());
+			gateOutwardEntryVO.setCreatedBy(gateOutwardEntryDTO.getCreatedBy());
 
-	        gateOutwardEntryVO.setUpdatedBy(
-	                gateOutwardEntryDTO.getCreatedBy());
+			gateOutwardEntryVO.setUpdatedBy(gateOutwardEntryDTO.getCreatedBy());
 
-	        message = "Gate Outward Entry Created Successfully";
-	    }
+			message = "Gate Outward Entry Created Successfully";
+		}
 
-	    // ============================================================
-	    // HEADER MAPPING
-	    // ============================================================
+		// ============================================================
+		// HEADER MAPPING
+		// ============================================================
 
-	    createUpdateGateOutwardEntryVOByDTO(
-	            gateOutwardEntryDTO,
-	            gateOutwardEntryVO);
+		createUpdateGateOutwardEntryVOByDTO(gateOutwardEntryDTO, gateOutwardEntryVO);
 
-	    // ============================================================
-	    // DETAIL MAPPING
-	    // ============================================================
+		// ============================================================
+		// DETAIL MAPPING
+		// ============================================================
 
-	    if (gateOutwardEntryDTO.getGateOutwardEntryDetailDTO() != null) {
+		if (gateOutwardEntryDTO.getGateOutwardEntryDetailDTO() != null) {
 
-	        List<GateOutwardEntryDetailVO> detailList =
-	                new ArrayList<>();
+			List<GateOutwardEntryDetailVO> detailList = new ArrayList<>();
 
-	        for (GateOutwardEntryDetailDTO detailDTO :
-	                gateOutwardEntryDTO.getGateOutwardEntryDetailDTO()) {
+			for (GateOutwardEntryDetailDTO detailDTO : gateOutwardEntryDTO.getGateOutwardEntryDetailDTO()) {
 
-	            GateOutwardEntryDetailVO detailVO =
-	                    new GateOutwardEntryDetailVO();
+				GateOutwardEntryDetailVO detailVO = new GateOutwardEntryDetailVO();
 
-	            // ====================================================
-	            // BASIC DETAILS
-	            // ====================================================
+				// ====================================================
+				// BASIC DETAILS
+				// ====================================================
 
-	            detailVO.setToolMachineInstrumentNo(
-	                    detailDTO.getToolMachineInstrumentNo());
+				detailVO.setToolMachineInstrumentNo(detailDTO.getToolMachineInstrumentNo());
 
-	            detailVO.setToolMachineInstrumentNoDesc(
-	                    detailDTO.getToolMachineInstrumentNoDesc());
+				detailVO.setToolMachineInstrumentNoDesc(detailDTO.getToolMachineInstrumentNoDesc());
 
-	            detailVO.setQuantity(
-	                    detailDTO.getQuantity());
+				detailVO.setQuantity(detailDTO.getQuantity());
 
-	            // ====================================================
-	            // ITEM
-	            // ====================================================
+				// ====================================================
+				// ITEM
+				// ====================================================
 
-	            if (detailDTO.getItemCode() != null) {
+				if (detailDTO.getItemCode() != null) {
 
-	                ItemMasterVO itemMasterVO =
-	                        itemMasterRepo.findById(
-	                                detailDTO.getItemCode())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Item Master Not Found"));
+					ItemMasterVO itemMasterVO = itemMasterRepo.findById(detailDTO.getItemCode())
+							.orElseThrow(() -> new ApplicationException("Item Master Not Found"));
 
-	                detailVO.setItemCode(itemMasterVO);
+					detailVO.setItemCode(itemMasterVO);
 
-	                // Auto fill Item Description
+					// Auto fill Item Description
 
-	                detailVO.setItemDescription(
-	                        itemMasterVO.getItemDescription());
-	            }
+					detailVO.setItemDescription(itemMasterVO.getItemDescription());
+				}
 
-	            // ====================================================
-	            // UNIT
-	            // ====================================================
+				// ====================================================
+				// UNIT
+				// ====================================================
 
-	            if (detailDTO.getUnit() != null) {
+				if (detailDTO.getUnit() != null) {
 
-	                UnitMasterVO unitMasterVO =
-	                        unitMasterRepo.findById(
-	                                detailDTO.getUnit())
-	                        .orElseThrow(() ->
-	                                new ApplicationException(
-	                                        "Unit Master Not Found"));
+					UnitMasterVO unitMasterVO = unitMasterRepo.findById(detailDTO.getUnit())
+							.orElseThrow(() -> new ApplicationException("Unit Master Not Found"));
 
-	                detailVO.setUnit(unitMasterVO);
-	            }
+					detailVO.setUnit(unitMasterVO);
+				}
 
-	            // ====================================================
-	            // SET HEADER
-	            // ====================================================
+				// ====================================================
+				// SET HEADER
+				// ====================================================
 
-	            detailVO.setGateOutwardEntryVO(
-	                    gateOutwardEntryVO);
+				detailVO.setGateOutwardEntryVO(gateOutwardEntryVO);
 
-	            detailList.add(detailVO);
-	        }
+				detailList.add(detailVO);
+			}
 
-	        gateOutwardEntryVO.setGateOutwardEntryDetailVO(
-	                detailList);
-	    }
+			gateOutwardEntryVO.setGateOutwardEntryDetailVO(detailList);
+		}
 
-	    // ============================================================
-	    // SAVE
-	    // ============================================================
+		// ============================================================
+		// SAVE
+		// ============================================================
 
-	    gateOutwardEntryVO =
-	            gateOutwardEntryRepo.save(gateOutwardEntryVO);
+		gateOutwardEntryVO = gateOutwardEntryRepo.save(gateOutwardEntryVO);
 
-	    // ============================================================
-	    // RESPONSE
-	    // ============================================================
+		// ============================================================
+		// RESPONSE
+		// ============================================================
 
-	    GateOutwardEntryResponseDTO responseDTO =
-	            buildGateOutwardEntryResponse(
-	                    gateOutwardEntryVO);
+		GateOutwardEntryResponseDTO responseDTO = buildGateOutwardEntryResponse(gateOutwardEntryVO);
 
-	    Map<String, Object> response =
-	            new HashMap<>();
+		Map<String, Object> response = new HashMap<>();
 
-	    response.put("message", message);
-	    response.put("gateOutwardEntryVO", responseDTO);
+		response.put("message", message);
+		response.put("gateOutwardEntryVO", responseDTO);
 
-	    return response;
+		return response;
 	}
-	
-	
-	private void createUpdateGateOutwardEntryVOByDTO(
-	        GateOutwardEntryDTO dto,
-	        GateOutwardEntryVO vo) throws ApplicationException {
 
-	    // ============================================================
-	    // PLANT
-	    // ============================================================
+	private void createUpdateGateOutwardEntryVOByDTO(GateOutwardEntryDTO dto, GateOutwardEntryVO vo)
+			throws ApplicationException {
 
-	    if (dto.getPlantId() != null) {
+		// ============================================================
+		// PLANT
+		// ============================================================
 
-	        BranchVO branchVO =
-	                branchRepo.findById(dto.getPlantId())
-	                .orElseThrow(() ->
-	                        new ApplicationException(
-	                                "Branch Not Found"));
+		if (dto.getPlantId() != null) {
 
-	        vo.setPlantId(branchVO);
-	    }
+			BranchVO branchVO = branchRepo.findById(dto.getPlantId())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
-	    // ============================================================
-	 // ============================================================
-	 // BASIC DETAILS
-	 // ============================================================
+			vo.setPlantId(branchVO);
+		}
 
-	 vo.setBreakDown(dto.getBreakDown());
-	 
-	 vo.setDocId(dto.getDocId());
-	 
-	 vo.setDocDate(dto.getDocDate());
-	 
-	 vo.setBreakDownNo(dto.getBreakDownNo());
-	 
-	 vo.setOutwardTime(dto.getOutwardTime());
-	 
-	 vo.setChallanNo(dto.getChallanNo());
-	 
-	 vo.setVehicleNo(dto.getVehicleNo());
-	 
-	 vo.setRemarks(dto.getRemarks());
-	    // ============================================================
-	    // MATERIAL TYPE
-	    // ============================================================
+		// ============================================================
+		// ============================================================
+		// BASIC DETAILS
+		// ============================================================
 
-	    if (dto.getMaterialType() != null) {
+		vo.setBreakDown(dto.getBreakDown());
 
-	        ToolCategoryVO toolCategoryVO =
-	                toolCategoryRepo.findById(
-	                        dto.getMaterialType())
-	                .orElseThrow(() ->
-	                        new ApplicationException(
-	                                "Tool Category Not Found"));
+		vo.setDocId(dto.getDocId());
 
-	        vo.setMaterialType(toolCategoryVO);
-	    }
+		vo.setDocDate(dto.getDocDate());
 
-	    // ============================================================
-	    // MATERIAL TAKEN OUT BY
-	    // ============================================================
+		vo.setBreakDownNo(dto.getBreakDownNo());
 
-	    if (dto.getMaterialTakenOutBy() != null) {
+		vo.setOutwardTime(dto.getOutwardTime());
 
-	        EmployeeMasterVO employeeMasterVO =
-	                employeeMasterRepo.findById(
-	                        dto.getMaterialTakenOutBy())
-	                .orElseThrow(() ->
-	                        new ApplicationException(
-	                                "Employee Master Not Found"));
+		vo.setChallanNo(dto.getChallanNo());
 
-	        vo.setMaterialTakenOutBy(
-	                employeeMasterVO);
-	    }
+		vo.setVehicleNo(dto.getVehicleNo());
 
-	    // ============================================================
-	    // MATERIAL SENT TO
-	    // ============================================================
+		vo.setRemarks(dto.getRemarks());
+		// ============================================================
+		// MATERIAL TYPE
+		// ============================================================
 
-	    if (dto.getMaterialSentTo() != null) {
+		if (dto.getMaterialType() != null) {
 
-	        CustomerVO customerVO =
-	                customerRepo.findById(
-	                        dto.getMaterialSentTo())
-	                .orElseThrow(() ->
-	                        new ApplicationException(
-	                                "Customer Not Found"));
+			ToolCategoryVO toolCategoryVO = toolCategoryRepo.findById(dto.getMaterialType())
+					.orElseThrow(() -> new ApplicationException("Tool Category Not Found"));
 
-	        vo.setMaterialSentTo(customerVO);
-	    }
+			vo.setMaterialType(toolCategoryVO);
+		}
 
-	    // ============================================================
-	    // COMMON FIELDS
-	    // ============================================================
+		// ============================================================
+		// MATERIAL TAKEN OUT BY
+		// ============================================================
 
-	    vo.setActive(dto.isActive());
+		if (dto.getMaterialTakenOutBy() != null) {
 
-	    vo.setOrgId(dto.getOrgId());
+			EmployeeMasterVO employeeMasterVO = employeeMasterRepo.findById(dto.getMaterialTakenOutBy())
+					.orElseThrow(() -> new ApplicationException("Employee Master Not Found"));
 
-	    vo.setFinancialYear(
-	            dto.getFinancialYear());
+			vo.setMaterialTakenOutBy(employeeMasterVO);
+		}
 
-	    vo.setCreatedBy(
-	            dto.getCreatedBy());
+		// ============================================================
+		// MATERIAL SENT TO
+		// ============================================================
 
-	    vo.setUpdatedBy(
-	            dto.getUpdatedBy());
+		if (dto.getMaterialSentTo() != null) {
 
-	    vo.setCancel(dto.isCancel());
+			CustomerVO customerVO = customerRepo.findById(dto.getMaterialSentTo())
+					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
 
-	    vo.setCancelRemarks(
-	            dto.getCancelRemarks());
+			vo.setMaterialSentTo(customerVO);
+		}
 
-	    // ============================================================
-	    // SCREEN DETAILS
-	    // ============================================================
+		// ============================================================
+		// COMMON FIELDS
+		// ============================================================
 
-	    vo.setScreenName("GATEOUTWARDENTRY");
+		vo.setActive(dto.isActive());
 
-	    vo.setScreenCode("GOE");
+		vo.setOrgId(dto.getOrgId());
+
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		vo.setCreatedBy(dto.getCreatedBy());
+
+		vo.setUpdatedBy(dto.getUpdatedBy());
+
+		vo.setCancel(dto.isCancel());
+
+		vo.setCancelRemarks(dto.getCancelRemarks());
+
+		// ============================================================
+		// SCREEN DETAILS
+		// ============================================================
+
+		vo.setScreenName("GATEOUTWARDENTRY");
+
+		vo.setScreenCode("GOE");
 	}
-	
-	private GateOutwardEntryResponseDTO buildGateOutwardEntryResponse(
-	        GateOutwardEntryVO vo) {
 
-	    GateOutwardEntryResponseDTO responseDTO =
-	            new GateOutwardEntryResponseDTO();
+	private GateOutwardEntryResponseDTO buildGateOutwardEntryResponse(GateOutwardEntryVO vo) {
 
-	    // ============================================================
-	    // HEADER RESPONSE
-	    // ============================================================
+		GateOutwardEntryResponseDTO responseDTO = new GateOutwardEntryResponseDTO();
 
-	    responseDTO.setId(vo.getId());
+		// ============================================================
+		// HEADER RESPONSE
+		// ============================================================
 
-	    responseDTO.setSerialNo(
-	            vo.getSerialNo());
+		responseDTO.setId(vo.getId());
 
-	    responseDTO.setBreakDown(
-	            vo.getBreakDown());
+		responseDTO.setSerialNo(vo.getSerialNo());
 
-	    responseDTO.setDocdate(
-	            vo.getDocDate());
-	    
-	    responseDTO.setBreakDownNo(
-	            vo.getBreakDownNo());
+		responseDTO.setBreakDown(vo.getBreakDown());
 
-	    responseDTO.setOutwardTime(
-	            vo.getOutwardTime());
+		responseDTO.setDocdate(vo.getDocDate());
 
-	    responseDTO.setChallanNo(
-	            vo.getChallanNo());
+		responseDTO.setBreakDownNo(vo.getBreakDownNo());
 
-	    responseDTO.setVehicleNo(
-	            vo.getVehicleNo());
+		responseDTO.setOutwardTime(vo.getOutwardTime());
 
-	    responseDTO.setRemarks(
-	            vo.getRemarks());
+		responseDTO.setChallanNo(vo.getChallanNo());
 
-	    responseDTO.setActive(
-	            vo.isActive());
+		responseDTO.setVehicleNo(vo.getVehicleNo());
 
-	    responseDTO.setOrgId(
-	            vo.getOrgId());
+		responseDTO.setRemarks(vo.getRemarks());
 
-	    responseDTO.setFinancialYear(
-	            vo.getFinancialYear());
+		responseDTO.setActive(vo.isActive());
 
-	    responseDTO.setCreatedBy(
-	            vo.getCreatedBy());
+		responseDTO.setOrgId(vo.getOrgId());
 
-	    responseDTO.setUpdatedBy(
-	            vo.getUpdatedBy());
+		responseDTO.setFinancialYear(vo.getFinancialYear());
 
-	    responseDTO.setCancel(
-	            vo.isCancel());
+		responseDTO.setCreatedBy(vo.getCreatedBy());
 
-	    responseDTO.setCancelRemarks(
-	            vo.getCancelRemarks());
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
 
-	    // ============================================================
-	    // PLANT RESPONSE
-	    // ============================================================
+		responseDTO.setCancel(vo.isCancel());
 
-	    if (vo.getPlantId() != null) {
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
 
-	        BranchResponseDTO branchResponseDTO =
-	                new BranchResponseDTO();
+		// ============================================================
+		// PLANT RESPONSE
+		// ============================================================
 
-	        branchResponseDTO.setId(
-	                vo.getPlantId().getId());
+		if (vo.getPlantId() != null) {
 
-	        // Add the other BranchResponseDTO fields
-	        // according to your existing BranchResponseDTO.
+			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
 
-	        responseDTO.setPlantId(
-	                branchResponseDTO);
-	    }
+			branchResponseDTO.setId(vo.getPlantId().getId());
 
-	    // ============================================================
-	    // MATERIAL TYPE RESPONSE
-	    // ============================================================
+			// Add the other BranchResponseDTO fields
+			// according to your existing BranchResponseDTO.
 
-	    if (vo.getMaterialType() != null) {
+			responseDTO.setPlantId(branchResponseDTO);
+		}
 
-	        ToolCategoryDetailResponseDTO
-	                materialTypeResponseDTO =
-	                new ToolCategoryDetailResponseDTO();
+		// ============================================================
+		// MATERIAL TYPE RESPONSE
+		// ============================================================
 
-	        materialTypeResponseDTO.setId(
-	                vo.getMaterialType().getId());
+		if (vo.getMaterialType() != null) {
 
-	        // Set the remaining ToolCategory fields
-	        // according to your ToolCategoryDetailResponseDTO.
+			ToolCategoryDetailResponseDTO materialTypeResponseDTO = new ToolCategoryDetailResponseDTO();
 
-	        responseDTO.setMaterialType(
-	                materialTypeResponseDTO);
-	    }
+			materialTypeResponseDTO.setId(vo.getMaterialType().getId());
 
-	    // ============================================================
-	    // EMPLOYEE RESPONSE
-	    // ============================================================
+			// Set the remaining ToolCategory fields
+			// according to your ToolCategoryDetailResponseDTO.
 
-	    if (vo.getMaterialTakenOutBy() != null) {
+			responseDTO.setMaterialType(materialTypeResponseDTO);
+		}
 
-	        EmployeeResponseDTO employeeResponseDTO =
-	                new EmployeeResponseDTO();
+		// ============================================================
+		// EMPLOYEE RESPONSE
+		// ============================================================
 
-	        employeeResponseDTO.setId(
-	                vo.getMaterialTakenOutBy().getId());
+		if (vo.getMaterialTakenOutBy() != null) {
 
-	        // Set the remaining employee fields
-	        // according to your EmployeeResponseDTO.
+			EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO();
 
-	        responseDTO.setMaterialTakenOutBy(
-	                employeeResponseDTO);
-	    }
+			employeeResponseDTO.setId(vo.getMaterialTakenOutBy().getId());
 
-	    // ============================================================
-	    // CUSTOMER RESPONSE
-	    // ============================================================
+			// Set the remaining employee fields
+			// according to your EmployeeResponseDTO.
 
-	    if (vo.getMaterialSentTo() != null) {
+			responseDTO.setMaterialTakenOutBy(employeeResponseDTO);
+		}
 
-	        CustomerResponse1DTO customerResponseDTO =
-	                new CustomerResponse1DTO();
+		// ============================================================
+		// CUSTOMER RESPONSE
+		// ============================================================
 
-	        customerResponseDTO.setId(
-	                vo.getMaterialSentTo().getId());
+		if (vo.getMaterialSentTo() != null) {
 
-	        customerResponseDTO.setCustomerName(
-	                vo.getMaterialSentTo().getCustomerName());
+			CustomerResponse1DTO customerResponseDTO = new CustomerResponse1DTO();
 
-	        responseDTO.setMaterialSentTo(
-	                customerResponseDTO);
-	    }
+			customerResponseDTO.setId(vo.getMaterialSentTo().getId());
 
-	    // ============================================================
-	    // DETAIL RESPONSE
-	    // ============================================================
+			customerResponseDTO.setCustomerName(vo.getMaterialSentTo().getCustomerName());
 
-	    if (vo.getGateOutwardEntryDetailVO() != null) {
+			responseDTO.setMaterialSentTo(customerResponseDTO);
+		}
 
-	        List<GateOutwardEntryDetailResponseDTO>
-	                detailList = new ArrayList<>();
+		// ============================================================
+		// DETAIL RESPONSE
+		// ============================================================
 
-	        for (GateOutwardEntryDetailVO detailVO :
-	                vo.getGateOutwardEntryDetailVO()) {
+		if (vo.getGateOutwardEntryDetailVO() != null) {
 
-	            GateOutwardEntryDetailResponseDTO
-	                    detailDTO =
-	                    new GateOutwardEntryDetailResponseDTO();
+			List<GateOutwardEntryDetailResponseDTO> detailList = new ArrayList<>();
 
-	            // ====================================================
-	            // BASIC DETAILS
-	            // ====================================================
+			for (GateOutwardEntryDetailVO detailVO : vo.getGateOutwardEntryDetailVO()) {
 
-	            detailDTO.setId(
-	                    detailVO.getId());
+				GateOutwardEntryDetailResponseDTO detailDTO = new GateOutwardEntryDetailResponseDTO();
 
-	            detailDTO.setItemDescription(
-	                    detailVO.getItemDescription());
+				// ====================================================
+				// BASIC DETAILS
+				// ====================================================
 
-	            detailDTO.setToolMachineInstrumentNo(
-	                    detailVO.getToolMachineInstrumentNo());
+				detailDTO.setId(detailVO.getId());
 
-	            detailDTO.setToolMachineInstrumentNoDesc(
-	                    detailVO.getToolMachineInstrumentNoDesc());
+				detailDTO.setItemDescription(detailVO.getItemDescription());
 
-	            detailDTO.setQuantity(
-	                    detailVO.getQuantity());
+				detailDTO.setToolMachineInstrumentNo(detailVO.getToolMachineInstrumentNo());
 
-	            // ====================================================
-	            // ITEM RESPONSE
-	            // ====================================================
+				detailDTO.setToolMachineInstrumentNoDesc(detailVO.getToolMachineInstrumentNoDesc());
 
-	            if (detailVO.getItemCode() != null) {
+				detailDTO.setQuantity(detailVO.getQuantity());
 
-	                ItemMasterDetailsResponseImportDTO
-	                        itemResponseDTO =
-	                        new ItemMasterDetailsResponseImportDTO();
+				// ====================================================
+				// ITEM RESPONSE
+				// ====================================================
 
-	                itemResponseDTO.setId(
-	                        detailVO.getItemCode().getId());
+				if (detailVO.getItemCode() != null) {
 
-	                itemResponseDTO.setItemCode(
-	                        detailVO.getItemCode().getItemCode());
+					ItemMasterDetailsResponseImportDTO itemResponseDTO = new ItemMasterDetailsResponseImportDTO();
 
-	                itemResponseDTO.setItemDescription(
-	                        detailVO.getItemCode()
-	                                .getItemDescription());
+					itemResponseDTO.setId(detailVO.getItemCode().getId());
 
-	                detailDTO.setItemCode(
-	                        itemResponseDTO);
-	            }
+					itemResponseDTO.setItemCode(detailVO.getItemCode().getItemCode());
 
-	            // ====================================================
-	            // UNIT RESPONSE
-	            // ====================================================
+					itemResponseDTO.setItemDescription(detailVO.getItemCode().getItemDescription());
 
-	            if (detailVO.getUnit() != null) {
+					detailDTO.setItemCode(itemResponseDTO);
+				}
 
-	                UnitResponseDTO unitResponseDTO =
-	                        new UnitResponseDTO();
+				// ====================================================
+				// UNIT RESPONSE
+				// ====================================================
 
-	                unitResponseDTO.setId(
-	                        detailVO.getUnit().getId());
+				if (detailVO.getUnit() != null) {
 
-	                // Set the remaining UnitResponseDTO fields
-	                // according to your existing UnitResponseDTO.
+					UnitResponseDTO unitResponseDTO = new UnitResponseDTO();
 
-	                detailDTO.setUnit(
-	                        unitResponseDTO);
-	            }
+					unitResponseDTO.setId(detailVO.getUnit().getId());
 
-	            detailList.add(detailDTO);
-	        }
+					// Set the remaining UnitResponseDTO fields
+					// according to your existing UnitResponseDTO.
 
-	        responseDTO.setGateOutwardEntryDetailResponseDTO(
-	                detailList);
-	    }
+					detailDTO.setUnit(unitResponseDTO);
+				}
 
-	    return responseDTO;
+				detailList.add(detailDTO);
+			}
+
+			responseDTO.setGateOutwardEntryDetailResponseDTO(detailList);
+		}
+
+		return responseDTO;
 	}
-	
+
 	@Override
-	public List<GateOutwardEntryResponseDTO> getGateOutwardEntryByOrgId(Long orgId)
-	        throws ApplicationException {
+	public List<GateOutwardEntryResponseDTO> getGateOutwardEntryByOrgId(Long orgId) throws ApplicationException {
 
-	    List<GateOutwardEntryVO> gateOutwardEntryList =
-	            gateOutwardEntryRepo.findByOrgIdAndCancelFalse(orgId);
+		List<GateOutwardEntryVO> gateOutwardEntryList = gateOutwardEntryRepo.findByOrgIdAndCancelFalse(orgId);
 
-	    if (gateOutwardEntryList == null
-	            || gateOutwardEntryList.isEmpty()) {
+		if (gateOutwardEntryList == null || gateOutwardEntryList.isEmpty()) {
 
-	        throw new ApplicationException(
-	                "Gate Outward Entry Not Found");
-	    }
+			throw new ApplicationException("Gate Outward Entry Not Found");
+		}
 
-	    List<GateOutwardEntryResponseDTO> responseList =
-	            new ArrayList<>();
+		List<GateOutwardEntryResponseDTO> responseList = new ArrayList<>();
 
-	    for (GateOutwardEntryVO gateOutwardEntryVO :
-	            gateOutwardEntryList) {
+		for (GateOutwardEntryVO gateOutwardEntryVO : gateOutwardEntryList) {
 
-	        responseList.add(
-	                buildGateOutwardEntryResponse(
-	                        gateOutwardEntryVO));
-	    }
+			responseList.add(buildGateOutwardEntryResponse(gateOutwardEntryVO));
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
+
 	@Override
-	public GateOutwardEntryResponseDTO getGateOutwardEntryById(Long id)
-	        throws ApplicationException {
+	public GateOutwardEntryResponseDTO getGateOutwardEntryById(Long id) throws ApplicationException {
 
-	    GateOutwardEntryVO gateOutwardEntryVO =
-	            gateOutwardEntryRepo.findById(id)
-	                    .orElse(null);
+		GateOutwardEntryVO gateOutwardEntryVO = gateOutwardEntryRepo.findById(id).orElse(null);
 
-	    if (gateOutwardEntryVO == null) {
+		if (gateOutwardEntryVO == null) {
 
-	        throw new ApplicationException(
-	                "Gate Outward Entry Not Found");
-	    }
+			throw new ApplicationException("Gate Outward Entry Not Found");
+		}
 
-	    return buildGateOutwardEntryResponse(
-	            gateOutwardEntryVO);
+		return buildGateOutwardEntryResponse(gateOutwardEntryVO);
 	}
-	
+
 	@Override
-	public String getGateOutwardEntryDocId(
-	        Long orgId,
-	        String financialYear) {
+	public String getGateOutwardEntryDocId(Long orgId, String financialYear) {
 
-	    String screenCode = "GOE";
+		String screenCode = "GOE";
 
-	    String result =
-	            gateOutwardEntryRepo
-	                    .getGateOutwardEntryDocId(
-	                            orgId,
-	                            financialYear,
-	                            screenCode);
+		String result = gateOutwardEntryRepo.getGateOutwardEntryDocId(orgId, financialYear, screenCode);
 
-	    return result;
+		return result;
 	}
-	
-	
+
 //	 getBreakdownNoDropdownForGateOutwardEntry
-	
+
 	@Override
-	public List<Map<String, Object>> getBreakdownNoDropdownForGateOutwardEntry(
-	        Long orgId,
-	        Long branch) throws ApplicationException {
+	public List<Map<String, Object>> getBreakdownNoDropdownForGateOutwardEntry(Long orgId, Long branch)
+			throws ApplicationException {
 
-	    List<Object[]> breakdownList =
-	    		machineToolBreakdownRepo
-	                    .getBreakdownNoDropdownForGateOutwardEntry(
-	                            orgId,
-	                            branch);
+		List<Object[]> breakdownList = machineToolBreakdownRepo.getBreakdownNoDropdownForGateOutwardEntry(orgId,
+				branch);
 
-	    if (breakdownList == null || breakdownList.isEmpty()) {
+		if (breakdownList == null || breakdownList.isEmpty()) {
 
-	        throw new ApplicationException(
-	                "Breakdown No Not Found");
-	    }
+			throw new ApplicationException("Breakdown No Not Found");
+		}
 
-	    List<Map<String, Object>> responseList =
-	            new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : breakdownList) {
+		for (Object[] obj : breakdownList) {
 
-	        Map<String, Object> response =
-	                new HashMap<>();
+			Map<String, Object> response = new HashMap<>();
 
-	        response.put("id", obj[0]);
-	        response.put("name", obj[1]);
+			response.put("id", obj[0]);
+			response.put("name", obj[1]);
 
-	        responseList.add(response);
-	    }
+			responseList.add(response);
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	
+
 	// getChallanNoDropdownForGateOutwardEntry
 
 	@Override
-	public List<Map<String, Object>> getSubcontractChallanNoForGateOutwardEntry(
-	        Long orgId,
-	        Long branch) throws ApplicationException {
+	public List<Map<String, Object>> getSubcontractChallanNoForGateOutwardEntry(Long orgId, Long branch)
+			throws ApplicationException {
 
-	    List<Object[]> challanList =
-	    		deliveryChallanSubcontractingRepo
-	                    .getSubcontractChallanNoForGateOutwardEntry(
-	                            orgId,
-	                            branch);
+		List<Object[]> challanList = deliveryChallanSubcontractingRepo.getSubcontractChallanNoForGateOutwardEntry(orgId,
+				branch);
 
-	    if (challanList == null || challanList.isEmpty()) {
-	        throw new ApplicationException(
-	                "Challan No Not Found");
-	    }
+		if (challanList == null || challanList.isEmpty()) {
+			throw new ApplicationException("Challan No Not Found");
+		}
 
-	    List<Map<String, Object>> responseList =
-	            new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-	    for (Object[] obj : challanList) {
+		for (Object[] obj : challanList) {
 
-	        Map<String, Object> response =
-	                new HashMap<>();
+			Map<String, Object> response = new HashMap<>();
 
-	        response.put("id", obj[0]);
-	        response.put("name", obj[1]);
+			response.put("id", obj[0]);
+			response.put("name", obj[1]);
 
-	        responseList.add(response);
-	    }
+			responseList.add(response);
+		}
 
-	    return responseList;
+		return responseList;
 	}
-	
-	
-	
-	
+
 }

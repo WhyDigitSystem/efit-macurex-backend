@@ -306,4 +306,6 @@ public interface PurchaseServiceImport {
 			throws ApplicationException;
 
 	List<Map<String, Object>> getIndentNoForProductionBulkIssue(Long orgId, Long branch, Long fgItem);
+
+	List<Map<String, Object>> getFgItemCodeDetails(Long orgId, Long branch);
 }

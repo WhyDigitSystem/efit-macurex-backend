@@ -46,4 +46,10 @@ public interface FgTransferSlipRepo extends JpaRepository<FgTransferSlipVO, Long
 			+ "left join item i on i.item_id=b1.item left join unitmaster u on u.unitmaster_id=i.primary_unit\r\n"
 			+ " where b.org_id=?1 and b.branch=?2 and b.bill_of_material_id=?3")
 	Set<Object[]> getBomDetailsFromFgTransferSlip(Long orgId, Long branch,Long bom);
+	
+	@Query(nativeQuery = true, value = "select i.item_id,i.item_code,i.item_description from item i left join listofvaluesdetails l1\r\n"
+			+ "		                        on l1.listofvaluesdetails_id=i.item_type where i.org_id=?1 and \r\n"
+			+ "			                       i.branch=?1 and l1.value_description='FG'")
+	Set<Object[]> getFgItemCodeDetails(Long orgId, Long branch);
+
 }

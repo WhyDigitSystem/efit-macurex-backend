@@ -3136,9 +3136,10 @@ public class SubContractServiceImpl implements SubContractService {
 			part.put("outgoingItem", fs[3] != null ? fs[3] : null);
 			part.put("itemCode", fs[4] != null ? fs[4] : null);
 			part.put("itemDescription", fs[5] != null ? fs[5] : null);
-			part.put("unit", fs[6] != null ? fs[6] : null);
-			part.put("unitDescription", fs[7] != null ? fs[7] : null);
-			part.put("rate", fs[8] != null ? fs[8] : null);
+			part.put("unitId", fs[6] != null ? fs[6] : null);
+			part.put("unit", fs[7] != null ? fs[7] : null);
+			part.put("unitDescription", fs[8] != null ? fs[8] : null);
+			part.put("rate", fs[9] != null ? fs[9] : null);
 
 			details1.add(part);
 		}

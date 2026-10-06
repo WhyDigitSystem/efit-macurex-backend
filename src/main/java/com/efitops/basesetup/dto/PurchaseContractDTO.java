@@ -4,64 +4,65 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.Column;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class PurchaseContractDTO {
 
-    private Long id;
+	private Long id;
 
-    private Long branch;
-    
-    private String belongsTo;
-   
-    private Long department;
-    
-    private Long supplier;
+	private Long branch;
 
-    private Long gstState;
-    
-    private boolean isIGSTAppl;
+	private String belongsTo;
 
-    private LocalDate validFrom;
+	private Long department;
 
-    private LocalDate validTo;
-    
-    private String purchaseOrderType;
-    
-    private Long currency;
+	private Long supplier;
 
-    // -------- 3. Charges Summary (single set of entered fields) --------
-    private String modeOfDespatch;
-    private String paymentTerms;
-    private String delivery;
-    private String freightType;
-    private String packingType;
-    private BigDecimal insuranceAmount;
-    private String bank;
-    private String accounts;
-    private String swiftCode;
-    private String checkedBy;
-    private String preparedBy;
-    private String authorisedBy;
-    private String freightForwarder;
-    private String notes;
-    private String termsConditions;
-    
-    private Long orgId;
-    private String financialYear;
-    private boolean active;
-    private String cancelRemarks;
-    private String createdBy;
-    
+	private Long gstState;
 
-    private List<PurchaseContractDetailsDTO> details;
-    private List<PurchaseContractTaxDetailsDTO> taxDetails;
-	
-   
+	private boolean isIGSTAppl;
+
+	private LocalDate validFrom;
+
+	private LocalDate validTo;
+
+	private String purchaseOrderType;
+
+	private Long currency;
+
+	// -------- 3. Charges Summary (single set of entered fields) --------
+	private String modeOfDespatch;
+	private String paymentTerms;
+	private String delivery;
+	private String freightType;
+	private String packingType;
+	private BigDecimal insuranceAmount;
+	private String bank;
+	private String accounts;
+	private String swiftCode;
+	private String checkedBy;
+	private String preparedBy;
+	private String authorisedBy;
+	private String freightForwarder;
+	private String notes;
+	private String termsConditions;
+
+	private Long orgId;
+	private String financialYear;
+	private boolean active;
+	private String cancelRemarks;
+	private String createdBy;
+	private String supplierRefNo;
+	private LocalDate refDate;
+
+	private List<PurchaseContractDetailsDTO> details;
+	private List<PurchaseContractTaxDetailsDTO> taxDetails;
+
 }

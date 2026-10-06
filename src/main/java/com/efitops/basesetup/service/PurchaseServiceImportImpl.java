@@ -4895,7 +4895,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			Map<String, Object> map = new HashMap<>();
 			map.put("docId", ch[0] != null ? ch[0].toString() : "");
 			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
-			map.put("scheduledQty", ch[3] != null ? new BigDecimal(ch[3].toString()) : BigDecimal.ZERO);
+			map.put("scheduledQty", ch[2] != null ? new BigDecimal(ch[2].toString()) : BigDecimal.ZERO);
 			list.add(map);
 		}
 

@@ -1618,8 +1618,7 @@ public class DevelopController extends BaseController {
 	// docidissues
 
 	@GetMapping("/getIssuesDocId")
-	public ResponseEntity<ResponseDTO> getIssuesDocId(@RequestParam Long orgId, @RequestParam String financialYear,
-			@RequestParam String screenCode1) {
+	public ResponseEntity<ResponseDTO> getIssuesDocId(@RequestParam Long orgId, @RequestParam String financialYear) {
 
 		String methodName = "getIssuesDocId()";
 

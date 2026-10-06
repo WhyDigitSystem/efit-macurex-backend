@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -3661,6 +3662,7 @@ public class DevelopServiceImpl implements DevelopService {
 	@Transactional
 	public Map<String, Object> createUpdateOpenStockEntry(OpenStockEntryDto openStockEntryDto)
 			throws ApplicationException {
+		String screenCode = "OSE";
 
 		OpenStockEntryVO openStockEntryVO;
 		String message;
@@ -3677,6 +3679,17 @@ public class DevelopServiceImpl implements DevelopService {
 		} else {
 
 			openStockEntryVO = new OpenStockEntryVO();
+
+			String docId = openStockEntryRepo.getOpenStockEntryDocId(openStockEntryDto.getOrgId(),
+					openStockEntryDto.getFinancialYear(), screenCode);
+
+			openStockEntryVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(openStockEntryDto.getOrgId(),
+							openStockEntryDto.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			openStockEntryVO.setCreatedBy(openStockEntryDto.getCreatedBy());
 
@@ -3779,6 +3792,10 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setCreatedBy(openStockEntryVO.getCreatedBy());
 
 		responseDTO.setCancelRemarks(openStockEntryVO.getCancelRemarks());
+
+		responseDTO.setDocId(openStockEntryVO.getDocId());
+
+		responseDTO.setDocDate(openStockEntryVO.getDocDate());
 
 		// Branch
 		if (openStockEntryVO.getBranch() != null) {
@@ -3911,11 +3928,11 @@ public class DevelopServiceImpl implements DevelopService {
 	}
 
 	@Override
-	public String getOpenStockEntryDocId(Long orgId, String financialYear, String screenCode) {
+	public String getOpenStockEntryDocId(Long orgId, String financialYear) {
 
 		String screenCode1 = "OSE";
 
-		String result = openStockEntryRepo.getOpenStockEntryDocId(orgId, financialYear, screenCode);
+		String result = openStockEntryRepo.getOpenStockEntryDocId(orgId, financialYear, screenCode1);
 
 		return result;
 	}
@@ -3932,15 +3949,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		String message;
 
-		// =========================
-		// Create / Update
-		// =========================
-
 		if (ObjectUtils.isNotEmpty(issuesDto.getId())) {
-
-			// =========================
-			// Update
-			// =========================
 
 			issuesVO = issuesRepo.findById(issuesDto.getId())
 					.orElseThrow(() -> new ApplicationException("Issues Not Found"));
@@ -3958,10 +3967,6 @@ public class DevelopServiceImpl implements DevelopService {
 			String docId = issuesRepo.getIssuesDocId(issuesDto.getOrgId(), issuesDto.getFinancialYear(), screenCode);
 
 			issuesVO.setDocId(docId);
-
-			// =========================
-			// Document Type Mapping
-			// =========================
 
 			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
 					.findByOrgIdAndFinYearAndScreenCode(issuesDto.getOrgId(), issuesDto.getFinancialYear(), screenCode);
@@ -4049,15 +4054,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		issuesVO.setBelongsTo(dto.getBelongsTo());
 
-		// =========================
-		// Time
-		// =========================
-
-		issuesVO.setTime(dto.getTime());
-
-		// =========================
-		// Reference No
-		// =========================
+		issuesVO.setTime(LocalTime.parse(dto.getTime()));
 
 		issuesVO.setRefNo(dto.getRefNo());
 
@@ -4126,18 +4123,6 @@ public class DevelopServiceImpl implements DevelopService {
 		// =========================
 
 		issuesVO.setCancelRemarks(dto.getCancelRemarks());
-
-		// =========================
-		// Screen Details
-		// =========================
-
-		issuesVO.setScreenCode("ISU");
-
-		issuesVO.setScreenName("ISSUES");
-
-		// =====================================================
-		// Delete Existing Details During Update
-		// =====================================================
 
 		if (dto.getId() != null) {
 

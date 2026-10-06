@@ -22,24 +22,29 @@ public interface GrnRepo extends JpaRepository<GrnVO, Long> {
 	@Query(nativeQuery = true, value = "select concat(prefix,lpad(last_no,5,0)) AS docid from documenttypemapping_details where org_id=?1 and fin_year=?2 and  screen_code=?3")
 	String getGrnDocId(Long orgId, String financialYear, String screenCode);
 
-	@Query(nativeQuery = true, value = "SELECT\r\n" + "			    c.customer_id,\r\n"
-			+ "			    c.customer_name,\r\n" + "			    c.customer_code,\r\n"
-			+ "			    c.address,\r\n" + "			    c.pincode,\r\n" + "			    c.gst_no,\r\n"
-			+ "			    g.state_name,\r\n" + "			    c.is_registered,\r\n" + "                c1.country\r\n"
-			+ "			FROM customer_header c\r\n" + "			LEFT JOIN listofvaluesdetails l1\r\n"
-			+ "			    ON c.customer_category = l1.listofvaluesdetails_id\r\n"
-			+ "			LEFT JOIN listofvaluesdetails l2\r\n"
-			+ "			    ON c.customer_category1 = l2.listofvaluesdetails_id\r\n"
-			+ "			LEFT JOIN listofvaluesdetails l3\r\n"
-			+ "			    ON c.customer_category2 = l3.listofvaluesdetails_id\r\n"
-			+ "			left JOIN gststatemaster g\r\n" + "			    ON g.gststatemaster_id = c.gst_state\r\n"
-			+ "                left join country c1 on c1.countryid=c.country\r\n" + "			WHERE c.org_id = ?1\r\n"
-			+ "			  AND c.branch = ?2\r\n" + "			  AND c.active = 1\r\n"
-			+ "			  AND c.cancel = 0\r\n" + "			  AND (\r\n"
-			+ "			        l1.value_description = 'Supplier'\r\n"
-			+ "			        OR l2.value_description = 'Supplier'\r\n"
-			+ "			        OR l3.value_description = 'Supplier'\r\n" + "			      )\r\n"
-			+ "			ORDER BY c.customer_code")
+	@Query(nativeQuery = true, value = "SELECT		    c.customer_id,\r\n"
+			+ "						    c.customer_name,		    c.customer_code,\r\n"
+			+ "						    c.address,		    c.pincode,		    c.gst_no,\r\n"
+			+ "						    g.state_name,		    c.is_registered,                 c1.country,c.gst_type,\r\n"
+			+ "case \r\n"
+			+ "    when c.gst_type = 'Registered' THEN 'YES'\r\n"
+			+ "    else 'NO'\r\n"
+			+ "end as gst_registered\r\n"
+			+ "                            \r\n"
+			+ "						FROM customer_header c		LEFT JOIN listofvaluesdetails l1\r\n"
+			+ "						    ON c.customer_category = l1.listofvaluesdetails_id\r\n"
+			+ "						LEFT JOIN listofvaluesdetails l2\r\n"
+			+ "						    ON c.customer_category1 = l2.listofvaluesdetails_id\r\n"
+			+ "						LEFT JOIN listofvaluesdetails l3\r\n"
+			+ "						    ON c.customer_category2 = l3.listofvaluesdetails_id\r\n"
+			+ "						left JOIN gststatemaster g		    ON g.gststatemaster_id = c.gst_state\r\n"
+			+ "			                left join country c1 on c1.countryid=c.country		WHERE c.org_id = ?1\r\n"
+			+ "						  AND c.branch = ?2		  AND c.active = 1\r\n"
+			+ "						  AND c.cancel = 0		  AND (\r\n"
+			+ "						        l1.value_description = 'Supplier'\r\n"
+			+ "						        OR l2.value_description = 'Supplier'\r\n"
+			+ "						        OR l3.value_description = 'Supplier'		      )\r\n"
+			+ "						ORDER BY c.customer_code")
 	Set<Object[]> getSupplierDetailsForGrn(Long orgId, Long branch);
 
 	@Query(nativeQuery = true, value = "select multiplication_factor from uomconversion where org_id=?1 and from_unit=?2 and to_unit=?3")

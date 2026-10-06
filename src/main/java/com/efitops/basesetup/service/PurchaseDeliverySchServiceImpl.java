@@ -3191,6 +3191,7 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 					detailVO.setItem(item);
 				}
+				
 
 				detailVO.setRequiredQty(detailDTO.getRequiredQty());
 

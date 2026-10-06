@@ -144,8 +144,6 @@ public interface DevelopService {
 
 	Map<String, Object> getOpenStockEntryItemCodeDropdown(Long orgId, Long branch) throws ApplicationException;
 
-	String getOpenStockEntryDocId(Long orgId, String financialYear, String screenCode);
-
 	Map<String, Object> createUpdateIssues(IssuesDTO issuesDto) throws ApplicationException;
 
 	IssuesResponseDTO getIssuesById(Long id) throws ApplicationException;
@@ -344,5 +342,7 @@ public interface DevelopService {
 	String getPurchaseContractAmendmentDocId(Long orgId, String financialYear);
 
 	ResponseEntity<byte[]> viewPurchaseContractAmendmentFile(HttpServletRequest request) throws IOException;
+
+	String getOpenStockEntryDocId(Long orgId, String financialYear);
 
 }

@@ -1313,7 +1313,7 @@ public class DevelopController extends BaseController {
 	@GetMapping("/getOpenStockEntryDocId")
 
 	public ResponseEntity<ResponseDTO> getOpenStockEntryDocId(@RequestParam Long orgId,
-			@RequestParam String financialYear, @RequestParam String screenCode) {
+			@RequestParam String financialYear) {
 
 		String methodName = "getOpenStockEntryDocId()";
 
@@ -1329,7 +1329,7 @@ public class DevelopController extends BaseController {
 
 		try {
 
-			mapp = developService.getOpenStockEntryDocId(orgId, financialYear, screenCode);
+			mapp = developService.getOpenStockEntryDocId(orgId, financialYear);
 
 		} catch (Exception e) {
 

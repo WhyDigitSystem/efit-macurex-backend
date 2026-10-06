@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -3451,47 +3452,59 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getMRINGRNDropdownForFlashNCReport(Long orgId, Long branch)
-			throws ApplicationException {
+	public List<Map<String, Object>> getMRINGRNDropdownForFlashNCReport(
+	        Long orgId, Long branch) throws ApplicationException {
 
-		List<Object[]> mrinGrnList = flashNCReportRepo.getMRINGRNDropdownForFlashNCReport(orgId, branch);
+	    List<Object[]> mrinGrnList =
+	            flashNCReportRepo.getMRINGRNDropdownForFlashNCReport(orgId, branch);
 
-		if (mrinGrnList == null || mrinGrnList.isEmpty()) {
+	    if (mrinGrnList == null || mrinGrnList.isEmpty()) {
+	        throw new ApplicationException("No MRIN/GRN Details Found");
+	    }
 
-			throw new ApplicationException("No MRIN/GRN Details Found");
-		}
+	    Map<Object, Map<String, Object>> groupedMap = new LinkedHashMap<>();
 
-		List<Map<String, Object>> responseList = new ArrayList<>();
+	    for (Object[] obj : mrinGrnList) {
 
-		for (Object[] obj : mrinGrnList) {
+	        Object mrinGrnNo = obj[0];
 
-			Map<String, Object> mrinGrnMap = new HashMap<>();
+	        Map<String, Object> mrinGrnMap = groupedMap.get(mrinGrnNo);
 
-			mrinGrnMap.put("mrinGrnNo", obj[0]);
-			mrinGrnMap.put("supplierCode", obj[1]);
-			mrinGrnMap.put("supplierName", obj[2]);
-			mrinGrnMap.put("invoiceNo", obj[3]);
-			mrinGrnMap.put("mrinGrnDate", obj[4]);
-			mrinGrnMap.put("poNo", obj[5]);
-			mrinGrnMap.put("qty", obj[6]);
-			mrinGrnMap.put("sourceType", obj[7]);
-			
-			List<Map<String, Object>> itemList = new ArrayList<>();
+	        // Create parent only once
+	        if (mrinGrnMap == null) {
 
-			Map<String, Object> itemData = new HashMap<>();
+	            mrinGrnMap = new LinkedHashMap<>();
 
-			itemData.put("itemCode", obj[4]);
-			itemData.put("itemDescription", obj[5]);
-			
+	            mrinGrnMap.put("mrinGrnNo", obj[0]);
+	            mrinGrnMap.put("supplierCode", obj[1]);
+	            mrinGrnMap.put("supplierName", obj[2]);
+	            mrinGrnMap.put("invoiceNo", obj[3]);
+	            mrinGrnMap.put("mrinGrnDate", obj[6]);
+	            mrinGrnMap.put("poNo", obj[7]);
+	            mrinGrnMap.put("qty", obj[8]);
+	            mrinGrnMap.put("sourceType", obj[9]);
 
-			itemList.add(itemData);
+	            List<Map<String, Object>> itemList = new ArrayList<>();
 
-			mrinGrnMap.put("items", itemList);
+	            mrinGrnMap.put("items", itemList);
 
-			responseList.add(mrinGrnMap);
-		}
+	            groupedMap.put(mrinGrnNo, mrinGrnMap);
+	        }
 
-		return responseList;
+	        // Only item details should come inside items
+	        @SuppressWarnings("unchecked")
+	        List<Map<String, Object>> itemList =
+	                (List<Map<String, Object>>) mrinGrnMap.get("items");
+
+	        Map<String, Object> itemMap = new LinkedHashMap<>();
+
+	        itemMap.put("itemCode", obj[4]);
+	        itemMap.put("itemDescription", obj[5]);
+
+	        itemList.add(itemMap);
+	    }
+
+	    return new ArrayList<>(groupedMap.values());
 	}
 
 	@Override

@@ -220,5 +220,53 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 			""", nativeQuery = true)
 	List<Object[]> getSalesContractForApproval(@Param("branch") Long branch, @Param("orgId") Long orgId,
 			@Param("fromDate") String fromDate, @Param("toDate") String toDate);
+	
+//	sales conntract register
+	@Query(value = """
+	        SELECT 
+	            scb.salescontract_id,
+	            scb.doc_id,
+	            scb.doc_date,
+	            scb.customer_contract_no,
+	            scb.contract_date,
+	            q.doc_id AS quotationno,
+	            q.doc_date AS quotationdate,
+	            c.customer_name,
+	            c.customer_code,
+	            sd.effective_from,
+	            sd.effective_to,
+	            sd.order_rate,
+	            sd.amount,
+	            sd.item,
+	            h.hsn
+	        FROM sales_contract_basic scb
+
+	        INNER JOIN sales_contract_detail sd
+	            ON sd.salescontract_id = scb.salescontract_id
+
+	        INNER JOIN quotation_header q
+	            ON q.doc_id = scb.quotation_no
+
+	        INNER JOIN customer_header c
+	            ON c.customer_id = scb.customer
+
+	        INNER JOIN item i
+	            ON i.item_id = sd.item
+
+	        INNER JOIN hsn h
+	            ON h.hsn_id = i.hsn_code
+
+	        WHERE scb.doc_date BETWEEN :fromDate AND :toDate
+	          AND scb.branch = :branch
+	          and scb.org_id = :orgId
+	          AND (c.belongs_to  = :belongsTo
+	               OR :belongsTo = 'ALL')
+	        """, nativeQuery = true)
+	List<Object[]> getSalesContractRegisterReport(
+	        @Param("fromDate") String fromDate,
+	        @Param("toDate") String toDate,
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId,
+	        @Param("belongsTo") String belongsTo);
 
 }

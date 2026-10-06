@@ -14,6 +14,7 @@ public class SalesContractAmendmentDTO {
 	private Long id;
 //	private String docId;
 //	private LocalDate docDate;
+	private String financialYear;
 	private String partyPoAmdNo;
 	private String partyPoAmdDate;
 	private Long branch;

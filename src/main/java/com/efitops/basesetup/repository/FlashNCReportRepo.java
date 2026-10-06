@@ -58,16 +58,26 @@ public interface FlashNCReportRepo extends JpaRepository<FlashNCReportVO, Long>{
 	    
 	    @Query(value = """
 	            SELECT
-	                lovd.listofvaluesdetails_id AS id,
-	                lovd.value_code AS valueCode,
-	                lovd.value_description AS valueDescription
-	            FROM listofvaluesdetails lovd
-	            WHERE lovd.listofvalues_id = :listOfValuesId
-	              AND lovd.active = 1
-	            ORDER BY lovd.listofvaluesdetails_id DESC
+	                departmentid AS id,
+	                department_name AS name
+	            FROM department
+	            WHERE active = TRUE
+	              AND cancel = FALSE
+	              AND branch = :branch
+	              AND org_id = :orgId
+	              AND department_name IN (
+	                  'Quality',
+	                  'Production',
+	                  'Quality Inward',
+	                  'Quality Outward',
+	                  'Maintenance',
+	                  'Purchase'
+	              )
+	            ORDER BY department_name
 	            """, nativeQuery = true)
-	    List<Object[]> getFromDeptDropdownForFlashNCReport(
-	            @Param("listOfValuesId") Long listOfValuesId);
+	    List<Object[]> getFromDepartmentForFlashNCReport(
+	            @Param("branch") Long branch,
+	            @Param("orgId") Long orgId);
 	    
 	    @Query(value = """
 	            SELECT

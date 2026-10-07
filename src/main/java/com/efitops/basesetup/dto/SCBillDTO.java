@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.efitops.basesetup.entity.BranchVO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +18,7 @@ public class SCBillDTO {
     private Long id;
 
     // Header
-    private Long plantId;
+    private Long branch;
 
     private String docId;
 

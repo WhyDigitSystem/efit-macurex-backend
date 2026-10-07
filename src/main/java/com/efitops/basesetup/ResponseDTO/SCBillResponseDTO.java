@@ -21,7 +21,7 @@ public class SCBillResponseDTO {
 	 private Long id;
 
 	    // Header
-	    private BranchResponseDTO plantId;
+	    private BranchResponseDTO branch;
 
 	    private String docId;
 

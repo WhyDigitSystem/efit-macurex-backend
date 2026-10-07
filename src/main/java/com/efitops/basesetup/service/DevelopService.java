@@ -1,6 +1,7 @@
 package com.efitops.basesetup.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,10 @@ import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderAmendmentResponceDTO;
 import com.efitops.basesetup.ResponseDTO.RootCauseAnalysisResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SCBillResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
+import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
+
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransferOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
@@ -47,6 +52,9 @@ import com.efitops.basesetup.dto.ProcessSheetCompRoutingDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
 import com.efitops.basesetup.dto.RootCauseAnalysisDTO;
+import com.efitops.basesetup.dto.SCBillDTO;
+import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
+import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.ToolCategoryDTO;
@@ -335,7 +343,27 @@ public interface DevelopService {
 	List<Map<String, Object>> getTypeDropdownByOrderTypeForTransferOrder(String orderType, Long orgId)
 			throws ApplicationException;
 
-	String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear);
+	List<Map<String, Object>> getProcessSheetNoDropdownForInitialStageInspection(Long orgId, Long branch, Long itemId)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getControlPlanDetailsByItemIdForInitialStageInspection(Long itemId)
+			throws ApplicationException;
+
+	Map<String, Object> getDailyDespatchInstructionReport(Long pprm, String fdprm, Long division, Long partyId,
+			String tdprm) throws ApplicationException;
+
+	Map<String, Object> getCustomerComplaintReport(Long pprm, String fromdate, String todate)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateSCBill(SCBillDTO dto) throws ApplicationException;
+
+	List<SCBillResponseDTO> getSCBillByOrgId(Long orgId) throws ApplicationException;
+
+	SCBillResponseDTO getSCBillById(Long id) throws ApplicationException;
+
+	String getSCBillDocId(Long orgId, String financialYear);
+
+  String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear);
 
 	ResponseEntity<byte[]> viewPurchaseOrderAmendmentFile(HttpServletRequest request) throws IOException;
 

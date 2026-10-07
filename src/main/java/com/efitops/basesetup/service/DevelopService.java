@@ -373,4 +373,6 @@ public interface DevelopService {
 
 	String getOpenStockEntryDocId(Long orgId, String financialYear);
 
+	ResponseEntity<byte[]> viewEnquiryFile(HttpServletRequest request) throws IOException;
+
 }

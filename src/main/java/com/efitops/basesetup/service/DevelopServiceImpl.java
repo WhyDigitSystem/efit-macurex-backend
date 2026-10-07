@@ -11419,6 +11419,7 @@ public class DevelopServiceImpl implements DevelopService {
 			throws ApplicationException {
 
 		TransferOrderVO transferOrderVO;
+		String screenCode = "TO";
 		String message;
 
 		// ============================================================
@@ -11444,6 +11445,18 @@ public class DevelopServiceImpl implements DevelopService {
 			// CREATE
 
 			transferOrderVO = new TransferOrderVO();
+			
+			String docId = transferOrderRepo.getTransferOrderDocId(transferOrderDTO.getOrgId(), transferOrderDTO.getFinancialYear(),
+					screenCode);
+
+			transferOrderVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(transferOrderDTO.getOrgId(), transferOrderDTO.getFinancialYear(),
+							screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
 
 			transferOrderVO.setCreatedBy(transferOrderDTO.getCreatedBy());
 			transferOrderVO.setUpdatedBy(transferOrderDTO.getCreatedBy());
@@ -11578,9 +11591,9 @@ public class DevelopServiceImpl implements DevelopService {
 		// BASIC DETAILS
 		// ============================================================
 
-		vo.setDocId(dto.getDocId());
-
-		vo.setDocDate(dto.getDocDate());
+//		vo.setDocId(dto.getDocId());
+//
+//		vo.setDocDate(dto.getDocDate());
 
 		// ============================================================
 		// COMMON FIELDS

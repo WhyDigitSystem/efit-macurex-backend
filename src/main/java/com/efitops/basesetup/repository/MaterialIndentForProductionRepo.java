@@ -30,7 +30,7 @@ public interface MaterialIndentForProductionRepo extends JpaRepository<MaterialI
 
 	@Query(nativeQuery = true, value = "select p1.item,i.item_code,i.item_description,p1.qty_required from production_schedule_order_basic p join production_schedule_order_details p1 on p.production_schedule_order_basic_id=p1.production_schedule_order_basic_id  left join item i on p1.item=i.item_id\r\n"
 			+ "  where p.org_id=?1 \r\n"
-			+ "    and p.branch=?2 and p.fg_itme=?3 and p.active=1 and p.cancel=0")
+			+ "    and p.branch=?2 and p.fg_item=?3 and p.active=1 and p.cancel=0")
 	Set<Object[]> getFgAndSfgItemDetailsFromMaterialDetails(Long orgId, Long branch, Long fgItem);
 
 }

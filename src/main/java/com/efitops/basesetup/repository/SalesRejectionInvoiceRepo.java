@@ -263,8 +263,91 @@ public interface SalesRejectionInvoiceRepo extends JpaRepository<SalesRejectionI
 			    srd.new_rate,
 			    srd.rate_in_selected_currency
 			""", nativeQuery = true)
-	List<Object[]> getSalesRegisterCustomerWiseReport(@Param("belongsTo") Long belongsTo, @Param("fromDate") String fromDate,
-			@Param("toDate") String toDate, @Param("customerName") String customerName, @Param("branch") Long branch,
-			@Param("orgId") Long orgId);
+	List<Object[]> getSalesRegisterCustomerWiseReport(@Param("belongsTo") Long belongsTo,
+			@Param("fromDate") String fromDate, @Param("toDate") String toDate,
+			@Param("customerName") String customerName, @Param("branch") Long branch, @Param("orgId") Long orgId);
+
+//	Regular Lc Sales Report
+
+	@Query(value = """
+			SELECT
+			    sri.doc_id AS docid,
+			    sri.doc_date AS docdt,
+			    sri.cancel,
+			    sri.cancel_remarks,
+			    c.customer_code AS partyid,
+			    c.customer_name AS partyname,
+			    sri.purchase_order AS pono,
+			    sri.purchase_order_date AS podt,
+			    i.item_id AS itemid,
+			    i.item_description AS itemdesc,
+			    srid.customer_part_no AS cpart,
+			    u.unitmaster_id AS unitid,
+
+			    CASE
+			        WHEN sri.cancel = FALSE THEN srid.despatch_qty
+			        ELSE 0
+			    END AS qty,
+
+			    srid.new_rate AS rate,
+
+			    CASE
+			        WHEN sri.cancel = FALSE THEN srid.amount_in_rs
+			        ELSE 0
+			    END AS amount,
+
+			    SUM(COALESCE(srid.igst_amount, 0)) AS igst,
+			    SUM(COALESCE(srid.sgst_amount, 0)) AS sgst,
+			    SUM(COALESCE(srid.cgst_amount, 0)) AS cgst,
+			    MAX(COALESCE(sri.tcs_amount, 0)) AS tcs,
+
+			    CASE
+			        WHEN sri.cancel = FALSE THEN sri.net_amount
+			        ELSE 0
+			    END AS grossamt
+
+			FROM sales_rejection_invoice_basic sri
+
+			INNER JOIN sales_rejection_invoice_detail srid
+			    ON srid.sales_rejection_invoice_basic_id =
+			       sri.sales_rejection_invoice_basic_id
+
+			INNER JOIN customer_header c
+			    ON c.customer_id = sri.customer
+
+			INNER JOIN item i
+			    ON i.item_id = srid.item
+
+			LEFT JOIN unitmaster u
+			    ON u.unitmaster_id = srid.unit
+
+			WHERE sri.belongs_to = :belongsTo
+			  AND sri.branch = :branch
+			  AND sri.org_id = :orgId
+			  AND sri.doc_date BETWEEN :fromDate AND :toDate
+
+			GROUP BY
+			    sri.doc_id,
+			    sri.doc_date,
+			    sri.cancel,
+			    sri.cancel_remarks,
+			    c.customer_code,
+			    c.customer_name,
+			    sri.purchase_order,
+			    sri.purchase_order_date,
+			    i.item_id,
+			    i.item_description,
+			    srid.customer_part_no,
+			    u.unitmaster_id,
+			    srid.despatch_qty,
+			    srid.new_rate,
+			    srid.amount_in_rs,
+			    sri.net_amount
+
+			ORDER BY sri.doc_id
+			""", nativeQuery = true)
+	List<Object[]> getRegularLCSalesReport(@Param("belongsTo") Long belongsTo, @Param("branch") Long branch,
+			@Param("orgId") Long orgId, @Param("fromDate") String fromDate, @Param("toDate") String toDate);
+
 
 }

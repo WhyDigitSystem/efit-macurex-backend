@@ -1,6 +1,9 @@
+
+
 package com.efitops.basesetup.repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -561,5 +564,49 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 	        @Param("orgId") Long orgId,
 	        @Param("financialYear") String financialYear,
 	        @Param("screenCode") String screenCode);
+	
+	
+	@Query(value = """
+	        SELECT
+	            i.item_id AS itemId,
+	            i.item_code AS itemCode,
+	            i.item_description AS itemDescription,
+
+	            c.customer_id AS customerId,
+	            c.customer_code AS customerCode,
+	            c.customer_name AS customerName,
+
+	            db.doc_id AS docId,
+	            db.doc_date AS docDate,
+
+	            dd.desc_qty AS despatchQty,
+	            dd.pending_qty AS pendingQty,
+	            dd.available_qty AS availableQty,
+	            dd.planned_qty AS plannedQty
+
+	        FROM despatch_basic db
+
+	        INNER JOIN despatch_detail dd
+	            ON dd.despatch_basic_id = db.despatch_basic_id
+
+	        INNER JOIN item i
+	            ON i.item_id = dd.item
+
+	        INNER JOIN customer_header c
+	            ON c.customer_id = db.custumer
+
+	        WHERE db.branch = :pprm
+	          AND db.doc_date BETWEEN :fdprm AND :tdprm
+	          AND c.belongs_to = :division
+	          AND (:partyId IS NULL OR c.customer_id = :partyId)
+
+	        ORDER BY db.doc_id, c.customer_name
+	        """, nativeQuery = true)
+	List<Object[]> getDailyDespatchInstructionReport(
+	        @Param("division") Long division,
+	        @Param("fdprm") String fdprm,
+	        @Param("partyId") Long partyId,
+	        @Param("pprm") Long pprm,
+	        @Param("tdprm") String tdprm);
 
 }

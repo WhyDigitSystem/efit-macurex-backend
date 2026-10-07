@@ -1,5 +1,6 @@
 package com.efitops.basesetup.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +64,7 @@ import com.efitops.basesetup.dto.PurchaseIndentDTO;
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.RootCauseAnalysisDTO;
+import com.efitops.basesetup.dto.SCBillDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.ToolCategoryDTO;
@@ -4931,5 +4933,156 @@ public class DevelopController extends BaseController {
 	    return ResponseEntity.ok(responseDTO);
 	}
 	
+	//DailyDespatchInstructionReport
+	
+	@GetMapping("/getDailyDespatchInstructionReport")
+	public ResponseEntity<ResponseDTO> getDailyDespatchInstructionReport(
+	        @RequestParam Long division,
+	        @RequestParam String fdprm,
+	        @RequestParam(required = false) Long partyId,
+	        @RequestParam Long pprm,
+	        @RequestParam String tdprm) {
 
+	    String methodName = "getDailyDespatchInstructionReport()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+	    String errorMsg = null;
+
+	    try {
+
+	        responseObjectsMap =
+	                developService.getDailyDespatchInstructionReport(
+	                        division,
+	                        fdprm,
+	                        partyId,
+	                        pprm,
+	                        tdprm);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg,
+	                e);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        errorMsg,
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+	//CustomerComplaintReport
+
+	@GetMapping("/getCustomerComplaintReport")
+
+	public ResponseEntity<ResponseDTO> getCustomerComplaintReport(
+
+	        @RequestParam Long pprm,
+
+	        @RequestParam String fromdate,
+
+	        @RequestParam String todate) {
+
+	    String methodName = "getCustomerComplaintReport()";
+
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO = null;
+
+	    String errorMsg = null;
+
+	    try {
+
+	        responseObjectsMap =
+	                developService.getCustomerComplaintReport(
+	                        pprm,
+	                        fromdate,
+	                        todate);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg,
+	                e);
+
+	        responseDTO =
+	                createServiceResponseError(
+	                        responseObjectsMap,
+	                        errorMsg,
+	                        errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	//S.C.BILL
+	
+	
+	// createUpdateSCBill
+
+	@PutMapping("/createUpdateSCBill")
+
+	public ResponseEntity<ResponseDTO> createUpdateSCBill(
+	        @RequestBody SCBillDTO dto) {
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+	    ResponseDTO responseDTO;
+
+	    try {
+
+	        Map<String, Object> scBillMap =
+	                developService.createUpdateSCBill(dto);
+
+	        responseObjectsMap.put(
+	                CommonConstant.STRING_MESSAGE,
+	                scBillMap.get("message"));
+
+	        responseObjectsMap.put(
+	                "scBillVO",
+	                scBillMap.get("scBill"));
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap,
+	                e.getMessage(),
+	                e.getMessage());
+	    }
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	
+	
+	
 }

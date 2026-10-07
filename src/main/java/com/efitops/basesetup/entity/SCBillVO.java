@@ -42,9 +42,9 @@ public class SCBillVO {
 	private Long id;
 	
 	
-	 @ManyToOne
-	 @JoinColumn(name = "plant_id")
-	 private BranchVO plantId;
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
 	 
 	 @Column(name = "doc_id")
 	 private String docId;

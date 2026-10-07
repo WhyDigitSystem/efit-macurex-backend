@@ -51,8 +51,8 @@ public class DevController extends BaseController {
 	// customer complaint master
 	@PutMapping(value = "/updateCreateCustomerComplaint", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> updateCreateCustomerComplaint(
-//	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
-			@RequestBody CustomerComplaintDTO customerComplaintDTO,
+	        @RequestPart("customerComplaint") CustomerComplaintDTO customerComplaintDTO,
+//			@RequestBody CustomerComplaintDTO customerComplaintDTO,
 			@RequestPart(value = "images", required = false) MultipartFile[] images) {
 
 		String methodName = "updateCreateCustomerComplaint";
@@ -868,7 +868,7 @@ public class DevController extends BaseController {
 
 	@GetMapping("/getStockTransferChallanDocId")
 	public ResponseEntity<ResponseDTO> getStockTransferChallanDocId(@RequestParam Long orgId,
-			@RequestParam String financialYear, @RequestParam String screenCode) {
+			@RequestParam String financialYear) {
 
 		String methodName = "getStockTransferChallanDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -878,7 +878,7 @@ public class DevController extends BaseController {
 		String mapp = "";
 
 		try {
-			mapp = transportMasterService.getStockTransferChallanDocId(orgId, financialYear, screenCode);
+			mapp = transportMasterService.getStockTransferChallanDocId(orgId, financialYear);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -932,7 +932,7 @@ public class DevController extends BaseController {
 
 	@GetMapping("/getDespatchInstructionDocId")
 	public ResponseEntity<ResponseDTO> getDespatchInstructionDocId(@RequestParam Long orgId,
-			@RequestParam String financialYear, @RequestParam String screenCode) {
+			@RequestParam String financialYear) {
 
 		String methodName = "getDespatchInstructionDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);

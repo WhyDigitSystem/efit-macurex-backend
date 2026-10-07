@@ -62,7 +62,7 @@ public class FGTransferSlipDetailsVO {
 
 	@ManyToOne
 	@JoinColumn(name = "scrap")
-	private ListOfValuesDetailsVO scrap;
+	private ItemMasterVO scrap;
 	
 
 	@Column(name = "scrap_qty", precision = 10, scale = 2)

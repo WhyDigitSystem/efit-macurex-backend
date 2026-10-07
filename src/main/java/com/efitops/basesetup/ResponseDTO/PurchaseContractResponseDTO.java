@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
+import com.efitops.basesetup.dto.CurrencyResponseDTO;
 // NOTE: GSTStateResponseDTO is in this SAME package (com.efitops.basesetup.ResponseDTO) in your codebase, so no import needed.
 // CustomerResponseDetailsDTO / ListOfVlauesDetailsResponseDTO / PurchaseContractAttachmentDTO live in com.efitops.basesetup.dto.
 import com.efitops.basesetup.service.CustomerResponseDetailsDTO;
@@ -20,54 +21,57 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PurchaseContractResponseDTO {
 
-    private Long id;
+	private Long id;
 
-    private BranchResponseDTO branch;
+	private BranchResponseDTO branch;
 
-//    private String docId;
-//
-//    private LocalDate docDate;
+	private String docId;
 
-    private DepartmentResponseDTO department;
+	private LocalDate docDate;
 
-    private CustomerResponseDetailsDTO supplier;
+	private DepartmentResponseDTO department;
 
-    private GSTStateResponseDTO gstState;
+	private CustomerResponseDetailsDTO supplier;
 
-    private LocalDate validFrom;
+	private GSTStateResponseDTO gstState;
 
-    private LocalDate validTo;
+	private LocalDate validFrom;
 
-    private boolean isIgstAppl;
+	private LocalDate validTo;
 
-    private String purchaseOrderType;
+	private boolean isIgstAppl;
 
-    // charges summary
-    private String modeOfDespatch;
-    private String paymentTerms;
-    private String delivery;
-    private String freightType;
-    private String packingType;
-    private BigDecimal insuranceAmount;
-    private String bank;
-    private String accounts;
-    private String swiftCode;
-    private String checkedBy;
-    private String preparedBy;
-    private String authorisedBy;
-    private String freightForwarder;
-    private String notes;
-    private String termsConditions;
-    private Long orgId;
-    private String financialYear;
-    private String active;
-    private String cancelRemarks;
-    private String createdBy;
+	private String purchaseOrderType;
 
-    private List<PurchaseContractDetailsResponseDTO> details;
-    private List<PurchaseContractTaxDetailsResponseDTO> taxDetails;
-    private List<PurchaseContractAttachmentResponseDTO> attachments;
+	// charges summary
+	private String modeOfDespatch;
+	private String paymentTerms;
+	private String delivery;
+	private String freightType;
+	private String packingType;
+	private BigDecimal insuranceAmount;
+	private String bank;
+	private String accounts;
+	private String swiftCode;
+	private String checkedBy;
+	private String preparedBy;
+	private String authorisedBy;
+	private String freightForwarder;
+	private String notes;
+	private String termsConditions;
+	private Long orgId;
+	private String financialYear;
+	private String active;
+	private String cancelRemarks;
+	private String createdBy;
+	private String belongsTo;
+	private String supplierRefNo;
+	private LocalDate refDate;
 
-    
-    
+	private CurrencyResponseDTO currency;
+
+	private List<PurchaseContractDetailsResponseDTO> details;
+	private List<PurchaseContractTaxDetailsResponseDTO> taxDetails;
+	private List<PurchaseContractAttachmentResponseDTO> attachments;
+
 }

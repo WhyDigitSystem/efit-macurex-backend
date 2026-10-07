@@ -25,36 +25,32 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ImportPurchaseBillTaxDetailsVO {
 
-	 @Id
-	    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "import_purchase_bill_tax_details_seq")
-	    @SequenceGenerator(
-	            name = "import_purchase_bill_tax_details_seq",
-	            sequenceName = "import_purchase_bill_tax_details_seq",
-	            initialValue = 1000000001,
-	            allocationSize = 1)
-	    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "import_purchase_bill_tax_detailsgen")
+	@SequenceGenerator(name = "import_purchase_bill_tax_detailsgen", sequenceName = "import_purchase_bill_tax_detailsseq", initialValue = 1000000001, allocationSize = 1)
+	private Long id;
 
-	    @Column(name = "particulars")
-	    private String particulars;
+	@Column(name = "particulars")
+	private String particulars;
 
-	    @Column(name = "tax", precision = 10, scale = 2)
-	    private BigDecimal tax;
+	@Column(name = "tax", precision = 10, scale = 2)
+	private BigDecimal tax;
 
-	    @Column(name = "taxval1", precision = 18, scale = 4)
-	    private BigDecimal taxval1;
+	@Column(name = "taxval1", precision = 18, scale = 4)
+	private BigDecimal taxval1;
 
-	    @Column(name = "tax_amount", precision = 18, scale = 4)
-	    private BigDecimal taxAmount;
+	@Column(name = "tax_amount", precision = 18, scale = 4)
+	private BigDecimal taxAmount;
 
-	    @Column(name = "db_cr")
-	    private String dbCr;
+	@Column(name = "db_cr")
+	private String dbCr;
 
-	    @Column(name = "gl_subledger")
-	    private String glSubledger;
+	@Column(name = "gl_subledger")
+	private String glSubledger;
 
-	    @ManyToOne
-	    @JoinColumn(name = "purchasebill_id")
-	    @JsonBackReference
-	    private PurchaseBillVO purchaseBillVO;
-	    
+	@ManyToOne
+	@JoinColumn(name = "purchase_bill_basic_id")
+	@JsonBackReference
+	private PurchaseBillVO purchaseBillVO;
+
 }

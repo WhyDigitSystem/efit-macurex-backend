@@ -19,9 +19,9 @@ public class TransferOrderDTO {
 
     private Long orderType;
 
-    private String docId;
+//    private String docId;
 
-    private LocalDate docDate;
+//    private LocalDate docDate;
 
     private boolean active;
 

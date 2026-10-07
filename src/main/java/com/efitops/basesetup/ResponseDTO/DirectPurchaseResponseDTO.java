@@ -53,6 +53,8 @@ public class DirectPurchaseResponseDTO {
 	private Long orgId;
 	private String financialYear;
 	private BranchResponseDTO branch;
+	private String supplierCode;
+	private String tallyRefNo;
 
 	private List<DirectPurchaseCashDetailsResponseDTO> directPurchaseCashDetails;
 	private List<DirectPurchaseTaxDetailsResponseDTO> directPurchaseTaxDetails;

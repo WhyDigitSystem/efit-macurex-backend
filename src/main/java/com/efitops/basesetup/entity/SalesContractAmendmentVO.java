@@ -41,7 +41,7 @@ public class SalesContractAmendmentVO {
 	private String docId;
 	
 	@Column(name = "doc_date")
-	private LocalDate docDate;
+	private LocalDate docDate = LocalDate.now();
 	
 	@ManyToOne
 	@JoinColumn(name = "branch")

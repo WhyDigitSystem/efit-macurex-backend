@@ -85,7 +85,8 @@ public interface JobOrderRepo extends JpaRepository<JobOrderVO, Long> {
 			    jod.incoming_item AS outgoingItem,
 			    i.item_code AS itemCode,
 			    i.item_description AS itemDescription,
-			    jod.unit AS unit,
+			    jod.unit AS unitId,
+			    u.unit_id As unit,
 			    u.description AS unitDescription,
 			    jod.rate AS rate
 			FROM job_order_basic job

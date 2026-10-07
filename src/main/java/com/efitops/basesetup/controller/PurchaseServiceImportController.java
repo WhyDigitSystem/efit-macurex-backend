@@ -826,8 +826,7 @@ public class PurchaseServiceImportController extends BaseController {
 	}
 
 	@GetMapping("/getItemType")
-	public ResponseEntity<ResponseDTO> getItemType(@RequestParam Long orgId, @RequestParam Long branch,
-			@RequestParam Long itemType) {
+	public ResponseEntity<ResponseDTO> getItemType(@RequestParam Long orgId, @RequestParam Long branch) {
 		String methodName = "getItemType()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 		String errorMsg = null;
@@ -836,7 +835,7 @@ public class PurchaseServiceImportController extends BaseController {
 		List<Map<String, Object>> mapp = new ArrayList<>();
 
 		try {
-			mapp = purchaseOrderService.getItemType(orgId, branch, itemType);
+			mapp = purchaseOrderService.getItemType(orgId, branch);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
@@ -3867,6 +3866,46 @@ public class PurchaseServiceImportController extends BaseController {
 		} else {
 
 			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve IndentNo", errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getScrapItemDetails")
+	public ResponseEntity<ResponseDTO> getScrapItemDetails(@RequestParam Long orgId, @RequestParam Long branch) {
+
+		String methodName = "getScrapItemDetails()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		List<Map<String, Object>> mapp = new ArrayList<>();
+
+		try {
+
+			mapp = purchaseOrderService.getScrapItemDetails(orgId, branch);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Scrap retrieved successfully");
+
+			responseObjectsMap.put("mapp", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Scrap", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

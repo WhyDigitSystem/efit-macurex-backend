@@ -17,6 +17,10 @@ public class SalesContractResponseDTO {
 
     private Long id;
 
+    private String docId;
+
+    private LocalDate docDate;
+    
     private String customerContractNo;
 
     private LocalDate contractDate;

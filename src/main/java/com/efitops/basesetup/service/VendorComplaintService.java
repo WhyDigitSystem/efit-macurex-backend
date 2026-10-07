@@ -141,10 +141,10 @@ public interface VendorComplaintService {
 	Map<String, Object> updateCreateFlashNCReport(FlashNCReportDTO flashNCReportDTO, MultipartFile[] files,
 			MultipartFile[] images) throws ApplicationException;
 
-	List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long listOfValuesId) throws ApplicationException;
+	List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long branch,Long orgId) throws ApplicationException;
 
-	List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long listOfValuesId, Long fromDept)
-			throws ApplicationException;
+//	List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long listOfValuesId, Long fromDept)
+//			throws ApplicationException;
 
 	List<Map<String, Object>> getMRINGRNDropdownForFlashNCReport(Long orgId, Long branch) throws ApplicationException;
 
@@ -315,6 +315,35 @@ public interface VendorComplaintService {
 
 	Map<String, Object> getScheduleWiseDespatchQtyReport(String mon, Long under, String party)
 			throws ApplicationException;
+
+	Map<String, Object> getSalesOrderPendingItemWiseReport(Long plant, Long division, String asondt)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getToDepartmentDropdownForFlashNCReport(Long fromDept) throws ApplicationException;
+
+	Map<String, Object> getSalesRegisterProductWiseReport(String customerName, String itemCode, String fromDate,
+			String toDate, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getSalesRegisterLocationWiseReport(String location, String itemCode, String fromDate,
+			String toDate, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getSalesContractRegisterReport(String fromDate, String toDate, Long branch, Long orgId,
+			String belongsTo) throws ApplicationException;
+
+	Map<String, Object> getSalesCustomerPartNoCumlReport(Long branch, Long orgId, String fromDate, String toDate,
+			String customerName) throws ApplicationException;
+
+	Map<String, Object> getSalesRegisterCustomerWiseReport(Long belongsTo, String fromDate, String toDate,
+			String customerName, Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getMonthlyScheduleRevDetails(String belongsTo, String myear, Long branch, Long orgId,
+			String fromDate, String toDate) throws ApplicationException;
+
+	Map<String, Object> getDeliveryScheduleOthersReport(String monthYear, Long belongsTo, String itemCode,
+			Long branchId, Long orgId, String fromDate, String toDate) throws ApplicationException;
+
+	Map<String, Object> getDeliveryScheduleDayWiseReport(String monthYear, String fromDate, String toDate,
+			Long branchId, Long orgId) throws ApplicationException;
 
 	
 

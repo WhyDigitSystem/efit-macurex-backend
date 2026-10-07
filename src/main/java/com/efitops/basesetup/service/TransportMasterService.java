@@ -109,7 +109,7 @@ public interface TransportMasterService {
 	Map<String, Object> getItemsForStockTransferChallan( Long branch, Long orgId)
 			throws ApplicationException;
 
-	String getStockTransferChallanDocId(Long orgId, String financialYear, String screenCode);
+	String getStockTransferChallanDocId(Long orgId, String financialYear);
 
 	String getCustomerComplaintDocId(Long orgId, String financialYear, String screenCode);
 

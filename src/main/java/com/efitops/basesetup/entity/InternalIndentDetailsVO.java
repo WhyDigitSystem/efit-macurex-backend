@@ -40,6 +40,7 @@ public class InternalIndentDetailsVO {
 	@Column(name = "purpose")
 	private String purpose;
 
+
 	@ManyToOne
 	@JoinColumn(name = "internal_indent_basic_id")
 	@JsonBackReference

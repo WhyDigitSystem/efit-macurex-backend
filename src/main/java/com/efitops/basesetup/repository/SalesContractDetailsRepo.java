@@ -37,10 +37,11 @@ public interface SalesContractDetailsRepo extends JpaRepository<SalesContractDet
 		        i.item_id,
 		        i.item_code,
 		        i.item_description,
-		        u.description,
+		        u.unit_id,
 		        scd.quantity,
 		        scd.item,
-		        scd.unit
+		        scd.unit,
+		        u.description
 		    FROM sales_contract_basic scb
 		    INNER JOIN sales_contract_detail scd
 		        ON scb.salescontract_id = scd.salescontract_id
@@ -56,10 +57,11 @@ public interface SalesContractDetailsRepo extends JpaRepository<SalesContractDet
 		        i.item_id,
 		        i.item_code,
 		        i.item_description,
-		        u.description,
+		        u.unit_id,
 		        oad.quantity,
 		        oad.item,
-		        oad.unit
+		        oad.unit,
+		        u.description
 		    FROM order_acceptance_basic oab
 		    INNER JOIN order_acceptance_detail oad
 		        ON oab.order_acceptance_basic_id = oad.order_acceptance_basic_id

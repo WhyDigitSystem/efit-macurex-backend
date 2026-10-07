@@ -1,6 +1,7 @@
 package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -11,53 +12,53 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseOrderAmendmentDTO {
-	
-	 private Long id;
-	 
-	 private Long branch;
-	 
-	 private String belongsTo;
-	 
-	 private Long customer;
-	 
-	 private String purchaseordernumber;
-	 
-	 private Long currency;
-	 
+
+	private Long id;
+
+	private Long branch;
+
+	private String belongsTo;
+
+	private Long customer;
+
+	private String purchaseordernumber;
+
+	private Long currency;
+
 //	 private String refNo;
 //	 
 //	 private String refDate;
-	 
-	 private Long exchangeRate;
-	 
-	 private int revisionNo;
-	 
-	 private boolean active;
-	 
-	 
-	 private String freightType;
-	 
-	 private String packingType;
-	 
-	 private BigDecimal insuranceAmount;
-	 
-	 private String modeOfDespatch;
-	 
-	 private String taxDescription;
-	 
-	 private String remarks;
-	 
-	 
-	 private Long orgId;
 
-	 private String createdBy;
-	 
-	 private String cancelRemarks;
-	 
-	 private List<PurchaseOrderAmendmentDetailsDTO> details;
-	 
-	
+	private BigDecimal exchangeRate;
 
-	 
+	private int revisionNo;
+
+	private boolean active;
+
+	private String freightType;
+
+	private String packingType;
+
+	private BigDecimal insuranceAmount;
+
+	private String modeOfDespatch;
+
+	private String taxDescription;
+
+	private String remarks;
+
+	private Long orgId;
+
+	private String financialYear;
+
+	private String createdBy;
+
+	private String cancelRemarks;
+
+	private String refNo;
+
+	private LocalDate refDate;
+
+	private List<PurchaseOrderAmendmentDetailsDTO> details;
 
 }

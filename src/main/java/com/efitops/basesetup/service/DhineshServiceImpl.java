@@ -441,6 +441,8 @@ public class DhineshServiceImpl implements DhineshService {
 		SalesContractResponseDTO dto = new SalesContractResponseDTO();
 
 		dto.setId(vo.getId());
+		dto.setDocId(vo.getDocId());
+		dto.setDocDate(vo.getDocDate());
 		dto.setCustomerContractNo(vo.getCustomerContractNo());
 		dto.setContractDate(vo.getContractDate());
 
@@ -750,6 +752,8 @@ public class DhineshServiceImpl implements DhineshService {
 			dto.setUnitMasterId(obj[9] != null ? ((Number) obj[9]).longValue() : null);
 			dto.setUnitId(obj[10] != null ? obj[10].toString() : null);
 			dto.setGstRateMasterId(obj[11] != null ? ((Number) obj[11]).longValue() : null);
+			dto.setQuotationRate(obj[12] != null ? (BigDecimal) obj[12] : null);
+			dto.setQty(obj[13] != null ? (BigDecimal) obj[13] : null);
 
 			responseList.add(dto);
 		}

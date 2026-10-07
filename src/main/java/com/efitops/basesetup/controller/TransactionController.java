@@ -247,15 +247,18 @@ public class TransactionController extends BaseController {
 
 	// sales contract amendment
 
-	@PostMapping("/updateCreateSalesContractAmendment")
+	@PutMapping("/updateCreateSalesContractAmendment")
 	public ResponseEntity<ResponseDTO> updateCreateSalesContractAmendment(
 			@RequestBody SalesContractAmendmentDTO salesContractAmendmentDTO) {
 
 		String methodName = "updateCreateSalesContractAmendment()";
+
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
+
 		String errorMsg = null;
+
 		ResponseDTO responseDTO = null;
 
 		try {
@@ -264,6 +267,7 @@ public class TransactionController extends BaseController {
 					.updateCreateSalesContractAmendment(salesContractAmendmentDTO);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+
 			responseObjectsMap.put("salesContractAmendmentVO", responseMap.get("salesContractAmendmentVO"));
 
 			responseDTO = createServiceResponse(responseObjectsMap);
@@ -987,42 +991,31 @@ public class TransactionController extends BaseController {
 //	}
 
 	@PutMapping(value = "/createUpdateSalesReturn")
-	public ResponseEntity<ResponseDTO> createUpdateSalesReturn(
-	        @RequestBody SalesReturnDTO salesReturnDTO) {
+	public ResponseEntity<ResponseDTO> createUpdateSalesReturn(@RequestBody SalesReturnDTO salesReturnDTO) {
 
-	    Map<String, Object> responseObjectsMap = new HashMap<>();
-	    ResponseDTO responseDTO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO;
 
-	    try {
+		try {
 
-	        Map<String, Object> salesReturnMap =
-	                transactionService.createUpdateSalesReturn(salesReturnDTO);
+			Map<String, Object> salesReturnMap = transactionService.createUpdateSalesReturn(salesReturnDTO);
 
-	        responseObjectsMap.put(
-	                CommonConstant.STRING_MESSAGE,
-	                salesReturnMap.get("message"));
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, salesReturnMap.get("message"));
 
-	        responseObjectsMap.put(
-	                "salesReturnVO",
-	                salesReturnMap.get("salesReturnVO"));
+			responseObjectsMap.put("salesReturnVO", salesReturnMap.get("salesReturnVO"));
 
-	        responseDTO = createServiceResponse(responseObjectsMap);
+			responseDTO = createServiceResponse(responseObjectsMap);
 
-	        return ResponseEntity.ok(responseDTO);
+			return ResponseEntity.ok(responseDTO);
 
-	    } catch (Exception e) {
+		} catch (Exception e) {
 
-	        e.printStackTrace();
+			e.printStackTrace();
 
-	        responseDTO = createServiceResponseError(
-	                responseObjectsMap,
-	                e.getMessage(),
-	                e.getMessage());
+			responseDTO = createServiceResponseError(responseObjectsMap, e.getMessage(), e.getMessage());
 
-	        return ResponseEntity
-	                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body(responseDTO);
-	    }
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
+		}
 	}
 
 	@GetMapping("/getSalesRejectionInvoiceDocId")
@@ -1244,7 +1237,8 @@ public class TransactionController extends BaseController {
 	}
 
 	@GetMapping("/getSalesReturnDocId")
-	public ResponseEntity<ResponseDTO> getSalesReturnDocId(@RequestParam Long orgId, @RequestParam String financialYear) {
+	public ResponseEntity<ResponseDTO> getSalesReturnDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
 
 		String methodName = "getSalesReturnDocId()";
 
@@ -1281,6 +1275,52 @@ public class TransactionController extends BaseController {
 
 			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Sales Return DocId",
 					errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSalesContractAmendmentDocId")
+	public ResponseEntity<ResponseDTO> getSalesContractAmendmentDocId(@RequestParam Long orgId,
+			@RequestParam String financialYear) {
+
+		String methodName = "getSalesContractAmendmentDocId()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+
+		String mapp = "";
+
+		try {
+
+			mapp = transactionService.getSalesContractAmendmentDocId(orgId, financialYear);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+		}
+
+		if (StringUtils.isBlank(errorMsg)) {
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					" Sales Contract Amendment DocId information retrieved successfully");
+
+			responseObjectsMap.put("salesContractAmendmentDocId", mapp);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} else {
+
+			responseDTO = createServiceResponseError(responseObjectsMap,
+					"Failed to retrieve Sales Contract Amendment DocId", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

@@ -14,42 +14,37 @@ import lombok.NoArgsConstructor;
 
 public class IssuesDTO {
 
-    private Long id;
+	private Long id;
 
-    private Long branch;
+	private Long branch;
 
-//   private String docId;
-//
-//  private LocalDate docDate;
-  
-  private String financialYear;
-  
-    private Long department;
+	private String financialYear;
 
-    private String belongsTo;
+	private Long department;
 
-    private LocalTime time;
+	private String belongsTo;
 
-    private String refNo;
+	private String time;
 
-    private LocalDate refDate;
+	private String refNo;
 
-    private String indentNo;
+	private LocalDate refDate;
 
-    private Long issueFrom;
+	private String indentNo;
 
-    private Long issueTo;
+	private Long issueFrom;
 
-    private String narration;
+	private Long issueTo;
 
-    private boolean active;
+	private String narration;
 
-    private Long orgId;
+	private boolean active;
 
-    private String createdBy;
+	private Long orgId;
 
-    private String cancelRemarks;
-    
-    
-    private List<IssuesDetailsDTO> issuesDetails;
+	private String createdBy;
+
+	private String cancelRemarks;
+
+	private List<IssuesDetailsDTO> issuesDetails;
 }

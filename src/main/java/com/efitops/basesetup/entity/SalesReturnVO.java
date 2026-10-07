@@ -160,10 +160,7 @@ public class SalesReturnVO {
 		return cancel ? "T" : "F";
 	}
     
-  
 
-    @Embedded
-    private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
     
     
     @OneToMany(
@@ -177,6 +174,11 @@ public class SalesReturnVO {
             cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<SalesReturnTaxDetailsVO> salesReturnTaxDetails;
+    
+    
+
+    @Embedded
+    private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 
    
 }

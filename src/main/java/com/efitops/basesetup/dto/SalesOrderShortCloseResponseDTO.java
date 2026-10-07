@@ -3,7 +3,7 @@ package com.efitops.basesetup.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.efitops.basesetup.entity.SalesOrderShortCloseFileDetailsVO;
+import com.efitops.basesetup.ResponseDTO.OrderAcceptanceResponsesDTO;
 import com.efitops.basesetup.service.CustomerResponseDetailsDTO;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public class SalesOrderShortCloseResponseDTO {
 	
 	private LocalDate docDate=LocalDate.now();
 
-
+    private OrderAcceptanceResponsesDTO orderAcceptance;
 	private String cancelRemarks;
 
 	private Long orgId;
@@ -38,6 +38,6 @@ public class SalesOrderShortCloseResponseDTO {
 
 	private List<SalesOrderShortCloseDetailsResponseDTO> salesOrderShortCloseDetailsResponseDTO;
 	
-	private List<SalesOrderShortCloseFileDetailsResponseDTO> salesOrderShortCloseFileDetailsResponseDTO;
+//	private List<SalesOrderShortCloseFileDetailsResponseDTO> salesOrderShortCloseFileDetailsResponseDTO;
 
 }

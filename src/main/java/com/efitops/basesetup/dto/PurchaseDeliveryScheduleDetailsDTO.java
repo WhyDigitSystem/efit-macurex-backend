@@ -11,9 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PurchaseDeliveryScheduleDetailsDTO {
-
-	private Long id;
-
 	private Long item;
 	private Long primaryUnit;
 	private Long purchaseUnit;

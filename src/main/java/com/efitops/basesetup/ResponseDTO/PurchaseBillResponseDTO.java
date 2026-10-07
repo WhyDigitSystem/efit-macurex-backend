@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.Column;
+
 import com.efitops.basesetup.dto.BranchResponseDTO;
 import com.efitops.basesetup.dto.CurrencyResponseDTO;
 
@@ -60,6 +62,8 @@ public class PurchaseBillResponseDTO {
     private String cancelRemarks;
     private String createdBy;
     private String updatedBy;
+    
+	private String postingCategory;
 
     private List<PurchaseBillDetailsResponseDTO> purchaseDetails;
     private List<PurchaseBillTaxGridResponseDTO> taxGrid;

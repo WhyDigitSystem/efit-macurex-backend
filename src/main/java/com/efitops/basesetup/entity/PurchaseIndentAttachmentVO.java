@@ -19,16 +19,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "indent_Attachment")
+@Table(name = "indent_attachment")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseIndentAttachmentVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "indent_Attachmentgen")
-    @SequenceGenerator(name = "indent_Attachmentgen", sequenceName = "indent_Attachmentseq", initialValue = 1000000001, allocationSize = 1)
-    @Column(name = "indent_Attachment_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "indent_attachmentgen")
+    @SequenceGenerator(name = "indent_attachmentgen", sequenceName = "indent_attachmentseq", initialValue = 1000000001, allocationSize = 1)
+    @Column(name = "indent_attachment_id")
     private Long id;
 
     @Column(name = "name")
@@ -47,7 +47,7 @@ public class PurchaseIndentAttachmentVO {
     private LocalDateTime uploadOn;
 
     @ManyToOne
-    @JoinColumn(name = "Indent_Basic_id")
+    @JoinColumn(name = "indent_basic_id")
     @JsonBackReference
     private PurchaseIndentVO purchaseIndentVO;
 }

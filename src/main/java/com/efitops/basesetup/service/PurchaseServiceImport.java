@@ -107,7 +107,7 @@ public interface PurchaseServiceImport {
 
 	List<Map<String, Object>> getIssueTo(Long orgId, Long branch);
 
-	List<Map<String, Object>> getItemType(Long orgId, Long branch, Long itemType);
+	List<Map<String, Object>> getItemType(Long orgId, Long branch);
 
 	// Applic
 
@@ -306,4 +306,6 @@ public interface PurchaseServiceImport {
 			throws ApplicationException;
 
 	List<Map<String, Object>> getIndentNoForProductionBulkIssue(Long orgId, Long branch, Long fgItem);
+
+	List<Map<String, Object>> getScrapItemDetails(Long orgId, Long branch);
 }

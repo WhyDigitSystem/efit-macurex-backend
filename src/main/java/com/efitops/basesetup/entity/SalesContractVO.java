@@ -46,7 +46,7 @@ public class SalesContractVO {
 	private String docId;
 	
 	@Column(name = "doc_date")
-	private LocalDate docDate;
+	private LocalDate docDate = LocalDate.now();
 	
     @Column(name = "customer_contract_no")
     private String customerContractNo;

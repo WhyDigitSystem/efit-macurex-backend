@@ -5,12 +5,14 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
-import com.efitops.basesetup.ResponseDTO.CustomerDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.DrawingAttachmentsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.GateOutwardEntryResponseDTO;
@@ -22,20 +24,16 @@ import com.efitops.basesetup.ResponseDTO.MaintenanceServiceRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingResponseDTO;
-import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
-import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseOrderAmendmentResponceDTO;
 import com.efitops.basesetup.ResponseDTO.RootCauseAnalysisResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SCBillResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
 import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
+
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransferOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
-import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentContractDropdownResponseDto;
-import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentItemDropdownResponseDto;
-import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
 import com.efitops.basesetup.dto.ActivityMasterDTO;
 import com.efitops.basesetup.dto.ControlPlanDTO;
 import com.efitops.basesetup.dto.DrawingAttachmentsDTO;
@@ -52,13 +50,11 @@ import com.efitops.basesetup.dto.OpenStockEntryDto;
 import com.efitops.basesetup.dto.ParameterMasterDTO;
 import com.efitops.basesetup.dto.ProcessSheetCompRoutingDTO;
 import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
-
 import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
 import com.efitops.basesetup.dto.RootCauseAnalysisDTO;
 import com.efitops.basesetup.dto.SCBillDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
 import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
-
 import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
 import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
 import com.efitops.basesetup.dto.ToolCategoryDTO;
@@ -122,9 +118,6 @@ public interface DevelopService {
 	List<PurchaseContractAmendmentResponseDto> getPurchaseContractAmendmentByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
 
-	
-	
-	
 	Integer getPurchaseContractAmdRevisionNo(String contractNo, Long orgId, Long branch) throws ApplicationException;
 
 	String getEnquiryDocId(Long orgId, String financialYear, String screenCode);
@@ -132,12 +125,9 @@ public interface DevelopService {
 	Map<String, Object> updateCreatePurchaseOrderAmendment(PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
 			MultipartFile[] files) throws ApplicationException;
 
-	PurchaseOrderAmendmentResponceDTO getPurchaseOrderAmendmentById(Long id)
-	        throws ApplicationException;
-	
+	PurchaseOrderAmendmentResponceDTO getPurchaseOrderAmendmentById(Long id) throws ApplicationException;
 
-	List<PurchaseOrderAmendmentResponceDTO> getPurchaseOrderAmendmentByOrgId(Long orgId)
-	        throws ApplicationException;
+	List<PurchaseOrderAmendmentResponceDTO> getPurchaseOrderAmendmentByOrgId(Long orgId) throws ApplicationException;
 
 	Map<String, Object> getPurchaseOrderAmendmentforCustomer(Long customer, Long branch, Long orgId)
 			throws ApplicationException;
@@ -145,7 +135,6 @@ public interface DevelopService {
 	Integer getPurchaseOrderAmendmentRevisionNo(String purchaseOrderNumber, Long orgId, Long branch)
 			throws ApplicationException;
 
-	
 	List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(String docId, Long orgId, Long branch)
 			throws ApplicationException;
 
@@ -155,19 +144,13 @@ public interface DevelopService {
 	Map<String, Object> getPurchaseContractAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
 			throws ApplicationException;
 
-	Map<String, Object> createUpdateOpenStockEntry(OpenStockEntryDto openStockEntryDto)
-			throws ApplicationException;
+	Map<String, Object> createUpdateOpenStockEntry(OpenStockEntryDto openStockEntryDto) throws ApplicationException;
 
-	OpenStockEntryResponseDTO getOpenStockEntryById(Long id)
-			throws ApplicationException;
-	
-	List<OpenStockEntryResponseDTO> getOpenStockEntryByOrgId(
-	        Long orgId, Long branch)
-	        throws ApplicationException;
+	OpenStockEntryResponseDTO getOpenStockEntryById(Long id) throws ApplicationException;
+
+	List<OpenStockEntryResponseDTO> getOpenStockEntryByOrgId(Long orgId, Long branch) throws ApplicationException;
 
 	Map<String, Object> getOpenStockEntryItemCodeDropdown(Long orgId, Long branch) throws ApplicationException;
-
-	String getOpenStockEntryDocId(Long orgId, String financialYear, String screenCode);
 
 	Map<String, Object> createUpdateIssues(IssuesDTO issuesDto) throws ApplicationException;
 
@@ -181,27 +164,23 @@ public interface DevelopService {
 
 	Map<String, Object> getIssueIndentNoDropdown(Long orgId, Long branch) throws ApplicationException;
 
-	Map<String, Object> getIssueItemCodeDropdown(Long orgId, Long branch, String indentNo) throws ApplicationException ;
+	Map<String, Object> getIssueItemCodeDropdown(Long orgId, Long branch, String indentNo) throws ApplicationException;
 
-	Map<String, Object> createUpdateParameterMaster(ParameterMasterDTO parameterMasterDTO) throws ApplicationException ;
+	Map<String, Object> createUpdateParameterMaster(ParameterMasterDTO parameterMasterDTO) throws ApplicationException;
 
-	ParameterMasterResponseDTO getParameterMasterById(Long id) throws ApplicationException ;
+	ParameterMasterResponseDTO getParameterMasterById(Long id) throws ApplicationException;
 
-	List<ParameterMasterResponseDTO> getParameterMasterByOrgId(Long orgId) throws ApplicationException ;
+	List<ParameterMasterResponseDTO> getParameterMasterByOrgId(Long orgId) throws ApplicationException;
 
 	String getIssuesDocId(Long orgId, String financialYear);
 
-
-	Map<String, Object> updateCreateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files, MultipartFile[] images) throws ApplicationException ;
-
-	String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear, String screenCode);
-
+	Map<String, Object> updateCreateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files,
+			MultipartFile[] images) throws ApplicationException;
 
 	List<MachineMasterResponseDTO> getMachineMasterByOrgId(Long orgId, Long branch) throws ApplicationException;
 
-	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String purchaseOrderNumber, Long branch, Long orgId)
-			throws ApplicationException;
-	
+	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String purchaseOrderNumber, Long branch,
+			Long orgId) throws ApplicationException;
 
 	Map<String, Object> createUpdateToolCategory(ToolCategoryDTO toolCategoryDTO) throws ApplicationException;
 
@@ -213,19 +192,19 @@ public interface DevelopService {
 
 	Map<String, Object> getToolCategoryforMachineMaster(Long orgId, String applicableFor) throws ApplicationException;
 
-	
 	List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(Long branch, Long customerId,
 			Long orgId) throws ApplicationException;
 
 	Map<String, Object> updateCreateProcessSheetCompRouting(ProcessSheetCompRoutingDTO processSheetCompRoutingDTO)
 			throws ApplicationException;
-	
+
 	List<ProcessSheetCompRoutingResponseDTO> getProcessSheetCompRoutingByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
 
 	ProcessSheetCompRoutingResponseDTO getProcessSheetCompRoutingById(Long id) throws ApplicationException;
 
-	Map<String, Object> getFgSfgItemCodeDropdownforProcessSheetCompRouting(Long orgId, Long branch, Long itemType) throws ApplicationException;
+	Map<String, Object> getFgSfgItemCodeDropdownforProcessSheetCompRouting(Long orgId, Long branch, Long itemType)
+			throws ApplicationException;
 
 	Map<String, Object> getLocationDropdownforProcessSheetCompRouting(Long orgId, Long branch)
 			throws ApplicationException;
@@ -240,7 +219,8 @@ public interface DevelopService {
 
 	RootCauseAnalysisResponseDTO getRootCauseAnalysisById(Long id) throws ApplicationException;
 
-	Map<String, Object> getCustomerComplaintDropDownForRootCauseAnalysis(Long orgId, Long branch) throws ApplicationException;
+	Map<String, Object> getCustomerComplaintDropDownForRootCauseAnalysis(Long orgId, Long branch)
+			throws ApplicationException;
 
 	Map<String, Object> createUpdateControlPlan(ControlPlanDTO controlPlanDTO) throws ApplicationException;
 
@@ -253,7 +233,6 @@ public interface DevelopService {
 	Map<String, Object> getcontrolplandropdownforMachineFixtureDropdown(Long branch, Long orgId)
 			throws ApplicationException;
 
-	
 	String getControlPlanDocId(Long orgId, String financialYear);
 
 	Map<String, Object> getFGItemDropdownforControlPlan(Long branch, Long orgId) throws ApplicationException;
@@ -267,8 +246,7 @@ public interface DevelopService {
 	List<ZeroKmFailureEntryResponseDTO> getZeroKmFailureEntryByOrgId(Long orgId, Long branch)
 			throws ApplicationException;
 
-	ZeroKmFailureEntryResponseDTO getZeroKmFailureEntryById(Long id)
-	        throws ApplicationException;
+	ZeroKmFailureEntryResponseDTO getZeroKmFailureEntryById(Long id) throws ApplicationException;
 
 	String getZeroKmFailureEntryDocId(Long orgId, String financialYear);
 
@@ -281,10 +259,8 @@ public interface DevelopService {
 
 	List<EightDisciplineEntryResponseDTO> getEightDisciplineEntryByOrgId(Long orgId) throws ApplicationException;
 
-	String getEightDisciplineEntryDocId(
-	        Long orgId,
-	        String financialYear) throws ApplicationException;
-	
+	String getEightDisciplineEntryDocId(Long orgId, String financialYear) throws ApplicationException;
+
 	Map<String, Object> getComplaintNoDropDownForEightDiscipline(Long orgId) throws ApplicationException;
 
 	Map<String, Object> getRootCauseNoDropDownForEightDiscipline(Long orgId, Long complaintNo)
@@ -358,7 +334,8 @@ public interface DevelopService {
 
 	String getMaintenanceServiceRequestDocId(Long orgId, String financialYear);
 
-	List<Map<String, Object>> getBreakdownNoDropdownForGateOutwardEntry(Long orgId, Long branch) throws ApplicationException;
+	List<Map<String, Object>> getBreakdownNoDropdownForGateOutwardEntry(Long orgId, Long branch)
+			throws ApplicationException;
 
 	List<Map<String, Object>> getSubcontractChallanNoForGateOutwardEntry(Long orgId, Long branch)
 			throws ApplicationException;
@@ -386,18 +363,14 @@ public interface DevelopService {
 
 	String getSCBillDocId(Long orgId, String financialYear);
 
+  String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear);
 
-	
-	
-	
+	ResponseEntity<byte[]> viewPurchaseOrderAmendmentFile(HttpServletRequest request) throws IOException;
 
-	
+	String getPurchaseContractAmendmentDocId(Long orgId, String financialYear);
 
+	ResponseEntity<byte[]> viewPurchaseContractAmendmentFile(HttpServletRequest request) throws IOException;
 
-	
-	
-	
-	
-	
-	
+	String getOpenStockEntryDocId(Long orgId, String financialYear);
+
 }

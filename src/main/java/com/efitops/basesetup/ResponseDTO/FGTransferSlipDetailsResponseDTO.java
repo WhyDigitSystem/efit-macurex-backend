@@ -22,7 +22,7 @@ public class FGTransferSlipDetailsResponseDTO {
     private BigDecimal consumedQty;
     private BigDecimal rate;
     private BigDecimal value;
-    private ListOfValuesResponseDTO scrap;
+    private ItemMasterDetailsResponseImportDTO scrap;
     private BigDecimal scrapQty;
     private UnitResponseDTO scrapUnit;
     private BigDecimal scrapTotal;

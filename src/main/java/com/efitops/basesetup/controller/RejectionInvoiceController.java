@@ -311,7 +311,7 @@ public class RejectionInvoiceController extends BaseController {
 
 	@GetMapping("/getProformaInvoiceDocId")
 	public ResponseEntity<ResponseDTO> getProformaInvoiceDocId(@RequestParam Long orgId,
-			@RequestParam String financialYear, @RequestParam String screenCode) {
+			@RequestParam String financialYear) {
 
 		String methodName = "getProformaInvoiceDocId()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
@@ -321,7 +321,7 @@ public class RejectionInvoiceController extends BaseController {
 		String mapp = "";
 
 		try {
-			mapp = rejectionInvoiceService.getProformaInvoiceDocId(orgId, financialYear, screenCode);
+			mapp = rejectionInvoiceService.getProformaInvoiceDocId(orgId, financialYear);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);

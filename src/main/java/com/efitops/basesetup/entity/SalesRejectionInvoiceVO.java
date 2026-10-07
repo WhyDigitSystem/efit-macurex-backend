@@ -34,8 +34,8 @@ package com.efitops.basesetup.entity;
 	public class SalesRejectionInvoiceVO {
 	
 		@Id
-		@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_rejection_invoice_basicseq")
-		@SequenceGenerator(name = "sales_rejection_invoice_basicseq", sequenceName = "sales_rejection_invoice_basicseq", allocationSize = 1, initialValue = 1000000001)
+		@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sales_rejection_invoice_basicgen")
+		@SequenceGenerator(name = "sales_rejection_invoice_basicgen", sequenceName = "sales_rejection_invoice_basicseq", allocationSize = 1, initialValue = 1000000001)
 		@Column(name = "sales_rejection_invoice_basic_id")
 		private Long id;
 	

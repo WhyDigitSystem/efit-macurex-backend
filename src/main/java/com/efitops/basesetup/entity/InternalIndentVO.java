@@ -38,83 +38,83 @@ public class InternalIndentVO {
 	@SequenceGenerator(name = "internal_indent_basicgen", sequenceName = "internal_indent_basicseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "internal_indent_basic_id")
 	private Long id;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
-	
+
 	@Column(name = "belongs_to")
 	private String belongTo;
-	
+
 	@Column(name = "doc_id")
 	private String docId;
-	
+
 	@Column(name = "doc_date")
 	private LocalDate docDate = LocalDate.now();
-	
+
 	@ManyToOne
 	@JoinColumn(name = "department")
 	private DepartmentVO department;
-	
+
 	@Column(name = "time_of_indent")
 	private String timeOfIndent;
-	
+
 	@Column(name = "approved_by_pm")
 	private String approvedByPM;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "prepared_by")
 	private EmployeeMasterVO preparedBy;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "authorized_by")
 	private EmployeeMasterVO authorizedBy;
-	
+
 	@Column(name = "remarks")
 	private String remarks;
-	
-    @Column(name = "org_id")
-    private Long orgId;
 
-    @Column(name = "financial_year")
-    private String financialYear;
+	@Column(name = "org_id")
+	private Long orgId;
 
-    @Column(name = "active")
-    private boolean active;
+	@Column(name = "financial_year")
+	private String financialYear;
 
-    @Column(name = "cancel")
-    private boolean cancel = false;
+	@Column(name = "active")
+	private boolean active;
 
-    @Column(name = "cancel_remarks")
-    private String cancelRemarks;
+	@Column(name = "cancel")
+	private boolean cancel = false;
 
-    @Column(name = "created_by")
-    private String createdBy;
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
 
-    @Column(name = "modified_by")
-    private String updatedBy;
-    
-    @Column(name = "screen_code")
-    private String screenCode = "INTI";
+	@Column(name = "created_by")
+	private String createdBy;
 
-    @Column(name = "screen_name")
-    private String screenName = "INTERNAL INDENT";
-	
-    @OneToMany(mappedBy = "internalIndentVO", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<InternalIndentDetailsVO> internalIndentDetailsVO = new ArrayList<>();
-	
-    @JsonGetter("active")
-   	public String getActive() {
-   		return active ? "Active" : "In-Active";
-   	}
+	@Column(name = "modified_by")
+	private String updatedBy;
 
-   	@JsonGetter("cancel")
-   	public String getCancel() {
-   		return cancel ? "T" : "F";
-   	}
-    @Embedded
-    private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-	
+	@Column(name = "screen_code")
+	private String screenCode = "INTI";
+
+	@Column(name = "screen_name")
+	private String screenName = "INTERNAL INDENT";
+
+	@OneToMany(mappedBy = "internalIndentVO", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference
+	private List<InternalIndentDetailsVO> internalIndentDetailsVO = new ArrayList<>();
+
+	@JsonGetter("active")
+	public String getActive() {
+		return active ? "Active" : "In-Active";
+	}
+
+	@JsonGetter("cancel")
+	public String getCancel() {
+		return cancel ? "T" : "F";
+	}
+
+	@Embedded
+	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 
 }

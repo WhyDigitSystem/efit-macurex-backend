@@ -46,9 +46,9 @@ public class PurchaseOrderAmendmentAttachmentVO {
 
 	    @Column(name = "file_size")
 	    private Long fileSize;
-
-	    @Column(name = "upload_on")
-	    private LocalDateTime uploadOn;
+//
+//	    @Column(name = "upload_on")
+//	    private LocalDateTime uploadOn;
 	    
 	    
 	    @ManyToOne

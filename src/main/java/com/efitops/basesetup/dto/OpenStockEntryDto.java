@@ -3,6 +3,8 @@ package com.efitops.basesetup.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import javax.persistence.Column;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,30 +14,32 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class OpenStockEntryDto {
-	
-	 private Long id;
-	
+
+	private Long id;
+
 	private Long branch;
-	
+
 	private LocalDate asOnDate;
-	
+
 	private Long location;
-	
+
 	private Long item;
-	
+
 	private BigDecimal qty;
 
 	private BigDecimal rate;
-	
+
 	private BigDecimal amount;
 
 	private String remarks;
-	
+
 	private boolean active;
-	
+
 	private Long orgId;
 
-	 private String createdBy;
-	 
-	 private String cancelRemarks;
+	private String createdBy;
+
+	private String cancelRemarks;
+
+	private String financialYear;
 }

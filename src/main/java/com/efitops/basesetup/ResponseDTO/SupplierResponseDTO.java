@@ -19,5 +19,6 @@ public class SupplierResponseDTO {
 	private String gstNo;
 	private String gstApproval;
 	private String gstSate;
+	private String country;
 
 }

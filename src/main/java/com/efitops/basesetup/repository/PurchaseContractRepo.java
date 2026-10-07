@@ -72,12 +72,13 @@ public interface PurchaseContractRepo extends JpaRepository<PurchaseContractVO, 
 			    u.unit_id,
 			    g.gstratemaster_id,
 			    g.hsn_sac_code,
-			    g.description
+			    h.hsn
 			FROM item i
 			INNER JOIN unitmaster u
 			    ON i.primary_unit = u.unitmaster_id
 			INNER JOIN customer_header c
-			    ON c.customer_id = i.default_supplier
+			    ON c.customer_id = i.default_supplier 
+                
 			INNER JOIN (
 			    SELECT g1.*
 			    FROM gstratemaster g1
@@ -88,6 +89,7 @@ public interface PurchaseContractRepo extends JpaRepository<PurchaseContractVO, 
 			    )
 			) g
 			    ON i.hsn_code = g.hsn_sac_code
+                left join hsn h on h.hsn_id=i.hsn_code
 			INNER JOIN listofvaluesdetails l
 			    ON i.item_type = l.listofvaluesdetails_id
 			WHERE i.cancel = false

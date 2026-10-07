@@ -1370,6 +1370,8 @@ public class GrnServiceImpl implements GrnService {
 			map.put("stateName", ch[6] != null ? ch[6].toString() : "");
 			map.put("isRegistered", ch[7] != null ? ch[7].toString() : "");
 			map.put("country", ch[8] != null ? ch[8].toString() : "");
+			map.put("dealerType", ch[9] != null ? ch[9].toString() : "");
+			map.put("isReverseChrg", ch[10] != null ? ch[10].toString() : "");
 			list.add(map);
 		}
 
@@ -1783,6 +1785,10 @@ public class GrnServiceImpl implements GrnService {
 			supplierDTO.setAddress(vo.getSupplierCode().getAddress());
 			supplierDTO.setGstNo(vo.getSupplierCode().getGstNo());
 			supplierDTO.setGstApproval(vo.getSupplierCode().isGstApplicable() ? "Yes" : "No");
+			
+			if (vo.getSupplierCode().getCountry() != null) {
+				supplierDTO.setCountry(vo.getSupplierCode().getCountry().getCountryName());
+			}
 			if (vo.getSupplierCode().getGstState() != null) {
 				supplierDTO.setGstSate(vo.getSupplierCode().getGstState().getStateName());
 			}

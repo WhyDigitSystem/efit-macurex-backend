@@ -91,7 +91,7 @@ public class PurchaseDeliveryScheduleVO {
     @Column(name = "screen_code", length = 10)
 	private String screenCode = "PDS";
 	@Column(name = "screen_name", length = 30)
-	private String screenName = "Purchase Delivery Schedule";
+	private String screenName = "	";
 
 
 	@JsonGetter("active")

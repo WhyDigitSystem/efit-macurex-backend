@@ -106,6 +106,8 @@ public interface TransactionService {
 		String getSalesReturnDocId(Long orgId, String financialYear);
 
 		List<SalesReturnResponseDTO> getSalesReturnByOrgIdAndBranch(Long orgId, Long branch) throws ApplicationException;
+
+		String getSalesContractAmendmentDocId(Long orgId, String financialYear);
 		
 
 }

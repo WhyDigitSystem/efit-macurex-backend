@@ -17,7 +17,7 @@ public class PurchaseOrderDTO {
 	private String poType;
 
 	private String belongsTo;
-	
+
 	private LocalDate orderPlacedDate;
 
 	private Long department;
@@ -104,12 +104,12 @@ public class PurchaseOrderDTO {
 
 	private String amountInWord;
 
-	private String preparedBy;
+	private Long preparedBy;
 
-	private String checkedBy;
+	private Long checkedBy;
 
-	private String authorisedBy;
-	
+	private Long authorisedBy;
+
 	private String freightType;
 
 	private String packingType;
@@ -121,7 +121,7 @@ public class PurchaseOrderDTO {
 	private String modeOfDespatch;
 
 	private String notes;
-	
+
 	private String freight;
 
 	// Purchase Local
@@ -133,6 +133,5 @@ public class PurchaseOrderDTO {
 	private List<PurchaseOrderLocalFileUploadDetailsDTO> purchaseOrderLocalFileUploadDetailsDTO;
 
 	private List<PurchaseOrderImportDetailsDTO> purchaseOrderImportDetailsDTO;
-
 
 }

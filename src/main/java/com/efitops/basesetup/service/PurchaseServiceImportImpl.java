@@ -505,7 +505,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setBelongsTo(dto.getBelongsTo());
 		vo.setIsIgstApplicable(dto.getIsIgstApplicable());
 
-		if (dto.getDepartment() != null && dto.getDepartment() >= 0) {
+		if (dto.getDepartment() != null && dto.getDepartment() > 0) {
 
 			DepartmentVO department = departmentRepo.findById(dto.getDepartment())
 					.orElseThrow(() -> new ApplicationException("Department Not Found"));
@@ -524,9 +524,29 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setDeliveryTerms(dto.getDeliveryTerms());
 		vo.setNotes(dto.getNotes());
 
-		vo.setPreparedBy(dto.getPreparedBy());
-		vo.setCheckedBy(dto.getCheckedBy());
-		vo.setAuthorisedBy(dto.getAuthorisedBy());
+		if (dto.getPreparedBy() != null && dto.getPreparedBy() > 0) {
+
+			EmployeeMasterVO preparedBy = employeeMasterRepo.findById(dto.getPreparedBy())
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+			vo.setPreparedBy(preparedBy);
+		}
+
+		if (dto.getCheckedBy() != null && dto.getCheckedBy() > 0) {
+
+			EmployeeMasterVO checkedBy = employeeMasterRepo.findById(dto.getCheckedBy())
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+			vo.setCheckedBy(checkedBy);
+		}
+
+		if (dto.getAuthorisedBy() != null && dto.getAuthorisedBy() > 0) {
+
+			EmployeeMasterVO authorisedBy = employeeMasterRepo.findById(dto.getAuthorisedBy())
+					.orElseThrow(() -> new ApplicationException("Employee Not Found"));
+
+			vo.setAuthorisedBy(authorisedBy);
+		}
 
 		vo.setIsReverseCharge(dto.getIsReverseCharge());
 		vo.setIndentRequired(dto.getIndentRequired());
@@ -556,9 +576,6 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setSurCharges(dto.getSurCharges());
 		vo.setTotalPoValueInr(dto.getTotalPoValueInr());
 		vo.setAmountInWord(dto.getAmountInWord());
-		vo.setPreparedBy(dto.getPreparedBy());
-		vo.setCheckedBy(dto.getCheckedBy());
-		vo.setAuthorisedBy(dto.getAuthorisedBy());
 
 		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
@@ -900,9 +917,40 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setPaymentTerms(vo.getPaymentTerms());
 		responseDTO.setDeliveryTerms(vo.getDeliveryTerms());
 		responseDTO.setNotes(vo.getNotes());
-		responseDTO.setPreparedBy(vo.getPreparedBy());
-		responseDTO.setCheckedBy(vo.getCheckedBy());
-		responseDTO.setAuthorisedBy(vo.getAuthorisedBy());
+
+		if (vo.getPreparedBy() != null) {
+
+			EmployeeMasterResponseDetailsDTO preparedByDTO = new EmployeeMasterResponseDetailsDTO();
+
+			preparedByDTO.setId(vo.getPreparedBy().getId());
+			preparedByDTO.setEmployeeCode(vo.getPreparedBy().getEmployeeId());
+			preparedByDTO.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+
+			responseDTO.setPreparedBy(preparedByDTO);
+		}
+
+		if (vo.getCheckedBy() != null) {
+
+			EmployeeMasterResponseDetailsDTO checkedByDTO = new EmployeeMasterResponseDetailsDTO();
+
+			checkedByDTO.setId(vo.getCheckedBy().getId());
+			checkedByDTO.setEmployeeCode(vo.getCheckedBy().getEmployeeId());
+			checkedByDTO.setEmployeeName(vo.getCheckedBy().getEmployeeName());
+
+			responseDTO.setCheckedBy(checkedByDTO);
+		}
+
+		if (vo.getAuthorisedBy() != null) {
+
+			EmployeeMasterResponseDetailsDTO authorisedByDTO = new EmployeeMasterResponseDetailsDTO();
+
+			authorisedByDTO.setId(vo.getAuthorisedBy().getId());
+			authorisedByDTO.setEmployeeCode(vo.getAuthorisedBy().getEmployeeId());
+			authorisedByDTO.setEmployeeName(vo.getAuthorisedBy().getEmployeeName());
+
+			responseDTO.setAuthorisedBy(authorisedByDTO);
+		}
+
 		responseDTO.setTotalAmount(vo.getTotalAmount());
 		responseDTO.setAmountInWord(vo.getAmountInWord());
 
@@ -1970,6 +2018,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setAfterDiscountTotalAmount(dto.getAfterDiscountTotalAmount());
 		vo.setBasicAmount(dto.getBasicAmount());
 		vo.setTotalAmount(dto.getTotalAmount());
+		vo.setSupplierCode(dto.getSupplierCode());
+		vo.setTallyRefNo(dto.getTallyRefNo());
 
 		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
@@ -1989,7 +2039,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 		if (dto.getItemCategory() != null && dto.getItemCategory() != 0) {
 
-			ItemMasterVO itemCategory = itemMasterRepo.findByItemType(dto.getItemCategory())
+			ItemMasterVO itemCategory = itemMasterRepo.findById(dto.getItemCategory())
 					.orElseThrow(() -> new ApplicationException("Item Category Not Found"));
 
 			vo.setItemCategory(itemCategory);
@@ -2402,6 +2452,13 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setScreenName(vo.getScreenName());
 		responseDTO.setScreenCode(vo.getScreenCode());
 
+		responseDTO.setBasicAmount(vo.getBasicAmount());
+		responseDTO.setDiscount(vo.getDiscount());
+		responseDTO.setAfterDiscountTotalAmount(vo.getAfterDiscountTotalAmount());
+		responseDTO.setTotalAmount(vo.getTotalAmount());
+		responseDTO.setSupplierCode(vo.getSupplierCode());
+		responseDTO.setTallyRefNo(vo.getTallyRefNo());
+
 		if (vo.getBranch() != null) {
 			BranchResponseDTO branchDTO = new BranchResponseDTO();
 			branchDTO.setId(vo.getBranch().getId());
@@ -2537,8 +2594,8 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 	}
 
 	@Override
-	public List<Map<String, Object>> getItemType(Long orgId, Long branch, Long itemType) {
-		Set<Object[]> chType = directPurchaseRepo.getItemType(orgId, branch, itemType);
+	public List<Map<String, Object>> getItemType(Long orgId, Long branch) {
+		Set<Object[]> chType = directPurchaseRepo.getItemType(orgId, branch);
 		return getItemType(chType);
 	}
 
@@ -2550,7 +2607,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			Map<String, Object> map = new HashMap<>();
 			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
 			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
-
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
 			list.add(map);
 		}
 		return list;
@@ -4628,7 +4685,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				}
 
 				if (d.getScrap() != null && d.getScrap() != 0) {
-					ListOfValuesDetailsVO item = listOfValuesDetailsRepo.findById(d.getScrap())
+					ItemMasterVO item = itemMasterRepo.findById(d.getScrap())
 							.orElseThrow(() -> new ApplicationException("Scrap Not Found"));
 					detailsVO.setScrap(item);
 				}
@@ -4736,11 +4793,12 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailsDTO.setScrapTotal(detailsVO.getScrapTotal());
 
 				if (detailsVO.getScrap() != null) {
-					ListOfValuesResponseDTO fgItemDTO = new ListOfValuesResponseDTO();
-					fgItemDTO.setId(detailsVO.getScrap().getId());
-					fgItemDTO.setListCode(detailsVO.getScrap().getValueCode());
-					fgItemDTO.setListDescription(detailsVO.getScrap().getValueDescription());
-					detailsDTO.setScrap(fgItemDTO);
+
+					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+					itemDTO.setId(detailsVO.getItem().getId());
+					itemDTO.setItemCode(detailsVO.getItem().getItemCode());
+					itemDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+					detailsDTO.setScrap(itemDTO);
 				}
 
 				if (detailsVO.getItem() != null) {
@@ -4838,7 +4896,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			Map<String, Object> map = new HashMap<>();
 			map.put("docId", ch[0] != null ? ch[0].toString() : "");
 			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
-			map.put("scheduledQty", ch[3] != null ? new BigDecimal(ch[3].toString()) : BigDecimal.ZERO);
+			map.put("scheduledQty", ch[2] != null ? new BigDecimal(ch[2].toString()) : BigDecimal.ZERO);
 			list.add(map);
 		}
 
@@ -6284,7 +6342,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 			map.put("unitMasterId", ch[3] != null ? ((Number) ch[3]).longValue() : null);
 
-			map.put("unitMasterDescri	ption", ch[4] != null ? ch[4].toString() : "");
+			map.put("unitMasterDescription", ch[4] != null ? ch[4].toString() : "");
 
 			list.add(map);
 		}
@@ -6907,6 +6965,33 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 			map.put("docId", ch[0] != null ? ch[0].toString() : "");
 			map.put("docDate", ch[1] != null ? ch[1].toString() : "");
+
+			list.add(map);
+		}
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getScrapItemDetails(Long orgId, Long branch) {
+
+		Set<Object[]> chType = fgTransferSlipRepo.getScrapItemDetails(orgId, branch);
+
+		return getScarpItemDetails(chType);
+	}
+
+	private List<Map<String, Object>> getScarpItemDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
 
 			list.add(map);
 		}

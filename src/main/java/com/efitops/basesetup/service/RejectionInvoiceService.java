@@ -36,7 +36,7 @@ public interface RejectionInvoiceService {
 
 	List<Map<String, Object>> getItemDetailsResponse(Long orgId, Long branch);
 
-	String getProformaInvoiceDocId(Long orgId, String financialYear, String screenCode);
+	String getProformaInvoiceDocId(Long orgId, String financialYear);
 
 //	List<Map<String, Object>> getGstState(Long orgId, Long customer);
 

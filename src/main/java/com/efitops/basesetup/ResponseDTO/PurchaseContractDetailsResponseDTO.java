@@ -3,9 +3,7 @@ package com.efitops.basesetup.ResponseDTO;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.efitops.basesetup.dto.HsnResponseImageDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
-import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
 import com.efitops.basesetup.dto.PrimaryUnitImageDTO;
 
 import lombok.AllArgsConstructor;
@@ -17,30 +15,30 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PurchaseContractDetailsResponseDTO {
 
-    // item code + item description come from the same ItemMaster record
-    private ItemMasterResponseDetailsDTO itemCode;
+	private Long id;
+	private ItemMasterResponseDetailsDTO itemCode;
 
-    private String hsnCode;
+	private String hsnCode;
 
-    private String taxType;
+	private String taxType;
 
-    private String taxName;
+	private String taxName;
 
-    private String taxPercentage;
+	private String taxPercentage;
 
-    private PrimaryUnitImageDTO unit;
+	private PrimaryUnitImageDTO unit;
 
-    private BigDecimal rateInCurrency;
+	private BigDecimal rateInCurrency;
 
-    private BigDecimal sgstRate;
-    private BigDecimal sgstAmount;
+	private BigDecimal sgstRate;
+	private BigDecimal sgstAmount;
 
-    private BigDecimal cgstRate;
-    private BigDecimal cgstAmount;
+	private BigDecimal cgstRate;
+	private BigDecimal cgstAmount;
 
-    private BigDecimal igstRate;
-    private BigDecimal igstAmount;
+	private BigDecimal igstRate;
+	private BigDecimal igstAmount;
 
-    private LocalDate validFrom;
-    private LocalDate validTo;
+	private LocalDate validFrom;
+	private LocalDate validTo;
 }

@@ -32,7 +32,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-
 public class IssuesVO {
 
 	@Id
@@ -40,52 +39,51 @@ public class IssuesVO {
 	@SequenceGenerator(name = "issue_basicgen", sequenceName = "issue_basicseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "issue_basic_id")
 	private Long id;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "branch")
 	private BranchVO branch;
-	
+
 	@Column(name = "doc_id")
 	private String docId;
-	
+
 	@Column(name = "doc_date")
-	private LocalDate docDate=LocalDate.now();
-	
-    @ManyToOne
+	private LocalDate docDate = LocalDate.now();
+
+	@ManyToOne
 	@JoinColumn(name = "department")
 	private DepartmentVO department;
-	 
+
 	@Column(name = "belongs_to")
 	private String belongsTo;
-	 
+
 	@Column(name = "time")
 	private LocalTime time;
-	 
+
 	@Column(name = "ref_no")
 	private String refNo;
-	  
+
 	@Column(name = "ref_date")
 	private LocalDate refDate;
-	  
+
 	@Column(name = "indent_no")
 	private String indentNo;
-	  
+
 	@ManyToOne
 	@JoinColumn(name = "issue_from")
-    private LocationVO issueFrom;
-	  
+	private LocationVO issueFrom;
+
 	@ManyToOne
 	@JoinColumn(name = "issue_to")
-    private LocationVO issueTo;
-	
+	private LocationVO issueTo;
+
 	@Column(name = "narration")
 	private String narration;
-	
+
 	@Column(name = "active")
 	private boolean active;
 
-    
-    @Column(name = "org_id")
+	@Column(name = "org_id")
 	private Long orgId;
 
 	@Column(name = "created_by")
@@ -100,13 +98,11 @@ public class IssuesVO {
 	private String screenName = "ISSUES";
 	@Column(name = "screen_code")
 	private String screenCode = "ISU";
-	
-	
+
 	@OneToMany(mappedBy = "issuesVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<IssuesDetailsVO> details = new ArrayList<>();
 
-	
 	@JsonGetter("activeStatus")
 	public String getActiveStatus() {
 		return active ? "Active" : "In-Active";
@@ -119,17 +115,5 @@ public class IssuesVO {
 
 	@Embedded
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-
-	
-	
-	  
-	
-	
-	  
-	  
-	  
-	  
-	  
-
 
 }

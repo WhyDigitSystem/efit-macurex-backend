@@ -75,6 +75,6 @@ public class FlashNCReportDTO {
 
 	private String createdBy;
 
-	private List<FlashNCReportAttachmentDTO>flashNCReportAttachmentDTO;
+	
 
 }

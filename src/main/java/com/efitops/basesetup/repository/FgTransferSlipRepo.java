@@ -29,7 +29,7 @@ public interface FgTransferSlipRepo extends JpaRepository<FgTransferSlipVO, Long
 	@Query(nativeQuery = true, value = "select doc_id,doc_date,total_qty from production_schedule_order_basic  where org_id=?1 and\r\n"
 			+ " branch=?2 and active=1 and cancel=0")
 	Set<Object[]> getSchNoFromFgTransferSlip(Long orgId, Long branch);
-	
+		
 	@Query(nativeQuery = true, value = "SELECT     c.customer_id,     c.customer_name,\r\n"
 			+ "						    c.customer_code FROM customer_header c\r\n"
 			+ "						LEFT JOIN listofvaluesdetails l1     ON c.customer_category = l1.listofvaluesdetails_id\r\n"
@@ -49,7 +49,7 @@ public interface FgTransferSlipRepo extends JpaRepository<FgTransferSlipVO, Long
 	
 	@Query(nativeQuery = true, value = "select i.item_id,i.item_code,i.item_description from item i left join listofvaluesdetails l1\r\n"
 			+ "		                        on l1.listofvaluesdetails_id=i.item_type where i.org_id=?1 and \r\n"
-			+ "			                       i.branch=?1 and l1.value_description='FG'")
-	Set<Object[]> getFgItemCodeDetails(Long orgId, Long branch);
+			+ "			                       i.branch=?2 and l1.value_description='SCRAP'")
+	Set<Object[]> getScrapItemDetails(Long orgId, Long branch);
 
 }

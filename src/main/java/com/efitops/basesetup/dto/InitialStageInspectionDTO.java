@@ -3,6 +3,8 @@ package com.efitops.basesetup.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.efitops.basesetup.entity.ShiftVO;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +22,7 @@ public class InitialStageInspectionDTO {
 
     private LocalDate docDate;
 
-    private String shift;
+    private Long  shift;
 
     private Long itemCode;
 

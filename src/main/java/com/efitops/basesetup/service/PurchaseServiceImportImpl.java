@@ -4089,6 +4089,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 			map.put("fgItemId", ch[2] != null ? ((Number) ch[2]).longValue() : null);
 			map.put("itemCode", ch[3] != null ? ch[3].toString() : "");
 			map.put("itemDescription", ch[4] != null ? ch[4].toString() : "");
+			map.put("scQty", ch[5] != null ? new BigDecimal(ch[5].toString()) : BigDecimal.ZERO);
 			list.add(map);
 		}
 

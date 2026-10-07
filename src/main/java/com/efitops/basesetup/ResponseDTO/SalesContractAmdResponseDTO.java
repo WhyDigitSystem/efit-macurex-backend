@@ -16,6 +16,8 @@ public class SalesContractAmdResponseDTO {
 	private Long id;
 	private String contractAmdNo;
 	private LocalDate date;
+//	private String docId;
+//	private LocalDate docDate;
 	private BranchResponseDTO branch;
 	private String contractNo;
 	private String contractDate;

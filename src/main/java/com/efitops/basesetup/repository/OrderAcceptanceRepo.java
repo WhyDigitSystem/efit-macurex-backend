@@ -134,5 +134,126 @@ public interface OrderAcceptanceRepo extends JpaRepository<OrderAcceptanceVO, Lo
 			""", nativeQuery = true)
 	List<Object[]> getSalesOrderReport(@Param("fromDate") String fromDate, @Param("toDate") String toDate,
 			@Param("branch") Long branch, @Param("orgId") Long orgId, @Param("customerName") String customerName);
+	
+//	sales order pending itemwise
+	
+	@Query(value = """
+	        SELECT 
+	            b.branch_id,
+	            o.order_acceptance_basic_id,
+	            o.doc_id,
+	            o.doc_date,
+	            o.customer_purchase_order_no,
+	            o.customer_purchase_order_date,
+	            c.customer_id,
+	            c.customer_name,
+	            i.item_id,
+	            i.item_description,
+	            d.quantity,
+	            SUM(srd.despatch_qty) AS sqty,
+	            (d.quantity - SUM(srd.despatch_qty)) AS pqty,
+	            d.amount,
+	            o.specification
+	        FROM order_acceptance_basic o
+	        INNER JOIN branch b
+	            ON b.branch_id = o.branch
+	        INNER JOIN customer_header c
+	            ON c.customer_id = o.customer
+	        INNER JOIN order_acceptance_detail d
+	            ON d.order_acceptance_basic_id =
+	               o.order_acceptance_basic_id
+	        INNER JOIN item i
+	            ON i.item_id = d.item
+	        INNER JOIN sales_rejection_invoice_basic sr
+	            ON sr.purchase_order = o.customer_purchase_order_no
+	        INNER JOIN sales_rejection_invoice_detail srd
+	            ON srd.sales_rejection_invoice_basic_id =
+	               sr.sales_rejection_invoice_basic_id
+	            AND srd.item = d.item
+	        WHERE o.cancel = FALSE
+	          AND b.branch_id = :plant
+	          AND c.belongs_to = :division
+	          AND o.doc_date <= :asondt
+	        GROUP BY
+	            b.branch_id,
+	            o.order_acceptance_basic_id,
+	            o.doc_id,
+	            o.doc_date,
+	            o.customer_purchase_order_no,
+	            o.customer_purchase_order_date,
+	            c.customer_id,
+	            c.customer_name,
+	            i.item_id,
+	            i.item_description,
+	            d.quantity,
+	            d.amount,
+	            o.specification
+	        HAVING (d.quantity - SUM(srd.despatch_qty)) > 0
+
+	        UNION
+
+	        SELECT 
+	            b.branch_id,
+	            o.order_acceptance_basic_id,
+	            o.doc_id,
+	            o.doc_date,
+	            o.customer_purchase_order_no,
+	            o.customer_purchase_order_date,
+	            c.customer_id,
+	            c.customer_name,
+	            i.item_id,
+	            i.item_description,
+	            d.quantity,
+	            0 AS sqty,
+	            d.quantity AS pqty,
+	            d.amount,
+	            o.specification
+	        FROM branch b
+	        INNER JOIN order_acceptance_basic o
+	            ON b.branch_id = o.branch
+	        INNER JOIN customer_header c
+	            ON c.customer_id = o.customer
+	        INNER JOIN order_acceptance_detail d
+	            ON d.order_acceptance_basic_id =
+	               o.order_acceptance_basic_id
+	        INNER JOIN item i
+	            ON i.item_id = d.item
+	        WHERE o.cancel = FALSE
+	          AND b.branch_id = :plant
+	          AND o.doc_date <= :asondt
+	          AND c.belongs_to = :division
+	          AND NOT EXISTS (
+	              SELECT 1
+	              FROM sales_rejection_invoice_basic sr
+	              INNER JOIN sales_rejection_invoice_detail srd
+	                  ON srd.sales_rejection_invoice_basic_id =
+	                     sr.sales_rejection_invoice_basic_id
+	              WHERE sr.purchase_order =
+	                    o.customer_purchase_order_no
+	                AND srd.item = d.item
+	                AND sr.cancel = FALSE
+	          )
+	        GROUP BY
+	            b.branch_id,
+	            o.order_acceptance_basic_id,
+	            o.doc_id,
+	            o.doc_date,
+	            o.customer_purchase_order_no,
+	            o.customer_purchase_order_date,
+	            c.customer_id,
+	            c.customer_name,
+	            i.item_id,
+	            i.item_description,
+	            d.quantity,
+	            d.amount,
+	            o.specification
+	        HAVING d.quantity > 0
+
+	        ORDER BY doc_id, customer_name
+	        """, nativeQuery = true)
+	List<Object[]> getSalesOrderPendingItemWiseReport(
+	        @Param("plant") Long plant,
+	        @Param("division") Long division,
+	        @Param("asondt") String asondt);
 
 }

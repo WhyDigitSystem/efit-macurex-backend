@@ -55,9 +55,9 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	
 	
 	@Query(value = """
-	        select
+	       select
 	            i.item_id, i.item_code, pdl.hsn_code, pdl.primary_unit unit,
-	            pdl.qty_in_primary_unit qty, pdl.rate_in_inr rate, pdl.delivery_date,
+	            pdl.qty_in_primary_unit qty, pdl.rate_in_inr rate, pdl.delivery_date,i.item_description,u.unit_id,
 
 	            (
 	                select coalesce(new_rate, 0) new_rate
@@ -102,7 +102,7 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	        inner join purchase_order_local_details pdl
 	            on po.purchase_order_basic_id = pdl.purchase_order_basic_id
 	        inner join item i
-	            on i.item_id = pdl.item
+	            on i.item_id = pdl.item  left join  unitmaster u on u.unitmaster_id=pdl.primary_unit
 	        where po.doc_id = :purchaseordernumber
 	        AND po.org_id = :orgId
 	        AND po.branch = :branch
@@ -111,7 +111,7 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 
 	        select
 	            i.item_id, i.item_code, pdl.hsn_code, pdl.uom unit,
-	            pdl.po_qty qty, pdl.order_rate rate, pdl.indent_date delivery_date,
+	            pdl.po_qty qty, pdl.order_rate rate, pdl.indent_date delivery_date,i.item_description,u.unit_id,
 
 	            (
 	                select coalesce(new_rate, 0) new_rate
@@ -156,7 +156,7 @@ public interface PurchaseOrderAmendmentRepo extends JpaRepository<PurchaseOrderA
 	        inner join purchase_order_import_details pdl
 	            on po.purchase_order_basic_id = pdl.purchase_order_basic_id
 	        inner join item i
-	            on i.item_id = pdl.item
+	            on i.item_id = pdl.item  left join  unitmaster u on u.unitmaster_id=pdl.uom
 	        where po.doc_id = :purchaseordernumber
 	        AND po.org_id = :orgId
 	        AND po.branch = :branch

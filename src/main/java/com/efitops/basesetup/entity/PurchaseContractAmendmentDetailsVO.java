@@ -26,45 +26,41 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PurchaseContractAmendmentDetailsVO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator = "pcamddetail_seq")
-    @SequenceGenerator(name = "pcamddetail_seq",
-            sequenceName = "pcamddetail_seq",initialValue = 1000000001,
-            allocationSize = 1)
-    @Column(name = "pcamddetail_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pcamddetailgen")
+	@SequenceGenerator(name = "pcamddetailgen", sequenceName = "pcamddetail_seq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "pcamddetail_id")
+	private Long id;
 
-    // Parent
-    @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name = "pcamdbasic_id")
-    private PurchaseContractAmendmentVO purchaseContractAmendmentVO;
-    // Item Code (Normalized with Item Master)
-    @ManyToOne
-    @JoinColumn(name = "item")
-    private ItemMasterVO item;
+	// Parent
+	@ManyToOne
+	@JsonBackReference
+	@JoinColumn(name = "pcamdbasic_id")
+	private PurchaseContractAmendmentVO purchaseContractAmendmentVO;
 
-    // Unit (Normalized with Unit Master)
-    @ManyToOne
-    @JoinColumn(name = "unit")
-    private UnitMasterVO unit;
+	@ManyToOne
+	@JoinColumn(name = "item")
+	private ItemMasterVO item;
 
-    @Column(name = "old_rate")
-    private BigDecimal oldRate;
+	@ManyToOne
+	@JoinColumn(name = "unit")
+	private UnitMasterVO unit;
 
-    @Column(name = "new_rate")
-    private BigDecimal newRate;
+	@Column(name = "old_rate")
+	private BigDecimal oldRate;
 
-    @Column(name = "valid_from")
-    private LocalDate validFrom;
+	@Column(name = "new_rate")
+	private BigDecimal newRate;
 
-    @Column(name = "new_valid_from")
-    private LocalDate newValidFrom;
+	@Column(name = "valid_from")
+	private LocalDate validFrom;
 
-    @Column(name = "valid_to")
-    private LocalDate validTo;
+	@Column(name = "new_valid_from")
+	private LocalDate newValidFrom;
 
-    @Column(name = "new_valid_to")
-    private LocalDate newValidTo;
+	@Column(name = "valid_to")
+	private LocalDate validTo;
+
+	@Column(name = "new_valid_to")
+	private LocalDate newValidTo;
 }

@@ -3873,10 +3873,10 @@ public class PurchaseServiceImportController extends BaseController {
 		return ResponseEntity.ok().body(responseDTO);
 	}
 
-	@GetMapping("/getFgItemCodeDetails")
-	public ResponseEntity<ResponseDTO> getFgItemCodeDetails(@RequestParam Long orgId, @RequestParam Long branch) {
+	@GetMapping("/getScrapItemDetails")
+	public ResponseEntity<ResponseDTO> getScrapItemDetails(@RequestParam Long orgId, @RequestParam Long branch) {
 
-		String methodName = "getFgItemCodeDetails()";
+		String methodName = "getScrapItemDetails()";
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
 		String errorMsg = null;
@@ -3886,7 +3886,7 @@ public class PurchaseServiceImportController extends BaseController {
 
 		try {
 
-			mapp = purchaseOrderService.getFgItemCodeDetails(orgId, branch);
+			mapp = purchaseOrderService.getScrapItemDetails(orgId, branch);
 
 		} catch (Exception e) {
 
@@ -3897,7 +3897,7 @@ public class PurchaseServiceImportController extends BaseController {
 
 		if (StringUtils.isBlank(errorMsg)) {
 
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "FgTransfer retrieved successfully");
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "Scrap retrieved successfully");
 
 			responseObjectsMap.put("mapp", mapp);
 
@@ -3905,7 +3905,7 @@ public class PurchaseServiceImportController extends BaseController {
 
 		} else {
 
-			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve FgTransfer", errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "Failed to retrieve Scrap", errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);

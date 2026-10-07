@@ -2451,7 +2451,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setFinancialYear(vo.getFinancialYear());
 		responseDTO.setScreenName(vo.getScreenName());
 		responseDTO.setScreenCode(vo.getScreenCode());
-		
+
 		responseDTO.setBasicAmount(vo.getBasicAmount());
 		responseDTO.setDiscount(vo.getDiscount());
 		responseDTO.setAfterDiscountTotalAmount(vo.getAfterDiscountTotalAmount());
@@ -4685,7 +4685,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				}
 
 				if (d.getScrap() != null && d.getScrap() != 0) {
-					ListOfValuesDetailsVO item = listOfValuesDetailsRepo.findById(d.getScrap())
+					ItemMasterVO item = itemMasterRepo.findById(d.getScrap())
 							.orElseThrow(() -> new ApplicationException("Scrap Not Found"));
 					detailsVO.setScrap(item);
 				}
@@ -4793,11 +4793,12 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 				detailsDTO.setScrapTotal(detailsVO.getScrapTotal());
 
 				if (detailsVO.getScrap() != null) {
-					ListOfValuesResponseDTO fgItemDTO = new ListOfValuesResponseDTO();
-					fgItemDTO.setId(detailsVO.getScrap().getId());
-					fgItemDTO.setListCode(detailsVO.getScrap().getValueCode());
-					fgItemDTO.setListDescription(detailsVO.getScrap().getValueDescription());
-					detailsDTO.setScrap(fgItemDTO);
+
+					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+					itemDTO.setId(detailsVO.getItem().getId());
+					itemDTO.setItemCode(detailsVO.getItem().getItemCode());
+					itemDTO.setItemDescription(detailsVO.getItem().getItemDescription());
+					detailsDTO.setScrap(itemDTO);
 				}
 
 				if (detailsVO.getItem() != null) {
@@ -6969,17 +6970,16 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		}
 		return list;
 	}
-	
-	
+
 	@Override
-	public List<Map<String, Object>> getFgItemCodeDetails(Long orgId, Long branch) {
+	public List<Map<String, Object>> getScrapItemDetails(Long orgId, Long branch) {
 
-		Set<Object[]> chType = fgTransferSlipRepo.getFgItemCodeDetails(orgId, branch);
+		Set<Object[]> chType = fgTransferSlipRepo.getScrapItemDetails(orgId, branch);
 
-		return getFgItemCodeDetails(chType);
+		return getScarpItemDetails(chType);
 	}
 
-	private List<Map<String, Object>> getFgItemCodeDetails(Set<Object[]> chType) {
+	private List<Map<String, Object>> getScarpItemDetails(Set<Object[]> chType) {
 
 		List<Map<String, Object>> list = new ArrayList<>();
 

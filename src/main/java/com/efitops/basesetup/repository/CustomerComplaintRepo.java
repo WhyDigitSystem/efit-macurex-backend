@@ -90,5 +90,37 @@ public interface CustomerComplaintRepo extends JpaRepository<CustomerComplaintEn
 //		       "ORDER BY type",
 //		       nativeQuery = true)
 //		List<Object[]> getTypeDropdown();
+		
+		
+		@Query(value = """
+		        SELECT
+		            ccm.complaint_no AS complaintNo,
+		            c.customer_id AS customerId,
+		            c.customer_code AS customerCode,
+		            c.customer_name AS customerName,
+		            i.item_id AS itemId,
+		            i.item_code AS itemCode,
+		            i.item_description AS itemDescription,
+		            ccm.customer_ref_no AS customerPartNo,
+		            ccm.complaint_date AS openDate,
+		            DATE_ADD(ccm.complaint_date, INTERVAL 3 DAY) AS closeDate
+		        FROM customercomplaintmaster ccm
+		        LEFT JOIN customer_header c
+		            ON c.customer_id = ccm.customer
+		        LEFT JOIN item i
+		            ON i.item_id = ccm.item
+		        WHERE ccm.branch = :pprm
+		          AND ccm.complaint_date BETWEEN :fromdate AND :todate
+		          AND NOT EXISTS (
+		              SELECT 1
+		              FROM eight_discipline_entry_basic ed
+		              WHERE ed.complaint_no = ccm.customercomplaintmaster_id
+		          )
+		        ORDER BY ccm.complaint_date, ccm.complaint_no
+		        """, nativeQuery = true)
+		List<Object[]> getCustomerComplaintReport(
+		        @Param("pprm") Long branch,
+		        @Param("fromdate") String fromdate,
+		        @Param("todate") String todate);
 
 }

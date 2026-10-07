@@ -49,9 +49,10 @@ public class InitialStageInspectionVO {
 	  
 	    @Column(name = "doc_date")
 	    private LocalDate docDate = LocalDate.now();
-
-	    @Column(name = "shift")
-	    private String shift;
+	    
+	    @ManyToOne
+	    @JoinColumn(name = "shift")
+	    private ShiftVO shift;
 
 	    @ManyToOne
 	    @JoinColumn(name = "item_code")

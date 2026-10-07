@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -2414,14 +2415,14 @@ public class DevelopServiceImpl implements DevelopService {
 
 	private void createUpdatePurchaseContractAmendmentVOByDTO(PurchaseContractAmendmentDto dto,
 			PurchaseContractAmendmentVO vo) throws ApplicationException {
-		if (dto.getBranch() != null  && dto.getBranch() !=0) {
+		if (dto.getBranch() != null && dto.getBranch() != 0) {
 
 			BranchVO branchVO = branchRepo.findById(dto.getBranch())
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 			vo.setBranch(branchVO);
 		}
-		if (dto.getCustomer() != null && dto.getBranch() !=0) {
+		if (dto.getCustomer() != null && dto.getBranch() != 0) {
 
 			CustomerVO customerVO = customerRepo.findById(dto.getCustomer())
 					.orElseThrow(() -> new ApplicationException("Customer Not Found"));
@@ -2451,16 +2452,14 @@ public class DevelopServiceImpl implements DevelopService {
 		vo.setActive(dto.isActive());
 		vo.setCancelRemarks(dto.getCancelRemarks());
 
-
 		if (vo.getId() != null) {
-			
+
 			List<PurchaseContractAmendmentDetailsVO> details = purchaseContractAmendmentDetailsRepo
 					.findByPurchaseContractAmendmentVO(vo);
 
 			purchaseContractAmendmentDetailsRepo.deleteAll(details);
 
 		}
-
 
 		List<PurchaseContractAmendmentDetailsVO> detailsList = new ArrayList<>();
 
@@ -2531,7 +2530,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 			responseDto.setBranch(branchResponseDTO);
 		}
-		
+
 		if (vo.getCustomer() != null) {
 
 			PurchaseContractAmendmentCustomerResponceDto customerResponseDTO = new PurchaseContractAmendmentCustomerResponceDto();
@@ -2553,7 +2552,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		responseDto.setRefNo(vo.getRefNo());
 		responseDto.setRefDate(vo.getRefDate());
-		
+
 		responseDto.setScreenCode(vo.getScreenCode());
 		responseDto.setScreenName(vo.getScreenName());
 
@@ -2783,7 +2782,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
 
-
 		if (relativePath.startsWith("/")) {
 			relativePath = relativePath.substring(1);
 		}
@@ -2791,7 +2789,7 @@ public class DevelopServiceImpl implements DevelopService {
 		if (relativePath.startsWith("uploads/")) {
 			relativePath = relativePath.substring("uploads/".length());
 		}
-		
+
 		int index = relativePath.indexOf("purchaseContractAmendment/");
 		if (index > 0) {
 			relativePath = relativePath.substring(index);
@@ -2887,6 +2885,8 @@ public class DevelopServiceImpl implements DevelopService {
 
 			contract.put("contractNo", obj[1] != null ? obj[1].toString() : null);
 
+			contract.put("contractDate", obj[2] != null ? obj[2].toString() : null);
+
 			contractList.add(contract);
 		}
 
@@ -2923,7 +2923,9 @@ public class DevelopServiceImpl implements DevelopService {
 
 			itemCode.put("itemDescription", obj[2] != null ? obj[2].toString() : null);
 
-			itemCode.put("unitId", obj[3] != null ? ((Number) obj[3]).longValue() : null);
+			itemCode.put("unitDescription", obj[3] != null ? obj[3].toString() : null);
+
+			itemCode.put("unitId", obj[4] != null ? ((Number) obj[4]).longValue() : null);
 
 			itemCodeList.add(itemCode);
 		}
@@ -3055,7 +3057,8 @@ public class DevelopServiceImpl implements DevelopService {
 		vo.setTaxDescription(dto.getTaxDescription());
 		vo.setExchangeRate(dto.getExchangeRate());
 		vo.setRemarks(dto.getRemarks());
-
+		vo.setRefNo(dto.getRefNo());
+		vo.setRefDate(dto.getRefDate());
 		vo.setOrgId(dto.getOrgId());
 		vo.setActive(dto.isActive());
 		vo.setCancelRemarks(dto.getCancelRemarks());
@@ -3330,6 +3333,8 @@ public class DevelopServiceImpl implements DevelopService {
 		dto.setModeOfDespatch(vo.getModeOfDespatch());
 		dto.setTaxDescription(vo.getTaxDescription());
 		dto.setRemarks(vo.getRemarks());
+		dto.setRefNo(vo.getRefNo());
+		dto.setRefDate(vo.getRefDate());
 
 		dto.setOrgId(vo.getOrgId());
 		dto.setCreatedBy(vo.getCreatedBy());
@@ -3574,7 +3579,7 @@ public class DevelopServiceImpl implements DevelopService {
 			response.put("rate", obj[5]);
 			response.put("deliveryDate", obj[6]);
 			response.put("itemDescription", obj[7]);
-			response.put("unitDescription", obj[8]);			
+			response.put("unitDescription", obj[8]);
 			response.put("oldRate", obj[9]);
 			response.put("oldQty", obj[10]);
 			response.put("oldDeliveryDate", obj[11]);
@@ -3657,6 +3662,7 @@ public class DevelopServiceImpl implements DevelopService {
 	@Transactional
 	public Map<String, Object> createUpdateOpenStockEntry(OpenStockEntryDto openStockEntryDto)
 			throws ApplicationException {
+		String screenCode = "OSE";
 
 		OpenStockEntryVO openStockEntryVO;
 		String message;
@@ -3673,6 +3679,17 @@ public class DevelopServiceImpl implements DevelopService {
 		} else {
 
 			openStockEntryVO = new OpenStockEntryVO();
+
+			String docId = openStockEntryRepo.getOpenStockEntryDocId(openStockEntryDto.getOrgId(),
+					openStockEntryDto.getFinancialYear(), screenCode);
+
+			openStockEntryVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(openStockEntryDto.getOrgId(),
+							openStockEntryDto.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			openStockEntryVO.setCreatedBy(openStockEntryDto.getCreatedBy());
 
@@ -3775,6 +3792,10 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setCreatedBy(openStockEntryVO.getCreatedBy());
 
 		responseDTO.setCancelRemarks(openStockEntryVO.getCancelRemarks());
+
+		responseDTO.setDocId(openStockEntryVO.getDocId());
+
+		responseDTO.setDocDate(openStockEntryVO.getDocDate());
 
 		// Branch
 		if (openStockEntryVO.getBranch() != null) {
@@ -3907,11 +3928,11 @@ public class DevelopServiceImpl implements DevelopService {
 	}
 
 	@Override
-	public String getOpenStockEntryDocId(Long orgId, String financialYear, String screenCode) {
+	public String getOpenStockEntryDocId(Long orgId, String financialYear) {
 
 		String screenCode1 = "OSE";
 
-		String result = openStockEntryRepo.getOpenStockEntryDocId(orgId, financialYear, screenCode);
+		String result = openStockEntryRepo.getOpenStockEntryDocId(orgId, financialYear, screenCode1);
 
 		return result;
 	}
@@ -3928,15 +3949,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		String message;
 
-		// =========================
-		// Create / Update
-		// =========================
-
 		if (ObjectUtils.isNotEmpty(issuesDto.getId())) {
-
-			// =========================
-			// Update
-			// =========================
 
 			issuesVO = issuesRepo.findById(issuesDto.getId())
 					.orElseThrow(() -> new ApplicationException("Issues Not Found"));
@@ -3954,10 +3967,6 @@ public class DevelopServiceImpl implements DevelopService {
 			String docId = issuesRepo.getIssuesDocId(issuesDto.getOrgId(), issuesDto.getFinancialYear(), screenCode);
 
 			issuesVO.setDocId(docId);
-
-			// =========================
-			// Document Type Mapping
-			// =========================
 
 			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
 					.findByOrgIdAndFinYearAndScreenCode(issuesDto.getOrgId(), issuesDto.getFinancialYear(), screenCode);
@@ -4045,15 +4054,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		issuesVO.setBelongsTo(dto.getBelongsTo());
 
-		// =========================
-		// Time
-		// =========================
-
-		issuesVO.setTime(dto.getTime());
-
-		// =========================
-		// Reference No
-		// =========================
+		issuesVO.setTime(LocalTime.parse(dto.getTime()));
 
 		issuesVO.setRefNo(dto.getRefNo());
 
@@ -4122,18 +4123,6 @@ public class DevelopServiceImpl implements DevelopService {
 		// =========================
 
 		issuesVO.setCancelRemarks(dto.getCancelRemarks());
-
-		// =========================
-		// Screen Details
-		// =========================
-
-		issuesVO.setScreenCode("ISU");
-
-		issuesVO.setScreenName("ISSUES");
-
-		// =====================================================
-		// Delete Existing Details During Update
-		// =====================================================
 
 		if (dto.getId() != null) {
 

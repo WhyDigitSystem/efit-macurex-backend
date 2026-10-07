@@ -505,7 +505,7 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		vo.setBelongsTo(dto.getBelongsTo());
 		vo.setIsIgstApplicable(dto.getIsIgstApplicable());
 
-		if (dto.getDepartment() != null && dto.getDepartment() >= 0) {
+		if (dto.getDepartment() != null && dto.getDepartment() > 0) {
 
 			DepartmentVO department = departmentRepo.findById(dto.getDepartment())
 					.orElseThrow(() -> new ApplicationException("Department Not Found"));
@@ -6967,6 +6967,35 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 			list.add(map);
 		}
+		return list;
+	}
+	
+	
+	@Override
+	public List<Map<String, Object>> getFgItemCodeDetails(Long orgId, Long branch) {
+
+		Set<Object[]> chType = fgTransferSlipRepo.getFgItemCodeDetails(orgId, branch);
+
+		return getFgItemCodeDetails(chType);
+	}
+
+	private List<Map<String, Object>> getFgItemCodeDetails(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+
+			list.add(map);
+		}
+
 		return list;
 	}
 

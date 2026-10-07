@@ -118,6 +118,12 @@ public class PurchaseOrderAmendmentVO {
 	@Column(name = "financial_year")
 	private String financialYear;
 
+	@Column(name = "ref_no")
+	private String refNo;
+
+	@Column(name = "ref_date")
+	private LocalDate refDate;
+
 	@OneToMany(mappedBy = "purchaseOrderAmendmentVO", cascade = CascadeType.ALL)
 	@JsonManagedReference
 	private List<PurchaseOrderAmendmentDetailsVO> details = new ArrayList<>();

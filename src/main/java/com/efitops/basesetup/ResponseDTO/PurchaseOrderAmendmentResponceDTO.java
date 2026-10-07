@@ -61,6 +61,10 @@ public class PurchaseOrderAmendmentResponceDTO {
 	private String screenName;
 	private String screenCode;
 
+	private String refNo;
+
+	private LocalDate refDate;
+
 	private List<PurchaseOrderAmendmentDetailsResponseDTO> details;
 
 	private List<PurchaseOrderAmendmentAttachmentResponseDTO> attachments;

@@ -618,9 +618,7 @@ public class DevelopController extends BaseController {
 	@PutMapping(value = "/createUpdatePurchaseContractAmendment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseDTO> createUpdatePurchaseContractAmendment(
 			@RequestPart("purchaseContractAmendment") PurchaseContractAmendmentDto purchaseContractAmendmentDto,
-
 //			@RequestBody PurchaseContractAmendmentDto purchaseContractAmendmentDto,
-
 			@RequestPart(value = "files", required = false) MultipartFile[] files) {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
@@ -1315,7 +1313,7 @@ public class DevelopController extends BaseController {
 	@GetMapping("/getOpenStockEntryDocId")
 
 	public ResponseEntity<ResponseDTO> getOpenStockEntryDocId(@RequestParam Long orgId,
-			@RequestParam String financialYear, @RequestParam String screenCode) {
+			@RequestParam String financialYear) {
 
 		String methodName = "getOpenStockEntryDocId()";
 
@@ -1331,7 +1329,7 @@ public class DevelopController extends BaseController {
 
 		try {
 
-			mapp = developService.getOpenStockEntryDocId(orgId, financialYear, screenCode);
+			mapp = developService.getOpenStockEntryDocId(orgId, financialYear);
 
 		} catch (Exception e) {
 
@@ -1620,8 +1618,7 @@ public class DevelopController extends BaseController {
 	// docidissues
 
 	@GetMapping("/getIssuesDocId")
-	public ResponseEntity<ResponseDTO> getIssuesDocId(@RequestParam Long orgId, @RequestParam String financialYear,
-			@RequestParam String screenCode1) {
+	public ResponseEntity<ResponseDTO> getIssuesDocId(@RequestParam Long orgId, @RequestParam String financialYear) {
 
 		String methodName = "getIssuesDocId()";
 

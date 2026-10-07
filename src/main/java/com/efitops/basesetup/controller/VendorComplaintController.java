@@ -1375,10 +1375,9 @@ public class VendorComplaintController extends BaseController {
 	 * Create / Update Flash NC Report
 	 */
 	@PostMapping(value = "/updateCreateFlashNCReport", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseDTO updateCreateFlashNCReport(
-			@RequestPart("flashNCReportVO") FlashNCReportDTO flashNCReportDTO,
+	public ResponseDTO updateCreateFlashNCReport(@RequestPart("flashNCReportVO") FlashNCReportDTO flashNCReportDTO,
 //			@RequestBody FlashNCReportDTO flashNCReportDTO,
-	
+
 			@RequestPart(value = "files", required = false) MultipartFile[] files,
 			@RequestPart(value = "images", required = false) MultipartFile[] images) {
 
@@ -1591,7 +1590,7 @@ public class VendorComplaintController extends BaseController {
 	}
 
 	@GetMapping("/getFromDeptDropdownForFlashNCReport")
-	public ResponseEntity<ResponseDTO> getFromDeptDropdownForFlashNCReport(@RequestParam Long listOfValuesId) {
+	public ResponseEntity<ResponseDTO> getFromDeptDropdownForFlashNCReport(@RequestParam Long branch,@RequestParam Long orgId) {
 
 		String methodName = "getFromDeptDropdownForFlashNCReport()";
 
@@ -1606,7 +1605,7 @@ public class VendorComplaintController extends BaseController {
 		try {
 
 			List<Map<String, Object>> response = vendorComplaintService
-					.getFromDeptDropdownForFlashNCReport(listOfValuesId);
+					.getFromDeptDropdownForFlashNCReport(branch,orgId);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "From Department Retrieved Successfully");
 
@@ -1629,8 +1628,7 @@ public class VendorComplaintController extends BaseController {
 	}
 
 	@GetMapping("/getToDepartmentDropdownForFlashNCReport")
-	public ResponseEntity<ResponseDTO> getToDepartmentDropdownForFlashNCReport(
-			@RequestParam Long fromDept) {
+	public ResponseEntity<ResponseDTO> getToDepartmentDropdownForFlashNCReport(@RequestParam Long fromDept) {
 
 		String methodName = "getToDepartmentDropdownForFlashNCReport()";
 
@@ -1645,7 +1643,7 @@ public class VendorComplaintController extends BaseController {
 		try {
 
 			List<Map<String, Object>> response = vendorComplaintService
-					.getToDepartmentDropdownForFlashNCReport( fromDept);
+					.getToDepartmentDropdownForFlashNCReport(fromDept);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "To Department Retrieved Successfully");
 
@@ -3818,8 +3816,7 @@ public class VendorComplaintController extends BaseController {
 
 	@GetMapping("/getSalesOrderPendingItemWiseReport")
 	public ResponseEntity<ResponseDTO> getSalesOrderPendingItemWiseReport(@RequestParam Long plant,
-			@RequestParam Long division,
-			@RequestParam String asondt) {
+			@RequestParam Long division, @RequestParam String asondt) {
 
 		String methodName = "getSalesOrderPendingItemWiseReport()";
 
@@ -3832,6 +3829,286 @@ public class VendorComplaintController extends BaseController {
 		try {
 
 			responseObjectsMap = vendorComplaintService.getSalesOrderPendingItemWiseReport(plant, division, asondt);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	sales Register product wise
+	@GetMapping("/getSalesRegisterProductWiseReport")
+	public ResponseEntity<ResponseDTO> getSalesRegisterProductWiseReport(@RequestParam String customerName,
+			@RequestParam String itemCode, @RequestParam String fromDate, @RequestParam String toDate,
+			@RequestParam Long branch, @RequestParam Long orgId) {
+
+		String methodName = "getSalesRegisterProductWiseReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getSalesRegisterProductWiseReport(customerName, itemCode,
+					fromDate, toDate, branch, orgId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	sales register location ise
+
+	@GetMapping("/getSalesRegisterLocationWiseReport")
+	public ResponseEntity<ResponseDTO> getSalesRegisterLocationWiseReport(@RequestParam String location,
+			@RequestParam String itemCode, @RequestParam String fromDate, @RequestParam String toDate,
+			@RequestParam Long branch, @RequestParam Long orgId) {
+
+		String methodName = "getSalesRegisterLocationWiseReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getSalesRegisterLocationWiseReport(location, itemCode, fromDate,
+					toDate, branch, orgId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getSalesContractRegisterReport")
+	public ResponseEntity<ResponseDTO> getSalesContractRegisterReport(@RequestParam String fromDate,
+			@RequestParam String toDate, @RequestParam Long branch, @RequestParam Long orgId,
+			@RequestParam String belongsTo) {
+
+		String methodName = "getSalesContractRegisterReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getSalesContractRegisterReport(fromDate, toDate, branch, orgId,
+					belongsTo);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	salesCustomerPartnocuml
+	@GetMapping("/getSalesCustomerPartNoCumlReport")
+	public ResponseEntity<ResponseDTO> getSalesCustomerPartNoCumlReport(@RequestParam Long branch,
+			@RequestParam Long orgId, @RequestParam String fromDate, @RequestParam String toDate,
+			@RequestParam String customerName) {
+
+		String methodName = "getSalesCustomerPartNoCumlReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getSalesCustomerPartNoCumlReport(branch, orgId, fromDate,
+					toDate, customerName);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	sales Register customer wise report
+	@GetMapping("/getSalesRegisterCustomerWiseReport")
+	public ResponseEntity<ResponseDTO> getSalesRegisterCustomerWiseReport(@RequestParam Long belongsTo,
+			@RequestParam String fromDate, @RequestParam String toDate, @RequestParam String customerName,
+			@RequestParam Long branch, @RequestParam Long orgId) {
+
+		String methodName = "getSalesRegisterCustomerWiseReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getSalesRegisterCustomerWiseReport(belongsTo, fromDate, toDate,
+					customerName, branch, orgId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getMonthlyScheduleRevDetails")
+	public ResponseEntity<ResponseDTO> getMonthlyScheduleRevDetails(@RequestParam String belongsTo,
+			@RequestParam String myear, @RequestParam Long branch, @RequestParam Long orgId,
+			@RequestParam String fromDate, @RequestParam String toDate) {
+
+		String methodName = "getMonthlyScheduleRevDetails()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getMonthlyScheduleRevDetails(belongsTo, myear, branch, orgId,
+					fromDate, toDate);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	delivery schedule other report
+
+	@GetMapping("/getDeliveryScheduleOthersReport")
+	public ResponseEntity<ResponseDTO> getDeliveryScheduleOthersReport(@RequestParam String monthYear,
+			@RequestParam Long belongsTo, @RequestParam String itemCode, @RequestParam Long branchId,
+			@RequestParam Long orgId, @RequestParam String fromDate, @RequestParam String toDate) {
+
+		String methodName = "getDeliveryScheduleOthersReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getDeliveryScheduleOthersReport(monthYear, belongsTo, itemCode,
+					branchId, orgId, fromDate, toDate);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+//	delivery schedule daywise
+	@GetMapping("/getDeliveryScheduleDayWiseReport")
+	public ResponseEntity<ResponseDTO> getDeliveryScheduleDayWiseReport(@RequestParam String monthYear,
+			@RequestParam String fromDate, @RequestParam String toDate, @RequestParam Long branchId,
+			@RequestParam Long orgId) {
+
+		String methodName = "getDeliveryScheduleDayWiseReport()";
+
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+
+			responseObjectsMap = vendorComplaintService.getDeliveryScheduleDayWiseReport(monthYear, fromDate, toDate,
+					branchId, orgId);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 

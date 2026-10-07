@@ -1,6 +1,7 @@
 package com.efitops.basesetup.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -53,6 +54,10 @@ public class PurchaseOrderAmendmentDTO {
 	private String createdBy;
 
 	private String cancelRemarks;
+
+	private String refNo;
+
+	private LocalDate refDate;
 
 	private List<PurchaseOrderAmendmentDetailsDTO> details;
 

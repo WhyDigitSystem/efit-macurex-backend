@@ -41,7 +41,7 @@ public interface PurchaseContractAmendmentRepo
     @Query(value = """
             SELECT
                 p.purchase_contract_basic_id,
-                p.doc_id
+                p.doc_id,p.doc_date
             FROM purchase_contract_basic p
             WHERE p.org_id = :orgId
               AND p.branch = :branch
@@ -56,20 +56,22 @@ public interface PurchaseContractAmendmentRepo
     
     
     @Query(value = """
-            SELECT DISTINCT
+          SELECT DISTINCT
                    i.item_id AS id,
                    i.item_code AS itemCode,
                    i.item_description AS itemDescription,
-                   d.unit_id AS unitId
+                   u.unit_id AS unitId,
+                   d.unit
             FROM item i
             INNER JOIN purchase_contract_details d
-                    ON i.item_id = d.item_id
+                    ON i.item_id = d.item
             INNER JOIN purchase_contract_basic b
-                    ON b.purchase_contract_basic_id = d.purchase_contract_basic_id
+                    ON b.purchase_contract_basic_id = d.purchase_contract_basic_id 
+                    left join unitmaster u on u.unitmaster_id=d.unit
             WHERE b.cancel = 0
-              AND b.doc_id = :docId
-              AND b.org_id = :orgId
-              AND b.branch = :branch
+               AND b.doc_id = :docId
+               AND b.org_id = :orgId
+             and  b.branch = :branch
             """, nativeQuery = true)
     List<Object[]> getPurchaseContractAmendmentItemCodeDropdown(
             @Param("docId") String docId,

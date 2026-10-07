@@ -49,7 +49,7 @@ public interface FgTransferSlipRepo extends JpaRepository<FgTransferSlipVO, Long
 	
 	@Query(nativeQuery = true, value = "select i.item_id,i.item_code,i.item_description from item i left join listofvaluesdetails l1\r\n"
 			+ "		                        on l1.listofvaluesdetails_id=i.item_type where i.org_id=?1 and \r\n"
-			+ "			                       i.branch=?1 and l1.value_description='FG'")
-	Set<Object[]> getFgItemCodeDetails(Long orgId, Long branch);
+			+ "			                       i.branch=?2 and l1.value_description='SCRAP'")
+	Set<Object[]> getScrapItemDetails(Long orgId, Long branch);
 
 }

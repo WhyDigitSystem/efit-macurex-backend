@@ -2782,7 +2782,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * Supplier
 		 */
-		
+
 		/*
 		 * Item
 		 */
@@ -2820,8 +2820,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		 * Status
 		 */
 		vo.setStatus(dto.getStatus());
-		
+
 		vo.setSupplier(dto.getSupplier());
+		vo.setSupplierName(dto.getSupplierName());
 		/*
 		 * Normal Fields
 		 */
@@ -3018,7 +3019,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * Supplier
 		 */
-	
+
 		/*
 		 * Item
 		 */
@@ -3070,7 +3071,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		 */
 		response.setStatus(vo.getStatus());
 		response.setSupplier(vo.getSupplier());
-//		* Normal Fields	 */
+		response.setSupplierName(vo.getSupplierName());
+//				* Normal Fields	 */
 
 		response.setDocId(vo.getDocId());
 
@@ -3363,10 +3365,10 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long branch,Long orgId)
+	public List<Map<String, Object>> getFromDeptDropdownForFlashNCReport(Long branch, Long orgId)
 			throws ApplicationException {
 
-		List<Object[]> departmentList = flashNCReportRepo.getFromDepartmentForFlashNCReport(branch,orgId);
+		List<Object[]> departmentList = flashNCReportRepo.getFromDepartmentForFlashNCReport(branch, orgId);
 
 		if (departmentList == null || departmentList.isEmpty()) {
 
@@ -3381,7 +3383,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			departmentMap.put("id", obj[0]);
 			departmentMap.put("name", obj[1]);
-			
+
 			responseList.add(departmentMap);
 		}
 
@@ -3416,60 +3418,60 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getMRINGRNDropdownForFlashNCReport(
-	        Long orgId, Long branch) throws ApplicationException {
+	public List<Map<String, Object>> getMRINGRNDropdownForFlashNCReport(Long orgId, Long branch)
+			throws ApplicationException {
 
-	    List<Object[]> mrinGrnList =
-	            flashNCReportRepo.getMRINGRNDropdownForFlashNCReport(orgId, branch);
+		List<Object[]> mrinGrnList = flashNCReportRepo.getMRINGRNDropdownForFlashNCReport(orgId, branch);
 
-	    if (mrinGrnList == null || mrinGrnList.isEmpty()) {
-	        throw new ApplicationException("No MRIN/GRN Details Found");
-	    }
+		if (mrinGrnList == null || mrinGrnList.isEmpty()) {
+			throw new ApplicationException("No MRIN/GRN Details Found");
+		}
 
-	    Map<Object, Map<String, Object>> groupedMap = new LinkedHashMap<>();
+		Map<Object, Map<String, Object>> groupedMap = new LinkedHashMap<>();
 
-	    for (Object[] obj : mrinGrnList) {
+		for (Object[] obj : mrinGrnList) {
 
-	        Object mrinGrnNo = obj[0];
+			Object mrinGrnNo = obj[0];
 
-	        Map<String, Object> mrinGrnMap = groupedMap.get(mrinGrnNo);
+			Map<String, Object> mrinGrnMap = groupedMap.get(mrinGrnNo);
 
-	        // Create parent only once
-	        if (mrinGrnMap == null) {
+			// Create parent only once
+			if (mrinGrnMap == null) {
 
-	            mrinGrnMap = new LinkedHashMap<>();
+				mrinGrnMap = new LinkedHashMap<>();
 
-	            mrinGrnMap.put("mrinGrnNo", obj[0]);
-	            mrinGrnMap.put("supplierCode", obj[1]);
-	            mrinGrnMap.put("supplierName", obj[2]);
-	            mrinGrnMap.put("invoiceNo", obj[3]);
-	            mrinGrnMap.put("mrinGrnDate", obj[6]);
-	            mrinGrnMap.put("poNo", obj[7]);
-	            mrinGrnMap.put("qty", obj[8]);
-	            mrinGrnMap.put("sourceType", obj[9]);
+				mrinGrnMap.put("mrinGrnNo", obj[0]);
+				mrinGrnMap.put("supplierCode", obj[1]);
+				mrinGrnMap.put("supplierName", obj[2]);
+				mrinGrnMap.put("invoiceNo", obj[3]);
 
-	            List<Map<String, Object>> itemList = new ArrayList<>();
+				// Correct indexes
+				mrinGrnMap.put("mrinGrnDate", obj[7]);
+				mrinGrnMap.put("poNo", obj[8]);
+				mrinGrnMap.put("qty", obj[9]);
+				mrinGrnMap.put("sourceType", obj[10]);
 
-	            mrinGrnMap.put("items", itemList);
+				List<Map<String, Object>> itemList = new ArrayList<>();
 
-	            groupedMap.put(mrinGrnNo, mrinGrnMap);
-	        }
+				mrinGrnMap.put("items", itemList);
 
-	        // Only item details should come inside items
-	        @SuppressWarnings("unchecked")
-	        List<Map<String, Object>> itemList =
-	                (List<Map<String, Object>>) mrinGrnMap.get("items");
+				groupedMap.put(mrinGrnNo, mrinGrnMap);
+			}
 
-	        Map<String, Object> itemMap = new LinkedHashMap<>();
+			@SuppressWarnings("unchecked")
+			List<Map<String, Object>> itemList = (List<Map<String, Object>>) mrinGrnMap.get("items");
 
-	        itemMap.put("itemid", obj[4]);
-	        itemMap.put("itemCode", obj[5]);
-	        itemMap.put("itemDescription", obj[6]);
+			Map<String, Object> itemMap = new LinkedHashMap<>();
 
-	        itemList.add(itemMap);
-	    }
+			// Correct item indexes
+			itemMap.put("itemid", obj[4]);
+			itemMap.put("itemCode", obj[5]);
+			itemMap.put("itemDescription", obj[6]);
 
-	    return new ArrayList<>(groupedMap.values());
+			itemList.add(itemMap);
+		}
+
+		return new ArrayList<>(groupedMap.values());
 	}
 
 	@Override
@@ -8842,8 +8844,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-		List<Object[]> resultList = salesDeliveryScheduleRepo.getDeliveryScheduleDayWiseReport(monthYear, fromDate, toDate,
-				branchId, orgId);
+		List<Object[]> resultList = salesDeliveryScheduleRepo.getDeliveryScheduleDayWiseReport(monthYear, fromDate,
+				toDate, branchId, orgId);
 
 		List<Map<String, Object>> responseList = new ArrayList<>();
 

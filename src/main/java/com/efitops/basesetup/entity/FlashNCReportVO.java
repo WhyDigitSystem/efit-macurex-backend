@@ -90,6 +90,9 @@
 		@Column(name = "supplier")
 		private String supplier;
 	
+		@Column(name = "supplier_name")
+		private String supplierName;
+		
 		@Column(name = "operation_no")
 		private String operationNo;
 	

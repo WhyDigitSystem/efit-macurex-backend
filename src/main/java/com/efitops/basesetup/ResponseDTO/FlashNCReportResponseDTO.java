@@ -47,6 +47,8 @@ public class FlashNCReportResponseDTO {
 	private String poNo;
 
 	private String supplier;
+	
+	private String supplierName;
 
 	private String operationNo;
 

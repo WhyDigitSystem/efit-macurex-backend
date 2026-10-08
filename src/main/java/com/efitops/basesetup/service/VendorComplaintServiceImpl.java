@@ -2762,7 +2762,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		 */
 		if (dto.getFromDept() != null) {
 
-			ListOfValuesDetailsVO fromDept = listOfValuesDetailsRepo.findById(dto.getFromDept())
+			DepartmentVO fromDept = departmentRepo.findById(dto.getFromDept())
 					.orElseThrow(() -> new ApplicationException("From Department Not Found"));
 
 			vo.setFromDept(fromDept);
@@ -2773,7 +2773,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		 */
 		if (dto.getToDept() != null) {
 
-			ListOfValuesDetailsVO toDept = listOfValuesDetailsRepo.findById(dto.getToDept())
+			DepartmentVO toDept = departmentRepo.findById(dto.getToDept())
 					.orElseThrow(() -> new ApplicationException("To Department Not Found"));
 
 			vo.setToDept(toDept);
@@ -2782,14 +2782,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * Supplier
 		 */
-		if (dto.getSupplier() != null) {
-
-			CustomerVO supplier = customerRepo.findById(dto.getSupplier())
-					.orElseThrow(() -> new ApplicationException("Supplier Not Found"));
-
-			vo.setSupplier(supplier);
-		}
-
+		
 		/*
 		 * Item
 		 */
@@ -2826,14 +2819,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * Status
 		 */
-		if (dto.getStatus() != null) {
-
-			ListOfValuesDetailsVO status = listOfValuesDetailsRepo.findById(dto.getStatus())
-					.orElseThrow(() -> new ApplicationException("Status Not Found"));
-
-			vo.setStatus(status);
-		}
-
+		vo.setStatus(dto.getStatus());
+		
+		vo.setSupplier(dto.getSupplier());
 		/*
 		 * Normal Fields
 		 */
@@ -3001,14 +2989,13 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		 */
 		if (vo.getFromDept() != null) {
 
-			ListOfValuesDetailsResponseDTO fromDept = new ListOfValuesDetailsResponseDTO();
+			DepartmentResponseDTO fromDept = new DepartmentResponseDTO();
 
 			fromDept.setId(vo.getFromDept().getId());
 
-			fromDept.setCode(vo.getFromDept().getValueCode());
+			fromDept.setDepartmentCode(vo.getFromDept().getDepartmentCode());
 
-			fromDept.setDescription(vo.getFromDept().getValueDescription());
-
+			fromDept.setDepartmentName(vo.getFromDept().getDepartmentName());
 			response.setFromDept(fromDept);
 		}
 
@@ -3017,13 +3004,13 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		 */
 		if (vo.getToDept() != null) {
 
-			ListOfValuesDetailsResponseDTO toDept = new ListOfValuesDetailsResponseDTO();
+			DepartmentResponseDTO toDept = new DepartmentResponseDTO();
 
 			toDept.setId(vo.getToDept().getId());
 
-			toDept.setCode(vo.getToDept().getValueCode());
+			toDept.setDepartmentCode(vo.getToDept().getDepartmentCode());
 
-			toDept.setDescription(vo.getToDept().getValueDescription());
+			toDept.setDepartmentName(vo.getToDept().getDepartmentName());
 
 			response.setToDept(toDept);
 		}
@@ -3031,17 +3018,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * Supplier
 		 */
-		if (vo.getSupplier() != null) {
-
-			CustomerResponse1DTO supplier = new CustomerResponse1DTO();
-
-			supplier.setId(vo.getSupplier().getId());
-
-			supplier.setCustomerName(vo.getSupplier().getCustomerName());
-
-			response.setSupplier(supplier);
-		}
-
+	
 		/*
 		 * Item
 		 */
@@ -3091,22 +3068,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		/*
 		 * Status
 		 */
-		if (vo.getStatus() != null) {
-
-			ListOfValuesDetailsResponseDTO status = new ListOfValuesDetailsResponseDTO();
-
-			status.setId(vo.getStatus().getId());
-
-			status.setCode(vo.getStatus().getValueCode());
-
-			status.setDescription(vo.getStatus().getValueDescription());
-
-			response.setStatus(status);
-		}
-
-		/*
-		 * Normal Fields
-		 */
+		response.setStatus(vo.getStatus());
+		response.setSupplier(vo.getSupplier());
+//		* Normal Fields	 */
 
 		response.setDocId(vo.getDocId());
 
@@ -3498,8 +3462,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 	        Map<String, Object> itemMap = new LinkedHashMap<>();
 
-	        itemMap.put("itemCode", obj[4]);
-	        itemMap.put("itemDescription", obj[5]);
+	        itemMap.put("itemid", obj[4]);
+	        itemMap.put("itemCode", obj[5]);
+	        itemMap.put("itemDescription", obj[6]);
 
 	        itemList.add(itemMap);
 	    }

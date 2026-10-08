@@ -39,7 +39,7 @@ public class FlashNCReportDTO {
 
 	private String poNo;
 
-	private Long supplier;
+	private String supplier;
 
 	private String operationNo;
 
@@ -61,7 +61,7 @@ public class FlashNCReportDTO {
 
 	private Long inspectedBy;
 
-	private Long status;
+	private String status;
 
 	private String narration;
 

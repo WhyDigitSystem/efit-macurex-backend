@@ -349,5 +349,164 @@ public interface SalesRejectionInvoiceRepo extends JpaRepository<SalesRejectionI
 	List<Object[]> getRegularLCSalesReport(@Param("belongsTo") Long belongsTo, @Param("branch") Long branch,
 			@Param("orgId") Long orgId, @Param("fromDate") String fromDate, @Param("toDate") String toDate);
 
+//	rejection invoice report
+	@Query(value = """
+			SELECT
+			    sri.doc_id AS docid,
+			    sri.doc_date AS docdt,
+			    c.customer_code AS partyid,
+			    c.customer_name AS partyname,
+			    c.state AS state,
+			    sri.purchase_order AS pono,
+			    sri.purchase_order_date AS podt,
+			    i.item_id AS itemid,
+			    i.item_description AS itemdesc,
+			    u.unit_id AS unitid,
+			    srid.despatch_qty AS qty,
+			    srid.new_rate AS rate,
+			    srid.amount_in_rs AS amount,
+			    sri.net_amount AS vatval
 
+			FROM sales_rejection_invoice_basic sri
+
+			INNER JOIN sales_rejection_invoice_detail srid
+			    ON srid.sales_rejection_invoice_basic_id =
+			       sri.sales_rejection_invoice_basic_id
+
+			INNER JOIN customer_header c
+			    ON c.customer_id = sri.customer
+
+			INNER JOIN item i
+			    ON i.item_id = srid.item
+
+			LEFT JOIN unitmaster u
+			    ON u.unitmaster_id = srid.unit
+
+			WHERE sri.cancel = FALSE
+			  AND sri.doc_type IS NOT NULL
+			  AND sri.doc_date BETWEEN :fromDate AND :toDate
+			  AND sri.branch = :branch
+			  AND sri.org_id = :orgId
+
+			ORDER BY sri.doc_id
+			""", nativeQuery = true)
+	List<Object[]> getRejectionInvoiceReport(@Param("fromDate") String fromDate, @Param("toDate") String toDate,
+			@Param("branch") Long branch, @Param("orgId") Long orgId);
+
+	// Regular LC Appliances Report
+	@Query(value = """
+			SELECT
+			    sri.doc_id AS docid,
+			    sri.doc_date AS docdt,
+			    sri.cancel,
+			    sri.cancel_remarks,
+			    c.customer_code AS partyid,
+			    c.customer_name AS partyname,
+			    sri.purchase_order AS pono,
+			    sri.purchase_order_date AS podt,
+			    sri.ref_no AS pdino,
+			    srid.customer_part_no AS cpart,
+			    i.item_id AS itemid,
+			    i.item_description AS itemdesc,
+			    u.unit_id AS unitid,
+
+			    CASE
+			        WHEN sri.cancel = FALSE THEN srid.despatch_qty
+			        ELSE 0
+			    END AS qty,
+
+			    CASE
+			        WHEN srid.new_rate = 0
+			        THEN srid.rate_in_selected_currency
+			        ELSE srid.new_rate
+			    END AS rate,
+
+			    CASE
+			        WHEN sri.cancel = FALSE THEN srid.amount_in_rs
+			        ELSE 0
+			    END AS amount,
+
+			    SUM(COALESCE(srid.igst_amount, 0)) AS igst,
+			    SUM(COALESCE(srid.sgst_amount, 0)) AS sgst,
+			    SUM(COALESCE(srid.cgst_amount, 0)) AS cgst,
+			    MAX(COALESCE(sri.tcs_amount, 0)) AS tcs,
+
+			    CASE
+			        WHEN sri.cancel = FALSE THEN sri.net_amount
+			        ELSE 0
+			    END AS grossamt
+
+			FROM sales_rejection_invoice_basic sri
+
+			INNER JOIN sales_rejection_invoice_detail srid
+			    ON srid.sales_rejection_invoice_basic_id =
+			       sri.sales_rejection_invoice_basic_id
+
+			INNER JOIN customer_header c
+			    ON c.customer_id = sri.customer
+
+			INNER JOIN item i
+			    ON i.item_id = srid.item
+
+			LEFT JOIN unitmaster u
+			    ON u.unitmaster_id = srid.unit
+
+			WHERE
+			    (sri.doc_type IS NULL OR sri.doc_type = 'INVOICE')
+			    AND sri.belongs_to = 1000000002
+			    AND sri.cancel = FALSE
+			    AND sri.branch = :branch
+			    AND sri.org_id = :orgId
+			    AND sri.doc_date BETWEEN :fromDate AND :toDate
+
+			GROUP BY
+			    sri.doc_id,
+			    sri.doc_date,
+			    sri.cancel,
+			    sri.cancel_remarks,
+			    c.customer_code,
+			    c.customer_name,
+			    sri.purchase_order,
+			    sri.purchase_order_date,
+			    sri.ref_no,
+			    srid.customer_part_no,
+			    i.item_id,
+			    i.item_description,
+			    u.unit_id,
+			    srid.despatch_qty,
+			    srid.new_rate,
+			    srid.rate_in_selected_currency,
+			    srid.amount_in_rs,
+			    sri.net_amount
+
+			ORDER BY sri.doc_id
+			""", nativeQuery = true)
+	List<Object[]> getRegularLCAppliancesReport(@Param("fromDate") String fromDate, @Param("toDate") String toDate,
+			@Param("branch") Long branch, @Param("orgId") Long orgId);
+
+	// Customer Details Sales Report
+	@Query(value = """
+			SELECT
+			    c.customer_code AS partyid,
+			    c.customer_name AS partyname,
+			    SUM(COALESCE(sri.net_amount, 0)) AS totamt
+
+			FROM customer_header c
+
+			INNER JOIN sales_rejection_invoice_basic sri
+			    ON sri.customer = c.customer_id
+
+			WHERE c.customer_name NOT LIKE 'BOSCH %'
+			  AND sri.doc_date BETWEEN :fromDate AND :toDate
+			  AND sri.org_id = :orgId
+			  AND sri.branch = :branch
+
+			GROUP BY
+			    c.customer_code,
+			    c.customer_name
+
+			ORDER BY totamt DESC
+			""", nativeQuery = true)
+	List<Object[]> getCustomerDetailsSales(@Param("fromDate") String fromDate, @Param("toDate") String toDate,
+			@Param("orgId") Long orgId, @Param("branch") Long branch);
 }

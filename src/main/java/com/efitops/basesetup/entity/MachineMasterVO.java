@@ -70,9 +70,9 @@ public class MachineMasterVO {
 	 @Column(name = "process_no")
 	 private String processNo;
 
-     @ManyToOne
-	 @JoinColumn(name = "machine_instrument_category")
-	 private ToolCategoryDetailVO machineInstrumentCategory;
+//     @ManyToOne
+//	 @JoinColumn(name = "machine_instrument_category")
+//	 private ToolCategoryDetailVO machineInstrumentCategory;
 
      @Column(name = "section")
 	 private String section;
@@ -152,9 +152,9 @@ public class MachineMasterVO {
      @Column(name = "parallelity")
      private BigDecimal parallelity;
 
-     @ManyToOne
-     @JoinColumn(name = "machine_type")
-     private ListOfValuesDetailsVO machineType;
+//     @ManyToOne
+//     @JoinColumn(name = "machine_type")
+//     private ListOfValuesDetailsVO machineType;
 
      @Column(name = "hourly_rate")
      private BigDecimal hourlyRate;

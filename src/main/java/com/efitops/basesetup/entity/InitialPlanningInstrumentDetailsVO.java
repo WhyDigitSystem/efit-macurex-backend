@@ -32,7 +32,7 @@ public class InitialPlanningInstrumentDetailsVO {
 	@JoinColumn(name = "instrument_no")
 	private MachineMasterVO instrumentNo;
 	
-	@Column(name = "range")
+	@Column(name = "range_no")
 	private String  range;
 	
 	@ManyToOne

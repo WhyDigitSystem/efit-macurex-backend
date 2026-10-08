@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.efitops.basesetup.entity.EnquiryAttachmentVO;
+import com.efitops.basesetup.entity.EnquiryVO;
 
 public interface EnquiryAttachmentRepo extends JpaRepository<EnquiryAttachmentVO, Long> {
 	
@@ -16,5 +17,7 @@ public interface EnquiryAttachmentRepo extends JpaRepository<EnquiryAttachmentVO
 	        WHERE enquiry_id = :enquiryId
 	        """, nativeQuery = true)
 	List<EnquiryAttachmentVO> findByEnquiryId(@Param("enquiryId") Long enquiryId);
+
+	List<EnquiryAttachmentVO> findByEnquiryVO(EnquiryVO enquiryVO);
 
 }

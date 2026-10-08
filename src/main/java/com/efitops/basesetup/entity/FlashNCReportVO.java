@@ -59,11 +59,11 @@
 	
 		@ManyToOne
 		@JoinColumn(name = "from_dept")
-		private ListOfValuesDetailsVO fromDept;
+		private DepartmentVO fromDept;
 	
 		@ManyToOne
 		@JoinColumn(name = "to_dept")
-		private ListOfValuesDetailsVO toDept;
+		private DepartmentVO toDept;
 	
 		@Column(name = "description")
 		private String Description;
@@ -86,10 +86,13 @@
 		@Column(name = "po_no")
 		private String poNo;
 	
-		@ManyToOne
-		@JoinColumn(name = "supplier")
-		private CustomerVO supplier;
+		
+		@Column(name = "supplier")
+		private String supplier;
 	
+		@Column(name = "supplier_name")
+		private String supplierName;
+		
 		@Column(name = "operation_no")
 		private String operationNo;
 	
@@ -123,9 +126,9 @@
 		@JoinColumn(name = "inspected_by")
 		private EmployeeMasterVO inspectedBy;
 	
-		@ManyToOne
-		@JoinColumn(name = "status")
-		private ListOfValuesDetailsVO status;
+		
+		@Column(name = "status")
+		private String status;
 	
 		@Column(name = "narration")
 		private String narration;

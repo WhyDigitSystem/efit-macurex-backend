@@ -1,6 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -19,10 +20,14 @@ import lombok.NoArgsConstructor;
 public class QualityScrapNoteResponseDTO {
 	
 	private Long id;
+	
+	private String docId;
+	
+	private LocalDate docDate;
 
 	private BranchResponseDTO branch;
 
-	private LocalTime time;
+	private String time;
 
 	private ListOfValuesDetailsResponseDTO belongsTo;
 

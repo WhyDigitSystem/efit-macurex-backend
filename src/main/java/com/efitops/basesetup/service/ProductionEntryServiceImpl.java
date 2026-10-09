@@ -347,13 +347,13 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 			for (ToolDetailsDTO d : dto.getToolDetailsDTO()) {
 				ToolDetailsVO detailsVO = new ToolDetailsVO();
 
-//				if (d.getToolNo() != null && d.getToolNo() != 0) {
-//
-//					ToolMasterVO preparedBy = toolMasterRepo.findById(d.getToolNo())
-//							.orElseThrow(() -> new ApplicationException("ToolMaster Not Found"));
-//
-//					detailsVO.setToolNo(preparedBy);
-//				}
+				if (d.getToolNo() != null && d.getToolNo() != 0) {
+
+					ToolMasterVO preparedBy = toolMasterRepo.findById(d.getToolNo())
+							.orElseThrow(() -> new ApplicationException("ToolMaster Not Found"));
+
+					detailsVO.setToolNo(preparedBy);
+				}
 				detailsVO.setStrokes(d.getStrokes());
 				detailsVO.setStrokesRate(d.getStrokesRate());
 				detailsVO.setToolValue(d.getStrokes().multiply(d.getStrokesRate()));
@@ -523,6 +523,8 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				rDto.setMachineHourRate(d.getMachineHourRate());
 				rDto.setLabourHourRate(d.getLabourHourRate());
 				rDto.setOperationName(d.getOperationName());
+				rDto.setToTimeMins(d.getToTimeMins());
+				rDto.setLunchTimeMins(d.getLunchTimeMins());
 				rDto.setFrTimeHrs(d.getFrTimeHrs());
 				rDto.setFrTimeMins(d.getFrTimeMins());
 				rDto.setToTimeHrs(d.getToTimeHrs());

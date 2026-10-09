@@ -6703,7 +6703,7 @@ public class DevelopServiceImpl implements DevelopService {
 				// =========================
 				// Tool Fixture No
 				// =========================
-
+//
 				if (ObjectUtils.isNotEmpty(toolFixtureDTO.getToolFixtureNo())) {
 
 					toolFixtureVO.setToolFixtureNo(toolMasterRepo.findById(toolFixtureDTO.getToolFixtureNo())
@@ -6882,32 +6882,35 @@ public class DevelopServiceImpl implements DevelopService {
 				// =========================
 
 				if (ObjectUtils.isNotEmpty(detailVO.getLocation())) {
+	
+					LocationMasterResponseDTO locDTO = new LocationMasterResponseDTO();
+					locDTO.setId(detailVO.getLocation().getId());
+					locDTO.setLocationName(detailVO.getLocation().getLocationName());
+					detailResponseDTO.setLocation(locDTO);
 
-					LocationResponseDTO locationResponseDTO = new LocationResponseDTO();
+//					locationResponseDTO.setId(detailVO.getLocation().getId());
+//
+//					locationResponseDTO.setOrgId(detailVO.getLocation().getOrgId());
+//
+//					locationResponseDTO.setLocationId(detailVO.getLocation().getLocationId());
+//
+//					locationResponseDTO.setLocationName(detailVO.getLocation().getLocationName());
+//
+//					locationResponseDTO.setAddress(detailVO.getLocation().getAddress());
+//
+//					locationResponseDTO.setPhoneNo(detailVO.getLocation().getPhoneNo());
+//
+//					locationResponseDTO.setFaxNo(detailVO.getLocation().getFaxNo());
+//
+//					locationResponseDTO.setEmail(detailVO.getLocation().getEmail());
+//
+//					locationResponseDTO.setConsiderMrp(detailVO.getLocation().getConsiderMrp());
+//
+//					locationResponseDTO.setCancelRemarks(detailVO.getLocation().getCancelRemarks());
+//
+//					locationResponseDTO.setCreatedBy(detailVO.getLocation().getCreatedBy());
 
-					locationResponseDTO.setId(detailVO.getLocation().getId());
-
-					locationResponseDTO.setOrgId(detailVO.getLocation().getOrgId());
-
-					locationResponseDTO.setLocationId(detailVO.getLocation().getLocationId());
-
-					locationResponseDTO.setLocationName(detailVO.getLocation().getLocationName());
-
-					locationResponseDTO.setAddress(detailVO.getLocation().getAddress());
-
-					locationResponseDTO.setPhoneNo(detailVO.getLocation().getPhoneNo());
-
-					locationResponseDTO.setFaxNo(detailVO.getLocation().getFaxNo());
-
-					locationResponseDTO.setEmail(detailVO.getLocation().getEmail());
-
-					locationResponseDTO.setConsiderMrp(detailVO.getLocation().getConsiderMrp());
-
-					locationResponseDTO.setCancelRemarks(detailVO.getLocation().getCancelRemarks());
-
-					locationResponseDTO.setCreatedBy(detailVO.getLocation().getCreatedBy());
-
-					detailResponseDTO.setLocation(locationResponseDTO);
+//					detailResponseDTO.setLocation(locationResponseDTO);
 				}
 
 				// =========================

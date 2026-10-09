@@ -40,5 +40,6 @@ public class ProductionEntryDetailsDTO {
     private BigDecimal runningActCostTool;
     private BigDecimal stdConsumCost;
     private BigDecimal runningActCostConsum;
+    
 	
 }

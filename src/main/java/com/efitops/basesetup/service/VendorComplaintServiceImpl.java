@@ -7446,6 +7446,409 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	}
 
 //	quality scrap note
+//	@Override
+//	@Transactional
+//	public Map<String, Object> updateCreateQualityScrapNote(QualityScrapNoteDTO qualityScrapNoteDTO)
+//			throws ApplicationException {
+//
+//		String screenCode = "QSN";
+//
+//		QualityScrapNoteVO qualityScrapNoteVO;
+//		String message;
+//
+//		if (qualityScrapNoteDTO.getId() != null) {
+//
+//			qualityScrapNoteVO = qualityScrapNoteRepo.findById(qualityScrapNoteDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("Invalid Quality Scrap Note Details"));
+//
+//			qualityScrapNoteVO.setUpdatedBy(qualityScrapNoteDTO.getCreatedBy());
+//
+//			message = "Quality Scrap Note Updated Successfully";
+//
+//		} else {
+//
+//			qualityScrapNoteVO = new QualityScrapNoteVO();
+//
+//			String docId = qualityScrapNoteRepo.getQualityScrapNoteDocId(qualityScrapNoteDTO.getOrgId(),
+//					qualityScrapNoteDTO.getFinancialYear(), screenCode);
+//
+//			if (StringUtils.isBlank(docId)) {
+//				throw new ApplicationException("Quality Scrap Note DocId Not Found");
+//			}
+//
+//			qualityScrapNoteVO.setDocId(docId);
+//
+//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+//					.findByOrgIdScreenCode(qualityScrapNoteDTO.getOrgId(), screenCode);
+//
+//			if (documentTypeMappingDetailsVO == null) {
+//				throw new ApplicationException("Document Type Mapping Details Not Found");
+//			}
+//
+//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//
+//			qualityScrapNoteVO.setCreatedBy(qualityScrapNoteDTO.getCreatedBy());
+//
+//			qualityScrapNoteVO.setUpdatedBy(qualityScrapNoteDTO.getCreatedBy());
+//
+//			message = "Quality Scrap Note Created Successfully";
+//		}
+//
+//		createUpdateQualityScrapNoteVO(qualityScrapNoteVO, qualityScrapNoteDTO);
+//
+//		qualityScrapNoteVO = qualityScrapNoteRepo.save(qualityScrapNoteVO);
+//
+//		/*
+//		 * Save Details
+//		 */
+//		if (qualityScrapNoteDTO.getQualityScrapNoteDetailsDTO() != null) {
+//
+//			saveQualityScrapNoteDetails(qualityScrapNoteVO, qualityScrapNoteDTO.getQualityScrapNoteDetailsDTO());
+//		}
+//
+//		/*
+//		 * Reload parent with saved details
+//		 */
+//		qualityScrapNoteVO = qualityScrapNoteRepo.findById(qualityScrapNoteVO.getId())
+//				.orElseThrow(() -> new ApplicationException("Quality Scrap Note Not Found"));
+//
+//		Map<String, Object> responseObjectsMap = new HashMap<>();
+//
+//		responseObjectsMap.put(CommonConstant.STRING_MESSAGE, message);
+//
+//		responseObjectsMap.put("qualityScrapNoteVO", qualityScrapNoteResponse(qualityScrapNoteVO));
+//		responseObjectsMap.put("docId", qualityScrapNoteVO.getDocId());
+//
+//		responseObjectsMap.put("docDate", qualityScrapNoteVO.getDocDate());
+//
+//		return responseObjectsMap;
+//	}
+//
+//	private void createUpdateQualityScrapNoteVO(QualityScrapNoteVO qualityScrapNoteVO,
+//			QualityScrapNoteDTO qualityScrapNoteDTO) throws ApplicationException {
+//
+//		if (qualityScrapNoteDTO.getBranch() != null) {
+//
+//			BranchVO branchVO = branchRepo.findById(qualityScrapNoteDTO.getBranch())
+//					.orElseThrow(() -> new ApplicationException("Invalid Branch"));
+//
+//			qualityScrapNoteVO.setBranch(branchVO);
+//		}
+//
+//		if (qualityScrapNoteDTO.getBelongsTo() != null) {
+//
+//			ListOfValuesDetailsVO belongsTo = listOfValuesDetailsRepo.findById(qualityScrapNoteDTO.getBelongsTo())
+//					.orElseThrow(() -> new ApplicationException("Invalid Belongs To"));
+//
+//			qualityScrapNoteVO.setBelongsTo(belongsTo);
+//		}
+//
+//		if (qualityScrapNoteDTO.getDepartment() != null) {
+//
+//			DepartmentVO departmentVO = departmentRepo.findById(qualityScrapNoteDTO.getDepartment())
+//					.orElseThrow(() -> new ApplicationException("Invalid Department"));
+//
+//			qualityScrapNoteVO.setDepartment(departmentVO);
+//		}
+//
+//		if (qualityScrapNoteDTO.getFromLocation() != null) {
+//
+//			LocationVO fromLocation = locationRepo.findById(qualityScrapNoteDTO.getFromLocation())
+//					.orElseThrow(() -> new ApplicationException("Invalid From Location"));
+//
+//			qualityScrapNoteVO.setFromLocation(fromLocation);
+//		}
+//
+//		if (qualityScrapNoteDTO.getToLocation() != null) {
+//
+//			LocationVO toLocation = locationRepo.findById(qualityScrapNoteDTO.getToLocation())
+//					.orElseThrow(() -> new ApplicationException("Invalid To Location"));
+//
+//			qualityScrapNoteVO.setToLocation(toLocation);
+//		}
+//
+//		if (qualityScrapNoteDTO.getPreparedBy() != null) {
+//
+//			EmployeeMasterVO preparedBy = employeeMasterRepo.findById(qualityScrapNoteDTO.getPreparedBy())
+//					.orElseThrow(() -> new ApplicationException("Invalid Prepared By"));
+//
+//			qualityScrapNoteVO.setPreparedBy(preparedBy);
+//		}
+//
+//		if (qualityScrapNoteDTO.getAuthorizedBy() != null) {
+//
+//			EmployeeMasterVO authorizedBy = employeeMasterRepo.findById(qualityScrapNoteDTO.getAuthorizedBy())
+//					.orElseThrow(() -> new ApplicationException("Invalid Authorized By"));
+//
+//			qualityScrapNoteVO.setAuthorizedBy(authorizedBy);
+//		}
+//
+//		
+//
+//		// DO NOT SET totalScrapValue FROM DTO
+//		// It will be calculated from quantity × rate
+//		// qualityScrapNoteVO.setTotalScrapValue(
+//		// qualityScrapNoteDTO.getTotalScrapValue());
+//
+//		qualityScrapNoteVO.setQualityApproval(qualityScrapNoteDTO.getQualityApproval());
+//		
+//		qualityScrapNoteVO.setTime(qualityScrapNoteDTO.getTime());
+//
+//		qualityScrapNoteVO.setNarration(qualityScrapNoteDTO.getNarration());
+//
+//		qualityScrapNoteVO.setOrgId(qualityScrapNoteDTO.getOrgId());
+//
+//		qualityScrapNoteVO.setFinancialYear(qualityScrapNoteDTO.getFinancialYear());
+//
+//		qualityScrapNoteVO.setActive(qualityScrapNoteDTO.isActive());
+//
+//		qualityScrapNoteVO.setCancelRemarks(qualityScrapNoteDTO.getCancelRemarks());
+//
+//		qualityScrapNoteVO.setScreenCode("QSN");
+//
+//		qualityScrapNoteVO.setScreenName("QUALITY SCRAP NOTE");
+//	}
+//
+//	private void saveQualityScrapNoteDetails(QualityScrapNoteVO qualityScrapNoteVO,
+//			List<QualityScrapNoteDetailsDTO> detailsDTOList) throws ApplicationException {
+//
+//		List<QualityScrapNoteDetailsVO> detailsList = new ArrayList<>();
+//
+//		BigDecimal totalScrapValue = BigDecimal.ZERO;
+//
+//		for (QualityScrapNoteDetailsDTO detailsDTO : detailsDTOList) {
+//
+//			QualityScrapNoteDetailsVO detailsVO = new QualityScrapNoteDetailsVO();
+//
+//			if (detailsDTO.getItem() != null) {
+//
+//				ItemMasterVO itemVO = itemRepo.findById(detailsDTO.getItem())
+//						.orElseThrow(() -> new ApplicationException("Invalid Item"));
+//
+//				detailsVO.setItem(itemVO);
+//			}
+//
+//			detailsVO.setStock(detailsDTO.getStock());
+//
+//			detailsVO.setQuantity(detailsDTO.getQuantity());
+//
+//			detailsVO.setRate(detailsDTO.getRate());
+//
+//			/*
+//			 * Value = Quantity × Rate
+//			 */
+//			BigDecimal value = BigDecimal.ZERO;
+//
+//			if (detailsDTO.getQuantity() != null && detailsDTO.getRate() != null) {
+//
+//				value = detailsDTO.getQuantity().multiply(detailsDTO.getRate());
+//			}
+//
+//			detailsVO.setValue(value);
+//
+//			/*
+//			 * Add child value to header total
+//			 */
+//			totalScrapValue = totalScrapValue.add(value);
+//
+//			detailsVO.setQualityScrapNoteVO(qualityScrapNoteVO);
+//
+//			detailsList.add(detailsVO);
+//		}
+//
+//		/*
+//		 * Set calculated total value in header
+//		 */
+//		qualityScrapNoteVO.setTotalScrapValue(totalScrapValue);
+//
+//		/*
+//		 * Set details to parent
+//		 */
+//		qualityScrapNoteVO.setQualityScrapNoteDetailsVO(detailsList);
+//	}
+//
+//	private QualityScrapNoteResponseDTO qualityScrapNoteResponse(QualityScrapNoteVO vo) {
+//
+//		QualityScrapNoteResponseDTO response = new QualityScrapNoteResponseDTO();
+//
+//		response.setId(vo.getId());
+//
+//		// Branch
+//		if (vo.getBranch() != null) {
+//
+//			BranchResponseDTO branchResponse = new BranchResponseDTO();
+//
+//			branchResponse.setId(vo.getBranch().getId());
+//			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+//			branchResponse.setBranchName(vo.getBranch().getBranchName());
+//
+//			response.setBranch(branchResponse);
+//		}
+//
+//		response.setTime(vo.getTime());
+//
+//		// Belongs To
+//		if (vo.getBelongsTo() != null) {
+//
+//			ListOfValuesDetailsResponseDTO belongsTo = new ListOfValuesDetailsResponseDTO();
+//
+//			belongsTo.setId(vo.getBelongsTo().getId());
+//
+//			belongsTo.setCode(vo.getBelongsTo().getValueCode());
+//
+//			belongsTo.setDescription(vo.getBelongsTo().getValueDescription());
+//
+//			response.setBelongsTo(belongsTo);
+//		}
+//
+//		// Department
+//		if (vo.getDepartment() != null) {
+//
+//			DepartmentResponseDTO department = new DepartmentResponseDTO();
+//
+//			department.setId(vo.getDepartment().getId());
+//
+//			department.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+//
+//			department.setDepartmentName(vo.getDepartment().getDepartmentName());
+//
+//			response.setDepartment(department);
+//		}
+//
+//		// From Location
+//		if (vo.getFromLocation() != null) {
+//
+//			LocationMasterResponseDTO fromLocation = new LocationMasterResponseDTO();
+//
+//			fromLocation.setId(vo.getFromLocation().getId());
+//
+////			fromLocation.setLocationCode(vo.getFromLocation().getLocationCode());
+//
+//			fromLocation.setLocationName(vo.getFromLocation().getLocationName());
+//
+//			response.setFromLocation(fromLocation);
+//		}
+//
+//		// To Location
+//		if (vo.getToLocation() != null) {
+//
+//			LocationMasterResponseDTO toLocation = new LocationMasterResponseDTO();
+//
+//			toLocation.setId(vo.getToLocation().getId());
+//
+////			toLocation.setLocationCode(vo.getToLocation().getLocationCode());
+//
+//			toLocation.setLocationName(vo.getToLocation().getLocationName());
+//
+//			response.setToLocation(toLocation);
+//		}
+//
+//		// Prepared By
+//		if (vo.getPreparedBy() != null) {
+//
+//			EmployeeMasterDetailsReponseDTO preparedBy = new EmployeeMasterDetailsReponseDTO();
+//
+//			preparedBy.setId(vo.getPreparedBy().getId());
+//
+////			spreparedBy.setEmployeeCode(vo.getPreparedBy().getEmployeeCode());
+//
+//			preparedBy.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+//
+//			response.setPreparedBy(preparedBy);
+//		}
+//
+//		// Authorized By
+//		if (vo.getAuthorizedBy() != null) {
+//
+//			EmployeeMasterDetailsReponseDTO authorizedBy = new EmployeeMasterDetailsReponseDTO();
+//
+//			authorizedBy.setId(vo.getAuthorizedBy().getId());
+//
+////			authorizedBy.setEmployeeCode(vo.getAuthorizedBy().getEmployeeCode());
+//
+//			authorizedBy.setEmployeeName(vo.getAuthorizedBy().getEmployeeName());
+//
+//			response.setAuthorizedBy(authorizedBy);
+//		}
+//
+//		response.setTotalScrapValue(vo.getTotalScrapValue());
+//		
+//		response.setDocId(vo.getDocId());
+//		
+//		response.setDocDate(vo.getDocDate());
+//		
+//		response.setQualityApproval(vo.getQualityApproval());
+//
+//		response.setNarration(vo.getNarration());
+//
+//		response.setOrgId(vo.getOrgId());
+//
+//		response.setFinancialYear(vo.getFinancialYear());
+//
+//		response.setActive(vo.getActive());
+//
+//		response.setCancelRemarks(vo.getCancelRemarks());
+//
+//		response.setCreatedBy(vo.getCreatedBy());
+//		
+//		response.setTime(vo.getTime());
+//
+//		// Details
+//		List<QualityScrapNoteDetailsResponseDTO> detailsResponseList = new ArrayList<>();
+//
+//		if (vo.getQualityScrapNoteDetailsVO() != null && !vo.getQualityScrapNoteDetailsVO().isEmpty()) {
+//
+//			for (QualityScrapNoteDetailsVO detailsVO : vo.getQualityScrapNoteDetailsVO()) {
+//
+//				QualityScrapNoteDetailsResponseDTO detailsResponse = new QualityScrapNoteDetailsResponseDTO();
+//
+//				// Item
+//				if (detailsVO.getItem() != null) {
+//
+//					ItemResponse1DTO itemResponse = new ItemResponse1DTO();
+//
+//					itemResponse.setId(detailsVO.getItem().getId());
+//
+//					itemResponse.setItemCode(detailsVO.getItem().getItemCode());
+//
+//					itemResponse.setItemDescription(detailsVO.getItem().getItemDescription());
+//
+//					// Unit
+//					if (detailsVO.getItem().getPrimaryUnit() != null) {
+//
+//						UnitMasterResponseDTO unitResponse = new UnitMasterResponseDTO();
+//
+//						unitResponse.setId(detailsVO.getItem().getPrimaryUnit().getId());
+//
+//						unitResponse.setUnitId(detailsVO.getItem().getPrimaryUnit().getUnitId());
+//
+//						unitResponse.setUnitDescription(detailsVO.getItem().getPrimaryUnit().getDescription());
+//
+//						itemResponse.setUnit(unitResponse);
+//					}
+//
+//					detailsResponse.setItem(itemResponse);
+//				}
+//
+//				detailsResponse.setStock(detailsVO.getStock());
+//
+//				detailsResponse.setQuantity(detailsVO.getQuantity());
+//
+//				detailsResponse.setRate(detailsVO.getRate());
+//
+//				detailsResponse.setValue(detailsVO.getValue());
+//
+//				detailsResponseList.add(detailsResponse);
+//			}
+//		}
+//
+//		response.setQualityScrapNoteDetailsResponseDTO(detailsResponseList);
+//
+//		return response;
+//	}
+
 	@Override
 	@Transactional
 	public Map<String, Object> updateCreateQualityScrapNote(QualityScrapNoteDTO qualityScrapNoteDTO)
@@ -7453,14 +7856,28 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		String screenCode = "QSN";
 
-		QualityScrapNoteVO qualityScrapNoteVO;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
 		String message;
 
-		if (qualityScrapNoteDTO.getId() != null) {
+		QualityScrapNoteVO qualityScrapNoteVO;
+
+		boolean isUpdate = qualityScrapNoteDTO.getId() != null && qualityScrapNoteDTO.getId() != 0;
+
+		if (isUpdate) {
 
 			qualityScrapNoteVO = qualityScrapNoteRepo.findById(qualityScrapNoteDTO.getId())
 					.orElseThrow(() -> new ApplicationException("Invalid Quality Scrap Note Details"));
 
+			
+			if (qualityScrapNoteDTO.getId() != null) {
+
+				List<QualityScrapNoteDetailsVO> oldList = qualityScrapNoteDetailsRepo
+						.findByQualityScrapNoteVO(qualityScrapNoteVO);
+
+				qualityScrapNoteDetailsRepo.deleteAll(oldList);
+			}
+			
 			qualityScrapNoteVO.setUpdatedBy(qualityScrapNoteDTO.getCreatedBy());
 
 			message = "Quality Scrap Note Updated Successfully";
@@ -7469,6 +7886,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			qualityScrapNoteVO = new QualityScrapNoteVO();
 
+			// Generate Doc ID
 			String docId = qualityScrapNoteRepo.getQualityScrapNoteDocId(qualityScrapNoteDTO.getOrgId(),
 					qualityScrapNoteDTO.getFinancialYear(), screenCode);
 
@@ -7478,6 +7896,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			qualityScrapNoteVO.setDocId(docId);
 
+			// Update Last Number
 			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
 					.findByOrgIdScreenCode(qualityScrapNoteDTO.getOrgId(), screenCode);
 
@@ -7490,38 +7909,47 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			qualityScrapNoteVO.setCreatedBy(qualityScrapNoteDTO.getCreatedBy());
-
 			qualityScrapNoteVO.setUpdatedBy(qualityScrapNoteDTO.getCreatedBy());
 
 			message = "Quality Scrap Note Created Successfully";
 		}
 
+		// Delete existing child records during update
+//		if (isUpdate) {
+//
+//			List<QualityScrapNoteDetailsVO> oldDetailsList = qualityScrapNoteDetailsRepo
+//					.findByQualityScrapNoteVOId(qualityScrapNoteVO);
+//
+//			if (oldDetailsList != null && !oldDetailsList.isEmpty()) {
+//				qualityScrapNoteDetailsRepo.deleteAll(oldDetailsList);
+//				qualityScrapNoteDetailsRepo.flush();
+//			}
+//
+//			qualityScrapNoteVO.getQualityScrapNoteDetailsVO().clear();
+//		}
+
+		// Map parent fields
 		createUpdateQualityScrapNoteVO(qualityScrapNoteVO, qualityScrapNoteDTO);
 
+		// Save parent
 		qualityScrapNoteVO = qualityScrapNoteRepo.save(qualityScrapNoteVO);
 
-		/*
-		 * Save Details
-		 */
+		// Save new child details and calculate total scrap value
 		if (qualityScrapNoteDTO.getQualityScrapNoteDetailsDTO() != null) {
 
 			saveQualityScrapNoteDetails(qualityScrapNoteVO, qualityScrapNoteDTO.getQualityScrapNoteDetailsDTO());
 		}
 
-		/*
-		 * Reload parent with saved details
-		 */
+		// Save parent with updated details and calculated total
+		qualityScrapNoteVO = qualityScrapNoteRepo.save(qualityScrapNoteVO);
+
+		// Reload saved parent
 		qualityScrapNoteVO = qualityScrapNoteRepo.findById(qualityScrapNoteVO.getId())
 				.orElseThrow(() -> new ApplicationException("Quality Scrap Note Not Found"));
-
-		Map<String, Object> responseObjectsMap = new HashMap<>();
 
 		responseObjectsMap.put(CommonConstant.STRING_MESSAGE, message);
 
 		responseObjectsMap.put("qualityScrapNoteVO", qualityScrapNoteResponse(qualityScrapNoteVO));
-		responseObjectsMap.put("docId", qualityScrapNoteVO.getDocId());
-
-		responseObjectsMap.put("docDate", qualityScrapNoteVO.getDocDate());
 
 		return responseObjectsMap;
 	}
@@ -7529,7 +7957,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	private void createUpdateQualityScrapNoteVO(QualityScrapNoteVO qualityScrapNoteVO,
 			QualityScrapNoteDTO qualityScrapNoteDTO) throws ApplicationException {
 
-		if (qualityScrapNoteDTO.getBranch() != null) {
+		if (qualityScrapNoteDTO.getBranch() != null && qualityScrapNoteDTO.getBranch() != 0) {
 
 			BranchVO branchVO = branchRepo.findById(qualityScrapNoteDTO.getBranch())
 					.orElseThrow(() -> new ApplicationException("Invalid Branch"));
@@ -7537,7 +7965,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			qualityScrapNoteVO.setBranch(branchVO);
 		}
 
-		if (qualityScrapNoteDTO.getBelongsTo() != null) {
+		if (qualityScrapNoteDTO.getBelongsTo() != null && qualityScrapNoteDTO.getBelongsTo() != 0) {
 
 			ListOfValuesDetailsVO belongsTo = listOfValuesDetailsRepo.findById(qualityScrapNoteDTO.getBelongsTo())
 					.orElseThrow(() -> new ApplicationException("Invalid Belongs To"));
@@ -7545,7 +7973,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			qualityScrapNoteVO.setBelongsTo(belongsTo);
 		}
 
-		if (qualityScrapNoteDTO.getDepartment() != null) {
+		if (qualityScrapNoteDTO.getDepartment() != null && qualityScrapNoteDTO.getDepartment() != 0) {
 
 			DepartmentVO departmentVO = departmentRepo.findById(qualityScrapNoteDTO.getDepartment())
 					.orElseThrow(() -> new ApplicationException("Invalid Department"));
@@ -7553,7 +7981,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			qualityScrapNoteVO.setDepartment(departmentVO);
 		}
 
-		if (qualityScrapNoteDTO.getFromLocation() != null) {
+		if (qualityScrapNoteDTO.getFromLocation() != null && qualityScrapNoteDTO.getFromLocation() != 0) {
 
 			LocationVO fromLocation = locationRepo.findById(qualityScrapNoteDTO.getFromLocation())
 					.orElseThrow(() -> new ApplicationException("Invalid From Location"));
@@ -7561,7 +7989,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			qualityScrapNoteVO.setFromLocation(fromLocation);
 		}
 
-		if (qualityScrapNoteDTO.getToLocation() != null) {
+		if (qualityScrapNoteDTO.getToLocation() != null && qualityScrapNoteDTO.getToLocation() != 0) {
 
 			LocationVO toLocation = locationRepo.findById(qualityScrapNoteDTO.getToLocation())
 					.orElseThrow(() -> new ApplicationException("Invalid To Location"));
@@ -7569,7 +7997,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			qualityScrapNoteVO.setToLocation(toLocation);
 		}
 
-		if (qualityScrapNoteDTO.getPreparedBy() != null) {
+		if (qualityScrapNoteDTO.getPreparedBy() != null && qualityScrapNoteDTO.getPreparedBy() != 0) {
 
 			EmployeeMasterVO preparedBy = employeeMasterRepo.findById(qualityScrapNoteDTO.getPreparedBy())
 					.orElseThrow(() -> new ApplicationException("Invalid Prepared By"));
@@ -7577,7 +8005,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			qualityScrapNoteVO.setPreparedBy(preparedBy);
 		}
 
-		if (qualityScrapNoteDTO.getAuthorizedBy() != null) {
+		if (qualityScrapNoteDTO.getAuthorizedBy() != null && qualityScrapNoteDTO.getAuthorizedBy() != 0) {
 
 			EmployeeMasterVO authorizedBy = employeeMasterRepo.findById(qualityScrapNoteDTO.getAuthorizedBy())
 					.orElseThrow(() -> new ApplicationException("Invalid Authorized By"));
@@ -7585,28 +8013,19 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			qualityScrapNoteVO.setAuthorizedBy(authorizedBy);
 		}
 
-		qualityScrapNoteVO.setTime(qualityScrapNoteDTO.getTime());
-
-		// DO NOT SET totalScrapValue FROM DTO
-		// It will be calculated from quantity × rate
-		// qualityScrapNoteVO.setTotalScrapValue(
-		// qualityScrapNoteDTO.getTotalScrapValue());
-
 		qualityScrapNoteVO.setQualityApproval(qualityScrapNoteDTO.getQualityApproval());
 
+		qualityScrapNoteVO.setTime(qualityScrapNoteDTO.getTime());
 		qualityScrapNoteVO.setNarration(qualityScrapNoteDTO.getNarration());
-
 		qualityScrapNoteVO.setOrgId(qualityScrapNoteDTO.getOrgId());
-
 		qualityScrapNoteVO.setFinancialYear(qualityScrapNoteDTO.getFinancialYear());
-
 		qualityScrapNoteVO.setActive(qualityScrapNoteDTO.isActive());
-
 		qualityScrapNoteVO.setCancelRemarks(qualityScrapNoteDTO.getCancelRemarks());
 
 		qualityScrapNoteVO.setScreenCode("QSN");
-
 		qualityScrapNoteVO.setScreenName("QUALITY SCRAP NOTE");
+
+		// Total scrap value is calculated from the detail records.
 	}
 
 	private void saveQualityScrapNoteDetails(QualityScrapNoteVO qualityScrapNoteVO,
@@ -7620,7 +8039,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			QualityScrapNoteDetailsVO detailsVO = new QualityScrapNoteDetailsVO();
 
-			if (detailsDTO.getItem() != null) {
+			if (detailsDTO.getItem() != null && detailsDTO.getItem() != 0) {
 
 				ItemMasterVO itemVO = itemRepo.findById(detailsDTO.getItem())
 						.orElseThrow(() -> new ApplicationException("Invalid Item"));
@@ -7629,14 +8048,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			}
 
 			detailsVO.setStock(detailsDTO.getStock());
-
 			detailsVO.setQuantity(detailsDTO.getQuantity());
-
 			detailsVO.setRate(detailsDTO.getRate());
 
-			/*
-			 * Value = Quantity × Rate
-			 */
 			BigDecimal value = BigDecimal.ZERO;
 
 			if (detailsDTO.getQuantity() != null && detailsDTO.getRate() != null) {
@@ -7646,9 +8060,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			detailsVO.setValue(value);
 
-			/*
-			 * Add child value to header total
-			 */
 			totalScrapValue = totalScrapValue.add(value);
 
 			detailsVO.setQualityScrapNoteVO(qualityScrapNoteVO);
@@ -7656,14 +8067,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			detailsList.add(detailsVO);
 		}
 
-		/*
-		 * Set calculated total value in header
-		 */
 		qualityScrapNoteVO.setTotalScrapValue(totalScrapValue);
-
-		/*
-		 * Set details to parent
-		 */
 		qualityScrapNoteVO.setQualityScrapNoteDetailsVO(detailsList);
 	}
 
@@ -7672,6 +8076,9 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		QualityScrapNoteResponseDTO response = new QualityScrapNoteResponseDTO();
 
 		response.setId(vo.getId());
+
+		response.setDocId(vo.getDocId());
+		response.setDocDate(vo.getDocDate());
 
 		// Branch
 		if (vo.getBranch() != null) {
@@ -7685,6 +8092,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			response.setBranch(branchResponse);
 		}
 
+		// Time
 		response.setTime(vo.getTime());
 
 		// Belongs To
@@ -7693,9 +8101,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			ListOfValuesDetailsResponseDTO belongsTo = new ListOfValuesDetailsResponseDTO();
 
 			belongsTo.setId(vo.getBelongsTo().getId());
-
 			belongsTo.setCode(vo.getBelongsTo().getValueCode());
-
 			belongsTo.setDescription(vo.getBelongsTo().getValueDescription());
 
 			response.setBelongsTo(belongsTo);
@@ -7707,9 +8113,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			DepartmentResponseDTO department = new DepartmentResponseDTO();
 
 			department.setId(vo.getDepartment().getId());
-
 			department.setDepartmentCode(vo.getDepartment().getDepartmentCode());
-
 			department.setDepartmentName(vo.getDepartment().getDepartmentName());
 
 			response.setDepartment(department);
@@ -7721,9 +8125,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			LocationMasterResponseDTO fromLocation = new LocationMasterResponseDTO();
 
 			fromLocation.setId(vo.getFromLocation().getId());
-
-//			fromLocation.setLocationCode(vo.getFromLocation().getLocationCode());
-
 			fromLocation.setLocationName(vo.getFromLocation().getLocationName());
 
 			response.setFromLocation(fromLocation);
@@ -7735,9 +8136,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			LocationMasterResponseDTO toLocation = new LocationMasterResponseDTO();
 
 			toLocation.setId(vo.getToLocation().getId());
-
-//			toLocation.setLocationCode(vo.getToLocation().getLocationCode());
-
 			toLocation.setLocationName(vo.getToLocation().getLocationName());
 
 			response.setToLocation(toLocation);
@@ -7749,9 +8147,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			EmployeeMasterDetailsReponseDTO preparedBy = new EmployeeMasterDetailsReponseDTO();
 
 			preparedBy.setId(vo.getPreparedBy().getId());
-
-//			spreparedBy.setEmployeeCode(vo.getPreparedBy().getEmployeeCode());
-
 			preparedBy.setEmployeeName(vo.getPreparedBy().getEmployeeName());
 
 			response.setPreparedBy(preparedBy);
@@ -7763,31 +8158,22 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			EmployeeMasterDetailsReponseDTO authorizedBy = new EmployeeMasterDetailsReponseDTO();
 
 			authorizedBy.setId(vo.getAuthorizedBy().getId());
-
-//			authorizedBy.setEmployeeCode(vo.getAuthorizedBy().getEmployeeCode());
-
 			authorizedBy.setEmployeeName(vo.getAuthorizedBy().getEmployeeName());
 
 			response.setAuthorizedBy(authorizedBy);
 		}
 
+		// Header Details
 		response.setTotalScrapValue(vo.getTotalScrapValue());
-
 		response.setQualityApproval(vo.getQualityApproval());
-
 		response.setNarration(vo.getNarration());
-
 		response.setOrgId(vo.getOrgId());
-
 		response.setFinancialYear(vo.getFinancialYear());
-
 		response.setActive(vo.getActive());
-
 		response.setCancelRemarks(vo.getCancelRemarks());
-
 		response.setCreatedBy(vo.getCreatedBy());
 
-		// Details
+		// Child Details
 		List<QualityScrapNoteDetailsResponseDTO> detailsResponseList = new ArrayList<>();
 
 		if (vo.getQualityScrapNoteDetailsVO() != null && !vo.getQualityScrapNoteDetailsVO().isEmpty()) {
@@ -7802,9 +8188,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 					ItemResponse1DTO itemResponse = new ItemResponse1DTO();
 
 					itemResponse.setId(detailsVO.getItem().getId());
-
 					itemResponse.setItemCode(detailsVO.getItem().getItemCode());
-
 					itemResponse.setItemDescription(detailsVO.getItem().getItemDescription());
 
 					// Unit
@@ -7825,11 +8209,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 				}
 
 				detailsResponse.setStock(detailsVO.getStock());
-
 				detailsResponse.setQuantity(detailsVO.getQuantity());
-
 				detailsResponse.setRate(detailsVO.getRate());
-
 				detailsResponse.setValue(detailsVO.getValue());
 
 				detailsResponseList.add(detailsResponse);

@@ -17,7 +17,7 @@ public class QualityScrapNoteDTO {
 
 	private Long branch;
 
-	private LocalTime time;
+	private String time;
 
 	private Long belongsTo;
 

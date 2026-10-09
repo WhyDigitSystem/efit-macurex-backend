@@ -5782,18 +5782,18 @@ public class DevelopServiceImpl implements DevelopService {
 		// MACHINE TYPE - LIST OF VALUES
 		// =========================================================
 
-		if (vo.getMachineType() != null) {
-
-			ListOfValuesDetailsResponseDTO machineTypeDTO = new ListOfValuesDetailsResponseDTO();
-
-			machineTypeDTO.setId(vo.getMachineType().getId());
-
-			machineTypeDTO.setCode(vo.getMachineType().getValueCode());
-
-			machineTypeDTO.setDescription(vo.getMachineType().getValueDescription());
-
-			dto.setMachineType(machineTypeDTO);
-		}
+//		if (vo.getMachineType() != null) {
+//
+//			ListOfValuesDetailsResponseDTO machineTypeDTO = new ListOfValuesDetailsResponseDTO();
+//
+//			machineTypeDTO.setId(vo.getMachineType().getId());
+//
+//			machineTypeDTO.setCode(vo.getMachineType().getValueCode());
+//
+//			machineTypeDTO.setDescription(vo.getMachineType().getValueDescription());
+//
+//			dto.setMachineType(machineTypeDTO);
+//		}
 
 		// =========================================================
 		// RATE / WEIGHT

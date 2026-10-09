@@ -347,13 +347,13 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 			for (ToolDetailsDTO d : dto.getToolDetailsDTO()) {
 				ToolDetailsVO detailsVO = new ToolDetailsVO();
 
-				if (d.getToolNo() != null && d.getToolNo() != 0) {
-
-					ToolMasterVO preparedBy = toolMasterRepo.findById(d.getToolNo())
-							.orElseThrow(() -> new ApplicationException("ToolMaster Not Found"));
-
-					detailsVO.setToolNo(preparedBy);
-				}
+//				if (d.getToolNo() != null && d.getToolNo() != 0) {
+//
+//					ToolMasterVO preparedBy = toolMasterRepo.findById(d.getToolNo())
+//							.orElseThrow(() -> new ApplicationException("ToolMaster Not Found"));
+//
+//					detailsVO.setToolNo(preparedBy);
+//				}
 				detailsVO.setStrokes(d.getStrokes());
 				detailsVO.setStrokesRate(d.getStrokesRate());
 				detailsVO.setToolValue(d.getStrokes().multiply(d.getStrokesRate()));
@@ -419,7 +419,7 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				ScrapDetailsVO detailsVO = new ScrapDetailsVO();
 				if (d.getScrap() != null && d.getScrap() != 0) {
 
-					ListOfValuesDetailsVO item = listOfValuesDetailsRepo.findById(d.getScrap())
+					ItemMasterVO item = itemMasterRepo.findById(d.getScrap())
 							.orElseThrow(() -> new ApplicationException("Scrap Not Found"));
 
 					detailsVO.setScrap(item);
@@ -643,10 +643,12 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				ScrapDetailsResponseDTO rDto = new ScrapDetailsResponseDTO();
 				rDto.setId(d.getId());
 				if (d.getScrap() != null) {
-					ListOfValuesDetailsResponseDTO lovDto = new ListOfValuesDetailsResponseDTO();
-					lovDto.setId(d.getScrap().getId());
-					lovDto.setDescription(d.getScrap().getValueDescription());
-					rDto.setScrap(lovDto);
+
+					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+					itemDTO.setId(d.getScrap().getId());
+					itemDTO.setItemCode(d.getScrap().getItemCode());
+					itemDTO.setItemDescription(d.getScrap().getItemDescription());
+					rDto.setScrap(itemDTO);
 				}
 				rDto.setWeight(d.getWeight());
 				rDto.setQty(d.getQty());

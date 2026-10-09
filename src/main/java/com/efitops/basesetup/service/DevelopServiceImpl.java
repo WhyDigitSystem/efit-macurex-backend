@@ -97,6 +97,7 @@ import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailRepo;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ToolMasterResponseMasterDTO;
 import com.efitops.basesetup.ResponseDTO.TransferOrderDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransferOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
@@ -1201,8 +1202,8 @@ public class DevelopServiceImpl implements DevelopService {
 				 *
 				 * http://localhost:8080/api/enquiry/viewFile/ enquiry/1001/quotation_1001.pdf
 				 */
-				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/develop/enquiry/viewFile/")
-						.toUriString();
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/develop/enquiry/viewFile/").toUriString();
 
 				Path baseDir = Paths.get(uploadPath).toAbsolutePath().normalize();
 
@@ -6882,7 +6883,7 @@ public class DevelopServiceImpl implements DevelopService {
 				// =========================
 
 				if (ObjectUtils.isNotEmpty(detailVO.getLocation())) {
-	
+
 					LocationMasterResponseDTO locDTO = new LocationMasterResponseDTO();
 					locDTO.setId(detailVO.getLocation().getId());
 					locDTO.setLocationName(detailVO.getLocation().getLocationName());
@@ -7078,47 +7079,53 @@ public class DevelopServiceImpl implements DevelopService {
 
 				if (ObjectUtils.isNotEmpty(toolFixtureVO.getToolFixtureNo())) {
 
-					ToolMasterVO toolMasterVO = toolFixtureVO.getToolFixtureNo();
+					ToolMasterResponseMasterDTO preparedByDTO = new ToolMasterResponseMasterDTO();
+					preparedByDTO.setId(toolFixtureVO.getToolFixtureNo().getId());
+					preparedByDTO.setToolName(toolFixtureVO.getToolFixtureNo().getToolName());
+					preparedByDTO.setToolDescription(toolFixtureVO.getToolFixtureNo().getToolDescription());
+					toolFixtureResponseDTO.setToolFixtureNo(preparedByDTO);
 
-					ToolMasterResponseDTO toolMasterResponseDTO = new ToolMasterResponseDTO();
-
-					toolMasterResponseDTO.setId(toolMasterVO.getId());
-					toolMasterResponseDTO.setToolNo(toolMasterVO.getToolNo());
-					toolMasterResponseDTO.setToolDescription(toolMasterVO.getToolDescription());
-					toolMasterResponseDTO.setToolCategory(toolMasterVO.getToolCategory());
-					toolMasterResponseDTO.setDrawingNo(toolMasterVO.getDrawingNo());
-					toolMasterResponseDTO.setSerialNo(toolMasterVO.getSerialNo());
-					toolMasterResponseDTO.setManufacturedBy(toolMasterVO.getManufacturedBy());
-					toolMasterResponseDTO.setSection(toolMasterVO.getSection());
-					toolMasterResponseDTO.setStatus(toolMasterVO.getStatus());
-					toolMasterResponseDTO.setToolUsedFor(toolMasterVO.getToolUsedFor());
-					toolMasterResponseDTO.setToolCost(toolMasterVO.getToolCost());
-					toolMasterResponseDTO.setCavityNumber(toolMasterVO.getCavityNumber());
-					toolMasterResponseDTO.setRemarks(toolMasterVO.getRemarks());
-					toolMasterResponseDTO.setToolName(toolMasterVO.getToolName());
-					toolMasterResponseDTO.setImage(toolMasterVO.getImage());
-					toolMasterResponseDTO.setOrgId(toolMasterVO.getOrgId());
-					toolMasterResponseDTO.setFinancialYear(toolMasterVO.getFinancialYear());
-					toolMasterResponseDTO.setCreatedBy(toolMasterVO.getCreatedBy());
-					toolMasterResponseDTO.setCancelRemarks(toolMasterVO.getCancelRemarks());
-
-					toolMasterResponseDTO.setToolWeight(toolMasterVO.getToolWeight());
-					toolMasterResponseDTO.setToolFixtureSize(toolMasterVO.getToolFixtureSize());
-					toolMasterResponseDTO.setLifeOfTool(toolMasterVO.getLifeOfTool());
-					toolMasterResponseDTO.setReconditionFreq(toolMasterVO.getReconditionFreq());
-					toolMasterResponseDTO.setSetUpTimeInMinutes(toolMasterVO.getSetUpTimeInMinutes());
-					toolMasterResponseDTO.setCompletedLifeCycle(toolMasterVO.getCompletedLifeCycle());
-					toolMasterResponseDTO.setToolMadeOf(toolMasterVO.getToolMadeOf());
-					toolMasterResponseDTO.setTechnicalSpecification(toolMasterVO.getTechnicalSpecification());
-					toolMasterResponseDTO.setNoOfStokesCompleted(toolMasterVO.getNoOfStokesCompleted());
-					toolMasterResponseDTO.setStrokesCompletedAfterReconditioning(
-							toolMasterVO.getStrokesCompletedAfterReconditioning());
-					toolMasterResponseDTO.setReconditionedDate(toolMasterVO.getReconditionedDate());
-					toolMasterResponseDTO.setToolFixtureCost(toolMasterVO.getToolFixtureCost());
-					toolMasterResponseDTO
-							.setToolFixtureAmortizedRecovered(toolMasterVO.getToolFixtureAmortizedRecovered());
-
-					toolFixtureResponseDTO.setToolFixtureNo(toolMasterResponseDTO);
+//					ToolMasterVO toolMasterVO = toolFixtureVO.getToolFixtureNo();
+//
+//					ToolMasterResponseDTO toolMasterResponseDTO = new ToolMasterResponseDTO();
+//
+//					toolMasterResponseDTO.setId(toolMasterVO.getId());
+//					toolMasterResponseDTO.setToolNo(toolMasterVO.getToolNo());
+//					toolMasterResponseDTO.setToolDescription(toolMasterVO.getToolDescription());
+//					toolMasterResponseDTO.setToolCategory(toolMasterVO.getToolCategory());
+//					toolMasterResponseDTO.setDrawingNo(toolMasterVO.getDrawingNo());
+//					toolMasterResponseDTO.setSerialNo(toolMasterVO.getSerialNo());
+//					toolMasterResponseDTO.setManufacturedBy(toolMasterVO.getManufacturedBy());
+//					toolMasterResponseDTO.setSection(toolMasterVO.getSection());
+//					toolMasterResponseDTO.setStatus(toolMasterVO.getStatus());
+//					toolMasterResponseDTO.setToolUsedFor(toolMasterVO.getToolUsedFor());
+//					toolMasterResponseDTO.setToolCost(toolMasterVO.getToolCost());
+//					toolMasterResponseDTO.setCavityNumber(toolMasterVO.getCavityNumber());
+//					toolMasterResponseDTO.setRemarks(toolMasterVO.getRemarks());
+//					toolMasterResponseDTO.setToolName(toolMasterVO.getToolName());
+//					toolMasterResponseDTO.setImage(toolMasterVO.getImage());
+//					toolMasterResponseDTO.setOrgId(toolMasterVO.getOrgId());
+//					toolMasterResponseDTO.setFinancialYear(toolMasterVO.getFinancialYear());
+//					toolMasterResponseDTO.setCreatedBy(toolMasterVO.getCreatedBy());
+//					toolMasterResponseDTO.setCancelRemarks(toolMasterVO.getCancelRemarks());
+//
+//					toolMasterResponseDTO.setToolWeight(toolMasterVO.getToolWeight());
+//					toolMasterResponseDTO.setToolFixtureSize(toolMasterVO.getToolFixtureSize());
+//					toolMasterResponseDTO.setLifeOfTool(toolMasterVO.getLifeOfTool());
+//					toolMasterResponseDTO.setReconditionFreq(toolMasterVO.getReconditionFreq());
+//					toolMasterResponseDTO.setSetUpTimeInMinutes(toolMasterVO.getSetUpTimeInMinutes());
+//					toolMasterResponseDTO.setCompletedLifeCycle(toolMasterVO.getCompletedLifeCycle());
+//					toolMasterResponseDTO.setToolMadeOf(toolMasterVO.getToolMadeOf());
+//					toolMasterResponseDTO.setTechnicalSpecification(toolMasterVO.getTechnicalSpecification());
+//					toolMasterResponseDTO.setNoOfStokesCompleted(toolMasterVO.getNoOfStokesCompleted());
+//					toolMasterResponseDTO.setStrokesCompletedAfterReconditioning(
+//							toolMasterVO.getStrokesCompletedAfterReconditioning());
+//					toolMasterResponseDTO.setReconditionedDate(toolMasterVO.getReconditionedDate());
+//					toolMasterResponseDTO.setToolFixtureCost(toolMasterVO.getToolFixtureCost());
+//					toolMasterResponseDTO
+//							.setToolFixtureAmortizedRecovered(toolMasterVO.getToolFixtureAmortizedRecovered());
+//
+//					toolFixtureResponseDTO.setToolFixtureNo(toolMasterResponseDTO);
 
 				}
 

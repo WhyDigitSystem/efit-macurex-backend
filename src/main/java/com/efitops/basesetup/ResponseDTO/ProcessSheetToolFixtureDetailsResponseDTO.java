@@ -13,15 +13,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class ProcessSheetToolFixtureDetailsResponseDTO {
-	
+
 	private Long id;
 
-    private ListOfValuesDetailsResponseDTO usageType;
+	private ListOfValuesDetailsResponseDTO usageType;
 
-    private ToolMasterResponseDTO toolFixtureNo;
+	private ToolMasterResponseMasterDTO toolFixtureNo;
 
-    private String toolFixtureName;
+	private String toolFixtureName;
 
-    private BigDecimal activityToolFixtureCost;
+	private BigDecimal activityToolFixtureCost;
 
 }

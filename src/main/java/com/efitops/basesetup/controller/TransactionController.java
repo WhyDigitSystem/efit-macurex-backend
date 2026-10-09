@@ -247,45 +247,44 @@ public class TransactionController extends BaseController {
 
 	// sales contract amendment
 
-	@PutMapping("/updateCreateSalesContractAmendment")
+	@PostMapping("/updateCreateSalesContractAmendment")
 	public ResponseEntity<ResponseDTO> updateCreateSalesContractAmendment(
-			@RequestBody SalesContractAmendmentDTO salesContractAmendmentDTO) {
+	        @RequestBody SalesContractAmendmentDTO salesContractAmendmentDTO) {
 
-		String methodName = "updateCreateSalesContractAmendment()";
+	    String methodName = "updateCreateSalesContractAmendment()";
 
-		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		Map<String, Object> responseObjectsMap = new HashMap<>();
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
 
-		String errorMsg = null;
+	    String errorMsg = null;
 
-		ResponseDTO responseDTO = null;
+	    ResponseDTO responseDTO = null;
 
-		try {
+	    try {
 
-			Map<String, Object> responseMap = transactionService
-					.updateCreateSalesContractAmendment(salesContractAmendmentDTO);
+	        Map<String, Object> responseMap = transactionService
+	                .updateCreateSalesContractAmendment(salesContractAmendmentDTO);
 
-			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
+	        responseObjectsMap.put(CommonConstant.STRING_MESSAGE, responseMap.get("message"));
 
-			responseObjectsMap.put("salesContractAmendmentVO", responseMap.get("salesContractAmendmentVO"));
+	        responseObjectsMap.put("salesContractAmendmentVO", responseMap.get("salesContractAmendmentVO"));
 
-			responseDTO = createServiceResponse(responseObjectsMap);
+	        responseDTO = createServiceResponse(responseObjectsMap);
 
-		} catch (Exception e) {
+	    } catch (Exception e) {
 
-			errorMsg = e.getMessage();
+	        errorMsg = e.getMessage();
 
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
+	        LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
-		}
+	        responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+	    }
 
-		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		return ResponseEntity.ok().body(responseDTO);
+	    return ResponseEntity.ok().body(responseDTO);
 	}
-
 	@GetMapping("/getSalesContractAmendmentById")
 	public ResponseEntity<ResponseDTO> getSalesContractAmendmentById(@RequestParam Long id) {
 

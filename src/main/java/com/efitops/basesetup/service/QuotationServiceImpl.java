@@ -1,9 +1,8 @@
 package com.efitops.basesetup.service;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.http.HttpHeaders;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,8 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -22,6 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -997,69 +999,111 @@ public class QuotationServiceImpl implements QuotationService {
 //		quotationVO.setQuotationIemFileUploadDetailsVO(fileList);
 	}
 
+	
+	
 	@Value("${quotation.upload.path}")
 	private String uploadPath;
+	
+	private void saveAttachments(
+	        MultipartFile[] files,
+	        QuotationVO quotationVO) throws ApplicationException {
 
-	private void saveAttachments(MultipartFile[] files, QuotationVO quotationVO) throws ApplicationException {
+	    if (files == null || files.length == 0) {
+	        return;
+	    }
 
-		if (files == null || files.length == 0) {
-			return;
-		}
+	    try {
+	        Path baseDir = Paths.get(uploadPath)
+	                .toAbsolutePath()
+	                .normalize();
 
-		try {
+	        Path quotationFolder = baseDir
+	                .resolve(quotationVO.getId().toString())
+	                .normalize();
 
-			File folder = new File(uploadPath);
+	        Files.createDirectories(quotationFolder);
 
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
+	        List<QuotationIemFileUploadDetailsVO> attachmentList =
+	                new ArrayList<>();
 
-			List<QuotationIemFileUploadDetailsVO> attachmentList = new ArrayList<>();
+	        for (MultipartFile file : files) {
 
-			for (MultipartFile file : files) {
+	            if (file == null || file.isEmpty()) {
+	                continue;
+	            }
 
-				if (file == null || file.isEmpty()) {
-					continue;
-				}
+	            String originalName = file.getOriginalFilename();
 
-				String originalFileName = file.getOriginalFilename();
+	            if (originalName == null || originalName.trim().isEmpty()) {
+	                originalName = "file";
+	            }
 
-				String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
+	            // Prevent directory names from being included in the filename
+	            originalName = originalName.replace("\\", "/");
+	            originalName = originalName.substring(
+	                    originalName.lastIndexOf("/") + 1);
 
-				Path path = Paths.get(uploadPath, uniqueFileName);
+	            String safeName = originalName.replaceAll("\\s+", "_");
 
-				try (InputStream inputStream = file.getInputStream()) {
+	            String extension = "";
+	            String fileNameWithoutExtension = safeName;
 
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-				}
+	            int dotIndex = safeName.lastIndexOf(".");
 
-				QuotationIemFileUploadDetailsVO attachment = new QuotationIemFileUploadDetailsVO();
+	            if (dotIndex > 0) {
+	                extension = safeName.substring(dotIndex);
+	                fileNameWithoutExtension = safeName.substring(0, dotIndex);
+	            }
 
-				attachment.setQuotationVO(quotationVO);
+	            String fileName = fileNameWithoutExtension
+	                    + "_" + quotationVO.getId()
+	                    + extension;
 
-				attachment.setName(originalFileName);
+	            Path filePath = quotationFolder.resolve(fileName).normalize();
 
-				attachment.setFileName(uniqueFileName);
+	            if (!filePath.startsWith(quotationFolder)) {
+	                throw new ApplicationException("Invalid file path");
+	            }
 
-				attachment.setFilePath(path.toString());
+	            Files.copy(
+	                    file.getInputStream(),
+	                    filePath,
+	                    StandardCopyOption.REPLACE_EXISTING
+	            );
 
-				attachment.setFileSize(file.getSize());
+	            String relativePath = baseDir
+	                    .relativize(filePath)
+	                    .toString()
+	                    .replace("\\", "/");
 
-				attachment.setUploadOn(LocalDateTime.now());
+	            String publicUrl = serverBaseUrl
+	                    + "/api/quotationservice/quatation/viewFile/"
+	                    + relativePath;
 
-				attachmentList.add(attachment);
-			}
+	            QuotationIemFileUploadDetailsVO attachment =
+	                    new QuotationIemFileUploadDetailsVO();
 
-			List<QuotationIemFileUploadDetailsVO> savedAttachments = quotationIemFileUploadDetailsRepo
-					.saveAll(attachmentList);
+	            attachment.setQuotationVO(quotationVO);
+	            attachment.setName(originalName);
+	            attachment.setFileName(fileName);
+	            attachment.setFilePath(publicUrl);
+	            attachment.setFileSize(file.getSize());
+	            attachment.setUploadOn(LocalDateTime.now());
 
-			quotationVO.setQuotationIemFileUploadDetailsVO(savedAttachments);
+	            attachmentList.add(attachment);
+	        }
 
-		} catch (IOException e) {
+	        List<QuotationIemFileUploadDetailsVO> savedAttachments =
+	                quotationIemFileUploadDetailsRepo.saveAll(attachmentList);
 
-			throw new ApplicationException("File Upload Failed : " + e.getMessage());
-		}
+	        quotationVO.setQuotationIemFileUploadDetailsVO(savedAttachments);
+
+	    } catch (IOException e) {
+	        throw new ApplicationException(
+	                "File Upload Failed: " + e.getMessage());
+	    }
 	}
+	
 
 	private QuotationResponseDTO buildQuotationResponse(QuotationVO quotationVO) {
 		QuotationResponseDTO responseDTO = new QuotationResponseDTO();
@@ -1217,9 +1261,7 @@ public class QuotationServiceImpl implements QuotationService {
 
 				fileDTO.setFileName(fileVO.getFileName());
 
-				String urlPath = uploadPath.replace("C:/", "/").replace("\\", "/");
-
-				fileDTO.setFilePath(serverBaseUrl + urlPath + fileVO.getFileName());
+				fileDTO.setFilePath(fileVO.getFilePath());
 
 				fileDTO.setFileSize(fileVO.getFileSize());
 
@@ -1241,5 +1283,71 @@ public class QuotationServiceImpl implements QuotationService {
 		String result = quotationRepo.getQuotationDocId(orgId, financialYear, screenCode1);
 		return result;
 	}
+	
+	@Override
+	public ResponseEntity<byte[]> viewQuotationFile(
+	        HttpServletRequest request) throws IOException {
 
+	    return serveFile(
+	            request,
+	            "/api/quotationservice/quatation/viewFile/",
+	            uploadPath
+	    );
+	}
+	
+	
+	private ResponseEntity<byte[]> serveFile(
+	        HttpServletRequest request,
+	        String urlPrefix,
+	        String uploadPath) throws IOException {
+
+	    try {
+	        String requestUri = request.getRequestURI();
+
+	        String relativePath = requestUri.substring(
+	                requestUri.indexOf(urlPrefix) + urlPrefix.length()
+	        );
+
+	        relativePath = java.net.URLDecoder.decode(
+	                relativePath,
+	                java.nio.charset.StandardCharsets.UTF_8
+	        );
+
+	        Path baseDir = Paths.get(uploadPath)
+	                .toAbsolutePath()
+	                .normalize();
+
+	        Path filePath = baseDir.resolve(relativePath)
+	                .normalize();
+
+	        // Security: prevent access outside the upload folder
+	        if (!filePath.startsWith(baseDir)) {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+	        }
+
+	        if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+	            return ResponseEntity.notFound().build();
+	        }
+
+	        String contentType = Files.probeContentType(filePath);
+
+	        if (contentType == null) {
+	            contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+	        }
+
+	        byte[] fileBytes = Files.readAllBytes(filePath);
+
+	        return ResponseEntity.ok()
+	                .contentType(MediaType.parseMediaType(contentType))
+	                .header(
+	                	    "Content-Disposition",
+	                	    "inline; filename=\"" + filePath.getFileName() + "\""
+	                	)
+	                .body(fileBytes);
+
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.badRequest().build();
+	    }
+	}
+	
 }

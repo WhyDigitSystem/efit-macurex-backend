@@ -50,7 +50,7 @@ public class SalesOrderAmendmentVO {
     private String salesOrderNumber;
 
     @Column(name = "doc_date")
-    private LocalDate docDate;
+	private LocalDate docDate = LocalDate.now();
 
     @Column(name = "party_po_amendment_no")
     private String partyPoAmendmentNo;
@@ -80,6 +80,9 @@ public class SalesOrderAmendmentVO {
     
     @Column(name = "org_id")
 	private Long orgId;
+    
+    @Column(name = "financial_year")
+	private String financialYear;
 	
 	@Column(name = "created_by")
 	private String createdBy;

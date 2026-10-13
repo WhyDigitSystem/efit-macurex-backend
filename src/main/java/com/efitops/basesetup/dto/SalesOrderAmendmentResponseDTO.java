@@ -36,6 +36,7 @@ public class SalesOrderAmendmentResponseDTO {
 
     // Common Details
     private Long orgId;
+    private String financialYear;
     private String createdBy;
     private String updatedBy;
     private boolean active;

@@ -344,5 +344,44 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 						ORDER BY c.customer_code
 						""", nativeQuery = true)
 	Set<Object[]> getCustomerForSupplierRateContract(@Param("orgId") Long orgId, @Param("branch") Long branch);
+	
+	
+	
+	@Query(value = """
+	        SELECT
+	            c.customer_name AS partyname,
+	            c.address AS add1,
+	            NULL AS add2,
+	            NULL AS add3,
+	            NULL AS add4,
+	            c.account_name AS accountname,
+	            c.customer_id AS PartyMASTID,
+	            c.customer_code AS PartyID,
+	            g.state_name AS GSTSTATE,
+	            c.is_gst_applicable AS ISGSTAPPL,
+	            c.gst_no AS GSTNNO
+	        FROM customer_header c
+	        LEFT JOIN gststatemaster g
+	            ON g.gststatemaster_id = c.gst_state
+	        LEFT JOIN listofvaluesdetails lov1
+	            ON lov1.listofvaluesdetails_id = c.customer_category
+	        LEFT JOIN listofvaluesdetails lov2
+	            ON lov2.listofvaluesdetails_id = c.customer_category1
+	        LEFT JOIN listofvaluesdetails lov3
+	            ON lov3.listofvaluesdetails_id = c.customer_category2
+	        WHERE c.cancel = FALSE
+	          AND c.active = TRUE
+	          AND c.org_id = :orgId
+	          AND c.branch = :branch
+	          AND (
+	                lov1.value_description IN ('Sub Contract', 'Sub Contractor')
+	                OR lov2.value_description IN ('Sub Contract', 'Sub Contractor')
+	                OR lov3.value_description IN ('Sub Contract', 'Sub Contractor')
+	              )
+	        ORDER BY c.customer_name
+	        """, nativeQuery = true)
+	List<Object[]> getSubContractorForSCBill(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch);
 
 }

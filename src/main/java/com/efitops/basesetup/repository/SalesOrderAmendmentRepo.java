@@ -57,7 +57,11 @@ public interface SalesOrderAmendmentRepo extends JpaRepository<SalesOrderAmendme
             String salesOrderNo,
             Long item,
             Long orgId,
-            Long branch);    
+            Long branch); 
+    
+    
+    @Query(nativeQuery = true, value = "SELECT CONCAT(prefix, LPAD(last_no, 5, 0)) AS docid FROM documenttypemapping_details WHERE org_id=?1 AND fin_year=?2 AND screen_code=?3")
+    String getSalesOrderAmendmentDocId(Long orgId, String financialYear, String screenCode);
     
     
    

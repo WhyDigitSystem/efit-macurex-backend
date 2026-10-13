@@ -1,6 +1,6 @@
 package com.efitops.basesetup.entity;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,8 +122,6 @@ public class ControlPlanVO {
 		@OneToMany(mappedBy = "controlPlanVO", cascade = CascadeType.ALL)
 		@JsonManagedReference
 		private List<ControlPlanMachineFixtureVO> controlPlanMachineFixtureVO = new ArrayList<>();
-		
-		
 		
 		@JsonGetter("activeStatus")
 		public String getActiveStatus() {

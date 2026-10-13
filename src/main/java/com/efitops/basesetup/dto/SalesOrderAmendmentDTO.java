@@ -18,6 +18,7 @@ public class SalesOrderAmendmentDTO {
     private Long branch;
 //    private String docId;
     private String salesOrderNumber;
+    private String financialYear;
 //    private LocalDate docDate;
     private String partyPoAmendmentNo;
     private LocalDate salesOrderDate;

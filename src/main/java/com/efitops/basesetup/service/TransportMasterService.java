@@ -1,8 +1,12 @@
 package com.efitops.basesetup.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.DespatchInstructionResponseDTO;
@@ -114,6 +118,8 @@ public interface TransportMasterService {
 	String getCustomerComplaintDocId(Long orgId, String financialYear, String screenCode);
 
 	String getDespatchInstructionDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	ResponseEntity<byte[]> viewCustomerComplaintImage(HttpServletRequest request) throws IOException;
 
 
 

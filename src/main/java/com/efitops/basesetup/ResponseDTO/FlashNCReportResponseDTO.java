@@ -28,9 +28,9 @@ public class FlashNCReportResponseDTO {
 
 	private ListOfValuesDetailsResponseDTO reference;
 
-	private ListOfValuesDetailsResponseDTO fromDept;
+	private DepartmentResponseDTO fromDept;
 
-	private ListOfValuesDetailsResponseDTO toDept;
+	private DepartmentResponseDTO toDept;
 
 	private String Description;
 
@@ -46,7 +46,9 @@ public class FlashNCReportResponseDTO {
 
 	private String poNo;
 
-	private CustomerResponse1DTO supplier;
+	private String supplier;
+	
+	private String supplierName;
 
 	private String operationNo;
 
@@ -68,7 +70,7 @@ public class FlashNCReportResponseDTO {
 
 	private EmployeeDropdownResponseDTO inspectedBy;
 
-	private ListOfValuesDetailsResponseDTO status;
+	private String status;
 
 	private String narration;
 

@@ -21,15 +21,16 @@ public interface MaterialIndentForProductionRepo extends JpaRepository<MaterialI
 	@Query(nativeQuery = true, value = "select * from material_indent_for_production where org_id=?1 and branch=?2 and active=1 and cancel=0")
 	List<MaterialIndentForProductionVO> getMaterialIndentForProductionByOrgId(Long orgId, Long branch);
 
-	@Query(nativeQuery = true, value = "select p.doc_id,p.doc_date,p.fg_item,i.item_code,i.item_description from production_schedule_order_basic p\r\n"
-			+ " left join item i on p.fg_item=i.item_id\r\n"
+	@Query(nativeQuery = true, value = "select p.doc_id,p.doc_date,p.fg_item,i.item_code,i.item_description,p1.qty_required from production_schedule_order_basic p join production_schedule_order_details p1 on\r\n"
+			+ " p.production_schedule_order_basic_id=p1.production_schedule_order_basic_id\r\n"
+			+ "			 left join item i on p.fg_item=i.item_id \r\n"
 			+ "			  where p.org_id=?1\r\n"
-			+ "			    and p.branch=?2 and p.active=1 and p.cancel=0")
+			+ "					    and p.branch=?2 and p.active=1 and p.cancel=0")
 	Set<Object[]> getFgAndSfgItemDetailsFromMaterial(Long orgId, Long branch);
 
 	@Query(nativeQuery = true, value = "select p1.item,i.item_code,i.item_description,p1.qty_required from production_schedule_order_basic p join production_schedule_order_details p1 on p.production_schedule_order_basic_id=p1.production_schedule_order_basic_id  left join item i on p1.item=i.item_id\r\n"
 			+ "  where p.org_id=?1 \r\n"
-			+ "    and p.branch=?2 and p.fg_itme=?3 and p.active=1 and p.cancel=0")
+			+ "    and p.branch=?2 and p.fg_item=?3 and p.active=1 and p.cancel=0")
 	Set<Object[]> getFgAndSfgItemDetailsFromMaterialDetails(Long orgId, Long branch, Long fgItem);
 
 }

@@ -382,4 +382,6 @@ public interface DevelopService {
 
 	Map<String, Object> updateCreateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
 			throws ApplicationException;
+	ResponseEntity<byte[]> viewEnquiryFile(HttpServletRequest request) throws IOException;
+
 }

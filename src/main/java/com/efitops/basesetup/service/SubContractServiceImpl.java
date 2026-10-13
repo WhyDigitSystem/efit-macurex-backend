@@ -6723,29 +6723,29 @@ public class SubContractServiceImpl implements SubContractService {
 			// GENERATE DOCUMENT ID
 			// =====================================================
 
-//			String docId = subContractingGRNRepo.getSubContractingGRNDocId(dto.getOrgId(), dto.getFinancialYear(),
-//					screenCode);
-//
-//			if (docId == null || docId.isBlank()) {
-//
-//				throw new ApplicationException("Sub Contracting GRN DocId Generation Failed");
-//			}
-//
-//			subContractingGRNVO.setDocId(docId);
+			String docId = subContractingGRNRepo.getSubContractingGRNDocId(dto.getOrgId(), dto.getFinancialYear(),
+					screenCode);
+
+			if (docId == null || docId.isBlank()) {
+
+				throw new ApplicationException("Sub Contracting GRN DocId Generation Failed");
+			}
+
+			subContractingGRNVO.setDocId(docId);
 
 			// =====================================================
 			// UPDATE DOCUMENT LAST NUMBER
 			// =====================================================
 
-//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-//					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
-//
-//			if (documentTypeMappingDetailsVO != null) {
-//
-//				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-//
-//				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
-//			}
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(dto.getOrgId(), dto.getFinancialYear(), screenCode);
+
+			if (documentTypeMappingDetailsVO != null) {
+
+				documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+
+				documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+			}
 
 			// =====================================================
 			// CREATED BY

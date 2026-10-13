@@ -31,96 +31,89 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BulkIssueIndentVO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bulk_issue_indentgen")
-    @SequenceGenerator(
-            name = "bulk_issue_indentgen",
-            sequenceName = "bulk_issue_indentseq",
-            initialValue = 1000000001,
-            allocationSize = 1)
-    @Column(name = "bulk_issue_indent_id", columnDefinition = "BIGINT DEFAULT 0")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bulk_issue_indentgen")
+	@SequenceGenerator(name = "bulk_issue_indentgen", sequenceName = "bulk_issue_indentseq", initialValue = 1000000001, allocationSize = 1)
+	@Column(name = "bulk_issue_indent_id", columnDefinition = "BIGINT DEFAULT 0")
+	private Long id;
 
-    @Column(name = "doc_id")
-    private String docId;
+	@Column(name = "doc_id")
+	private String docId;
 
-    @Column(name = "doc_date")
-    private LocalDate docDate = LocalDate.now();
+	@Column(name = "doc_date")
+	private LocalDate docDate = LocalDate.now();
 
-    @ManyToOne
-    @JoinColumn(name = "branch")
-    private BranchVO branch;
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
 
-    @ManyToOne
-    @JoinColumn(name = "department")
-    private DepartmentVO department;
+	@ManyToOne
+	@JoinColumn(name = "department")
+	private DepartmentVO department;
 
-    @Column(name = "belongs_to")
-    private String belongsTo;
+	@Column(name = "belongs_to")
+	private String belongsTo;
 
-    @ManyToOne
-    @JoinColumn(name = "fg_sfg_item")
-    private ItemMasterVO fgSfgItem;
+	@ManyToOne
+	@JoinColumn(name = "fg_sfg_item")
+	private ItemMasterVO fgSfgItem;
 
-    @ManyToOne
-    @JoinColumn(name = "bom_id")
-    private BillOfMaterialVO bom;
+	@ManyToOne
+	@JoinColumn(name = "bom_id")
+	private BillOfMaterialVO bom;
 
-    @Column(name = "time_of_indent")
-    private String timeOfIndent;
+	@Column(name = "time_of_indent")
+	private String timeOfIndent;
 
-    @ManyToOne
-    @JoinColumn(name = "from_location")
-    private LocationVO fromLocation;
+	@ManyToOne
+	@JoinColumn(name = "from_location")
+	private LocationVO fromLocation;
 
-    @Column(name = "approved_by_pm")
-    private String approvedByPM;
+	@Column(name = "approved_by_pm")
+	private String approvedByPM;
 
-    @ManyToOne
-    @JoinColumn(name = "prepared_by")
-    private EmployeeMasterVO preparedBy;
+	@ManyToOne
+	@JoinColumn(name = "prepared_by")
+	private EmployeeMasterVO preparedBy;
 
-    @ManyToOne
-    @JoinColumn(name = "authorised_by")
-    private EmployeeMasterVO authorisedBy;
+	@ManyToOne
+	@JoinColumn(name = "authorised_by")
+	private EmployeeMasterVO authorisedBy;
 
-    @Column(name = "remarks")
-    private String remarks;
+	@Column(name = "remarks")
+	private String remarks;
 
-    @Column(name = "created_by")
-    private String createdBy;
+	@Column(name = "created_by")
+	private String createdBy;
 
-    @Column(name = "active")
-    private boolean active;
+	@Column(name = "active")
+	private boolean active;
 
-    @Column(name = "cancel")
-    private boolean cancel = false;
+	@Column(name = "cancel")
+	private boolean cancel = false;
 
-    @Column(name = "modified_by")
-    private String updatedBy;
+	@Column(name = "modified_by")
+	private String updatedBy;
 
-    @Column(name = "cancel_remarks")
-    private String cancelRemarks;
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
 
-    @Column(name = "screen_name")
-    private String screenName = "BULK ISSUE INDENT";
+	@Column(name = "screen_name")
+	private String screenName = "BULK ISSUE INDENT";
 
-    @Column(name = "screen_code")
-    private String screenCode = "BII";
+	@Column(name = "screen_code")
+	private String screenCode = "BII";
 
-    @Column(name = "org_id")
-    private Long orgId;
+	@Column(name = "org_id")
+	private Long orgId;
 
-    @Column(name = "financial_year")
-    private String financialYear;
+	@Column(name = "financial_year")
+	private String financialYear;
 
-    @OneToMany(
-            mappedBy = "bulkIssueIndentVO",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
-    @JsonManagedReference
-    private List<BulkIssueIndentDetailsVO> details = new ArrayList<>();
+	@OneToMany(mappedBy = "bulkIssueIndentVO", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	private List<BulkIssueIndentDetailsVO> details = new ArrayList<>();
 
-    @Embedded
-    private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
+	@Embedded
+	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 }

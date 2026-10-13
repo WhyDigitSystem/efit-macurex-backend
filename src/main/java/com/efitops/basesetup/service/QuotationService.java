@@ -32,4 +32,6 @@ public interface QuotationService {
 
 	String getQuotationDocId(Long orgId, String financialYear, String screenCode);
 
+	ResponseEntity<byte[]> viewQuotationFile(HttpServletRequest request) throws IOException;
+
 }

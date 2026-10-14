@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.DocketInvoiceRepo;
+import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
 import com.efitops.basesetup.repository.SalesRejectionInvoiceRepo;
 
 @Service
@@ -20,6 +22,12 @@ public class RegularLCSalesReportServiceImpl implements RegularLCSalesReportServ
 	@Autowired
 	private SalesRejectionInvoiceRepo salesRejectionInvoiceRepo;
 
+	@Autowired
+	private SalesDeliveryScheduleRepo salesDeliveryScheduleRepo;
+	
+	@Autowired
+	private DocketInvoiceRepo docketInvoiceRepo;
+	
 	@Override
 	public Map<String, Object> getRegularLCSalesReport(Long belongsTo, Long branch, Long orgId, String fromDate,
 			String toDate) throws ApplicationException {
@@ -175,4 +183,104 @@ public class RegularLCSalesReportServiceImpl implements RegularLCSalesReportServ
 		return responseObjectsMap;
 	}
 
+//	schedule vs sales
+	@Override
+	public Map<String, Object> getScheduleVsSalesReport(String mon, Long under, Long branch, Long orgId)
+			throws ApplicationException {
+
+		List<Object[]> resultList = salesDeliveryScheduleRepo.getScheduleVsSalesReport(mon, under, branch, orgId);
+
+		List<Map<String, Object>> reportList = new ArrayList<>();
+
+		for (Object[] obj : resultList) {
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("partyid", obj[0]);
+			map.put("partyname", obj[1]);
+			map.put("itemid", obj[2]);
+			map.put("itemdesc", obj[3]);
+			map.put("cpartno", obj[4]);
+			map.put("pLqty", obj[5]);
+			map.put("sqty", obj[6]);
+			map.put("PQTY", obj[7]);
+			map.put("shvalue", obj[8]);
+			map.put("sales", obj[9]);
+			map.put("RATE", obj[10]);
+
+			reportList.add(map);
+		}
+
+		Map<String, Object> responseMap = new HashMap<>();
+		responseMap.put("scheduleVsSalesReport", reportList);
+
+		return responseMap;
+	}
+	
+//	invoice/docket details
+	@Override
+	public Map<String, Object> getInvoiceDocketDetailsReport(
+	        String fromDate, String toDate, Long branch, Long orgId)
+	        throws ApplicationException {
+
+	    List<Object[]> resultList = docketInvoiceRepo
+	            .getInvoiceDocketDetailsReport(fromDate, toDate, branch, orgId);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : resultList) {
+	        Map<String, Object> map = new HashMap<>();
+
+	        map.put("transmastid", obj[0]);
+	        map.put("transid", obj[1]);
+	        map.put("dono", obj[2]);
+	        map.put("docdate", obj[3]);
+	        map.put("billno", obj[4]);
+	        map.put("billdt", obj[5]);
+	        map.put("totamt", obj[6]);
+
+	        reportList.add(map);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("invoiceDocketDetailsReport", reportList);
+
+	    return responseObjectsMap;
+	}
+	
+//	delivery schedule year wise
+	@Override
+	public Map<String, Object> getDeliveryScheduleYearWiseReport(
+	        String year, String belongs, Long branch, Long orgId) throws ApplicationException {
+
+	    List<Object[]> deliveryScheduleList = salesDeliveryScheduleRepo
+	            .getDeliveryScheduleYearWiseReport(year, belongs, branch, orgId);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : deliveryScheduleList) {
+	        Map<String, Object> reportMap = new HashMap<>();
+
+	        reportMap.put("ITEMID", obj[0]);
+	        reportMap.put("ITEMDESCRIPTION", obj[1]);
+	        reportMap.put("JAN", obj[2]);
+	        reportMap.put("FEB", obj[3]);
+	        reportMap.put("MAR", obj[4]);
+	        reportMap.put("APR", obj[5]);
+	        reportMap.put("MAY", obj[6]);
+	        reportMap.put("JUN", obj[7]);
+	        reportMap.put("JUL", obj[8]);
+	        reportMap.put("AUG", obj[9]);
+	        reportMap.put("SEP", obj[10]);
+	        reportMap.put("OCT", obj[11]);
+	        reportMap.put("NOV", obj[12]);
+	        reportMap.put("DECE", obj[13]);
+
+	        reportList.add(reportMap);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("deliveryScheduleYearWiseReport", reportList);
+
+	    return responseObjectsMap;
+	}
 }

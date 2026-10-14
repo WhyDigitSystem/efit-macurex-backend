@@ -18,4 +18,14 @@ public interface RegularLCSalesReportService {
 	Map<String, Object> getCustomerDetailsSales(String fromDate, String toDate, Long orgId, Long branch)
 			throws ApplicationException;
 
+	Map<String, Object> getScheduleVsSalesReport(String mon, Long under, Long branch, Long orgId)
+			throws ApplicationException;
+
+//	invoicedocketdetails
+	Map<String, Object> getInvoiceDocketDetailsReport(String fromDate, String toDate, Long branch, Long orgId)
+			throws ApplicationException;
+
+	Map<String, Object> getDeliveryScheduleYearWiseReport(String year, String belongs, Long branch, Long orgId)
+			throws ApplicationException;
+
 }

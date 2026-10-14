@@ -313,4 +313,313 @@ public interface SalesDeliveryScheduleRepo extends JpaRepository<SalesDeliverySc
 			@Param("fromDate") String fromDate, @Param("toDate") String toDate, @Param("branchId") Long branchId,
 			@Param("orgId") Long orgId);
 
+//	schedule vs sale
+
+	@Query(value = """
+			SELECT
+			    partyid,
+			    partyname,
+			    itemid,
+			    itemdesc,
+			    cpartno,
+			    pLqty,
+			    sqty,
+			    PQTY,
+			    (pLqty * RATE) AS shvalue,
+			    (sqty * RATE) AS sales,
+			    RATE
+			FROM (
+			    SELECT
+			        partyid,
+			        partyname,
+			        itemid,
+			        itemdesc,
+			        cpartno,
+			        SUM(pLqty) AS pLqty,
+			        SUM(sqty) AS sqty,
+			        SUM(PQTY) AS PQTY,
+			        RATE
+			    FROM (
+			        SELECT
+			            ob.doc_id AS docid,
+			            ob.doc_date AS docdt,
+			            a.dlv_no AS divno,
+			            a.dlv_date AS divdt,
+			            a.month_of_schedule AS month,
+			            c.customer_code AS partyid,
+			            c.customer_name AS partyname,
+			            i.item_id AS itemid,
+			            i.item_description AS itemdesc,
+			            i.customer_part_no AS cpartno,
+			            SUM(b.actual_planned_qty) AS pLqty,
+			            SUM(dd.despatch_qty) AS sqty,
+			            SUM(b.actual_planned_qty) - SUM(dd.despatch_qty) AS PQTY,
+			            od.order_rate AS RATE
+			        FROM sdvbasic a
+			        INNER JOIN sdvdet b
+			            ON a.sdvbasic_id = b.sdvbasic_id
+			        INNER JOIN customer_header c
+			            ON a.customer_id = c.customer_id
+			        INNER JOIN order_acceptance_basic ob
+			            ON ob.doc_id = b.so_no_contractno
+			        INNER JOIN order_acceptance_detail od
+			            ON ob.order_acceptance_basic_id = od.order_acceptance_basic_id
+			        INNER JOIN item i
+			            ON b.item_id = i.item_id
+			           AND od.item = i.item_id
+			        INNER JOIN sales_rejection_invoice_detail dd
+			            ON dd.item = i.item_id
+			        INNER JOIN sales_rejection_invoice_basic dc
+			            ON dc.sales_rejection_invoice_basic_id =
+			               dd.sales_rejection_invoice_basic_id
+			        WHERE a.cancel = FALSE
+			          AND dc.cancel = FALSE
+			          AND a.month_year = :mon
+			          AND c.belongs_to = :under
+			          AND a.branch_id = :branch
+			          AND a.org_id = :orgId
+			        GROUP BY
+			            a.dlv_no,
+			            a.dlv_date,
+			            a.month_of_schedule,
+			            c.customer_code,
+			            c.customer_name,
+			            i.item_id,
+			            i.item_description,
+			            i.customer_part_no,
+			            ob.doc_id,
+			            ob.doc_date,
+			            od.order_rate
+
+			        UNION
+
+			        SELECT
+			            sc.doc_id AS docid,
+			            sc.doc_date AS docdt,
+			            a.dlv_no AS divno,
+			            a.dlv_date AS divdt,
+			            a.month_of_schedule AS month,
+			            c.customer_code AS partyid,
+			            c.customer_name AS partyname,
+			            i.item_id AS itemid,
+			            i.item_description AS itemdesc,
+			            i.customer_part_no AS cpartno,
+			            MAX(b.actual_planned_qty) AS pLqty,
+			            SUM(dd.despatch_qty) AS sqty,
+			            MAX(b.actual_planned_qty) - SUM(dd.despatch_qty) AS PQTY,
+			            d.order_rate AS RATE
+			        FROM sdvbasic a
+			        INNER JOIN sdvdet b
+			            ON a.sdvbasic_id = b.sdvbasic_id
+			        INNER JOIN customer_header c
+			            ON a.customer_id = c.customer_id
+			        INNER JOIN sales_contract_basic sc
+			            ON sc.customer_contract_no = b.so_no_contractno
+			        INNER JOIN sales_contract_detail d
+			            ON d.salescontract_id = sc.salescontract_id
+			        INNER JOIN item i
+			            ON b.item_id = i.item_id
+			           AND d.item = i.item_id
+			        INNER JOIN sales_rejection_invoice_detail dd
+			            ON dd.item = i.item_id
+			        INNER JOIN sales_rejection_invoice_basic dc
+			            ON dc.sales_rejection_invoice_basic_id =
+			               dd.sales_rejection_invoice_basic_id
+			        WHERE a.cancel = FALSE
+			          AND dc.cancel = FALSE
+			          AND a.month_year = :mon
+			          AND c.belongs_to = :under
+			          AND a.branch_id = :branch
+			          AND a.org_id = :orgId
+			        GROUP BY
+			            sc.doc_id,
+			            sc.doc_date,
+			            a.dlv_no,
+			            a.dlv_date,
+			            a.month_of_schedule,
+			            c.customer_code,
+			            c.customer_name,
+			            i.item_id,
+			            i.item_description,
+			            i.customer_part_no,
+			            d.order_rate
+
+			        UNION
+
+			        SELECT
+			            sc.doc_id AS docid,
+			            sc.doc_date AS docdt,
+			            a.dlv_no AS divno,
+			            a.dlv_date AS divdt,
+			            a.month_of_schedule AS month,
+			            c.customer_code AS partyid,
+			            c.customer_name AS partyname,
+			            i.item_id AS itemid,
+			            i.item_description AS itemdesc,
+			            i.customer_part_no AS cpartno,
+			            b.actual_planned_qty AS pLqty,
+			            0 AS sqty,
+			            b.actual_planned_qty AS PQTY,
+			            d.order_rate AS RATE
+			        FROM sdvbasic a
+			        INNER JOIN sdvdet b
+			            ON a.sdvbasic_id = b.sdvbasic_id
+			        INNER JOIN customer_header c
+			            ON a.customer_id = c.customer_id
+			        INNER JOIN item i
+			            ON b.item_id = i.item_id
+			        INNER JOIN sales_contract_basic sc
+			            ON sc.salescontract_id = b.so_no_contractno
+			        INNER JOIN sales_contract_detail d
+			            ON d.salescontract_id = sc.salescontract_id
+			           AND d.item = b.item_id
+			        WHERE a.cancel = FALSE
+			          AND a.month_year = :mon
+			          AND c.belongs_to = :under
+			          AND a.branch_id = :branch
+			          AND a.org_id = :orgId
+			          AND NOT EXISTS (
+			              SELECT 1
+			              FROM sales_rejection_invoice_basic dc
+			              INNER JOIN sales_rejection_invoice_detail dd
+			                  ON dc.sales_rejection_invoice_basic_id =
+			                     dd.sales_rejection_invoice_basic_id
+			              WHERE dc.cancel = FALSE
+			                AND dd.item = i.item_id
+			          )
+
+			        UNION
+
+			        SELECT
+			            ob.doc_id AS docid,
+			            ob.doc_date AS docdt,
+			            a.dlv_no AS divno,
+			            a.dlv_date AS divdt,
+			            a.month_of_schedule AS month,
+			            c.customer_code AS partyid,
+			            c.customer_name AS partyname,
+			            i.item_id AS itemid,
+			            i.item_description AS itemdesc,
+			            i.customer_part_no AS cpartno,
+			            b.actual_planned_qty AS pLqty,
+			            0 AS sqty,
+			            b.actual_planned_qty AS PQTY,
+			            od.order_rate AS RATE
+			        FROM sdvbasic a
+			        INNER JOIN sdvdet b
+			            ON a.sdvbasic_id = b.sdvbasic_id
+			        INNER JOIN customer_header c
+			            ON a.customer_id = c.customer_id
+			        INNER JOIN item i
+			            ON b.item_id = i.item_id
+			        INNER JOIN order_acceptance_basic ob
+			            ON ob.doc_id = b.so_no_contractno
+			        INNER JOIN order_acceptance_detail od
+			            ON od.order_acceptance_basic_id =
+			               ob.order_acceptance_basic_id
+			           AND od.item = b.item_id
+			        WHERE a.cancel = FALSE
+			          AND a.month_year = :mon
+			          AND c.belongs_to = :under
+			          AND a.branch_id = :branch
+			          AND a.org_id = :orgId
+			          AND NOT EXISTS (
+			              SELECT 1
+			              FROM sales_rejection_invoice_basic dc
+			              INNER JOIN sales_rejection_invoice_detail dd
+			                  ON dc.sales_rejection_invoice_basic_id =
+			                     dd.sales_rejection_invoice_basic_id
+			              WHERE dc.cancel = FALSE
+			                AND dd.item = i.item_id
+			          )
+			    ) AS union_data
+			    GROUP BY
+			        partyid,
+			        partyname,
+			        itemid,
+			        itemdesc,
+			        cpartno,
+			        RATE
+			) AS final_data
+			ORDER BY 1
+			""", nativeQuery = true)
+	List<Object[]> getScheduleVsSalesReport(@Param("mon") String mon, @Param("under") Long under,
+			@Param("branch") Long branch, @Param("orgId") Long orgId);
+	
+//	delivery schedule year wise
+	
+	@Query(value = """
+	        SELECT
+	            i.item_code AS ITEMID,
+	            i.item_description AS ITEMDESCRIPTION,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('JANUARY', 'JAN')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS JAN,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('FEBRUARY', 'FEB')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS FEB,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('MARCH', 'MAR')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS MAR,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('APRIL', 'APR')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS APR,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('MAY')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS MAY,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('JUNE', 'JUN')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS JUN,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('JULY', 'JUL')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS JUL,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('AUGUST', 'AUG')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS AUG,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('SEPTEMBER', 'SEP')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS SEP,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('OCTOBER', 'OCT')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS OCT,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('NOVEMBER', 'NOV')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS NOV,
+	            SUM(CASE
+	                WHEN UPPER(a.month_of_schedule) IN ('DECEMBER', 'DEC')
+	                THEN b.actual_planned_qty ELSE 0
+	            END) AS DECE
+	        FROM sdvbasic a
+	        INNER JOIN sdvdet b
+	            ON a.sdvbasic_id = b.sdvbasic_id
+	        INNER JOIN item i
+	            ON b.item_id = i.item_id
+	        WHERE a.cancel = FALSE
+	          AND a.month_year = :year
+	          AND a.belongs_to = :belongs
+	          AND a.branch_id = :branch
+	          AND a.org_id = :orgId
+	        GROUP BY
+	            i.item_code,
+	            i.item_description
+	        ORDER BY
+	            i.item_code
+	        """, nativeQuery = true)
+	List<Object[]> getDeliveryScheduleYearWiseReport(
+	        @Param("year") String year,
+	        @Param("belongs") String belongs,
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId
+	);
 }

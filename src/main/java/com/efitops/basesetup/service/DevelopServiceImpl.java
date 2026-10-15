@@ -11,13 +11,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.BomFgResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
@@ -96,7 +97,6 @@ import com.efitops.basesetup.ResponseDTO.ShiftResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailRepo;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ToolMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolMasterResponseMasterDTO;
 import com.efitops.basesetup.ResponseDTO.TransferOrderDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransferOrderResponseDTO;
@@ -139,7 +139,6 @@ import com.efitops.basesetup.dto.InitialStageInspectionDetailDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.IssuesDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
-import com.efitops.basesetup.dto.LocationResponseDTO;
 import com.efitops.basesetup.dto.MachineHistoryDTO;
 import com.efitops.basesetup.dto.MachineMasterDTO;
 import com.efitops.basesetup.dto.MachineSpareDetailsDTO;
@@ -171,6 +170,7 @@ import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.dto.ZeroEntryDetailDTO;
 import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
 import com.efitops.basesetup.entity.ActivityMasterVO;
+import com.efitops.basesetup.entity.BillOfMaterialVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.ControlPlanDetailVO;
 import com.efitops.basesetup.entity.ControlPlanMachineFixtureVO;
@@ -238,7 +238,6 @@ import com.efitops.basesetup.entity.SalesOrderAmendmentVO;
 import com.efitops.basesetup.entity.ShiftVO;
 import com.efitops.basesetup.entity.ToolCategoryDetailVO;
 import com.efitops.basesetup.entity.ToolCategoryVO;
-import com.efitops.basesetup.entity.ToolMasterVO;
 import com.efitops.basesetup.entity.TransferOrderDetailVO;
 import com.efitops.basesetup.entity.TransferOrderVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
@@ -246,6 +245,7 @@ import com.efitops.basesetup.entity.ZeroEntryDetailVO;
 import com.efitops.basesetup.entity.ZeroKmFailureEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.ActivityMasterRepo;
+import com.efitops.basesetup.repository.BillOfMaterialRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.ControlPlanDetailRepo;
 import com.efitops.basesetup.repository.ControlPlanMachineFixtureRepo;
@@ -618,6 +618,9 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	private DailyExchangeRateRepo dailyExchangeRateRepo;
+
+	@Autowired
+	private BillOfMaterialRepo billOfMaterialRepo;
 
 //	@Override
 //	@Transactional
@@ -6408,13 +6411,15 @@ public class DevelopServiceImpl implements DevelopService {
 
 			throws ApplicationException {
 
-		// =========================
-		// Basic Fields
-		// =========================
-
 		processSheetCompRoutingVO.setItemDescription(processSheetCompRoutingDTO.getItemDescription());
 
-		processSheetCompRoutingVO.setBomId(processSheetCompRoutingDTO.getBomId());
+		if (processSheetCompRoutingDTO.getBom() != null && processSheetCompRoutingDTO.getBom() != 0) {
+
+			BillOfMaterialVO department = billOfMaterialRepo.findById(processSheetCompRoutingDTO.getBom())
+					.orElseThrow(() -> new ApplicationException("Bom Not Found"));
+
+			processSheetCompRoutingVO.setBom(department);
+		}
 
 		processSheetCompRoutingVO.setActive(processSheetCompRoutingDTO.isActive());
 
@@ -6434,44 +6439,35 @@ public class DevelopServiceImpl implements DevelopService {
 
 		processSheetCompRoutingVO.setCancelRemarks(processSheetCompRoutingDTO.getCancelRemarks());
 
+		processSheetCompRoutingVO.setFgSfgItemType(processSheetCompRoutingDTO.getFgSfgItemType());
+
 		// =========================
 		// Branch
 		// =========================
+		if (processSheetCompRoutingDTO.getBranch() != null && processSheetCompRoutingDTO.getBranch() != 0) {
 
-		if (ObjectUtils.isNotEmpty(processSheetCompRoutingDTO.getBranch())) {
+			BranchVO branch = branchRepo.findById(processSheetCompRoutingDTO.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
-			processSheetCompRoutingVO.setBranch(branchRepo.findById(processSheetCompRoutingDTO.getBranch())
-
-					.orElseThrow(() -> new ApplicationException("Branch Not Found")));
+			processSheetCompRoutingVO.setBranch(branch);
 		}
 
-		// =========================
-		// FG / SFG Item Type
-		// =========================
+//
+//		if (ObjectUtils.isNotEmpty(processSheetCompRoutingDTO.getBranch())) {
+//
+//			processSheetCompRoutingVO.setBranch(branchRepo.findById(processSheetCompRoutingDTO.getBranch())
+//
+//					.orElseThrow(() -> new ApplicationException("Branch Not Found")));
+//		}
 
-		if (ObjectUtils.isNotEmpty(processSheetCompRoutingDTO.getFgSfgItemType())) {
+		if (processSheetCompRoutingDTO.getFgSfgItemCode() != null
+				&& processSheetCompRoutingDTO.getFgSfgItemCode() != 0) {
 
-			processSheetCompRoutingVO
-					.setFgSfgItemType(listOfValuesDetailsRepo.findById(processSheetCompRoutingDTO.getFgSfgItemType())
+			ItemMasterVO itemMasterVO = itemMasterRepo.findById(processSheetCompRoutingDTO.getFgSfgItemCode())
+					.orElseThrow(() -> new ApplicationException("FG/SFG Item Code Not Found"));
 
-							.orElseThrow(() -> new ApplicationException("FG/SFG Item Type Not Found")));
+			processSheetCompRoutingVO.setFgSfgItemCode(itemMasterVO);
 		}
-
-		// =========================
-		// FG / SFG Item Code
-		// =========================
-
-		if (ObjectUtils.isNotEmpty(processSheetCompRoutingDTO.getFgSfgItemCode())) {
-
-			processSheetCompRoutingVO
-					.setFgSfgItemCode(itemMasterRepo.findById(processSheetCompRoutingDTO.getFgSfgItemCode())
-
-							.orElseThrow(() -> new ApplicationException("FG/SFG Item Code Not Found")));
-		}
-
-		// =========================
-		// Prepared By
-		// =========================
 
 		if (ObjectUtils.isNotEmpty(processSheetCompRoutingDTO.getPreparedBy())) {
 
@@ -6619,19 +6615,9 @@ public class DevelopServiceImpl implements DevelopService {
 					.getProcessSheetCompRoutingMachineDTO()) {
 
 				ProcessSheetCompRoutingMachineVO machineVO = new ProcessSheetCompRoutingMachineVO();
+				
+				machineVO.setUsageMachine(machineDTO.getUsageMachine());
 
-				// =========================
-				// Usage
-				// =========================
-
-				if (ObjectUtils.isNotEmpty(machineDTO.getUsageMachine())) {
-
-					machineVO.setUsageMachine(listOfValuesDetailsRepo.findById(machineDTO.getUsageMachine())
-							.orElseThrow(() -> new ApplicationException("usageMachine Not Found")));
-				}
-				// =========================
-				// Machine No
-				// =========================
 
 				if (ObjectUtils.isNotEmpty(machineDTO.getMachineNo())) {
 
@@ -6690,21 +6676,8 @@ public class DevelopServiceImpl implements DevelopService {
 
 				ProcessSheetToolFixtureDetailsVO toolFixtureVO = new ProcessSheetToolFixtureDetailsVO();
 
-				// =========================
-				// Usage Type
-				// =========================
+				toolFixtureVO.setUsageType(toolFixtureDTO.getUsageType());
 
-				if (ObjectUtils.isNotEmpty(toolFixtureDTO.getUsageType())) {
-
-					toolFixtureVO.setUsageType(listOfValuesDetailsRepo.findById(toolFixtureDTO.getUsageType())
-
-							.orElseThrow(() -> new ApplicationException("Usage Type Not Found")));
-				}
-
-				// =========================
-				// Tool Fixture No
-				// =========================
-//
 				if (ObjectUtils.isNotEmpty(toolFixtureDTO.getToolFixtureNo())) {
 
 					toolFixtureVO.setToolFixtureNo(toolMasterRepo.findById(toolFixtureDTO.getToolFixtureNo())
@@ -6750,7 +6723,15 @@ public class DevelopServiceImpl implements DevelopService {
 
 		responseDTO.setItemDescription(processSheetCompRoutingVO.getItemDescription());
 
-		responseDTO.setBomId(processSheetCompRoutingVO.getBomId());
+		responseDTO.setFgSfgItemType(processSheetCompRoutingVO.getFgSfgItemType());
+
+		if (processSheetCompRoutingVO.getBom() != null) {
+			BomFgResponseDTO locDto = new BomFgResponseDTO();
+			locDto.setId(processSheetCompRoutingVO.getBom().getId());
+			locDto.setDocId(processSheetCompRoutingVO.getBom().getDocId());
+			locDto.setDocDate(processSheetCompRoutingVO.getBom().getDocDate());
+			responseDTO.setBom(locDto);
+		}
 
 		responseDTO.setActive(processSheetCompRoutingVO.isActive());
 
@@ -6788,27 +6769,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 			responseDTO.setBranch(branchResponseDTO);
 		}
-
-		// =========================
-		// FG / SFG Item Type
-		// =========================
-
-		if (ObjectUtils.isNotEmpty(processSheetCompRoutingVO.getFgSfgItemType())) {
-
-			ListOfValuesDetailsResponseDTO fgSfgItemTypeResponseDTO = new ListOfValuesDetailsResponseDTO();
-
-			fgSfgItemTypeResponseDTO.setId(processSheetCompRoutingVO.getFgSfgItemType().getId());
-
-			fgSfgItemTypeResponseDTO.setCode(processSheetCompRoutingVO.getFgSfgItemType().getValueCode());
-
-			fgSfgItemTypeResponseDTO.setDescription(processSheetCompRoutingVO.getFgSfgItemType().getValueDescription());
-
-			responseDTO.setFgSfgItemType(fgSfgItemTypeResponseDTO);
-		}
-
-		// =========================
-		// FG / SFG Item Code
-		// =========================
 
 		if (ObjectUtils.isNotEmpty(processSheetCompRoutingVO.getFgSfgItemCode())) {
 
@@ -6966,10 +6926,7 @@ public class DevelopServiceImpl implements DevelopService {
 					.getProcessSheetCompRoutingMachineVO()) {
 
 				ProcessSheetCompRoutingMachineResponseDTO machineResponseDTO = new ProcessSheetCompRoutingMachineResponseDTO();
-
-				// =========================
-				// Basic
-				// =========================
+				machineResponseDTO.setUsageMachine(machineVO.getUsageMachine());
 
 				machineResponseDTO.setId(machineVO.getId());
 
@@ -6991,26 +6948,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 				machineResponseDTO.setTotal(machineVO.getTotal());
 
-				// =========================
-				// Usage
-				// =========================
 
-				if (ObjectUtils.isNotEmpty(machineVO.getUsageMachine())) {
-
-					ListOfValuesDetailsResponseDTO usageResponseDTO = new ListOfValuesDetailsResponseDTO();
-
-					usageResponseDTO.setId(machineVO.getUsageMachine().getId());
-
-					usageResponseDTO.setCode(machineVO.getUsageMachine().getValueCode());
-
-					usageResponseDTO.setDescription(machineVO.getUsageMachine().getValueDescription());
-
-					machineResponseDTO.setUsageMachine(usageResponseDTO);
-				}
-
-				// =========================
-				// Machine No
-				// =========================
 
 				if (ObjectUtils.isNotEmpty(machineVO.getMachineNo())) {
 
@@ -7051,31 +6989,13 @@ public class DevelopServiceImpl implements DevelopService {
 				// =========================
 
 				toolFixtureResponseDTO.setId(toolFixtureVO.getId());
+				
+				toolFixtureResponseDTO.setUsageType(toolFixtureVO.getUsageType());
 
 				toolFixtureResponseDTO.setToolFixtureName(toolFixtureVO.getToolFixtureName());
 
 				toolFixtureResponseDTO.setActivityToolFixtureCost(toolFixtureVO.getActivityToolFixtureCost());
 
-				// =========================
-				// Usage Type
-				// =========================
-
-				if (ObjectUtils.isNotEmpty(toolFixtureVO.getUsageType())) {
-
-					ListOfValuesDetailsResponseDTO usageTypeResponseDTO = new ListOfValuesDetailsResponseDTO();
-
-					usageTypeResponseDTO.setId(toolFixtureVO.getUsageType().getId());
-
-					usageTypeResponseDTO.setCode(toolFixtureVO.getUsageType().getValueCode());
-
-					usageTypeResponseDTO.setDescription(toolFixtureVO.getUsageType().getValueDescription());
-
-					toolFixtureResponseDTO.setUsageType(usageTypeResponseDTO);
-				}
-
-				// =========================
-				// Tool Fixture No
-				// =========================
 
 				if (ObjectUtils.isNotEmpty(toolFixtureVO.getToolFixtureNo())) {
 
@@ -13096,6 +13016,81 @@ public class DevelopServiceImpl implements DevelopService {
 		String result = scBillRepo.getSCBillDocId(orgId, financialYear, screenCode);
 
 		return result;
+	}
+
+	@Override
+	public List<Map<String, Object>> getFgAndSfgItemDetailsProcessSheetComp(Long orgId, Long branch, String type) {
+		Set<Object[]> chType = processSheetCompRoutingRepo.getFgAndSfgItemDetailsProcessSheetComp(orgId, branch, type);
+		return getFgAndSfgItemDetailsProcessSheetComp(chType);
+	}
+
+	private List<Map<String, Object>> getFgAndSfgItemDetailsProcessSheetComp(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("drawingNo", ch[3] != null ? ch[3].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getOperationDetailsProcessSheetComp(Long orgId) {
+		Set<Object[]> operationDetails = processSheetCompRoutingRepo.getOperationDetailsProcessSheetComp(orgId);
+		return getOperationDetailsProcessSheetComp(operationDetails);
+	}
+
+	private List<Map<String, Object>> getOperationDetailsProcessSheetComp(Set<Object[]> operationDetails) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] od : operationDetails) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("operationMasterBasicId", od[0] != null ? ((Number) od[0]).longValue() : null);
+			map.put("operationId", od[1] != null ? ((Number) od[1]).longValue() : null);
+			map.put("description", od[2] != null ? od[2].toString() : "");
+			map.put("machineInstrumentNo", od[3] != null ? od[3].toString() : "");
+			map.put("machineInstrumentName", od[4] != null ? od[4].toString() : "");
+			map.put("hourlyRate", od[5] != null ? ((Number) od[5]).doubleValue() : null);
+			map.put("toolNo", od[6] != null ? od[6].toString() : "");
+			map.put("toolDescription", od[7] != null ? od[7].toString() : "");
+			map.put("toolFixtureCost", od[8] != null ? ((Number) od[8]).doubleValue() : null);
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getMachineDetailsProcessSheetComp(Long orgId, Long branch) {
+		Set<Object[]> operationDetails = processSheetCompRoutingRepo.getMachineDetailsProcessSheetComp(orgId, branch);
+		return getMachineDetailsProcessSheetComp(operationDetails);
+	}
+
+	private List<Map<String, Object>> getMachineDetailsProcessSheetComp(Set<Object[]> operationDetails) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] od : operationDetails) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("MachineId", od[0] != null ? ((Number) od[0]).longValue() : null);
+			map.put("machineInstrumentNo", od[1] != null ? od[1].toString() : "");
+			map.put("machineInstrumentName", od[2] != null ? od[2].toString() : "");
+			map.put("hourlyRate", od[3] != null ? new BigDecimal(od[3].toString()) : BigDecimal.ZERO);
+			list.add(map);
+		}
+
+		return list;
 	}
 
 }

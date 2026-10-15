@@ -16,7 +16,7 @@ public class ProcessSheetToolFixtureDetailsResponseDTO {
 
 	private Long id;
 
-	private ListOfValuesDetailsResponseDTO usageType;
+	private String usageType;
 
 	private ToolMasterResponseMasterDTO toolFixtureNo;
 

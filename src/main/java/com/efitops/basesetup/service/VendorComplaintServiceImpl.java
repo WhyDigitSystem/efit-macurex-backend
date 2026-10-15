@@ -146,6 +146,7 @@ import com.efitops.basesetup.entity.MachineToolsScrapNoteDetailsVO;
 import com.efitops.basesetup.entity.MachineToolsScrapNoteVO;
 import com.efitops.basesetup.entity.PMCheckListDetailsVO;
 import com.efitops.basesetup.entity.PMCheckListMasterVO;
+import com.efitops.basesetup.entity.ProductionTransferSlipDetailsVO;
 import com.efitops.basesetup.entity.QualityScrapNoteDetailsVO;
 import com.efitops.basesetup.entity.QualityScrapNoteVO;
 import com.efitops.basesetup.entity.ScrapMaterialReturnRejectionDetailsVO;
@@ -5723,6 +5724,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		MachineToolRectificationResponseDTO response = new MachineToolRectificationResponseDTO();
 
 		response.setId(vo.getId());
+		response.setDocId(vo.getDocId());
+		response.setDocDate(vo.getDocDate());
 
 		if (vo.getBranch() != null) {
 
@@ -6207,6 +6210,601 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	}
 
 //	MachineToolsScrapNote 
+//
+//	@Override
+//	@Transactional
+//	public Map<String, Object> updateCreateMachineToolsScrapNote(MachineToolsScrapNoteDTO machineToolsScrapNoteDTO,
+//			MultipartFile[] files) throws ApplicationException {
+//
+//		MachineToolsScrapNoteVO machineToolsScrapNoteVO;
+//		String message;
+//
+//		if (ObjectUtils.isNotEmpty(machineToolsScrapNoteDTO.getId())) {
+//
+//			machineToolsScrapNoteVO = machineToolsScrapNoteRepo.findById(machineToolsScrapNoteDTO.getId())
+//					.orElseThrow(() -> new ApplicationException("Invalid Machine Tools Scrap Note"));
+//
+//			machineToolsScrapNoteVO.setUpdatedBy(machineToolsScrapNoteDTO.getCreatedBy());
+//
+//			message = "Machine Tools Scrap Note Updated Successfully";
+//		}
+//
+//		/*
+//		 * Create
+//		 */
+//		else {
+//
+//			machineToolsScrapNoteVO = new MachineToolsScrapNoteVO();
+//
+//			String screenCode = "MTSN";
+//
+//			String docId = machineToolsScrapNoteRepo.getMachineToolsScrapNoteDocId(machineToolsScrapNoteDTO.getOrgId(),
+//					machineToolsScrapNoteDTO.getFinancialYear(), screenCode);
+//
+//			if (StringUtils.isBlank(docId)) {
+//
+//				throw new ApplicationException("Machine Tools Scrap Note DocId Not Found");
+//			}
+//
+//			machineToolsScrapNoteVO.setDocId(docId);
+//
+//			DocumentTypeMappingDetailsVO mapping = documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+//					machineToolsScrapNoteDTO.getOrgId(), machineToolsScrapNoteDTO.getFinancialYear(), screenCode);
+//
+//			if (mapping == null) {
+//
+//				throw new ApplicationException("Document Type Mapping Details Not Found");
+//			}
+//
+//			mapping.setLastNo(mapping.getLastNo() + 1);
+//
+//			documentTypeMappingDetailsRepo.save(mapping);
+//
+//			machineToolsScrapNoteVO.setCreatedBy(machineToolsScrapNoteDTO.getCreatedBy());
+//
+//			machineToolsScrapNoteVO.setUpdatedBy(machineToolsScrapNoteDTO.getCreatedBy());
+//
+//			message = "Machine Tools Scrap Note Created Successfully";
+//		}
+//
+//		createUpdateMachineToolsScrapNoteVO(machineToolsScrapNoteDTO, machineToolsScrapNoteVO);
+//
+//		machineToolsScrapNoteVO = machineToolsScrapNoteRepo.save(machineToolsScrapNoteVO);
+//
+//		saveMachineToolsScrapNoteDetails(machineToolsScrapNoteDTO.getMachineToolsScrapNoteDetailsDTO(),
+//				machineToolsScrapNoteVO);
+//
+//		saveMachineToolsScrapNoteAttachments(files, machineToolsScrapNoteVO);
+//
+//		MachineToolsScrapNoteResponseDTO responseDTO = machineToolsScrapNoteResponse(machineToolsScrapNoteVO);
+//
+//		Map<String, Object> response = new HashMap<>();
+//
+//		response.put("message", message);
+//
+//		response.put("machineToolsScrapNoteVO", responseDTO);
+//
+//		return response;
+//	}
+//
+//	private void createUpdateMachineToolsScrapNoteVO(MachineToolsScrapNoteDTO dto, MachineToolsScrapNoteVO vo)
+//			throws ApplicationException {
+//
+//		if (dto.getBranch() != null) {
+//
+//			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+//					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+//
+//			vo.setBranch(branchVO);
+//		}
+//
+//		/*
+//		 * Belongs To
+//		 */
+//		if (dto.getBelongsTo() != null) {
+//
+//			ListOfValuesDetailsVO belongsTo = listOfValuesDetailsRepo.findById(dto.getBelongsTo())
+//					.orElseThrow(() -> new ApplicationException("Belongs To Not Found"));
+//
+//			vo.setBelongsTo(belongsTo);
+//		}
+//
+//		/*
+//		 * Department
+//		 */
+//		if (dto.getDepartement() != null) {
+//
+//			DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartement())
+//					.orElseThrow(() -> new ApplicationException("Department Not Found"));
+//
+//			vo.setDepartement(departmentVO);
+//		}
+//
+//		/*
+//		 * From Location
+//		 */
+//		if (dto.getFromLocation() != null) {
+//
+//			LocationVO fromLocation = locationRepo.findById(dto.getFromLocation())
+//					.orElseThrow(() -> new ApplicationException("From Location Not Found"));
+//
+//			vo.setFromLocation(fromLocation);
+//		}
+//
+//		/*
+//		 * To Location
+//		 */
+//		if (dto.getToLocation() != null) {
+//
+//			LocationVO toLocation = locationRepo.findById(dto.getToLocation())
+//					.orElseThrow(() -> new ApplicationException("To Location Not Found"));
+//
+//			vo.setToLocation(toLocation);
+//		}
+//
+//		/*
+//		 * Prepared By
+//		 */
+//		if (dto.getPreparedBy() != null) {
+//
+//			EmployeeMasterVO preparedBy = employeeMasterRepo.findById(dto.getPreparedBy())
+//					.orElseThrow(() -> new ApplicationException("Prepared By Employee Not Found"));
+//
+//			vo.setPreparedBy(preparedBy);
+//		}
+//
+//		/*
+//		 * Authorized By
+//		 */
+//		if (dto.getAuthorizedBy() != null) {
+//
+//			EmployeeMasterVO authorizedBy = employeeMasterRepo.findById(dto.getAuthorizedBy())
+//					.orElseThrow(() -> new ApplicationException("Authorized By Employee Not Found"));
+//
+//			vo.setAuthorizedBy(authorizedBy);
+//		}
+//
+//		/*
+//		 * Normal Fields
+//		 */
+//		vo.setTime(dto.getTime());
+//
+//		vo.setProductionApproval(dto.getProductionApproval());
+//
+//		vo.setQualityApproval(dto.getQualityApproval());
+//
+//		vo.setStoreApproval(dto.getStoreApproval());
+//
+//		vo.setNarration(dto.getNarration());
+//
+//		vo.setOrgId(dto.getOrgId());
+//
+//		vo.setFinancialYear(dto.getFinancialYear());
+//
+//		vo.setActive(dto.isActive());
+//
+//		vo.setCancelRemarks(dto.getCancelRemarks());
+//	}
+//
+//	/*
+//	 * ============================================================ SAVE DETAILS
+//	 * ============================================================
+//	 */
+//
+//	private void saveMachineToolsScrapNoteDetails(List<MachineToolsScrapNoteDetailsDTO> detailsDTOList,
+//			MachineToolsScrapNoteVO machineToolsScrapNoteVO) throws ApplicationException {
+//
+//		if (ObjectUtils.isNotEmpty(machineToolsScrapNoteVO.getId())) {
+//			List<MachineToolsScrapNoteDetailsVO> existingDetails = machineToolsScrapNoteDetailsRepo
+//					.findByMachineToolsScrapNote(machineToolsScrapNoteVO);
+//			machineToolsScrapNoteDetailsRepo.deleteAll(existingDetails);
+//		}
+//
+//		if (detailsDTOList == null || detailsDTOList.isEmpty()) {
+//
+//			return;
+//		}
+//
+//		List<MachineToolsScrapNoteDetailsVO> detailsList = new ArrayList<>();
+//
+//		for (MachineToolsScrapNoteDetailsDTO dto : detailsDTOList) {
+//
+//			MachineToolsScrapNoteDetailsVO detailsVO = new MachineToolsScrapNoteDetailsVO();
+//
+//			/*
+//			 * Item
+//			 */
+//			if (dto.getItem() != null) {
+//
+//				ItemMasterVO itemVO = itemRepo.findById(dto.getItem())
+//						.orElseThrow(() -> new ApplicationException("Item Not Found"));
+//
+//				detailsVO.setItem(itemVO);
+//			}
+//
+//			/*
+//			 * Normal Fields
+//			 */
+//			detailsVO.setStock(dto.getStock());
+//
+//			detailsVO.setQuantity(dto.getQuantity());
+//
+//			detailsVO.setRate(dto.getRate());
+//
+//			// Quantity * Rate = Value
+//			if (detailsVO.getQuantity() != null && detailsVO.getRate() != null) {
+//
+//				BigDecimal value = detailsVO.getQuantity().multiply(detailsVO.getRate());
+//
+//				detailsVO.setValue(value);
+//
+//			} else {
+//
+//				detailsVO.setValue(BigDecimal.ZERO);
+//			}
+//
+//			/*
+//			 * Parent
+//			 */
+//			detailsVO.setMachineToolsScrapNoteVO(machineToolsScrapNoteVO);
+//
+//			detailsList.add(detailsVO);
+//		}
+//
+//		/*
+//		 * Save Details
+//		 */
+//		machineToolsScrapNoteDetailsRepo.saveAll(detailsList);
+//
+//		machineToolsScrapNoteVO.setMachineToolsScrapNoteDetailsVO(detailsList);
+//	}
+//
+//	/*
+//	 * ============================================================ SAVE CHILD
+//	 * ATTACHMENTS ============================================================
+//	 */
+//
+//	@Value("${machine.tools.scrap.note.upload.path}")
+//	private String machineToolsScrapNoteUploadPath;
+//
+//	private void saveMachineToolsScrapNoteAttachments(MultipartFile[] files,
+//			MachineToolsScrapNoteVO machineToolsScrapNoteVO) throws ApplicationException {
+//
+//		if (files == null || files.length == 0) {
+//			return;
+//		}
+//
+//		try {
+//
+//			/*
+//			 * Create folder
+//			 */
+//			Path machineToolsScrapNoteFolder = Paths.get(machineToolsScrapNoteUploadPath, "machine-tools-scrap-note",
+//					machineToolsScrapNoteVO.getId().toString());
+//
+//			createDirectory(machineToolsScrapNoteFolder);
+//
+//			List<MachineToolScrapNoteAttachmentVO> attachmentList = new ArrayList<>();
+//
+//			for (MultipartFile file : files) {
+//
+//				if (file == null || file.isEmpty()) {
+//					continue;
+//				}
+//
+//				/*
+//				 * Get original file name
+//				 */
+//				String originalName = file.getOriginalFilename();
+//
+//				if (originalName == null) {
+//					originalName = "file";
+//				}
+//
+//				originalName = originalName.replaceAll("\\s+", "_");
+//
+//				String extension = "";
+//
+//				if (originalName.contains(".")) {
+//
+//					extension = originalName.substring(originalName.lastIndexOf("."));
+//
+//					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+//				}
+//
+//				/*
+//				 * Create unique file name
+//				 */
+//				String fileName = originalName + "_" + machineToolsScrapNoteVO.getId() + extension;
+//
+//				/*
+//				 * Actual physical file path
+//				 */
+//				Path filePath = machineToolsScrapNoteFolder.resolve(fileName);
+//
+//				/*
+//				 * Save file to disk
+//				 */
+//				try (InputStream inputStream = file.getInputStream()) {
+//
+//					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+//				}
+//
+//				/*
+//				 * Create URL
+//				 */
+//				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+//						.path("/api/vendorComplaintEntry/machineToolsScrapNote/viewFile/").toUriString();
+//
+//				String relativePath = "machine-tools-scrap-note/" + machineToolsScrapNoteVO.getId() + "/" + fileName;
+//
+//				String publicUrl = baseUrl + relativePath;
+//
+//				/*
+//				 * Save Attachment Details
+//				 */
+//				MachineToolScrapNoteAttachmentVO attachment = new MachineToolScrapNoteAttachmentVO();
+//
+//				attachment.setMachineToolsScrapNoteVO(machineToolsScrapNoteVO);
+//
+//				attachment.setName(file.getOriginalFilename());
+//
+//				attachment.setFileName(fileName);
+//
+//				attachment.setFilePath(publicUrl);
+//
+//				attachment.setFileSize(file.getSize());
+//
+//				attachment.setContentType(file.getContentType());
+//
+//				attachment.setUploadOn(LocalDateTime.now());
+//
+//				attachmentList.add(attachment);
+//			}
+//
+//			/*
+//			 * Save Attachment Records
+//			 */
+//			if (!attachmentList.isEmpty()) {
+//
+//				List<MachineToolScrapNoteAttachmentVO> saved = machineToolScrapNoteAttachmentRepo
+//						.saveAll(attachmentList);
+//
+//				machineToolsScrapNoteVO.setMachineToolScrapNoteAttachmentVO(saved);
+//			}
+//
+//		} catch (IOException e) {
+//
+//			throw new ApplicationException("File Upload Failed : " + e.getMessage());
+//		}
+//	}
+//
+//	/*
+//	 * ============================================================ RESPONSE
+//	 * ============================================================
+//	 */
+//
+//	private MachineToolsScrapNoteResponseDTO machineToolsScrapNoteResponse(MachineToolsScrapNoteVO vo) {
+//
+//		MachineToolsScrapNoteResponseDTO response = new MachineToolsScrapNoteResponseDTO();
+//
+//		response.setId(vo.getId());
+//
+//		// Branch Response
+//		if (vo.getBranch() != null) {
+//			BranchResponseDTO branchResponse = new BranchResponseDTO();
+//
+//			branchResponse.setId(vo.getBranch().getId());
+//			branchResponse.setBranchCode(vo.getBranch().getBranchCode());
+//			branchResponse.setBranchName(vo.getBranch().getBranchName());
+//
+//			response.setBranch(branchResponse);
+//		}
+//
+//		// Belongs To Response
+//		if (vo.getBelongsTo() != null) {
+//			ListOfValuesDetailsResponseDTO belongsTo = new ListOfValuesDetailsResponseDTO();
+//
+//			belongsTo.setId(vo.getBelongsTo().getId());
+//			belongsTo.setCode(vo.getBelongsTo().getValueCode());
+//			belongsTo.setDescription(vo.getBelongsTo().getValueDescription());
+//
+//			response.setBelongsTo(belongsTo);
+//		}
+//
+//		// Department Response
+//		if (vo.getDepartement() != null) {
+//			DepartmentResponseDTO departmentResponse = new DepartmentResponseDTO();
+//
+//			departmentResponse.setId(vo.getDepartement().getId());
+//			departmentResponse.setDepartmentCode(vo.getDepartement().getDepartmentCode());
+//			departmentResponse.setDepartmentName(vo.getDepartement().getDepartmentName());
+//
+//			response.setDepartement(departmentResponse);
+//		}
+//
+//		// From Location Response
+//		if (vo.getFromLocation() != null) {
+//			LocationMasterResponseDTO fromLocation = new LocationMasterResponseDTO();
+//
+//			fromLocation.setId(vo.getFromLocation().getId());
+//			fromLocation.setLocationName(vo.getFromLocation().getLocationName());
+//
+//			response.setFromLocation(fromLocation);
+//		}
+//
+//		// To Location Response
+//		if (vo.getToLocation() != null) {
+//			LocationMasterResponseDTO toLocation = new LocationMasterResponseDTO();
+//
+//			toLocation.setId(vo.getToLocation().getId());
+//			toLocation.setLocationName(vo.getToLocation().getLocationName());
+//
+//			response.setToLocation(toLocation);
+//		}
+//
+//		// Prepared By Response
+//		if (vo.getPreparedBy() != null) {
+//			EmployeeMasterResponseDetailsDTO preparedBy = new EmployeeMasterResponseDetailsDTO();
+//
+//			preparedBy.setId(vo.getPreparedBy().getId());
+//			preparedBy.setEmployeeName(vo.getPreparedBy().getEmployeeName());
+//
+//			response.setPreparedBy(preparedBy);
+//		}
+//
+//		// Authorized By Response
+//		if (vo.getAuthorizedBy() != null) {
+//			EmployeeMasterResponseDetailsDTO authorizedBy = new EmployeeMasterResponseDetailsDTO();
+//
+//			authorizedBy.setId(vo.getAuthorizedBy().getId());
+//			authorizedBy.setEmployeeName(vo.getAuthorizedBy().getEmployeeName());
+//
+//			response.setAuthorizedBy(authorizedBy);
+//		}
+//
+//		// Normal Fields
+//
+//		response.setTime(vo.getTime());
+//		response.setProductionApproval(vo.getProductionApproval());
+//		response.setQualityApproval(vo.getQualityApproval());
+//		response.setStoreApproval(vo.getStoreApproval());
+//		response.setNarration(vo.getNarration());
+//		response.setOrgId(vo.getOrgId());
+//		response.setFinancialYear(vo.getFinancialYear());
+//		response.setActive(vo.getActive());
+//		response.setCancelRemarks(vo.getCancelRemarks());
+//		response.setCreatedBy(vo.getCreatedBy());
+//		response.setDocId(vo.getDocId());
+//		response.setDocDate(vo.getDocDate());
+//		// Details Response
+//		List<MachineToolsScrapNoteDetailsResponseDTO> detailsList = new ArrayList<>();
+//
+//		if (vo.getMachineToolsScrapNoteDetailsVO() != null && !vo.getMachineToolsScrapNoteDetailsVO().isEmpty()) {
+//
+//			for (MachineToolsScrapNoteDetailsVO detailsVO : vo.getMachineToolsScrapNoteDetailsVO()) {
+//
+//				MachineToolsScrapNoteDetailsResponseDTO detailsResponse = new MachineToolsScrapNoteDetailsResponseDTO();
+//
+//				if (detailsVO.getItem() != null) {
+//
+//					ItemResponse1DTO itemResponse = new ItemResponse1DTO();
+//
+//					itemResponse.setId(detailsVO.getItem().getId());
+//					itemResponse.setItemCode(detailsVO.getItem().getItemCode());
+//					itemResponse.setItemDescription(detailsVO.getItem().getItemDescription());
+//
+//					detailsResponse.setItem(itemResponse);
+//				}
+//
+//				detailsResponse.setStock(detailsVO.getStock());
+//				detailsResponse.setQuantity(detailsVO.getQuantity());
+//				detailsResponse.setRate(detailsVO.getRate());
+//				detailsResponse.setValue(detailsVO.getValue());
+//
+//				detailsList.add(detailsResponse);
+//			}
+//		}
+//
+//		response.setMachineToolsScrapNoteDetailsResponseDTO(detailsList);
+//
+//		// Attachment Response
+//		List<MachineToolScrapNoteAttachmentResponseDTO> attachmentList = new ArrayList<>();
+//
+//		if (vo.getMachineToolScrapNoteAttachmentVO() != null && !vo.getMachineToolScrapNoteAttachmentVO().isEmpty()) {
+//
+//			for (MachineToolScrapNoteAttachmentVO attachmentVO : vo.getMachineToolScrapNoteAttachmentVO()) {
+//
+//				MachineToolScrapNoteAttachmentResponseDTO attachmentDTO = new MachineToolScrapNoteAttachmentResponseDTO();
+//
+//				attachmentDTO.setId(attachmentVO.getId());
+//				attachmentDTO.setName(attachmentVO.getName());
+//				attachmentDTO.setFileName(attachmentVO.getFileName());
+//				attachmentDTO.setFilePath(attachmentVO.getFilePath());
+//				attachmentDTO.setFileSize(attachmentVO.getFileSize());
+//				attachmentDTO.setContentType(attachmentVO.getContentType());
+//				attachmentDTO.setUploadOn(attachmentVO.getUploadOn());
+//
+//				attachmentList.add(attachmentDTO);
+//			}
+//		}
+//
+//		response.setMachineToolsScrapNoteAttachmentResponseDTO(attachmentList);
+//
+//		return response;
+//	}
+//
+//	/*
+//	 * / ============================================================ VIEW FILE
+//	 * ============================================================
+//	 */
+//
+	@Override
+	public ResponseEntity<byte[]> viewMachineToolsScrapNoteFile(HttpServletRequest request) throws IOException {
+
+		return serveMachineToolsScrapNoteFile(request, "/api/vendorComplaintEntry/machineToolsScrapNote/viewFile/",
+				machineToolsScrapNoteUploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveMachineToolsScrapNoteFile(HttpServletRequest request, String apiPrefix,
+			String uploadBasePath) throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.replace(apiPrefix, "");
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		if (relativePath.startsWith("uploads/")) {
+
+			relativePath = relativePath.substring("uploads/".length());
+		}
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		/*
+		 * Prevent path traversal
+		 */
+		if (!filePath.startsWith(baseDir)) {
+
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		/*
+		 * File not found
+		 */
+		if (!Files.exists(filePath)) {
+
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+
+			contentType = "application/octet-stream";
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
+	}
+//
+//	/*
+//	 * ============================================================ CREATE DIRECTORY
+//	 * ============================================================
+//	 */
+//
+//	private void createDirectory11(Path path) throws IOException {
+//
+//		if (!Files.exists(path)) {
+//
+//			Files.createDirectories(path);
+//		}
+//	}
 
 	@Override
 	@Transactional
@@ -6216,9 +6814,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		MachineToolsScrapNoteVO machineToolsScrapNoteVO;
 		String message;
 
-		/*
-		 * Update
-		 */
 		if (ObjectUtils.isNotEmpty(machineToolsScrapNoteDTO.getId())) {
 
 			machineToolsScrapNoteVO = machineToolsScrapNoteRepo.findById(machineToolsScrapNoteDTO.getId())
@@ -6227,12 +6822,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			machineToolsScrapNoteVO.setUpdatedBy(machineToolsScrapNoteDTO.getCreatedBy());
 
 			message = "Machine Tools Scrap Note Updated Successfully";
-		}
-
-		/*
-		 * Create
-		 */
-		else {
+		} else {
 
 			machineToolsScrapNoteVO = new MachineToolsScrapNoteVO();
 
@@ -6242,7 +6832,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 					machineToolsScrapNoteDTO.getFinancialYear(), screenCode);
 
 			if (StringUtils.isBlank(docId)) {
-
 				throw new ApplicationException("Machine Tools Scrap Note DocId Not Found");
 			}
 
@@ -6252,174 +6841,112 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 					machineToolsScrapNoteDTO.getOrgId(), machineToolsScrapNoteDTO.getFinancialYear(), screenCode);
 
 			if (mapping == null) {
-
 				throw new ApplicationException("Document Type Mapping Details Not Found");
 			}
 
 			mapping.setLastNo(mapping.getLastNo() + 1);
-
 			documentTypeMappingDetailsRepo.save(mapping);
 
 			machineToolsScrapNoteVO.setCreatedBy(machineToolsScrapNoteDTO.getCreatedBy());
-
 			machineToolsScrapNoteVO.setUpdatedBy(machineToolsScrapNoteDTO.getCreatedBy());
 
 			message = "Machine Tools Scrap Note Created Successfully";
 		}
 
-		/*
-		 * Set Machine Tools Scrap Note values
-		 */
 		createUpdateMachineToolsScrapNoteVO(machineToolsScrapNoteDTO, machineToolsScrapNoteVO);
 
-		/*
-		 * Save Main VO first
-		 */
 		machineToolsScrapNoteVO = machineToolsScrapNoteRepo.save(machineToolsScrapNoteVO);
 
-		/*
-		 * Save Details
-		 */
 		saveMachineToolsScrapNoteDetails(machineToolsScrapNoteDTO.getMachineToolsScrapNoteDetailsDTO(),
 				machineToolsScrapNoteVO);
 
-		/*
-		 * Save Attachments
-		 */
 		saveMachineToolsScrapNoteAttachments(files, machineToolsScrapNoteVO);
 
-		/*
-		 * Response
-		 */
 		MachineToolsScrapNoteResponseDTO responseDTO = machineToolsScrapNoteResponse(machineToolsScrapNoteVO);
 
 		Map<String, Object> response = new HashMap<>();
-
 		response.put("message", message);
-
 		response.put("machineToolsScrapNoteVO", responseDTO);
 
 		return response;
 	}
 
-	/*
-	 * ============================================================ SET MACHINE
-	 * TOOLS SCRAP NOTE VALUES
-	 * ============================================================
-	 */
-
 	private void createUpdateMachineToolsScrapNoteVO(MachineToolsScrapNoteDTO dto, MachineToolsScrapNoteVO vo)
 			throws ApplicationException {
 
-		/*
-		 * Branch
-		 */
 		if (dto.getBranch() != null) {
-
 			BranchVO branchVO = branchRepo.findById(dto.getBranch())
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
 			vo.setBranch(branchVO);
 		}
 
-		/*
-		 * Belongs To
-		 */
 		if (dto.getBelongsTo() != null) {
-
 			ListOfValuesDetailsVO belongsTo = listOfValuesDetailsRepo.findById(dto.getBelongsTo())
 					.orElseThrow(() -> new ApplicationException("Belongs To Not Found"));
-
 			vo.setBelongsTo(belongsTo);
 		}
 
-		/*
-		 * Department
-		 */
 		if (dto.getDepartement() != null) {
-
 			DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartement())
 					.orElseThrow(() -> new ApplicationException("Department Not Found"));
-
 			vo.setDepartement(departmentVO);
 		}
 
-		/*
-		 * From Location
-		 */
 		if (dto.getFromLocation() != null) {
-
 			LocationVO fromLocation = locationRepo.findById(dto.getFromLocation())
 					.orElseThrow(() -> new ApplicationException("From Location Not Found"));
-
 			vo.setFromLocation(fromLocation);
 		}
 
-		/*
-		 * To Location
-		 */
 		if (dto.getToLocation() != null) {
-
 			LocationVO toLocation = locationRepo.findById(dto.getToLocation())
 					.orElseThrow(() -> new ApplicationException("To Location Not Found"));
-
 			vo.setToLocation(toLocation);
 		}
 
-		/*
-		 * Prepared By
-		 */
 		if (dto.getPreparedBy() != null) {
-
 			EmployeeMasterVO preparedBy = employeeMasterRepo.findById(dto.getPreparedBy())
 					.orElseThrow(() -> new ApplicationException("Prepared By Employee Not Found"));
-
 			vo.setPreparedBy(preparedBy);
 		}
 
-		/*
-		 * Authorized By
-		 */
 		if (dto.getAuthorizedBy() != null) {
-
 			EmployeeMasterVO authorizedBy = employeeMasterRepo.findById(dto.getAuthorizedBy())
 					.orElseThrow(() -> new ApplicationException("Authorized By Employee Not Found"));
-
 			vo.setAuthorizedBy(authorizedBy);
 		}
 
-		/*
-		 * Normal Fields
-		 */
 		vo.setTime(dto.getTime());
-
 		vo.setProductionApproval(dto.getProductionApproval());
-
 		vo.setQualityApproval(dto.getQualityApproval());
-
 		vo.setStoreApproval(dto.getStoreApproval());
-
 		vo.setNarration(dto.getNarration());
-
 		vo.setOrgId(dto.getOrgId());
-
 		vo.setFinancialYear(dto.getFinancialYear());
-
 		vo.setActive(dto.isActive());
-
 		vo.setCancelRemarks(dto.getCancelRemarks());
-	}
 
-	/*
-	 * ============================================================ SAVE DETAILS
-	 * ============================================================
-	 */
+		if (ObjectUtils.isNotEmpty(vo.getId())) {
+
+			List<MachineToolsScrapNoteDetailsVO> oldDetails = machineToolsScrapNoteDetailsRepo
+					.findByMachineToolsScrapNoteVO(vo);
+
+			if (oldDetails != null && !oldDetails.isEmpty()) {
+				machineToolsScrapNoteDetailsRepo.deleteAll(oldDetails);
+			}
+			List<MachineToolScrapNoteAttachmentVO> oldAttachments = machineToolScrapNoteAttachmentRepo
+					.findByMachineToolsScrapNoteVO(vo);
+
+			if (oldAttachments != null && !oldAttachments.isEmpty()) {
+				machineToolScrapNoteAttachmentRepo.deleteAll(oldAttachments);
+			}
+		}
+	}
 
 	private void saveMachineToolsScrapNoteDetails(List<MachineToolsScrapNoteDetailsDTO> detailsDTOList,
 			MachineToolsScrapNoteVO machineToolsScrapNoteVO) throws ApplicationException {
 
 		if (detailsDTOList == null || detailsDTOList.isEmpty()) {
-
 			return;
 		}
 
@@ -6429,58 +6956,32 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 			MachineToolsScrapNoteDetailsVO detailsVO = new MachineToolsScrapNoteDetailsVO();
 
-			/*
-			 * Item
-			 */
 			if (dto.getItem() != null) {
-
 				ItemMasterVO itemVO = itemRepo.findById(dto.getItem())
 						.orElseThrow(() -> new ApplicationException("Item Not Found"));
-
 				detailsVO.setItem(itemVO);
 			}
 
-			/*
-			 * Normal Fields
-			 */
 			detailsVO.setStock(dto.getStock());
-
 			detailsVO.setQuantity(dto.getQuantity());
-
 			detailsVO.setRate(dto.getRate());
 
-			// Quantity * Rate = Value
 			if (detailsVO.getQuantity() != null && detailsVO.getRate() != null) {
-
 				BigDecimal value = detailsVO.getQuantity().multiply(detailsVO.getRate());
-
 				detailsVO.setValue(value);
-
 			} else {
-
 				detailsVO.setValue(BigDecimal.ZERO);
 			}
 
-			/*
-			 * Parent
-			 */
 			detailsVO.setMachineToolsScrapNoteVO(machineToolsScrapNoteVO);
 
 			detailsList.add(detailsVO);
 		}
 
-		/*
-		 * Save Details
-		 */
 		machineToolsScrapNoteDetailsRepo.saveAll(detailsList);
 
 		machineToolsScrapNoteVO.setMachineToolsScrapNoteDetailsVO(detailsList);
 	}
-
-	/*
-	 * ============================================================ SAVE CHILD
-	 * ATTACHMENTS ============================================================
-	 */
 
 	@Value("${machine.tools.scrap.note.upload.path}")
 	private String machineToolsScrapNoteUploadPath;
@@ -6494,13 +6995,20 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		try {
 
-			/*
-			 * Create folder
-			 */
 			Path machineToolsScrapNoteFolder = Paths.get(machineToolsScrapNoteUploadPath, "machine-tools-scrap-note",
 					machineToolsScrapNoteVO.getId().toString());
 
-			createDirectory(machineToolsScrapNoteFolder);
+			createDirectoryMachine(machineToolsScrapNoteFolder);
+
+			if (ObjectUtils.isNotEmpty(machineToolsScrapNoteVO.getId())) {
+
+				List<MachineToolScrapNoteAttachmentVO> existingAttachments = machineToolScrapNoteAttachmentRepo
+						.findByMachineToolsScrapNoteVO(machineToolsScrapNoteVO);
+
+				if (existingAttachments != null && !existingAttachments.isEmpty()) {
+					machineToolScrapNoteAttachmentRepo.deleteAll(existingAttachments);
+				}
+			}
 
 			List<MachineToolScrapNoteAttachmentVO> attachmentList = new ArrayList<>();
 
@@ -6510,9 +7018,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 					continue;
 				}
 
-				/*
-				 * Get original file name
-				 */
 				String originalName = file.getOriginalFilename();
 
 				if (originalName == null) {
@@ -6524,83 +7029,56 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 				String extension = "";
 
 				if (originalName.contains(".")) {
-
 					extension = originalName.substring(originalName.lastIndexOf("."));
-
 					originalName = originalName.substring(0, originalName.lastIndexOf("."));
 				}
 
-				/*
-				 * Create unique file name
-				 */
 				String fileName = originalName + "_" + machineToolsScrapNoteVO.getId() + extension;
 
-				/*
-				 * Actual physical file path
-				 */
 				Path filePath = machineToolsScrapNoteFolder.resolve(fileName);
 
-				/*
-				 * Save file to disk
-				 */
 				try (InputStream inputStream = file.getInputStream()) {
-
 					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
 				}
 
-				/*
-				 * Create URL
-				 */
+				// ✅ MATCHING PurchaseOrder URL building pattern
 				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
 						.path("/api/vendorComplaintEntry/machineToolsScrapNote/viewFile/").toUriString();
 
-				String relativePath = "machine-tools-scrap-note/" + machineToolsScrapNoteVO.getId() + "/" + fileName;
+				String relativePath = machineToolsScrapNoteUploadPath.replace("\\", "/");
+				relativePath = filePath.toString().replace("\\", "/").replace(relativePath + "/", "");
 
 				String publicUrl = baseUrl + relativePath;
 
-				/*
-				 * Save Attachment Details
-				 */
 				MachineToolScrapNoteAttachmentVO attachment = new MachineToolScrapNoteAttachmentVO();
 
 				attachment.setMachineToolsScrapNoteVO(machineToolsScrapNoteVO);
-
 				attachment.setName(file.getOriginalFilename());
-
 				attachment.setFileName(fileName);
-
 				attachment.setFilePath(publicUrl);
-
 				attachment.setFileSize(file.getSize());
-
 				attachment.setContentType(file.getContentType());
-
 				attachment.setUploadOn(LocalDateTime.now());
 
 				attachmentList.add(attachment);
 			}
 
-			/*
-			 * Save Attachment Records
-			 */
 			if (!attachmentList.isEmpty()) {
-
 				List<MachineToolScrapNoteAttachmentVO> saved = machineToolScrapNoteAttachmentRepo
 						.saveAll(attachmentList);
-
 				machineToolsScrapNoteVO.setMachineToolScrapNoteAttachmentVO(saved);
 			}
 
 		} catch (IOException e) {
-
 			throw new ApplicationException("File Upload Failed : " + e.getMessage());
 		}
 	}
 
-	/*
-	 * ============================================================ RESPONSE
-	 * ============================================================
-	 */
+	private void createDirectoryMachine(Path path) throws IOException {
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
 
 	private MachineToolsScrapNoteResponseDTO machineToolsScrapNoteResponse(MachineToolsScrapNoteVO vo) {
 
@@ -6682,7 +7160,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		}
 
 		// Normal Fields
-
 		response.setTime(vo.getTime());
 		response.setProductionApproval(vo.getProductionApproval());
 		response.setQualityApproval(vo.getQualityApproval());
@@ -6695,6 +7172,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		response.setCreatedBy(vo.getCreatedBy());
 		response.setDocId(vo.getDocId());
 		response.setDocDate(vo.getDocDate());
+
 		// Details Response
 		List<MachineToolsScrapNoteDetailsResponseDTO> detailsList = new ArrayList<>();
 
@@ -6750,78 +7228,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		response.setMachineToolsScrapNoteAttachmentResponseDTO(attachmentList);
 
 		return response;
-	}
-
-	/*
-	 * / ============================================================ VIEW FILE
-	 * ============================================================
-	 */
-
-	@Override
-	public ResponseEntity<byte[]> viewMachineToolsScrapNoteFile(HttpServletRequest request) throws IOException {
-
-		return serveMachineToolsScrapNoteFile(request, "/api/vendorComplaintEntry/machineToolsScrapNote/viewFile/",
-				machineToolsScrapNoteUploadPath);
-	}
-
-	private ResponseEntity<byte[]> serveMachineToolsScrapNoteFile(HttpServletRequest request, String apiPrefix,
-			String uploadBasePath) throws IOException {
-
-		String uri = request.getRequestURI();
-
-		String relativePath = uri.replace(apiPrefix, "");
-
-		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
-
-		if (relativePath.startsWith("uploads/")) {
-
-			relativePath = relativePath.substring("uploads/".length());
-		}
-
-		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
-
-		Path filePath = baseDir.resolve(relativePath).normalize();
-
-		/*
-		 * Prevent path traversal
-		 */
-		if (!filePath.startsWith(baseDir)) {
-
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
-
-		/*
-		 * File not found
-		 */
-		if (!Files.exists(filePath)) {
-
-			return ResponseEntity.notFound().build();
-		}
-
-		String contentType = Files.probeContentType(filePath);
-
-		if (contentType == null) {
-
-			contentType = "application/octet-stream";
-		}
-
-		byte[] data = Files.readAllBytes(filePath);
-
-		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
-				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
-	}
-
-	/*
-	 * ============================================================ CREATE DIRECTORY
-	 * ============================================================
-	 */
-
-	private void createDirectory11(Path path) throws IOException {
-
-		if (!Files.exists(path)) {
-
-			Files.createDirectories(path);
-		}
 	}
 
 	@Override
@@ -7869,7 +8275,6 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			qualityScrapNoteVO = qualityScrapNoteRepo.findById(qualityScrapNoteDTO.getId())
 					.orElseThrow(() -> new ApplicationException("Invalid Quality Scrap Note Details"));
 
-			
 			if (qualityScrapNoteDTO.getId() != null) {
 
 				List<QualityScrapNoteDetailsVO> oldList = qualityScrapNoteDetailsRepo
@@ -7877,7 +8282,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 				qualityScrapNoteDetailsRepo.deleteAll(oldList);
 			}
-			
+
 			qualityScrapNoteVO.setUpdatedBy(qualityScrapNoteDTO.getCreatedBy());
 
 			message = "Quality Scrap Note Updated Successfully";
@@ -9280,4 +9685,5 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 
 		return responseObjectsMap;
 	}
+
 }

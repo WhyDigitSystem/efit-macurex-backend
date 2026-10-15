@@ -18,14 +18,12 @@ public class ProcessSheetCompRoutingResponseDTO {
 	private Long id;
 
     private BranchResponseDTO branch;
-
-    private ListOfValuesDetailsResponseDTO fgSfgItemType;
+    
+    private BomFgResponseDTO bom;
 
     private ItemResponse1DTO fgSfgItemCode;
 
     private String itemDescription;
-
-    private String bomId;
 
     private boolean active;
     
@@ -50,6 +48,8 @@ public class ProcessSheetCompRoutingResponseDTO {
     private boolean cancel;
 
     private String cancelRemarks;
+    
+    private String fgSfgItemType;
 
     private List<ProcessSheetCompRoutingDetailResponseDTO> processSheetCompRoutingDetailResponseDTO;
     

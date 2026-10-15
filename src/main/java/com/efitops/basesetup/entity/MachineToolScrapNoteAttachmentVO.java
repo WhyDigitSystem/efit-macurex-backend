@@ -51,7 +51,7 @@ public class MachineToolScrapNoteAttachmentVO {
 	private LocalDateTime uploadOn;
 
 	@ManyToOne
-	@JoinColumn(name = "machine_tool_scrap_note_basic_id")
+	@JoinColumn(name = "machine_tools_scrap_note_basic_id")
 	@JsonBackReference
 	private MachineToolsScrapNoteVO machineToolsScrapNoteVO;
 }

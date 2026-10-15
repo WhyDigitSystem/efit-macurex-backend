@@ -363,7 +363,7 @@ public interface DevelopService {
 
 	String getSCBillDocId(Long orgId, String financialYear);
 
-  String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear);
+	String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear);
 
 	ResponseEntity<byte[]> viewPurchaseOrderAmendmentFile(HttpServletRequest request) throws IOException;
 
@@ -374,5 +374,11 @@ public interface DevelopService {
 	String getOpenStockEntryDocId(Long orgId, String financialYear);
 
 	ResponseEntity<byte[]> viewEnquiryFile(HttpServletRequest request) throws IOException;
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsProcessSheetComp(Long orgId, Long branch, String type);
+
+	List<Map<String, Object>> getOperationDetailsProcessSheetComp(Long orgId);
+
+	List<Map<String, Object>> getMachineDetailsProcessSheetComp(Long orgId, Long branch);
 
 }

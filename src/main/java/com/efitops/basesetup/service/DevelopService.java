@@ -85,8 +85,7 @@ public interface DevelopService {
 
 	// salesorderamendment
 
-	Map<String, Object> createUpdateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
-			throws ApplicationException;
+	
 
 	SalesOrderAmendmentResponseDTO getSalesOrderAmendmentById(Long id) throws ApplicationException;
 
@@ -373,12 +372,26 @@ public interface DevelopService {
 
 	String getOpenStockEntryDocId(Long orgId, String financialYear);
 
+	List<Map<String, Object>> getSubContractorForSCBill(
+	        Long orgId,
+	        Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getGrnDropdown(String venid, Long recid, String oldgrnno) throws ApplicationException;
+
+	String getSalesOrderAmendmentDocId(Long orgId, String financialYear);
+
+	Map<String, Object> updateCreateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
+			throws ApplicationException;
 	ResponseEntity<byte[]> viewEnquiryFile(HttpServletRequest request) throws IOException;
+
+//	Map<String, Object> createUpdateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
+//			throws ApplicationException;
 
 	List<Map<String, Object>> getFgAndSfgItemDetailsProcessSheetComp(Long orgId, Long branch, String type);
 
 	List<Map<String, Object>> getOperationDetailsProcessSheetComp(Long orgId);
 
 	List<Map<String, Object>> getMachineDetailsProcessSheetComp(Long orgId, Long branch);
+
 
 }

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,8 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -21,6 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -392,6 +397,10 @@ public class DhineshServiceImpl implements DhineshService {
 		salesContractVO.setSalesContractTaxDetails(taxDetailList);
 	}
 
+
+	@Value("${server.base-url}")
+	private String serverBaseUrl;
+
 	private void saveAttachments(MultipartFile[] files, SalesContractVO salesContractVO) throws ApplicationException {
 
 		if (files == null || files.length == 0) {
@@ -399,41 +408,67 @@ public class DhineshServiceImpl implements DhineshService {
 		}
 
 		try {
+			Path baseDir = Paths.get(uploadPath).toAbsolutePath().normalize();
 
-			File folder = new File(uploadPath);
+			Path contractFolder = baseDir.resolve(salesContractVO.getId().toString()).normalize();
 
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
+			Files.createDirectories(contractFolder);
 
 			for (MultipartFile file : files) {
-
 				if (file == null || file.isEmpty()) {
 					continue;
 				}
 
-				String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+				String originalName = file.getOriginalFilename();
 
-				Path path = Paths.get(uploadPath, fileName);
-
-				// Copy file and automatically close InputStream
-				try (InputStream inputStream = file.getInputStream()) {
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+				if (originalName == null || originalName.trim().isEmpty()) {
+					originalName = "file";
 				}
 
-				SalesContractAttachVO attach = new SalesContractAttachVO();
-				attach.setSalesContract(salesContractVO);
-				attach.setPdfAttached(path.toString());
+				originalName = originalName.replace("\\", "/");
+				originalName = originalName.substring(originalName.lastIndexOf("/") + 1);
 
-				salesContractVO.getAttachments().add(attach);
+				String safeName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+				String nameWithoutExtension = safeName;
+				int dotIndex = safeName.lastIndexOf(".");
+
+				if (dotIndex > 0) {
+					extension = safeName.substring(dotIndex);
+					nameWithoutExtension = safeName.substring(0, dotIndex);
+				}
+
+				String fileName = nameWithoutExtension + "_" + salesContractVO.getId() + extension;
+
+				Path filePath = contractFolder.resolve(fileName).normalize();
+
+				if (!filePath.startsWith(contractFolder)) {
+					throw new ApplicationException("Invalid file path");
+				}
+
+				try (InputStream inputStream = file.getInputStream()) {
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				String relativePath = baseDir.relativize(filePath).toString().replace("\\", "/");
+
+				String publicUrl = serverBaseUrl + "/api/salesContract/viewFile/" + relativePath;
+
+				SalesContractAttachVO attachment = new SalesContractAttachVO();
+				attachment.setSalesContract(salesContractVO);
+
+				// Store the URL instead of the physical file path
+				attachment.setPdfAttached(publicUrl);
+
+				salesContractVO.getAttachments().add(attachment);
 			}
 
 			salesContractRepo.saveAndFlush(salesContractVO);
 
 		} catch (IOException e) {
-			throw new ApplicationException("File upload failed : " + e.getMessage(), e);
+			throw new ApplicationException("File upload failed: " + e.getMessage(), e);
 		}
-
 	}
 
 	private SalesContractResponseDTO convertToResponse(SalesContractVO vo) {
@@ -617,6 +652,46 @@ public class DhineshServiceImpl implements DhineshService {
 		dto.setSalesContractTaxDetailsDTO(taxResponse);
 
 		return dto;
+	}
+
+	@Override
+	public ResponseEntity<byte[]> viewSalesContractFile(HttpServletRequest request) throws IOException {
+
+		return serveFile(request, "/api/salesContract/viewFile/", uploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveFile(HttpServletRequest request, String apiPrefix, String uploadBasePath)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+
+		if (!uri.startsWith(apiPrefix)) {
+			return ResponseEntity.badRequest().build();
+		}
+
+		String relativePath = URLDecoder.decode(uri.substring(apiPrefix.length()), StandardCharsets.UTF_8);
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.isRegularFile(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+			contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+		}
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header("Content-Disposition", "inline; filename=\"" + filePath.getFileName() + "\"")
+				.body(Files.readAllBytes(filePath));
 	}
 
 	// dropdown

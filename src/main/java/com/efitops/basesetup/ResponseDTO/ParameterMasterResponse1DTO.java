@@ -14,8 +14,6 @@ public class ParameterMasterResponse1DTO {
 
 	    private String parameterCode;
 
-	    private ListOfValuesDetailsResponseDTO parameterType;
-
 	    private String parameterDescription;
 
 }

@@ -35,8 +35,8 @@ public class ControlPlanMachineFixtureVO {
 	 @JoinColumn(name = "machine_fixtureno")
 	 private MachineMasterVO machineFixtureNo;
 	 
-	 @Column(name = "machine_fixture_name")
-	 private String machineFixtureName;
+//	 @Column(name = "machine_fixture_name")
+//	 private String machineFixtureName;
 	 
 	 @ManyToOne
 	 @JoinColumn(name = "control_plan_basic_id")

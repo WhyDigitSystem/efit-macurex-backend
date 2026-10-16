@@ -1029,30 +1029,30 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 			// DOC ID GENERATION
 			// ========================================================
 
-			String docId = instrumentCalibrationRepo.getInstrumentCalibrationDocId(instrumentCalibrationDTO.getOrgId(),
-					instrumentCalibrationDTO.getFinancialYear(), screenCode);
-
-			if (StringUtils.isBlank(docId)) {
-				throw new ApplicationException("Instrument Calibration DocId Not Found");
-			}
-
-			instrumentCalibrationVO.setDocId(docId);
+//			String docId = instrumentCalibrationRepo.getInstrumentCalibrationDocId(instrumentCalibrationDTO.getOrgId(),
+//					instrumentCalibrationDTO.getFinancialYear(), screenCode);
+//
+//			if (StringUtils.isBlank(docId)) {
+//				throw new ApplicationException("Instrument Calibration DocId Not Found");
+//			}
+//
+//			instrumentCalibrationVO.setDocId(docId);
 
 			// ========================================================
 			// UPDATE LAST NUMBER
 			// ========================================================
-
-			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdAndFinYearAndScreenCode(instrumentCalibrationDTO.getOrgId(),
-							instrumentCalibrationDTO.getFinancialYear(), screenCode);
-
-			if (documentTypeMappingDetailsVO == null) {
-				throw new ApplicationException("Document Type Mapping Details Not Found");
-			}
-
-			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+//
+//			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+//					.findByOrgIdAndFinYearAndScreenCode(instrumentCalibrationDTO.getOrgId(),
+//							instrumentCalibrationDTO.getFinancialYear(), screenCode);
+//
+//			if (documentTypeMappingDetailsVO == null) {
+//				throw new ApplicationException("Document Type Mapping Details Not Found");
+//			}
+//
+//			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+//
+//			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			// ========================================================
 			// CREATED / UPDATED BY
@@ -4569,12 +4569,11 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		PMCheckListMasterResponseDTO response = new PMCheckListMasterResponseDTO();
 
 		response.setId(vo.getId());
-		
+
 		response.setDocId(vo.getDocId());
-		
-		response.setDocDate(vo.getDocDate());
-		
+		response.setDocDate(vo.getDocDate());	
 		response.setFinancialYear(vo.getFinancialYear());
+
 
 		/*
 		 * Branch
@@ -5225,7 +5224,8 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		MachineToolBreakdownResponseDTO response = new MachineToolBreakdownResponseDTO();
 
 		response.setId(vo.getId());
-
+		response.setDocId(vo.getDocId());
+		response.setDocDate(vo.getDocDate());
 		/*
 		 * Branch Response
 		 */

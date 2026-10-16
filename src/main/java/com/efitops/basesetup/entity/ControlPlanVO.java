@@ -1,6 +1,6 @@
 package com.efitops.basesetup.entity;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,8 +74,9 @@ public class ControlPlanVO {
 	   @Column(name = "item_size")
 	   private String itemSize;
 	   
-	   @Column(name = "process_sheet_no")
-	   private String processSheetNo;
+	   @ManyToOne
+	   @JoinColumn(name = "process_sheet_no")
+	   private ProcessSheetCompRoutingVO processSheetNo;
 	   
 	   @ManyToOne
 	   @JoinColumn(name = "prepared_by")
@@ -94,6 +95,8 @@ public class ControlPlanVO {
 	   @Column(name = "org_id")
 		private Long orgId;
 
+	   @Column(name = "financial_year")
+	    private String financialYear;
 		@Column(name = "created_by")
 		private String createdBy;
 		@Column(name = "modified_by")
@@ -122,8 +125,6 @@ public class ControlPlanVO {
 		@OneToMany(mappedBy = "controlPlanVO", cascade = CascadeType.ALL)
 		@JsonManagedReference
 		private List<ControlPlanMachineFixtureVO> controlPlanMachineFixtureVO = new ArrayList<>();
-		
-		
 		
 		@JsonGetter("activeStatus")
 		public String getActiveStatus() {

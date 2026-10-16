@@ -6,9 +6,7 @@ import java.util.List;
 import javax.persistence.Column;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
-import com.efitops.basesetup.dto.DesignationResponseDTO;
 import com.efitops.basesetup.dto.EmployeeMasterDetailsReponseDTO;
-import com.efitops.basesetup.dto.ListOfVlauesDetailsResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +18,10 @@ import lombok.NoArgsConstructor;
 public class PMCheckListMasterResponseDTO {
 
 	private Long id;
+	
+	private String docId;
+	
+	private LocalDate docDate;
 
 	private BranchResponseDTO branch;
 

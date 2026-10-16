@@ -1,6 +1,5 @@
 package com.efitops.basesetup.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,6 +27,7 @@ public class ControlPlanDTO {
 	    private Long controlPlanType;
 
 	    private String planNo;
+	    private String financialYear;
 
 	    private Long fgItemCode;
 
@@ -37,7 +37,7 @@ public class ControlPlanDTO {
 
 	    private String itemSize;
 
-	    private String processSheetNo;
+	    private Long processSheetNo;
 
 	    private Long preparedBy;
 

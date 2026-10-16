@@ -74,8 +74,9 @@ public class ControlPlanVO {
 	   @Column(name = "item_size")
 	   private String itemSize;
 	   
-	   @Column(name = "process_sheet_no")
-	   private String processSheetNo;
+	   @ManyToOne
+	   @JoinColumn(name = "process_sheet_no")
+	   private ProcessSheetCompRoutingVO processSheetNo;
 	   
 	   @ManyToOne
 	   @JoinColumn(name = "prepared_by")
@@ -94,6 +95,8 @@ public class ControlPlanVO {
 	   @Column(name = "org_id")
 		private Long orgId;
 
+	   @Column(name = "financial_year")
+	    private String financialYear;
 		@Column(name = "created_by")
 		private String createdBy;
 		@Column(name = "modified_by")

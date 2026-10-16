@@ -4,9 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
-import com.efitops.basesetup.dto.EmployeeMasterResponseDTO;
 import com.efitops.basesetup.dto.GradeMasterResponseDTO;
-import com.efitops.basesetup.dto.ItemMasterResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +25,7 @@ public class ControlPlanResponseDTO {
 	    private ListOfValuesDetailsResponseDTO controlPlanType;
 
 	    private String planNo;
+	    private String financialYear;
 
 	    private ItemResponse1DTO fgItemCode;
 
@@ -36,7 +35,7 @@ public class ControlPlanResponseDTO {
 
 	    private String itemSize;
 
-	    private String processSheetNo;
+	    private ProcessSheetCompRoutingResponsesDTO processSheetNo;
 
 	    private EmployeeMasterResponseDetailsDTO preparedBy;
 

@@ -83,6 +83,7 @@ import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingMachineResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingResponsesDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessSheetToolFixtureDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentAttachmentResponseDto;
 import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentCustomerResponceDto;
@@ -7780,6 +7781,8 @@ public class DevelopServiceImpl implements DevelopService {
 		ControlPlanVO controlPlanVO;
 		String message;
 
+		String screenCode = "CP";
+
 		// ============================================================
 		// CREATE / UPDATE
 		// ============================================================
@@ -7839,6 +7842,20 @@ public class DevelopServiceImpl implements DevelopService {
 
 			// CREATE
 			controlPlanVO = new ControlPlanVO();
+			
+
+			String docId = salesContractRepo.getSalesContractDocId(controlPlanDTO.getOrgId(), controlPlanDTO.getFinancialYear(), screenCode);
+
+			controlPlanVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(controlPlanDTO.getOrgId(), controlPlanDTO.getFinancialYear(), screenCode);
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+			controlPlanVO.setCreatedBy(controlPlanDTO.getCreatedBy());
+			controlPlanVO.setUpdatedBy(controlPlanDTO.getCreatedBy());
+
 
 			controlPlanVO.setCreatedBy(controlPlanDTO.getCreatedBy());
 
@@ -8011,7 +8028,7 @@ public class DevelopServiceImpl implements DevelopService {
 				// MACHINE FIXTURE NAME
 				// ========================================================
 
-				machineFixtureVO.setMachineFixtureName(machineFixtureDTO.getMachineFixtureName());
+//				machineFixtureVO.setMachineFixtureName(machineFixtureDTO.getMachineFixtureName());
 
 				// ========================================================
 				// MACHINE FIXTURE NO
@@ -8080,6 +8097,7 @@ public class DevelopServiceImpl implements DevelopService {
 		// ============================================================
 
 		vo.setRevisionDate(dto.getRevisionDate());
+		vo.setFinancialYear(dto.getFinancialYear());
 
 		vo.setPlanNo(dto.getPlanNo());
 
@@ -8087,8 +8105,16 @@ public class DevelopServiceImpl implements DevelopService {
 
 		vo.setItemSize(dto.getItemSize());
 
-		vo.setProcessSheetNo(dto.getProcessSheetNo());
+//		vo.setProcessSheetNo(dto.getProcessSheetNo());
 
+		if (dto.getProcessSheetNo() != null) {
+
+			ProcessSheetCompRoutingVO process = processSheetCompRoutingRepo.findById(dto.getProcessSheetNo())
+					.orElseThrow(() -> new ApplicationException("ProcessSheetCompRouting Not Found"));
+
+			vo.setProcessSheetNo(process);
+		}
+		
 		// ============================================================
 		// CONTROL PLAN TYPE
 		// ============================================================
@@ -8186,7 +8212,23 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setPlanNo(controlPlanVO.getPlanNo());
 		responseDTO.setItemDescription(controlPlanVO.getItemDescription());
 		responseDTO.setItemSize(controlPlanVO.getItemSize());
-		responseDTO.setProcessSheetNo(controlPlanVO.getProcessSheetNo());
+//		responseDTO.setProcessSheetNo(controlPlanVO.getProcessSheetNo());
+		if (controlPlanVO.getProcessSheetNo() != null) {
+
+		    ProcessSheetCompRoutingResponsesDTO processSheetDTO =
+		            new ProcessSheetCompRoutingResponsesDTO();
+
+		    processSheetDTO.setId(
+		            controlPlanVO.getProcessSheetNo().getId());
+
+		    processSheetDTO.setDocId(
+		            controlPlanVO.getProcessSheetNo().getDocId());
+
+		    processSheetDTO.setDocDate(
+		            controlPlanVO.getProcessSheetNo().getDocDate());
+
+		    responseDTO.setProcessSheetNo(processSheetDTO);
+		}
 		responseDTO.setApproved(controlPlanVO.isApproved());
 		responseDTO.setActive(controlPlanVO.isActive());
 		responseDTO.setCancel(controlPlanVO.isCancel());
@@ -8194,7 +8236,26 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setOrgId(controlPlanVO.getOrgId());
 		responseDTO.setCreatedBy(controlPlanVO.getCreatedBy());
 		responseDTO.setUpdatedBy(controlPlanVO.getUpdatedBy());
+		responseDTO.setFinancialYear(controlPlanVO.getFinancialYear());
 
+		// CONTROL PLAN TYPE RESPONSE
+		// CONTROL PLAN TYPE RESPONSE
+		if (controlPlanVO.getControlPlanType() != null) {
+
+			ListOfValuesDetailsResponseDTO controlPlanTypeDTO =
+		            new ListOfValuesDetailsResponseDTO();
+
+		    controlPlanTypeDTO.setId(
+		            controlPlanVO.getControlPlanType().getId());
+
+		    controlPlanTypeDTO.setCode(
+		            controlPlanVO.getControlPlanType().getValueCode());
+
+		    controlPlanTypeDTO.setDescription(
+		            controlPlanVO.getControlPlanType().getValueDescription());
+
+		    responseDTO.setControlPlanType(controlPlanTypeDTO);
+		}
 		// BRANCH RESPONSE
 		if (controlPlanVO.getBranch() != null) {
 
@@ -8216,7 +8277,8 @@ public class DevelopServiceImpl implements DevelopService {
 	        preparedByDTO.setId(controlPlanVO.getPreparedBy().getId());
 	        preparedByDTO.setEmployeeName(
 	                controlPlanVO.getPreparedBy().getEmployeeName());
-	        
+	        preparedByDTO.setEmployeeCode(
+	                controlPlanVO.getPreparedBy().getEmployeeId());
 	        responseDTO.setPreparedBy(preparedByDTO);
 	    }
 
@@ -8229,7 +8291,8 @@ public class DevelopServiceImpl implements DevelopService {
 	        checkedByDTO.setId(controlPlanVO.getCheckedBy().getId());
 	        checkedByDTO.setEmployeeName(
 	                controlPlanVO.getCheckedBy().getEmployeeName());
-	        
+	        checkedByDTO.setEmployeeCode(
+	                controlPlanVO.getCheckedBy().getEmployeeId());
 	        responseDTO.setCheckedBy(checkedByDTO);
 	    }
 
@@ -8265,29 +8328,33 @@ public class DevelopServiceImpl implements DevelopService {
 	        responseDTO.setItemGrade(gradeDTO);
 	    }
 
-	    List<ControlPlanDetailResponseDTO> detailResponseList = new ArrayList<>();
+	    List<ControlPlanDetailResponseDTO> detailResponseList =
+	            new ArrayList<>();
 
 	    if (controlPlanVO.getControlPlanDetailVO() != null
 	            && !controlPlanVO.getControlPlanDetailVO().isEmpty()) {
 
-	        for (ControlPlanDetailVO detailVO : controlPlanVO.getControlPlanDetailVO()) {
+	        for (ControlPlanDetailVO detailVO :
+	                controlPlanVO.getControlPlanDetailVO()) {
 
-	            ControlPlanDetailResponseDTO detailDTO = new ControlPlanDetailResponseDTO();
+	            ControlPlanDetailResponseDTO detailDTO =
+	                    new ControlPlanDetailResponseDTO();
 
 	            detailDTO.setId(detailVO.getId());
 	            detailDTO.setOperationNo(detailVO.getOperationNo());
 	            detailDTO.setProcess(detailVO.getProcess());
 	            detailDTO.setSpecification(detailVO.getSpecification());
-	            detailDTO.setEvaluationTechnique(detailVO.getEvaluationTechnique());
+	            detailDTO.setEvaluationTechnique(
+	                    detailVO.getEvaluationTechnique());
 	            detailDTO.setReactionPlan(detailVO.getReactionPlan());
 	            detailDTO.setRecord(detailVO.getRecord());
 	            detailDTO.setRiskClassSpecialCharacter(
 	                    detailVO.getRiskClassSpecialCharacter());
 
-	            // MACHINE DEVICE RESPONSE
+	            // Machine Device
 	            if (detailVO.getMachineDevice() != null) {
-
-	                MachineMasterResponse1DTO machineDTO = new MachineMasterResponse1DTO();
+	                MachineMasterResponse1DTO machineDTO =
+	                        new MachineMasterResponse1DTO();
 
 	                machineDTO.setId(detailVO.getMachineDevice().getId());
 	                machineDTO.setMachineInstrumentNo(
@@ -8298,18 +8365,15 @@ public class DevelopServiceImpl implements DevelopService {
 	                detailDTO.setMachineDevice(machineDTO);
 	            }
 
-	         // CONTROL METHOD RESPONSE
+	            // Control Method
 	            if (detailVO.getControlMethod() != null) {
-
 	                ListOfValuesDetailsResponseDTO controlMethodDTO =
 	                        new ListOfValuesDetailsResponseDTO();
 
 	                controlMethodDTO.setId(
 	                        detailVO.getControlMethod().getId());
-
 	                controlMethodDTO.setCode(
 	                        detailVO.getControlMethod().getValueCode());
-
 	                controlMethodDTO.setDescription(
 	                        detailVO.getControlMethod().getValueDescription());
 
@@ -8317,9 +8381,11 @@ public class DevelopServiceImpl implements DevelopService {
 	            }
 
 	            detailResponseList.add(detailDTO);
-	        
 	        }
 	    }
+
+	    // IMPORTANT: Assign the child list to the parent DTO
+	    responseDTO.setControlPlanDetailResponseDTO(detailResponseList);
 		// MACHINE / FIXTURE RESPONSE
 		List<ControlPlanMachineFixtureResponseDTO> machineFixtureResponseList = new ArrayList<>();
 
@@ -8331,25 +8397,26 @@ public class DevelopServiceImpl implements DevelopService {
 				ControlPlanMachineFixtureResponseDTO machineDTO = new ControlPlanMachineFixtureResponseDTO();
 
 				machineDTO.setId(machineVO.getId());
-				machineDTO.setMachineFixtureName(machineVO.getMachineFixtureName());
+				machineDTO.setMachineFixtureName(machineVO.getMachineFixtureNo().getMachineInstrumentName());
+				machineDTO.setMachineFixtureNo(machineVO.getMachineFixtureNo().getMachineInstrumentNo());
 
-				// MACHINE MASTER RESPONSE
-				if (machineVO.getMachineFixtureNo() != null) {
-
-					MachineMasterResponse1DTO machineMasterDTO = new MachineMasterResponse1DTO();
-
-					machineMasterDTO.setId(machineVO.getMachineFixtureNo().getId());
-
-					machineMasterDTO.setMachineInstrumentNo(
-					    machineVO.getMachineFixtureNo().getMachineInstrumentNo());
-
-					machineMasterDTO.setMachineInstrumentName(
-					    machineVO.getMachineFixtureNo().getMachineInstrumentName());
-
-					machineDTO.setMachineFixtureNo(machineMasterDTO);
-					
-					
-				}
+//				// MACHINE MASTER RESPONSE
+//				if (machineVO.getMachineFixtureNo() != null) {
+//
+//					MachineMasterResponse1DTO machineMasterDTO = new MachineMasterResponse1DTO();
+//
+//					machineMasterDTO.setId(machineVO.getMachineFixtureNo().getId());
+//
+//					machineMasterDTO.setMachineInstrumentNo(
+//					    machineVO.getMachineFixtureNo().getMachineInstrumentNo());
+//
+//					machineMasterDTO.setMachineInstrumentName(
+//					    machineVO.getMachineFixtureNo().getMachineInstrumentName());
+//
+//					machineDTO.setMachineFixtureNo(machineMasterDTO);
+//					
+//					
+//				}
 
 				machineFixtureResponseList.add(machineDTO);
 			}
@@ -8383,20 +8450,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 					parameterMasterDTO.setParameterDescription(parameterVO.getParameter().getParameterDescription());
 
-					// PARAMETER TYPE RESPONSE
-					if (parameterVO.getParameter().getParameterType() != null) {
-
-						ListOfValuesDetailsResponseDTO parameterTypeDTO = new ListOfValuesDetailsResponseDTO();
-
-						parameterTypeDTO.setId(parameterVO.getParameter().getParameterType().getId());
-
-						parameterTypeDTO.setCode(parameterVO.getParameter().getParameterType().getValueCode());
-
-						parameterTypeDTO
-								.setDescription(parameterVO.getParameter().getParameterType().getValueDescription());
-
-						parameterMasterDTO.setParameterType(parameterTypeDTO);
-					}
 
 					parameterDTO.setParameter(parameterMasterDTO);
 				}

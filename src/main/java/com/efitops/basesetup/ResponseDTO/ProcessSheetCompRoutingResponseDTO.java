@@ -14,49 +14,49 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class ProcessSheetCompRoutingResponseDTO {
-	
+
 	private Long id;
 
-    private BranchResponseDTO branch;
-    
-    private BomFgResponseDTO bom;
+	private BranchResponseDTO branch;
 
-    private ItemResponse1DTO fgSfgItemCode;
+	private BomFgResponseDTO bom;
 
-    private String itemDescription;
+	private ItemResponse1DTO fgSfgItemCode;
 
-    private boolean active;
-    
-    private BigDecimal totalMcValue;
-    
-    private BigDecimal totalLabourValue;
-    
-    private BigDecimal totalToolFixtureValue;
-    
-    private BigDecimal totalConsumablesValue;
-    
-    private BigDecimal totalOperationValue;
-    
-    private EmployeeMasterResponseDetailsDTO preparedBy;
+	private String itemDescription;
 
-    private Long orgId;
+	private boolean active;
 
-    private String createdBy;
+	private BigDecimal totalMcValue;
 
-    private String updatedBy;
+	private BigDecimal totalLabourValue;
 
-    private boolean cancel;
+	private BigDecimal totalToolFixtureValue;
 
-    private String cancelRemarks;
-    
-    private String fgSfgItemType;
+	private BigDecimal totalConsumablesValue;
 
-    private List<ProcessSheetCompRoutingDetailResponseDTO> processSheetCompRoutingDetailResponseDTO;
-    
-    private List<ProcessSheetCompRoutingMachineResponseDTO> processSheetCompRoutingMachineResponseDTO;
-    
-    private List<ProcessSheetToolFixtureDetailsResponseDTO> processSheetToolFixtureDetailsResponseDTO;
+	private BigDecimal totalOperationValue;
 
-    
+	private EmployeeMasterResponseDetailsDTO preparedBy;
+
+	private Long orgId;
+
+	private String createdBy;
+
+	private String updatedBy;
+
+	private boolean cancel;
+
+	private String cancelRemarks;
+
+	private String fgSfgItemType;
+
+	private String costRate;
+
+	private List<ProcessSheetCompRoutingDetailResponseDTO> processSheetCompRoutingDetailResponseDTO;
+
+	private List<ProcessSheetCompRoutingMachineResponseDTO> processSheetCompRoutingMachineResponseDTO;
+
+	private List<ProcessSheetToolFixtureDetailsResponseDTO> processSheetToolFixtureDetailsResponseDTO;
 
 }

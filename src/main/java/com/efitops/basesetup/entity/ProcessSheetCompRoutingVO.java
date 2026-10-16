@@ -59,6 +59,9 @@ public class ProcessSheetCompRoutingVO {
 
 	@Column(name = "item_description")
 	private String itemDescription;
+	
+	@Column(name = "cost_rate")
+	private String costRate;
 
 	@ManyToOne
 	@JoinColumn(name = "bom")

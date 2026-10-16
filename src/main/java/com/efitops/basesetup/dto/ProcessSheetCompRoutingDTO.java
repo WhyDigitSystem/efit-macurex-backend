@@ -49,6 +49,8 @@ public class ProcessSheetCompRoutingDTO {
 
 	private String cancelRemarks;
 
+	private String costRate;
+
 	private List<ProcessSheetCompRoutingDetailDTO> processSheetCompRoutingDetailDTO;
 
 	private List<ProcessSheetCompRoutingMachineDTO> processSheetCompRoutingMachineDTO;

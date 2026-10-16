@@ -6440,6 +6440,7 @@ public class DevelopServiceImpl implements DevelopService {
 		processSheetCompRoutingVO.setCancelRemarks(processSheetCompRoutingDTO.getCancelRemarks());
 
 		processSheetCompRoutingVO.setFgSfgItemType(processSheetCompRoutingDTO.getFgSfgItemType());
+		processSheetCompRoutingVO.setCostRate(processSheetCompRoutingDTO.getCostRate());
 
 		// =========================
 		// Branch
@@ -6722,6 +6723,8 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setId(processSheetCompRoutingVO.getId());
 
 		responseDTO.setItemDescription(processSheetCompRoutingVO.getItemDescription());
+		
+		responseDTO.setCostRate(processSheetCompRoutingVO.getCostRate());
 
 		responseDTO.setFgSfgItemType(processSheetCompRoutingVO.getFgSfgItemType());
 
@@ -13055,11 +13058,11 @@ public class DevelopServiceImpl implements DevelopService {
 
 			Map<String, Object> map = new HashMap<>();
 			map.put("operationMasterBasicId", od[0] != null ? ((Number) od[0]).longValue() : null);
-			map.put("operationId", od[1] != null ? ((Number) od[1]).longValue() : null);
+			map.put("operationId", od[1] != null ?  od[1].toString() : "");
 			map.put("description", od[2] != null ? od[2].toString() : "");
 			map.put("machineInstrumentNo", od[3] != null ? od[3].toString() : "");
 			map.put("machineInstrumentName", od[4] != null ? od[4].toString() : "");
-			map.put("hourlyRate", od[5] != null ? ((Number) od[5]).doubleValue() : null);
+			map.put("hourlyRate", od[5] != null ? new BigDecimal(od[5].toString()) : BigDecimal.ZERO);
 			map.put("toolNo", od[6] != null ? od[6].toString() : "");
 			map.put("toolDescription", od[7] != null ? od[7].toString() : "");
 			map.put("toolFixtureCost", od[8] != null ? ((Number) od[8]).doubleValue() : null);

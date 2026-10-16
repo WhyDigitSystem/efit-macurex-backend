@@ -4569,6 +4569,12 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 		PMCheckListMasterResponseDTO response = new PMCheckListMasterResponseDTO();
 
 		response.setId(vo.getId());
+		
+		response.setDocId(vo.getDocId());
+		
+		response.setDocDate(vo.getDocDate());
+		
+		response.setFinancialYear(vo.getFinancialYear());
 
 		/*
 		 * Branch

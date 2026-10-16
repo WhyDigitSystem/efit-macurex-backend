@@ -1,6 +1,7 @@
 package com.efitops.basesetup.ResponseDTO;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.efitops.basesetup.dto.BranchResponseDTO;
@@ -52,6 +53,12 @@ public class ProcessSheetCompRoutingResponseDTO {
 	private String fgSfgItemType;
 
 	private String costRate;
+
+	private String financialYear;
+	
+	private String docId;
+	
+	private LocalDate docDate ;
 
 	private List<ProcessSheetCompRoutingDetailResponseDTO> processSheetCompRoutingDetailResponseDTO;
 

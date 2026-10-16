@@ -106,6 +106,9 @@ public class ProcessSheetCompRoutingVO {
 	private String screenName = "PROCESSSHEETCOMPROUTING";
 	@Column(name = "screen_code")
 	private String screenCode = "PSCR";
+	
+	@Column(name = "financial_year")
+	private String financialYear;
 
 	@JsonGetter("activeStatus")
 	public String getActiveStatus() {

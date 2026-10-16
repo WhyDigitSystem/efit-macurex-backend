@@ -6374,9 +6374,19 @@ public class DevelopServiceImpl implements DevelopService {
 
 		} else {
 
-			// =========================
-			// Create
-			// =========================
+			String screenCode = "PSCR";
+			String docId = processSheetCompRoutingRepo.getProcessSheetCompRoutingDocId(
+					processSheetCompRoutingDTO.getOrgId(), processSheetCompRoutingDTO.getFinancialYear(), screenCode);
+			processSheetCompRoutingVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(processSheetCompRoutingDTO.getOrgId(),
+							processSheetCompRoutingDTO.getFinancialYear(), screenCode);
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			processSheetCompRoutingVO.setCreatedBy(processSheetCompRoutingDTO.getCreatedBy());
 
@@ -6441,6 +6451,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		processSheetCompRoutingVO.setFgSfgItemType(processSheetCompRoutingDTO.getFgSfgItemType());
 		processSheetCompRoutingVO.setCostRate(processSheetCompRoutingDTO.getCostRate());
+		processSheetCompRoutingVO.setFinancialYear(processSheetCompRoutingDTO.getFinancialYear());
 
 		// =========================
 		// Branch
@@ -6616,9 +6627,8 @@ public class DevelopServiceImpl implements DevelopService {
 					.getProcessSheetCompRoutingMachineDTO()) {
 
 				ProcessSheetCompRoutingMachineVO machineVO = new ProcessSheetCompRoutingMachineVO();
-				
-				machineVO.setUsageMachine(machineDTO.getUsageMachine());
 
+				machineVO.setUsageMachine(machineDTO.getUsageMachine());
 
 				if (ObjectUtils.isNotEmpty(machineDTO.getMachineNo())) {
 
@@ -6723,8 +6733,15 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setId(processSheetCompRoutingVO.getId());
 
 		responseDTO.setItemDescription(processSheetCompRoutingVO.getItemDescription());
-		
+
 		responseDTO.setCostRate(processSheetCompRoutingVO.getCostRate());
+
+		responseDTO.setDocId(processSheetCompRoutingVO.getDocId());
+
+		responseDTO.setDocDate(processSheetCompRoutingVO.getDocDate());
+		
+		
+		responseDTO.setFinancialYear(processSheetCompRoutingVO.getFinancialYear());
 
 		responseDTO.setFgSfgItemType(processSheetCompRoutingVO.getFgSfgItemType());
 
@@ -6754,6 +6771,8 @@ public class DevelopServiceImpl implements DevelopService {
 
 		responseDTO.setUpdatedBy(processSheetCompRoutingVO.getUpdatedBy());
 
+		responseDTO.setFinancialYear(processSheetCompRoutingVO.getFinancialYear());
+
 		responseDTO.setCancel(processSheetCompRoutingVO.isCancel());
 
 		responseDTO.setCancelRemarks(processSheetCompRoutingVO.getCancelRemarks());
@@ -6782,6 +6801,8 @@ public class DevelopServiceImpl implements DevelopService {
 			itemResponseDTO.setItemCode(processSheetCompRoutingVO.getFgSfgItemCode().getItemCode());
 
 			itemResponseDTO.setItemDescription(processSheetCompRoutingVO.getFgSfgItemCode().getItemDescription());
+			
+			itemResponseDTO.setDrawingNo(processSheetCompRoutingVO.getFgSfgItemCode().getDrawingNo());
 
 			responseDTO.setFgSfgItemCode(itemResponseDTO);
 		}
@@ -6951,8 +6972,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 				machineResponseDTO.setTotal(machineVO.getTotal());
 
-
-
 				if (ObjectUtils.isNotEmpty(machineVO.getMachineNo())) {
 
 					MachineMasterResponse1DTO machineMasterResponseDTO = new MachineMasterResponse1DTO();
@@ -6992,13 +7011,12 @@ public class DevelopServiceImpl implements DevelopService {
 				// =========================
 
 				toolFixtureResponseDTO.setId(toolFixtureVO.getId());
-				
+
 				toolFixtureResponseDTO.setUsageType(toolFixtureVO.getUsageType());
 
 				toolFixtureResponseDTO.setToolFixtureName(toolFixtureVO.getToolFixtureName());
 
 				toolFixtureResponseDTO.setActivityToolFixtureCost(toolFixtureVO.getActivityToolFixtureCost());
-
 
 				if (ObjectUtils.isNotEmpty(toolFixtureVO.getToolFixtureNo())) {
 
@@ -13058,7 +13076,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 			Map<String, Object> map = new HashMap<>();
 			map.put("operationMasterBasicId", od[0] != null ? ((Number) od[0]).longValue() : null);
-			map.put("operationId", od[1] != null ?  od[1].toString() : "");
+			map.put("operationId", od[1] != null ? od[1].toString() : "");
 			map.put("description", od[2] != null ? od[2].toString() : "");
 			map.put("machineInstrumentNo", od[3] != null ? od[3].toString() : "");
 			map.put("machineInstrumentName", od[4] != null ? od[4].toString() : "");

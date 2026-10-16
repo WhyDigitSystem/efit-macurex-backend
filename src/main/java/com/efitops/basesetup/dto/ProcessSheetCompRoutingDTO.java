@@ -51,6 +51,8 @@ public class ProcessSheetCompRoutingDTO {
 
 	private String costRate;
 
+	private String financialYear;
+
 	private List<ProcessSheetCompRoutingDetailDTO> processSheetCompRoutingDetailDTO;
 
 	private List<ProcessSheetCompRoutingMachineDTO> processSheetCompRoutingMachineDTO;

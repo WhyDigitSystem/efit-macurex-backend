@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,9 +38,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
+
 import com.efitops.basesetup.ResponseDTO.ControlPlanDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanMachineFixtureResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanParameterResponseDTO;
+
+import com.efitops.basesetup.ResponseDTO.BomFgResponseDTO;
+
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanSampleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
@@ -101,7 +106,7 @@ import com.efitops.basesetup.ResponseDTO.ShiftResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailRepo;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ToolMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ToolMasterResponseMasterDTO;
 import com.efitops.basesetup.ResponseDTO.TransferOrderDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.TransferOrderResponseDTO;
 import com.efitops.basesetup.ResponseDTO.UnitResponseDTO;
@@ -143,7 +148,6 @@ import com.efitops.basesetup.dto.InitialStageInspectionDetailDTO;
 import com.efitops.basesetup.dto.IssuesDTO;
 import com.efitops.basesetup.dto.IssuesDetailsDTO;
 import com.efitops.basesetup.dto.ItemMasterResponseDetailsDTO;
-import com.efitops.basesetup.dto.LocationResponseDTO;
 import com.efitops.basesetup.dto.MachineHistoryDTO;
 import com.efitops.basesetup.dto.MachineMasterDTO;
 import com.efitops.basesetup.dto.MachineSpareDetailsDTO;
@@ -175,6 +179,7 @@ import com.efitops.basesetup.dto.UnitMasterResponseDTO;
 import com.efitops.basesetup.dto.ZeroEntryDetailDTO;
 import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
 import com.efitops.basesetup.entity.ActivityMasterVO;
+import com.efitops.basesetup.entity.BillOfMaterialVO;
 import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.ControlPlanDetailVO;
 import com.efitops.basesetup.entity.ControlPlanMachineFixtureVO;
@@ -242,7 +247,6 @@ import com.efitops.basesetup.entity.SalesOrderAmendmentVO;
 import com.efitops.basesetup.entity.ShiftVO;
 import com.efitops.basesetup.entity.ToolCategoryDetailVO;
 import com.efitops.basesetup.entity.ToolCategoryVO;
-import com.efitops.basesetup.entity.ToolMasterVO;
 import com.efitops.basesetup.entity.TransferOrderDetailVO;
 import com.efitops.basesetup.entity.TransferOrderVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
@@ -250,6 +254,7 @@ import com.efitops.basesetup.entity.ZeroEntryDetailVO;
 import com.efitops.basesetup.entity.ZeroKmFailureEntryVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.ActivityMasterRepo;
+import com.efitops.basesetup.repository.BillOfMaterialRepo;
 import com.efitops.basesetup.repository.BranchRepo;
 import com.efitops.basesetup.repository.ControlPlanDetailRepo;
 import com.efitops.basesetup.repository.ControlPlanMachineFixtureRepo;
@@ -625,8 +630,12 @@ public class DevelopServiceImpl implements DevelopService {
 	private DailyExchangeRateRepo dailyExchangeRateRepo;
 
 	@Autowired
+
 	SubContractingGRNRepo subContractingGRNRepo;
-	
+
+	private BillOfMaterialRepo billOfMaterialRepo;
+
+
 //	@Override
 //	@Transactional
 //	public Map<String, Object> updateCreateEnquiry(EnquiryDTO enquiryDTO) throws ApplicationException {
@@ -1210,8 +1219,8 @@ public class DevelopServiceImpl implements DevelopService {
 				 *
 				 * http://localhost:8080/api/enquiry/viewFile/ enquiry/1001/quotation_1001.pdf
 				 */
-				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/develop/enquiry/viewFile/")
-						.toUriString();
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+						.path("/api/develop/enquiry/viewFile/").toUriString();
 
 				Path baseDir = Paths.get(uploadPath).toAbsolutePath().normalize();
 
@@ -6379,9 +6388,19 @@ public class DevelopServiceImpl implements DevelopService {
 
 		} else {
 
-			// =========================
-			// Create
-			// =========================
+			String screenCode = "PSCR";
+			String docId = processSheetCompRoutingRepo.getProcessSheetCompRoutingDocId(
+					processSheetCompRoutingDTO.getOrgId(), processSheetCompRoutingDTO.getFinancialYear(), screenCode);
+			processSheetCompRoutingVO.setDocId(docId);
+
+			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
+					.findByOrgIdAndFinYearAndScreenCode(processSheetCompRoutingDTO.getOrgId(),
+							processSheetCompRoutingDTO.getFinancialYear(), screenCode);
+			if (documentTypeMappingDetailsVO == null) {
+				throw new ApplicationException("Document Type Mapping Details Not Found");
+			}
+			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
+			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
 
 			processSheetCompRoutingVO.setCreatedBy(processSheetCompRoutingDTO.getCreatedBy());
 
@@ -6416,13 +6435,15 @@ public class DevelopServiceImpl implements DevelopService {
 
 			throws ApplicationException {
 
-		// =========================
-		// Basic Fields
-		// =========================
-
 		processSheetCompRoutingVO.setItemDescription(processSheetCompRoutingDTO.getItemDescription());
 
-		processSheetCompRoutingVO.setBomId(processSheetCompRoutingDTO.getBomId());
+		if (processSheetCompRoutingDTO.getBom() != null && processSheetCompRoutingDTO.getBom() != 0) {
+
+			BillOfMaterialVO department = billOfMaterialRepo.findById(processSheetCompRoutingDTO.getBom())
+					.orElseThrow(() -> new ApplicationException("Bom Not Found"));
+
+			processSheetCompRoutingVO.setBom(department);
+		}
 
 		processSheetCompRoutingVO.setActive(processSheetCompRoutingDTO.isActive());
 
@@ -6442,44 +6463,37 @@ public class DevelopServiceImpl implements DevelopService {
 
 		processSheetCompRoutingVO.setCancelRemarks(processSheetCompRoutingDTO.getCancelRemarks());
 
+		processSheetCompRoutingVO.setFgSfgItemType(processSheetCompRoutingDTO.getFgSfgItemType());
+		processSheetCompRoutingVO.setCostRate(processSheetCompRoutingDTO.getCostRate());
+		processSheetCompRoutingVO.setFinancialYear(processSheetCompRoutingDTO.getFinancialYear());
+
 		// =========================
 		// Branch
 		// =========================
+		if (processSheetCompRoutingDTO.getBranch() != null && processSheetCompRoutingDTO.getBranch() != 0) {
 
-		if (ObjectUtils.isNotEmpty(processSheetCompRoutingDTO.getBranch())) {
+			BranchVO branch = branchRepo.findById(processSheetCompRoutingDTO.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
-			processSheetCompRoutingVO.setBranch(branchRepo.findById(processSheetCompRoutingDTO.getBranch())
-
-					.orElseThrow(() -> new ApplicationException("Branch Not Found")));
+			processSheetCompRoutingVO.setBranch(branch);
 		}
 
-		// =========================
-		// FG / SFG Item Type
-		// =========================
+//
+//		if (ObjectUtils.isNotEmpty(processSheetCompRoutingDTO.getBranch())) {
+//
+//			processSheetCompRoutingVO.setBranch(branchRepo.findById(processSheetCompRoutingDTO.getBranch())
+//
+//					.orElseThrow(() -> new ApplicationException("Branch Not Found")));
+//		}
 
-		if (ObjectUtils.isNotEmpty(processSheetCompRoutingDTO.getFgSfgItemType())) {
+		if (processSheetCompRoutingDTO.getFgSfgItemCode() != null
+				&& processSheetCompRoutingDTO.getFgSfgItemCode() != 0) {
 
-			processSheetCompRoutingVO
-					.setFgSfgItemType(listOfValuesDetailsRepo.findById(processSheetCompRoutingDTO.getFgSfgItemType())
+			ItemMasterVO itemMasterVO = itemMasterRepo.findById(processSheetCompRoutingDTO.getFgSfgItemCode())
+					.orElseThrow(() -> new ApplicationException("FG/SFG Item Code Not Found"));
 
-							.orElseThrow(() -> new ApplicationException("FG/SFG Item Type Not Found")));
+			processSheetCompRoutingVO.setFgSfgItemCode(itemMasterVO);
 		}
-
-		// =========================
-		// FG / SFG Item Code
-		// =========================
-
-		if (ObjectUtils.isNotEmpty(processSheetCompRoutingDTO.getFgSfgItemCode())) {
-
-			processSheetCompRoutingVO
-					.setFgSfgItemCode(itemMasterRepo.findById(processSheetCompRoutingDTO.getFgSfgItemCode())
-
-							.orElseThrow(() -> new ApplicationException("FG/SFG Item Code Not Found")));
-		}
-
-		// =========================
-		// Prepared By
-		// =========================
 
 		if (ObjectUtils.isNotEmpty(processSheetCompRoutingDTO.getPreparedBy())) {
 
@@ -6628,18 +6642,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 				ProcessSheetCompRoutingMachineVO machineVO = new ProcessSheetCompRoutingMachineVO();
 
-				// =========================
-				// Usage
-				// =========================
-
-				if (ObjectUtils.isNotEmpty(machineDTO.getUsageMachine())) {
-
-					machineVO.setUsageMachine(listOfValuesDetailsRepo.findById(machineDTO.getUsageMachine())
-							.orElseThrow(() -> new ApplicationException("usageMachine Not Found")));
-				}
-				// =========================
-				// Machine No
-				// =========================
+				machineVO.setUsageMachine(machineDTO.getUsageMachine());
 
 				if (ObjectUtils.isNotEmpty(machineDTO.getMachineNo())) {
 
@@ -6698,20 +6701,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 				ProcessSheetToolFixtureDetailsVO toolFixtureVO = new ProcessSheetToolFixtureDetailsVO();
 
-				// =========================
-				// Usage Type
-				// =========================
-
-				if (ObjectUtils.isNotEmpty(toolFixtureDTO.getUsageType())) {
-
-					toolFixtureVO.setUsageType(listOfValuesDetailsRepo.findById(toolFixtureDTO.getUsageType())
-
-							.orElseThrow(() -> new ApplicationException("Usage Type Not Found")));
-				}
-
-				// =========================
-				// Tool Fixture No
-				// =========================
+				toolFixtureVO.setUsageType(toolFixtureDTO.getUsageType());
 
 				if (ObjectUtils.isNotEmpty(toolFixtureDTO.getToolFixtureNo())) {
 
@@ -6758,7 +6748,24 @@ public class DevelopServiceImpl implements DevelopService {
 
 		responseDTO.setItemDescription(processSheetCompRoutingVO.getItemDescription());
 
-		responseDTO.setBomId(processSheetCompRoutingVO.getBomId());
+		responseDTO.setCostRate(processSheetCompRoutingVO.getCostRate());
+
+		responseDTO.setDocId(processSheetCompRoutingVO.getDocId());
+
+		responseDTO.setDocDate(processSheetCompRoutingVO.getDocDate());
+		
+		
+		responseDTO.setFinancialYear(processSheetCompRoutingVO.getFinancialYear());
+
+		responseDTO.setFgSfgItemType(processSheetCompRoutingVO.getFgSfgItemType());
+
+		if (processSheetCompRoutingVO.getBom() != null) {
+			BomFgResponseDTO locDto = new BomFgResponseDTO();
+			locDto.setId(processSheetCompRoutingVO.getBom().getId());
+			locDto.setDocId(processSheetCompRoutingVO.getBom().getDocId());
+			locDto.setDocDate(processSheetCompRoutingVO.getBom().getDocDate());
+			responseDTO.setBom(locDto);
+		}
 
 		responseDTO.setActive(processSheetCompRoutingVO.isActive());
 
@@ -6777,6 +6784,8 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setCreatedBy(processSheetCompRoutingVO.getCreatedBy());
 
 		responseDTO.setUpdatedBy(processSheetCompRoutingVO.getUpdatedBy());
+
+		responseDTO.setFinancialYear(processSheetCompRoutingVO.getFinancialYear());
 
 		responseDTO.setCancel(processSheetCompRoutingVO.isCancel());
 
@@ -6797,27 +6806,6 @@ public class DevelopServiceImpl implements DevelopService {
 			responseDTO.setBranch(branchResponseDTO);
 		}
 
-		// =========================
-		// FG / SFG Item Type
-		// =========================
-
-		if (ObjectUtils.isNotEmpty(processSheetCompRoutingVO.getFgSfgItemType())) {
-
-			ListOfValuesDetailsResponseDTO fgSfgItemTypeResponseDTO = new ListOfValuesDetailsResponseDTO();
-
-			fgSfgItemTypeResponseDTO.setId(processSheetCompRoutingVO.getFgSfgItemType().getId());
-
-			fgSfgItemTypeResponseDTO.setCode(processSheetCompRoutingVO.getFgSfgItemType().getValueCode());
-
-			fgSfgItemTypeResponseDTO.setDescription(processSheetCompRoutingVO.getFgSfgItemType().getValueDescription());
-
-			responseDTO.setFgSfgItemType(fgSfgItemTypeResponseDTO);
-		}
-
-		// =========================
-		// FG / SFG Item Code
-		// =========================
-
 		if (ObjectUtils.isNotEmpty(processSheetCompRoutingVO.getFgSfgItemCode())) {
 
 			ItemResponse1DTO itemResponseDTO = new ItemResponse1DTO();
@@ -6827,6 +6815,8 @@ public class DevelopServiceImpl implements DevelopService {
 			itemResponseDTO.setItemCode(processSheetCompRoutingVO.getFgSfgItemCode().getItemCode());
 
 			itemResponseDTO.setItemDescription(processSheetCompRoutingVO.getFgSfgItemCode().getItemDescription());
+			
+			itemResponseDTO.setDrawingNo(processSheetCompRoutingVO.getFgSfgItemCode().getDrawingNo());
 
 			responseDTO.setFgSfgItemCode(itemResponseDTO);
 		}
@@ -6892,31 +6882,34 @@ public class DevelopServiceImpl implements DevelopService {
 
 				if (ObjectUtils.isNotEmpty(detailVO.getLocation())) {
 
-					LocationResponseDTO locationResponseDTO = new LocationResponseDTO();
+					LocationMasterResponseDTO locDTO = new LocationMasterResponseDTO();
+					locDTO.setId(detailVO.getLocation().getId());
+					locDTO.setLocationName(detailVO.getLocation().getLocationName());
+					detailResponseDTO.setLocation(locDTO);
 
-					locationResponseDTO.setId(detailVO.getLocation().getId());
+//					locationResponseDTO.setId(detailVO.getLocation().getId());
+//
+//					locationResponseDTO.setOrgId(detailVO.getLocation().getOrgId());
+//
+//					locationResponseDTO.setLocationId(detailVO.getLocation().getLocationId());
+//
+//					locationResponseDTO.setLocationName(detailVO.getLocation().getLocationName());
+//
+//					locationResponseDTO.setAddress(detailVO.getLocation().getAddress());
+//
+//					locationResponseDTO.setPhoneNo(detailVO.getLocation().getPhoneNo());
+//
+//					locationResponseDTO.setFaxNo(detailVO.getLocation().getFaxNo());
+//
+//					locationResponseDTO.setEmail(detailVO.getLocation().getEmail());
+//
+//					locationResponseDTO.setConsiderMrp(detailVO.getLocation().getConsiderMrp());
+//
+//					locationResponseDTO.setCancelRemarks(detailVO.getLocation().getCancelRemarks());
+//
+//					locationResponseDTO.setCreatedBy(detailVO.getLocation().getCreatedBy());
 
-					locationResponseDTO.setOrgId(detailVO.getLocation().getOrgId());
-
-					locationResponseDTO.setLocationId(detailVO.getLocation().getLocationId());
-
-					locationResponseDTO.setLocationName(detailVO.getLocation().getLocationName());
-
-					locationResponseDTO.setAddress(detailVO.getLocation().getAddress());
-
-					locationResponseDTO.setPhoneNo(detailVO.getLocation().getPhoneNo());
-
-					locationResponseDTO.setFaxNo(detailVO.getLocation().getFaxNo());
-
-					locationResponseDTO.setEmail(detailVO.getLocation().getEmail());
-
-					locationResponseDTO.setConsiderMrp(detailVO.getLocation().getConsiderMrp());
-
-					locationResponseDTO.setCancelRemarks(detailVO.getLocation().getCancelRemarks());
-
-					locationResponseDTO.setCreatedBy(detailVO.getLocation().getCreatedBy());
-
-					detailResponseDTO.setLocation(locationResponseDTO);
+//					detailResponseDTO.setLocation(locationResponseDTO);
 				}
 
 				// =========================
@@ -6971,10 +6964,7 @@ public class DevelopServiceImpl implements DevelopService {
 					.getProcessSheetCompRoutingMachineVO()) {
 
 				ProcessSheetCompRoutingMachineResponseDTO machineResponseDTO = new ProcessSheetCompRoutingMachineResponseDTO();
-
-				// =========================
-				// Basic
-				// =========================
+				machineResponseDTO.setUsageMachine(machineVO.getUsageMachine());
 
 				machineResponseDTO.setId(machineVO.getId());
 
@@ -6995,27 +6985,6 @@ public class DevelopServiceImpl implements DevelopService {
 				machineResponseDTO.setActivityLabourCost(machineVO.getActivityLabourCost());
 
 				machineResponseDTO.setTotal(machineVO.getTotal());
-
-				// =========================
-				// Usage
-				// =========================
-
-				if (ObjectUtils.isNotEmpty(machineVO.getUsageMachine())) {
-
-					ListOfValuesDetailsResponseDTO usageResponseDTO = new ListOfValuesDetailsResponseDTO();
-
-					usageResponseDTO.setId(machineVO.getUsageMachine().getId());
-
-					usageResponseDTO.setCode(machineVO.getUsageMachine().getValueCode());
-
-					usageResponseDTO.setDescription(machineVO.getUsageMachine().getValueDescription());
-
-					machineResponseDTO.setUsageMachine(usageResponseDTO);
-				}
-
-				// =========================
-				// Machine No
-				// =========================
 
 				if (ObjectUtils.isNotEmpty(machineVO.getMachineNo())) {
 
@@ -7057,74 +7026,61 @@ public class DevelopServiceImpl implements DevelopService {
 
 				toolFixtureResponseDTO.setId(toolFixtureVO.getId());
 
+				toolFixtureResponseDTO.setUsageType(toolFixtureVO.getUsageType());
+
 				toolFixtureResponseDTO.setToolFixtureName(toolFixtureVO.getToolFixtureName());
 
 				toolFixtureResponseDTO.setActivityToolFixtureCost(toolFixtureVO.getActivityToolFixtureCost());
 
-				// =========================
-				// Usage Type
-				// =========================
-
-				if (ObjectUtils.isNotEmpty(toolFixtureVO.getUsageType())) {
-
-					ListOfValuesDetailsResponseDTO usageTypeResponseDTO = new ListOfValuesDetailsResponseDTO();
-
-					usageTypeResponseDTO.setId(toolFixtureVO.getUsageType().getId());
-
-					usageTypeResponseDTO.setCode(toolFixtureVO.getUsageType().getValueCode());
-
-					usageTypeResponseDTO.setDescription(toolFixtureVO.getUsageType().getValueDescription());
-
-					toolFixtureResponseDTO.setUsageType(usageTypeResponseDTO);
-				}
-
-				// =========================
-				// Tool Fixture No
-				// =========================
-
 				if (ObjectUtils.isNotEmpty(toolFixtureVO.getToolFixtureNo())) {
 
-					ToolMasterVO toolMasterVO = toolFixtureVO.getToolFixtureNo();
+					ToolMasterResponseMasterDTO preparedByDTO = new ToolMasterResponseMasterDTO();
+					preparedByDTO.setId(toolFixtureVO.getToolFixtureNo().getId());
+					preparedByDTO.setToolName(toolFixtureVO.getToolFixtureNo().getToolName());
+					preparedByDTO.setToolDescription(toolFixtureVO.getToolFixtureNo().getToolDescription());
+					toolFixtureResponseDTO.setToolFixtureNo(preparedByDTO);
 
-					ToolMasterResponseDTO toolMasterResponseDTO = new ToolMasterResponseDTO();
-
-					toolMasterResponseDTO.setId(toolMasterVO.getId());
-					toolMasterResponseDTO.setToolNo(toolMasterVO.getToolNo());
-					toolMasterResponseDTO.setToolDescription(toolMasterVO.getToolDescription());
-					toolMasterResponseDTO.setToolCategory(toolMasterVO.getToolCategory());
-					toolMasterResponseDTO.setDrawingNo(toolMasterVO.getDrawingNo());
-					toolMasterResponseDTO.setSerialNo(toolMasterVO.getSerialNo());
-					toolMasterResponseDTO.setManufacturedBy(toolMasterVO.getManufacturedBy());
-					toolMasterResponseDTO.setSection(toolMasterVO.getSection());
-					toolMasterResponseDTO.setStatus(toolMasterVO.getStatus());
-					toolMasterResponseDTO.setToolUsedFor(toolMasterVO.getToolUsedFor());
-					toolMasterResponseDTO.setToolCost(toolMasterVO.getToolCost());
-					toolMasterResponseDTO.setCavityNumber(toolMasterVO.getCavityNumber());
-					toolMasterResponseDTO.setRemarks(toolMasterVO.getRemarks());
-					toolMasterResponseDTO.setToolName(toolMasterVO.getToolName());
-					toolMasterResponseDTO.setImage(toolMasterVO.getImage());
-					toolMasterResponseDTO.setOrgId(toolMasterVO.getOrgId());
-					toolMasterResponseDTO.setFinancialYear(toolMasterVO.getFinancialYear());
-					toolMasterResponseDTO.setCreatedBy(toolMasterVO.getCreatedBy());
-					toolMasterResponseDTO.setCancelRemarks(toolMasterVO.getCancelRemarks());
-
-					toolMasterResponseDTO.setToolWeight(toolMasterVO.getToolWeight());
-					toolMasterResponseDTO.setToolFixtureSize(toolMasterVO.getToolFixtureSize());
-					toolMasterResponseDTO.setLifeOfTool(toolMasterVO.getLifeOfTool());
-					toolMasterResponseDTO.setReconditionFreq(toolMasterVO.getReconditionFreq());
-					toolMasterResponseDTO.setSetUpTimeInMinutes(toolMasterVO.getSetUpTimeInMinutes());
-					toolMasterResponseDTO.setCompletedLifeCycle(toolMasterVO.getCompletedLifeCycle());
-					toolMasterResponseDTO.setToolMadeOf(toolMasterVO.getToolMadeOf());
-					toolMasterResponseDTO.setTechnicalSpecification(toolMasterVO.getTechnicalSpecification());
-					toolMasterResponseDTO.setNoOfStokesCompleted(toolMasterVO.getNoOfStokesCompleted());
-					toolMasterResponseDTO.setStrokesCompletedAfterReconditioning(
-							toolMasterVO.getStrokesCompletedAfterReconditioning());
-					toolMasterResponseDTO.setReconditionedDate(toolMasterVO.getReconditionedDate());
-					toolMasterResponseDTO.setToolFixtureCost(toolMasterVO.getToolFixtureCost());
-					toolMasterResponseDTO
-							.setToolFixtureAmortizedRecovered(toolMasterVO.getToolFixtureAmortizedRecovered());
-
-					toolFixtureResponseDTO.setToolFixtureNo(toolMasterResponseDTO);
+//					ToolMasterVO toolMasterVO = toolFixtureVO.getToolFixtureNo();
+//
+//					ToolMasterResponseDTO toolMasterResponseDTO = new ToolMasterResponseDTO();
+//
+//					toolMasterResponseDTO.setId(toolMasterVO.getId());
+//					toolMasterResponseDTO.setToolNo(toolMasterVO.getToolNo());
+//					toolMasterResponseDTO.setToolDescription(toolMasterVO.getToolDescription());
+//					toolMasterResponseDTO.setToolCategory(toolMasterVO.getToolCategory());
+//					toolMasterResponseDTO.setDrawingNo(toolMasterVO.getDrawingNo());
+//					toolMasterResponseDTO.setSerialNo(toolMasterVO.getSerialNo());
+//					toolMasterResponseDTO.setManufacturedBy(toolMasterVO.getManufacturedBy());
+//					toolMasterResponseDTO.setSection(toolMasterVO.getSection());
+//					toolMasterResponseDTO.setStatus(toolMasterVO.getStatus());
+//					toolMasterResponseDTO.setToolUsedFor(toolMasterVO.getToolUsedFor());
+//					toolMasterResponseDTO.setToolCost(toolMasterVO.getToolCost());
+//					toolMasterResponseDTO.setCavityNumber(toolMasterVO.getCavityNumber());
+//					toolMasterResponseDTO.setRemarks(toolMasterVO.getRemarks());
+//					toolMasterResponseDTO.setToolName(toolMasterVO.getToolName());
+//					toolMasterResponseDTO.setImage(toolMasterVO.getImage());
+//					toolMasterResponseDTO.setOrgId(toolMasterVO.getOrgId());
+//					toolMasterResponseDTO.setFinancialYear(toolMasterVO.getFinancialYear());
+//					toolMasterResponseDTO.setCreatedBy(toolMasterVO.getCreatedBy());
+//					toolMasterResponseDTO.setCancelRemarks(toolMasterVO.getCancelRemarks());
+//
+//					toolMasterResponseDTO.setToolWeight(toolMasterVO.getToolWeight());
+//					toolMasterResponseDTO.setToolFixtureSize(toolMasterVO.getToolFixtureSize());
+//					toolMasterResponseDTO.setLifeOfTool(toolMasterVO.getLifeOfTool());
+//					toolMasterResponseDTO.setReconditionFreq(toolMasterVO.getReconditionFreq());
+//					toolMasterResponseDTO.setSetUpTimeInMinutes(toolMasterVO.getSetUpTimeInMinutes());
+//					toolMasterResponseDTO.setCompletedLifeCycle(toolMasterVO.getCompletedLifeCycle());
+//					toolMasterResponseDTO.setToolMadeOf(toolMasterVO.getToolMadeOf());
+//					toolMasterResponseDTO.setTechnicalSpecification(toolMasterVO.getTechnicalSpecification());
+//					toolMasterResponseDTO.setNoOfStokesCompleted(toolMasterVO.getNoOfStokesCompleted());
+//					toolMasterResponseDTO.setStrokesCompletedAfterReconditioning(
+//							toolMasterVO.getStrokesCompletedAfterReconditioning());
+//					toolMasterResponseDTO.setReconditionedDate(toolMasterVO.getReconditionedDate());
+//					toolMasterResponseDTO.setToolFixtureCost(toolMasterVO.getToolFixtureCost());
+//					toolMasterResponseDTO
+//							.setToolFixtureAmortizedRecovered(toolMasterVO.getToolFixtureAmortizedRecovered());
+//
+//					toolFixtureResponseDTO.setToolFixtureNo(toolMasterResponseDTO);
 
 				}
 
@@ -13763,5 +13719,80 @@ public class DevelopServiceImpl implements DevelopService {
 			return responseDTO;
 		}
 
+
+	@Override
+	public List<Map<String, Object>> getFgAndSfgItemDetailsProcessSheetComp(Long orgId, Long branch, String type) {
+		Set<Object[]> chType = processSheetCompRoutingRepo.getFgAndSfgItemDetailsProcessSheetComp(orgId, branch, type);
+		return getFgAndSfgItemDetailsProcessSheetComp(chType);
+	}
+
+	private List<Map<String, Object>> getFgAndSfgItemDetailsProcessSheetComp(Set<Object[]> chType) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] ch : chType) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("itemId", ch[0] != null ? ((Number) ch[0]).longValue() : null);
+			map.put("itemCode", ch[1] != null ? ch[1].toString() : "");
+			map.put("itemDescription", ch[2] != null ? ch[2].toString() : "");
+			map.put("drawingNo", ch[3] != null ? ch[3].toString() : "");
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getOperationDetailsProcessSheetComp(Long orgId) {
+		Set<Object[]> operationDetails = processSheetCompRoutingRepo.getOperationDetailsProcessSheetComp(orgId);
+		return getOperationDetailsProcessSheetComp(operationDetails);
+	}
+
+	private List<Map<String, Object>> getOperationDetailsProcessSheetComp(Set<Object[]> operationDetails) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] od : operationDetails) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("operationMasterBasicId", od[0] != null ? ((Number) od[0]).longValue() : null);
+			map.put("operationId", od[1] != null ? od[1].toString() : "");
+			map.put("description", od[2] != null ? od[2].toString() : "");
+			map.put("machineInstrumentNo", od[3] != null ? od[3].toString() : "");
+			map.put("machineInstrumentName", od[4] != null ? od[4].toString() : "");
+			map.put("hourlyRate", od[5] != null ? new BigDecimal(od[5].toString()) : BigDecimal.ZERO);
+			map.put("toolNo", od[6] != null ? od[6].toString() : "");
+			map.put("toolDescription", od[7] != null ? od[7].toString() : "");
+			map.put("toolFixtureCost", od[8] != null ? ((Number) od[8]).doubleValue() : null);
+
+			list.add(map);
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> getMachineDetailsProcessSheetComp(Long orgId, Long branch) {
+		Set<Object[]> operationDetails = processSheetCompRoutingRepo.getMachineDetailsProcessSheetComp(orgId, branch);
+		return getMachineDetailsProcessSheetComp(operationDetails);
+	}
+
+	private List<Map<String, Object>> getMachineDetailsProcessSheetComp(Set<Object[]> operationDetails) {
+
+		List<Map<String, Object>> list = new ArrayList<>();
+
+		for (Object[] od : operationDetails) {
+
+			Map<String, Object> map = new HashMap<>();
+			map.put("MachineId", od[0] != null ? ((Number) od[0]).longValue() : null);
+			map.put("machineInstrumentNo", od[1] != null ? od[1].toString() : "");
+			map.put("machineInstrumentName", od[2] != null ? od[2].toString() : "");
+			map.put("hourlyRate", od[3] != null ? new BigDecimal(od[3].toString()) : BigDecimal.ZERO);
+			list.add(map);
+		}
+
+		return list;
+	}
 
 }

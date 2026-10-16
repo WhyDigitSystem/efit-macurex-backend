@@ -15,59 +15,61 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MachineToolRectificationResponseDTO {
-	
-    private Long id;
 
-    private BranchResponseDTO branch;
-    
-   
+	private Long id;
 
-    private DepartmentResponseDTO department;
+	private BranchResponseDTO branch;
 
-    private String breakdownNo;
+	private DepartmentResponseDTO department;
 
-    private LocalDate breakdownDate;
+	private String breakdownNo;
 
-    private EmployeeMasterDetailsReponseDTO attendBy;
+	private LocalDate breakdownDate;
 
-    private String time;
+	private EmployeeMasterDetailsReponseDTO attendBy;
 
-    private String machineToolNo;
+	private String time;
 
-    private LocalDateTime rectificationTime;
+	private String machineToolNo;
 
-    private String description;
+	private LocalDateTime rectificationTime;
 
-    private String cause;
+	private String description;
 
-    private String maintenanceType;
+	private String cause;
 
-    private String actionTaken;
+	private String maintenanceType;
 
-    private String natureOfProblem;
+	private String actionTaken;
 
-    private EmployeeMasterDetailsReponseDTO carriedOutBy;
+	private String natureOfProblem;
 
-    private String timeTakenForRectification;
+	private EmployeeMasterDetailsReponseDTO carriedOutBy;
 
-    private String location;
+	private String timeTakenForRectification;
 
-    private String sparesUsed;
+	private String location;
 
-    private EmployeeMasterDetailsReponseDTO preparedBy;
+	private String sparesUsed;
 
-    private EmployeeMasterDetailsReponseDTO approvedBy;
+	private EmployeeMasterDetailsReponseDTO preparedBy;
 
-    private String remarks;
+	private EmployeeMasterDetailsReponseDTO approvedBy;
 
-    private Long orgId;
+	private String remarks;
 
-    private String financialYear;
+	private Long orgId;
 
-    private String active;
+	private String financialYear;
 
-    private String cancelRemarks;
+	private String active;
 
-    private String createdBy;
+	private String cancelRemarks;
+
+	private String createdBy;
+
+	private String docId;
+
+	private LocalDate docDate;
 
 }

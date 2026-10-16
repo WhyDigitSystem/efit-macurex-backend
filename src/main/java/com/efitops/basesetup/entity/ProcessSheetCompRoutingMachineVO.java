@@ -34,10 +34,9 @@ public class ProcessSheetCompRoutingMachineVO {
 	@SequenceGenerator(name = "process_sheet_comp_routing_machine_detailgen", sequenceName = "process_sheet_comp_routing_machine_detailseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "process_sheet_comp_routing_machine_detail_id")
 	private Long id;
-	
-	 @ManyToOne
-	 @JoinColumn(name = "usage_machine")
-	 private ListOfValuesDetailsVO usageMachine;
+
+	 @Column(name = "usage_machine")
+	 private String usageMachine;
 	 
 	  @ManyToOne
 	  @JoinColumn(name = "machine_no")

@@ -419,7 +419,7 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				ScrapDetailsVO detailsVO = new ScrapDetailsVO();
 				if (d.getScrap() != null && d.getScrap() != 0) {
 
-					ListOfValuesDetailsVO item = listOfValuesDetailsRepo.findById(d.getScrap())
+					ItemMasterVO item = itemMasterRepo.findById(d.getScrap())
 							.orElseThrow(() -> new ApplicationException("Scrap Not Found"));
 
 					detailsVO.setScrap(item);
@@ -523,6 +523,8 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				rDto.setMachineHourRate(d.getMachineHourRate());
 				rDto.setLabourHourRate(d.getLabourHourRate());
 				rDto.setOperationName(d.getOperationName());
+				rDto.setToTimeMins(d.getToTimeMins());
+				rDto.setLunchTimeMins(d.getLunchTimeMins());
 				rDto.setFrTimeHrs(d.getFrTimeHrs());
 				rDto.setFrTimeMins(d.getFrTimeMins());
 				rDto.setToTimeHrs(d.getToTimeHrs());
@@ -643,10 +645,12 @@ public class ProductionEntryServiceImpl implements ProductionEntryService {
 				ScrapDetailsResponseDTO rDto = new ScrapDetailsResponseDTO();
 				rDto.setId(d.getId());
 				if (d.getScrap() != null) {
-					ListOfValuesDetailsResponseDTO lovDto = new ListOfValuesDetailsResponseDTO();
-					lovDto.setId(d.getScrap().getId());
-					lovDto.setDescription(d.getScrap().getValueDescription());
-					rDto.setScrap(lovDto);
+
+					ItemMasterDetailsResponseImportDTO itemDTO = new ItemMasterDetailsResponseImportDTO();
+					itemDTO.setId(d.getScrap().getId());
+					itemDTO.setItemCode(d.getScrap().getItemCode());
+					itemDTO.setItemDescription(d.getScrap().getItemDescription());
+					rDto.setScrap(itemDTO);
 				}
 				rDto.setWeight(d.getWeight());
 				rDto.setQty(d.getQty());

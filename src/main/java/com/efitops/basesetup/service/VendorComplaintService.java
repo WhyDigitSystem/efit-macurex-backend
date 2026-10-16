@@ -259,7 +259,7 @@ public interface VendorComplaintService {
 
 	String getMachineToolsScrapNoteDocId(Long orgId, String financialYear) throws ApplicationException;
 
-	Map<String, Object> getMachineToolsScrapNoteById(Long id) throws ApplicationException;
+	MachineToolsScrapNoteResponseDTO getMachineToolsScrapNoteById(Long id) throws ApplicationException;
 
 
 	List<MachineToolsScrapNoteResponseDTO> getMachineToolsScrapNoteByOrgId(Long orgId, Long branch)

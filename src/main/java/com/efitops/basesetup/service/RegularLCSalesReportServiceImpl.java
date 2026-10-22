@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.DocketInvoiceRepo;
+import com.efitops.basesetup.repository.PhysicalStockReConcilationRepo;
+import com.efitops.basesetup.repository.SalesContractRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
 import com.efitops.basesetup.repository.SalesRejectionInvoiceRepo;
 
@@ -27,6 +29,12 @@ public class RegularLCSalesReportServiceImpl implements RegularLCSalesReportServ
 	
 	@Autowired
 	private DocketInvoiceRepo docketInvoiceRepo;
+	
+	@Autowired
+	private SalesContractRepo salesContractRepo;
+	
+	@Autowired
+	private PhysicalStockReConcilationRepo physicalStockReConcilationRepo;
 	
 	@Override
 	public Map<String, Object> getRegularLCSalesReport(Long belongsTo, Long branch, Long orgId, String fromDate,
@@ -283,4 +291,68 @@ public class RegularLCSalesReportServiceImpl implements RegularLCSalesReportServ
 
 	    return responseObjectsMap;
 	}
+	
+//	sales contract approval report
+	
+	@Override
+	public Map<String, Object> getSalesContractApprovalReport(
+	        String frdt, String endt, Long branch, Long orgId) throws ApplicationException {
+
+	    List<Object[]> salesContractList = salesContractRepo
+	            .getSalesContractApprovalReport(frdt, endt, branch, orgId);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : salesContractList) {
+	        Map<String, Object> reportMap = new HashMap<>();
+
+	        reportMap.put("ORDRECDNO", obj[0]);
+	        reportMap.put("ORDRECDDT", obj[1]);
+	        reportMap.put("partyid", obj[2]);
+	        reportMap.put("partyname", obj[3]);
+	        reportMap.put("approval", obj[4]);
+	        reportMap.put("schagrbasicid", obj[5]);
+	        reportMap.put("note", obj[6]);
+
+	        reportList.add(reportMap);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("salesContractApprovalReport", reportList);
+
+	    return responseObjectsMap;
+	}
+	
+//	physical stock reconcilation
+	
+	@Override
+	public Map<String, Object> getPhysicalStockReconciliationReport(
+	        Long orgId, Long branch, String fromDate, String toDate)
+	        throws ApplicationException {
+
+	    List<Object[]> physicalStockList = physicalStockReConcilationRepo
+	            .getPhysicalStockReconciliationReport(
+	                    orgId, branch, fromDate, toDate);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : physicalStockList) {
+	        Map<String, Object> reportMap = new HashMap<>();
+
+	        reportMap.put("phystheadid", obj[0]);
+	        reportMap.put("reconid", obj[1]);
+	        reportMap.put("recondt", obj[2]);
+	        reportMap.put("appprod", obj[3]);
+	        reportMap.put("ttime", obj[4]);
+	        reportMap.put("PREBY", obj[5]);
+
+	        reportList.add(reportMap);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("physicalStockReconciliationReport", reportList);
+
+	    return responseObjectsMap;
+	}
+	
 }

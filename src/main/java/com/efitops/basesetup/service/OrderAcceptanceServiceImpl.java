@@ -445,84 +445,114 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 
 	}
 
-	@Value("${order.upload.path}")
-	private String uploadPath;
 
-	private void saveAttachments(MultipartFile[] files, OrderAcceptanceVO orderAcceptanceVO)
-			throws ApplicationException {
+@Value("${order.upload.path}")
+private String uploadPath;
 
-		if (files == null || files.length == 0) {
-			return;
-		}
+@Value("${server.base-url}")
+private String serverBaseUrl;
 
-		try {
+private void saveAttachments(
+        MultipartFile[] files,
+        OrderAcceptanceVO orderAcceptanceVO) throws ApplicationException {
 
-			Path orderFolder = Paths.get(uploadPath, "orderAcceptance", orderAcceptanceVO.getId().toString());
+    if (files == null || files.length == 0) {
+        return;
+    }
 
-			createDirectory(orderFolder);
+    try {
+        Path baseDir = Paths.get(uploadPath)
+                .toAbsolutePath()
+                .normalize();
 
-			List<OrderAcceptanceFileUploadDetailsVO> attachmentList = new ArrayList<>();
+        Path orderFolder = baseDir
+                .resolve(orderAcceptanceVO.getId().toString())
+                .normalize();
 
-			for (MultipartFile file : files) {
+        Files.createDirectories(orderFolder);
 
-				if (file == null || file.isEmpty()) {
-					continue;
-				}
+        List<OrderAcceptanceFileUploadDetailsVO> attachmentList =
+                new ArrayList<>();
 
-				String originalName = file.getOriginalFilename();
+        for (MultipartFile file : files) {
+            if (file == null || file.isEmpty()) {
+                continue;
+            }
 
-				if (originalName == null) {
-					originalName = "file";
-				}
+            String originalName = file.getOriginalFilename();
 
-				originalName = originalName.replaceAll("\\s+", "_");
+            if (originalName == null || originalName.trim().isEmpty()) {
+                originalName = "file";
+            }
 
-				String extension = "";
+            // Remove any client-supplied directory path
+            originalName = originalName.replace("\\", "/");
+            originalName = originalName.substring(
+                    originalName.lastIndexOf("/") + 1);
 
-				if (originalName.contains(".")) {
-					extension = originalName.substring(originalName.lastIndexOf("."));
-					originalName = originalName.substring(0, originalName.lastIndexOf("."));
-				}
+            String safeName = originalName.replaceAll("\\s+", "_");
 
-				String fileName = originalName + "_" + orderAcceptanceVO.getId() + extension;
+            String extension = "";
+            String nameWithoutExtension = safeName;
+            int dotIndex = safeName.lastIndexOf(".");
 
-				Path filePath = orderFolder.resolve(fileName);
+            if (dotIndex > 0) {
+                extension = safeName.substring(dotIndex);
+                nameWithoutExtension = safeName.substring(0, dotIndex);
+            }
 
-				try (InputStream inputStream = file.getInputStream()) {
-					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-				}
+            String fileName = nameWithoutExtension
+                    + "_" + orderAcceptanceVO.getId()
+                    + extension;
 
-				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-						.path("/api/orderAcceptance/viewFile/").toUriString();
+            Path filePath = orderFolder.resolve(fileName).normalize();
 
-				String relativePath = uploadPath.replace("\\", "/");
+            if (!filePath.startsWith(orderFolder)) {
+                throw new ApplicationException("Invalid file path");
+            }
 
-				relativePath = filePath.toString().replace("\\", "/").replace(relativePath + "/", "");
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(
+                        inputStream,
+                        filePath,
+                        StandardCopyOption.REPLACE_EXISTING);
+            }
 
-				String publicUrl = baseUrl + relativePath;
+            String relativePath = baseDir.relativize(filePath)
+                    .toString()
+                    .replace("\\", "/");
 
-				OrderAcceptanceFileUploadDetailsVO attachment = new OrderAcceptanceFileUploadDetailsVO();
+            String publicUrl = serverBaseUrl
+                    + "/api/orderAcceptance/viewFile/"
+                    + relativePath;
 
-				attachment.setOrderAcceptanceVO(orderAcceptanceVO);
-				attachment.setName(file.getOriginalFilename());
-				attachment.setFileName(fileName);
-				attachment.setFilePath(publicUrl);
-				attachment.setFileSize(file.getSize());
-				attachment.setContentType(file.getContentType());
-				attachment.setUploadOn(LocalDateTime.now());
+            OrderAcceptanceFileUploadDetailsVO attachment =
+                    new OrderAcceptanceFileUploadDetailsVO();
 
-				attachmentList.add(attachment);
-			}
+            attachment.setOrderAcceptanceVO(orderAcceptanceVO);
+            attachment.setName(originalName);
+            attachment.setFileName(fileName);
+            attachment.setFilePath(publicUrl);
+            attachment.setFileSize(file.getSize());
+            attachment.setContentType(file.getContentType());
+            attachment.setUploadOn(LocalDateTime.now());
 
-			List<OrderAcceptanceFileUploadDetailsVO> saved = orderAcceptanceFileUploadDetailsRepo
-					.saveAll(attachmentList);
+            attachmentList.add(attachment);
+        }
 
-			orderAcceptanceVO.setOrderAcceptanceFileUploadDetailsVO(saved);
+        if (!attachmentList.isEmpty()) {
+            List<OrderAcceptanceFileUploadDetailsVO> saved =
+                    orderAcceptanceFileUploadDetailsRepo.saveAll(attachmentList);
 
-		} catch (IOException e) {
-			throw new ApplicationException("File Upload Failed : " + e.getMessage());
-		}
-	}
+            orderAcceptanceVO.setOrderAcceptanceFileUploadDetailsVO(saved);
+        }
+
+    } catch (IOException e) {
+        throw new ApplicationException(
+                "File Upload Failed: " + e.getMessage());
+    }
+}
+
 
 	private void createDirectory(Path path) throws IOException {
 
@@ -530,49 +560,63 @@ public class OrderAcceptanceServiceImpl implements OrderAcceptanceService {
 			Files.createDirectories(path);
 		}
 	}
+	
 
-	@Override
-	public ResponseEntity<byte[]> viewOrderAcceptanceFile(HttpServletRequest request) throws IOException {
+@Override
+public ResponseEntity<byte[]> viewOrderAcceptanceFile(
+        HttpServletRequest request) throws IOException {
 
-		return serveFile(request, "/api/orderAcceptance/viewFile/", uploadPath);
-	}
+    return serveFile(
+            request,
+            "/api/orderAcceptance/viewFile/",
+            uploadPath);
+}
 
-	private ResponseEntity<byte[]> serveFile(HttpServletRequest request, String apiPrefix, String uploadBasePath)
-			throws IOException {
+private ResponseEntity<byte[]> serveFile(
+        HttpServletRequest request,
+        String apiPrefix,
+        String uploadBasePath) throws IOException {
 
-		String uri = request.getRequestURI();
+    String uri = request.getRequestURI();
 
-		String relativePath = uri.replace(apiPrefix, "");
+    if (!uri.startsWith(apiPrefix)) {
+        return ResponseEntity.badRequest().build();
+    }
 
-		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+    String relativePath = URLDecoder.decode(
+            uri.substring(apiPrefix.length()),
+            StandardCharsets.UTF_8);
 
-		if (relativePath.startsWith("uploads/")) {
-			relativePath = relativePath.substring("uploads/".length());
-		}
+    Path baseDir = Paths.get(uploadBasePath)
+            .toAbsolutePath()
+            .normalize();
 
-		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+    Path filePath = baseDir.resolve(relativePath).normalize();
 
-		Path filePath = baseDir.resolve(relativePath).normalize();
+    if (!filePath.startsWith(baseDir)) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 
-		if (!filePath.startsWith(baseDir)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
+    if (!Files.isRegularFile(filePath)) {
+        return ResponseEntity.notFound().build();
+    }
 
-		if (!Files.exists(filePath)) {
-			return ResponseEntity.notFound().build();
-		}
+    String contentType = Files.probeContentType(filePath);
 
-		String contentType = Files.probeContentType(filePath);
+    if (contentType == null) {
+        contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+    }
 
-		if (contentType == null) {
-			contentType = "application/octet-stream";
-		}
+    byte[] data = Files.readAllBytes(filePath);
 
-		byte[] data = Files.readAllBytes(filePath);
+    return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType(contentType))
+            .header(
+                    "Content-Disposition",
+                    "inline; filename=\"" + filePath.getFileName() + "\"")
+            .body(data);
+}
 
-		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
-				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(data);
-	}
 
 	private OrderAcceptanceResponseDTO buildOrderAcceptanceResponse(OrderAcceptanceVO orderAcceptanceVO) {
 

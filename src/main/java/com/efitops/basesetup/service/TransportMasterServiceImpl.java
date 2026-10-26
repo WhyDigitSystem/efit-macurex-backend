@@ -1,9 +1,10 @@
 package com.efitops.basesetup.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,8 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -23,6 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -378,51 +382,79 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 	}
 
 	// ================= IMAGE UPLOAD =================
+
 	@Value("${customer.complaint.upload.path}")
 	private String uploadPath;
 
-	private void saveImages(MultipartFile[] images, CustomerComplaintEntryVO customerComplaintEntryVO)
-			throws ApplicationException {
+	@Value("${server.base-url}")
+	private String serverBaseUrl;
+
+	private void saveImages(MultipartFile[] images, CustomerComplaintEntryVO complaintVO) throws ApplicationException {
 
 		if (images == null || images.length == 0) {
 			return;
 		}
 
 		try {
+			Path baseDir = Paths.get(uploadPath).toAbsolutePath().normalize();
 
-			File folder = new File(uploadPath);
+			Path complaintFolder = baseDir.resolve(complaintVO.getId().toString()).normalize();
 
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
+			Files.createDirectories(complaintFolder);
 
-			List<String> imageNames = new ArrayList<>();
+			List<String> imageUrls = new ArrayList<>();
 
 			for (MultipartFile image : images) {
-
 				if (image == null || image.isEmpty()) {
 					continue;
 				}
 
-				String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
+				String originalName = image.getOriginalFilename();
 
-				Path path = Paths.get(uploadPath, fileName);
-
-				try (InputStream inputStream = image.getInputStream()) {
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+				if (originalName == null || originalName.trim().isEmpty()) {
+					originalName = "image";
 				}
 
-				imageNames.add(fileName);
+				originalName = originalName.replace("\\", "/");
+				originalName = originalName.substring(originalName.lastIndexOf("/") + 1);
+
+				String safeName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+				String nameWithoutExtension = safeName;
+				int dotIndex = safeName.lastIndexOf(".");
+
+				if (dotIndex > 0) {
+					extension = safeName.substring(dotIndex);
+					nameWithoutExtension = safeName.substring(0, dotIndex);
+				}
+
+				String fileName = nameWithoutExtension + "_" + complaintVO.getId() + extension;
+
+				Path filePath = complaintFolder.resolve(fileName).normalize();
+
+				if (!filePath.startsWith(complaintFolder)) {
+					throw new ApplicationException("Invalid file path");
+				}
+
+				try (InputStream inputStream = image.getInputStream()) {
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				String relativePath = baseDir.relativize(filePath).toString().replace("\\", "/");
+
+				String imageUrl = serverBaseUrl + "/api/customerComplaintEntry/viewFile/" + relativePath;
+
+				imageUrls.add(imageUrl);
 			}
 
-			// Save all image names as comma-separated values
-			customerComplaintEntryVO.setImage(String.join(",", imageNames));
-
-			customerComplaintRepo.save(customerComplaintEntryVO);
+			if (!imageUrls.isEmpty()) {
+				complaintVO.setImage(String.join(",", imageUrls));
+				customerComplaintRepo.save(complaintVO);
+			}
 
 		} catch (IOException e) {
-
-			throw new ApplicationException("Image Upload Failed : " + e.getMessage());
+			throw new ApplicationException("Image Upload Failed: " + e.getMessage());
 		}
 	}
 
@@ -453,6 +485,47 @@ public class TransportMasterServiceImpl implements TransportMasterService {
 //		
 //		return customerComplaintResponse(responseList);
 //	}
+
+	@Override
+	public ResponseEntity<byte[]> viewCustomerComplaintImage(HttpServletRequest request) throws IOException {
+
+		return serveFile(request, "/api/customerComplaintEntry/viewFile/", uploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveFile(HttpServletRequest request, String apiPrefix, String uploadBasePath)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+
+		if (!uri.startsWith(apiPrefix)) {
+			return ResponseEntity.badRequest().build();
+		}
+
+		String relativePath = URLDecoder.decode(uri.substring(apiPrefix.length()), StandardCharsets.UTF_8);
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.isRegularFile(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+			contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+		}
+
+		byte[] data = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header("Content-Disposition", "inline; filename=\"" + filePath.getFileName() + "\"").body(data);
+	}
 
 	@Override
 	public List<CustomerComplaintResponseDTO> getCustomerComplaintByOrgId(Long orgId, Long branch)

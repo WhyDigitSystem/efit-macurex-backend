@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -29,7 +29,6 @@ import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
 import com.efitops.basesetup.ResponseDTO.SalesContractResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
-import com.efitops.basesetup.dto.InprocessInspectionDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
 import com.efitops.basesetup.dto.SalesContractDTO;
 import com.efitops.basesetup.service.DhineshService;
@@ -321,6 +320,31 @@ public class DhineshController extends BaseController {
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 		return ResponseEntity.ok().body(responseDTO);
 	}
+	
+
+@GetMapping("/SalesContract/viewFile/**")
+public ResponseEntity<byte[]> viewSalesContractFile(
+        HttpServletRequest request) {
+
+    String methodName = "viewSalesContractFile()";
+
+    LOGGER.debug(
+            CommonConstant.STARTING_METHOD,
+            methodName);
+
+    try {
+        return dhineshService.viewSalesContractFile(request);
+
+    } catch (Exception e) {
+        LOGGER.error(
+                UserConstants.ERROR_MSG_METHOD_NAME,
+                methodName,
+                e.getMessage());
+
+        return ResponseEntity.status(500).build();
+    }
+}
+
 	
 	
 }

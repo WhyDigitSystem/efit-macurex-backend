@@ -608,5 +608,54 @@ public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructi
 	        @Param("partyId") Long partyId,
 	        @Param("pprm") Long pprm,
 	        @Param("tdprm") String tdprm);
+	
+	  @Query(value = """
+		        SELECT
+		            O.doc_id AS SO,
+		            O.doc_date AS SD,
+		            DB.doc_id AS DESPATCH_NO,
+		            DB.doc_date AS DESPATCH_DATE,
+		            O.customer_purchase_order_no AS CUSTPONO,
+		            O.customer_purchase_order_date AS CUSTPODT,
+		            I.item_id AS ITEMID,
+		            I.item_description AS ITEMDESC,
+		            U.unit_id AS UNITID,
+		            DD.desc_qty AS RECQTY,
+		            OD.order_rate AS RATE,
+		            P.customer_name AS partyname,
+		            DB.despatch_basic_id AS DESPBASICID
+		        FROM despatch_detail DD
+		        INNER JOIN despatch_basic DB
+		            ON DB.despatch_basic_id = DD.despatch_basic_id
+		        INNER JOIN customer_header P
+		            ON DB.custumer = P.customer_id
+		        INNER JOIN order_acceptance_basic O
+		            ON O.customer = DB.custumer
+		        INNER JOIN order_acceptance_detail OD
+		            ON OD.order_acceptance_basic_id = O.order_acceptance_basic_id
+		            AND OD.item = DD.item
+		        INNER JOIN item I
+		            ON I.item_id = DD.item
+		        LEFT JOIN unitmaster U
+		            ON U.unitmaster_id = OD.unit
+		        WHERE DB.doc_date BETWEEN STR_TO_DATE(:fromdate, '%Y-%m-%d')
+		                              AND STR_TO_DATE(:todate, '%Y-%m-%d')
+		          AND DB.org_id = :orgId
+		          AND DB.branch = :branch
+		          AND O.org_id = :orgId
+		          AND O.branch = :branch
+		          AND (P.belongs_to = :division OR :division = 'ALL')
+		        ORDER BY P.customer_name, DB.doc_id
+		        """, nativeQuery = true)
+		    List<Object[]> getDespatchInstructionReport(
+		            @Param("fromdate") String fromdate,
+		            @Param("todate") String todate,
+		            @Param("division") String division,
+		            @Param("orgId") Long orgId,
+		            @Param("branch") Long branch);
+		}
+	
+	
+	
 
-}
+

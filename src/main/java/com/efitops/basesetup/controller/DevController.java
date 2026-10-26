@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,19 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.efitops.basesetup.ResponseDTO.DespatchInstructionResponseDTO;
-import com.efitops.basesetup.ResponseDTO.DocketInvoiceResponseDTO;
-import com.efitops.basesetup.ResponseDTO.SalesContractAmdResponseDTO;
 import com.efitops.basesetup.ResponseDTO.StockTransferChallanResponseDTO;
 import com.efitops.basesetup.common.CommonConstant;
 import com.efitops.basesetup.common.UserConstants;
 import com.efitops.basesetup.dto.CustomerComplaintDTO;
 import com.efitops.basesetup.dto.CustomerComplaintResponseDTO;
 import com.efitops.basesetup.dto.DespatchInstructionDTO;
-import com.efitops.basesetup.dto.DocketInvoiceDTO;
 import com.efitops.basesetup.dto.ResponseDTO;
-import com.efitops.basesetup.dto.SalesContractAmendmentDTO;
 import com.efitops.basesetup.dto.StockTransferChallanDTO;
-import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.service.TransportMasterService;
 
 @CrossOrigin
@@ -177,6 +174,34 @@ public class DevController extends BaseController {
 		return ResponseEntity.ok(responseDTO);
 	}
 
+	@GetMapping("/customerComplaintEntry/viewFile/**")
+	public ResponseEntity<byte[]> viewCustomerComplaintImage(
+	        HttpServletRequest request) {
+
+	    String methodName = "viewCustomerComplaintImage()";
+
+	    LOGGER.debug(
+	            CommonConstant.STARTING_METHOD,
+	            methodName);
+
+	    try {
+
+	        return transportMasterService
+	                .viewCustomerComplaintImage(request);
+
+	    } catch (Exception e) {
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                e.getMessage());
+
+	        return ResponseEntity
+	                .status(500)
+	                .build();
+	    }
+	}
+	
 	@GetMapping("/getCustomerComplaintItemDetails")
 	public ResponseEntity<ResponseDTO> getCustomerComplaintItemDetails(@RequestParam Long orgId,
 			@RequestParam Long branch) {

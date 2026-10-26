@@ -509,4 +509,198 @@ public interface SalesRejectionInvoiceRepo extends JpaRepository<SalesRejectionI
 			""", nativeQuery = true)
 	List<Object[]> getCustomerDetailsSales(@Param("fromDate") String fromDate, @Param("toDate") String toDate,
 			@Param("orgId") Long orgId, @Param("branch") Long branch);
+	
+	
+	
+	
+	
+	
+	
+	//sneha
+	
+
+	
+	
+	@Query(value = """
+	        SELECT
+	            c.customer_code AS partyid,
+	            c.customer_name AS partyname,
+	            SUM(COALESCE(d.amount_in_rs, 0)) AS basic,
+	            SUM(COALESCE(d.igst_amount, 0)) AS IGST,
+	            SUM(COALESCE(d.sgst_amount, 0)) AS SGST,
+	            SUM(COALESCE(d.cgst_amount, 0)) AS CGST
+	        FROM sales_rejection_invoice_basic h
+	        INNER JOIN sales_rejection_invoice_detail d
+	            ON d.sales_rejection_invoice_basic_id =
+	               h.sales_rejection_invoice_basic_id
+	        INNER JOIN customer_header c
+	            ON c.customer_id = h.customer
+	        LEFT JOIN item i
+	            ON i.item_id = d.item
+	        LEFT JOIN unitmaster u
+	            ON u.unitmaster_id = d.unit
+	        WHERE COALESCE(h.cancel, 0) = 0
+	          AND h.doc_date BETWEEN STR_TO_DATE(?1, '%Y-%m-%d')
+	          AND h.belongs_to = ?3
+	        GROUP BY
+	            c.customer_code,
+	            c.customer_name
+	        ORDER BY
+	            c.customer_name,
+	            c.customer_code
+	        """, nativeQuery = true)
+	List<Object[]> getRegularSaleCustomerWiseCumlReport(
+	        String fromdate,
+	        String todate,
+	        Long orgId);
+	
+	
+	  @Query(value = """
+	            SELECT
+	                h.doc_id AS DOCID,
+	                h.doc_date AS DOCDT,
+	                d.sales_order_contract_no AS OANO,
+	                c.customer_code AS PARTYID,
+	                c.customer_name AS PARTYNAME,
+	                i.item_id AS ITEMID,
+	                i.item_description AS ITEMDESC,
+	                d.customer_part_no AS CPART,
+	                u.unit_id AS UNITID,
+	                d.despatch_qty AS QTY,
+
+	                CASE
+	                    WHEN COALESCE(d.new_rate, 0) = 0
+	                        THEN d.rate_in_selected_currency
+	                    ELSE d.new_rate
+	                END AS RATE,
+
+	                h.total_ass_val AS AMTINRS,
+	                h.net_amount AS VATVAL,
+
+	                SUM(COALESCE(d.igst_amount, 0)) AS IGST,
+	                SUM(COALESCE(d.sgst_amount, 0)) AS SGST,
+	                SUM(COALESCE(d.cgst_amount, 0)) AS CGST
+
+	            FROM sales_rejection_invoice_basic h
+
+	            INNER JOIN sales_rejection_invoice_detail d
+	                ON h.sales_rejection_invoice_basic_id =
+	                   d.sales_rejection_invoice_basic_id
+
+	            INNER JOIN customer_header c
+	                ON c.customer_id = h.customer
+
+	            INNER JOIN item i
+	                ON i.item_id = d.item
+
+	            LEFT JOIN unitmaster u
+	                ON u.unitmaster_id = d.unit
+
+	            WHERE h.doc_date BETWEEN STR_TO_DATE(:fromdate, '%Y-%m-%d')
+	                                  AND STR_TO_DATE(:todate, '%Y-%m-%d')
+
+	              AND h.org_id = :orgId
+	              AND h.branch = :branch
+
+	              AND c.customer_name NOT LIKE 'BOSCH%'
+	              AND c.customer_name NOT LIKE 'FOUNDATION%'
+	              AND c.customer_name NOT LIKE 'ROBERT%'
+	              AND c.customer_name NOT LIKE 'SARASWATHI%'
+	              AND c.customer_name NOT LIKE 'ENGINEERING%'
+
+	              AND (h.doc_type IS NULL OR h.doc_type = 'INVOICE')
+
+	            GROUP BY
+	                h.doc_id,
+	                h.doc_date,
+	                d.sales_order_contract_no,
+	                c.customer_code,
+	                c.customer_name,
+	                i.item_id,
+	                i.item_description,
+	                d.customer_part_no,
+	                u.unit_id,
+	                d.despatch_qty,
+	                d.new_rate,
+	                d.rate_in_selected_currency,
+	                h.total_ass_val,
+	                h.net_amount
+
+	            ORDER BY
+	                c.customer_code,
+	                c.customer_name,
+	                h.doc_id
+	            """, nativeQuery = true)
+	    List<Object[]> getSalesRegisterAppliancesReport(
+	            @Param("fromdate") String fromdate,
+	            @Param("todate") String todate,
+	            @Param("orgId") Long orgId,
+	            @Param("branch") Long branch);
+	    
+	    //getSalesRegisterAppliancesReportMultiselectquery
+	    
+	    @Query(value = """
+	            SELECT
+	                p.customer_id AS id,
+	                p.customer_name AS name
+	            FROM customer_header p
+	            INNER JOIN listofvaluesdetails lov
+	                ON lov.listofvaluesdetails_id = p.customer_category
+	            WHERE lov.value_description = 'Customer'
+	              AND p.org_id = :orgId
+	              AND p.branch = :branch
+	              AND p.customer_name NOT LIKE 'BOSCH%'
+	              AND p.customer_name NOT LIKE 'MOTOR%'
+	              AND p.customer_name NOT LIKE 'SHASH%'
+	              AND p.customer_name NOT LIKE 'ENGINEE%'
+	              AND p.customer_name NOT LIKE 'J.L%'
+	            ORDER BY p.customer_name
+	            """, nativeQuery = true)
+	    List<Object[]> getCustomerSalesRegisterAppliancesReport(
+	            @Param("orgId") Long orgId,
+	            @Param("branch") Long branch);
+	    
+	    
+	  //salesRegisterCustomerBosch
+	    
+	    @Query(value = """
+	    	    SELECT
+	    	        IVB.doc_id AS DOCID,
+	    	        IVB.doc_date AS DOCDT,
+	    	        IVD.sales_order_contract_no AS OANO,
+	    	        PM.customer_code AS PARTYID,
+	    	        PM.customer_name AS PARTYNAME,
+	    	        IM.item_code AS ITEMID,
+	    	        IM.item_description AS ITEMDESC,
+	    	        UM.unit_id AS UNITID,
+	    	        IVD.despatch_qty AS QTY,
+	    	        IF(
+	    	            COALESCE(IVD.new_rate, 0) = 0,
+	    	            IVD.rate_in_selected_currency,
+	    	            IVD.new_rate
+	    	        ) AS RATE,
+	    	        IVD.amount_in_rs AS amtinrs,
+	    	        IVD.cgst_amount AS CGSTVAL,
+	    	        IVD.sgst_amount AS SGSTVAL,
+	    	        IVD.igst_amount AS IGSTVAL
+	    	    FROM sales_rejection_invoice_basic IVB
+	    	    JOIN sales_rejection_invoice_detail IVD
+	    	        ON IVB.sales_rejection_invoice_basic_id =
+	    	           IVD.sales_rejection_invoice_basic_id
+	    	    LEFT JOIN customer_header PM
+	    	        ON PM.customer_id = IVB.customer
+	    	    LEFT JOIN item IM
+	    	        ON IM.item_id = IVD.item
+	    	    LEFT JOIN unitmaster UM
+	    	        ON UM.unitmaster_id = IVD.unit
+	    	    WHERE IVB.cancel = b'0'
+	    	      AND IVB.doc_date BETWEEN :fromdate AND :todate
+	    	      AND LOWER(IVB.narration) = 'sales rejection invoice'
+	    	    ORDER BY PM.customer_name, IM.item_description
+	    	    """, nativeQuery = true)
+	    	List<Object[]> getsalesRegisterCustomerBosch(
+	    	    @Param("fromdate") String fromdate,
+	    	    @Param("todate") String todate);
+
+	
 }

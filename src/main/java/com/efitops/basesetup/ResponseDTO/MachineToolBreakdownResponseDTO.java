@@ -17,6 +17,11 @@ public class MachineToolBreakdownResponseDTO {
 
 	private Long id;
 
+	private String docId;
+
+	private LocalDate docDate;
+
+	
 	private BranchResponseDTO branch;
 
 	private DepartmentResponseDTO department;

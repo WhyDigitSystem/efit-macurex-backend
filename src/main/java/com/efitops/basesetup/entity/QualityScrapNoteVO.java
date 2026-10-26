@@ -51,7 +51,7 @@ public class QualityScrapNoteVO {
 	private LocalDate docDate = LocalDate .now();
 	
 	@Column(name = "time")
-	private LocalTime time;
+	private String time;
 	
 	@ManyToOne
 	@JoinColumn(name = "belongs_to")

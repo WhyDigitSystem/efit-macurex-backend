@@ -39,25 +39,25 @@ public class FGTransferSlipDetailsVO {
 	@JoinColumn(name = "unit")
 	private UnitMasterVO unit;
 
-	@Column(name = "bom_qty", precision = 10, scale = 2)
+	@Column(name = "bom_qty", precision = 15, scale = 2)
 	private BigDecimal bomQty;
 
-	@Column(name = "available_stock", precision = 10, scale = 2)
+	@Column(name = "available_stock", precision = 15, scale = 2)
 	private BigDecimal availableStock;
 
-	@Column(name = "consumption_as_per_bom", precision = 10, scale = 2)
+	@Column(name = "consumption_as_per_bom", precision = 15, scale = 2)
 	private BigDecimal consumptionAsPerBom;
 
-	@Column(name = "wastage_qty", precision = 10, scale = 2)
+	@Column(name = "wastage_qty", precision = 15, scale = 2)
 	private BigDecimal wastageQty;
 
-	@Column(name = "consumed_qty", precision = 10, scale = 2)
+	@Column(name = "consumed_qty", precision = 15, scale = 2)
 	private BigDecimal consumedQty;
 
-	@Column(name = "rate", precision = 10, scale = 2)
+	@Column(name = "rate", precision = 15, scale = 2)
 	private BigDecimal rate;
 
-	@Column(name = "value", precision = 10, scale = 2)
+	@Column(name = "value", precision = 15, scale = 2)
 	private BigDecimal value;
 
 	@ManyToOne
@@ -65,14 +65,14 @@ public class FGTransferSlipDetailsVO {
 	private ItemMasterVO scrap;
 	
 
-	@Column(name = "scrap_qty", precision = 10, scale = 2)
+	@Column(name = "scrap_qty", precision = 15, scale = 2)
 	private BigDecimal scrapQty;
 
 	@ManyToOne
 	@JoinColumn(name = "scrap_unit")
 	private UnitMasterVO scrapUnit;
 
-	@Column(name = "scrap_total", precision = 10, scale = 2)
+	@Column(name = "scrap_total", precision = 15, scale = 2)
 	private BigDecimal scrapTotal;
 
 	@ManyToOne

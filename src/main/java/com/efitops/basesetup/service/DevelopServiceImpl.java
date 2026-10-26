@@ -25,6 +25,7 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ControlPlanDetailResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ControlPlanMachineFixtureResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ControlPlanParameterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
-import com.efitops.basesetup.ResponseDTO.ControlPlanSampleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CustomerResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.DepartmentResponseDTO;
@@ -79,7 +76,6 @@ import com.efitops.basesetup.ResponseDTO.MachineSpareDetailsResponseDTO;
 import com.efitops.basesetup.ResponseDTO.MaintenanceServiceRequestResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
 import com.efitops.basesetup.ResponseDTO.OperationMasterResponseforPSCRDTO;
-import com.efitops.basesetup.ResponseDTO.ParameterMasterResponse1DTO;
 import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingMachineResponseDTO;
@@ -331,7 +327,6 @@ import com.efitops.basesetup.repository.SalesOrderAmendmentDetailsRepo;
 import com.efitops.basesetup.repository.SalesOrderAmendmentRepo;
 import com.efitops.basesetup.repository.SalesReturnRepo;
 import com.efitops.basesetup.repository.ShiftRepo;
-import com.efitops.basesetup.repository.SubContractingGRNRepo;
 import com.efitops.basesetup.repository.ToolCategoryRepo;
 import com.efitops.basesetup.repository.ToolMasterRepo;
 import com.efitops.basesetup.repository.TransferOrderDetailRepo;
@@ -620,9 +615,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 	@Autowired
 	private CurrencyRepo currencyRepo;
-
-	@Autowired
-	private SubContractingGRNRepo subContractingGRNRepo;
 
 	@Autowired
 	private DailyExchangeRateRepo dailyExchangeRateRepo;
@@ -1084,6 +1076,12 @@ public class DevelopServiceImpl implements DevelopService {
 		// saveAttachments(files, enquiryVO);
 	}
 
+	private void createDirectory(Path path) throws IOException {
+		if (!Files.exists(path)) {
+			Files.createDirectories(path);
+		}
+	}
+
 	@Value("${enquiry.upload.path}")
 	private String uploadPath;
 
@@ -1095,10 +1093,54 @@ public class DevelopServiceImpl implements DevelopService {
 
 		try {
 
-			File folder = new File(uploadPath);
+			// Folder structure:
+			// uploadPath/enquiry/{enquiryId}
+			Path enquiryFolder = Paths.get(uploadPath, enquiryVO.getId().toString());
 
-			if (!folder.exists()) {
-				folder.mkdirs();
+			createDirectory(enquiryFolder);
+
+			/*
+			 * If enquiry already exists, remove old attachments from DB and physical
+			 * folder.
+			 */
+			if (ObjectUtils.isNotEmpty(enquiryVO.getId())) {
+
+				List<EnquiryAttachmentVO> existingAttachments = enquiryAttachmentRepo.findByEnquiryVO(enquiryVO);
+
+				if (existingAttachments != null && !existingAttachments.isEmpty()) {
+
+					for (EnquiryAttachmentVO attachment : existingAttachments) {
+
+						try {
+
+							/*
+							 * Delete physical file using fileName.
+							 *
+							 * Do NOT use attachment.getFilePath() because filePath is now a public URL.
+							 */
+							if (attachment.getFileName() != null) {
+
+								Path oldFilePath = enquiryFolder.resolve(attachment.getFileName());
+
+								Files.deleteIfExists(oldFilePath);
+							}
+
+						} catch (IOException e) {
+
+							// Continue deleting other files
+							e.printStackTrace();
+						}
+					}
+
+					enquiryAttachmentRepo.deleteAll(existingAttachments);
+
+					/*
+					 * IMPORTANT: Clear old attachments from entity collection.
+					 */
+					if (enquiryVO.getEnquiryAttachment() != null) {
+						enquiryVO.getEnquiryAttachment().clear();
+					}
+				}
 			}
 
 			List<EnquiryAttachmentVO> attachmentList = new ArrayList<>();
@@ -1109,22 +1151,82 @@ public class DevelopServiceImpl implements DevelopService {
 					continue;
 				}
 
-				String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+				String originalName = file.getOriginalFilename();
 
-				Path path = Paths.get(uploadPath, fileName);
-
-				try (InputStream inputStream = file.getInputStream()) {
-
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+				if (originalName == null || originalName.trim().isEmpty()) {
+					originalName = "file";
 				}
 
+				/*
+				 * Replace spaces with underscore
+				 */
+				originalName = originalName.replaceAll("\\s+", "_");
+
+				String extension = "";
+
+				/*
+				 * Separate extension
+				 */
+				if (originalName.contains(".")) {
+
+					extension = originalName.substring(originalName.lastIndexOf("."));
+
+					originalName = originalName.substring(0, originalName.lastIndexOf("."));
+				}
+
+				/*
+				 * Example:
+				 *
+				 * quotation.pdf
+				 *
+				 * becomes:
+				 *
+				 * quotation_1001.pdf
+				 */
+				String fileName = originalName + "_" + enquiryVO.getId() + extension;
+
+				Path filePath = enquiryFolder.resolve(fileName);
+
+				/*
+				 * Save physical file
+				 */
+				try (InputStream inputStream = file.getInputStream()) {
+
+					Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+				}
+
+				/*
+				 * Build public URL
+				 *
+				 * Example:
+				 *
+				 * http://localhost:8080/api/enquiry/viewFile/ enquiry/1001/quotation_1001.pdf
+				 */
+				String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/develop/enquiry/viewFile/")
+						.toUriString();
+
+				Path baseDir = Paths.get(uploadPath).toAbsolutePath().normalize();
+
+				String relativePath = baseDir.relativize(filePath.toAbsolutePath().normalize()).toString().replace("\\",
+						"/");
+
+				String publicUrl = baseUrl + relativePath;
+
+				/*
+				 * Create attachment entity
+				 */
 				EnquiryAttachmentVO attachment = new EnquiryAttachmentVO();
+
+				attachment.setEnquiryVO(enquiryVO);
 
 				attachment.setName(file.getOriginalFilename());
 
 				attachment.setFileName(fileName);
 
-				attachment.setFilePath(path.toString());
+				/*
+				 * Store URL instead of physical path
+				 */
+				attachment.setFilePath(publicUrl);
 
 				attachment.setFileSize(file.getSize());
 
@@ -1132,19 +1234,63 @@ public class DevelopServiceImpl implements DevelopService {
 
 				attachment.setUploadOn(LocalDateTime.now());
 
-				attachment.setEnquiryVO(enquiryVO);
-
 				attachmentList.add(attachment);
 			}
 
-			attachmentList = enquiryAttachmentRepo.saveAll(attachmentList);
+			/*
+			 * Save attachment records
+			 */
+			if (!attachmentList.isEmpty()) {
 
-			enquiryVO.setEnquiryAttachment(attachmentList);
+				List<EnquiryAttachmentVO> saved = enquiryAttachmentRepo.saveAll(attachmentList);
+
+				enquiryVO.setEnquiryAttachment(saved);
+			}
 
 		} catch (IOException e) {
 
 			throw new ApplicationException("File Upload Failed : " + e.getMessage());
 		}
+	}
+
+	@Override
+	public ResponseEntity<byte[]> viewEnquiryFile(HttpServletRequest request) throws IOException {
+
+		return serveFile(request, "/api/develop/enquiry/viewFile/", uploadPath);
+	}
+
+	private ResponseEntity<byte[]> serveFile(HttpServletRequest request, String apiPrefix, String uploadBasePath)
+			throws IOException {
+
+		String uri = request.getRequestURI();
+
+		String relativePath = uri.substring(uri.indexOf(apiPrefix) + apiPrefix.length());
+
+		relativePath = URLDecoder.decode(relativePath, StandardCharsets.UTF_8);
+
+		Path baseDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+
+		Path filePath = baseDir.resolve(relativePath).normalize();
+
+		// Security check
+		if (!filePath.startsWith(baseDir)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		String contentType = Files.probeContentType(filePath);
+
+		if (contentType == null) {
+			contentType = "application/octet-stream";
+		}
+
+		byte[] fileBytes = Files.readAllBytes(filePath);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline").body(fileBytes);
 	}
 
 	private EnquiryResponseDTO buildEnquiryResponse(EnquiryVO enquiryVO) {
@@ -2038,337 +2184,206 @@ public class DevelopServiceImpl implements DevelopService {
 //		return null;
 //	}
 
-	// Sales Order Amendment
+	// salesorderamendment
 
 	@Override
 	@Transactional
-	public Map<String, Object> updateCreateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
+	public Map<String, Object> createUpdateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
 			throws ApplicationException {
 
-		String screenCode = "SOA";
-
-		Map<String, Object> response = new HashMap<>();
+		SalesOrderAmendmentVO salesOrderAmendmentVO = new SalesOrderAmendmentVO();
 
 		String message;
 
-		SalesOrderAmendmentVO salesOrderAmendmentVO;
+		if (ObjectUtils.isNotEmpty(salesOrderAmendmentDTO.getId())) {
 
-		// =========================
-		// Create / Update
-		// =========================
+			salesOrderAmendmentVO = salesOrderAmendmentRepo.findById(salesOrderAmendmentDTO.getId())
+					.orElseThrow(() -> new ApplicationException("Sales Order Amendment Not Found"));
 
-		if (salesOrderAmendmentDTO.getId() == null) {
+			createUpdateSalesOrderAmendmentVOByDTO(salesOrderAmendmentDTO, salesOrderAmendmentVO);
 
-			salesOrderAmendmentVO = new SalesOrderAmendmentVO();
-
-			// =========================
-			// Generate Doc ID
-			// =========================
-
-			String docId = salesOrderAmendmentRepo.getSalesOrderAmendmentDocId(salesOrderAmendmentDTO.getOrgId(),
-					salesOrderAmendmentDTO.getFinancialYear(), screenCode);
-
-			salesOrderAmendmentVO.setDocId(docId);
-
-			// =========================
-			// Update Last Number
-			// =========================
-
-			DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO = documentTypeMappingDetailsRepo
-					.findByOrgIdAndFinYearAndScreenCode(salesOrderAmendmentDTO.getOrgId(),
-							salesOrderAmendmentDTO.getFinancialYear(), screenCode);
-
-			if (documentTypeMappingDetailsVO == null) {
-				throw new ApplicationException("Document Type Mapping Details Not Found");
-			}
-
-			documentTypeMappingDetailsVO.setLastNo(documentTypeMappingDetailsVO.getLastNo() + 1);
-
-			documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
-
-			salesOrderAmendmentVO.setCreatedBy(salesOrderAmendmentDTO.getCreatedBy());
-
-			salesOrderAmendmentVO.setUpdatedBy(salesOrderAmendmentDTO.getCreatedBy());
-
-			message = "Sales Order Amendment Created Successfully";
+			message = "Sales Order Amendment Updated Successfully";
 
 		} else {
 
-			// =========================
-			// Update Existing Record
-			// =========================
+			createUpdateSalesOrderAmendmentVOByDTO(salesOrderAmendmentDTO, salesOrderAmendmentVO);
 
-			salesOrderAmendmentVO = salesOrderAmendmentRepo.findById(salesOrderAmendmentDTO.getId())
-					.orElseThrow(() -> new ApplicationException("Invalid Sales Order Amendment Details"));
-
-			salesOrderAmendmentVO.setUpdatedBy(salesOrderAmendmentDTO.getCreatedBy());
-
-			message = "Sales Order Amendment Updated Successfully";
+			message = "Sales Order Amendment Created Successfully";
 		}
-
-		// =========================
-		// Basic + Detail Mapping
-		// =========================
-
-		createUpdateSalesOrderAmendmentVO(salesOrderAmendmentDTO, salesOrderAmendmentVO);
-
-		// =========================
-		// Save
-		// =========================
 
 		SalesOrderAmendmentVO savedSalesOrderAmendment = salesOrderAmendmentRepo.save(salesOrderAmendmentVO);
 
-		// =========================
-		// Response
-		// =========================
+		if (ObjectUtils.isNotEmpty(salesOrderAmendmentDTO.getId())) {
 
-		response.put("message", message);
-
-		response.put("salesOrderAmendmentVO", salesOrderAmendmentResponse(savedSalesOrderAmendment));
-
-		return response;
-	}
-
-	private void createUpdateSalesOrderAmendmentVO(SalesOrderAmendmentDTO dto,
-			SalesOrderAmendmentVO salesOrderAmendmentVO) throws ApplicationException {
-
-		// =========================
-		// Basic Fields
-		// =========================
-
-		salesOrderAmendmentVO.setSalesOrderNumber(dto.getSalesOrderNumber());
-
-		salesOrderAmendmentVO.setSalesOrderDate(dto.getSalesOrderDate());
-
-		salesOrderAmendmentVO.setPartyPoAmendmentNo(dto.getPartyPoAmendmentNo());
-
-		salesOrderAmendmentVO.setPartyPoAmendmentDate(dto.getPartyPoAmendmentDate());
-
-		salesOrderAmendmentVO.setPoNo(dto.getPoNo());
-
-		salesOrderAmendmentVO.setPoDate(dto.getPoDate());
-
-		salesOrderAmendmentVO.setRevisionNo(dto.getRevisionNo());
-
-		salesOrderAmendmentVO.setRemarks(dto.getRemarks());
-
-		salesOrderAmendmentVO.setOrgId(dto.getOrgId());
-
-		salesOrderAmendmentVO.setActive(dto.getActive());
-
-		salesOrderAmendmentVO.setCancelRemarks(dto.getCancelRemarks());
-
-		// =========================
-		// Branch
-		// =========================
-
-		if (dto.getBranch() != null && dto.getBranch() != 0) {
-
-			BranchVO branch = branchRepo.findById(dto.getBranch())
-					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-			salesOrderAmendmentVO.setBranch(branch);
+			salesOrderAmendmentDetailsRepo.deleteBySalesOrderAmendmentVO(savedSalesOrderAmendment);
 		}
 
-		// =========================
-		// Delete Existing Details
-		// During Update
-		// =========================
+		if (salesOrderAmendmentDTO.getDetails() != null) {
 
-		if (dto.getId() != null) {
-
-			List<SalesOrderAmendmentDetailsVO> oldList = salesOrderAmendmentDetailsRepo
-					.findBySalesOrderAmendmentVO(salesOrderAmendmentVO);
-
-			if (oldList != null && !oldList.isEmpty()) {
-
-				salesOrderAmendmentDetailsRepo.deleteAll(oldList);
-			}
-		}
-
-		// =========================
-		// Details Grid
-		// =========================
-
-		List<SalesOrderAmendmentDetailsVO> detailList = new ArrayList<>();
-
-		if (dto.getDetails() != null && !dto.getDetails().isEmpty()) {
-
-			for (SalesOrderAmendmentDetailsDTO detailDTO : dto.getDetails()) {
+			for (SalesOrderAmendmentDetailsDTO detailDTO : salesOrderAmendmentDTO.getDetails()) {
 
 				SalesOrderAmendmentDetailsVO detailVO = new SalesOrderAmendmentDetailsVO();
 
-				// =========================
-				// Item
-				// =========================
+				if (detailDTO.getItem() != null) {
 
-				if (detailDTO.getItem() != null && detailDTO.getItem() != 0) {
-
-					ItemMasterVO item = itemMasterRepo.findById(detailDTO.getItem())
+					ItemMasterVO itemVO = itemMasterRepo.findById(detailDTO.getItem())
 							.orElseThrow(() -> new ApplicationException("Item Not Found"));
 
-					detailVO.setItem(item);
+					detailVO.setItem(itemVO);
 				}
 
-				// =========================
-				// Detail Fields
-				// =========================
-
 				detailVO.setOldQty(detailDTO.getOldQty());
-
 				detailVO.setOldRate(detailDTO.getOldRate());
-
 				detailVO.setNewQty(detailDTO.getNewQty());
-
 				detailVO.setNewRate(detailDTO.getNewRate());
-
 				detailVO.setOldDeliveryDate(detailDTO.getOldDeliveryDate());
-
 				detailVO.setNewDeliveryDate(detailDTO.getNewDeliveryDate());
 
-				// =========================
-				// Parent Mapping
-				// =========================
+				detailVO.setSalesOrderAmendmentVO(savedSalesOrderAmendment);
 
-				detailVO.setSalesOrderAmendmentVO(salesOrderAmendmentVO);
-
-				detailList.add(detailVO);
+				salesOrderAmendmentDetailsRepo.save(detailVO);
 			}
 		}
 
-		// =========================
-		// Save Details
-		// =========================
+		savedSalesOrderAmendment = salesOrderAmendmentRepo.findById(savedSalesOrderAmendment.getId())
+				.orElseThrow(() -> new ApplicationException("Sales Order Amendment Not Found"));
 
-		if (!detailList.isEmpty()) {
+		Map<String, Object> response = new HashMap<>();
 
-			salesOrderAmendmentDetailsRepo.saveAll(detailList);
+		response.put("message", message);
+		response.put("salesOrderAmendmentVO", salesOrderAmendmentResponse(savedSalesOrderAmendment));
+
+		return response;
+
+	}
+
+	private void createUpdateSalesOrderAmendmentVOByDTO(SalesOrderAmendmentDTO dto, SalesOrderAmendmentVO vo)
+			throws ApplicationException {
+
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branchVO);
 		}
+
+//		    vo.setDocId(dto.getDocId());
+		vo.setSalesOrderNumber(dto.getSalesOrderNumber());
+//		    vo.setDocDate(dto.getDocDate());
+		vo.setPartyPoAmendmentNo(dto.getPartyPoAmendmentNo());
+		vo.setSalesOrderDate(dto.getSalesOrderDate());
+		vo.setPartyPoAmendmentDate(dto.getPartyPoAmendmentDate());
+		vo.setPoNo(dto.getPoNo());
+		vo.setRevisionNo(dto.getRevisionNo());
+		vo.setPoDate(dto.getPoDate());
+		vo.setRemarks(dto.getRemarks());
+
+		vo.setActive(dto.getActive());
+		vo.setOrgId(dto.getOrgId());
+		vo.setCreatedBy(dto.getCreatedBy());
+//		    vo.setUpdatedBy(dto.getUpdatedBy());
+//		    vo.setCancel(dto.isCancel());
+		vo.setCancelRemarks(dto.getCancelRemarks());
 	}
 
 	private SalesOrderAmendmentResponseDTO salesOrderAmendmentResponse(SalesOrderAmendmentVO salesOrderAmendmentVO) {
 
 		SalesOrderAmendmentResponseDTO responseDTO = new SalesOrderAmendmentResponseDTO();
 
-		// =========================
-		// Basic Fields
-		// =========================
-
 		responseDTO.setId(salesOrderAmendmentVO.getId());
 
-		responseDTO.setDocId(salesOrderAmendmentVO.getDocId());
-
-		responseDTO.setDocDate(salesOrderAmendmentVO.getDocDate());
-
-		responseDTO.setSalesOrderNumber(salesOrderAmendmentVO.getSalesOrderNumber());
-
-		responseDTO.setSalesOrderDate(salesOrderAmendmentVO.getSalesOrderDate());
-
-		responseDTO.setPartyPoAmendmentNo(salesOrderAmendmentVO.getPartyPoAmendmentNo());
-
-		responseDTO.setPartyPoAmendmentDate(salesOrderAmendmentVO.getPartyPoAmendmentDate());
-
-		responseDTO.setPoNo(salesOrderAmendmentVO.getPoNo());
-
-		responseDTO.setPoDate(salesOrderAmendmentVO.getPoDate());
-
-		responseDTO.setRevisionNo(salesOrderAmendmentVO.getRevisionNo());
-
-		responseDTO.setRemarks(salesOrderAmendmentVO.getRemarks());
-
-		responseDTO.setOrgId(salesOrderAmendmentVO.getOrgId());
-
-		responseDTO.setCreatedBy(salesOrderAmendmentVO.getCreatedBy());
-
-		responseDTO.setUpdatedBy(salesOrderAmendmentVO.getUpdatedBy());
-
-		responseDTO.setActive(salesOrderAmendmentVO.isActive());
-
-		responseDTO.setCancel(salesOrderAmendmentVO.isCancel());
-
-		responseDTO.setCancelRemarks(salesOrderAmendmentVO.getCancelRemarks());
-
-		responseDTO.setScreenName(salesOrderAmendmentVO.getScreenName());
-
-		responseDTO.setScreenCode(salesOrderAmendmentVO.getScreenCode());
-
-		// =========================
-		// Branch
-		// =========================
-
 		if (salesOrderAmendmentVO.getBranch() != null) {
-
 			responseDTO.setBranchId(salesOrderAmendmentVO.getBranch().getId());
 
 			responseDTO.setBranchName(salesOrderAmendmentVO.getBranch().getBranchName());
 		}
 
-		// =========================
-		// Details
-		// =========================
+		responseDTO.setDocId(salesOrderAmendmentVO.getDocId());
+		responseDTO.setDocDate(salesOrderAmendmentVO.getDocDate());
+		responseDTO.setSalesOrderNumber(salesOrderAmendmentVO.getSalesOrderNumber());
+		responseDTO.setPartyPoAmendmentNo(salesOrderAmendmentVO.getPartyPoAmendmentNo());
+		responseDTO.setSalesOrderDate(salesOrderAmendmentVO.getSalesOrderDate());
+		responseDTO.setPartyPoAmendmentDate(salesOrderAmendmentVO.getPartyPoAmendmentDate());
+		responseDTO.setPoNo(salesOrderAmendmentVO.getPoNo());
+		responseDTO.setRevisionNo(salesOrderAmendmentVO.getRevisionNo());
+		responseDTO.setPoDate(salesOrderAmendmentVO.getPoDate());
+		responseDTO.setRemarks(salesOrderAmendmentVO.getRemarks());
 
-		List<SalesOrderAmendmentDetailsResponseDTO> detailResponseList = new ArrayList<>();
+		responseDTO.setOrgId(salesOrderAmendmentVO.getOrgId());
+		responseDTO.setCreatedBy(salesOrderAmendmentVO.getCreatedBy());
+		responseDTO.setUpdatedBy(salesOrderAmendmentVO.getUpdatedBy());
+		responseDTO.setActive(salesOrderAmendmentVO.isActive());
+		responseDTO.setCancel(salesOrderAmendmentVO.isCancel());
+		responseDTO.setCancelRemarks(salesOrderAmendmentVO.getCancelRemarks());
+		responseDTO.setScreenName(salesOrderAmendmentVO.getScreenName());
+		responseDTO.setScreenCode(salesOrderAmendmentVO.getScreenCode());
 
+		// Fetch child table directly
 		List<SalesOrderAmendmentDetailsVO> detailList = salesOrderAmendmentDetailsRepo
 				.findBySalesOrderAmendmentVO_Id(salesOrderAmendmentVO.getId());
 
-		if (detailList != null && !detailList.isEmpty()) {
+		List<SalesOrderAmendmentDetailsResponseDTO> details = new ArrayList<>();
 
-			for (SalesOrderAmendmentDetailsVO detailVO : detailList) {
+		for (SalesOrderAmendmentDetailsVO detailVO : detailList) {
 
-				SalesOrderAmendmentDetailsResponseDTO detailDTO = new SalesOrderAmendmentDetailsResponseDTO();
+			SalesOrderAmendmentDetailsResponseDTO detailDTO = new SalesOrderAmendmentDetailsResponseDTO();
 
-				detailDTO.setId(detailVO.getId());
+			detailDTO.setId(detailVO.getId());
 
-				// =========================
-				// Item
-				// =========================
+//		        if (detailVO.getItem() != null) {
+//		        	detailDTO.setId(
+//		                    detailVO.getItem().getId());
+//		            detailDTO.setItemCode(
+//		                    detailVO.getItem().getItemCode());
+//
+//		            detailDTO.setItemDescription(
+//		                    detailVO.getItem().getItemDescription());
+//		        }
 
-				if (detailVO.getItem() != null) {
+			if (detailVO.getItem() != null) {
 
-					ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
+				ItemMasterResponseDetailsDTO itemDTO = new ItemMasterResponseDetailsDTO();
 
-					itemDTO.setId(detailVO.getItem().getId());
+				itemDTO.setId(detailVO.getItem().getId());
 
-					itemDTO.setItemCode(detailVO.getItem().getItemCode());
+				itemDTO.setItemCode(detailVO.getItem().getItemCode());
 
-					itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
+				itemDTO.setItemDescription(detailVO.getItem().getItemDescription());
 
-					detailDTO.setItem(itemDTO);
-				}
+				// If you need unit
+//		            if (detailVO.getItem().getUnit() != null) {
+//
+//		                UnitMasterResponseDTO unitDTO =
+//		                        new UnitMasterResponseDTO();
+//
+//		                unitDTO.setId(
+//		                        detailVO.getItem().getUnit().getId());
+//
+//		                unitDTO.setDescription(
+//		                        detailVO.getItem().getUnit().getDescription());
+//
+//		                itemDTO.setUnit(unitDTO);
+//		            }
 
-				// =========================
-				// Detail Fields
-				// =========================
-
-				detailDTO.setOldQty(detailVO.getOldQty());
-
-				detailDTO.setOldRate(detailVO.getOldRate());
-
-				detailDTO.setNewQty(detailVO.getNewQty());
-
-				detailDTO.setNewRate(detailVO.getNewRate());
-
-				detailDTO.setOldDeliveryDate(detailVO.getOldDeliveryDate());
-
-				detailDTO.setNewDeliveryDate(detailVO.getNewDeliveryDate());
-
-				detailResponseList.add(detailDTO);
+				detailDTO.setItem(itemDTO);
 			}
+
+			detailDTO.setOldQty(detailVO.getOldQty());
+			detailDTO.setOldRate(detailVO.getOldRate());
+			detailDTO.setNewQty(detailVO.getNewQty());
+			detailDTO.setNewRate(detailVO.getNewRate());
+
+			detailDTO.setOldDeliveryDate(detailVO.getOldDeliveryDate());
+
+			detailDTO.setNewDeliveryDate(detailVO.getNewDeliveryDate());
+
+			details.add(detailDTO);
 		}
 
-		responseDTO.setSalesOrderAmendmentDetails(detailResponseList);
+		responseDTO.setSalesOrderAmendmentDetails(details);
 
 		return responseDTO;
-	}
-
-	@Override
-	public String getSalesOrderAmendmentDocId(Long orgId, String financialYear) {
-		String screenCode = "SOA";
-
-		String result = salesOrderAmendmentRepo.getSalesOrderAmendmentDocId(orgId, financialYear, screenCode);
-
-		return result;
 	}
 
 	@Override
@@ -3406,12 +3421,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		} catch (IOException e) {
 			throw new ApplicationException("File Upload Failed : " + e.getMessage());
-		}
-	}
-
-	private void createDirectory(Path path) throws IOException {
-		if (!Files.exists(path)) {
-			Files.createDirectories(path);
 		}
 	}
 
@@ -5774,18 +5783,18 @@ public class DevelopServiceImpl implements DevelopService {
 		// MACHINE TYPE - LIST OF VALUES
 		// =========================================================
 
-		if (vo.getMachineType() != null) {
-
-			ListOfValuesDetailsResponseDTO machineTypeDTO = new ListOfValuesDetailsResponseDTO();
-
-			machineTypeDTO.setId(vo.getMachineType().getId());
-
-			machineTypeDTO.setCode(vo.getMachineType().getValueCode());
-
-			machineTypeDTO.setDescription(vo.getMachineType().getValueDescription());
-
-			dto.setMachineType(machineTypeDTO);
-		}
+//		if (vo.getMachineType() != null) {
+//
+//			ListOfValuesDetailsResponseDTO machineTypeDTO = new ListOfValuesDetailsResponseDTO();
+//
+//			machineTypeDTO.setId(vo.getMachineType().getId());
+//
+//			machineTypeDTO.setCode(vo.getMachineType().getValueCode());
+//
+//			machineTypeDTO.setDescription(vo.getMachineType().getValueDescription());
+//
+//			dto.setMachineType(machineTypeDTO);
+//		}
 
 		// =========================================================
 		// RATE / WEIGHT
@@ -8164,255 +8173,37 @@ public class DevelopServiceImpl implements DevelopService {
 
 		ControlPlanResponseDTO responseDTO = new ControlPlanResponseDTO();
 
+		// ============================================================
 		// HEADER RESPONSE
+		// ============================================================
+
 		responseDTO.setId(controlPlanVO.getId());
+
 		responseDTO.setRevisionDate(controlPlanVO.getRevisionDate());
+
 		responseDTO.setPlanNo(controlPlanVO.getPlanNo());
+
 		responseDTO.setItemDescription(controlPlanVO.getItemDescription());
+
 		responseDTO.setItemSize(controlPlanVO.getItemSize());
+
 		responseDTO.setProcessSheetNo(controlPlanVO.getProcessSheetNo());
+
 		responseDTO.setApproved(controlPlanVO.isApproved());
+
 		responseDTO.setActive(controlPlanVO.isActive());
-		responseDTO.setCancel(controlPlanVO.isCancel());
-		responseDTO.setCancelRemarks(controlPlanVO.getCancelRemarks());
+
 		responseDTO.setOrgId(controlPlanVO.getOrgId());
+
 		responseDTO.setCreatedBy(controlPlanVO.getCreatedBy());
+
 		responseDTO.setUpdatedBy(controlPlanVO.getUpdatedBy());
 
-		// BRANCH RESPONSE
-		if (controlPlanVO.getBranch() != null) {
+		responseDTO.setCancel(controlPlanVO.isCancel());
 
-			BranchResponseDTO branchDTO = new BranchResponseDTO();
+		responseDTO.setCancelRemarks(controlPlanVO.getCancelRemarks());
 
-			branchDTO.setId(controlPlanVO.getBranch().getId());
-			branchDTO.setBranchCode(controlPlanVO.getBranch().getBranchCode());
-			branchDTO.setBranchName(controlPlanVO.getBranch().getBranchName());
-
-			responseDTO.setBranch(branchDTO);
-		}
-		
-		 // PREPARED BY RESPONSE
-	    if (controlPlanVO.getPreparedBy() != null) {
-
-	        EmployeeMasterResponseDetailsDTO preparedByDTO =
-	                new EmployeeMasterResponseDetailsDTO();
-
-	        preparedByDTO.setId(controlPlanVO.getPreparedBy().getId());
-	        preparedByDTO.setEmployeeName(
-	                controlPlanVO.getPreparedBy().getEmployeeName());
-	        
-	        responseDTO.setPreparedBy(preparedByDTO);
-	    }
-
-	    // CHECKED BY RESPONSE
-	    if (controlPlanVO.getCheckedBy() != null) {
-
-	        EmployeeMasterResponseDetailsDTO checkedByDTO =
-	                new EmployeeMasterResponseDetailsDTO();
-
-	        checkedByDTO.setId(controlPlanVO.getCheckedBy().getId());
-	        checkedByDTO.setEmployeeName(
-	                controlPlanVO.getCheckedBy().getEmployeeName());
-	        
-	        responseDTO.setCheckedBy(checkedByDTO);
-	    }
-
-		// FG ITEM RESPONSE
-		if (controlPlanVO.getFgItemCode() != null) {
-
-			ItemResponse1DTO itemDTO = new ItemResponse1DTO();
-
-			itemDTO.setId(controlPlanVO.getFgItemCode().getId());
-			itemDTO.setItemCode(controlPlanVO.getFgItemCode().getItemCode());
-			itemDTO.setItemDescription(controlPlanVO.getFgItemCode().getItemDescription());
-
-			responseDTO.setFgItemCode(itemDTO);
-		}
-		
-		
-		   // ITEM GRADE RESPONSE
-	    if (controlPlanVO.getItemGrade() != null) {
-
-	        GradeMasterResponseDTO gradeDTO =
-	                new GradeMasterResponseDTO();
-
-	        gradeDTO.setId(controlPlanVO.getItemGrade().getId());
-	        gradeDTO.setGradeCode(controlPlanVO.getItemGrade().getGradeCode());
-	        gradeDTO.setGradeDescription(controlPlanVO.getItemGrade().getGradeDescription());
-
-
-	        gradeDTO.setId(controlPlanVO.getItemGrade().getId());
-
-
-	       
-
-	        responseDTO.setItemGrade(gradeDTO);
-	    }
-
-	    List<ControlPlanDetailResponseDTO> detailResponseList = new ArrayList<>();
-
-	    if (controlPlanVO.getControlPlanDetailVO() != null
-	            && !controlPlanVO.getControlPlanDetailVO().isEmpty()) {
-
-	        for (ControlPlanDetailVO detailVO : controlPlanVO.getControlPlanDetailVO()) {
-
-	            ControlPlanDetailResponseDTO detailDTO = new ControlPlanDetailResponseDTO();
-
-	            detailDTO.setId(detailVO.getId());
-	            detailDTO.setOperationNo(detailVO.getOperationNo());
-	            detailDTO.setProcess(detailVO.getProcess());
-	            detailDTO.setSpecification(detailVO.getSpecification());
-	            detailDTO.setEvaluationTechnique(detailVO.getEvaluationTechnique());
-	            detailDTO.setReactionPlan(detailVO.getReactionPlan());
-	            detailDTO.setRecord(detailVO.getRecord());
-	            detailDTO.setRiskClassSpecialCharacter(
-	                    detailVO.getRiskClassSpecialCharacter());
-
-	            // MACHINE DEVICE RESPONSE
-	            if (detailVO.getMachineDevice() != null) {
-
-	                MachineMasterResponse1DTO machineDTO = new MachineMasterResponse1DTO();
-
-	                machineDTO.setId(detailVO.getMachineDevice().getId());
-	                machineDTO.setMachineInstrumentNo(
-	                        detailVO.getMachineDevice().getMachineInstrumentNo());
-	                machineDTO.setMachineInstrumentName(
-	                        detailVO.getMachineDevice().getMachineInstrumentName());
-
-	                detailDTO.setMachineDevice(machineDTO);
-	            }
-
-	         // CONTROL METHOD RESPONSE
-	            if (detailVO.getControlMethod() != null) {
-
-	                ListOfValuesDetailsResponseDTO controlMethodDTO =
-	                        new ListOfValuesDetailsResponseDTO();
-
-	                controlMethodDTO.setId(
-	                        detailVO.getControlMethod().getId());
-
-	                controlMethodDTO.setCode(
-	                        detailVO.getControlMethod().getValueCode());
-
-	                controlMethodDTO.setDescription(
-	                        detailVO.getControlMethod().getValueDescription());
-
-	                detailDTO.setControlMethod(controlMethodDTO);
-	            }
-
-	            detailResponseList.add(detailDTO);
-	        
-	        }
-	    }
-		// MACHINE / FIXTURE RESPONSE
-		List<ControlPlanMachineFixtureResponseDTO> machineFixtureResponseList = new ArrayList<>();
-
-		if (controlPlanVO.getControlPlanMachineFixtureVO() != null
-				&& !controlPlanVO.getControlPlanMachineFixtureVO().isEmpty()) {
-
-			for (ControlPlanMachineFixtureVO machineVO : controlPlanVO.getControlPlanMachineFixtureVO()) {
-
-				ControlPlanMachineFixtureResponseDTO machineDTO = new ControlPlanMachineFixtureResponseDTO();
-
-				machineDTO.setId(machineVO.getId());
-				machineDTO.setMachineFixtureName(machineVO.getMachineFixtureName());
-
-				// MACHINE MASTER RESPONSE
-				if (machineVO.getMachineFixtureNo() != null) {
-
-					MachineMasterResponse1DTO machineMasterDTO = new MachineMasterResponse1DTO();
-
-					machineMasterDTO.setId(machineVO.getMachineFixtureNo().getId());
-
-					machineMasterDTO.setMachineInstrumentNo(
-					    machineVO.getMachineFixtureNo().getMachineInstrumentNo());
-
-					machineMasterDTO.setMachineInstrumentName(
-					    machineVO.getMachineFixtureNo().getMachineInstrumentName());
-
-					machineDTO.setMachineFixtureNo(machineMasterDTO);
-					
-					
-				}
-
-				machineFixtureResponseList.add(machineDTO);
-			}
-		}
-
-		responseDTO.setControlPlanMachineFixtureResponseDTO(machineFixtureResponseList);
-
-		// PARAMETER RESPONSE
-		List<ControlPlanParameterResponseDTO> parameterResponseList = new ArrayList<>();
-
-		if (controlPlanVO.getControlPlanParameterVO() != null && !controlPlanVO.getControlPlanParameterVO().isEmpty()) {
-
-			for (ControlPlanParameterVO parameterVO : controlPlanVO.getControlPlanParameterVO()) {
-
-				ControlPlanParameterResponseDTO parameterDTO = new ControlPlanParameterResponseDTO();
-
-				parameterDTO.setId(parameterVO.getId());
-				parameterDTO.setParameterType(parameterVO.getParameterType());
-				parameterDTO.setTol(parameterVO.getTol());
-
-				
-				
-				// PARAMETER MASTER RESPONSE
-				if (parameterVO.getParameter() != null) {
-
-					ParameterMasterResponse1DTO parameterMasterDTO = new ParameterMasterResponse1DTO();
-
-					parameterMasterDTO.setId(parameterVO.getParameter().getId());
-
-					parameterMasterDTO.setParameterCode(parameterVO.getParameter().getParameterCode());
-
-					parameterMasterDTO.setParameterDescription(parameterVO.getParameter().getParameterDescription());
-
-					// PARAMETER TYPE RESPONSE
-					if (parameterVO.getParameter().getParameterType() != null) {
-
-						ListOfValuesDetailsResponseDTO parameterTypeDTO = new ListOfValuesDetailsResponseDTO();
-
-						parameterTypeDTO.setId(parameterVO.getParameter().getParameterType().getId());
-
-						parameterTypeDTO.setCode(parameterVO.getParameter().getParameterType().getValueCode());
-
-						parameterTypeDTO
-								.setDescription(parameterVO.getParameter().getParameterType().getValueDescription());
-
-						parameterMasterDTO.setParameterType(parameterTypeDTO);
-					}
-
-					parameterDTO.setParameter(parameterMasterDTO);
-				}
-
-				parameterResponseList.add(parameterDTO);
-			}
-		}
-
-		responseDTO.setControlPlanParameterResponseDTO(parameterResponseList);
-
-		responseDTO.setControlPlanParameterResponseDTO(parameterResponseList);
-		// SAMPLE RESPONSE
-		List<ControlPlanSampleResponseDTO> sampleResponseList = new ArrayList<>();
-
-		if (controlPlanVO.getControlPlansampleVO() != null && !controlPlanVO.getControlPlansampleVO().isEmpty()) {
-
-			for (ControlPlanSampleVO sampleVO : controlPlanVO.getControlPlansampleVO()) {
-
-				ControlPlanSampleResponseDTO sampleDTO = new ControlPlanSampleResponseDTO();
-
-				sampleDTO.setId(sampleVO.getId());
-				sampleDTO.setSampleFrequency(sampleVO.getSampleFrequency());
-				sampleDTO.setSize(sampleVO.getSize());
-
-				sampleResponseList.add(sampleDTO);
-			}
-		}
-
-		responseDTO.setControlPlanSampleResponseDTO(sampleResponseList);
-	         	      
 		return responseDTO;
-		
 	}
 
 	@Override
@@ -12118,8 +11909,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		if (transferOrderVO == null) {
 
-			
-			
 			throw new ApplicationException("Transfer Order Not Found");
 		}
 
@@ -12224,17 +12013,49 @@ public class DevelopServiceImpl implements DevelopService {
 
 		} else {
 
-			// CREATE
+		    // CREATE
 
-			gateOutwardEntryVO = new GateOutwardEntryVO();
+		    gateOutwardEntryVO = new GateOutwardEntryVO();
 
-			gateOutwardEntryVO.setCreatedBy(gateOutwardEntryDTO.getCreatedBy());
+		    gateOutwardEntryVO.setCreatedBy(gateOutwardEntryDTO.getCreatedBy());
+		    gateOutwardEntryVO.setUpdatedBy(gateOutwardEntryDTO.getCreatedBy());
 
-			gateOutwardEntryVO.setUpdatedBy(gateOutwardEntryDTO.getCreatedBy());
+		    // GENERATE DOCUMENT ID
+		    String screenCode = "GOE";
 
-			message = "Gate Outward Entry Created Successfully";
+		    String docId = gateOutwardEntryRepo.getGateOutwardEntryDocId(
+		            gateOutwardEntryDTO.getOrgId(),
+		            gateOutwardEntryDTO.getFinancialYear(),
+		            screenCode
+		    );
+
+		    if (StringUtils.isBlank(docId)) {
+		        throw new ApplicationException("Gate Outward Entry DocId Not Found");
+		    }
+
+		    gateOutwardEntryVO.setDocId(docId);
+
+		    DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+		            documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+		                    gateOutwardEntryDTO.getOrgId(),
+		                    gateOutwardEntryDTO.getFinancialYear(),
+		                    screenCode
+		            );
+
+		    if (documentTypeMappingDetailsVO == null) {
+		        throw new ApplicationException("Document Type Mapping Details Not Found");
+		    }
+
+		    documentTypeMappingDetailsVO.setLastNo(
+		            documentTypeMappingDetailsVO.getLastNo() + 1
+		    );
+
+		    documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+		    gateOutwardEntryVO.setDocDate(LocalDate.now());
+
+		    message = "Gate Outward Entry Created Successfully";
 		}
-
 		// ============================================================
 		// HEADER MAPPING
 		// ============================================================
@@ -12343,11 +12164,12 @@ public class DevelopServiceImpl implements DevelopService {
 		// BASIC DETAILS
 		// ============================================================
 
+		vo.setSerialNo(dto.getSerialNo());	
 		vo.setBreakDown(dto.getBreakDown());
 
-		vo.setDocId(dto.getDocId());
-
-		vo.setDocDate(dto.getDocDate());
+//		vo.setDocId(dto.getDocId());
+//
+//		vo.setDocDate(dto.getDocDate());
 
 		vo.setBreakDownNo(dto.getBreakDownNo());
 
@@ -12434,6 +12256,8 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setSerialNo(vo.getSerialNo());
 
 		responseDTO.setBreakDown(vo.getBreakDown());
+		
+		responseDTO.setDocId(vo.getDocId());
 
 		responseDTO.setDocdate(vo.getDocDate());
 
@@ -12470,6 +12294,8 @@ public class DevelopServiceImpl implements DevelopService {
 			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
 
 			branchResponseDTO.setId(vo.getPlantId().getId());
+			branchResponseDTO.setBranchCode(vo.getPlantId().getBranchCode());
+			branchResponseDTO.setBranchName(vo.getPlantId().getBranchName());
 
 			// Add the other BranchResponseDTO fields
 			// according to your existing BranchResponseDTO.
@@ -12486,6 +12312,7 @@ public class DevelopServiceImpl implements DevelopService {
 			ToolCategoryDetailResponseDTO materialTypeResponseDTO = new ToolCategoryDetailResponseDTO();
 
 			materialTypeResponseDTO.setId(vo.getMaterialType().getId());
+			materialTypeResponseDTO.setCategory(vo.getMaterialType().getApllicableFor());;
 
 			// Set the remaining ToolCategory fields
 			// according to your ToolCategoryDetailResponseDTO.
@@ -12502,7 +12329,7 @@ public class DevelopServiceImpl implements DevelopService {
 			EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO();
 
 			employeeResponseDTO.setId(vo.getMaterialTakenOutBy().getId());
-
+			employeeResponseDTO.setEmployeeName(vo.getMaterialTakenOutBy().getEmployeeName());
 			// Set the remaining employee fields
 			// according to your EmployeeResponseDTO.
 
@@ -13185,8 +13012,6 @@ public class DevelopServiceImpl implements DevelopService {
 
 		responseDTO.setAmountInWords(vo.getAmountInWords());
 
-		
-		
 		responseDTO.setRemarks(vo.getRemarks());
 
 		// ============================================================
@@ -13301,67 +13126,36 @@ public class DevelopServiceImpl implements DevelopService {
 
 		return result;
 	}
-
-//getSubContractorForSCBill
-
+	
+//	challan no dropdown
+	
 	@Override
-	public List<Map<String, Object>> getSubContractorForSCBill(Long orgId, Long branch) throws ApplicationException {
+	public Map<String, Object> getChallanNoForGateOutwardEntry(
+	        Long customer,  String breakdown,
+	        Long branch, Long orgId) throws ApplicationException {
 
-		List<Object[]> subContractorList = customerRepo.getSubContractorForSCBill(orgId, branch);
+	    List<Object[]> challanList = gateOutwardEntryRepo
+	            .getChallanNoForGateOutwardEntry(
+	                    customer,  breakdown, branch, orgId);
 
-		if (subContractorList == null || subContractorList.isEmpty()) {
-			throw new ApplicationException("Sub Contractor Not Found");
-		}
+	    List<Map<String, Object>> reportList = new ArrayList<>();
 
-		List<Map<String, Object>> responseList = new ArrayList<>();
+	    for (Object[] obj : challanList) {
+	        Map<String, Object> reportMap = new HashMap<>();
 
-		for (Object[] obj : subContractorList) {
+	        reportMap.put("subcontbasicid", obj[0]);
+	        reportMap.put("DOCID", obj[1]);
+	        reportMap.put("DOCDATE", obj[2]);
+	        reportMap.put("PARTY", obj[3]);
+	        reportMap.put("BASICID", obj[4]);
 
-			Map<String, Object> response = new HashMap<>();
+	        reportList.add(reportMap);
+	    }
 
-			response.put("partyname", obj[0]);
-			response.put("add1", obj[1]);
-			response.put("add2", obj[2]);
-			response.put("add3", obj[3]);
-			response.put("add4", obj[4]);
-			response.put("accountname", obj[5]);
-			response.put("PartyMASTID", obj[6]);
-			response.put("PartyID", obj[7]);
-			response.put("GSTSTATE", obj[8]);
-			response.put("ISGSTAPPL", obj[9]);
-			response.put("GSTNNO", obj[10]);
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("challanNoForGateOutwardEntry", reportList);
 
-			responseList.add(response);
-		}
-
-		return responseList;
+	    return responseObjectsMap;
 	}
 
-	// getGrnDropdown
-
-	@Override
-	public List<Map<String, Object>> getGrnDropdown(String venid, Long recid, String oldgrnno)
-			throws ApplicationException {
-
-		List<Object[]> grnList = subContractingGRNRepo.getGrnDropdown(venid, recid, oldgrnno);
-
-		if (grnList == null || grnList.isEmpty()) {
-			throw new ApplicationException("GRN Not Found");
-		}
-
-		List<Map<String, Object>> responseList = new ArrayList<>();
-
-		for (Object[] obj : grnList) {
-
-			Map<String, Object> response = new HashMap<>();
-
-			
-			response.put("grnNo", obj[0]);
-			response.put("subGrnBasicId", obj[1]);
-			response.put("under", obj[2]);
-
-			responseList.add(response);
-		}
-		return responseList;
-	}
 }

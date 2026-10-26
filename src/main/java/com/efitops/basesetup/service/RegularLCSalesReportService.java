@@ -28,6 +28,7 @@ public interface RegularLCSalesReportService {
 	Map<String, Object> getDeliveryScheduleYearWiseReport(String year, String belongs, Long branch, Long orgId)
 			throws ApplicationException;
 
+
 	Map<String, Object> getSalesContractApprovalReport(String frdt, String endt, Long branch, Long orgId)
 			throws ApplicationException;
 

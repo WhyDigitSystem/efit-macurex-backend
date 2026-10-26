@@ -35,4 +35,6 @@ public class ProductionEntryDetailsResponseDTO {
     private BigDecimal runningActCostTool;
     private BigDecimal stdConsumCost;
     private BigDecimal runningActCostConsum;
+	private BigDecimal toTimeMins;
+	private BigDecimal lunchTimeMins;
 }

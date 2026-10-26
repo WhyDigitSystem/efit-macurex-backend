@@ -12,53 +12,51 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class ProcessSheetCompRoutingDTO {
-	
-	 private Long id;
 
-	    private Long branch;
+	private Long id;
 
-	    private Long fgSfgItemType;
+	private Long branch;
 
-	    private Long fgSfgItemCode;
+	private String fgSfgItemType;
 
-	    private String itemDescription;
+	private Long fgSfgItemCode;
 
-	    private String bomId;
+	private String itemDescription;
 
-	    private boolean active;
-	    
-	    private BigDecimal totalMcValue;
-	    
-	    private BigDecimal totalLabourValue;
-	    
-	    private BigDecimal totalToolFixtureValue;
-	    
-	    private BigDecimal totalConsumablesValue;
-	    
-	    private BigDecimal totalOperationValue;
-	    
-	    private Long preparedBy;
+	private Long bom;
 
-	    private Long orgId;
+	private boolean active;
 
-	    private String createdBy;
+	private BigDecimal totalMcValue;
 
-	    private String updatedBy;
+	private BigDecimal totalLabourValue;
 
-	    private boolean cancel;
+	private BigDecimal totalToolFixtureValue;
 
-	    private String cancelRemarks;
-	    
-        private List<ProcessSheetCompRoutingDetailDTO> processSheetCompRoutingDetailDTO;
-	    
-	    private List<ProcessSheetCompRoutingMachineDTO> processSheetCompRoutingMachineDTO;
-	    
-	    private List<ProcessSheetToolFixtureDetailsDTO> processSheetToolFixtureDetailsDTO;
-		 
-		 
-	   
-	    
-	
-	
+	private BigDecimal totalConsumablesValue;
+
+	private BigDecimal totalOperationValue;
+
+	private Long preparedBy;
+
+	private Long orgId;
+
+	private String createdBy;
+
+	private String updatedBy;
+
+	private boolean cancel;
+
+	private String cancelRemarks;
+
+	private String costRate;
+
+	private String financialYear;
+
+	private List<ProcessSheetCompRoutingDetailDTO> processSheetCompRoutingDetailDTO;
+
+	private List<ProcessSheetCompRoutingMachineDTO> processSheetCompRoutingMachineDTO;
+
+	private List<ProcessSheetToolFixtureDetailsDTO> processSheetToolFixtureDetailsDTO;
 
 }

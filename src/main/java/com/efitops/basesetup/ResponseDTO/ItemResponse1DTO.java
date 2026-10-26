@@ -13,6 +13,7 @@ public class ItemResponse1DTO {
 	private Long id;
 	private String itemCode;
 	private String itemDescription;
+	private String drawingNo;
 	private UnitMasterResponseDTO unit;
 	
 	

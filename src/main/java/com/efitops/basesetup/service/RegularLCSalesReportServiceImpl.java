@@ -33,6 +33,7 @@ public class RegularLCSalesReportServiceImpl implements RegularLCSalesReportServ
 	@Autowired
 	private DocketInvoiceRepo docketInvoiceRepo;
 	
+
 	@Autowired
 	private SalesContractRepo salesContractRepo;
 	

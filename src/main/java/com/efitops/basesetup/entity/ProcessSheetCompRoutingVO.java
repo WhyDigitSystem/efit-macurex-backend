@@ -33,110 +33,106 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class ProcessSheetCompRoutingVO {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "process_sheet_comp_routing_basicgen")
 	@SequenceGenerator(name = "process_sheet_comp_routing_basicgen", sequenceName = "process_sheet_comp_routing_basicseq", initialValue = 1000000001, allocationSize = 1)
 	@Column(name = "process_sheet_comp_routing_basic_id")
 	private Long id;
+
+	@ManyToOne
+	@JoinColumn(name = "branch")
+	private BranchVO branch;
+
+	@Column(name = "doc_id")
+	private String docId;
+
+	@Column(name = "doc_date")
+	private LocalDate docDate = LocalDate.now();
+
+	@Column(name = "fg_sfg_item_type")
+	private String fgSfgItemType;
+
+	@ManyToOne
+	@JoinColumn(name = "fg_sfg_item_code")
+	private ItemMasterVO fgSfgItemCode;
+
+	@Column(name = "item_description")
+	private String itemDescription;
 	
-	 @ManyToOne
-	 @JoinColumn(name = "branch")
-	 private BranchVO branch;
-	 
-	 @Column(name = "doc_id")
-	 private String docId;
-	 
-	 @Column(name = "doc_date")
-	 private LocalDate docDate = LocalDate.now();
+	@Column(name = "cost_rate")
+	private String costRate;
 
-	 @ManyToOne
-	 @JoinColumn(name = "fg_sfg_item_type")
-	 private ListOfValuesDetailsVO fgSfgItemType;
+	@ManyToOne
+	@JoinColumn(name = "bom")
+	private BillOfMaterialVO bom;
 
-	 @ManyToOne
-	 @JoinColumn(name = "fg_sfg_item_code")
-	 private ItemMasterVO fgSfgItemCode;
-	 
-	 @Column(name = "item_description")
-	 private String itemDescription;
+	@Column(name = "active")
+	private boolean active;
 
-	 @Column(name = "bom_id")
-	 private String bomId;
+	// summary
 
-	 
-	 @Column(name = "active")
-	 private boolean active;
-	 
-	 //summary
-	 
-	 @Column(name = "total_mc_value")
-	 private BigDecimal totalMcValue;
+	@Column(name = "total_mc_value")
+	private BigDecimal totalMcValue;
 
-	 @Column(name = "total_labour_value")
-	 private BigDecimal totalLabourValue;
+	@Column(name = "total_labour_value")
+	private BigDecimal totalLabourValue;
 
-	 @Column(name = "total_tool_fixture_value")
-	 private BigDecimal totalToolFixtureValue;
+	@Column(name = "total_tool_fixture_value")
+	private BigDecimal totalToolFixtureValue;
 
-	 @Column(name = "total_consumables_value")
-	 private BigDecimal totalConsumablesValue;
+	@Column(name = "total_consumables_value")
+	private BigDecimal totalConsumablesValue;
 
-	 @Column(name = "total_operation_value")
-	 private BigDecimal totalOperationValue;
+	@Column(name = "total_operation_value")
+	private BigDecimal totalOperationValue;
 
-	 @ManyToOne
-	 @JoinColumn(name = "prepared_by")
-	 private EmployeeMasterVO preparedBy;
-	   
-	    @Column(name = "org_id")
-	    private Long orgId;
-       
-	    @Column(name = "created_by")
-        private String createdBy;
-		@Column(name = "modified_by")
-		private String updatedBy;
-		@Column(name = "cancel")
-		private boolean cancel = false;
-		@Column(name = "cancel_remarks")
-		private String cancelRemarks;
-		@Column(name = "screen_name")
-		private String screenName = "PROCESSSHEETCOMPROUTING";
-		@Column(name = "screen_code")
-		private String screenCode = "PSCR";
-		
+	@ManyToOne
+	@JoinColumn(name = "prepared_by")
+	private EmployeeMasterVO preparedBy;
 
-		@JsonGetter("activeStatus")
-		public String getActiveStatus() {
-			return active ? "Active" : "In-Active";
-		}
+	@Column(name = "org_id")
+	private Long orgId;
 
-		@JsonGetter("cancelStatus")
-		public String getCancelStatus() {
-			return cancel ? "T" : "F";
-		}
-
-		@Embedded
-		private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
-		
-		
-		@OneToMany(mappedBy = "processSheetCompRoutingVO", cascade = CascadeType.ALL)
-		@JsonManagedReference
-		private List<ProcessSheetCompRoutingDetailVO> processSheetCompRoutingDetailVO = new ArrayList<>();
-		
-		@OneToMany(mappedBy = "processSheetCompRoutingVO", cascade = CascadeType.ALL)
-		@JsonManagedReference
-		private List<ProcessSheetToolFixtureDetailsVO> processSheetToolFixtureDetailsVO = new ArrayList<>();
-		
-
-		@OneToMany(mappedBy = "processSheetCompRoutingVO", cascade = CascadeType.ALL)
-		@JsonManagedReference
-		private List<ProcessSheetCompRoutingMachineVO>processSheetCompRoutingMachineVO = new ArrayList<>();
-
-
-		
-	 
-	 
+	@Column(name = "created_by")
+	private String createdBy;
+	@Column(name = "modified_by")
+	private String updatedBy;
+	@Column(name = "cancel")
+	private boolean cancel = false;
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
+	@Column(name = "screen_name")
+	private String screenName = "PROCESSSHEETCOMPROUTING";
+	@Column(name = "screen_code")
+	private String screenCode = "PSCR";
 	
+	@Column(name = "financial_year")
+	private String financialYear;
+
+	@JsonGetter("activeStatus")
+	public String getActiveStatus() {
+		return active ? "Active" : "In-Active";
+	}
+
+	@JsonGetter("cancelStatus")
+	public String getCancelStatus() {
+		return cancel ? "T" : "F";
+	}
+
+	@Embedded
+	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
+
+	@OneToMany(mappedBy = "processSheetCompRoutingVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<ProcessSheetCompRoutingDetailVO> processSheetCompRoutingDetailVO = new ArrayList<>();
+
+	@OneToMany(mappedBy = "processSheetCompRoutingVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<ProcessSheetToolFixtureDetailsVO> processSheetToolFixtureDetailsVO = new ArrayList<>();
+
+	@OneToMany(mappedBy = "processSheetCompRoutingVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<ProcessSheetCompRoutingMachineVO> processSheetCompRoutingMachineVO = new ArrayList<>();
 
 }

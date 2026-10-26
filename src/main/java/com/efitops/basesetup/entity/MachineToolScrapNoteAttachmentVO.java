@@ -46,12 +46,12 @@ public class MachineToolScrapNoteAttachmentVO {
 
 	@Column(name = "content_type")
 	private String contentType;
-
-	@Column(name = "upload_on")
-	private LocalDateTime uploadOn;
+//
+//	@Column(name = "upload_on")
+//	private LocalDateTime uploadOn;
 
 	@ManyToOne
-	@JoinColumn(name = "machine_tool_scrap_note_basic_id")
+	@JoinColumn(name = "machine_tools_scrap_note_basic_id")
 	@JsonBackReference
 	private MachineToolsScrapNoteVO machineToolsScrapNoteVO;
 }

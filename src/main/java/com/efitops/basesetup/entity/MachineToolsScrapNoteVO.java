@@ -56,8 +56,8 @@ public class MachineToolsScrapNoteVO {
 	@JoinColumn(name = "department")
 	private DepartmentVO departement;
 	
-	@Column(name = "time")
-	private LocalTime time;
+//	@Column(name = "time")
+//	private LocalTime time;
 	
 	@ManyToOne
 	@JoinColumn(name = "from_location")
@@ -113,6 +113,9 @@ public class MachineToolsScrapNoteVO {
 
 	@Column(name = "screen_name")
 	private String screenName = "MACHINE TOOLS SCRAP NOTE";
+	
+    @Column(name = "time")
+    private LocalTime time; 
 	
 	@JsonGetter("active")
 	public String getActive() {

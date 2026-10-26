@@ -32,9 +32,8 @@ public class ProcessSheetToolFixtureDetailsVO {
 	@Column(name = "process_sheet_toolfixture_detail_id")
 	private Long id;
 	
-	@ManyToOne
-    @JoinColumn(name = "usage_type")
-    private ListOfValuesDetailsVO usageType;
+    @Column(name = "usage_type")
+    private String usageType;
 	
 	 @ManyToOne
 	 @JoinColumn(name = "tool_fixture_no")

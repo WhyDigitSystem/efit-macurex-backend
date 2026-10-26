@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -39,13 +40,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
-
+import com.efitops.basesetup.ResponseDTO.BomFgResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanMachineFixtureResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanParameterResponseDTO;
-
-import com.efitops.basesetup.ResponseDTO.BomFgResponseDTO;
-
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanSampleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
@@ -13394,40 +13392,40 @@ public class DevelopServiceImpl implements DevelopService {
 	    return responseObjectsMap;
 	}
 
-		  @Override
-			public List<ControlPlanResponseDTO> getControlPlanByOrgId(Long orgId, Long branch) throws ApplicationException {
+//		  @Override
+//			public List<ControlPlanResponseDTO> getControlPlanByOrgId(Long orgId, Long branch) throws ApplicationException {
+//
+//				List<ControlPlanVO> controlPlanList = controlPlanRepo.findByOrgIdAndBranch_Id(orgId, branch);
+//
+//				if (controlPlanList == null || controlPlanList.isEmpty()) {
+//
+//					throw new ApplicationException("Control Plan Not Found");
+//				}
+//
+//				List<ControlPlanResponseDTO> responseList = new ArrayList<>();
+//
+//				for (ControlPlanVO controlPlanVO : controlPlanList) {
+//
+//					responseList.add(buildControlPlanResponse(controlPlanVO));
+//				}
+//
+//				return responseList;
+//			}
 
-				List<ControlPlanVO> controlPlanList = controlPlanRepo.findByOrgIdAndBranch_Id(orgId, branch);
-
-				if (controlPlanList == null || controlPlanList.isEmpty()) {
-
-					throw new ApplicationException("Control Plan Not Found");
-				}
-
-				List<ControlPlanResponseDTO> responseList = new ArrayList<>();
-
-				for (ControlPlanVO controlPlanVO : controlPlanList) {
-
-					responseList.add(buildControlPlanResponse(controlPlanVO));
-				}
-
-				return responseList;
-			}
-
-		@Override
-		public String getSalesOrderAmendmentDocId(Long orgId, String financialYear) {
-			String screenCode = "SOA";
-
-			String result = salesOrderAmendmentRepo.getSalesOrderAmendmentDocId(orgId, financialYear, screenCode);
-
-			return result;
-		}
+//		@Override
+//		public String getSalesOrderAmendmentDocId(Long orgId, String financialYear) {
+//			String screenCode = "SOA";
+//
+//			String result = salesOrderAmendmentRepo.getSalesOrderAmendmentDocId(orgId, financialYear, screenCode);
+//
+//			return result;
+//		}
 
 //		 // Sales Order Amendment
 
 		@Override
 		@Transactional
-		public Map<String, Object> updateCreateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
+		public Map<String, Object> createUpdateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
 				throws ApplicationException {
 
 			String screenCode = "SOA";
@@ -13822,5 +13820,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		return list;
 	}
+
+	
 
 }

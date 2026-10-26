@@ -375,4 +375,9 @@ public interface DevelopService {
 
 	ResponseEntity<byte[]> viewEnquiryFile(HttpServletRequest request) throws IOException;
 
+	
+
+	Map<String, Object> getChallanNoForGateOutwardEntry(Long customer, String breakdown, Long branch, Long orgId)
+			throws ApplicationException;
+
 }

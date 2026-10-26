@@ -4755,4 +4755,43 @@ public class DevelopController extends BaseController {
 			return ResponseEntity.status(500).build();
 		}
 	}
+	
+	@GetMapping("/getChallanNoForGateOutwardEntry")
+	public ResponseEntity<ResponseDTO> getChallanNoForGateOutwardEntry(
+	        @RequestParam Long customer,
+	        @RequestParam String breakdown,
+	        @RequestParam Long branch,
+	        @RequestParam Long orgId) {
+
+	    String methodName = "getChallanNoForGateOutwardEntry()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+	    String errorMsg = null;
+
+	    try {
+	        responseObjectsMap = developService
+	                .getChallanNoForGateOutwardEntry(
+	                        customer,  breakdown, branch, orgId);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg,
+	                e);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap, errorMsg, errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
 }

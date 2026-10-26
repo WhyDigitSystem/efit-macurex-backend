@@ -25,6 +25,7 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12012,17 +12013,49 @@ public class DevelopServiceImpl implements DevelopService {
 
 		} else {
 
-			// CREATE
+		    // CREATE
 
-			gateOutwardEntryVO = new GateOutwardEntryVO();
+		    gateOutwardEntryVO = new GateOutwardEntryVO();
 
-			gateOutwardEntryVO.setCreatedBy(gateOutwardEntryDTO.getCreatedBy());
+		    gateOutwardEntryVO.setCreatedBy(gateOutwardEntryDTO.getCreatedBy());
+		    gateOutwardEntryVO.setUpdatedBy(gateOutwardEntryDTO.getCreatedBy());
 
-			gateOutwardEntryVO.setUpdatedBy(gateOutwardEntryDTO.getCreatedBy());
+		    // GENERATE DOCUMENT ID
+		    String screenCode = "GOE";
 
-			message = "Gate Outward Entry Created Successfully";
+		    String docId = gateOutwardEntryRepo.getGateOutwardEntryDocId(
+		            gateOutwardEntryDTO.getOrgId(),
+		            gateOutwardEntryDTO.getFinancialYear(),
+		            screenCode
+		    );
+
+		    if (StringUtils.isBlank(docId)) {
+		        throw new ApplicationException("Gate Outward Entry DocId Not Found");
+		    }
+
+		    gateOutwardEntryVO.setDocId(docId);
+
+		    DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+		            documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+		                    gateOutwardEntryDTO.getOrgId(),
+		                    gateOutwardEntryDTO.getFinancialYear(),
+		                    screenCode
+		            );
+
+		    if (documentTypeMappingDetailsVO == null) {
+		        throw new ApplicationException("Document Type Mapping Details Not Found");
+		    }
+
+		    documentTypeMappingDetailsVO.setLastNo(
+		            documentTypeMappingDetailsVO.getLastNo() + 1
+		    );
+
+		    documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+		    gateOutwardEntryVO.setDocDate(LocalDate.now());
+
+		    message = "Gate Outward Entry Created Successfully";
 		}
-
 		// ============================================================
 		// HEADER MAPPING
 		// ============================================================
@@ -12131,11 +12164,12 @@ public class DevelopServiceImpl implements DevelopService {
 		// BASIC DETAILS
 		// ============================================================
 
+		vo.setSerialNo(dto.getSerialNo());	
 		vo.setBreakDown(dto.getBreakDown());
 
-		vo.setDocId(dto.getDocId());
-
-		vo.setDocDate(dto.getDocDate());
+//		vo.setDocId(dto.getDocId());
+//
+//		vo.setDocDate(dto.getDocDate());
 
 		vo.setBreakDownNo(dto.getBreakDownNo());
 
@@ -12222,6 +12256,8 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setSerialNo(vo.getSerialNo());
 
 		responseDTO.setBreakDown(vo.getBreakDown());
+		
+		responseDTO.setDocId(vo.getDocId());
 
 		responseDTO.setDocdate(vo.getDocDate());
 
@@ -12258,6 +12294,8 @@ public class DevelopServiceImpl implements DevelopService {
 			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
 
 			branchResponseDTO.setId(vo.getPlantId().getId());
+			branchResponseDTO.setBranchCode(vo.getPlantId().getBranchCode());
+			branchResponseDTO.setBranchName(vo.getPlantId().getBranchName());
 
 			// Add the other BranchResponseDTO fields
 			// according to your existing BranchResponseDTO.
@@ -12274,6 +12312,7 @@ public class DevelopServiceImpl implements DevelopService {
 			ToolCategoryDetailResponseDTO materialTypeResponseDTO = new ToolCategoryDetailResponseDTO();
 
 			materialTypeResponseDTO.setId(vo.getMaterialType().getId());
+			materialTypeResponseDTO.setCategory(vo.getMaterialType().getApllicableFor());;
 
 			// Set the remaining ToolCategory fields
 			// according to your ToolCategoryDetailResponseDTO.
@@ -12290,7 +12329,7 @@ public class DevelopServiceImpl implements DevelopService {
 			EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO();
 
 			employeeResponseDTO.setId(vo.getMaterialTakenOutBy().getId());
-
+			employeeResponseDTO.setEmployeeName(vo.getMaterialTakenOutBy().getEmployeeName());
 			// Set the remaining employee fields
 			// according to your EmployeeResponseDTO.
 
@@ -13086,6 +13125,37 @@ public class DevelopServiceImpl implements DevelopService {
 		String result = scBillRepo.getSCBillDocId(orgId, financialYear, screenCode);
 
 		return result;
+	}
+	
+//	challan no dropdown
+	
+	@Override
+	public Map<String, Object> getChallanNoForGateOutwardEntry(
+	        Long customer,  String breakdown,
+	        Long branch, Long orgId) throws ApplicationException {
+
+	    List<Object[]> challanList = gateOutwardEntryRepo
+	            .getChallanNoForGateOutwardEntry(
+	                    customer,  breakdown, branch, orgId);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : challanList) {
+	        Map<String, Object> reportMap = new HashMap<>();
+
+	        reportMap.put("subcontbasicid", obj[0]);
+	        reportMap.put("DOCID", obj[1]);
+	        reportMap.put("DOCDATE", obj[2]);
+	        reportMap.put("PARTY", obj[3]);
+	        reportMap.put("BASICID", obj[4]);
+
+	        reportList.add(reportMap);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("challanNoForGateOutwardEntry", reportList);
+
+	    return responseObjectsMap;
 	}
 
 }

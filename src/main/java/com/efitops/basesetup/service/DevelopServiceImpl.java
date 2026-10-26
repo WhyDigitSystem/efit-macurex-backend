@@ -630,9 +630,9 @@ public class DevelopServiceImpl implements DevelopService {
 	private DailyExchangeRateRepo dailyExchangeRateRepo;
 
 	@Autowired
-
 	SubContractingGRNRepo subContractingGRNRepo;
 
+	@Autowired
 	private BillOfMaterialRepo billOfMaterialRepo;
 
 
@@ -6437,13 +6437,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		processSheetCompRoutingVO.setItemDescription(processSheetCompRoutingDTO.getItemDescription());
 
-		if (processSheetCompRoutingDTO.getBom() != null && processSheetCompRoutingDTO.getBom() != 0) {
-
-			BillOfMaterialVO department = billOfMaterialRepo.findById(processSheetCompRoutingDTO.getBom())
-					.orElseThrow(() -> new ApplicationException("Bom Not Found"));
-
-			processSheetCompRoutingVO.setBom(department);
-		}
+		
 
 		processSheetCompRoutingVO.setActive(processSheetCompRoutingDTO.isActive());
 
@@ -6476,6 +6470,14 @@ public class DevelopServiceImpl implements DevelopService {
 					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
 
 			processSheetCompRoutingVO.setBranch(branch);
+		}
+		
+		if (processSheetCompRoutingDTO.getBom() != null && processSheetCompRoutingDTO.getBom() != 0) {
+
+			BillOfMaterialVO billOfMaterialVO = billOfMaterialRepo.findById(processSheetCompRoutingDTO.getBom())
+					.orElseThrow(() -> new ApplicationException("Bom Not Found"));
+
+			processSheetCompRoutingVO.setBom(billOfMaterialVO);
 		}
 
 //

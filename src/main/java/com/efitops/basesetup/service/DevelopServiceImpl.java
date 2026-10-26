@@ -13412,14 +13412,14 @@ public class DevelopServiceImpl implements DevelopService {
 //				return responseList;
 //			}
 
-//		@Override
-//		public String getSalesOrderAmendmentDocId(Long orgId, String financialYear) {
-//			String screenCode = "SOA";
-//
-//			String result = salesOrderAmendmentRepo.getSalesOrderAmendmentDocId(orgId, financialYear, screenCode);
-//
-//			return result;
-//		}
+		@Override
+		public String getSalesOrderAmendmentDocId(Long orgId, String financialYear) {
+			String screenCode = "SOA";
+
+			String result = salesOrderAmendmentRepo.getSalesOrderAmendmentDocId(orgId, financialYear, screenCode);
+
+			return result;
+		}
 
 //		 // Sales Order Amendment
 

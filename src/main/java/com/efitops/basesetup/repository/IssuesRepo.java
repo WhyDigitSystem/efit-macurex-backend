@@ -145,4 +145,34 @@ public interface IssuesRepo extends JpaRepository<IssuesVO, Long> {
 			""")
 	String getIssuesDocId(Long orgId, String financialYear, String screenCode1);
 
+	@Query(value = """
+			SELECT
+			    l1.location_id AS LOCID,
+			    l2.location_id AS issueto,
+			    ib.doc_id AS ISSNO,
+			    ib.belongs_to AS UNDER,
+			    ib.doc_date AS ISSDT,
+			    i.item_code AS ITEMID,
+			    i.item_description AS ITEMDESC,
+			    id.qty AS ISSQTY,
+			    i.landed_cost_rate AS LPORATE,
+			    (id.qty * CAST(i.landed_cost_rate AS DECIMAL(19,2))) AS Value
+			FROM issue_basic ib
+			INNER JOIN issue_detail id
+			    ON ib.issue_basic_id = id.issue_basic_id
+			INNER JOIN location l1
+			    ON l1.id = ib.issue_from
+			INNER JOIN item i
+			    ON i.item_id = id.item
+			INNER JOIN location l2
+			    ON l2.id = ib.issue_to
+			WHERE ib.doc_date BETWEEN :fromDate AND :toDate
+			  AND ib.belongs_to = :bel
+			  AND ib.branch = :branch
+			  AND ib.org_id = :orgId
+			ORDER BY ib.doc_date, ib.indent_no
+			""", nativeQuery = true)
+	List<Object[]> getIssueReport(@Param("fromDate") String fromDate, @Param("toDate") String toDate,
+			@Param("bel") String bel, @Param("branch") Long branch, @Param("orgId") Long orgId);
+
 }

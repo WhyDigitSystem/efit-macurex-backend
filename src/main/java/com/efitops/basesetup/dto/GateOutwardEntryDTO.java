@@ -19,14 +19,14 @@ public class GateOutwardEntryDTO {
 
 	    private Long plantId;
 
-	    private String docId;
+	   
 	    
 	    private String serialNo;
 
 
 	    private String breakDown;
 
-	    private LocalDate docDate;
+	   
 	    
 	    private String breakDownNo;
 

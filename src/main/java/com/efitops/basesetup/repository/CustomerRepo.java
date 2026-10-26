@@ -383,5 +383,120 @@ public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
 	List<Object[]> getSubContractorForSCBill(
 	        @Param("orgId") Long orgId,
 	        @Param("branch") Long branch);
+	
+	
+	//getCustomerAchievedDetailsReport
+	
+	
+	@Query(value = """
+		    SELECT
+		        result.partymastid,
+		        result.partyid,
+		        result.partyname,
+		        SUM(result.mamt) AS mamt,
+		        SUM(result.damt) AS damt,
+		        result.monyear,
+		        result.belongs
+		    FROM (
+		        /* Section 1: Order Acceptance */
+		        SELECT
+		            s.month_year AS monyear,
+		            p.customer_id AS partymastid,
+		            p.customer_code AS partyid,
+		            p.customer_name AS partyname,
+		            SUM(sd.order_qty * d.order_rate) AS mamt,
+		            0 AS damt,
+		            p.belongs_to AS belongs
+		        FROM sdvbasic s
+		        JOIN customer_header p
+		            ON s.customer_id = p.customer_id
+		        JOIN sdvdet sd
+		            ON s.sdvbasic_id = sd.sdvbasic_id
+		        JOIN order_acceptance_basic o
+		            ON o.doc_id = sd.so_no_contractno
+		        JOIN order_acceptance_detail d
+		            ON d.order_acceptance_basic_id =
+		               o.order_acceptance_basic_id
+		           AND d.item = sd.item_id
+		        WHERE s.cancel = b'0'
+		          AND s.month_year = :myear
+		          AND p.belongs_to = :under
+		        GROUP BY
+		            s.month_year,
+		            p.customer_id,
+		            p.customer_code,
+		            p.customer_name,
+		            p.belongs_to
+
+		        UNION ALL
+
+		        /* Section 2: Sales Contract */
+		        SELECT
+		            s.month_year AS monyear,
+		            p.customer_id AS partymastid,
+		            p.customer_code AS partyid,
+		            p.customer_name AS partyname,
+		            SUM(sd.order_qty * d.order_rate) AS mamt,
+		            0 AS damt,
+		            p.belongs_to AS belongs
+		        FROM sdvbasic s
+		        JOIN customer_header p
+		            ON s.customer_id = p.customer_id
+		        JOIN sdvdet sd
+		            ON s.sdvbasic_id = sd.sdvbasic_id
+		        JOIN sales_contract_basic o
+		            ON o.customer_contract_no = sd.so_no_contractno
+		        JOIN sales_contract_detail d
+		            ON d.salescontract_id = o.salescontract_id
+		           AND d.item = sd.item_id
+		        WHERE s.cancel = b'0'
+		          AND s.month_year = :myear
+		          AND p.belongs_to = :under
+		        GROUP BY
+		            s.month_year,
+		            p.customer_id,
+		            p.customer_code,
+		            p.customer_name,
+		            p.belongs_to
+
+		        UNION ALL
+
+		        /* Section 3: Sales Rejection Invoice */
+		        SELECT
+		            db.month_year AS monyear,
+		            pm.customer_id AS partymastid,
+		            pm.customer_code AS partyid,
+		            pm.customer_name AS partyname,
+		            0 AS mamt,
+		            SUM(dd.amount_in_rs) AS damt,
+		            pm.belongs_to AS belongs
+		        FROM sales_rejection_invoice_basic db
+		        JOIN sales_rejection_invoice_detail dd
+		            ON db.sales_rejection_invoice_basic_id =
+		               dd.sales_rejection_invoice_basic_id
+		        JOIN customer_header pm
+		            ON pm.customer_id = db.customer
+		        WHERE db.cancel = b'0'
+		          AND db.month_year = :myear
+		          AND pm.belongs_to = :under
+		        GROUP BY
+		            db.month_year,
+		            pm.customer_id,
+		            pm.customer_code,
+		            pm.customer_name,
+		            pm.belongs_to
+		    ) AS result
+		    GROUP BY
+		        result.partymastid,
+		        result.partyid,
+		        result.partyname,
+		        result.monyear,
+		        result.belongs
+		    ORDER BY result.partyid
+		    """, nativeQuery = true)
+		List<Object[]> getCustomerAchievedDetails(
+		        @Param("myear") String myear,
+		        @Param("under") String under
+		);
 
 }

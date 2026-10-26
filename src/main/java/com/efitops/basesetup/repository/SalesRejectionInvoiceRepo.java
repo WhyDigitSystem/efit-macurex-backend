@@ -406,6 +406,47 @@ public interface SalesRejectionInvoiceRepo extends JpaRepository<SalesRejectionI
 	    List<Object[]> getCustomerSalesRegisterAppliancesReport(
 	            @Param("orgId") Long orgId,
 	            @Param("branch") Long branch);
-	
+	    
+	    
+	  //salesRegisterCustomerBosch
+	    
+	    @Query(value = """
+	    	    SELECT
+	    	        IVB.doc_id AS DOCID,
+	    	        IVB.doc_date AS DOCDT,
+	    	        IVD.sales_order_contract_no AS OANO,
+	    	        PM.customer_code AS PARTYID,
+	    	        PM.customer_name AS PARTYNAME,
+	    	        IM.item_code AS ITEMID,
+	    	        IM.item_description AS ITEMDESC,
+	    	        UM.unit_id AS UNITID,
+	    	        IVD.despatch_qty AS QTY,
+	    	        IF(
+	    	            COALESCE(IVD.new_rate, 0) = 0,
+	    	            IVD.rate_in_selected_currency,
+	    	            IVD.new_rate
+	    	        ) AS RATE,
+	    	        IVD.amount_in_rs AS amtinrs,
+	    	        IVD.cgst_amount AS CGSTVAL,
+	    	        IVD.sgst_amount AS SGSTVAL,
+	    	        IVD.igst_amount AS IGSTVAL
+	    	    FROM sales_rejection_invoice_basic IVB
+	    	    JOIN sales_rejection_invoice_detail IVD
+	    	        ON IVB.sales_rejection_invoice_basic_id =
+	    	           IVD.sales_rejection_invoice_basic_id
+	    	    LEFT JOIN customer_header PM
+	    	        ON PM.customer_id = IVB.customer
+	    	    LEFT JOIN item IM
+	    	        ON IM.item_id = IVD.item
+	    	    LEFT JOIN unitmaster UM
+	    	        ON UM.unitmaster_id = IVD.unit
+	    	    WHERE IVB.cancel = b'0'
+	    	      AND IVB.doc_date BETWEEN :fromdate AND :todate
+	    	      AND LOWER(IVB.narration) = 'sales rejection invoice'
+	    	    ORDER BY PM.customer_name, IM.item_description
+	    	    """, nativeQuery = true)
+	    	List<Object[]> getsalesRegisterCustomerBosch(
+	    	    @Param("fromdate") String fromdate,
+	    	    @Param("todate") String todate);
 
 }

@@ -22,6 +22,12 @@ public interface ReportService {
 	List<Map<String, Object>> getCustomerSalesRegisterAppliancesReport(Long orgId, Long branch)
 			throws ApplicationException;
 
+	Map<String, Object> getSalesRegisterCustomerBosch(String fromdate, String todate) throws ApplicationException;
+
+	Map<String, Object> getCustomerAchievedDetailsReport(String myear, String under) throws ApplicationException;
+
+	Map<String, Object> getSubContractingGrnForInwardInspectionReport(String asOnDate) throws ApplicationException;
+
 	
 	
 	

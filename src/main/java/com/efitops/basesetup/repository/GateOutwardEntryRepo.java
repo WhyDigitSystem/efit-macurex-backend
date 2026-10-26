@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.efitops.basesetup.entity.GateOutwardEntryVO;
 
@@ -19,5 +20,33 @@ public interface GateOutwardEntryRepo extends JpaRepository<GateOutwardEntryVO, 
 	        Long orgId,
 	        String financialYear,
 	        String screenCode);
+	
+	
+	@Query(value = """
+	        SELECT DISTINCT
+	            a.deliverychallan_subcontracting_id AS subcontbasicid,
+	            a.doc_id AS DOCID,
+	            a.doc_date AS DOCDATE,
+	            c.customer_name AS PARTY,
+	            a.deliverychallan_subcontracting_id AS BASICID
+	        FROM deliverychallan_subcontracting a
+	        INNER JOIN deliverychallan_subcontracting_details b
+	            ON a.deliverychallan_subcontracting_id =
+	               b.deliverychallan_subcontracting_id
+	        INNER JOIN customer_header c
+	            ON c.customer_id = a.vendor
+	        WHERE a.cancel = FALSE
+	          AND c.customer_id = :customer
+	          AND :breakdown = 'NO'
+	          AND a.branch = :branch
+	          AND a.org_id = :orgId
+	        ORDER BY a.doc_id
+	        """, nativeQuery = true)
+	List<Object[]> getChallanNoForGateOutwardEntry(
+	        @Param("customer") Long customer,
+	        @Param("breakdown") String breakdown,
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId
+	);
 
 }

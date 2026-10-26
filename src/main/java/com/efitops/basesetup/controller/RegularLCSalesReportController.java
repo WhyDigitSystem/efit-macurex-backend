@@ -255,4 +255,173 @@ public class RegularLCSalesReportController extends BaseController {
 
 		return ResponseEntity.ok().body(responseDTO);
 	}
+
+//	sales contract approved report
+	@GetMapping("/getSalesContractApprovalReport")
+	public ResponseEntity<ResponseDTO> getSalesContractApprovalReport(@RequestParam String frdt,
+			@RequestParam String endt, @RequestParam Long branch, @RequestParam Long orgId) {
+
+		String methodName = "getSalesContractApprovalReport()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+			responseObjectsMap = regularLCSalesReportService.getSalesContractApprovalReport(frdt, endt, branch, orgId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+//	physical stock reconcilation
+
+	@GetMapping("/getPhysicalStockReconciliationReport")
+	public ResponseEntity<ResponseDTO> getPhysicalStockReconciliationReport(@RequestParam Long orgId,
+			@RequestParam Long branch, @RequestParam String fromDate, @RequestParam String toDate) {
+
+		String methodName = "getPhysicalStockReconciliationReport()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+			responseObjectsMap = regularLCSalesReportService.getPhysicalStockReconciliationReport(orgId, branch,
+					fromDate, toDate);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+
+	@GetMapping("/getIssueReport")
+	public ResponseEntity<ResponseDTO> getIssueReport(@RequestParam String fromDate, @RequestParam String toDate,
+			@RequestParam String bel, @RequestParam Long branch, @RequestParam Long orgId) {
+
+		String methodName = "getIssueReport()";
+		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+		ResponseDTO responseDTO = null;
+		String errorMsg = null;
+
+		try {
+			responseObjectsMap = regularLCSalesReportService.getIssueReport(fromDate, toDate, bel, branch, orgId);
+
+			responseDTO = createServiceResponse(responseObjectsMap);
+
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
+
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+
+			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+		}
+
+		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+		return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getInternalIndentReport")
+	public ResponseEntity<ResponseDTO> getInternalIndentReport(
+	        @RequestParam String fromDate,
+	        @RequestParam String toDate,
+	        @RequestParam String bel,
+	        @RequestParam Long branch,
+	        @RequestParam Long orgId
+	        ) {
+
+	    String methodName = "getInternalIndentReport()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+	    String errorMsg = null;
+
+	    try {
+	        responseObjectsMap = regularLCSalesReportService
+	                .getInternalIndentReport(fromDate, toDate, bel,branch,orgId);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg,
+	                e);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap, errorMsg, errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
+	@GetMapping("/getSupplierRateContractReport")
+	public ResponseEntity<ResponseDTO> getSupplierRateContractReport(
+	        @RequestParam Long branch,
+	        @RequestParam Long orgId,
+	        @RequestParam String frdt,
+	        @RequestParam String todt) {
+
+	    String methodName = "getSupplierRateContractReport()";
+	    LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    ResponseDTO responseDTO = null;
+	    String errorMsg = null;
+
+	    try {
+	        responseObjectsMap = regularLCSalesReportService
+	                .getSupplierRateContractReport(branch,orgId, frdt, todt);
+
+	        responseDTO = createServiceResponse(responseObjectsMap);
+
+	    } catch (Exception e) {
+	        errorMsg = e.getMessage();
+
+	        LOGGER.error(
+	                UserConstants.ERROR_MSG_METHOD_NAME,
+	                methodName,
+	                errorMsg,
+	                e);
+
+	        responseDTO = createServiceResponseError(
+	                responseObjectsMap, errorMsg, errorMsg);
+	    }
+
+	    LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
+
+	    return ResponseEntity.ok().body(responseDTO);
+	}
+	
 }

@@ -389,5 +389,7 @@ public interface DevelopService {
 
 	List<Map<String, Object>> getMachineDetailsProcessSheetComp(Long orgId, Long branch);
 
+	String getSalesOrderAmendmentDocId(Long orgId, String financialYear);
+
 
 }

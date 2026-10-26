@@ -12,7 +12,8 @@ public class ControlPlanMachineFixtureResponseDTO {
 	
 	 private Long id;
 
-	    private MachineMasterResponse1DTO machineFixtureNo;
+//	    private MachineMasterResponse1DTO machineFixtureNo;
+	    private String machineFixtureNo;
 
 	    private String machineFixtureName;
 }

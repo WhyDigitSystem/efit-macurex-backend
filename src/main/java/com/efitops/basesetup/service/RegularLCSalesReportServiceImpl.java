@@ -12,8 +12,13 @@ import org.springframework.stereotype.Service;
 
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.DocketInvoiceRepo;
+import com.efitops.basesetup.repository.InternalIndentRepo;
+import com.efitops.basesetup.repository.IssuesRepo;
+import com.efitops.basesetup.repository.PhysicalStockReConcilationRepo;
+import com.efitops.basesetup.repository.SalesContractRepo;
 import com.efitops.basesetup.repository.SalesDeliveryScheduleRepo;
 import com.efitops.basesetup.repository.SalesRejectionInvoiceRepo;
+import com.efitops.basesetup.repository.SupplierRateContractRepo;
 
 @Service
 public class RegularLCSalesReportServiceImpl implements RegularLCSalesReportService {
@@ -27,6 +32,22 @@ public class RegularLCSalesReportServiceImpl implements RegularLCSalesReportServ
 	
 	@Autowired
 	private DocketInvoiceRepo docketInvoiceRepo;
+	
+
+	@Autowired
+	private SalesContractRepo salesContractRepo;
+	
+	@Autowired
+	private PhysicalStockReConcilationRepo physicalStockReConcilationRepo;
+	
+	@Autowired
+	private IssuesRepo issuesRepo;
+	
+	@Autowired
+	private InternalIndentRepo internalIndentRepo;
+	
+	@Autowired
+	private SupplierRateContractRepo supplierRateContractRepo;
 	
 	@Override
 	public Map<String, Object> getRegularLCSalesReport(Long belongsTo, Long branch, Long orgId, String fromDate,
@@ -280,6 +301,167 @@ public class RegularLCSalesReportServiceImpl implements RegularLCSalesReportServ
 
 	    Map<String, Object> responseObjectsMap = new HashMap<>();
 	    responseObjectsMap.put("deliveryScheduleYearWiseReport", reportList);
+
+	    return responseObjectsMap;
+	}
+	
+//	sales contract approval report
+	
+	@Override
+	public Map<String, Object> getSalesContractApprovalReport(
+	        String frdt, String endt, Long branch, Long orgId) throws ApplicationException {
+
+	    List<Object[]> salesContractList = salesContractRepo
+	            .getSalesContractApprovalReport(frdt, endt, branch, orgId);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : salesContractList) {
+	        Map<String, Object> reportMap = new HashMap<>();
+
+	        reportMap.put("ORDRECDNO", obj[0]);
+	        reportMap.put("ORDRECDDT", obj[1]);
+	        reportMap.put("partyid", obj[2]);
+	        reportMap.put("partyname", obj[3]);
+	        reportMap.put("approval", obj[4]);
+	        reportMap.put("schagrbasicid", obj[5]);
+	        reportMap.put("note", obj[6]);
+
+	        reportList.add(reportMap);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("salesContractApprovalReport", reportList);
+
+	    return responseObjectsMap;
+	}
+	
+//	physical stock reconcilation
+	
+	@Override
+	public Map<String, Object> getPhysicalStockReconciliationReport(
+	        Long orgId, Long branch, String fromDate, String toDate)
+	        throws ApplicationException {
+
+	    List<Object[]> physicalStockList = physicalStockReConcilationRepo
+	            .getPhysicalStockReconciliationReport(
+	                    orgId, branch, fromDate, toDate);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : physicalStockList) {
+	        Map<String, Object> reportMap = new HashMap<>();
+
+	        reportMap.put("phystheadid", obj[0]);
+	        reportMap.put("reconid", obj[1]);
+	        reportMap.put("recondt", obj[2]);
+	        reportMap.put("appprod", obj[3]);
+	        reportMap.put("ttime", obj[4]);
+	        reportMap.put("PREBY", obj[5]);
+
+	        reportList.add(reportMap);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("physicalStockReconciliationReport", reportList);
+
+	    return responseObjectsMap;
+	}
+	
+	@Override
+	public Map<String, Object> getIssueReport(
+	        String fromDate, String toDate, String bel,
+	        Long branch, Long orgId) throws ApplicationException {
+
+	    List<Object[]> issueList = issuesRepo.getIssueReport(
+	            fromDate, toDate, bel, branch, orgId);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : issueList) {
+	        Map<String, Object> reportMap = new HashMap<>();
+
+	        reportMap.put("LOCID", obj[0]);
+	        reportMap.put("issueto", obj[1]);
+	        reportMap.put("ISSNO", obj[2]);
+	        reportMap.put("UNDER", obj[3]);
+	        reportMap.put("ISSDT", obj[4]);
+	        reportMap.put("ITEMID", obj[5]);
+	        reportMap.put("ITEMDESC", obj[6]);
+	        reportMap.put("ISSQTY", obj[7]);
+	        reportMap.put("LPORATE", obj[8]);
+	        reportMap.put("Value", obj[9]);
+
+	        reportList.add(reportMap);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("issueReport", reportList);
+
+	    return responseObjectsMap;
+	}
+	
+	@Override
+	public Map<String, Object> getInternalIndentReport(
+	        String fromDate, String toDate, String bel,Long branch,Long orgId)
+	        throws ApplicationException {
+
+	    List<Object[]> indentList = internalIndentRepo
+	            .getInternalIndentReport(fromDate, toDate, bel,branch,orgId);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : indentList) {
+	        Map<String, Object> reportMap = new HashMap<>();
+
+	        reportMap.put("DEPTNAME", obj[0]);
+	        reportMap.put("DOCID", obj[1]);
+	        reportMap.put("indtime", obj[2]);
+	        reportMap.put("DOCDATE", obj[3]);
+	        reportMap.put("PREBY", obj[4]);
+	        reportMap.put("ITEMID", obj[5]);
+	        reportMap.put("ITEMDESC", obj[6]);
+	        reportMap.put("QTY", obj[7]);
+	        reportMap.put("DELIVERYDATE", obj[8]);
+
+	        reportList.add(reportMap);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("internalIndentReport", reportList);
+
+	    return responseObjectsMap;
+	}
+	
+	@Override
+	public Map<String, Object> getSupplierRateContractReport(
+	        Long branch,Long orgId, String frdt, String todt) throws ApplicationException {
+
+	    List<Object[]> supplierRateContractList =
+	            supplierRateContractRepo.getSupplierRateContractReport(
+	                    branch,orgId, frdt, todt);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : supplierRateContractList) {
+	        Map<String, Object> reportMap = new HashMap<>();
+
+	        reportMap.put("CONTNO", obj[0]);
+	        reportMap.put("CONTDT", obj[1]);
+	        reportMap.put("PARTYNAME", obj[2]);
+	        reportMap.put("CONFOR", obj[3]);
+	        reportMap.put("AMOUNT", obj[4]);
+	        reportMap.put("validfr", obj[5]);
+	        reportMap.put("validto", obj[6]);
+	        reportMap.put("taxdesc", obj[7]);
+	        reportMap.put("ITEMID", obj[8]);
+	        reportMap.put("ITEMDESC", obj[9]);
+
+	        reportList.add(reportMap);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("supplierRateContractReport", reportList);
 
 	    return responseObjectsMap;
 	}

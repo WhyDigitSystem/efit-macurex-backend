@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +40,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
-
+import com.efitops.basesetup.ResponseDTO.BomFgResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanDetailResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanMachineFixtureResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanParameterResponseDTO;
-
-import com.efitops.basesetup.ResponseDTO.BomFgResponseDTO;
-
 import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
 import com.efitops.basesetup.ResponseDTO.ControlPlanSampleResponseDTO;
 import com.efitops.basesetup.ResponseDTO.CountryResponseDTO;
@@ -7732,6 +7731,8 @@ public class DevelopServiceImpl implements DevelopService {
 
 	// createupdatecontrolplan
 
+	// createupdatecontrolplan
+
 	@Override
 	@Transactional
 	public Map<String, Object> createUpdateControlPlan(ControlPlanDTO controlPlanDTO) throws ApplicationException {
@@ -8440,6 +8441,25 @@ public class DevelopServiceImpl implements DevelopService {
 	         	      
 		return responseDTO;
 		
+	}
+	@Override
+	public List<ControlPlanResponseDTO> getControlPlanByOrgId(Long orgId, Long branch) throws ApplicationException {
+
+		List<ControlPlanVO> controlPlanList = controlPlanRepo.findByOrgIdAndBranch_Id(orgId, branch);
+
+		if (controlPlanList == null || controlPlanList.isEmpty()) {
+
+			throw new ApplicationException("Control Plan Not Found");
+		}
+
+		List<ControlPlanResponseDTO> responseList = new ArrayList<>();
+
+		for (ControlPlanVO controlPlanVO : controlPlanList) {
+
+			responseList.add(buildControlPlanResponse(controlPlanVO));
+		}
+
+		return responseList;
 	}
 
 	@Override
@@ -12229,17 +12249,49 @@ public class DevelopServiceImpl implements DevelopService {
 
 		} else {
 
-			// CREATE
+		    // CREATE
 
-			gateOutwardEntryVO = new GateOutwardEntryVO();
+		    gateOutwardEntryVO = new GateOutwardEntryVO();
 
-			gateOutwardEntryVO.setCreatedBy(gateOutwardEntryDTO.getCreatedBy());
+		    gateOutwardEntryVO.setCreatedBy(gateOutwardEntryDTO.getCreatedBy());
+		    gateOutwardEntryVO.setUpdatedBy(gateOutwardEntryDTO.getCreatedBy());
 
-			gateOutwardEntryVO.setUpdatedBy(gateOutwardEntryDTO.getCreatedBy());
+		    // GENERATE DOCUMENT ID
+		    String screenCode = "GOE";
 
-			message = "Gate Outward Entry Created Successfully";
+		    String docId = gateOutwardEntryRepo.getGateOutwardEntryDocId(
+		            gateOutwardEntryDTO.getOrgId(),
+		            gateOutwardEntryDTO.getFinancialYear(),
+		            screenCode
+		    );
+
+		    if (StringUtils.isBlank(docId)) {
+		        throw new ApplicationException("Gate Outward Entry DocId Not Found");
+		    }
+
+		    gateOutwardEntryVO.setDocId(docId);
+
+		    DocumentTypeMappingDetailsVO documentTypeMappingDetailsVO =
+		            documentTypeMappingDetailsRepo.findByOrgIdAndFinYearAndScreenCode(
+		                    gateOutwardEntryDTO.getOrgId(),
+		                    gateOutwardEntryDTO.getFinancialYear(),
+		                    screenCode
+		            );
+
+		    if (documentTypeMappingDetailsVO == null) {
+		        throw new ApplicationException("Document Type Mapping Details Not Found");
+		    }
+
+		    documentTypeMappingDetailsVO.setLastNo(
+		            documentTypeMappingDetailsVO.getLastNo() + 1
+		    );
+
+		    documentTypeMappingDetailsRepo.save(documentTypeMappingDetailsVO);
+
+		    gateOutwardEntryVO.setDocDate(LocalDate.now());
+
+		    message = "Gate Outward Entry Created Successfully";
 		}
-
 		// ============================================================
 		// HEADER MAPPING
 		// ============================================================
@@ -12348,11 +12400,12 @@ public class DevelopServiceImpl implements DevelopService {
 		// BASIC DETAILS
 		// ============================================================
 
+		vo.setSerialNo(dto.getSerialNo());	
 		vo.setBreakDown(dto.getBreakDown());
 
-		vo.setDocId(dto.getDocId());
-
-		vo.setDocDate(dto.getDocDate());
+//		vo.setDocId(dto.getDocId());
+//
+//		vo.setDocDate(dto.getDocDate());
 
 		vo.setBreakDownNo(dto.getBreakDownNo());
 
@@ -12439,6 +12492,8 @@ public class DevelopServiceImpl implements DevelopService {
 		responseDTO.setSerialNo(vo.getSerialNo());
 
 		responseDTO.setBreakDown(vo.getBreakDown());
+		
+		responseDTO.setDocId(vo.getDocId());
 
 		responseDTO.setDocdate(vo.getDocDate());
 
@@ -12475,6 +12530,8 @@ public class DevelopServiceImpl implements DevelopService {
 			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
 
 			branchResponseDTO.setId(vo.getPlantId().getId());
+			branchResponseDTO.setBranchCode(vo.getPlantId().getBranchCode());
+			branchResponseDTO.setBranchName(vo.getPlantId().getBranchName());
 
 			// Add the other BranchResponseDTO fields
 			// according to your existing BranchResponseDTO.
@@ -12491,6 +12548,7 @@ public class DevelopServiceImpl implements DevelopService {
 			ToolCategoryDetailResponseDTO materialTypeResponseDTO = new ToolCategoryDetailResponseDTO();
 
 			materialTypeResponseDTO.setId(vo.getMaterialType().getId());
+			materialTypeResponseDTO.setCategory(vo.getMaterialType().getApllicableFor());;
 
 			// Set the remaining ToolCategory fields
 			// according to your ToolCategoryDetailResponseDTO.
@@ -12507,7 +12565,7 @@ public class DevelopServiceImpl implements DevelopService {
 			EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO();
 
 			employeeResponseDTO.setId(vo.getMaterialTakenOutBy().getId());
-
+			employeeResponseDTO.setEmployeeName(vo.getMaterialTakenOutBy().getEmployeeName());
 			// Set the remaining employee fields
 			// according to your EmployeeResponseDTO.
 
@@ -12699,694 +12757,662 @@ public class DevelopServiceImpl implements DevelopService {
 
 	// DailyDespatchInstructionReport
 
-		@Override
-		public Map<String, Object> getDailyDespatchInstructionReport(Long pprm, String fdprm, Long division, Long partyId,
-				String tdprm) throws ApplicationException {
+	@Override
+	public Map<String, Object> getDailyDespatchInstructionReport(Long pprm, String fdprm, Long division, Long partyId,
+			String tdprm) throws ApplicationException {
 
-			Map<String, Object> responseObjectsMap = new HashMap<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-			List<Object[]> reportList = despatchInstructionRepo.getDailyDespatchInstructionReport(pprm, fdprm, division,
-					partyId, tdprm);
+		List<Object[]> reportList = despatchInstructionRepo.getDailyDespatchInstructionReport(pprm, fdprm, division,
+				partyId, tdprm);
 
-			List<Map<String, Object>> responseList = new ArrayList<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-			for (Object[] obj : reportList) {
+		for (Object[] obj : reportList) {
 
-				Map<String, Object> data = new HashMap<>();
+			Map<String, Object> data = new HashMap<>();
 
-				data.put("itemId", obj[0]);
-				data.put("itemCode", obj[1]);
-				data.put("itemDescription", obj[2]);
+			data.put("itemId", obj[0]);
+			data.put("itemCode", obj[1]);
+			data.put("itemDescription", obj[2]);
 
-				data.put("customerId", obj[3]);
-				data.put("customerCode", obj[4]);
-				data.put("customerName", obj[5]);
+			data.put("customerId", obj[3]);
+			data.put("customerCode", obj[4]);
+			data.put("customerName", obj[5]);
 
-				data.put("docId", obj[6]);
-				data.put("docDate", obj[7]);
+			data.put("docId", obj[6]);
+			data.put("docDate", obj[7]);
 
-				data.put("despatchQty", obj[8]);
-				data.put("pendingQty", obj[9]);
-				data.put("availableQty", obj[10]);
-				data.put("plannedQty", obj[11]);
+			data.put("despatchQty", obj[8]);
+			data.put("pendingQty", obj[9]);
+			data.put("availableQty", obj[10]);
+			data.put("plannedQty", obj[11]);
 
-				responseList.add(data);
-			}
-
-			responseObjectsMap.put("dailyDespatchInstructionReport", responseList);
-
-			return responseObjectsMap;
+			responseList.add(data);
 		}
 
-		// CustomerComplaintReport
+		responseObjectsMap.put("dailyDespatchInstructionReport", responseList);
 
-		@Override
-		public Map<String, Object> getCustomerComplaintReport(Long pprm, String fromdate, String todate)
-				throws ApplicationException {
+		return responseObjectsMap;
+	}
 
-			Map<String, Object> responseObjectsMap = new HashMap<>();
+	// CustomerComplaintReport
 
-			List<Object[]> complaintList = customerComplaintRepo.getCustomerComplaintReport(pprm, fromdate, todate);
+	@Override
+	public Map<String, Object> getCustomerComplaintReport(Long pprm, String fromdate, String todate)
+			throws ApplicationException {
 
-			List<Map<String, Object>> responseList = new ArrayList<>();
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-			for (Object[] obj : complaintList) {
+		List<Object[]> complaintList = customerComplaintRepo.getCustomerComplaintReport(pprm, fromdate, todate);
 
-				Map<String, Object> data = new HashMap<>();
+		List<Map<String, Object>> responseList = new ArrayList<>();
 
-				data.put("complaintNo", obj[0]);
-				data.put("customerId", obj[1]);
-				data.put("customerCode", obj[2]);
-				data.put("customerName", obj[3]);
-				data.put("itemId", obj[4]);
-				data.put("itemCode", obj[5]);
-				data.put("itemDescription", obj[6]);
-				data.put("customerPartNo", obj[7]);
-				data.put("openDate", obj[8]);
-				data.put("closeDate", obj[9]);
+		for (Object[] obj : complaintList) {
 
-				responseList.add(data);
-			}
+			Map<String, Object> data = new HashMap<>();
 
-			responseObjectsMap.put("CustomerComplaintReport", responseList);
+			data.put("complaintNo", obj[0]);
+			data.put("customerId", obj[1]);
+			data.put("customerCode", obj[2]);
+			data.put("customerName", obj[3]);
+			data.put("itemId", obj[4]);
+			data.put("itemCode", obj[5]);
+			data.put("itemDescription", obj[6]);
+			data.put("customerPartNo", obj[7]);
+			data.put("openDate", obj[8]);
+			data.put("closeDate", obj[9]);
 
-			return responseObjectsMap;
+			responseList.add(data);
 		}
 
-		// S.C.BILL
+		responseObjectsMap.put("CustomerComplaintReport", responseList);
 
-		// ================================================================
-		// S.C.BILL
-		// ================================================================
+		return responseObjectsMap;
+	}
 
-		@Override
-		@Transactional
-		public Map<String, Object> createUpdateSCBill(SCBillDTO dto) throws ApplicationException {
+	// S.C.BILL
 
-			Map<String, Object> responseObjectsMap = new HashMap<>();
+	// ================================================================
+	// S.C.BILL
+	// ================================================================
 
-			SCBillVO scBillVO;
+	@Override
+	@Transactional
+	public Map<String, Object> createUpdateSCBill(SCBillDTO dto) throws ApplicationException {
 
-			String message;
+		Map<String, Object> responseObjectsMap = new HashMap<>();
 
-			try {
+		SCBillVO scBillVO;
 
-				// ============================================================
-				// CREATE / UPDATE
-				// ============================================================
+		String message;
 
-				if (dto.getId() != null) {
+		try {
 
-					// UPDATE
+			// ============================================================
+			// CREATE / UPDATE
+			// ============================================================
 
-					scBillVO = scBillRepo.findById(dto.getId())
-							.orElseThrow(() -> new ApplicationException("SC Bill Not Found"));
+			if (dto.getId() != null) {
 
-					scBillVO.setUpdatedBy(dto.getCreatedBy());
+				// UPDATE
 
-					message = "SC Bill Updated Successfully";
+				scBillVO = scBillRepo.findById(dto.getId())
+						.orElseThrow(() -> new ApplicationException("SC Bill Not Found"));
 
-				} else {
+				scBillVO.setUpdatedBy(dto.getCreatedBy());
 
-					// CREATE
+				message = "SC Bill Updated Successfully";
 
-					scBillVO = new SCBillVO();
+			} else {
 
-					scBillVO.setCreatedBy(dto.getCreatedBy());
+				// CREATE
 
-					scBillVO.setUpdatedBy(dto.getCreatedBy());
+				scBillVO = new SCBillVO();
 
-					message = "SC Bill Created Successfully";
-				}
+				scBillVO.setCreatedBy(dto.getCreatedBy());
 
-				// ============================================================
-				// HEADER MAPPING
-				// ============================================================
+				scBillVO.setUpdatedBy(dto.getCreatedBy());
 
-				createUpdateSCBillVOByDTO(dto, scBillVO);
+				message = "SC Bill Created Successfully";
+			}
 
-				// ============================================================
-				// DETAIL
-				// ============================================================
+			// ============================================================
+			// HEADER MAPPING
+			// ============================================================
 
-				List<SCBillDetailVO> detailList = new ArrayList<>();
+			createUpdateSCBillVOByDTO(dto, scBillVO);
 
-				if (dto.getSCBillDetailDTO() != null) {
+			// ============================================================
+			// DETAIL
+			// ============================================================
 
-					for (SCBillDetailDTO detailDTO : dto.getSCBillDetailDTO()) {
+			List<SCBillDetailVO> detailList = new ArrayList<>();
 
-						SCBillDetailVO detailVO = new SCBillDetailVO();
+			if (dto.getSCBillDetailDTO() != null) {
 
-						// ====================================================
-						// DETAIL ID
-						// ====================================================
+				for (SCBillDetailDTO detailDTO : dto.getSCBillDetailDTO()) {
 
-						if (detailDTO.getId() != null) {
+					SCBillDetailVO detailVO = new SCBillDetailVO();
 
-							detailVO.setId(detailDTO.getId());
-						}
+					// ====================================================
+					// DETAIL ID
+					// ====================================================
 
-						// ====================================================
-						// DETAIL BASIC FIELDS
-						// ====================================================
+					if (detailDTO.getId() != null) {
 
-						detailVO.setScGrnNo(detailDTO.getScGrnNo());
-
-						detailVO.setIncomingItemDescription(detailDTO.getIncomingItemDescription());
-
-						detailVO.setChallanQty(detailDTO.getChallanQty());
-
-						detailVO.setReceivedQty(detailDTO.getReceivedQty());
-
-						detailVO.setShortageQty(detailDTO.getShortageQty());
-
-						detailVO.setGrnAcceptedQty(detailDTO.getGrnAcceptedQty());
-
-						detailVO.setRejectedQty(detailDTO.getRejectedQty());
-
-						detailVO.setRate(detailDTO.getRate());
-
-						detailVO.setAmount(detailDTO.getAmount());
-
-						// ====================================================
-						// GST
-						// ====================================================
-
-						detailVO.setSgstRate(detailDTO.getSgstRate());
-
-						detailVO.setSgstAmount(detailDTO.getSgstAmount());
-
-						detailVO.setCgstRate(detailDTO.getCgstRate());
-
-						detailVO.setCgstAmount(detailDTO.getCgstAmount());
-
-						detailVO.setIgstRate(detailDTO.getIgstRate());
-
-						detailVO.setIgstAmount(detailDTO.getIgstAmount());
-
-						// ====================================================
-						// SUPPLIER DC
-						// ====================================================
-
-						detailVO.setSupplierDcNo(detailDTO.getSupplierDcNo());
-
-						detailVO.setSupplierDcDate(detailDTO.getSupplierDcDate());
-
-						// ====================================================
-						// ITEM
-						// ====================================================
-
-						if (detailDTO.getIncomingItemCode() != null) {
-
-							ItemMasterVO itemVO = itemMasterRepo.findById(detailDTO.getIncomingItemCode())
-									.orElseThrow(() -> new ApplicationException("Item Not Found"));
-
-							detailVO.setIncomingItemCode(itemVO);
-						}
-
-						// ====================================================
-						// UNIT
-						// ====================================================
-
-						if (detailDTO.getUnit() != null) {
-
-							UnitMasterVO unitVO = unitMasterRepo.findById(detailDTO.getUnit())
-									.orElseThrow(() -> new ApplicationException("Unit Not Found"));
-
-							detailVO.setUnit(unitVO);
-						}
-
-						// ====================================================
-						// HEADER REFERENCE
-						// ====================================================
-
-						detailVO.setSCBillVO(scBillVO);
-
-						detailList.add(detailVO);
+						detailVO.setId(detailDTO.getId());
 					}
-				}
 
-				// ============================================================
-				// TAX GRID
-				// ============================================================
+					// ====================================================
+					// DETAIL BASIC FIELDS
+					// ====================================================
 
-				List<SCBillTaxGridVO> taxGridList = new ArrayList<>();
+					detailVO.setScGrnNo(detailDTO.getScGrnNo());
 
-				if (dto.getSCBillTaxGridDTO() != null) {
+					detailVO.setIncomingItemDescription(detailDTO.getIncomingItemDescription());
 
-					for (SCBillTaxGridDTO taxDTO : dto.getSCBillTaxGridDTO()) {
+					detailVO.setChallanQty(detailDTO.getChallanQty());
 
-						SCBillTaxGridVO taxVO = new SCBillTaxGridVO();
+					detailVO.setReceivedQty(detailDTO.getReceivedQty());
 
-						// ====================================================
-						// TAX GRID ID
-						// ====================================================
+					detailVO.setShortageQty(detailDTO.getShortageQty());
 
-						if (taxDTO.getId() != null) {
+					detailVO.setGrnAcceptedQty(detailDTO.getGrnAcceptedQty());
 
-							taxVO.setId(taxDTO.getId());
-						}
+					detailVO.setRejectedQty(detailDTO.getRejectedQty());
 
-						// ====================================================
-						// TAX GRID FIELDS
-						// ====================================================
+					detailVO.setRate(detailDTO.getRate());
 
-						taxVO.setParticulars(taxDTO.getParticulars());
+					detailVO.setAmount(detailDTO.getAmount());
 
-						taxVO.setGlAccountName(taxDTO.getGlAccountName());
+					// ====================================================
+					// GST
+					// ====================================================
 
-						taxVO.setAcceptedQtyAmount(taxDTO.getAcceptedQtyAmount());
+					detailVO.setSgstRate(detailDTO.getSgstRate());
 
-						taxVO.setRevisedAmount(taxDTO.getRevisedAmount());
+					detailVO.setSgstAmount(detailDTO.getSgstAmount());
 
-						// ====================================================
-						// HEADER REFERENCE
-						// ====================================================
+					detailVO.setCgstRate(detailDTO.getCgstRate());
 
-						taxVO.setSCBillVO(scBillVO);
+					detailVO.setCgstAmount(detailDTO.getCgstAmount());
 
-						taxGridList.add(taxVO);
+					detailVO.setIgstRate(detailDTO.getIgstRate());
+
+					detailVO.setIgstAmount(detailDTO.getIgstAmount());
+
+					// ====================================================
+					// SUPPLIER DC
+					// ====================================================
+
+					detailVO.setSupplierDcNo(detailDTO.getSupplierDcNo());
+
+					detailVO.setSupplierDcDate(detailDTO.getSupplierDcDate());
+
+					// ====================================================
+					// ITEM
+					// ====================================================
+
+					if (detailDTO.getIncomingItemCode() != null) {
+
+						ItemMasterVO itemVO = itemMasterRepo.findById(detailDTO.getIncomingItemCode())
+								.orElseThrow(() -> new ApplicationException("Item Not Found"));
+
+						detailVO.setIncomingItemCode(itemVO);
 					}
+
+					// ====================================================
+					// UNIT
+					// ====================================================
+
+					if (detailDTO.getUnit() != null) {
+
+						UnitMasterVO unitVO = unitMasterRepo.findById(detailDTO.getUnit())
+								.orElseThrow(() -> new ApplicationException("Unit Not Found"));
+
+						detailVO.setUnit(unitVO);
+					}
+
+					// ====================================================
+					// HEADER REFERENCE
+					// ====================================================
+
+					detailVO.setSCBillVO(scBillVO);
+
+					detailList.add(detailVO);
 				}
-
-				// ============================================================
-				// SET CHILD LISTS
-				// ============================================================
-
-				scBillVO.setSCBillDetailVO(detailList);
-
-				scBillVO.setSCBillTaxGridVO(taxGridList);
-
-				// ============================================================
-				// SAVE
-				// ============================================================
-
-				SCBillVO savedSCBill = scBillRepo.save(scBillVO);
-
-				// ============================================================
-				// RESPONSE
-				// ============================================================
-
-				responseObjectsMap.put("message", message);
-
-				responseObjectsMap.put("scBill", buildSCBillResponse(savedSCBill));
-
-			} catch (Exception e) {
-
-				e.printStackTrace();
-
-				throw new ApplicationException("Error while creating/updating SC Bill: " + e.getMessage());
-			}
-
-			return responseObjectsMap;
-		}
-
-		// ================================================================
-		// HEADER MAPPING
-		// ================================================================
-
-		private void createUpdateSCBillVOByDTO(SCBillDTO dto, SCBillVO vo) throws ApplicationException {
-
-			// ============================================================
-			// BASIC DETAILS
-			// ============================================================
-
-			vo.setDocId(dto.getDocId());
-
-			vo.setDocDate(dto.getDocDate());
-
-			vo.setGstState(dto.getGstState());
-
-			vo.setIsGstApplicable(dto.getIsGstApplicable());
-
-			vo.setVendorInvoiceNo(dto.getVendorInvoiceNo());
-
-			vo.setVendorDcNo(dto.getVendorDcNo());
-
-			vo.setGstnNo(dto.getGstnNo());
-
-			vo.setVendorInvoiceDate(dto.getVendorInvoiceDate());
-
-			vo.setServiceName(dto.getServiceName());
-
-			vo.setGrnNo(dto.getGrnNo());
-
-			vo.setHsnSacCode(dto.getHsnSacCode());
-
-			vo.setContractNo(dto.getContractNo());
-
-			vo.setTaxType(dto.getTaxType());
-
-			vo.setTaxPercentage(dto.getTaxPercentage());
-
-			vo.setBelongsTo(dto.getBelongsTo());
-
-			vo.setFreight(dto.getFreight());
-
-			vo.setTotalAmount(dto.getTotalAmount());
-
-			vo.setTotalBasic(dto.getTotalBasic());
-
-			vo.setTdsApplicable(dto.getTdsApplicable());
-
-			vo.setTdsPercentage(dto.getTdsPercentage());
-
-			vo.setAcceptedVal(dto.getAcceptedVal());
-
-			vo.setRejectedVal(dto.getRejectedVal());
-
-			vo.setTdsAmount(dto.getTdsAmount());
-
-			vo.setAmountInWords(dto.getAmountInWords());
-
-			vo.setRemarks(dto.getRemarks());
-
-			// ============================================================
-			// HEADER FOREIGN KEYS
-			// ============================================================
-
-			// ============================================================
-			// BRANCH
-			// ============================================================
-
-			if (dto.getBranch() != null) {
-
-				BranchVO branchVO = branchRepo.findById(dto.getBranch())
-						.orElseThrow(() -> new ApplicationException("Branch Not Found"));
-
-				vo.setBranch(branchVO);
 			}
 
 			// ============================================================
-			// DEPARTMENT
+			// TAX GRID
 			// ============================================================
 
-			if (dto.getDepartment() != null) {
+			List<SCBillTaxGridVO> taxGridList = new ArrayList<>();
 
-				DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartment())
-						.orElseThrow(() -> new ApplicationException("Department Not Found"));
+			if (dto.getSCBillTaxGridDTO() != null) {
 
-				vo.setDepartment(departmentVO);
-			}
+				for (SCBillTaxGridDTO taxDTO : dto.getSCBillTaxGridDTO()) {
 
-			// ============================================================
-			// VENDOR
-			// ============================================================
+					SCBillTaxGridVO taxVO = new SCBillTaxGridVO();
 
-			if (dto.getVendorName() != null) {
+					// ====================================================
+					// TAX GRID ID
+					// ====================================================
 
-				CustomerVO customerVO = customerRepo.findById(dto.getVendorName())
-						.orElseThrow(() -> new ApplicationException("Vendor Not Found"));
+					if (taxDTO.getId() != null) {
 
-				vo.setVendorName(customerVO);
-			}
+						taxVO.setId(taxDTO.getId());
+					}
 
-			// ============================================================
-			// COMMON FIELDS
-			// ============================================================
+					// ====================================================
+					// TAX GRID FIELDS
+					// ====================================================
 
-			vo.setActive(dto.isActive());
+					taxVO.setParticulars(taxDTO.getParticulars());
 
-			vo.setOrgId(dto.getOrgId());
+					taxVO.setGlAccountName(taxDTO.getGlAccountName());
 
-			vo.setFinancialYear(dto.getFinancialYear());
+					taxVO.setAcceptedQtyAmount(taxDTO.getAcceptedQtyAmount());
 
-			vo.setCreatedBy(dto.getCreatedBy());
+					taxVO.setRevisedAmount(taxDTO.getRevisedAmount());
 
-			vo.setUpdatedBy(dto.getUpdatedBy());
+					// ====================================================
+					// HEADER REFERENCE
+					// ====================================================
 
-			vo.setCancel(dto.isCancel());
+					taxVO.setSCBillVO(scBillVO);
 
-			vo.setCancelRemarks(dto.getCancelRemarks());
-
-			// ============================================================
-			// SCREEN DETAILS
-			// ============================================================
-
-			vo.setScreenCode("SCB");
-
-			vo.setScreenName("SCBILL");
-		}
-
-		// ================================================================
-		// BUILD RESPONSE
-		// ================================================================
-
-		private SCBillResponseDTO buildSCBillResponse(SCBillVO vo) {
-
-			SCBillResponseDTO responseDTO = new SCBillResponseDTO();
-
-			// ============================================================
-			// BASIC DETAILS
-			// ============================================================
-
-			responseDTO.setId(vo.getId());
-
-			responseDTO.setDocId(vo.getDocId());
-
-			responseDTO.setDocDate(vo.getDocDate());
-
-			responseDTO.setGstState(vo.getGstState());
-
-			responseDTO.setIsGstApplicable(vo.getIsGstApplicable());
-
-			responseDTO.setVendorInvoiceNo(vo.getVendorInvoiceNo());
-
-			responseDTO.setVendorDcNo(vo.getVendorDcNo());
-
-			responseDTO.setGstnNo(vo.getGstnNo());
-
-			responseDTO.setVendorInvoiceDate(vo.getVendorInvoiceDate());
-
-			responseDTO.setServiceName(vo.getServiceName());
-
-			responseDTO.setGrnNo(vo.getGrnNo());
-
-			responseDTO.setHsnSacCode(vo.getHsnSacCode());
-
-			responseDTO.setContractNo(vo.getContractNo());
-
-			responseDTO.setTaxType(vo.getTaxType());
-
-			responseDTO.setTaxPercentage(vo.getTaxPercentage());
-
-			responseDTO.setBelongsTo(vo.getBelongsTo());
-
-			responseDTO.setFreight(vo.getFreight());
-
-			responseDTO.setTotalAmount(vo.getTotalAmount());
-
-			responseDTO.setTotalBasic(vo.getTotalBasic());
-
-			responseDTO.setTdsApplicable(vo.getTdsApplicable());
-
-			responseDTO.setTdsPercentage(vo.getTdsPercentage());
-
-			responseDTO.setAcceptedVal(vo.getAcceptedVal());
-
-			responseDTO.setRejectedVal(vo.getRejectedVal());
-
-			responseDTO.setTdsAmount(vo.getTdsAmount());
-
-			responseDTO.setAmountInWords(vo.getAmountInWords());
-
-			responseDTO.setRemarks(vo.getRemarks());
-
-			// ============================================================
-			// BRANCH
-			// ============================================================
-
-			if (vo.getBranch() != null) {
-
-				BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
-
-				branchResponseDTO.setId(vo.getBranch().getId());
-
-				branchResponseDTO.setBranchCode(vo.getBranch().getBranchCode());
-
-				branchResponseDTO.setBranchName(vo.getBranch().getBranchName());
-
-				responseDTO.setBranch(branchResponseDTO);
-			}
-
-			// ============================================================
-			// DEPARTMENT
-			// ============================================================
-
-			if (vo.getDepartment() != null) {
-
-				DepartmentResponseDTO departmentResponseDTO = new DepartmentResponseDTO();
-
-				departmentResponseDTO.setId(vo.getDepartment().getId());
-
-				departmentResponseDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode());
-
-				departmentResponseDTO.setDepartmentName(vo.getDepartment().getDepartmentName());
-
-				responseDTO.setDepartment(departmentResponseDTO);
-			}
-
-			// ============================================================
-			// VENDOR
-			// ============================================================
-
-			if (vo.getVendorName() != null) {
-
-				CustomerResponse1DTO customerResponseDTO = new CustomerResponse1DTO();
-
-				customerResponseDTO.setId(vo.getVendorName().getId());
-
-				customerResponseDTO.setCustomerName(vo.getVendorName().getCustomerName());
-
-				responseDTO.setVendorName(customerResponseDTO);
-			}
-
-			// ============================================================
-			// COMMON FIELDS
-			// ============================================================
-
-			responseDTO.setActive(vo.isActive());
-
-			responseDTO.setOrgId(vo.getOrgId());
-
-			responseDTO.setFinancialYear(vo.getFinancialYear());
-
-			responseDTO.setCreatedBy(vo.getCreatedBy());
-
-			responseDTO.setUpdatedBy(vo.getUpdatedBy());
-
-			responseDTO.setCancel(vo.isCancel());
-
-			responseDTO.setCancelRemarks(vo.getCancelRemarks());
-
-			return responseDTO;
-		}
-
-		@Override
-		public List<SCBillResponseDTO> getSCBillByOrgId(Long orgId) throws ApplicationException {
-
-			List<SCBillVO> scBillList = scBillRepo.findByOrgIdAndCancelFalse(orgId);
-
-			if (scBillList == null || scBillList.isEmpty()) {
-
-				throw new ApplicationException("SC Bill Not Found");
-			}
-
-			List<SCBillResponseDTO> responseList = new ArrayList<>();
-
-			for (SCBillVO scBillVO : scBillList) {
-
-				responseList.add(buildSCBillResponse(scBillVO));
-			}
-
-			return responseList;
-		}
-
-		@Override
-		public SCBillResponseDTO getSCBillById(Long id) throws ApplicationException {
-
-			SCBillVO scBillVO = scBillRepo.findById(id).orElse(null);
-
-			if (scBillVO == null) {
-
-				throw new ApplicationException("SC Bill Not Found");
-			}
-
-			return buildSCBillResponse(scBillVO);
-		}
-
-		@Override
-		public String getSCBillDocId(Long orgId, String financialYear) {
-
-			String screenCode = "SCB";
-
-			String result = scBillRepo.getSCBillDocId(orgId, financialYear, screenCode);
-
-			return result;
-		}
-
-	//getSubContractorForSCBill
-
-		@Override
-		public List<Map<String, Object>> getSubContractorForSCBill(Long orgId, Long branch) throws ApplicationException {
-
-			List<Object[]> subContractorList = customerRepo.getSubContractorForSCBill(orgId, branch);
-
-			if (subContractorList == null || subContractorList.isEmpty()) {
-				throw new ApplicationException("Sub Contractor Not Found");
-			}
-
-			List<Map<String, Object>> responseList = new ArrayList<>();
-
-			for (Object[] obj : subContractorList) {
-
-				Map<String, Object> response = new HashMap<>();
-
-				response.put("partyname", obj[0]);
-				response.put("add1", obj[1]);
-				response.put("add2", obj[2]);
-				response.put("add3", obj[3]);
-				response.put("add4", obj[4]);
-				response.put("accountname", obj[5]);
-				response.put("PartyMASTID", obj[6]);
-				response.put("PartyID", obj[7]);
-				response.put("GSTSTATE", obj[8]);
-				response.put("ISGSTAPPL", obj[9]);
-				response.put("GSTNNO", obj[10]);
-
-				responseList.add(response);
-			}
-
-			return responseList;
-		}
-
-		// getGrnDropdown
-
-		@Override
-		public List<Map<String, Object>> getGrnDropdown(String venid, Long recid, String oldgrnno)
-				throws ApplicationException {
-
-			List<Object[]> grnList = subContractingGRNRepo.getGrnDropdown(venid, recid, oldgrnno);
-
-			if (grnList == null || grnList.isEmpty()) {
-				throw new ApplicationException("GRN Not Found");
-			}
-
-			List<Map<String, Object>> responseList = new ArrayList<>();
-
-			for (Object[] obj : grnList) {
-
-				Map<String, Object> response = new HashMap<>();
-
-				response.put("grnNo", obj[0]);
-				response.put("subGrnBasicId", obj[1]);
-				response.put("under", obj[2]);
-
-				responseList.add(response);
-			}
-
-			return responseList;
-		}
-
-		  @Override
-			public List<ControlPlanResponseDTO> getControlPlanByOrgId(Long orgId, Long branch) throws ApplicationException {
-
-				List<ControlPlanVO> controlPlanList = controlPlanRepo.findByOrgIdAndBranch_Id(orgId, branch);
-
-				if (controlPlanList == null || controlPlanList.isEmpty()) {
-
-					throw new ApplicationException("Control Plan Not Found");
+					taxGridList.add(taxVO);
 				}
-
-				List<ControlPlanResponseDTO> responseList = new ArrayList<>();
-
-				for (ControlPlanVO controlPlanVO : controlPlanList) {
-
-					responseList.add(buildControlPlanResponse(controlPlanVO));
-				}
-
-				return responseList;
 			}
+
+			// ============================================================
+			// SET CHILD LISTS
+			// ============================================================
+
+			scBillVO.setSCBillDetailVO(detailList);
+
+			scBillVO.setSCBillTaxGridVO(taxGridList);
+
+			// ============================================================
+			// SAVE
+			// ============================================================
+
+			SCBillVO savedSCBill = scBillRepo.save(scBillVO);
+
+			// ============================================================
+			// RESPONSE
+			// ============================================================
+
+			responseObjectsMap.put("message", message);
+
+			responseObjectsMap.put("scBill", buildSCBillResponse(savedSCBill));
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			throw new ApplicationException("Error while creating/updating SC Bill: " + e.getMessage());
+		}
+
+		return responseObjectsMap;
+	}
+
+	// ================================================================
+	// HEADER MAPPING
+	// ================================================================
+
+	private void createUpdateSCBillVOByDTO(SCBillDTO dto, SCBillVO vo) throws ApplicationException {
+
+		// ============================================================
+		// BASIC DETAILS
+		// ============================================================
+
+		vo.setDocId(dto.getDocId());
+
+		vo.setDocDate(dto.getDocDate());
+
+		vo.setGstState(dto.getGstState());
+
+		vo.setIsGstApplicable(dto.getIsGstApplicable());
+
+		vo.setVendorInvoiceNo(dto.getVendorInvoiceNo());
+
+		vo.setVendorDcNo(dto.getVendorDcNo());
+
+		vo.setGstnNo(dto.getGstnNo());
+
+		vo.setVendorInvoiceDate(dto.getVendorInvoiceDate());
+
+		vo.setServiceName(dto.getServiceName());
+
+		vo.setGrnNo(dto.getGrnNo());
+
+		vo.setHsnSacCode(dto.getHsnSacCode());
+
+		vo.setContractNo(dto.getContractNo());
+
+		vo.setTaxType(dto.getTaxType());
+
+		vo.setTaxPercentage(dto.getTaxPercentage());
+
+		vo.setBelongsTo(dto.getBelongsTo());
+
+		vo.setFreight(dto.getFreight());
+
+		vo.setTotalAmount(dto.getTotalAmount());
+
+		vo.setTotalBasic(dto.getTotalBasic());
+
+		vo.setTdsApplicable(dto.getTdsApplicable());
+
+		vo.setTdsPercentage(dto.getTdsPercentage());
+
+		vo.setAcceptedVal(dto.getAcceptedVal());
+
+		vo.setRejectedVal(dto.getRejectedVal());
+
+		vo.setTdsAmount(dto.getTdsAmount());
+
+		vo.setAmountInWords(dto.getAmountInWords());
+
+		vo.setRemarks(dto.getRemarks());
+
+		// ============================================================
+		// HEADER FOREIGN KEYS
+		// ============================================================
+
+		// ============================================================
+		// BRANCH
+		// ============================================================
+
+		if (dto.getBranch() != null) {
+
+			BranchVO branchVO = branchRepo.findById(dto.getBranch())
+					.orElseThrow(() -> new ApplicationException("Branch Not Found"));
+
+			vo.setBranch(branchVO);
+		}
+
+		// ============================================================
+		// DEPARTMENT
+		// ============================================================
+
+		if (dto.getDepartment() != null) {
+
+			DepartmentVO departmentVO = departmentRepo.findById(dto.getDepartment())
+					.orElseThrow(() -> new ApplicationException("Department Not Found"));
+
+			vo.setDepartment(departmentVO);
+		}
+
+		// ============================================================
+		// VENDOR
+		// ============================================================
+
+		if (dto.getVendorName() != null) {
+
+			CustomerVO customerVO = customerRepo.findById(dto.getVendorName())
+					.orElseThrow(() -> new ApplicationException("Vendor Not Found"));
+
+			vo.setVendorName(customerVO);
+		}
+
+		// ============================================================
+		// COMMON FIELDS
+		// ============================================================
+
+		vo.setActive(dto.isActive());
+
+		vo.setOrgId(dto.getOrgId());
+
+		vo.setFinancialYear(dto.getFinancialYear());
+
+		vo.setCreatedBy(dto.getCreatedBy());
+
+		vo.setUpdatedBy(dto.getUpdatedBy());
+
+		vo.setCancel(dto.isCancel());
+
+		vo.setCancelRemarks(dto.getCancelRemarks());
+
+		// ============================================================
+		// SCREEN DETAILS
+		// ============================================================
+
+		vo.setScreenCode("SCB");
+
+		vo.setScreenName("SCBILL");
+	}
+
+	// ================================================================
+	// BUILD RESPONSE
+	// ================================================================
+
+	private SCBillResponseDTO buildSCBillResponse(SCBillVO vo) {
+
+		SCBillResponseDTO responseDTO = new SCBillResponseDTO();
+
+		// ============================================================
+		// BASIC DETAILS
+		// ============================================================
+
+		responseDTO.setId(vo.getId());
+
+		responseDTO.setDocId(vo.getDocId());
+
+		responseDTO.setDocDate(vo.getDocDate());
+
+		responseDTO.setGstState(vo.getGstState());
+
+		responseDTO.setIsGstApplicable(vo.getIsGstApplicable());
+
+		responseDTO.setVendorInvoiceNo(vo.getVendorInvoiceNo());
+
+		responseDTO.setVendorDcNo(vo.getVendorDcNo());
+
+		responseDTO.setGstnNo(vo.getGstnNo());
+
+		responseDTO.setVendorInvoiceDate(vo.getVendorInvoiceDate());
+
+		responseDTO.setServiceName(vo.getServiceName());
+
+		responseDTO.setGrnNo(vo.getGrnNo());
+
+		responseDTO.setHsnSacCode(vo.getHsnSacCode());
+
+		responseDTO.setContractNo(vo.getContractNo());
+
+		responseDTO.setTaxType(vo.getTaxType());
+
+		responseDTO.setTaxPercentage(vo.getTaxPercentage());
+
+		responseDTO.setBelongsTo(vo.getBelongsTo());
+
+		responseDTO.setFreight(vo.getFreight());
+
+		responseDTO.setTotalAmount(vo.getTotalAmount());
+
+		responseDTO.setTotalBasic(vo.getTotalBasic());
+
+		responseDTO.setTdsApplicable(vo.getTdsApplicable());
+
+		responseDTO.setTdsPercentage(vo.getTdsPercentage());
+
+		responseDTO.setAcceptedVal(vo.getAcceptedVal());
+
+		responseDTO.setRejectedVal(vo.getRejectedVal());
+
+		responseDTO.setTdsAmount(vo.getTdsAmount());
+
+		responseDTO.setAmountInWords(vo.getAmountInWords());
+
+		responseDTO.setRemarks(vo.getRemarks());
+
+		// ============================================================
+		// BRANCH
+		// ============================================================
+
+		if (vo.getBranch() != null) {
+
+			BranchResponseDTO branchResponseDTO = new BranchResponseDTO();
+
+			branchResponseDTO.setId(vo.getBranch().getId());
+
+			branchResponseDTO.setBranchCode(vo.getBranch().getBranchCode());
+
+			branchResponseDTO.setBranchName(vo.getBranch().getBranchName());
+
+			responseDTO.setBranch(branchResponseDTO);
+		}
+
+		// ============================================================
+		// DEPARTMENT
+		// ============================================================
+
+		if (vo.getDepartment() != null) {
+
+			DepartmentResponseDTO departmentResponseDTO = new DepartmentResponseDTO();
+
+			departmentResponseDTO.setId(vo.getDepartment().getId());
+
+			departmentResponseDTO.setDepartmentCode(vo.getDepartment().getDepartmentCode());
+
+			departmentResponseDTO.setDepartmentName(vo.getDepartment().getDepartmentName());
+
+			responseDTO.setDepartment(departmentResponseDTO);
+		}
+
+		// ============================================================
+		// VENDOR
+		// ============================================================
+
+		if (vo.getVendorName() != null) {
+
+			CustomerResponse1DTO customerResponseDTO = new CustomerResponse1DTO();
+
+			customerResponseDTO.setId(vo.getVendorName().getId());
+
+			customerResponseDTO.setCustomerName(vo.getVendorName().getCustomerName());
+
+			responseDTO.setVendorName(customerResponseDTO);
+		}
+
+		// ============================================================
+		// COMMON FIELDS
+		// ============================================================
+
+		responseDTO.setActive(vo.isActive());
+
+		responseDTO.setOrgId(vo.getOrgId());
+
+		responseDTO.setFinancialYear(vo.getFinancialYear());
+
+		responseDTO.setCreatedBy(vo.getCreatedBy());
+
+		responseDTO.setUpdatedBy(vo.getUpdatedBy());
+
+		responseDTO.setCancel(vo.isCancel());
+
+		responseDTO.setCancelRemarks(vo.getCancelRemarks());
+
+		return responseDTO;
+	}
+
+	@Override
+	public List<SCBillResponseDTO> getSCBillByOrgId(Long orgId) throws ApplicationException {
+
+		List<SCBillVO> scBillList = scBillRepo.findByOrgIdAndCancelFalse(orgId);
+
+		if (scBillList == null || scBillList.isEmpty()) {
+
+			throw new ApplicationException("SC Bill Not Found");
+		}
+
+		List<SCBillResponseDTO> responseList = new ArrayList<>();
+
+		for (SCBillVO scBillVO : scBillList) {
+
+			responseList.add(buildSCBillResponse(scBillVO));
+		}
+
+		return responseList;
+	}
+
+	@Override
+	public SCBillResponseDTO getSCBillById(Long id) throws ApplicationException {
+
+		SCBillVO scBillVO = scBillRepo.findById(id).orElse(null);
+
+		if (scBillVO == null) {
+
+			throw new ApplicationException("SC Bill Not Found");
+		}
+
+		return buildSCBillResponse(scBillVO);
+	}
+
+	@Override
+	public String getSCBillDocId(Long orgId, String financialYear) {
+
+		String screenCode = "SCB";
+
+		String result = scBillRepo.getSCBillDocId(orgId, financialYear, screenCode);
+
+		return result;
+	}
+	
+//	challan no dropdown
+	
+	@Override
+	public Map<String, Object> getChallanNoForGateOutwardEntry(
+	        Long customer,  String breakdown,
+	        Long branch, Long orgId) throws ApplicationException {
+
+	    List<Object[]> challanList = gateOutwardEntryRepo
+	            .getChallanNoForGateOutwardEntry(
+	                    customer,  breakdown, branch, orgId);
+
+	    List<Map<String, Object>> reportList = new ArrayList<>();
+
+	    for (Object[] obj : challanList) {
+	        Map<String, Object> reportMap = new HashMap<>();
+
+	        reportMap.put("subcontbasicid", obj[0]);
+	        reportMap.put("DOCID", obj[1]);
+	        reportMap.put("DOCDATE", obj[2]);
+	        reportMap.put("PARTY", obj[3]);
+	        reportMap.put("BASICID", obj[4]);
+
+	        reportList.add(reportMap);
+	    }
+
+	    Map<String, Object> responseObjectsMap = new HashMap<>();
+	    responseObjectsMap.put("challanNoForGateOutwardEntry", reportList);
+
+	    return responseObjectsMap;
+	}
+
+//		  @Override
+//			public List<ControlPlanResponseDTO> getControlPlanByOrgId(Long orgId, Long branch) throws ApplicationException {
+//
+//				List<ControlPlanVO> controlPlanList = controlPlanRepo.findByOrgIdAndBranch_Id(orgId, branch);
+//
+//				if (controlPlanList == null || controlPlanList.isEmpty()) {
+//
+//					throw new ApplicationException("Control Plan Not Found");
+//				}
+//
+//				List<ControlPlanResponseDTO> responseList = new ArrayList<>();
+//
+//				for (ControlPlanVO controlPlanVO : controlPlanList) {
+//
+//					responseList.add(buildControlPlanResponse(controlPlanVO));
+//				}
+//
+//				return responseList;
+//			}
 
 		@Override
 		public String getSalesOrderAmendmentDocId(Long orgId, String financialYear) {
@@ -13401,7 +13427,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		@Override
 		@Transactional
-		public Map<String, Object> updateCreateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
+		public Map<String, Object> createUpdateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
 				throws ApplicationException {
 
 			String screenCode = "SOA";
@@ -13796,5 +13822,7 @@ public class DevelopServiceImpl implements DevelopService {
 
 		return list;
 	}
+
+	
 
 }

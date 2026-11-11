@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.efitops.basesetup.exception.ApplicationException;
+import com.efitops.basesetup.repository.CustomerRepo;
 import com.efitops.basesetup.repository.DespatchInstructionRepo;
 import com.efitops.basesetup.repository.SalesRejectionInvoiceRepo;
+import com.efitops.basesetup.repository.SubContractingGRNRepo;
 
 
 
@@ -24,9 +26,16 @@ public class ReportServiceImpl implements ReportService  {
 	@Autowired
 	private DespatchInstructionRepo despatchInstructionRepo;
 	
+	@Autowired
+	private CustomerRepo customerRepo;
+	
+	@Autowired
+	private SubContractingGRNRepo subContractingGRNRepo;
+
+
 
 	@Override
-	public Map<String, Object> getRegularSaleCustomerWiseCumlReport(
+	public Map<String,Object> getRegularSaleCustomerWiseCumlReport(
 	        String fromdate,
 	        String todate,
 	        Long orgId) throws ApplicationException {
@@ -142,4 +151,84 @@ public class ReportServiceImpl implements ReportService  {
 
 	    return responseList;
 	}
+	
+	
+	//salesRegisterCustomerBosch
+	
+@Override
+public Map<String, Object> getSalesRegisterCustomerBosch(
+        String fromdate,
+        String todate) throws ApplicationException {
+
+    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+    List<Object[]> salesRegisterCustomerBosch =
+            salesRejectionInvoiceRepo.getsalesRegisterCustomerBosch(
+                    fromdate,
+                    todate);
+
+    responseObjectsMap.put(
+            "salesRegisterCustomerBosch",
+            salesRegisterCustomerBosch);
+
+    responseObjectsMap.put(
+            "message",
+            "Sales Register Customer Bosch Report Retrieved Successfully");
+
+    return responseObjectsMap;
+}
+
+
+//getCustomerAchievedDetailsReport
+
+@Override
+public Map<String, Object> getCustomerAchievedDetailsReport(
+     String myear,
+     String under) throws ApplicationException {
+
+ Map<String, Object> responseObjectsMap = new HashMap<>();
+
+ List<Object[]> customerAchievedDetails =
+		 customerRepo.getCustomerAchievedDetails(
+                 myear,
+                 under);
+
+ responseObjectsMap.put(
+         "customerAchievedDetails",
+         customerAchievedDetails);
+
+ responseObjectsMap.put(
+         "message",
+         "Customer Achieved Details Report Retrieved Successfully");
+
+ return responseObjectsMap;
+}
+
+//getSubContractingGrnForInwardInspectionReport
+
+
+@Override
+public Map<String, Object> getSubContractingGrnForInwardInspectionReport(
+        String asOnDate) throws ApplicationException {
+
+    Map<String, Object> responseObjectsMap = new HashMap<>();
+
+    List<Object[]> subContractingGrnDetails =
+            subContractingGRNRepo
+            .getSubContractingGrnForInwardInspectionReport(asOnDate);
+    responseObjectsMap.put(
+            "subContractingGrnDetails",
+            subContractingGrnDetails);
+
+    responseObjectsMap.put(
+            "message",
+            "Sub Contracting GRN Details Retrieved Successfully");
+
+    return responseObjectsMap;
+}
+
+
+	
+	
+	
 }

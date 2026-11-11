@@ -269,4 +269,31 @@ public interface SalesContractRepo extends JpaRepository<SalesContractVO, Long> 
 	        @Param("orgId") Long orgId,
 	        @Param("belongsTo") String belongsTo);
 
+//	sales contract approval report
+	
+	@Query(value = """
+	        SELECT
+	            scb.doc_id AS ORDRECDNO,
+	            scb.doc_date AS ORDRECDDT,
+	            c.customer_code AS partyid,
+	            c.customer_name AS partyname,
+	            scb.approval AS approval,
+	            scb.salescontract_id AS schagrbasicid,
+	            scb.notes AS note
+	        FROM sales_contract_basic scb
+	        INNER JOIN customer_header c
+	            ON c.customer_id = scb.customer
+	        WHERE scb.approval = 'No'
+	          AND scb.doc_date BETWEEN :frdt AND :endt
+	          AND scb.cancel = FALSE
+	          AND scb.branch = :branch
+	          AND scb.org_id = :orgId
+	        ORDER BY scb.doc_id
+	        """, nativeQuery = true)
+	List<Object[]> getSalesContractApprovalReport(
+	        @Param("frdt") String frdt,
+	        @Param("endt") String endt,
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId
+	);
 }

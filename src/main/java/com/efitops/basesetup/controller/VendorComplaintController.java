@@ -1375,8 +1375,7 @@ public class VendorComplaintController extends BaseController {
 	 * Create / Update Flash NC Report
 	 */
 	@PostMapping(value = "/updateCreateFlashNCReport", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseDTO updateCreateFlashNCReport(
-			@RequestPart("flashNCReportVO") FlashNCReportDTO flashNCReportDTO,
+	public ResponseDTO updateCreateFlashNCReport(@RequestPart("flashNCReportVO") FlashNCReportDTO flashNCReportDTO,
 //			@RequestBody FlashNCReportDTO flashNCReportDTO,
 
 			@RequestPart(value = "files", required = false) MultipartFile[] files,
@@ -1591,7 +1590,8 @@ public class VendorComplaintController extends BaseController {
 	}
 
 	@GetMapping("/getFromDeptDropdownForFlashNCReport")
-	public ResponseEntity<ResponseDTO> getFromDeptDropdownForFlashNCReport(@RequestParam Long branch,@RequestParam Long orgId) {
+	public ResponseEntity<ResponseDTO> getFromDeptDropdownForFlashNCReport(@RequestParam Long branch,
+			@RequestParam Long orgId) {
 
 		String methodName = "getFromDeptDropdownForFlashNCReport()";
 
@@ -1605,8 +1605,8 @@ public class VendorComplaintController extends BaseController {
 
 		try {
 
-			List<Map<String, Object>> response = vendorComplaintService
-					.getFromDeptDropdownForFlashNCReport(branch,orgId);
+			List<Map<String, Object>> response = vendorComplaintService.getFromDeptDropdownForFlashNCReport(branch,
+					orgId);
 
 			responseObjectsMap.put(CommonConstant.STRING_MESSAGE, "From Department Retrieved Successfully");
 
@@ -3192,13 +3192,21 @@ public class VendorComplaintController extends BaseController {
 
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 
-		Map<String, Object> responseObjectsMap = new HashMap<>();
-		ResponseDTO responseDTO = null;
 		String errorMsg = null;
+
+		Map<String, Object> responseObjectsMap = new HashMap<>();
+
+		ResponseDTO responseDTO = null;
 
 		try {
 
-			responseObjectsMap = vendorComplaintService.getMachineToolsScrapNoteById(id);
+			MachineToolsScrapNoteResponseDTO getMachineToolsScrapNoteById = vendorComplaintService
+					.getMachineToolsScrapNoteById(id);
+
+			responseObjectsMap.put(CommonConstant.STRING_MESSAGE,
+					"MachineToolsScrapNoteById information retrieved successfully");
+
+			responseObjectsMap.put("getMachineToolsScrapNoteById", getMachineToolsScrapNoteById);
 
 			responseDTO = createServiceResponse(responseObjectsMap);
 
@@ -3206,14 +3214,15 @@ public class VendorComplaintController extends BaseController {
 
 			errorMsg = e.getMessage();
 
-			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg, e);
+			LOGGER.error(UserConstants.ERROR_MSG_METHOD_NAME, methodName, errorMsg);
 
-			responseDTO = createServiceResponseError(responseObjectsMap, errorMsg, errorMsg);
+			responseDTO = createServiceResponseError(responseObjectsMap, "MachineToolsScrapNoteById retrieval failed",
+					errorMsg);
 		}
 
 		LOGGER.debug(CommonConstant.ENDING_METHOD, methodName);
 
-		return ResponseEntity.ok().body(responseDTO);
+		return ResponseEntity.ok(responseDTO);
 	}
 
 	@GetMapping("/getMachineToolsScrapNoteByOrgId")

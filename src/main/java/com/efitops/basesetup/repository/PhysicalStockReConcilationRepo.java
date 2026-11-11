@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.efitops.basesetup.entity.PhysicalStockReConcilationVO;
 
@@ -51,4 +52,28 @@ public interface PhysicalStockReConcilationRepo extends JpaRepository<PhysicalSt
 			  AND screen_code = ?3
 			""")
 	String getPhysicalStockReConcilationDocId(Long orgId, String financialYear, String screenCode);
+
+	@Query(value = """
+			SELECT
+			    a.physical_stock_reconcilation_basic_id AS phystheadid,
+			    a.doc_id AS reconid,
+			    a.doc_date AS recondt,
+			    b.actual_qty AS appprod,
+			    a.time AS ttime,
+			    e.emp_name AS PREBY
+			FROM physical_stock_reconcilation_basic a
+			INNER JOIN physical_stock_reconcilation_details b
+			    ON a.physical_stock_reconcilation_basic_id =
+			       b.physical_stock_reconcilation_basic_id
+			INNER JOIN employeemaster e
+			    ON e.employeemaster_id = a.prepared_by
+			WHERE a.cancel = FALSE
+			  AND b.actual_qty = 0
+			  AND a.org_id = :orgId
+			  AND a.branch = :branch
+			  AND a.doc_date BETWEEN :fromDate AND :toDate
+			ORDER BY a.doc_id
+			""", nativeQuery = true)
+	List<Object[]> getPhysicalStockReconciliationReport(@Param("orgId") Long orgId, @Param("branch") Long branch,
+			@Param("fromDate") String fromDate, @Param("toDate") String toDate);
 }

@@ -15,7 +15,7 @@ public class ProcessSheetCompRoutingDetailResponseDTO {
 	
 	private Long id;
 
-    private LocationResponseDTO location;
+    private LocationMasterResponseDTO location;
 
     private OperationMasterResponseforPSCRDTO operation;
 

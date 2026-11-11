@@ -91,4 +91,39 @@ public interface SupplierRateContractRepo extends JpaRepository<SupplierRateCont
 			@Param("docId") String docId,
 			@Param("orgId") Long orgId,
 			@Param("branch") Long branch);	
+	
+	
+	@Query(value = """
+	        SELECT
+	            src.doc_id AS CONTNO,
+	            src.doc_date AS CONTDT,
+	            CONCAT(c.customer_code, '-', c.customer_name) AS PARTYNAME,
+	            src.contract_for AS CONFOR,
+	            d.rate AS AMOUNT,
+	            d.valid_from AS validfr,
+	            d.valid_to AS validto,
+	            t.particulars AS taxdesc,
+	            i.item_code AS ITEMID,
+	            i.item_description AS ITEMDESC
+	        FROM supplier_rate_contract src
+	        INNER JOIN customer_header c
+	            ON c.customer_id = src.customer
+	        INNER JOIN supplier_rate_contract_item_details d
+	            ON d.supplier_rate_contract_id = src.supplier_rate_contract_id
+	        LEFT JOIN supplier_rate_contract_tax_details t
+	            ON t.supplier_rate_contract_id = src.supplier_rate_contract_id
+	        LEFT JOIN item i
+	            ON i.item_id = d.incoming_item_code
+	        WHERE src.branch = :branch
+	          AND src.org_id = :orgId
+	          AND src.doc_date BETWEEN :frdt AND :todt
+	          AND src.cancel = FALSE
+	        ORDER BY src.doc_id, src.doc_date, PARTYNAME
+	        """, nativeQuery = true)
+	List<Object[]> getSupplierRateContractReport(
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId,
+	        @Param("frdt") String frdt,
+	        @Param("todt") String todt
+	);
 }

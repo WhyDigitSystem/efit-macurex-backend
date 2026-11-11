@@ -21,6 +21,8 @@ public class SalesReturnDTO {
     private String invoiceNo;
     private LocalDate invoiceDate;
 
+	private boolean stockPosting;
+
     
     private String customerInvoiceNo;
     private LocalDate customerInvoiceDate;

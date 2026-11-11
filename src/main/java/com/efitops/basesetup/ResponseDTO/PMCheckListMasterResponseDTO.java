@@ -47,9 +47,6 @@ public class PMCheckListMasterResponseDTO {
 
 	private String cancelRemarks;
 
-	private String docId;
-
-	private LocalDate docDate;
 
 	private List<PMCheckListDetailsResponseDTO> pmCheckListDetailsResponseDTO;
 

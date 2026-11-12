@@ -1,0 +1,661 @@
+
+
+package com.efitops.basesetup.repository;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.efitops.basesetup.entity.DespatchInstructionVO;
+
+public interface DespatchInstructionRepo extends JpaRepository<DespatchInstructionVO, Long> {
+
+	@Query(value = """
+			SELECT *
+			FROM despatch_basic
+			WHERE org_id = :orgId
+			  AND branch = :branch
+			  AND cancel = false
+			  AND active = 1
+			ORDER BY despatch_basic_id
+			""", nativeQuery = true)
+	List<DespatchInstructionVO> getDespatchInstructionByOrgId(@Param("orgId") Long orgId, @Param("branch") Long branch);
+
+	// despatch schedule no dropdown
+
+//         @Query(value = "(\r\n"
+//			+ "SELECT DISTINCT\r\n"
+//			+ "    sb.sdvbasic_id,\r\n"
+//			+ "    sb.dlv_no,\r\n"
+//			+ "    sb.dlv_date,\r\n"
+//			+ "    sb.month_of_schedule,\r\n"
+//			+ "    sd.invoicetype,\r\n"
+//			+ "    3 AS SN\r\n"
+//			+ "FROM sdvbasic sb\r\n"
+//			+ "INNER JOIN sdvdet sd\r\n"
+//			+ "    ON sb.sdvbasic_id = sd.sdvbasic_id\r\n"
+//			+ "INNER JOIN sales_contract_basic scb\r\n"
+//			+ "    ON scb.doc_id = sd.so_no_contractno\r\n"
+//			+ "INNER JOIN customer_header c\r\n"
+//			+ "    ON sb.customer_id = c.customer_id\r\n"
+//			+ "WHERE sb.cancel = FALSE\r\n"
+//			+ "  AND c.customer_id = ?1\r\n"
+//			+ "  AND sb.branch_id = ?3\r\n"
+//			+ "  AND sb.org_id = ?4\r\n"
+//			+ "  AND NOT EXISTS (\r\n"
+//			+ "        SELECT 1\r\n"
+//			+ "        FROM despatch_basic db\r\n"
+//			+ "        INNER JOIN despatch_detail dd\r\n"
+//			+ "            ON db.despatch_basic_id = dd.despatch_basic_id\r\n"
+//			+ "        WHERE db.cancel = FALSE\r\n"
+//			+ "          AND db.schdule_no = sb.dlv_no\r\n"
+//			+ "          AND db.custumer = c.customer_id\r\n"
+//			+ "          AND dd.item = sd.item_id\r\n"
+//			+ "  )\r\n"
+//			+ ")\r\n"
+//			+ "\r\n"
+//			+ "UNION\r\n"
+//			+ "\r\n"
+//			+ "(\r\n"
+//			+ "SELECT DISTINCT\r\n"
+//			+ "    sb.sdvbasic_id,\r\n"
+//			+ "    sb.dlv_no,\r\n"
+//			+ "    sb.dlv_date,\r\n"
+//			+ "    sb.month_of_schedule,\r\n"
+//			+ "    sd.invoicetype,\r\n"
+//			+ "    6 AS SN\r\n"
+//			+ "FROM sdvbasic sb\r\n"
+//			+ "INNER JOIN sdvdet sd\r\n"
+//			+ "    ON sb.sdvbasic_id = sd.sdvbasic_id\r\n"
+//			+ "INNER JOIN customer_header ch\r\n"
+//			+ "    ON sb.customer_id = ch.customer_id\r\n"
+//			+ "INNER JOIN order_acceptance_basic ob\r\n"
+//			+ "    ON sd.so_no_contractno = ob.doc_id\r\n"
+//			+ "WHERE sb.cancel = FALSE\r\n"
+//			+ "  AND ch.customer_id = ?1\r\n"
+//			+ "  AND sb.month_year = ?2\r\n"
+//			+ "  AND sb.branch_id =?3\r\n"
+//			+ "  AND sb.org_id = ?4\r\n"
+//			+ "  AND NOT EXISTS (\r\n"
+//			+ "        SELECT 1\r\n"
+//			+ "        FROM despatch_basic x\r\n"
+//			+ "        INNER JOIN despatch_detail y\r\n"
+//			+ "            ON x.despatch_basic_id = y.despatch_basic_id\r\n"
+//			+ "        WHERE x.cancel = FALSE\r\n"
+//			+ "          AND x.schdule_no = ob.doc_id\r\n"
+//			+ "          AND x.custumer = ch.customer_id\r\n"
+//			+ "          AND y.item = sd.item_id\r\n"
+//			+ "  )\r\n"
+//			+ ")\r\n"
+//			+ "ORDER BY dlv_no", nativeQuery = true)
+//	List<Object[]> getScheduleNoDropdownForDespatchInstruction(@Param("customer") Long customer, @Param("monthYear") String monthYear,
+//			@Param("branch") Long branch, @Param("orgId") Long orgId);
+
+         @Query(value = """
+			(
+			SELECT DISTINCT
+			    sb.sdvbasic_id,
+			     sb.doc_id,
+         		 sb.doc_date,
+			    sb.month_of_schedule,
+			    sd.invoicetype
+
+			FROM sdvbasic sb
+			INNER JOIN sdvdet sd
+			    ON sb.sdvbasic_id = sd.sdvbasic_id
+			INNER JOIN sales_contract_basic scb
+			    ON scb.doc_id = sd.so_no_contractno
+			INNER JOIN customer_header c
+			    ON sb.customer_id = c.customer_id
+			WHERE sb.cancel = FALSE
+			  AND c.customer_id = :customer
+			  AND sb.branch = :branch
+			  AND sb.org_id = :orgId
+			  AND NOT EXISTS (
+			        SELECT 1
+			        FROM despatch_basic db
+			        INNER JOIN despatch_detail dd
+			            ON db.despatch_basic_id = dd.despatch_basic_id
+			        WHERE db.cancel = FALSE
+			          AND db.schdule_no = sb.doc_id
+			          AND db.custumer = c.customer_id
+			          AND dd.item = sd.item_id
+			  )
+			)
+
+			UNION
+
+			(
+			SELECT DISTINCT
+			    sb.sdvbasic_id,
+			    sb.doc_id,
+         		 sb.doc_date,
+			    sb.month_of_schedule,
+			    sd.invoicetype
+
+			FROM sdvbasic sb
+			INNER JOIN sdvdet sd
+			    ON sb.sdvbasic_id = sd.sdvbasic_id
+			INNER JOIN customer_header ch
+			    ON sb.customer_id = ch.customer_id
+			INNER JOIN order_acceptance_basic ob
+			    ON sd.so_no_contractno = ob.doc_id
+			WHERE sb.cancel = FALSE
+			  AND ch.customer_id = :customer
+			  AND sb.month_year = :monthYear
+			  AND sb.branch = :branch
+			  AND sb.org_id = :orgId
+			  AND NOT EXISTS (
+			        SELECT 1
+			        FROM despatch_basic x
+			        INNER JOIN despatch_detail y
+			            ON x.despatch_basic_id = y.despatch_basic_id
+			        WHERE x.cancel = FALSE
+			          AND x.schdule_no = ob.doc_id
+			          AND x.custumer = ch.customer_id
+			          AND y.item = sd.item_id
+			  )
+			)
+
+			ORDER BY doc_id
+			""", nativeQuery = true)
+	List<Object[]> getScheduleNoDropdownForDespatchInstruction(@Param("customer") Long customer,
+			@Param("monthYear") String monthYear, @Param("branch") Long branch, @Param("orgId") Long orgId);
+
+	@Query(value = """
+			SELECT
+			    ob.doc_id,
+			    ob.doc_date,
+			    ob.order_acceptance_basic_id AS id,
+			    NULL AS type
+			FROM order_acceptance_basic ob
+			INNER JOIN customer_header ch
+			    ON ch.customer_id = ob.customer
+			WHERE ob.cancel = FALSE
+			  AND ch.customer_id = :customer
+			  AND ob.branch = :branch
+			  AND ob.org_id = :orgId
+
+			UNION
+
+			SELECT
+			    sc.doc_id,
+			    sc.doc_date,
+			    sc.salescontract_id AS id,
+			    sc.invoice_type AS type
+			FROM sales_contract_basic sc
+			INNER JOIN customer_header ch
+			    ON ch.customer_id = sc.customer
+			WHERE sc.cancel = FALSE
+			  AND ch.customer_id = :customer
+			  AND sc.branch = :branch
+			  AND sc.org_id = :orgId
+
+			ORDER BY doc_date
+			""", nativeQuery = true)
+	List<Object[]> getOrderAndSalesContractDropdownFromDespatchInstruction(@Param("customer") Long customerId,
+			@Param("branch") Long branch, @Param("orgId") Long orgId);
+
+	// Despatch Schedule month dropdown
+	@Query(value = """
+			SELECT
+			    a.sdvbasic_id,
+			    a.month_of_schedule
+			FROM sdvbasic a
+			INNER JOIN sdvdet d
+			    ON a.sdvbasic_id = d.sdvbasic_id
+			WHERE a.cancel = FALSE
+			  AND d.item_id = :item
+			  AND a.doc_id = :dlvNo
+			  AND a.branch = :branch
+			  AND a.org_id = :orgId
+			GROUP BY
+			    a.sdvbasic_id,
+			    a.month_of_schedule
+			""", nativeQuery = true)
+	List<Object[]> getScheduleMonthForDespatchInstruction(@Param("item") Long item, @Param("dlvNo") String dlvNo,
+			@Param("branch") Long branch, @Param("orgId") Long orgId);
+
+	// planned qty
+	@Query(value = """
+			SELECT
+			    SUM(sdsd.actual_planned_qty) - COALESCE(SUM(dd.desc_qty), 0) AS plannedQty
+
+			FROM sdvbasic sds
+
+			INNER JOIN sdvdet sdsd
+			    ON sds.sdvbasic_id = sdsd.sdvbasic_id
+
+			INNER JOIN item i
+			    ON i.item_id = sdsd.item_id
+
+			LEFT JOIN despatch_basic db
+			    ON db.schdule_no = sds.doc_id
+
+			LEFT JOIN despatch_detail dd
+			    ON dd.despatch_basic_id = db.despatch_basic_id
+			   AND dd.item = sdsd.item_id
+
+			WHERE sds.cancel = FALSE
+			  AND i.item_id = :item
+			  AND sds.branch = :branch
+			  AND sds.org_id = :orgId
+			""", nativeQuery = true)
+	BigDecimal getPlannedQtyForDespatchInstruction(@Param("item") Long item, @Param("branch") Long branch,
+			@Param("orgId") Long orgId);
+
+	// Pending qty
+
+//	    	@Query(value = """
+//
+//	    			SELECT
+//	    			    sdsd.actual_planned_qty AS pendingQty,
+//	    			    1 AS sno
+//	    			FROM sales_delivery_schedule sds
+//
+//	    			INNER JOIN customer_header ch
+//	    			    ON ch.customer_id = sds.customer_id
+//
+//	    			INNER JOIN sales_delivery_schedule_details sdsd
+//	    			    ON sds.sales_delivery_schedule_id = sdsd.sales_delivery_schedule_id
+//
+//	    			INNER JOIN item i
+//	    			    ON i.item_id = sdsd.item_id
+//
+//	    			WHERE sds.cancel = FALSE
+//	    			  AND sdsd.actual_planned_qty > 0
+//	    			  AND i.item_id = :itemId
+//	    			  AND sds.month_of_schedule = :month
+//	    			  AND sds.branch_id = :branch
+//	    			  AND sds.org_id = :orgId
+//	    			  AND ch.customer_id = :customerId
+//	    			  AND NOT EXISTS
+//	    			  (
+//	    			      SELECT 1
+//	    			      FROM despatch_basic db
+//	    			      INNER JOIN despatch_detail dd
+//	    			          ON db.despatch_basic_id = dd.despatch_basic_id
+//	    			      WHERE db.cancel = FALSE
+//	    			        AND db.schdule_no = sds.dlv_no
+//	    			        AND dd.item_id = i.item_id
+//	    			  )
+//
+//	    			UNION
+//
+//	    			SELECT
+//	    			    (sdsd.actual_planned_qty - SUM(dd.desc_qty)) AS pendingQty,
+//	    			    2 AS sno
+//	    			FROM sales_delivery_schedule sds
+//
+//	    			INNER JOIN customer_header ch
+//	    			    ON ch.customer_id = sds.customer_id
+//
+//	    			INNER JOIN sales_delivery_schedule_details sdsd
+//	    			    ON sds.sales_delivery_schedule_id = sdsd.sales_delivery_schedule_id
+//
+//	    			INNER JOIN item i
+//	    			    ON i.item_id = sdsd.item_id
+//
+//	    			INNER JOIN despatch_basic db
+//	    			    ON db.schdule_no = sds.dlv_no
+//
+//	    			INNER JOIN despatch_detail dd
+//	    			    ON dd.despatch_basic_id = db.despatch_basic_id
+//	    			   AND dd.item_id = i.item_id
+//
+//	    			WHERE sds.cancel = FALSE
+//	    			  AND i.item_id = :itemId
+//	    			  AND sds.month_of_schedule = :month
+//	    			  AND sds.branch_id = :branch
+//	    			  AND sds.org_id = :orgId
+//	    			  AND ch.customer_id = :customerId
+//
+//	    			GROUP BY
+//	    			    sdsd.actual_planned_qty
+//
+//	    			HAVING
+//	    			    (sdsd.actual_planned_qty - SUM(dd.desc_qty)) > 0
+//
+//	    			UNION
+//
+//	    			SELECT
+//	    			    sdsd.actual_planned_qty AS pendingQty,
+//	    			    3 AS sno
+//	    			FROM sales_delivery_schedule sds
+//
+//	    			INNER JOIN customer_header ch
+//	    			    ON ch.customer_id = sds.customer_id
+//
+//	    			INNER JOIN sales_delivery_schedule_details sdsd
+//	    			    ON sds.sales_delivery_schedule_id = sdsd.sales_delivery_schedule_id
+//
+//	    			INNER JOIN item i
+//	    			    ON i.item_id = sdsd.item_id
+//
+//	    			WHERE sds.cancel = FALSE
+//	    			  AND i.item_id = :itemId
+//	    			  AND sds.month_of_schedule = :month
+//	    			  AND sds.org_id = :orgId
+//	    			  AND ch.customer_id = :customerId
+//
+//	    			""", nativeQuery = true)
+//	    			List<Object[]> getDespatchPendingQty(
+//	    			        @Param("itemId") Long itemId,
+//	    			        @Param("month") String month,
+//	    			        @Param("branch") Long branch,
+//	    			        @Param("orgId") Long orgId,
+//	    			        @Param("customerId") Long customerId);
+
+	// despatch fill grid api
+	@Query(value = """
+			SELECT
+			    i.item_id,
+			    '' AS mark,
+			    i.item_code,
+			    i.item_description,
+			    u.unitmaster_id,
+			   
+			    sb.sdvbasic_id,
+			    sd.so_no_contractno,
+			    2 AS SN,
+			     u.unit_id
+			FROM sdvbasic sb
+			INNER JOIN sdvdet sd
+			    ON sb.sdvbasic_id = sd.sdvbasic_id
+			INNER JOIN item i
+			    ON sd.item_id = i.item_id
+			INNER JOIN unitmaster u
+			    ON i.primary_unit = u.unitmaster_id
+			INNER JOIN customer_header ch
+			    ON sb.customer_id = ch.customer_id
+			WHERE sb.cancel = FALSE
+			  AND i.cancel = FALSE
+			  AND ch.customer_id = :customerId
+			  AND sb.sdvbasic_id = :sdvBasicId
+			  AND sb.branch_id = :branch
+			  AND sb.org_id = :orgId
+			  AND NOT EXISTS (
+			        SELECT 1
+			        FROM despatch_basic db
+			        INNER JOIN despatch_detail dd
+			            ON db.despatch_basic_id = dd.despatch_basic_id
+			        WHERE db.cancel = FALSE
+			          AND db.schdule_no = sb.dlv_no
+			          AND dd.item = sd.item_id
+			  )
+			ORDER BY i.item_code
+			""", nativeQuery = true)
+	List<Object[]> getFillGridItemsForDespatchInstruction(@Param("customerId") Long customerId,
+			@Param("sdvBasicId") Long sdvBasicId, @Param("branch") Long branch, @Param("orgId") Long orgId);
+
+	@Query(value = """
+	        SELECT
+	            db.doc_id,
+	            db.doc_date,
+	            db.schdule_no,
+	            db.schdule_date
+	        FROM despatch_basic db
+	        WHERE db.custumer = ?1
+	          AND db.org_id = ?2
+	          AND db.branch = ?3 and active=1 and cancel=0
+	          AND NOT EXISTS (
+	              SELECT 1
+	              FROM sales_rejection_invoice_basic sri
+	              WHERE sri.dispatch_instruction_no = db.doc_id
+	                AND sri.customer = ?1
+	                AND sri.org_id = ?2
+	                AND sri.branch = ?3
+	                AND sri.doc_type = ?4 and active=1 and cancel=0
+	          )
+	        """, nativeQuery = true)
+	List<Object[]> getDespatchInstructionNoforSalesRejectionInv(
+	        Long customer,
+	        Long orgId,
+	        Long branch,
+	        String docType);
+
+	@Query(value = """
+	        SELECT
+	            i.item_id,
+	            i.item_code,
+	            i.item_description,
+	            h.hsn,
+	            i.customer_part_no,
+	            u.unitmaster_id,
+	            u.unit_id,
+	            gr.gstratemaster_id,
+	            gr.cgst,
+	            gr.sgst,
+	            gr.igst,
+	            dd.ord_accp_contr_no,
+	            dd.desc_qty,
+
+	            (
+	                SELECT x.new_rate
+	                FROM (
+
+	                    /* Sales Contract Amendment */
+	                    SELECT
+	                        scad.new_rate,
+	                        scad.new_validdate AS rate_date
+	                    FROM sales_contract_amendment_basic scab
+	                    INNER JOIN sales_contract_amendment_detail scad
+	                        ON scad.sales_contract_amendment_basic_id =
+	                           scab.sales_contract_amendment_basic_id
+	                    WHERE scab.doc_id = dd.ord_accp_contr_no
+	                      AND scad.item = dd.item
+	                      AND scab.org_id = db.org_id
+	                      AND scab.branch = db.branch
+	                      AND scab.active = 1
+	                      AND scab.cancel = 0
+	                      AND scad.new_validdate IS NOT NULL
+
+	                    UNION ALL
+
+	                    /* Sales Contract */
+	                    SELECT
+	                        scd.order_rate AS new_rate,
+	                        scd.effective_from AS rate_date
+	                    FROM sales_contract_basic scb
+	                    INNER JOIN sales_contract_detail scd
+	                        ON scd.salescontract_id =
+	                           scb.salescontract_id
+	                    WHERE scb.doc_id = dd.ord_accp_contr_no
+	                      AND scd.item = dd.item
+	                      AND scb.org_id = db.org_id
+	                      AND scb.branch = db.branch
+	                      AND scb.active = 1
+	                      AND scb.cancel = 0
+	                      AND scd.effective_from IS NOT NULL
+
+	                    UNION ALL
+
+	                    /* Order Acceptance */
+	                    SELECT
+	                        oad.order_rate AS new_rate,
+	                        oab.doc_date AS rate_date
+	                    FROM order_acceptance_basic oab
+	                    INNER JOIN order_acceptance_detail oad
+	                        ON oad.order_acceptance_basic_id =
+	                           oab.order_acceptance_basic_id
+	                    WHERE oab.doc_id = dd.ord_accp_contr_no
+	                      AND oad.item = dd.item
+	                      AND oab.org_id = db.org_id
+	                      AND oab.branch = db.branch
+	                      AND oab.active = 1
+	                      AND oab.cancel = 0
+	                      AND oab.doc_date IS NOT NULL
+
+	                    UNION ALL
+
+	                    /* Sales Order Amendment */
+	                    SELECT
+	                        soad.new_rate,
+	                        soad.new_delivery_date AS rate_date
+	                    FROM sales_order_amendment_basic soa
+	                    INNER JOIN sales_order_amendment_detail soad
+	                        ON soad.sales_order_amendment_id =
+	                           soa.sales_order_amendment_id
+	                    WHERE soa.doc_id = dd.ord_accp_contr_no
+	                      AND soad.item = dd.item
+	                      AND soa.org_id = db.org_id
+	                      AND soa.branch = db.branch
+	                      AND soa.active = 1
+	                      AND soa.cancel = 0
+	                      AND soad.new_delivery_date IS NOT NULL
+
+	                ) x
+	                ORDER BY x.rate_date DESC
+	                LIMIT 1
+	            ) AS new_rate
+
+	        FROM despatch_basic db
+
+	        INNER JOIN despatch_detail dd
+	            ON db.despatch_basic_id = dd.despatch_basic_id
+
+	        INNER JOIN item i
+	            ON i.item_id = dd.item
+
+	        INNER JOIN unitmaster u
+	            ON u.unitmaster_id = i.primary_unit
+
+	        INNER JOIN hsn h
+	            ON h.hsn_id = i.hsn_code
+
+	        LEFT JOIN gstratemaster gr
+	            ON gr.hsn_sac_code = h.hsn_id
+	            AND gr.active = 1
+	            AND gr.cancel = 0
+	            AND gr.org_id = db.org_id
+	            AND gr.branch = db.branch
+
+	        WHERE db.doc_id = ?1
+	          AND db.org_id = ?2
+	          AND db.branch = ?3
+	          AND db.active = 1
+	          AND db.cancel = 0
+
+	        ORDER BY i.item_code
+	        """, nativeQuery = true)
+	Set<Object[]> getItemDetailsforSalesRejectionInvoice(
+	        String docId,
+	        Long orgId,
+	        Long branch);
+	
+	
+	@Query(value = """
+
+	        SELECT CONCAT(
+	            dtmd.prefix,
+	            LPAD(dtmd.last_no + 1, 5, '0')
+	        )
+	        FROM documenttypemapping_details dtmd
+	        WHERE dtmd.org_id = :orgId
+	          AND dtmd.fin_year = :financialYear
+	          AND dtmd.screen_code = :screenCode
+	        """, nativeQuery = true)
+	String getDespatchInstructionDocId(
+	        @Param("orgId") Long orgId,
+	        @Param("financialYear") String financialYear,
+	        @Param("screenCode") String screenCode);
+	
+	
+	@Query(value = """
+	        SELECT
+	            i.item_id AS itemId,
+	            i.item_code AS itemCode,
+	            i.item_description AS itemDescription,
+
+	            c.customer_id AS customerId,
+	            c.customer_code AS customerCode,
+	            c.customer_name AS customerName,
+
+	            db.doc_id AS docId,
+	            db.doc_date AS docDate,
+
+	            dd.desc_qty AS despatchQty,
+	            dd.pending_qty AS pendingQty,
+	            dd.available_qty AS availableQty,
+	            dd.planned_qty AS plannedQty
+
+	        FROM despatch_basic db
+
+	        INNER JOIN despatch_detail dd
+	            ON dd.despatch_basic_id = db.despatch_basic_id
+
+	        INNER JOIN item i
+	            ON i.item_id = dd.item
+
+	        INNER JOIN customer_header c
+	            ON c.customer_id = db.custumer
+
+	        WHERE db.branch = :pprm
+	          AND db.doc_date BETWEEN :fdprm AND :tdprm
+	          AND c.belongs_to = :division
+	          AND (:partyId IS NULL OR c.customer_id = :partyId)
+
+	        ORDER BY db.doc_id, c.customer_name
+	        """, nativeQuery = true)
+	List<Object[]> getDailyDespatchInstructionReport(
+	        @Param("division") Long division,
+	        @Param("fdprm") String fdprm,
+	        @Param("partyId") Long partyId,
+	        @Param("pprm") Long pprm,
+	        @Param("tdprm") String tdprm);
+	
+	  @Query(value = """
+		        SELECT
+		            O.doc_id AS SO,
+		            O.doc_date AS SD,
+		            DB.doc_id AS DESPATCH_NO,
+		            DB.doc_date AS DESPATCH_DATE,
+		            O.customer_purchase_order_no AS CUSTPONO,
+		            O.customer_purchase_order_date AS CUSTPODT,
+		            I.item_id AS ITEMID,
+		            I.item_description AS ITEMDESC,
+		            U.unit_id AS UNITID,
+		            DD.desc_qty AS RECQTY,
+		            OD.order_rate AS RATE,
+		            P.customer_name AS partyname,
+		            DB.despatch_basic_id AS DESPBASICID
+		        FROM despatch_detail DD
+		        INNER JOIN despatch_basic DB
+		            ON DB.despatch_basic_id = DD.despatch_basic_id
+		        INNER JOIN customer_header P
+		            ON DB.custumer = P.customer_id
+		        INNER JOIN order_acceptance_basic O
+		            ON O.customer = DB.custumer
+		        INNER JOIN order_acceptance_detail OD
+		            ON OD.order_acceptance_basic_id = O.order_acceptance_basic_id
+		            AND OD.item = DD.item
+		        INNER JOIN item I
+		            ON I.item_id = DD.item
+		        LEFT JOIN unitmaster U
+		            ON U.unitmaster_id = OD.unit
+		        WHERE DB.doc_date BETWEEN STR_TO_DATE(:fromdate, '%Y-%m-%d')
+		                              AND STR_TO_DATE(:todate, '%Y-%m-%d')
+		          AND DB.org_id = :orgId
+		          AND DB.branch = :branch
+		          AND O.org_id = :orgId
+		          AND O.branch = :branch
+		          AND (P.belongs_to = :division OR :division = 'ALL')
+		        ORDER BY P.customer_name, DB.doc_id
+		        """, nativeQuery = true)
+		    List<Object[]> getDespatchInstructionReport(
+		            @Param("fromdate") String fromdate,
+		            @Param("todate") String todate,
+		            @Param("division") String division,
+		            @Param("orgId") Long orgId,
+		            @Param("branch") Long branch);
+		}
+	
+	
+	
+
+

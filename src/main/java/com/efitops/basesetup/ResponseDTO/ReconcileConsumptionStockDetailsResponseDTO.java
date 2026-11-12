@@ -1,0 +1,33 @@
+package com.efitops.basesetup.ResponseDTO;
+
+import java.math.BigDecimal;
+
+import com.efitops.basesetup.dto.UnitMasterResponseDTO;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReconcileConsumptionStockDetailsResponseDTO {
+
+    private Long id;
+
+    private ItemResponse1DTO item;
+
+    private UnitMasterResponseDTO unit;
+
+    private BigDecimal availableQty;
+
+    private BigDecimal consumptionQty;
+
+    private BigDecimal postedQty;
+
+    private BigDecimal differenceQty;
+
+    private BigDecimal rate;
+
+    private BigDecimal value;
+}

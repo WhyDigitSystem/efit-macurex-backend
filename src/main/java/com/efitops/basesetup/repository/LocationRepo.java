@@ -1,0 +1,66 @@
+package com.efitops.basesetup.repository;
+
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.efitops.basesetup.entity.LocationVO;
+
+public interface LocationRepo extends JpaRepository<LocationVO, Long> {
+
+	boolean existsByLocationIdAndOrgId(String locationId, Long orgId);
+
+	@Query(value = """
+			SELECT *
+			FROM location
+			WHERE org_id = :orgId
+			  AND branch= :branch
+			  AND cancel = false and active = 1
+			ORDER BY location_id
+			""", nativeQuery = true)
+	List<LocationVO> findByOrgIdAndBranch(@Param("orgId") Long orgId, @Param("branch") Long branch);
+
+	@Query(value = """
+			SELECT
+			    lm.id AS id,
+			    lm.location_id AS locationId,
+			    lm.location_name AS locationName
+
+			FROM location lm
+
+			JOIN listofvaluesdetails lov
+			    ON lov.listofvaluesdetails_id = lm.location_type
+
+			WHERE lm.org_id = :orgId
+			  AND lm.branch = :branch
+			  AND lov.value_description = 'SUB CONTRACT'
+			  AND lm.active = 1
+			  AND lm.cancel = 0
+
+			ORDER BY lm.location_name
+			""", nativeQuery = true)
+	Set<Object[]> getLocationForDeliverChallanSubContract(@Param("orgId") Long orgId, @Param("branch") Long branch);
+	
+	
+	
+	
+	@Query(value = """
+	        SELECT l.id,
+	               l.location_id,
+	               l.location_name
+	        FROM location l
+	        WHERE l.cancel = 0
+	          AND l.active = 1
+	          AND l.branch = :branch
+	          AND l.org_id = :orgId
+	        ORDER BY l.location_id
+	        """, nativeQuery = true)
+	List<Object[]> getLocationDropdownforProcessSheetCompRouting(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch);
+
+
+}

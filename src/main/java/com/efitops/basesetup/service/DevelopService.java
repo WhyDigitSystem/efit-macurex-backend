@@ -1,0 +1,395 @@
+package com.efitops.basesetup.service;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.efitops.basesetup.ResponseDTO.ActivityMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ControlPlanResponseDTO;
+import com.efitops.basesetup.ResponseDTO.DrawingAttachmentsResponseDTO;
+import com.efitops.basesetup.ResponseDTO.EightDisciplineEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.GateOutwardEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InitialSampleInspectionResponseDTO;
+import com.efitops.basesetup.ResponseDTO.InitialStageInspectionResponseDTO;
+import com.efitops.basesetup.ResponseDTO.IssuesResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MachineMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.MaintenanceServiceRequestResponseDTO;
+import com.efitops.basesetup.ResponseDTO.OpenStockEntryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ParameterMasterResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ProcessSheetCompRoutingResponseDTO;
+import com.efitops.basesetup.ResponseDTO.PurchaseContractAmendmentResponseDto;
+import com.efitops.basesetup.ResponseDTO.PurchaseOrderAmendmentResponceDTO;
+import com.efitops.basesetup.ResponseDTO.RootCauseAnalysisResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SCBillResponseDTO;
+import com.efitops.basesetup.ResponseDTO.SalesContractDropdownResponseDto;
+import com.efitops.basesetup.ResponseDTO.SalesContractItemDropdownResponseDTO;
+
+import com.efitops.basesetup.ResponseDTO.ToolCategoryResponseDTO;
+import com.efitops.basesetup.ResponseDTO.TransferOrderResponseDTO;
+import com.efitops.basesetup.ResponseDTO.ZeroKmFailureEntryResponseDTO;
+import com.efitops.basesetup.dto.ActivityMasterDTO;
+import com.efitops.basesetup.dto.ControlPlanDTO;
+import com.efitops.basesetup.dto.DrawingAttachmentsDTO;
+import com.efitops.basesetup.dto.EightDisciplineEntryDTO;
+import com.efitops.basesetup.dto.EnquiryDTO;
+import com.efitops.basesetup.dto.EnquiryResponseDTO;
+import com.efitops.basesetup.dto.GateOutwardEntryDTO;
+import com.efitops.basesetup.dto.InitialSampleInspectionDTO;
+import com.efitops.basesetup.dto.InitialStageInspectionDTO;
+import com.efitops.basesetup.dto.IssuesDTO;
+import com.efitops.basesetup.dto.MachineMasterDTO;
+import com.efitops.basesetup.dto.MaintenanceServiceRequestDTO;
+import com.efitops.basesetup.dto.OpenStockEntryDto;
+import com.efitops.basesetup.dto.ParameterMasterDTO;
+import com.efitops.basesetup.dto.ProcessSheetCompRoutingDTO;
+import com.efitops.basesetup.dto.PurchaseContractAmendmentDto;
+import com.efitops.basesetup.dto.PurchaseOrderAmendmentDTO;
+import com.efitops.basesetup.dto.RootCauseAnalysisDTO;
+import com.efitops.basesetup.dto.SCBillDTO;
+import com.efitops.basesetup.dto.SalesDeliveryScheduleDTO;
+import com.efitops.basesetup.dto.SalesDeliveryScheduleResponseDTO;
+import com.efitops.basesetup.dto.SalesOrderAmendmentDTO;
+import com.efitops.basesetup.dto.SalesOrderAmendmentResponseDTO;
+import com.efitops.basesetup.dto.ToolCategoryDTO;
+import com.efitops.basesetup.dto.TransferOrderDTO;
+import com.efitops.basesetup.dto.ZeroKmFailureEntryDTO;
+import com.efitops.basesetup.exception.ApplicationException;
+
+@Service
+public interface DevelopService {
+
+	EnquiryResponseDTO getEnquiryById(Long id) throws ApplicationException;
+
+	List<EnquiryResponseDTO> getEnquiryByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+//	Map<String, Object> uploadEnquiryAttachment(Long enquiryId, MultipartFile file) throws ApplicationException;
+//
+//	ResponseEntity<byte[]> viewEnquiryAttachment(Long attachmentId) throws ApplicationException;
+
+	Map<String, Object> updateCreateEnquiry(EnquiryDTO enquiryDTO, MultipartFile[] files) throws ApplicationException;
+
+	// SALES RETURN
+
+//	Map<String, Object> createUpdateSalesReturn(SalesReturnDTO salesReturnDTO) throws ApplicationException;
+//
+//	SalesReturnResponseDTO getSalesReturnById(Long id) throws ApplicationException;
+//
+//	List<SalesReturnResponseDTO> getAllSalesReturn(Long orgId, Long branch) throws ApplicationException;
+
+	// salesorderamendment
+
+	Map<String, Object> createUpdateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
+			throws ApplicationException;
+
+	SalesOrderAmendmentResponseDTO getSalesOrderAmendmentById(Long id) throws ApplicationException;
+
+	List<SalesOrderAmendmentResponseDTO> getSalesOrderAmendmentByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getOrderAcceptanceBySalesOrderAmendment(Long orgId, Long branch)
+			throws ApplicationException;
+
+//	Map<String, Object> getItemDropdownBySalesOrderAmendment(
+//	        Long salesContractId,
+//	        Long orgId,
+//	        Long branch)
+//	        throws ApplicationException;
+
+	List<Map<String, Object>> getOrderAcceptanceItemsWithAmendment(String docId, Long orgId, Long branch)
+			throws ApplicationException;
+
+	Integer getSalesOrderAmdRevisionNo(String salesOrderNo, Long item, Long orgId, Long branch)
+			throws ApplicationException;
+
+	// PurchaseContractAmendment
+
+	Map<String, Object> createUpdatePurchaseContractAmendment(PurchaseContractAmendmentDto purchaseContractAmendmentDto,
+			MultipartFile[] files) throws ApplicationException;
+
+	PurchaseContractAmendmentResponseDto getPurchaseContractAmendmentById(Long id) throws ApplicationException;
+
+	List<PurchaseContractAmendmentResponseDto> getPurchaseContractAmendmentByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	Integer getPurchaseContractAmdRevisionNo(String contractNo, Long orgId, Long branch) throws ApplicationException;
+
+	String getEnquiryDocId(Long orgId, String financialYear, String screenCode);
+
+	Map<String, Object> updateCreatePurchaseOrderAmendment(PurchaseOrderAmendmentDTO purchaseOrderAmendmentDTO,
+			MultipartFile[] files) throws ApplicationException;
+
+	PurchaseOrderAmendmentResponceDTO getPurchaseOrderAmendmentById(Long id) throws ApplicationException;
+
+	List<PurchaseOrderAmendmentResponceDTO> getPurchaseOrderAmendmentByOrgId(Long orgId) throws ApplicationException;
+
+	Map<String, Object> getPurchaseOrderAmendmentforCustomer(Long customer, Long branch, Long orgId)
+			throws ApplicationException;
+
+	Integer getPurchaseOrderAmendmentRevisionNo(String purchaseOrderNumber, Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getCurrencyExchangeRateforPurchaseOrderAmendment(String docId, Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> getContractNoDropdownforPurchaseContractAmendment(Long orgId, Long branch, Long customerId)
+			throws ApplicationException;
+
+	Map<String, Object> getPurchaseContractAmendmentItemCodeDropdown(String docId, Long branch, Long orgId)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateOpenStockEntry(OpenStockEntryDto openStockEntryDto) throws ApplicationException;
+
+	OpenStockEntryResponseDTO getOpenStockEntryById(Long id) throws ApplicationException;
+
+	List<OpenStockEntryResponseDTO> getOpenStockEntryByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> getOpenStockEntryItemCodeDropdown(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> createUpdateIssues(IssuesDTO issuesDto) throws ApplicationException;
+
+	IssuesResponseDTO getIssuesById(Long id) throws ApplicationException;
+
+	List<IssuesResponseDTO> getIssuesByOrgId(Long orgId, Long branchId) throws ApplicationException;
+
+	Map<String, Object> getIssueFromLocationDropdown(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> getIssueToLocationDropdown(Long orgId, Long branch, Long issueFrom) throws ApplicationException;
+
+	Map<String, Object> getIssueIndentNoDropdown(Long orgId, Long branch) throws ApplicationException;
+
+	Map<String, Object> getIssueItemCodeDropdown(Long orgId, Long branch, String indentNo) throws ApplicationException;
+
+	Map<String, Object> createUpdateParameterMaster(ParameterMasterDTO parameterMasterDTO) throws ApplicationException;
+
+	ParameterMasterResponseDTO getParameterMasterById(Long id) throws ApplicationException;
+
+	List<ParameterMasterResponseDTO> getParameterMasterByOrgId(Long orgId) throws ApplicationException;
+
+	String getIssuesDocId(Long orgId, String financialYear);
+
+	Map<String, Object> updateCreateMachineMaster(MachineMasterDTO machineMasterDTO, MultipartFile[] files,
+			MultipartFile[] images) throws ApplicationException;
+
+	List<MachineMasterResponseDTO> getMachineMasterByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	List<Map<String, Object>> getPurchaseOrderAmendmentItemCodeDropdown(String purchaseOrderNumber, Long branch,
+			Long orgId) throws ApplicationException;
+
+	Map<String, Object> createUpdateToolCategory(ToolCategoryDTO toolCategoryDTO) throws ApplicationException;
+
+	ToolCategoryResponseDTO getToolCategoryById(Long id) throws ApplicationException;
+
+	List<ToolCategoryResponseDTO> getToolCategoryByOrgId(Long orgId) throws ApplicationException;
+
+	MachineMasterResponseDTO getMachineMasterById(Long id) throws ApplicationException;
+
+	Map<String, Object> getToolCategoryforMachineMaster(Long orgId, String applicableFor) throws ApplicationException;
+
+	List<Map<String, Object>> getPurchaseOrderDropdownForPurchaseOrderAmendment(Long branch, Long customerId,
+			Long orgId) throws ApplicationException;
+
+	Map<String, Object> updateCreateProcessSheetCompRouting(ProcessSheetCompRoutingDTO processSheetCompRoutingDTO)
+			throws ApplicationException;
+
+	List<ProcessSheetCompRoutingResponseDTO> getProcessSheetCompRoutingByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	ProcessSheetCompRoutingResponseDTO getProcessSheetCompRoutingById(Long id) throws ApplicationException;
+
+	Map<String, Object> getFgSfgItemCodeDropdownforProcessSheetCompRouting(Long orgId, Long branch, Long itemType)
+			throws ApplicationException;
+
+	Map<String, Object> getLocationDropdownforProcessSheetCompRouting(Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> getOperationDropdownforProcessSheetCompRouting(Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> updateCreateRootCauseAnalysis(RootCauseAnalysisDTO rootCauseAnalysisDTO)
+			throws ApplicationException;
+
+	List<RootCauseAnalysisResponseDTO> getRootCauseAnalysisByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	RootCauseAnalysisResponseDTO getRootCauseAnalysisById(Long id) throws ApplicationException;
+
+	Map<String, Object> getCustomerComplaintDropDownForRootCauseAnalysis(Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateControlPlan(ControlPlanDTO controlPlanDTO) throws ApplicationException;
+
+	List<ControlPlanResponseDTO> getControlPlanByOrgId(Long orgId, Long branch) throws ApplicationException;
+
+	ControlPlanResponseDTO getControlPlanById(Long id) throws ApplicationException;
+
+	String getRootCauseAnalysisDocId(Long orgId, String financialYear);
+
+	Map<String, Object> getcontrolplandropdownforMachineFixtureDropdown(Long branch, Long orgId)
+			throws ApplicationException;
+
+	String getControlPlanDocId(Long orgId, String financialYear);
+
+	Map<String, Object> getFGItemDropdownforControlPlan(Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getItemDropdownForRootCauseAnalysis(Long complaintMasterId, Long branch, Long orgId)
+			throws ApplicationException;
+
+	Map<String, Object> updateCreateZeroKmFailureEntry(ZeroKmFailureEntryDTO zeroKmFailureEntryDTO)
+			throws ApplicationException;
+
+	List<ZeroKmFailureEntryResponseDTO> getZeroKmFailureEntryByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	ZeroKmFailureEntryResponseDTO getZeroKmFailureEntryById(Long id) throws ApplicationException;
+
+	String getZeroKmFailureEntryDocId(Long orgId, String financialYear);
+
+	String getProcessSheetCompRoutingDocId(Long orgId, String financialYear);
+
+	Map<String, Object> createUpdateEightDisciplineEntry(EightDisciplineEntryDTO eightDisciplineEntryDTO)
+			throws ApplicationException;
+
+	EightDisciplineEntryResponseDTO getEightDisciplineEntryById(Long id) throws ApplicationException;
+
+	List<EightDisciplineEntryResponseDTO> getEightDisciplineEntryByOrgId(Long orgId) throws ApplicationException;
+
+	String getEightDisciplineEntryDocId(Long orgId, String financialYear) throws ApplicationException;
+
+	Map<String, Object> getComplaintNoDropDownForEightDiscipline(Long orgId) throws ApplicationException;
+
+	Map<String, Object> getRootCauseNoDropDownForEightDiscipline(Long orgId, Long complaintNo)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateInitialStageInspection(InitialStageInspectionDTO initialStageInspectionDTO)
+			throws ApplicationException;
+
+	InitialStageInspectionResponseDTO getInitialStageInspectionById(Long id) throws ApplicationException;
+
+	String getInitialStageInspectionDocId(Long orgId, String financialYear);
+
+	List<InitialStageInspectionResponseDTO> getInitialStageInspectionByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getWorkOrderNoDropDownForInitialStageInspection(Long orgId, Long branch, Long partyId)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateInitialSampleInspection(InitialSampleInspectionDTO initialSampleInspectionDTO)
+			throws ApplicationException;
+
+	List<InitialSampleInspectionResponseDTO> getInitialSampleInspectionByOrgId(Long orgId, Long branch)
+			throws ApplicationException;
+
+	InitialSampleInspectionResponseDTO getInitialSampleInspectionById(Long id) throws ApplicationException;
+
+	String getInitialSampleInspectionDocId(Long orgId, String financialYear);
+
+	List<Map<String, Object>> getSupplierIdDropDownForInitialSampleInspection(Long orgId, Long branch)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateActivityMaster(ActivityMasterDTO activityMasterDTO) throws ApplicationException;
+
+	List<ActivityMasterResponseDTO> getActivityMasterByOrgId(Long orgId) throws ApplicationException;
+
+	ActivityMasterResponseDTO getActivityMasterById(Long id) throws ApplicationException;
+
+	Map<String, Object> updateCreateDrawingAttachments(DrawingAttachmentsDTO drawingAttachmentsDTO,
+			MultipartFile[] files) throws ApplicationException;
+
+	DrawingAttachmentsResponseDTO getDrawingAttachmentsById(Long id) throws ApplicationException;
+
+	List<DrawingAttachmentsResponseDTO> getDrawingAttachmentsByOrgId(Long orgId) throws ApplicationException;
+
+	Map<String, Object> updateCreateMaintenanceServiceRequest(MaintenanceServiceRequestDTO maintenanceServiceRequestDTO)
+			throws ApplicationException;
+
+	List<MaintenanceServiceRequestResponseDTO> getMaintenanceServiceRequestByOrgId(Long orgId)
+			throws ApplicationException;
+
+	MaintenanceServiceRequestResponseDTO getMaintenanceServiceRequestById(Long id) throws ApplicationException;
+
+	Map<String, Object> createUpdateTransferOrder(TransferOrderDTO transferOrderDTO) throws ApplicationException;
+
+	List<TransferOrderResponseDTO> getTransferOrderByOrgId(Long orgId) throws ApplicationException;
+
+	TransferOrderResponseDTO getTransferOrderById(Long id) throws ApplicationException;
+
+	String getTransferOrderDocId(Long orgId, String financialYear);
+
+	List<Map<String, Object>> getTransferOrderItemDropdown(Long orgId) throws ApplicationException;
+
+	Map<String, Object> createUpdateGateOutwardEntry(GateOutwardEntryDTO gateOutwardEntryDTO)
+			throws ApplicationException;
+
+	List<GateOutwardEntryResponseDTO> getGateOutwardEntryByOrgId(Long orgId) throws ApplicationException;
+
+	GateOutwardEntryResponseDTO getGateOutwardEntryById(Long id) throws ApplicationException;
+
+	String getGateOutwardEntryDocId(Long orgId, String financialYear);
+
+	String getMaintenanceServiceRequestDocId(Long orgId, String financialYear);
+
+	List<Map<String, Object>> getBreakdownNoDropdownForGateOutwardEntry(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getSubcontractChallanNoForGateOutwardEntry(Long orgId, Long branch)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getTypeDropdownByOrderTypeForTransferOrder(String orderType, Long orgId)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getProcessSheetNoDropdownForInitialStageInspection(Long orgId, Long branch, Long itemId)
+			throws ApplicationException;
+
+	List<Map<String, Object>> getControlPlanDetailsByItemIdForInitialStageInspection(Long itemId)
+			throws ApplicationException;
+
+	Map<String, Object> getDailyDespatchInstructionReport(Long pprm, String fdprm, Long division, Long partyId,
+			String tdprm) throws ApplicationException;
+
+	Map<String, Object> getCustomerComplaintReport(Long pprm, String fromdate, String todate)
+			throws ApplicationException;
+
+	Map<String, Object> createUpdateSCBill(SCBillDTO dto) throws ApplicationException;
+
+	List<SCBillResponseDTO> getSCBillByOrgId(Long orgId) throws ApplicationException;
+
+	SCBillResponseDTO getSCBillById(Long id) throws ApplicationException;
+
+	String getSCBillDocId(Long orgId, String financialYear);
+
+	String getPurchaseOrderAmendmentDocId(Long orgId, String financialYear);
+
+	ResponseEntity<byte[]> viewPurchaseOrderAmendmentFile(HttpServletRequest request) throws IOException;
+
+	String getPurchaseContractAmendmentDocId(Long orgId, String financialYear);
+
+	ResponseEntity<byte[]> viewPurchaseContractAmendmentFile(HttpServletRequest request) throws IOException;
+
+	String getOpenStockEntryDocId(Long orgId, String financialYear);
+
+	ResponseEntity<byte[]> viewEnquiryFile(HttpServletRequest request) throws IOException;
+
+	
+
+	Map<String, Object> getChallanNoForGateOutwardEntry(Long customer, String breakdown, Long branch, Long orgId)
+			throws ApplicationException;
+
+//	Map<String, Object> createUpdateSalesOrderAmendment(SalesOrderAmendmentDTO salesOrderAmendmentDTO)
+//			throws ApplicationException;
+
+	List<Map<String, Object>> getFgAndSfgItemDetailsProcessSheetComp(Long orgId, Long branch, String type);
+
+	List<Map<String, Object>> getOperationDetailsProcessSheetComp(Long orgId);
+
+	List<Map<String, Object>> getMachineDetailsProcessSheetComp(Long orgId, Long branch);
+
+	String getSalesOrderAmendmentDocId(Long orgId, String financialYear);
+
+
+}

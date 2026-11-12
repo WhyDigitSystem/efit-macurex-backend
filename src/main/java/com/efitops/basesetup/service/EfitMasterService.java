@@ -11,6 +11,7 @@ import com.efitops.basesetup.dto.BomDTO;
 import com.efitops.basesetup.dto.DepartmentDTO;
 import com.efitops.basesetup.dto.DesignationDTO;
 import com.efitops.basesetup.dto.EmployeeMasterDTO;
+import com.efitops.basesetup.dto.EmployeeMasterResponseDTO;
 import com.efitops.basesetup.dto.MaterialTypeDTO;
 import com.efitops.basesetup.dto.UomDTO;
 import com.efitops.basesetup.entity.BomVO;
@@ -23,19 +24,17 @@ import com.efitops.basesetup.exception.ApplicationException;
 
 @Service
 public interface EfitMasterService {
-	
-	
+
 	// Department
 
 	Map<String, Object> createUpdateDepartment(DepartmentDTO departmentDTO) throws ApplicationException;
 
-	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId, String branchCode);
+	List<DepartmentVO> getAllDepartmentByOrgId(Long orgId);
 
 	List<DepartmentVO> getDepartmentById(Long id);
 
-	String getDepartmentDocId(Long orgId, String finYear, String branchCode);
+	String getDepartmentDocId(Long orgId, String finYear, Long branch);
 
-	
 	// Material Type
 
 	Map<String, Object> createUpdateMaterialType(MaterialTypeDTO materialTypeDTO) throws ApplicationException;
@@ -46,12 +45,13 @@ public interface EfitMasterService {
 
 	// Designation
 
-	List<DesignationVO> getDesignationByOrgId(Long orgId, String branchCode);
+	List<DesignationVO> getDesignationByOrgId(Long orgId);
+
 	List<DesignationVO> getDesignationById(Long id);
 
 	Map<String, Object> updateCreateDesignation(DesignationDTO designationdto) throws ApplicationException;
 
-	String getDesignationDocId(Long orgId, String finYear, String branchCode);
+	String getDesignationDocId(Long orgId, String finYear, Long branch);
 
 	// UOM
 
@@ -60,8 +60,6 @@ public interface EfitMasterService {
 	List<UomVO> getUomById(Long id);
 
 	Map<String, Object> updateCreateUom(@Valid UomDTO uomDTO) throws ApplicationException;
-
-	
 
 	// Bom Master
 
@@ -77,11 +75,14 @@ public interface EfitMasterService {
 
 	List<Map<String, Object>> getSFGItemDetailsForBOM(Long orgId);
 
-	List<EmployeeMasterVO> getEmployeeMasterById(Long id);
-
-	List<EmployeeMasterVO> getAllEmployeeMasterByOrgId(Long orgId, String branchCode);
+	// EmployeeMaster
 
 	Map<String, Object> updateCreateEmployeeMaster(@Valid EmployeeMasterDTO employeeMasterDTO) throws Exception;
 
+	EmployeeMasterResponseDTO getEmployeeMasterById(Long id) throws ApplicationException;
+
+	List<EmployeeMasterResponseDTO> getEmployeeMasterByOrgId(Long orgId) throws ApplicationException;
+
+	String getEmployeeByDocId(Long orgId);
 
 }

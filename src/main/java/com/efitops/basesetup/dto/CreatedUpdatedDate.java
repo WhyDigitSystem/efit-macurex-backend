@@ -31,11 +31,11 @@ import lombok.NoArgsConstructor;
 public class CreatedUpdatedDate {
 
 	@DateTimeFormat(pattern = "dd-MM-yyyy hh:mm:ss a")
-	@Column(name="createdon",length = 25)
+	@Column(name="created_on",length = 25)
 	private String createdon;
 
 	@DateTimeFormat(pattern = "dd-MM-yyyy hh:mm:ss a")
-	@Column(name="modifiedon",length = 25)
+	@Column(name="modified_on",length = 25)
 	private String modifiedon;
 
 	@PrePersist

@@ -15,10 +15,9 @@ public class DesignationDTO {
     private String designation;
     private Long orgId;
     private String createdBy;
-	private String branch;
-	private String branchCode;
-    private String finYear;
+//	private Long branch;
     private boolean active;
+    private String cancelRemarks;
 }
 
 

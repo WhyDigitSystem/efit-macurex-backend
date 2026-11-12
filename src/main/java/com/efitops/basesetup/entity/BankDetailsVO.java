@@ -1,6 +1,5 @@
 package com.efitops.basesetup.entity;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -28,27 +27,25 @@ public class BankDetailsVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bankdetailsgen")
 	@SequenceGenerator(name = "bankdetailsgen", sequenceName = "bankdetailsseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "bankdetailsid")
+	@Column(name = "bankdetails_id")
 	private Long id;
-	@Column(name = "bankname")
+	@Column(name = "bank_name")
 	private String bankName;
-	@Column(name = "accountcode")
-	private String accountCode;
-	@Column(name = "beneficiaryname")
-	private String beneficiaryName;
-	@Column(name = "branch")
-	private String branch;
-	@Column(name = "ifsc")
-	private String ifsc;
-	@Column(name = "accountno")
+	@Column(name = "ifsc_code")
+	private String ifscCode;
+	@Column(name = "account_no")
 	private Long accountNo;
-	@Column(name = "accounttype")
-	private String accountType;
-	@Column(name = "primaryaccount")
-	private boolean primaryAccount;
+	@Column(name = "bank_branch")
+	private String bankBranch;
+
+	@Column(name = "screen_code", length = 5)
+	private String screenCode = "BD";
+
+	@Column(name = "screen_name", length = 30)
+	private String screenName = "BANKDETAILS";
 
 	@ManyToOne
 	@JsonBackReference
-	@JoinColumn(name = "companyid")
-	CompanyVO companyVO;
+	@JoinColumn(name = "branch_id")
+	BranchVO branchVO;
 }

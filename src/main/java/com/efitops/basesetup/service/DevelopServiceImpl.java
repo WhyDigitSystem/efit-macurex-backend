@@ -244,6 +244,7 @@ import com.efitops.basesetup.entity.SCBillVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentDetailsVO;
 import com.efitops.basesetup.entity.SalesOrderAmendmentVO;
 import com.efitops.basesetup.entity.ShiftVO;
+import com.efitops.basesetup.entity.StockValuationVO;
 import com.efitops.basesetup.entity.ToolCategoryDetailVO;
 import com.efitops.basesetup.entity.ToolCategoryVO;
 import com.efitops.basesetup.entity.TransferOrderDetailVO;
@@ -335,6 +336,7 @@ import com.efitops.basesetup.repository.SalesOrderAmendmentDetailsRepo;
 import com.efitops.basesetup.repository.SalesOrderAmendmentRepo;
 import com.efitops.basesetup.repository.SalesReturnRepo;
 import com.efitops.basesetup.repository.ShiftRepo;
+import com.efitops.basesetup.repository.StockValuationRepo;
 import com.efitops.basesetup.repository.SubContractingGRNRepo;
 import com.efitops.basesetup.repository.ToolCategoryRepo;
 import com.efitops.basesetup.repository.ToolMasterRepo;
@@ -634,6 +636,9 @@ public class DevelopServiceImpl implements DevelopService {
 
 	private BillOfMaterialRepo billOfMaterialRepo;
 
+	
+	@Autowired
+	StockValuationRepo stockValuationRepo;
 
 //	@Override
 //	@Transactional
@@ -4188,8 +4193,14 @@ public class DevelopServiceImpl implements DevelopService {
 		// Save Header + Details
 		// =========================
 
+		boolean isNewRecord = ObjectUtils.isEmpty(issuesDto.getId()); // capture BEFORE save
+
 		IssuesVO savedVO = issuesRepo.save(issuesVO);
 
+		// Stock posting only on create
+		if (isNewRecord) {
+		    createStockForIssues(savedVO);
+		}
 		// =========================
 		// Response
 		// =========================
@@ -4585,6 +4596,74 @@ public class DevelopServiceImpl implements DevelopService {
 		}
 
 		return responseDTO;
+	}
+	
+	private void createStockForIssues(IssuesVO vo) throws ApplicationException {
+
+	    if (vo.getDetails() == null || vo.getDetails().isEmpty()) {
+	        return;
+	    }
+
+	    if (vo.getIssueFrom() == null) {
+	        throw new ApplicationException("Issue From Location is required for stock posting");
+	    }
+
+	    for (IssuesDetailsVO detailVO : vo.getDetails()) {
+
+	        if (detailVO.getItem() == null || detailVO.getQty() == null
+	                || detailVO.getQty().compareTo(BigDecimal.ZERO) <= 0) {
+	            continue;
+	        }
+
+	        BigDecimal qty = detailVO.getQty();
+	        BigDecimal rate = detailVO.getRate() != null ? detailVO.getRate() : BigDecimal.ZERO;
+
+	        StockValuationVO stockVO = new StockValuationVO();
+
+	        // Issues = stock OUT
+	        stockVO.setPlusOrMinus("m");
+
+	        // Item
+	        stockVO.setStockPartNo(detailVO.getItem());
+
+	        // Location (stock leaves Issue From)
+	        stockVO.setLocDetailsId(vo.getIssueFrom());
+
+	        // Document
+	        stockVO.setDocId(vo.getDocId());
+	        stockVO.setDocDate(vo.getDocDate());
+	        stockVO.setDocTime(LocalTime.now());
+
+	        // Quantity / Rate / Value
+	        stockVO.setQuantity(qty);
+	        stockVO.setRate(rate);
+	        stockVO.setStockValue(detailVO.getAmount() != null ? detailVO.getAmount()
+	                : qty.multiply(rate).setScale(2, RoundingMode.HALF_UP));
+
+	        // Branch
+	        if (vo.getBranch() != null) {
+	            stockVO.setBranchVO(vo.getBranch());
+	        }
+
+	        // Organization
+	        stockVO.setOrgId(vo.getOrgId());
+
+	        // Narration
+	        stockVO.setNarration(vo.getNarration());
+
+	        // Audit
+	        stockVO.setCreatedBy(vo.getCreatedBy());
+	        stockVO.setUpdatedBy(vo.getUpdatedBy());
+
+	        stockVO.setActive(true);
+	        stockVO.setCancel(false);
+
+	        // Source
+	        stockVO.setSourceScreenName(vo.getScreenName());
+	        stockVO.setSourceScreenCode(vo.getScreenCode());
+
+	        stockValuationRepo.save(stockVO);
+	    }
 	}
 
 	@Override

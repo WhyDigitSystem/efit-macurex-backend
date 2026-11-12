@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -85,9 +85,6 @@ import com.efitops.basesetup.entity.BranchVO;
 import com.efitops.basesetup.entity.CurrencyVO;
 import com.efitops.basesetup.entity.CustomerVO;
 import com.efitops.basesetup.entity.DepartmentVO;
-import com.efitops.basesetup.entity.DirectPurchaseCashDetailsVO;
-import com.efitops.basesetup.entity.DirectPurchaseFileUploadDetailsVO;
-import com.efitops.basesetup.entity.DirectPurchaseTaxDetailsVO;
 import com.efitops.basesetup.entity.DocumentTypeMappingDetailsVO;
 import com.efitops.basesetup.entity.EmployeeMasterVO;
 import com.efitops.basesetup.entity.GSTStateMasterVO;
@@ -114,6 +111,7 @@ import com.efitops.basesetup.entity.PurchaseContractVO;
 import com.efitops.basesetup.entity.PurchaseDeliveryScheduleDetailsVO;
 import com.efitops.basesetup.entity.PurchaseDeliveryScheduleLineVO;
 import com.efitops.basesetup.entity.PurchaseDeliveryScheduleVO;
+import com.efitops.basesetup.entity.StockValuationVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -147,6 +145,7 @@ import com.efitops.basesetup.repository.PurchaseContractTaxDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleLineRepo;
 import com.efitops.basesetup.repository.PurchaseDeliveryScheduleRepo;
+import com.efitops.basesetup.repository.StockValuationRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
@@ -256,6 +255,9 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 	@Autowired
 	private PurchaseContractAttachmentRepo purchaseContractAttachmentRepo;
 
+	@Autowired
+	StockValuationRepo stockValuationRepo;
+	
 	@Override
 	@Transactional
 	public Map<String, Object> updateCreatePurchaseDeliverySchedule(
@@ -3470,8 +3472,15 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 
 		createUpdatePhysicalStockReConcilationVO(physicalStockReConcilationDTO, physicalStockReConcilationVO);
 
+		boolean isNewRecord = ObjectUtils.isEmpty(physicalStockReConcilationDTO.getId()); // capture BEFORE save
+
 		PhysicalStockReConcilationVO savedVO = physicalStockReConcilationRepo.save(physicalStockReConcilationVO);
 
+		// Stock posting only on create
+		if (isNewRecord) {
+		    createStockForPhysicalStockReConcilation(savedVO);
+		}
+		
 		Map<String, Object> response = new HashMap<>();
 
 		response.put("message", message);
@@ -3776,6 +3785,81 @@ public class PurchaseDeliverySchServiceImpl implements PurchaseDeliverySchServic
 		responseDTO.setPhysicalStockReConcilationDetailsResponseDTO(detailResponseList);
 
 		return responseDTO;
+	}
+	
+	private void createStockForPhysicalStockReConcilation(PhysicalStockReConcilationVO vo)
+	        throws ApplicationException {
+
+	    if (vo.getPhysicalStockReConcilationDetailsVO() == null
+	            || vo.getPhysicalStockReConcilationDetailsVO().isEmpty()) {
+	        return;
+	    }
+
+	    if (vo.getLocation() == null) {
+	        throw new ApplicationException("Location is required for stock posting");
+	    }
+
+	    for (PhysicalStockReConcilationDetailsVO detailVO : vo.getPhysicalStockReConcilationDetailsVO()) {
+
+	        if (detailVO.getItem() == null || detailVO.getActualQty() == null || detailVO.getBookStock() == null) {
+	            continue;
+	        }
+
+	        int compare = detailVO.getActualQty().compareTo(detailVO.getBookStock());
+
+	        // No difference = nothing to post
+	        if (compare == 0) {
+	            continue;
+	        }
+
+	        BigDecimal qty = detailVO.getActualQty().subtract(detailVO.getBookStock()).abs();
+	        BigDecimal rate = detailVO.getRate() != null ? detailVO.getRate() : BigDecimal.ZERO;
+
+	        StockValuationVO stockVO = new StockValuationVO();
+
+	        // Actual > Book = stock IN, Actual < Book = stock OUT
+	        stockVO.setPlusOrMinus(compare > 0 ? "p" : "m");
+
+	        // Item
+	        stockVO.setStockPartNo(detailVO.getItem());
+
+	        // Location
+	        stockVO.setLocDetailsId(vo.getLocation());
+
+	        // Document
+	        stockVO.setDocId(vo.getDocId());
+	        stockVO.setDocDate(vo.getDocDate());
+	        stockVO.setDocTime(LocalTime.now());
+
+	        // Quantity / Rate / Value
+	        stockVO.setQuantity(qty);
+	        stockVO.setRate(rate);
+	        stockVO.setStockValue(qty.multiply(rate).setScale(2, RoundingMode.HALF_UP));
+
+	        // Branch
+	        if (vo.getBranch() != null) {
+	            stockVO.setBranchVO(vo.getBranch());
+	        }
+
+	        // Organization
+	        stockVO.setOrgId(vo.getOrgId());
+
+	        // Narration
+	        stockVO.setNarration(vo.getNarration());
+
+	        // Audit
+	        stockVO.setCreatedBy(vo.getCreatedBy());
+	        stockVO.setUpdatedBy(vo.getUpdatedBy());
+
+	        stockVO.setActive(true);
+	        stockVO.setCancel(false);
+
+	        // Source
+	        stockVO.setSourceScreenName(vo.getScreenName());
+	        stockVO.setSourceScreenCode(vo.getScreenCode());
+
+	        stockValuationRepo.save(stockVO);
+	    }
 	}
 
 	@Override

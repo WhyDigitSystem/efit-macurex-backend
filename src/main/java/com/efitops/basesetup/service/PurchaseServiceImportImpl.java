@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -182,6 +183,7 @@ import com.efitops.basesetup.entity.ScrapNoteReasonDetailsVO;
 import com.efitops.basesetup.entity.ScrapNoteVO;
 import com.efitops.basesetup.entity.StockTransferDetailsVO;
 import com.efitops.basesetup.entity.StockTransferVO;
+import com.efitops.basesetup.entity.StockValuationVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BillOfMaterialDetailsRepo;
@@ -234,6 +236,7 @@ import com.efitops.basesetup.repository.ScrapNoteReasonDetailsRepo;
 import com.efitops.basesetup.repository.ScrapNoteRepo;
 import com.efitops.basesetup.repository.StockTransferDetailsRepo;
 import com.efitops.basesetup.repository.StockTransferRepo;
+import com.efitops.basesetup.repository.StockValuationRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 @Service
@@ -393,6 +396,9 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 	@Autowired
 	private ProductionBulkIssueDetailsRepo productionBulkIssueDetailsRepo;
+	
+	@Autowired
+	StockValuationRepo stockValuationRepo;
 
 	@Override
 	public PurchaseOrderResponseDTO getPurchaseOrderById(Long id, PoType type) throws ApplicationException {
@@ -2683,7 +2689,15 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 
 		createUpdateStockTransferVOByStockTransferDTO(stockTransferDTO, stockTransferVO);
 
+		boolean isNewRecord = ObjectUtils.isEmpty(stockTransferDTO.getId()); // capture BEFORE save
+
 		stockTransferVO = stockTransferRepo.save(stockTransferVO);
+
+		// Stock posting only on create
+		if (isNewRecord) {
+		    createStockForStockTransfer(stockTransferVO);
+		}
+
 
 		StockTransferResponseDTO responseDTO = buildStockTransferResponse(stockTransferVO);
 
@@ -2873,6 +2887,81 @@ public class PurchaseServiceImportImpl implements PurchaseServiceImport {
 		responseDTO.setStockTransferDetailsResponseDTO(detailsList);
 
 		return responseDTO;
+	}
+	
+	private void createStockForStockTransfer(StockTransferVO vo) throws ApplicationException {
+
+	    if (vo.getStockTransferDetailsVO() == null || vo.getStockTransferDetailsVO().isEmpty()) {
+	        return;
+	    }
+
+	    if (vo.getFromLocation() == null || vo.getToLocation() == null) {
+	        throw new ApplicationException("From Location and To Location are required for stock posting");
+	    }
+
+	    for (StockTransferDetailsVO detailVO : vo.getStockTransferDetailsVO()) {
+
+	        if (detailVO.getItem() == null || detailVO.getQty() == null
+	                || detailVO.getQty().compareTo(BigDecimal.ZERO) <= 0) {
+	            continue;
+	        }
+
+	        BigDecimal qty = detailVO.getQty();
+	        BigDecimal rate = detailVO.getRate() != null ? detailVO.getRate() : BigDecimal.ZERO;
+	        BigDecimal value = qty.multiply(rate).setScale(2, RoundingMode.HALF_UP);
+
+	        // ---------- FROM LOCATION : stock OUT ----------
+	        StockValuationVO outVO = buildTransferStockRow(vo, detailVO, qty, rate, value);
+	        outVO.setPlusOrMinus("m");
+	        outVO.setLocDetailsId(vo.getFromLocation());
+	        outVO.setBranchVO(vo.getBranch());
+	        stockValuationRepo.save(outVO);
+
+	        // ---------- TO LOCATION : stock IN ----------
+	        StockValuationVO inVO = buildTransferStockRow(vo, detailVO, qty, rate, value);
+	        inVO.setPlusOrMinus("p");
+	        inVO.setLocDetailsId(vo.getToLocation());
+	        inVO.setBranchVO(vo.getToBranch() != null ? vo.getToBranch() : vo.getBranch());
+	        stockValuationRepo.save(inVO);
+	    }
+	}
+
+	private StockValuationVO buildTransferStockRow(StockTransferVO vo, StockTransferDetailsVO detailVO,
+	        BigDecimal qty, BigDecimal rate, BigDecimal value) {
+
+	    StockValuationVO stockVO = new StockValuationVO();
+
+	    // Item
+	    stockVO.setStockPartNo(detailVO.getItem());
+
+	    // Document
+	    stockVO.setDocId(vo.getDocId());
+	    stockVO.setDocDate(vo.getDocDate());
+	    stockVO.setDocTime(LocalTime.now());
+
+	    // Quantity / Rate / Value
+	    stockVO.setQuantity(qty);
+	    stockVO.setRate(rate);
+	    stockVO.setStockValue(value);
+
+	    // Organization
+	    stockVO.setOrgId(vo.getOrgId());
+
+	    // Narration
+	    stockVO.setNarration(vo.getNarration());
+
+	    // Audit
+	    stockVO.setCreatedBy(vo.getCreatedBy());
+	    stockVO.setUpdatedBy(vo.getUpdatedBy());
+
+	    stockVO.setActive(true);
+	    stockVO.setCancel(false);
+
+	    // Source
+	    stockVO.setSourceScreenName(vo.getScreenName());
+	    stockVO.setSourceScreenCode(vo.getScreenCode());
+
+	    return stockVO;
 	}
 
 	@Override

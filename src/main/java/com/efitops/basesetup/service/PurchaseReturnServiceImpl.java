@@ -1,6 +1,8 @@
 package com.efitops.basesetup.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,7 @@ import com.efitops.basesetup.entity.ItemMasterVO;
 import com.efitops.basesetup.entity.PurchaseReturnDetailsVO;
 import com.efitops.basesetup.entity.PurchaseReturnTaxDetailsVO;
 import com.efitops.basesetup.entity.PurchaseReturnVO;
+import com.efitops.basesetup.entity.StockValuationVO;
 import com.efitops.basesetup.entity.UnitMasterVO;
 import com.efitops.basesetup.exception.ApplicationException;
 import com.efitops.basesetup.repository.BranchRepo;
@@ -40,6 +43,7 @@ import com.efitops.basesetup.repository.ItemMasterRepo;
 import com.efitops.basesetup.repository.PurchaseReturnDetailsRepo;
 import com.efitops.basesetup.repository.PurchaseReturnRepo;
 import com.efitops.basesetup.repository.PurchaseReturnTaxDetailsRepo;
+import com.efitops.basesetup.repository.StockValuationRepo;
 import com.efitops.basesetup.repository.UnitMasterRepo;
 
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +81,9 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 	@Autowired
 	private AmountInWordsConverterService amountInWordsConverterService;
 
+	@Autowired
+	StockValuationRepo stockValuationRepo;
+	
 	@Override
 	public PurchaseReturnResponseDTO getPurchaseReturnById(Long id) throws ApplicationException {
 
@@ -150,6 +157,15 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 		createUpdatePurchaseReturnVOByPurchaseReturnDTO(purchaseReturnDTO, purchaseReturnVO);
 
 		purchaseReturnVO = purchaseReturnRepo.save(purchaseReturnVO);
+
+		boolean isNewRecord = ObjectUtils.isEmpty(purchaseReturnDTO.getId()); // capture BEFORE save
+
+		purchaseReturnVO = purchaseReturnRepo.save(purchaseReturnVO);
+
+		// Stock posting only on create
+		if (isNewRecord) {
+		    createStockForPurchaseReturn(purchaseReturnVO);
+		}
 
 		PurchaseReturnResponseDTO responseDTO = buildPurchaseReturnResponse(purchaseReturnVO);
 
@@ -536,6 +552,66 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 		return responseDTO;
 	}
 
+	private void createStockForPurchaseReturn(PurchaseReturnVO vo) throws ApplicationException {
+
+	    if (vo.getPurchaseReturnDetailsVO() == null || vo.getPurchaseReturnDetailsVO().isEmpty()) {
+	        return;
+	    }
+
+	    for (PurchaseReturnDetailsVO detailVO : vo.getPurchaseReturnDetailsVO()) {
+
+	        BigDecimal qty = detailVO.getGrnReceivedQty();
+
+	        if (detailVO.getItem() == null || qty == null || qty.compareTo(BigDecimal.ZERO) <= 0) {
+	            continue;
+	        }
+
+	        BigDecimal rate = detailVO.getRateInInr() != null ? detailVO.getRateInInr() : BigDecimal.ZERO;
+
+	        StockValuationVO stockVO = new StockValuationVO();
+
+	        // Purchase Return = stock OUT
+	        stockVO.setPlusOrMinus("m");
+
+	        // Item
+	        stockVO.setStockPartNo(detailVO.getItem());
+
+	        // Document
+	        stockVO.setDocId(vo.getDocId());
+	        stockVO.setDocDate(vo.getDocDate());
+	        stockVO.setDocTime(LocalTime.now());
+
+	        // Quantity / Rate / Value
+	        stockVO.setQuantity(qty);
+	        stockVO.setRate(rate);
+	        stockVO.setStockValue(qty.multiply(rate).setScale(2, RoundingMode.HALF_UP));
+
+	        // Branch
+	        if (vo.getBranch() != null) {
+	            stockVO.setBranchVO(vo.getBranch());
+	        }
+
+	        // Organization
+	        stockVO.setOrgId(vo.getOrgId());
+
+	        // Narration
+	        stockVO.setNarration(vo.getNarration());
+
+	        // Audit
+	        stockVO.setCreatedBy(vo.getCreatedBy());
+	        stockVO.setUpdatedBy(vo.getUpdatedBy());
+
+	        stockVO.setActive(true);
+	        stockVO.setCancel(false);
+
+	        // Source
+	        stockVO.setSourceScreenName("Purchase Return");
+	        stockVO.setSourceScreenCode("PR");
+
+	        stockValuationRepo.save(stockVO);
+	    }
+	}
+	
 	@Override
 	public String getPurchaseReturnDocId(Long orgId, String financialYear) {
 		String screenCode = "PR";

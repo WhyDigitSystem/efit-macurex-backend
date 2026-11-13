@@ -41,9 +41,9 @@ public class UomVO {
 	@Column(name = "modifiedby")
 	private String updatedBy;
 	@Column(name = "cancel")
-	private boolean cancel;
+	private boolean cancel=false;
 	@Column(name = "active")
-	private boolean active;
+	private boolean active=true;
 
 	@JsonGetter("active")
 	public String getActive() {

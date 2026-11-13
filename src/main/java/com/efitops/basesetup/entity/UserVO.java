@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,6 +21,7 @@ import javax.persistence.Table;
 import com.efitops.basesetup.dto.CreatedUpdatedDate;
 import com.efitops.basesetup.dto.Role;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,10 +46,15 @@ public class UserVO {
 	private String userName;
 	@Column(name = "password")
 	private String password;
-	@Column(name = "employeecode")
-	private String employeeCode;
-	@Column(name = "employeename")
-	private String employeeName;
+//	@Column(name = "employeecode")
+//	private String employeeCode;
+//	@Column(name = "employeename")
+//	private String employeeName;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "employee")
+	private EmployeeMasterVO employeeMaster;
+	
 	@Column(name = "nickname")
 	private String nickName;
 	@Column(name = "email")
@@ -89,19 +96,22 @@ public class UserVO {
 	private CreatedUpdatedDate commonDate = new CreatedUpdatedDate();
 
 	@OneToMany(mappedBy = "userVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<UserLoginRolesVO> roleAccessVO;
 
 //	@OneToMany(mappedBy = "userVO", cascade = CascadeType.ALL)
 //	private List<UserLoginClientAccessVO> clientAccessVO;
 
 	@OneToMany(mappedBy = "userVO", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<UserLoginBranchAccessibleVO> branchAccessibleVO;
 	
 	private Date accountRemovedDate;
 	
-	@ManyToOne
-	@JoinColumn(name="companyid")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="company")
 	private CompanyVO companyVO;
+	
 	
 	@JsonGetter("active")
 	public String getActive() {
@@ -109,8 +119,7 @@ public class UserVO {
 	}
 
 	public boolean isActive() {
-		// TODO Auto-generated method stub
-		return false;
+	    return active;
 	}
 
 	

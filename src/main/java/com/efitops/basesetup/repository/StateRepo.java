@@ -12,8 +12,8 @@ import com.efitops.basesetup.entity.StateVO;
 public interface StateRepo extends JpaRepository<StateVO, Long> {
 
 
-	@Query("select a from StateVO a where a.orgId=?1 and a.country=?2")
-	List<StateVO> findByCountry(Long orgid,String country);
+	@Query(value = "SELECT * FROM state WHERE org_id = ?1 AND country = ?2", nativeQuery = true)
+	List<StateVO> findByCountry(Long orgid,Long country);
 
 	@Query("select a from StateVO a where a.orgId=?1")
 	List<StateVO> findAllByOrgId(Long orgid);

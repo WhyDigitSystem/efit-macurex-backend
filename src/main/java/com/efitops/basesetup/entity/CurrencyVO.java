@@ -27,34 +27,49 @@ public class CurrencyVO {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "currencygen")
 	@SequenceGenerator(name = "currencygen", sequenceName = "currencyseq", initialValue = 1000000001, allocationSize = 1)
-	@Column(name = "currencyid")
+	@Column(name = "currency_id")
 	private Long id;
 	
 	
 	@ManyToOne
-	@JoinColumn(name = "countryid")
+	@JoinColumn(name = "country_id")
 	private CountryVO country;
 	
+	
+	@Column(name = "main_currency")
+	private String mainCurrency;
 	@Column(name = "currency")
 	private String currency;
-	@Column(name = "subcurrency")
+	@Column(name = "sub_currency")
 	private String subCurrency;
-	@Column(name = "currencydesc")
+	@Column(name = "main_currencysymbol")
+	private String mainCurrencySymbol;
+	@Column(name = "sub_symbol")
+	private String subSymbol;
+	@Column(name = "currency_representation")
+	private String currencyRepresentation;
+	@Column(name = "currency_integer")
+	private String currencyInteger;
+	@Column(name = "currency_decimal")
+	private String currencyDecimal;
+	@Column(name = "currency_description")
 	private String currencyDescription;
-	@Column(name = "orgid")
+	@Column(name = "org_id")
 	private Long orgId;
 	@Column(name = "active")
 	private boolean active;
-	@Column(name = "createdby")
+	@Column(name = "created_by")
 	private String createdBy;
-	@Column(name = "modifiedby")
+	@Column(name = "modified_by")
 	private String updatedBy;
 	@Column(name = "cancel")
-	private boolean cancel=true;
-	@Column(name = "screenname")
+	private boolean cancel=false;
+	@Column(name = "cancel_remarks")
+	private String cancelRemarks;
+	@Column(name = "screen_name")
 	private String screenName="CURRENCY";
-	@Column(name = "screencode")
-	private String screenCode="CU";
+	@Column(name = "screen_code")
+	private String screenCode="CUR";
 	@JsonGetter("active")
 	public String getActive() {
 		return active ? "Active" : "In-Active";

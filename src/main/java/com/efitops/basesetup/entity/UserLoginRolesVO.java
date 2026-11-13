@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,18 +32,22 @@ public class UserLoginRolesVO {
 	@Column(name="userloginrolesid")
 	private long id;
 	
-	@Column(name="role")
-	private String role;
-	@Column(name="roleid")
-	private Long roleId;
-	@Column(name="startdate")
+//	@Column(name="role")
+//	private String role;
+//	@Column(name="roleid")
+//	private Long roleId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "roles")
+	private RolesVO roles;
+	
+	@Column(name="start_date")
 	private LocalDate startDate;
-	@Column(name="enddate")
+	@Column(name="end_date")
 	private LocalDate endDate;
 	
-	@JsonBackReference
 	@ManyToOne
-    @JoinColumn(name = "usersid")
+	@JsonBackReference
+    @JoinColumn(name = "users_id")
     private UserVO userVO;
 	
 	

@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BankDetailsDTO {
 	private String bankName;
-	private String accountCode;
-	private String beneficiaryName;
-	private String branch;
-	private String ifsc;
+	private String ifscCode;
 	private Long accountNo;
-	private String accountType;
-	private boolean primaryAccount;
+	private String bankBranch;
 }

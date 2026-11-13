@@ -12,27 +12,52 @@ import com.efitops.basesetup.entity.CompanyVO;
 @Repository
 public interface CompanyRepo extends JpaRepository<CompanyVO, Long> {
 
-	boolean existsByCompanyCodeAndId(String companyCode, Long id);
+//	boolean existsByCompanyCodeAndId(String companyCode, Long id);
+//
+//	boolean existsByCompanyNameAndId(String companyName, Long id);
+//
+//	boolean existsByEmployeeCodeAndId(String employeeCode, Long id);
+//
+//	boolean existsByEmailAndId(String email, Long id);
+//
+//	boolean existsByPhoneAndId(String phone, Long id);
 
-	boolean existsByCompanyNameAndId(String companyName, Long id);
 
-	boolean existsByEmployeeCodeAndId(String employeeCode, Long id);
-
-	boolean existsByEmailAndId(String email, Long id);
-
-	boolean existsByPhoneAndId(String phone, Long id);
-
-	boolean existsByCompanyCodeAndCompanyNameAndEmployeeCodeAndEmailAndPhoneAndId(String companyCode,
-			String companyName, String employeeCode, String email, String phone, Long id);
-
-	@Query(nativeQuery = true, value = "select * from company  where companyid=?1")
+//	boolean existsByCompanyCodeAndCompanyNameAndAdminNameAndAdminEmailAndAdminMobileNoAndIdNot(
+//	        String companyCode,
+//	        String companyName,
+//	        String adminName,
+//	        String adminEmail,
+//	        String adminMobileNo,
+//	        Long id);
+	
+	@Query(nativeQuery = true, value = "select * from company  where company_id=?1")
 	List<CompanyVO> findByCompany(Long companyid);
 
-	@Query(value="select companycode,companyname from company where companyid=?1", nativeQuery =true)
+	@Query(value="select companycode,companyname from company where company_id=?1", nativeQuery =true)
 	Set<Object[]> findCompanyForStockLocation(Long orgId);
-	
-	@Query(nativeQuery =true,value ="select b.bankname,b.accountcode,b.accountno,b.ifsc,b.accounttype,b.beneficiaryname,b.branch from bankdetails b inner join company c where b.companyid=c.companyid and b.companyid=?1 and b.primaryaccount=1")
-	Set<Object[]> findCompanyBankDetails(Long orgId);
+//	
+//	@Query(nativeQuery =true,value ="select b.bankname,b.accountcode,b.accountno,b.ifsc,b.accounttype,b.beneficiaryname,b.branch from bankdetails b inner join company c where b.companyid=c.companyid and b.companyid=?1 and b.primaryaccount=1")
+//	Set<Object[]> findCompanyBankDetails(Long orgId);
 
+	boolean existsByCompanyCode(String companyCode);
+
+	boolean existsByCompanyName(String companyName);
+
+	boolean existsByAdminEmail(String adminEmail);
+
+	boolean existsByAdminMobileNo(String adminMobileNo);
+
+	boolean existsByCompanyCodeAndIdNot(String companyCode, Long id);
+
+	boolean existsByCompanyNameAndIdNot(String companyName, Long id);
+
+	boolean existsByAdminEmailAndIdNot(String adminEmail, Long id);
+
+	boolean existsByAdminMobileNoAndIdNot(String adminMobileNo, Long id);
+
+	boolean existsByEmail(String adminEmail);
+
+	boolean existsByPhoneNo(String adminMobileNo);
 }
 

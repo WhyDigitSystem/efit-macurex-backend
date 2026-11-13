@@ -1,0 +1,502 @@
+package com.efitops.basesetup.repository;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.efitops.basesetup.entity.CustomerVO;
+
+@Repository
+public interface CustomerRepo extends JpaRepository<CustomerVO, Long> {
+
+	boolean existsByCustomerNameAndOrgId(String string, Long orgId);
+
+	boolean existsByGstNoAndOrgId(String gstNo, Long orgId);
+
+	@Query(value = """
+			SELECT *
+			FROM customer_header
+			WHERE org_id = :orgId
+			  AND branch = :branch
+			  AND active = 1
+			  AND cancel = 0
+			ORDER BY customer_id DESC
+			""", nativeQuery = true)
+	List<CustomerVO> findByOrgIdAndBranch(@Param("orgId") Long orgId, @Param("branch") Long branch);
+
+	// dropdown for mapping party to account
+	@Query(value = "SELECT customer_id, customer_code, customer_name " + "FROM customer_header " + "WHERE active = 1 "
+			+ "AND cancel = 0 " + "AND org_id = ?2 " + "AND branch = ?3 " + "AND (customer_category = ?1 "
+			+ "OR customer_category1 = ?1 " + "OR customer_category2 = ?1) "
+			+ "ORDER BY customer_name ASC", nativeQuery = true)
+	Set<Object[]> getParty(Long category, Long orgId, Long branch);
+
+	@Query(value = "SELECT customer_id, customer_code, customer_name, gst_no, is_gst_applicable "
+			+ "FROM customer_header " + "WHERE org_id = ?1 " + "AND branch = ?2 " + "AND cancel = 0 "
+			+ "AND active = 1", nativeQuery = true)
+	List<Object[]> getCustomerDetails(Long orgId, Long branch);
+
+//	@Query(value = """
+//			SELECT
+//			    c.customer_id,
+//			    c.customer_code,
+//			    c.customer_name,
+//			    c.address AS add1,
+//			    g.state_name AS GSTState,
+//			    c.gst_no,
+//			    c.is_gst_applicable,
+//			    c.gst_type
+//			FROM customer_header c
+//			INNER JOIN quotation_header q
+//			    ON q.customer = c.customer_id
+//			INNER JOIN gststatemaster g
+//			    ON g.gststatemaster_id = c.gst_state
+//			WHERE c.cancel = 0
+//			  AND c.active = 1
+//			  AND ?1 = 'Flow'
+//			  AND q.org_id = ?2
+//			  AND q.branch = ?3
+//			  AND NOT EXISTS (
+//			        SELECT 1
+//			        FROM sales_contract_basic sc
+//			        WHERE sc.customer = c.customer_id
+//			          AND sc.quotation_no = q.doc_id
+//			    )
+//
+//			UNION
+//
+//			SELECT
+//			    c.customer_id,
+//			    c.customer_code,
+//			    c.customer_name,
+//			    c.address AS add1,
+//			    g.state_name AS GSTState,
+//			    c.gst_no,
+//			    c.is_gst_applicable,
+//			    c.gst_type
+//			FROM customer_header c
+//			INNER JOIN gststatemaster g
+//			    ON g.gststatemaster_id = c.gst_state
+//			WHERE c.cancel = 0
+//			  AND c.active = 1
+//			  AND ?1 = 'Direct'
+//			  AND c.org_id = ?2
+//			  AND c.branch = ?3
+//			  AND UPPER(c.customer_type) = 'CUSTOMER'
+//			ORDER BY customer_code
+//			""", nativeQuery = true)
+	@Query(value = """
+						SELECT
+						    c.customer_id,
+						    c.customer_code,
+						    c.customer_name,
+						    c.address AS add1,
+						    g.state_name AS GSTState,
+						    c.gst_no,
+						    c.is_gst_applicable,
+						    c.gst_type
+
+						FROM customer_header c
+
+						INNER JOIN quotation_header q
+						    ON q.customer = c.customer_id
+
+						INNER JOIN gststatemaster g
+						    ON g.gststatemaster_id = c.gst_state
+
+						WHERE c.cancel = 0
+						  AND c.active = 1
+						  AND ?1 = 'Flow'
+						  AND q.org_id = ?2
+						  AND q.branch = ?3
+
+						  AND NOT EXISTS (
+						        SELECT 1
+						        FROM sales_contract_basic sc
+						        WHERE sc.customer = c.customer_id
+						          AND sc.quotation_no = q.doc_id
+						  )
+
+						UNION
+
+						SELECT
+						    c.customer_id,
+						    c.customer_code,
+						    c.customer_name,
+						    c.address AS add1,
+						    g.state_name AS GSTState,
+						    c.gst_no,
+						    c.is_gst_applicable,
+						    c.gst_type
+
+						FROM customer_header c
+
+						INNER JOIN gststatemaster g
+						    ON g.gststatemaster_id = c.gst_state
+
+						LEFT JOIN listofvaluesdetails a
+						    ON c.customer_category = a.listofvaluesdetails_id
+
+						LEFT JOIN listofvaluesdetails b
+						    ON c.customer_category1 = b.listofvaluesdetails_id
+
+						LEFT JOIN listofvaluesdetails cc
+						    ON c.customer_category2 = cc.listofvaluesdetails_id
+
+						WHERE c.cancel = 0
+						  AND c.active = 1
+						  AND ?1 = 'Direct'
+						  AND c.org_id = ?2
+						  AND c.branch = ?3
+						
+			AND (
+	              UPPER(a.value_description) LIKE '%CUSTOMER%' 
+	           OR UPPER(b.value_description) LIKE '%CUSTOMER%' 
+	           OR UPPER(cc.value_description) LIKE '%CUSTOMER%' 
+	        ) 
+
+						ORDER BY customer_code
+						""", nativeQuery = true)
+	List<Object[]> getCustomerDropdown(String ctype, Long orgId, Long branch);
+
+	// getstocktransfercustomer
+	@Query(value = "SELECT "
+	        + "c.customer_id, "
+	        + "c.customer_code, "
+	        + "c.customer_name, "
+	        + "c.account_name, "
+	        + "g.gststatemaster_id, "
+	        + "g.state_code, "
+	        + "g.state_name, "
+	        + "g.gst_state_id, "
+	        + "c.is_gst_applicable, "
+	        + "c.gst_no "
+	        + "FROM customer_header c "
+	        + "INNER JOIN gststatemaster g "
+	        + "    ON c.gst_state = g.gststatemaster_id "
+	        + "LEFT JOIN listofvaluesdetails a "
+	        + "    ON c.customer_category = a.listofvaluesdetails_id "
+	        + "LEFT JOIN listofvaluesdetails b "
+	        + "    ON c.customer_category1 = b.listofvaluesdetails_id "
+	        + "LEFT JOIN listofvaluesdetails cc "
+	        + "    ON c.customer_category2 = cc.listofvaluesdetails_id "
+	        + "WHERE c.cancel = false "
+	        + "AND c.active = true "
+	        + "AND ("
+	        + "       UPPER(a.value_description) LIKE '%CUSTOMER%' "
+	        + "    OR UPPER(b.value_description) LIKE '%CUSTOMER%' "
+	        + "    OR UPPER(cc.value_description) LIKE '%CUSTOMER%' "
+	        + ") "
+	        + "AND c.branch = ?1 "
+	        + "AND c.org_id = ?2 "
+	        + "ORDER BY c.customer_code",
+	        nativeQuery = true)
+	List<Object[]> getCustomerForStockTransferChallan(Long branch, Long orgId);
+
+	// despatch instruction customer dropdown
+	@Query(value = """
+						SELECT
+						    c.customer_id,
+						    c.customer_code,
+						    c.customer_name,
+						    c.account_name
+						FROM customer_header c
+
+						LEFT JOIN listofvaluesdetails a
+						    ON c.customer_category = a.listofvaluesdetails_id
+
+						LEFT JOIN listofvaluesdetails b
+						    ON c.customer_category1 = b.listofvaluesdetails_id
+
+						LEFT JOIN listofvaluesdetails cc
+						    ON c.customer_category2 = cc.listofvaluesdetails_id
+
+						WHERE c.cancel = FALSE
+						  AND c.active = TRUE
+						  AND c.branch = :branch
+						  AND c.org_id = :orgId
+						  AND (
+			       a.value_description LIKE 'CUSTOMER%'
+			    OR b.value_description LIKE 'CUSTOMER%'
+			    OR cc.value_description LIKE 'CUSTOMER%'
+			)
+						ORDER BY c.customer_code
+						""", nativeQuery = true)
+	List<Object[]> getCustomerDropdownForDespatchInstructions(@Param("branch") Long branch, @Param("orgId") Long orgId);
+
+	@Query(value = """
+			SELECT
+			    customer_id AS customerId,
+			    customer_name AS customerName,
+			    customer_code AS customerCode
+			FROM customer_header
+			WHERE org_id = ?1
+			  AND branch = ?2
+			  AND active = 1
+			  AND cancel = 0
+			ORDER BY customer_name
+			""", nativeQuery = true)
+	List<Map<String, Object>> getAllCustomerDetails(@Param("orgId") Long orgId, @Param("branch") Long branch);
+
+//		Customerdropdown for the purchasedelivaryschedule 
+
+	@Query(value = "SELECT\r\n" + "			    c.customer_id,\r\n" + "			    c.customer_code,\r\n"
+			+ "			    c.customer_name\r\n" + "			FROM customer_header c\r\n"
+			+ "			LEFT JOIN listofvaluesdetails a\r\n"
+			+ "			    ON c.customer_category = a.listofvaluesdetails_id\r\n"
+			+ "			LEFT JOIN listofvaluesdetails b\r\n"
+			+ "			    ON c.customer_category1 = b.listofvaluesdetails_id\r\n"
+			+ "			LEFT JOIN listofvaluesdetails cc\r\n"
+			+ "			    ON c.customer_category2 = cc.listofvaluesdetails_id\r\n"
+			+ "			WHERE c.cancel = FALSE\r\n" + "			  AND c.active = TRUE\r\n"
+			+ "			  AND c.branch = :branch\r\n" + "			  AND c.org_id = :orgId\r\n"
+			+ "AND ("
+			+ "    UPPER(a.value_description) LIKE '%SUPPLIER%' "
+			+ " OR UPPER(b.value_description) LIKE '%SUPPLIER%' "
+			+ " OR UPPER(cc.value_description) LIKE '%SUPPLIER%' "
+			+ ")"
+			+ "			ORDER BY c.customer_code", nativeQuery = true)
+	List<Object[]> getSupplierDropdownForPurchaseDeliverySchedule(@Param("branch") Long branch,
+			@Param("orgId") Long orgId);
+
+	@Query(value = """
+									SELECT
+						    c.customer_id AS customerId,
+						    c.customer_code AS customerCode,
+						    c.customer_name AS customerName,
+						    gs.state_name AS gstState,
+						    c.gst_no AS gstNo,
+						    c.is_gst_applicable AS igstApplicable,
+						    c.gst_type AS gstType,
+						    cs.shipping_address AS shippingAddress,
+						    city.city AS shippingCity,
+						    cs.shipping_pincode AS shippingPincode
+						FROM customer_header c
+
+						LEFT JOIN gststatemaster gs
+						    ON gs.gststatemaster_id = c.gst_state
+						    AND gs.active = 1
+						    AND gs.cancel = 0
+
+						LEFT JOIN customer_shipping_details cs
+						    ON cs.customer_id = c.customer_id
+
+						LEFT JOIN city city
+						    ON city.city_id = cs.shipping_city
+
+						LEFT JOIN listofvaluesdetails a
+						    ON c.customer_category = a.listofvaluesdetails_id
+
+						LEFT JOIN listofvaluesdetails b
+						    ON c.customer_category1 = b.listofvaluesdetails_id
+
+						LEFT JOIN listofvaluesdetails cc
+						    ON c.customer_category2 = cc.listofvaluesdetails_id
+
+						WHERE c.org_id = ?1
+						  AND c.branch = ?2
+						  AND c.active = 1
+						  AND c.cancel = 0
+						 AND (
+			       a.value_description LIKE 'CUSTOMER%'
+			    OR b.value_description LIKE 'CUSTOMER%'
+			    OR cc.value_description LIKE 'CUSTOMER%'
+			)
+
+						ORDER BY c.customer_name
+									""", nativeQuery = true)
+	Set<Object[]> getCustomerDetailsforSalesRejectionInvoice(Long orgId, Long branch);
+
+	@Query(value = """
+						SELECT
+						    c.customer_id,
+						    c.customer_code,
+						    c.customer_name,
+						    c.address AS add1,
+						    g.state_name AS GSTState,
+						    c.gst_no,
+						    c.is_gst_applicable,
+						    c.gst_type,
+						    g.gststatemaster_id
+						FROM customer_header c
+						INNER JOIN gststatemaster g
+						    ON g.gststatemaster_id = c.gst_state
+						LEFT JOIN listofvaluesdetails a
+						    ON c.customer_category = a.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails b
+						    ON c.customer_category1 = b.listofvaluesdetails_id
+						LEFT JOIN listofvaluesdetails cc
+						    ON c.customer_category2 = cc.listofvaluesdetails_id
+						WHERE c.cancel = 0
+						  AND c.active = 1
+						  AND c.branch = :branch
+						  AND c.org_id = :orgId
+						  AND (
+			       UPPER(a.value_description) LIKE 'SUB CONTRACT%'
+			    OR UPPER(b.value_description) LIKE 'SUB CONTRACT%'
+			    OR UPPER(cc.value_description) LIKE 'SUB CONTRACT%'
+			)
+						ORDER BY c.customer_code
+						""", nativeQuery = true)
+	Set<Object[]> getCustomerForSupplierRateContract(@Param("orgId") Long orgId, @Param("branch") Long branch);
+	
+	
+	
+	@Query(value = """
+	        SELECT
+	            c.customer_name AS partyname,
+	            c.address AS add1,
+	            NULL AS add2,
+	            NULL AS add3,
+	            NULL AS add4,
+	            c.account_name AS accountname,
+	            c.customer_id AS PartyMASTID,
+	            c.customer_code AS PartyID,
+	            g.state_name AS GSTSTATE,
+	            c.is_gst_applicable AS ISGSTAPPL,
+	            c.gst_no AS GSTNNO
+	        FROM customer_header c
+	        LEFT JOIN gststatemaster g
+	            ON g.gststatemaster_id = c.gst_state
+	        LEFT JOIN listofvaluesdetails lov1
+	            ON lov1.listofvaluesdetails_id = c.customer_category
+	        LEFT JOIN listofvaluesdetails lov2
+	            ON lov2.listofvaluesdetails_id = c.customer_category1
+	        LEFT JOIN listofvaluesdetails lov3
+	            ON lov3.listofvaluesdetails_id = c.customer_category2
+	        WHERE c.cancel = FALSE
+	          AND c.active = TRUE
+	          AND c.org_id = :orgId
+	          AND c.branch = :branch
+	          AND (
+	                lov1.value_description IN ('Sub Contract', 'Sub Contractor')
+	                OR lov2.value_description IN ('Sub Contract', 'Sub Contractor')
+	                OR lov3.value_description IN ('Sub Contract', 'Sub Contractor')
+	              )
+	        ORDER BY c.customer_name
+	        """, nativeQuery = true)
+	List<Object[]> getSubContractorForSCBill(
+	        @Param("orgId") Long orgId,
+	        @Param("branch") Long branch);
+	
+	
+	//getCustomerAchievedDetailsReport
+	
+	
+	@Query(value = """
+		    SELECT
+		        result.partymastid,
+		        result.partyid,
+		        result.partyname,
+		        SUM(result.mamt) AS mamt,
+		        SUM(result.damt) AS damt,
+		        result.monyear,
+		        result.belongs
+		    FROM (
+		        /* Section 1: Order Acceptance */
+		        SELECT
+		            s.month_year AS monyear,
+		            p.customer_id AS partymastid,
+		            p.customer_code AS partyid,
+		            p.customer_name AS partyname,
+		            SUM(sd.order_qty * d.order_rate) AS mamt,
+		            0 AS damt,
+		            p.belongs_to AS belongs
+		        FROM sdvbasic s
+		        JOIN customer_header p
+		            ON s.customer_id = p.customer_id
+		        JOIN sdvdet sd
+		            ON s.sdvbasic_id = sd.sdvbasic_id
+		        JOIN order_acceptance_basic o
+		            ON o.doc_id = sd.so_no_contractno
+		        JOIN order_acceptance_detail d
+		            ON d.order_acceptance_basic_id =
+		               o.order_acceptance_basic_id
+		           AND d.item = sd.item_id
+		        WHERE s.cancel = b'0'
+		          AND s.month_year = :myear
+		          AND p.belongs_to = :under
+		        GROUP BY
+		            s.month_year,
+		            p.customer_id,
+		            p.customer_code,
+		            p.customer_name,
+		            p.belongs_to
+
+		        UNION ALL
+
+		        /* Section 2: Sales Contract */
+		        SELECT
+		            s.month_year AS monyear,
+		            p.customer_id AS partymastid,
+		            p.customer_code AS partyid,
+		            p.customer_name AS partyname,
+		            SUM(sd.order_qty * d.order_rate) AS mamt,
+		            0 AS damt,
+		            p.belongs_to AS belongs
+		        FROM sdvbasic s
+		        JOIN customer_header p
+		            ON s.customer_id = p.customer_id
+		        JOIN sdvdet sd
+		            ON s.sdvbasic_id = sd.sdvbasic_id
+		        JOIN sales_contract_basic o
+		            ON o.customer_contract_no = sd.so_no_contractno
+		        JOIN sales_contract_detail d
+		            ON d.salescontract_id = o.salescontract_id
+		           AND d.item = sd.item_id
+		        WHERE s.cancel = b'0'
+		          AND s.month_year = :myear
+		          AND p.belongs_to = :under
+		        GROUP BY
+		            s.month_year,
+		            p.customer_id,
+		            p.customer_code,
+		            p.customer_name,
+		            p.belongs_to
+
+		        UNION ALL
+
+		        /* Section 3: Sales Rejection Invoice */
+		        SELECT
+		            db.month_year AS monyear,
+		            pm.customer_id AS partymastid,
+		            pm.customer_code AS partyid,
+		            pm.customer_name AS partyname,
+		            0 AS mamt,
+		            SUM(dd.amount_in_rs) AS damt,
+		            pm.belongs_to AS belongs
+		        FROM sales_rejection_invoice_basic db
+		        JOIN sales_rejection_invoice_detail dd
+		            ON db.sales_rejection_invoice_basic_id =
+		               dd.sales_rejection_invoice_basic_id
+		        JOIN customer_header pm
+		            ON pm.customer_id = db.customer
+		        WHERE db.cancel = b'0'
+		          AND db.month_year = :myear
+		          AND pm.belongs_to = :under
+		        GROUP BY
+		            db.month_year,
+		            pm.customer_id,
+		            pm.customer_code,
+		            pm.customer_name,
+		            pm.belongs_to
+		    ) AS result
+		    GROUP BY
+		        result.partymastid,
+		        result.partyid,
+		        result.partyname,
+		        result.monyear,
+		        result.belongs
+		    ORDER BY result.partyid
+		    """, nativeQuery = true)
+		List<Object[]> getCustomerAchievedDetails(
+		        @Param("myear") String myear,
+		        @Param("under") String under
+		);
+
+}

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.efitops.basesetup.entity.EngineeringChangeRecordVO;
 
@@ -44,5 +45,21 @@ public interface EngineeringChangeRecordRepo extends JpaRepository<EngineeringCh
 
 	        """)
 	String getEngineeringChangeRecordDocId(Long orgId, String financialYear, String screenCode);
+	
+	@Query(value = """
+	        SELECT
+	            b.branch,
+	            a.doc_id,
+	            a.approved
+	        FROM engineering_change_record_basic a
+	        INNER JOIN branch b
+	            ON b.branch_id = a.branch
+	        WHERE a.branch = :branch
+	          AND a.org_id = :orgId
+	        """, nativeQuery = true)
+	List<Object[]> getEngineeringChangeRecordReport(
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId
+	);
 
 }

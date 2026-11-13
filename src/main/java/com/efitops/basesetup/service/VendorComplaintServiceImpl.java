@@ -9466,7 +9466,7 @@ public class VendorComplaintServiceImpl implements VendorComplaintService {
 	public Map<String, Object> getOrderAcceptanceForGstApprovalReport(String fromDate, String toDate, Long orgId,
 			Long branch) throws ApplicationException {
 
-		List<Object[]> resultList = orderAcceptanceRepo.getOrderAcceptanceForGstApproval(fromDate, toDate, orgId,
+		List<Object[]> resultList = orderAcceptanceRepo.getOrderAcceptanceForApproval(fromDate, toDate, orgId,
 				branch);
 
 		List<Map<String, Object>> responseList = new ArrayList<>();

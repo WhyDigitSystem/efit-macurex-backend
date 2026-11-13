@@ -622,4 +622,72 @@ public interface SalesDeliveryScheduleRepo extends JpaRepository<SalesDeliverySc
 	        @Param("branch") Long branch,
 	        @Param("orgId") Long orgId
 	);
+	
+	
+	@Query(value = """
+	        SELECT
+	            i.item_code AS itemid,
+	            i.item_description AS itemdesc,
+	            a.dlv_no AS divnos,
+	            a.doc_date AS divdt,
+	            p.customer_code AS partyid,
+	            p.customer_name AS partyname,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 1 THEN sd.actual_planned_qty ELSE 0 END) AS d1,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 2 THEN sd.actual_planned_qty ELSE 0 END) AS d2,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 3 THEN sd.actual_planned_qty ELSE 0 END) AS d3,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 4 THEN sd.actual_planned_qty ELSE 0 END) AS d4,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 5 THEN sd.actual_planned_qty ELSE 0 END) AS d5,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 6 THEN sd.actual_planned_qty ELSE 0 END) AS d6,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 7 THEN sd.actual_planned_qty ELSE 0 END) AS d7,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 8 THEN sd.actual_planned_qty ELSE 0 END) AS d8,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 9 THEN sd.actual_planned_qty ELSE 0 END) AS d9,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 10 THEN sd.actual_planned_qty ELSE 0 END) AS d10,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 11 THEN sd.actual_planned_qty ELSE 0 END) AS d11,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 12 THEN sd.actual_planned_qty ELSE 0 END) AS d12,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 13 THEN sd.actual_planned_qty ELSE 0 END) AS d13,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 14 THEN sd.actual_planned_qty ELSE 0 END) AS d14,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 15 THEN sd.actual_planned_qty ELSE 0 END) AS d15,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 16 THEN sd.actual_planned_qty ELSE 0 END) AS d16,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 17 THEN sd.actual_planned_qty ELSE 0 END) AS d17,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 18 THEN sd.actual_planned_qty ELSE 0 END) AS d18,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 19 THEN sd.actual_planned_qty ELSE 0 END) AS d19,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 20 THEN sd.actual_planned_qty ELSE 0 END) AS d20,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 21 THEN sd.actual_planned_qty ELSE 0 END) AS d21,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 22 THEN sd.actual_planned_qty ELSE 0 END) AS d22,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 23 THEN sd.actual_planned_qty ELSE 0 END) AS d23,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 24 THEN sd.actual_planned_qty ELSE 0 END) AS d24,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 25 THEN sd.actual_planned_qty ELSE 0 END) AS d25,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 26 THEN sd.actual_planned_qty ELSE 0 END) AS d26,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 27 THEN sd.actual_planned_qty ELSE 0 END) AS d27,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 28 THEN sd.actual_planned_qty ELSE 0 END) AS d28,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 29 THEN sd.actual_planned_qty ELSE 0 END) AS d29,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 30 THEN sd.actual_planned_qty ELSE 0 END) AS d30,
+	            SUM(CASE WHEN DAY(a.dlv_date) = 31 THEN sd.actual_planned_qty ELSE 0 END) AS d31
+	        FROM sdvbasic a
+	        INNER JOIN sdvdet sd
+	            ON a.sdvbasic_id = sd.sdvbasic_id
+	        INNER JOIN item i
+	            ON sd.item_id = i.item_id
+	        INNER JOIN customer_header p
+	            ON a.customer_id = p.customer_id
+	        WHERE a.month_year = :monthYear
+	          AND COALESCE(a.cancel, 0) = 0
+	          AND a.branch_id = :branch
+	          AND a.org_id = :orgId
+	        GROUP BY
+	            i.item_code,
+	            i.item_description,
+	            a.dlv_no,
+	            a.doc_date,
+	            p.customer_code,
+	            p.customer_name
+	        ORDER BY
+	            a.dlv_no,
+	            i.item_code
+	        """, nativeQuery = true)
+	List<Object[]> getDeliveryScheduleWeekly(
+	        @Param("monthYear") String monthYear,
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId
+	);
 }

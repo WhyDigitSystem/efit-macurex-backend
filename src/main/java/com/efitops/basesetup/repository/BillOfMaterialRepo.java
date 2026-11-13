@@ -161,6 +161,41 @@ public interface BillOfMaterialRepo extends JpaRepository<BillOfMaterialVO, Long
 	        @Param("orgId") Long orgId,
 	        @Param("branch") Long branch,
 	        @Param("itemId") Long itemId);
+	
+	@Query(value = """
+	        SELECT
+	            a.doc_id AS docid,
+	            a.doc_date AS docdt,
+	            i.item_code AS itemid,
+	            i.item_description AS itemdesc,
+	            a.revision_no AS revno
+	        FROM bill_of_material a
+	        INNER JOIN item i
+	            ON i.item_id = a.fg_item
+	        WHERE COALESCE(a.cancel, 0) = 0
+	          AND a.type_of_item = 'FG'
+	          AND a.branch = :branch
+	          AND a.org_id = :orgId
+	        
+	          AND a.wef = (
+	              SELECT MAX(a2.wef)
+	              FROM bill_of_material a2
+	              WHERE a2.fg_item = i.item_id
+	                AND COALESCE(a2.cancel, 0) = 0
+	                AND a2.wef <= CURRENT_DATE()
+	                AND a2.branch = :branch
+	                AND a2.org_id = :orgId
+	          )
+	        ORDER BY
+	            i.item_code,
+	            a.revision_no
+	        """, nativeQuery = true)
+	List<Object[]> getBomListFgReport(
+	        @Param("branch") Long branch,
+	        @Param("orgId") Long orgId
+	       
+	);
+	
 
 	
 }

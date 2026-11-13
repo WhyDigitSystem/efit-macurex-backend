@@ -3644,11 +3644,11 @@ public class VendorComplaintController extends BaseController {
 
 //	order Acceptance approval report
 
-	@GetMapping("/getOrderAcceptanceForGstApprovalReport")
-	public ResponseEntity<ResponseDTO> getOrderAcceptanceForGstApprovalReport(@RequestParam String fromDate,
+	@GetMapping("/getOrderAcceptanceForApprovalReport")
+	public ResponseEntity<ResponseDTO> getOrderAcceptanceForApprovalReport(@RequestParam String fromDate,
 			@RequestParam String toDate, Long orgId, Long branch) {
 
-		String methodName = "getOrderAcceptanceForGstApprovalReport()";
+		String methodName = "getOrderAcceptanceForApprovalReport()";
 
 		LOGGER.debug(CommonConstant.STARTING_METHOD, methodName);
 

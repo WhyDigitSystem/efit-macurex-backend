@@ -89,7 +89,7 @@ public interface OrderAcceptanceRepo extends JpaRepository<OrderAcceptanceVO, Lo
 			  AND ob.org_id = :orgId
 			  AND ob.branch = :branch
 			""", nativeQuery = true)
-	List<Object[]> getOrderAcceptanceForGstApproval(@Param("fromDate") String fromDate, @Param("toDate") String toDate,
+	List<Object[]> getOrderAcceptanceForApproval(@Param("fromDate") String fromDate, @Param("toDate") String toDate,
 			@Param("orgId") Long orgId, @Param("branch") Long branch);
 
 //		sales order report

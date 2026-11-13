@@ -123,4 +123,79 @@ public interface JobOrderRepo extends JpaRepository<JobOrderVO, Long> {
 	Set<Object[]> getJobOrderNoAndDateForSubContractSupplySch(@Param("branch") Long branch, @Param("orgId") Long orgId,
 			@Param("contractNo") String contractNo);
 
+	@Query(value = """
+	        SELECT
+	            j.job_order_basic_id AS wkorderbasicid,
+	            j.doc_id AS WONO,
+	            j.doc_date AS WODT,
+	            CONCAT(c.customer_code, '-', c.customer_name) AS PARTYNAME,
+	            src.doc_id AS contno,
+	            i.item_code AS INCOMINGID,
+	            u.unit_id AS unitid,
+	            d.issue_qty AS grnrecqty,
+	            jd.order_qty AS jobqty,
+	            (jd.order_qty - COALESCE(d.issue_qty, 0)) AS PendQty,
+	            c.customer_code AS partyid
+	        FROM job_order_basic j
+	        INNER JOIN customer_header c
+	            ON c.customer_id = j.vendor
+	        LEFT JOIN supplier_rate_contract src
+	            ON src.doc_id = j.contract_no
+	        INNER JOIN job_order_details jd
+	            ON jd.job_order_basic_id = j.job_order_basic_id
+	        INNER JOIN item i
+	            ON i.item_id = jd.incoming_item
+	        LEFT JOIN unitmaster u
+	            ON u.unitmaster_id = jd.unit
+	        LEFT JOIN deliverychallan_subcontracting_details d
+	            ON d.contract_no = j.doc_id
+	           AND d.outgoing_item = i.item_id
+	        WHERE j.branch = :branch
+	          AND j.doc_date BETWEEN :fromDate AND :toDate
+	          AND j.cancel = FALSE
+	        ORDER BY j.doc_id, PARTYNAME, i.item_code
+	        """, nativeQuery = true)
+	List<Object[]> getJobOrderStatusReport(
+	        @Param("branch") Long branch,
+	        @Param("fromDate") String fromDate,
+	        @Param("toDate") String toDate
+	);
+	
+	@Query(value = """
+		    SELECT
+		        a.doc_id AS WONO,
+		        a.doc_date AS WODT,
+		        d.customer_name AS PARTYNAME,
+		        i1.item_code AS INCOMINGID,
+		        u1.unit_id AS unitid,
+		        d.customer_code AS partyid,
+		        i2.item_code AS itemid,
+		        i2.item_description AS itemdesc
+		    FROM job_order_basic a
+		    LEFT JOIN customer_header d
+		        ON d.customer_id = a.vendor
+		    INNER JOIN job_order_details wp
+		        ON wp.job_order_basic_id = a.job_order_basic_id
+		    LEFT JOIN item i1
+		        ON i1.item_id = wp.incoming_item
+		    LEFT JOIN unitmaster u1
+		        ON u1.unitmaster_id = wp.unit
+		    LEFT JOIN deliverychallan_subcontracting c
+		        ON c.job_order_no = a.doc_id
+		    LEFT JOIN item i2
+		        ON i2.item_id = c.incoming_item
+		    WHERE a.doc_date BETWEEN :fromdt AND :todate
+		      AND a.branch = :branch
+		      AND a.org_id = :orgId
+		    ORDER BY
+		        a.doc_id,
+		        d.customer_name,
+		        i1.item_code
+		    """, nativeQuery = true)
+		List<Object[]> getJobOrderdetailsReport(
+		        @Param("fromdt") String fromdt,
+		        @Param("todate") String todate,
+		        @Param("branch") Long branch,
+		        @Param("orgId") Long orgId
+		);
 }

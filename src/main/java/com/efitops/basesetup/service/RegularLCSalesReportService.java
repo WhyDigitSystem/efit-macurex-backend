@@ -48,4 +48,39 @@ public interface RegularLCSalesReportService {
 	Map<String, Object> getSupplierRateContractReport(Long branch, Long OrgId, String frdt, String todt)
 			throws ApplicationException;
 
+	Map<String, Object> getJobOrderStatusReport(Long branch, String fromDate, String toDate)
+			throws ApplicationException;
+
+	Map<String, Object> getJobOrderdetailsReport(String fromdt, String todate, Long branch, Long orgId)
+			throws ApplicationException;
+
+	Map<String, Object> getStoresAdviceReport(String fromDate, String toDate, Long branch, Long orgId)
+			throws ApplicationException;
+
+	Map<String, Object> getSubContractingGrnPendingListForInspection(String fromDate, String toDate, Long locId,
+			Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getSubContractingGrnItemWiseReport(String fromDate, String toDate, Long plant, Long locId,
+			Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getBomTreeReportLive(String itemCode, String branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getBomTreeAfterCorrectionReport(String itemCode, String branch, Long orgId)
+			throws ApplicationException;
+
+
+	
+	Map<String, Object> getBomListFgReport(Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getEngineeringChangeRecordReport(Long branch, Long orgId) throws ApplicationException;
+
+	Map<String, Object> getGateInwarddetails(Long branch, Long orgId, String startDate, String endDate)
+			throws ApplicationException;
+
+	Map<String, Object> getGateInwardModvatReport(Long branch, Long orgId, String startDate, String endDate)
+			throws ApplicationException;
+
+	Map<String, Object> getDeliveryScheduleWeekly(String monthYear, Long branch, Long orgId)
+			throws ApplicationException;
+
 }

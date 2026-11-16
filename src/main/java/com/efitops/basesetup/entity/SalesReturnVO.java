@@ -72,6 +72,9 @@ public class SalesReturnVO {
     @Column(name = "customer_invoice_date")
     private LocalDate customerInvoiceDate;
 
+
+	@Column(name = "stock_posting")
+	private boolean stockPosting;
    
     @Column(name = "gate_pass_no")
     private String gatePassNo;

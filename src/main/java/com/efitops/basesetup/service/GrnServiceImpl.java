@@ -1549,7 +1549,14 @@ public class GrnServiceImpl implements GrnService {
 
 		setStockTransferGrnValues(stockTransferGrnDTO, stockTransferGrnVO);
 
+		boolean isNewRecord = ObjectUtils.isEmpty(stockTransferGrnDTO.getId()); // capture BEFORE save
+
 		stockTransferGrnVO = stockTransferGrnRepo.save(stockTransferGrnVO);
+
+		// Stock posting only on create
+		if (isNewRecord) {
+		    createStockForStockTransferGrn(stockTransferGrnVO);
+		}
 
 		saveStockTransferAttachments(files, stockTransferGrnVO);
 
@@ -1910,6 +1917,74 @@ public class GrnServiceImpl implements GrnService {
 		responseDTO.setStockTransferGrnFileUploadDetailsResponseDTO(fileResponseList);
 
 		return responseDTO;
+	}
+	
+	private void createStockForStockTransferGrn(StockTransferGrnVO vo) throws ApplicationException {
+
+	    if (vo.getStockTransferGrnDetailsVO() == null || vo.getStockTransferGrnDetailsVO().isEmpty()) {
+	        return;
+	    }
+
+	    if (vo.getLocation() == null) {
+	        throw new ApplicationException("Location is required for stock posting");
+	    }
+
+	    for (StockTransferGrnDetailsVO detailVO : vo.getStockTransferGrnDetailsVO()) {
+
+	        // Stock is kept in the primary unit
+	        BigDecimal qty = detailVO.getAccQtyInPrimaryUnit();
+
+	        if (detailVO.getItem() == null || qty == null || qty.compareTo(BigDecimal.ZERO) <= 0) {
+	            continue;
+	        }
+
+	        BigDecimal rate = detailVO.getPoRate() != null ? detailVO.getPoRate() : BigDecimal.ZERO;
+
+	        StockValuationVO stockVO = new StockValuationVO();
+
+	        // Stock Transfer GRN = stock OUT (as requested)
+	        stockVO.setPlusOrMinus("m");
+
+	        // Item
+	        stockVO.setStockPartNo(detailVO.getItem());
+
+	        // Location
+	        stockVO.setLocDetailsId(vo.getLocation());
+
+	        // Document
+	        stockVO.setDocId(vo.getDocId());
+	        stockVO.setDocDate(vo.getDocDate());
+	        stockVO.setDocTime(LocalTime.now());
+
+	        // Quantity / Rate / Value
+	        stockVO.setQuantity(qty);
+	        stockVO.setRate(rate);
+	        stockVO.setStockValue(qty.multiply(rate).setScale(2, RoundingMode.HALF_UP));
+
+	        // Branch
+	        if (vo.getBranch() != null) {
+	            stockVO.setBranchVO(vo.getBranch());
+	        }
+
+	        // Organization
+	        stockVO.setOrgId(vo.getOrgId());
+
+	        // Narration
+	        stockVO.setNarration(vo.getRemarks());
+
+	        // Audit
+	        stockVO.setCreatedBy(vo.getCreatedBy());
+	        stockVO.setUpdatedBy(vo.getUpdatedBy());
+
+	        stockVO.setActive(true);
+	        stockVO.setCancel(false);
+
+	        // Source
+	        stockVO.setSourceScreenName(vo.getScreenName());
+	        stockVO.setSourceScreenCode(vo.getScreenCode());
+
+	        stockValuationRepo.save(stockVO);
+	    }
 	}
 
 	@Value("${stock.transfer.grn.upload.path}")
